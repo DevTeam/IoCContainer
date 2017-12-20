@@ -18,6 +18,10 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
 
             yield return container
+                .Map<IIssueResolver>()
+                .To(ctx => IssueResolver.Shared);
+
+            yield return container
                 .Map<ILifetime>()
                 .Tag(Lifetime.Transient)
                 .To(ctx => null);
@@ -43,7 +47,10 @@
 
             yield return container
                 .Map<IFactory>()
-                .To(ctx => new AutowiringFactory((Type) ctx.Args[0], (Dependency[]) ctx.Args[1]));
+                .To(ctx => new AutowiringFactory(
+                    ctx.ResolvingContainer.Get<IIssueResolver>(),
+                    (Type) ctx.Args[0],
+                    (Dependency[]) ctx.Args[1]));
 
             foreach (var reg in ApplyFeatures(container).SelectMany(i => i))
             {

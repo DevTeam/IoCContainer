@@ -53,12 +53,16 @@
 
         private static object CreateFunc(Context ctx)
         {
-            if (!ctx.ContractType.IsConstructedGenericType)
+            Type[] genericTypeArguments;
+            if (ctx.ContractType.IsConstructedGenericType)
             {
-                throw new InvalidOperationException();
+                genericTypeArguments = ctx.ContractType.GenericTypeArguments;
+            }
+            else
+            {
+                genericTypeArguments = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetGenericTypeArguments(ctx.ContractType);
             }
 
-            var genericTypeArguments = ctx.ContractType.GenericTypeArguments;
             Type instanceFuncType;
             switch (genericTypeArguments.Length)
             {
@@ -99,7 +103,7 @@
                     break;
 
                 default:
-                    throw new InvalidOperationException();
+                    throw new NotSupportedException($"{genericTypeArguments.Length} is not supported count of arguments");
             }
 
             var instanceType = instanceFuncType.MakeGenericType(genericTypeArguments);
@@ -125,7 +129,7 @@
                 var key = new Key(new Contract(typeof(T)), ctx.Key.Tag);
                 if (!ctx.ResolvingContainer.TryGetResolver(key, out Resolver))
                 {
-                    throw new InvalidOperationException();
+                    Resolver = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetResolver(ctx.ResolvingContainer, key);
                 }
             }
 

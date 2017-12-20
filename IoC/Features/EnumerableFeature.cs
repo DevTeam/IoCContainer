@@ -28,12 +28,17 @@
                 where key.Contract.Type == ctx.ContractType
                 select key;
 
-            if (!ctx.ContractType.IsConstructedGenericType)
+            Type[] genericTypeArguments;
+            if (ctx.ContractType.IsConstructedGenericType)
             {
-                throw new InvalidOperationException();
+                genericTypeArguments = ctx.ContractType.GenericTypeArguments;
+            }
+            else
+            {
+                genericTypeArguments = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetGenericTypeArguments(ctx.ContractType);
             }
 
-            var instanceType = typeof(InstanceEnumerable<>).MakeGenericType(ctx.ContractType.GenericTypeArguments);
+            var instanceType = typeof(InstanceEnumerable<>).MakeGenericType(genericTypeArguments);
             return Activator.CreateInstance(instanceType, keys, ctx);
         }
 

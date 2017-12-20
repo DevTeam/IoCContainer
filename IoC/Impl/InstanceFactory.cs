@@ -12,7 +12,10 @@
         private readonly object[] _args;
         private int _paramLength;
 
-        public InstanceFactory([NotNull] TypeInfo typeInfo, [NotNull] params Dependency[] dependencies)
+        public InstanceFactory(
+            [NotNull] IIssueResolver issueResolver,
+            [NotNull] TypeInfo typeInfo,
+            [NotNull] params Dependency[] dependencies)
         {
             if (typeInfo == null) throw new ArgumentNullException(nameof(typeInfo));
             if (dependencies == null) throw new ArgumentNullException(nameof(dependencies));
@@ -20,12 +23,12 @@
             var ctorInfo = (
                 from ctor in typeInfo.DeclaredConstructors
                 where ctor.IsPublic
-                let parameters = ctor.GetParameters()
-                where parameters.Length > maxParamsIndex && IsCtorMatched(parameters, dependencies)
-                select new { ctor, parameters })
-            .FirstOrDefault() ?? throw new InvalidOperationException();
+                let ctorItem = CreateCtorItem(ctor)
+                where ctorItem.Item2.Length > maxParamsIndex && IsCtorMatched(ctorItem.Item2, dependencies)
+                select ctorItem).FirstOrDefault()
+                ?? CreateCtorItem(issueResolver.CannotFindConsructor(typeInfo, dependencies));
 
-            var param = ctorInfo.parameters;
+            var param = ctorInfo.Item2;
             _paramLength = param.Length;
             _factories = new IFactory[_paramLength];
             _args = new object[_paramLength];
@@ -58,7 +61,7 @@
                 _factories[position] = new RefFactory(parameter.ParameterType, null);
             }
 
-            _ctor = CreateConstructor(ctorInfo.ctor);
+            _ctor = CreateConstructor(ctorInfo.Item1);
         }
 
         public object Create(Context context)
@@ -69,6 +72,11 @@
             }
 
             return _ctor(_args);
+        }
+
+        private static Tuple<ConstructorInfo, ParameterInfo[]> CreateCtorItem(ConstructorInfo ctor)
+        {
+            return new Tuple<ConstructorInfo, ParameterInfo[]>(ctor, ctor.GetParameters());
         }
 
         private static Constructor CreateConstructor(ConstructorInfo constructor)
@@ -125,12 +133,14 @@
 
         private struct RefFactory : IFactory
         {
-            private readonly Type _contractType;
+            [NotNull] private readonly Type _contractType;
             private readonly Key _key;
             [CanBeNull] private IContainer _lastContainer;
             private IResolver _lastResolver;
 
-            public RefFactory(Type contractType, object tagValue)
+            public RefFactory(
+                [NotNull] Type contractType,
+                object tagValue)
             {
                 _contractType = contractType;
                 _key = new Key(new Contract(contractType), new Tag(tagValue));
@@ -144,7 +154,7 @@
                 {
                     if (!context.ResolvingContainer.TryGetResolver(_key, out _lastResolver))
                     {
-                        throw new InvalidOperationException();
+                        return context.ResolvingContainer.Get<IIssueResolver>().CannotResolve(context.ResolvingContainer, _key);
                     }
 
                     _lastContainer = context.ResolvingContainer;

@@ -32,6 +32,12 @@
                 return hashCode;
             }
         }
+
+        public override string ToString()
+        {
+            return $"Parameter: [{Type.Name} {Name ?? "_"} at {Position}]";
+        }
+
         private bool Equals(Parameter other)
         {
             return Type == other.Type && Position == other.Position && string.Equals(Name, other.Name);

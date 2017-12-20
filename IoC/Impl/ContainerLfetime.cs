@@ -9,7 +9,7 @@
 
         protected override IDictionary<IInstanceKey, object> GetInstances(Context context)
         {
-            return (context.ResolvingContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified this container")).GetInstances();
+            return (context.ResolvingContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container")).GetInstances();
         }
 
         protected override IInstanceKey CeateKey(Context context)

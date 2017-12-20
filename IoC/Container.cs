@@ -141,19 +141,11 @@
             return new Resolving(container, tag);
         }
 
-        public static bool TryGet([NotNull] this IContainer container, [NotNull] Type contractType, out object instance, [NotNull] params object[] args)
-        {
+        public static bool TryGet([NotNull] this IContainer container, [NotNull] Type contractType, out object instance, [NotNull] params object[] args){
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (contractType == null) throw new ArgumentNullException(nameof(contractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            object tagValue = null;
-            if (container is Resolving resolving)
-            {
-                tagValue = resolving.Tag;
-            }
-
-            var tag = tagValue != null ? new Tag(tagValue) : IoC.Tag.Default;
-            var key = new Key(new Contract(contractType), tag);
+            var key = container.CreateKey(contractType);
             if (!container.TryGetResolver(key, out var resolver))
             {
                 instance = null;
@@ -186,7 +178,7 @@
             if (args == null) throw new ArgumentNullException(nameof(args));
             if (!container.TryGet(contractType, out var instance, args))
             {
-                throw new InvalidOperationException();
+                return container.GetIssueResolver().CannotResolve(container, container.CreateKey(contractType));
             }
 
             return instance;
@@ -199,7 +191,7 @@
             if (args == null) throw new ArgumentNullException(nameof(args));
             if (!container.TryGet<T>(out var instance, args))
             {
-                throw new InvalidOperationException();
+                return (T)container.GetIssueResolver().CannotResolve(container, container.CreateKey(typeof(T)));
             }
 
             return instance;
@@ -288,6 +280,23 @@
         {
             // ReSharper disable once AssignNullToNotNullAttribute
             return !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
+        }
+
+        private static Key CreateKey([NotNull] this IContainer container, [NotNull] Type contractType)
+        {
+            object tagValue = null;
+            if (container is Resolving resolving)
+            {
+                tagValue = resolving.Tag;
+            }
+
+            var tag = tagValue != null ? new Tag(tagValue) : IoC.Tag.Default;
+            return new Key(new Contract(contractType), tag);
+        }
+
+        private static IIssueResolver GetIssueResolver(this IContainer container)
+        {
+            return container.Get<IIssueResolver>();
         }
     }
 }

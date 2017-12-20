@@ -22,12 +22,17 @@
 
         private static object CreateTask(Context ctx)
         {
-            if (!ctx.ContractType.IsConstructedGenericType)
+            Type[] genericTypeArguments;
+            if (ctx.ContractType.IsConstructedGenericType)
             {
-                throw new InvalidOperationException();
+                genericTypeArguments = ctx.ContractType.GenericTypeArguments;
+            }
+            else
+            {
+                genericTypeArguments = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetGenericTypeArguments(ctx.ContractType);
             }
 
-            var instanceType = typeof(InstanceTask<>).MakeGenericType(ctx.ContractType.GenericTypeArguments);
+            var instanceType = typeof(InstanceTask<>).MakeGenericType(genericTypeArguments);
             return Activator.CreateInstance(instanceType, ctx);
         }
 
@@ -43,7 +48,7 @@
                 var key = new Key(new Contract(typeof(T)), ctx.Key.Tag);
                 if (!ctx.ResolvingContainer.TryGetResolver(key, out var resolver))
                 {
-                    throw new InvalidOperationException();
+                    resolver = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetResolver(ctx.ResolvingContainer, key);
                 }
 
                 return () => (T) resolver.Resolve(ctx.ResolvingContainer, typeof(T));

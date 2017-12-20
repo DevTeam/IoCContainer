@@ -33,12 +33,20 @@
             Tag = tag;
             ArgIndex = 0;
         }
-    }
 
-    public enum DependencyType
-    {
-        Arg,
+        public override string ToString()
+        {
+            switch (Type)
+            {
+                case DependencyType.Arg:
+                    return $"Argument: [{Parameter}, {ArgIndex}]";
 
-        Ref
+                case DependencyType.Ref:
+                    return $"Reference: [{Parameter}, {Tag}]";
+
+                default:
+                    return base.ToString();
+            }
+        }
     }
 }

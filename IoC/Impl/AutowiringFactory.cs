@@ -6,19 +6,24 @@
 
     internal class AutowiringFactory: IFactory
     {
-        private readonly Type _instanceType;
-        private readonly Dependency[] _dependencies;
+        [NotNull] private readonly IIssueResolver _issueResolver;
+        [NotNull] private readonly Type _instanceType;
+        [NotNull] private readonly Dependency[] _dependencies;
         private readonly IFactory _instanceFactory;
         private readonly Dictionary<Type, IFactory> _factories;
 
-        public AutowiringFactory([NotNull] Type instanceType, [NotNull] params Dependency[] dependencies)
+        public AutowiringFactory(
+            [NotNull] IIssueResolver issueResolver,
+            [NotNull] Type instanceType,
+            [NotNull] params Dependency[] dependencies)
         {
+            _issueResolver = issueResolver ?? throw new ArgumentNullException(nameof(issueResolver));
             _instanceType = instanceType ?? throw new ArgumentNullException(nameof(instanceType));
             _dependencies = dependencies ?? throw new ArgumentNullException(nameof(dependencies));
             var typeInfo = _instanceType.GetTypeInfo();
             if (!typeInfo.IsGenericTypeDefinition)
             {
-                _instanceFactory = new InstanceFactory(_instanceType.GetTypeInfo(), dependencies);
+                _instanceFactory = new InstanceFactory(issueResolver, _instanceType.GetTypeInfo(), dependencies);
             }
             else
             {
@@ -35,14 +40,18 @@
 
             if (!_factories.TryGetValue(context.ContractType, out var factory))
             {
-                if (!context.ContractType.IsConstructedGenericType)
+                Type[] genericTypeArguments;
+                if (context.ContractType.IsConstructedGenericType)
                 {
-                    throw new InvalidOperationException();
+                    genericTypeArguments = context.ContractType.GenericTypeArguments;
+                }
+                else
+                {
+                    genericTypeArguments = _issueResolver.CannotGetGenericTypeArguments(context.ContractType);
                 }
 
-                var typeInfo = context.ContractType.GetTypeInfo();
-                var genericInstanceType = _instanceType.MakeGenericType(typeInfo.GenericTypeArguments);
-                factory = new InstanceFactory(genericInstanceType.GetTypeInfo(), _dependencies);
+                var genericInstanceType = _instanceType.MakeGenericType(genericTypeArguments);
+                factory = new InstanceFactory(_issueResolver, genericInstanceType.GetTypeInfo(), _dependencies);
                 _factories.Add(context.ContractType, factory);
             }
 
