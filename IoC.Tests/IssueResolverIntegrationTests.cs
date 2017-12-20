@@ -50,7 +50,7 @@
 
                 try
                 {
-                    using (container.Pair<IMyService, MyClassWithoutCtor>())
+                    using (container.Autowiring<MyClassWithoutCtor, IMyService>())
                     {
                     }
                 }

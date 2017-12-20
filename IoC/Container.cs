@@ -37,12 +37,17 @@
         }
 
         [NotNull]
-        public static IDisposable Pair([NotNull] this IContainer container, [NotNull] Type contractType, [NotNull] Type instanceType)
+        public static IDisposable Autowiring([NotNull] this IContainer container, [NotNull] Type instanceType, [NotNull] Type contractType, [CanBeNull] object tagValue = null)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (contractType == null) throw new ArgumentNullException(nameof(contractType));
             if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
-            return new Registration<object>(container, contractType).To(instanceType);
+            if (tagValue == null)
+            {
+                return new Registration<object>(container, contractType).To(instanceType);
+            }
+
+            return new Registration<object>(container, contractType).Tag(tagValue).To(instanceType);
         }
 
         public static Registration<T> Map<T>([NotNull] this IContainer container)
@@ -52,11 +57,56 @@
         }
 
         [NotNull]
-        public static IDisposable Pair<T, TT>([NotNull] this IContainer container)
-            where TT: T
+        public static IDisposable Autowiring<TT, T1>([NotNull] this IContainer container, [CanBeNull] object tagValue = null)
+            where TT: T1
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Registration<T>(container, typeof(T)).To(typeof(TT));
+            if (tagValue == null)
+            {
+                return new Registration<T1>(container, typeof(T1)).To(typeof(TT));
+            }
+
+            return new Registration<T1>(container, typeof(T1)).Tag(tagValue).To(typeof(TT));
+        }
+
+
+        [NotNull]
+        public static IDisposable Autowiring<TT, T1, T2>([NotNull] this IContainer container, [CanBeNull] object tagValue = null)
+            where TT : T1, T2
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (tagValue == null)
+            {
+                return new Registration<T1>(container, typeof(T1), typeof(T2)).To(typeof(TT));
+            }
+
+            return new Registration<T1>(container, typeof(T1), typeof(T2)).Tag(tagValue).To(typeof(TT));
+        }
+
+        [NotNull]
+        public static IDisposable Autowiring<TT, T1, T2, T3>([NotNull] this IContainer container, [CanBeNull] object tagValue = null)
+            where TT : T1, T2, T3
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (tagValue == null)
+            {
+                return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3)).To(typeof(TT));
+            }
+
+            return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3)).Tag(tagValue).To(typeof(TT));
+        }
+
+        [NotNull]
+        public static IDisposable Autowiring<TT, T1, T2, T3, T4>([NotNull] this IContainer container, [CanBeNull] object tagValue = null)
+            where TT : T1, T2, T4
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (tagValue == null)
+            {
+                return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3), typeof(T4)).To(typeof(TT));
+            }
+
+            return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3), typeof(T4)).Tag(tagValue).To(typeof(TT));
         }
 
         public static Registration<T> Map<T, T1>([NotNull] this IContainer container)

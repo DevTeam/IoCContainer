@@ -61,7 +61,7 @@ namespace IoC.Tests
         private static long This(int series)
         {
             using (var container = Container.Create())
-            using (container.Pair<IService1, Service1>())
+            using (container.Autowiring<Service1, IService1>())
             using (container.Map<IService2>().Lifetime(Lifetime.Singletone).To(typeof(Service2)))
             {
                 var stopwatch = Stopwatch.StartNew();
@@ -78,7 +78,7 @@ namespace IoC.Tests
         private static long ThisFunc(int series)
         {
             using (var container = Container.Create())
-            using (container.Pair<IService1, Service1>())
+            using (container.Autowiring<Service1, IService1>())
             using (container.Map<IService2>().Lifetime(Lifetime.Singletone).To(typeof(Service2)))
             {
                 var stopwatch = Stopwatch.StartNew();
