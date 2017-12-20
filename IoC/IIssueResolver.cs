@@ -17,5 +17,7 @@
 
         [NotNull]
         Type[] CannotGetGenericTypeArguments([NotNull] Type type);
+
+        void CannotBeCeated(Type instanceType);
     }
 }

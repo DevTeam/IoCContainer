@@ -4,6 +4,7 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
+    using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
     using Impl;
@@ -176,6 +177,13 @@
         {
             if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
             if (dependencies == null) throw new ArgumentNullException(nameof(dependencies));
+            var typeInfo = instanceType.GetTypeInfo();
+            if (typeInfo.IsAbstract || typeInfo.IsInterface)
+            {
+                registration.Container.GetIssueResolver().CannotBeCeated(instanceType);
+                throw new InvalidOperationException($"An instance of the type \"{instanceType}\" cannot be created.");
+            }
+
             var factory = registration.Container.Get<IFactory>(instanceType, dependencies);
             return registration.To(factory);
         }

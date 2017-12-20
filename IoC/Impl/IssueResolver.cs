@@ -30,5 +30,10 @@
         {
             throw new InvalidOperationException($"Cannot get generic type arguments from the type \"{type.Name}\".");
         }
+
+        public void CannotBeCeated(Type instanceType)
+        {
+            throw new InvalidOperationException($"An instance of the type \"{instanceType}\" cannot be created.");
+        }
     }
 }
