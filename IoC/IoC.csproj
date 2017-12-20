@@ -6,7 +6,7 @@
     <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
     <TreatSpecificWarningsAsErrors />
-    <PackageId>IoCContainer</PackageId>
+    <PackageId>IoC.Container</PackageId>
     <Authors>NikolayP</Authors>
     <Description>Simple, flexible and fast IoC container</Description>
     <PackageLicenseUrl>https://github.com/DevTeam/IoCContainer/blob/master/LICENSE</PackageLicenseUrl>
@@ -14,7 +14,8 @@
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</PackageIconUrl>
     <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>IoC inversionofcontrol Container DI dependencyinjection</PackageTags>	
+    <PackageTags>IoC inversionofcontrol Container DI dependencyinjection</PackageTags>
+    <Product>IoC Container</Product>	
   </PropertyGroup>
 
 </Project>
