@@ -1,0 +1,20 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.0;netstandard1.6;netstandard2.0</TargetFrameworks>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
+    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <TreatSpecificWarningsAsErrors />
+    <PackageId>IoCContainer</PackageId>
+    <Authors>NikolayP</Authors>
+    <Description>Simple, flexible and fast IoC container</Description>
+    <PackageLicenseUrl>https://github.com/DevTeam/IoCContainer/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/DevTeam/IoCContainer/</PackageProjectUrl>
+    <PackageIconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</PackageIconUrl>
+    <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>IoC inversionofcontrol Container DI dependencyinjection</PackageTags>	
+  </PropertyGroup>
+
+</Project>

@@ -1,0 +1,61 @@
+﻿namespace IoC.Impl
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Features;
+
+    internal class RootConfiguration: IConfiguration
+    {
+        public static readonly IConfiguration Shared = new RootConfiguration();
+
+        private RootConfiguration()
+        {
+        }
+
+        public IEnumerable<IDisposable> Apply(IContainer container)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+
+            yield return container
+                .Map<ILifetime>()
+                .Tag(Lifetime.Transient)
+                .To(ctx => null);
+
+            yield return container
+                .Map<ILifetime>()
+                .Tag(Lifetime.Singletone)
+                .To(ctx => SingletoneLifetime.Shared);
+
+            yield return container
+                .Map<ILifetime>()
+                .Tag(Lifetime.Container)
+                .To(ctx => ContainerLifetime.Shared);
+
+            yield return container
+                .Map<IContainer>()
+                .Lifetime(Lifetime.Container)
+                .To(ctx => ctx.ResolvingContainer.CreateChild());
+
+            yield return container
+                .Map<IResourceStore>()
+                .To(ctx => (IResourceStore)ctx.ResolvingContainer);
+
+            yield return container
+                .Map<IFactory>()
+                .To(ctx => new AutowiringFactory((Type) ctx.Args[0], (Dependency[]) ctx.Args[1]));
+
+            foreach (var reg in ApplyFeatures(container).SelectMany(i => i))
+            {
+                yield return reg;
+            }
+        }
+
+        private static IEnumerable<IEnumerable<IDisposable>> ApplyFeatures(IContainer container)
+        {
+            yield return EnumerableFeature.Shared.Apply(container);
+            yield return FuncFeature.Shared.Apply(container);
+            yield return TaskFeature.Shared.Apply(container);
+        }
+    }
+}
