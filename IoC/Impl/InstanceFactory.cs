@@ -323,7 +323,7 @@
 
                 try
                 {
-                    return resolver.Resolve(container, _contractType);
+                    return resolver.Resolve(context.ResolvingContainer, _contractType);
                 }
                 finally
                 {

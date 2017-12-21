@@ -25,7 +25,7 @@
 
                 // Async way
                 var box3 = await container.StartGet<IBox<ICat>>(TaskScheduler.Default);
-                Console.WriteLine($"#3 is alive:" + box3.Content.IsAlive);
+                Console.WriteLine("#3 is alive:" + box3.Content.IsAlive);
                 return box3.Content.IsAlive;
             }
         }

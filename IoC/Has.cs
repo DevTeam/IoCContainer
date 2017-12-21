@@ -25,9 +25,19 @@
             return new Has(new Parameter(name, typeof(T)), new Tag(tag), scope);
         }
 
+        public static Has Ref<T>([NotNull] string name, Scope scope)
+        {
+            return new Has(new Parameter(name, typeof(T)), Tag.Default, scope);
+        }
+
         public static Has Ref([NotNull] string name, [CanBeNull] object tag, Scope scope = Scope.Current)
         {
             return new Has(new Parameter(name), new Tag(tag), scope);
+        }
+
+        public static Has Ref([NotNull] string name, Scope scope)
+        {
+            return new Has(new Parameter(name), Tag.Default, scope);
         }
 
         public static Has Method(string name, params Has[] dependencies)
