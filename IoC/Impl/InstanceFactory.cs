@@ -179,7 +179,7 @@
                         break;
 
                     case DependencyType.Ref:
-                        factories[position] = new RefFactory(parameters[position].ParameterType, dependency.Tag.Value);
+                        factories[position] = new RefFactory(parameters[position].ParameterType, dependency.Tag.Value, dependency.Scope);
                         break;
 
                     case DependencyType.Method:
@@ -207,7 +207,7 @@
                 }
 
                 var parameter = parameters[position];
-                factories[position] = new RefFactory(parameter.ParameterType, null);
+                factories[position] = new RefFactory(parameter.ParameterType, null, Scope.Current);
             }
 
             return new MethodData(paramsCount, factories, args, methods.ToArray());
@@ -259,15 +259,18 @@
         private struct RefFactory : IFactory
         {
             [NotNull] private readonly Type _contractType;
+            private readonly Scope _scope;
             private readonly Key _key;
             [CanBeNull] private IContainer _lastContainer;
             private IResolver _lastResolver;
 
             public RefFactory(
                 [NotNull] Type contractType,
-                object tagValue)
+                object tagValue,
+                Scope scope)
             {
                 _contractType = contractType;
+                _scope = scope;
                 _key = new Key(new Contract(contractType), new Tag(tagValue));
                 _lastContainer = null;
                 _lastResolver = null;
@@ -275,17 +278,36 @@
 
             public object Create(Context context)
             {
-                if (_lastContainer != context.ResolvingContainer)
+                IContainer container;
+                switch (_scope)
                 {
-                    if (!context.ResolvingContainer.TryGetResolver(_key, out _lastResolver))
-                    {
-                        return context.ResolvingContainer.Get<IIssueResolver>().CannotResolve(context.ResolvingContainer, _key);
-                    }
+                    case Scope.Current:
+                        container = context.ResolvingContainer;
+                        break;
 
-                    _lastContainer = context.ResolvingContainer;
+                    case Scope.Parent:
+                        container = context.RegistrationContainer.Parent;
+                        break;
+
+                    case Scope.Child:
+                        container = context.RegistrationContainer.CreateChild();
+                        break;
+
+                    default:
+                        throw new NotSupportedException($"The scope \"{_scope}\" is not supported.");
                 }
 
-                return _lastResolver.Resolve(_lastContainer, _contractType);
+                if (!Equals(_lastContainer, container))
+                {
+                    if (!container.TryGetResolver(_key, out _lastResolver))
+                    {
+                        return context.ResolvingContainer.Get<IIssueResolver>().CannotResolve(container, _key);
+                    }
+
+                    _lastContainer = container;
+                }
+
+                return _lastResolver.Resolve(container, _contractType);
             }
         }
     }

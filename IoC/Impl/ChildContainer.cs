@@ -43,6 +43,8 @@
             _resources.AddRange(ChildConfiguration.Shared.Apply(this));
         }
 
+        public IContainer Parent => _parentContainer;
+
         public IDictionary<IInstanceKey, object> GetInstances()
         {
             return _instances;

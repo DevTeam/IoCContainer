@@ -3,6 +3,6 @@
     [PublicAPI]
     public interface ILifetime
     {
-        [CanBeNull] object GetOrCreate(Context context, [NotNull] IFactory factory);
+        [NotNull] object GetOrCreate(Context context, [NotNull] IFactory factory);
     }
 }

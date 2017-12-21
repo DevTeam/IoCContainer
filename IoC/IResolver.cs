@@ -5,6 +5,6 @@
     [PublicAPI]
     public interface IResolver
     {
-        [CanBeNull] object Resolve([NotNull] IContainer resolvingContainer, [NotNull] Type contractType, [NotNull] params object[] args);
+        [NotNull] object Resolve([NotNull] IContainer resolvingContainer, [NotNull] Type contractType, [NotNull] params object[] args);
     }
 }

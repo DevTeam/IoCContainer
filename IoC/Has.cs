@@ -8,25 +8,26 @@
         internal readonly int ArgIndex;
         internal readonly DependencyType Type;
         internal readonly HasMethod HasMethod;
+        internal readonly Scope Scope;
 
-        public static Has Arg<T>(int argIndex, [NotNull] string name)
+        public static Has Arg<T>([NotNull] string name, int argIndex)
         {
             return new Has(new Parameter(name, typeof(T)), argIndex);
         }
 
-        public static Has Arg(int argIndex, [NotNull] string name)
+        public static Has Arg([NotNull] string name, int argIndex)
         {
             return new Has(new Parameter(name), argIndex);
         }
 
-        public static Has Ref<T>([NotNull] string name, [CanBeNull] object tag)
+        public static Has Ref<T>([NotNull] string name, [CanBeNull] object tag, Scope scope = Scope.Current)
         {
-            return new Has(new Parameter(name, typeof(T)), new Tag(tag));
+            return new Has(new Parameter(name, typeof(T)), new Tag(tag), scope);
         }
 
-        public static Has Ref([NotNull] string name, [CanBeNull] object tag)
+        public static Has Ref([NotNull] string name, [CanBeNull] object tag, Scope scope = Scope.Current)
         {
-            return new Has(new Parameter(name), new Tag(tag));
+            return new Has(new Parameter(name), new Tag(tag), scope);
         }
 
         public static Has Method(string name, params Has[] dependencies)
@@ -34,14 +35,14 @@
             return new Has(new HasMethod(name, dependencies));
         }
 
-        public static Has Property<T>(int argIndex, string propertyName)
+        public static Has Property<T>(string propertyName, int argIndex)
         {
-            return new Has(new HasMethod("set_" + propertyName, Arg<T>(argIndex, "value")));
+            return new Has(new HasMethod("set_" + propertyName, Arg<T>("value", argIndex)));
         }
 
-        public static Has Property(int argIndex, string propertyName)
+        public static Has Property(string propertyName, int argIndex)
         {
-            return new Has(new HasMethod("set_" + propertyName, Arg(argIndex, "value")));
+            return new Has(new HasMethod("set_" + propertyName, Arg("value", argIndex)));
         }
 
         private Has(Parameter parameter, int argIndex)
@@ -51,15 +52,17 @@
             ArgIndex = argIndex;
             Tag = Tag.Default;
             HasMethod = default(HasMethod);
+            Scope = Scope.Current;
         }
 
-        private Has(Parameter parameter, Tag tag)
+        private Has(Parameter parameter, Tag tag, Scope scope)
         {
             Type = DependencyType.Ref;
             Parameter = parameter;
             Tag = tag;
             ArgIndex = 0;
             HasMethod = default(HasMethod);
+            Scope = scope;
         }
 
         private Has(HasMethod hasMethod)
@@ -69,6 +72,7 @@
             Tag = default(Tag);
             ArgIndex = 0;
             HasMethod = hasMethod;
+            Scope = Scope.Current;
         }
 
         public override string ToString()

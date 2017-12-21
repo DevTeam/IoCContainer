@@ -41,12 +41,42 @@
 
                 // When
                 using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
-                using (var childContainer = container.Get<IContainer>())
+                using (var childContainer = container.Tag(Scope.Child).Get<IContainer>())
                 {
                     // Then
                     var actualInstance = childContainer.Get<IMyService>();
                     actualInstance.ShouldBe(expectedInstance);
                 }
+            }
+        }
+
+        [Theory]
+        [InlineData(null)]
+        [InlineData(Scope.Current)]
+        public void ContainerShouldResolveCurrentContainer(Scope? scope)
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                var curContainer = container.Tag(scope.HasValue ? (object) scope.Value : null).Get<IContainer>();
+
+                // Then
+                curContainer.ShouldBe(container);
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveParentContainer()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                var curContainer = container.Tag(Scope.Parent).Get<IContainer>();
+
+                // Then
+                curContainer.ShouldBe(container.Parent);
             }
         }
 
@@ -296,7 +326,7 @@
 
                 // When
                 using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>(0, "name")))
+                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0)))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>("abc");
@@ -318,7 +348,7 @@
 
                 // When
                 using (container.Map<IMyService1>().Tag(33).Lifetime(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>(0, "name"), Has.Ref<IMyService1>("someRef", 33)))
+                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0), Has.Ref<IMyService1>("someRef", 33)))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>("abc");
@@ -411,7 +441,7 @@
 
                 // When
                 using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>(0, "name")))
+                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0)))
                 {
                     // Then
                     var func = container.Get<Func<string, IMyService>>();
@@ -488,10 +518,10 @@
                 using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
                 using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(
                     typeof(MyService),
-                    Has.Arg<string>(0, "name"),
+                    Has.Arg<string>("name", 0),
                     Has.Method(
                         "Init",
-                        Has.Arg<string>(1, "intiValue"))))
+                        Has.Arg<string>("intiValue", 1))))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>("abc", "xyz");
@@ -515,10 +545,10 @@
                 using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
                 using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(
                     typeof(MyService),
-                    Has.Arg<string>(0, "name"),
+                    Has.Arg<string>("name", 0),
                     Has.Method(
                         "Init",
-                        Has.Arg(1, "intiValue"))))
+                        Has.Arg("intiValue", 1))))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>("abc", "xyz");
@@ -542,8 +572,8 @@
                 using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
                 using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(
                     typeof(MyService),
-                    Has.Arg(0, "name"),
-                    Has.Property(1, "Name")))
+                    Has.Arg("name", 0),
+                    Has.Property("Name", 1)))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>("abc", "xyz");
@@ -567,8 +597,8 @@
                 using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
                 using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(
                     typeof(MyService),
-                    Has.Arg(0, "name"),
-                    Has.Property<string>(1, "Name")))
+                    Has.Arg("name", 0),
+                    Has.Property<string>("Name", 1)))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>("abc", "xyz");
@@ -576,6 +606,49 @@
                     actualInstance.ShouldBeOfType<MyService>();
                     ((MyService)actualInstance).Name.ShouldBe("xyz");
                     ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveFromParentWhenParentScopeForRef()
+        {
+            // Given
+            var expectedRef = Mock.Of<IMyService>();
+            using (var container = Container.Create())
+            using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+            {
+                var childRef = Mock.Of<IMyService>();
+
+                // When
+                using (var childContainer = container.CreateChild())
+                using (childContainer.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => childRef))
+                using (childContainer.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0), Has.Ref("someRef", null, Scope.Parent)))
+                {
+                    // Then
+                    var actualInstance = childContainer.Get<IMyService>("abc");
+                    actualInstance.ShouldBeOfType<MyService>();
+                    ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
+                }
+            }
+        }
+
+
+        [Fact]
+        public void ContainerShouldSupportWrapping()
+        {
+            // Given
+            using (var container = Container.Create())
+            using (container.Map<IMyWrapper>().To(typeof(Wrappered)))
+            {
+                // When
+                using (var childContainer = container.CreateChild())
+                using (childContainer.Map<IMyWrapper>().To(typeof(Wrapper), Has.Ref("wrapped", null, Scope.Parent)))
+                {
+                    // Then
+                    var actualInstance = childContainer.Get<IMyWrapper>();
+                    actualInstance.ShouldBeOfType<Wrapper>();
+                    actualInstance.Wrapped.ShouldBeOfType<Wrappered>();
                 }
             }
         }
@@ -617,6 +690,26 @@
 
         public interface IMyGenericService1<T1>
         {
+        }
+
+        public interface IMyWrapper
+        {
+            IMyWrapper Wrapped { get; }
+        }
+
+        public class Wrappered: IMyWrapper
+        {
+            public IMyWrapper Wrapped => null;
+        }
+
+        public class Wrapper : IMyWrapper
+        {
+            public Wrapper(IMyWrapper wrapped)
+            {
+                Wrapped = wrapped;
+            }
+
+            public IMyWrapper Wrapped { get; }
         }
     }
 }

@@ -5,9 +5,11 @@
 
     internal class NullContainer : IContainer
     {
+        public IContainer Parent => throw new NotSupportedException();
+
         public IDisposable Register(IEnumerable<Key> keys, IFactory factory, ILifetime lifetime = null)
         {
-            throw new NotImplementedException();
+            throw new NotSupportedException();
         }
 
         public bool TryGetResolver(Key key, out IResolver resolver)

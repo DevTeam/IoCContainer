@@ -2,34 +2,71 @@
 {
     using System;
     using System.Collections.Generic;
+    using Impl;
 
     [PublicAPI]
-    public struct Resolving: IContainer
+    public struct Resolving: IContainer, IInstanceStore
     {
-        [NotNull] private readonly IContainer _container;
+        [NotNull] internal readonly IContainer Container;
         [CanBeNull] internal readonly object Tag;
+        private IInstanceStore _instanceStore;
 
         public Resolving([NotNull] IContainer container, [CanBeNull] object tag)
         {
-            _container = container ?? throw new ArgumentNullException(nameof(container));
+            Container = container ?? throw new ArgumentNullException(nameof(container));
+            _instanceStore = Container as IInstanceStore;
             Tag = tag;
+        }
+
+        public IContainer Parent => Container.Parent;
+
+        IDictionary<IInstanceKey, object> IInstanceStore.GetInstances()
+        {
+            return ((IInstanceStore) Container).GetInstances();
         }
 
         public IDisposable Register(IEnumerable<Key> keys, IFactory factory, ILifetime lifetime = null)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
-            return _container.Register(keys, factory, lifetime);
+            return Container.Register(keys, factory, lifetime);
         }
 
         public bool TryGetResolver(Key key, out IResolver resolver)
         {
-            return _container.TryGetResolver(key, out resolver);
+            return Container.TryGetResolver(key, out resolver);
         }
 
         public void Dispose()
         {
-            _container.Dispose();
+            Container.Dispose();
+        }
+
+        public override string ToString()
+        {
+            return Container.ToString();
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+
+            switch (obj)
+            {
+                case Resolving resolving:
+                    return Equals(resolving.Container, Container);
+
+                case IContainer container:
+                    return Equals(container, Container);
+
+                default:
+                    return false;
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return Container.GetHashCode();
         }
     }
 }

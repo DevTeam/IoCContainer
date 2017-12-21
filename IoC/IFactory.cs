@@ -6,6 +6,6 @@
     [PublicAPI]
     public interface IFactory
     {
-        [CanBeNull] object Create(Context context);
+        [NotNull] object Create(Context context);
     }
 }

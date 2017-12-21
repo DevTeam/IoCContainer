@@ -30,6 +30,87 @@
             return new ChildContainer($"{parent}/{CreateContainerName(name)}", parent, false);
         }
 
+        [NotNull]
+        public static IDisposable Autowiring([NotNull] this IContainer container, [NotNull] Type instanceType, [NotNull] Type contractType, Lifetime lifetime = IoC.Lifetime.Transient, [CanBeNull] object tagValue = null)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (contractType == null) throw new ArgumentNullException(nameof(contractType));
+            if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
+            if (tagValue == null)
+            {
+                return new Registration<object>(container, contractType).Lifetime(lifetime).To(instanceType);
+            }
+
+            return new Registration<object>(container, contractType).Lifetime(lifetime).Tag(tagValue).To(instanceType);
+        }
+
+        [NotNull]
+        public static IDisposable Autowiring([NotNull] this IContainer container, [NotNull] Type instanceType, Lifetime lifetime = IoC.Lifetime.Transient, [CanBeNull] object tagValue = null, [NotNull] params Type[] contractTypes)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (contractTypes == null) throw new ArgumentNullException(nameof(contractTypes));
+            if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
+            if (tagValue == null)
+            {
+                return new Registration<object>(container, contractTypes).Lifetime(lifetime).To(instanceType);
+            }
+
+            return new Registration<object>(container, contractTypes).Lifetime(lifetime).Tag(tagValue).To(instanceType);
+        }
+
+        [NotNull]
+        public static IDisposable Autowiring<TT, T1>([NotNull] this IContainer container, Lifetime lifetime = IoC.Lifetime.Transient, [CanBeNull] object tagValue = null)
+            where TT: T1
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (tagValue == null)
+            {
+                return new Registration<T1>(container, typeof(T1)).Lifetime(lifetime).To(typeof(TT));
+            }
+
+            return new Registration<T1>(container, typeof(T1)).Lifetime(lifetime).Tag(tagValue).To(typeof(TT));
+        }
+
+
+        [NotNull]
+        public static IDisposable Autowiring<TT, T1, T2>([NotNull] this IContainer container, Lifetime lifetime = IoC.Lifetime.Transient, [CanBeNull] object tagValue = null)
+            where TT : T1, T2
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (tagValue == null)
+            {
+                return new Registration<T1>(container, typeof(T1), typeof(T2)).Lifetime(lifetime).To(typeof(TT));
+            }
+
+            return new Registration<T1>(container, typeof(T1), typeof(T2)).Lifetime(lifetime).Tag(tagValue).To(typeof(TT));
+        }
+
+        [NotNull]
+        public static IDisposable Autowiring<TT, T1, T2, T3>([NotNull] this IContainer container, Lifetime lifetime = IoC.Lifetime.Transient, [CanBeNull] object tagValue = null)
+            where TT : T1, T2, T3
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (tagValue == null)
+            {
+                return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3)).Lifetime(lifetime).To(typeof(TT));
+            }
+
+            return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3)).Lifetime(lifetime).Tag(tagValue).To(typeof(TT));
+        }
+
+        [NotNull]
+        public static IDisposable Autowiring<TT, T1, T2, T3, T4>([NotNull] this IContainer container, Lifetime lifetime = IoC.Lifetime.Transient, [CanBeNull] object tagValue = null)
+            where TT : T1, T2, T4
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (tagValue == null)
+            {
+                return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3), typeof(T4)).Lifetime(lifetime).To(typeof(TT));
+            }
+
+            return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3), typeof(T4)).Lifetime(lifetime).Tag(tagValue).To(typeof(TT));
+        }
+
         public static Registration<object> Map([NotNull] this IContainer container, [NotNull] Type instanceType)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -37,77 +118,10 @@
             return new Registration<object>(container, instanceType);
         }
 
-        [NotNull]
-        public static IDisposable Autowiring([NotNull] this IContainer container, [NotNull] Type instanceType, [NotNull] Type contractType, [CanBeNull] object tagValue = null)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (contractType == null) throw new ArgumentNullException(nameof(contractType));
-            if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
-            if (tagValue == null)
-            {
-                return new Registration<object>(container, contractType).To(instanceType);
-            }
-
-            return new Registration<object>(container, contractType).Tag(tagValue).To(instanceType);
-        }
-
         public static Registration<T> Map<T>([NotNull] this IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             return new Registration<T>(container, typeof(T));
-        }
-
-        [NotNull]
-        public static IDisposable Autowiring<TT, T1>([NotNull] this IContainer container, [CanBeNull] object tagValue = null)
-            where TT: T1
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (tagValue == null)
-            {
-                return new Registration<T1>(container, typeof(T1)).To(typeof(TT));
-            }
-
-            return new Registration<T1>(container, typeof(T1)).Tag(tagValue).To(typeof(TT));
-        }
-
-
-        [NotNull]
-        public static IDisposable Autowiring<TT, T1, T2>([NotNull] this IContainer container, [CanBeNull] object tagValue = null)
-            where TT : T1, T2
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (tagValue == null)
-            {
-                return new Registration<T1>(container, typeof(T1), typeof(T2)).To(typeof(TT));
-            }
-
-            return new Registration<T1>(container, typeof(T1), typeof(T2)).Tag(tagValue).To(typeof(TT));
-        }
-
-        [NotNull]
-        public static IDisposable Autowiring<TT, T1, T2, T3>([NotNull] this IContainer container, [CanBeNull] object tagValue = null)
-            where TT : T1, T2, T3
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (tagValue == null)
-            {
-                return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3)).To(typeof(TT));
-            }
-
-            return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3)).Tag(tagValue).To(typeof(TT));
-        }
-
-        [NotNull]
-        public static IDisposable Autowiring<TT, T1, T2, T3, T4>([NotNull] this IContainer container, [CanBeNull] object tagValue = null)
-            where TT : T1, T2, T4
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (tagValue == null)
-            {
-                return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3), typeof(T4)).To(typeof(TT));
-            }
-
-            return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3), typeof(T4)).Tag(tagValue).To(typeof(TT));
         }
 
         public static Registration<T> Map<T, T1>([NotNull] this IContainer container)
@@ -290,7 +304,7 @@
         }
 
         [NotNull]
-        public static Task<T> TaskGet<T>([NotNull] this IContainer container, [NotNull] params object[] args)
+        public static Task<T> AsyncGet<T>([NotNull] this IContainer container, [NotNull] params object[] args)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
@@ -303,7 +317,7 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (taskScheduler == null) throw new ArgumentNullException(nameof(taskScheduler));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            var task = container.TaskGet<T>(args);
+            var task = container.AsyncGet<T>(args);
             task.Start(taskScheduler);
             return await task;
         }

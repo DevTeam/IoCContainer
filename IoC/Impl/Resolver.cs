@@ -38,7 +38,7 @@
             if (contractType == null) throw new ArgumentNullException(nameof(contractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
             var context = new Context(_registrationId, _key, _registrationContainer, resolvingContainer, contractType, args);
-            return _lifetime == null ? _factory.Create(context) : _lifetime.GetOrCreate(context, _factory);
+            return _lifetime?.GetOrCreate(context, _factory) ?? _factory.Create(context);
         }
     }
 }

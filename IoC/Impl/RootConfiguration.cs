@@ -38,8 +38,25 @@
 
             yield return container
                 .Map<IContainer>()
-                .Lifetime(Lifetime.Container)
-                .To(ctx => ctx.ResolvingContainer.CreateChild());
+                .To(ctx => Normalize(ctx.ResolvingContainer));
+
+            yield return container
+                .Map<IContainer>()
+                .Tag(Scope.Current)
+                .To(ctx => Normalize(ctx.ResolvingContainer));
+
+            yield return container
+                .Map<IContainer>()
+                .Tag(Scope.Child)
+                .To(ctx => Normalize(ctx.ResolvingContainer.CreateChild()));
+
+            yield return container
+                .Map<IContainer>()
+                .Tag(Scope.Parent)
+                .To(ctx =>
+                {
+                    return Normalize(ctx.ResolvingContainer.Parent);
+                });
 
             yield return container
                 .Map<IResourceStore>()
@@ -63,6 +80,18 @@
             yield return EnumerableFeature.Shared.Apply(container);
             yield return FuncFeature.Shared.Apply(container);
             yield return TaskFeature.Shared.Apply(container);
+        }
+
+        private static IContainer Normalize(IContainer container)
+        {
+            switch (container)
+            {
+                case Resolving resolving:
+                    return resolving.Container;
+
+                default:
+                    return container;
+            }
         }
     }
 }
