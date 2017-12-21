@@ -290,6 +290,10 @@
                         _isDisposingContainer = true;
                         break;
 
+                    case Scope.Root:
+                        _containerSelector = context => context.RegistrationContainer;
+                        break;
+
                     default:
                         throw new NotSupportedException($"The scope \"{scope}\" is not supported.");
                 }
