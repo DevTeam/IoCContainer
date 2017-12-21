@@ -259,8 +259,9 @@
         private struct RefFactory : IFactory
         {
             [NotNull] private readonly Type _contractType;
-            private readonly Scope _scope;
             private readonly Key _key;
+            [NotNull] private readonly ContainerSelector _containerSelector;
+            private bool _isDisposingContainer;
             [CanBeNull] private IContainer _lastContainer;
             private IResolver _lastResolver;
 
@@ -270,45 +271,66 @@
                 Scope scope)
             {
                 _contractType = contractType;
-                _scope = scope;
                 _key = new Key(new Contract(contractType), new Tag(tagValue));
                 _lastContainer = null;
                 _lastResolver = null;
+                _isDisposingContainer = false;
+                switch (scope)
+                {
+                    case Scope.Current:
+                        _containerSelector = context => context.ResolvingContainer;
+                        break;
+
+                    case Scope.Parent:
+                        _containerSelector = context => context.ResolvingContainer.Parent;
+                        break;
+
+                    case Scope.Child:
+                        _containerSelector = context => context.ResolvingContainer.CreateChild();
+                        _isDisposingContainer = true;
+                        break;
+
+                    default:
+                        throw new NotSupportedException($"The scope \"{scope}\" is not supported.");
+                }
             }
 
             public object Create(Context context)
             {
-                IContainer container;
-                switch (_scope)
-                {
-                    case Scope.Current:
-                        container = context.ResolvingContainer;
-                        break;
-
-                    case Scope.Parent:
-                        container = context.ResolvingContainer.Parent;
-                        break;
-
-                    case Scope.Child:
-                        container = context.ResolvingContainer.CreateChild();
-                        break;
-
-                    default:
-                        throw new NotSupportedException($"The scope \"{_scope}\" is not supported.");
-                }
-
+                var container = _containerSelector(context);
+                IResolver resolver;
                 if (!Equals(_lastContainer, container))
                 {
-                    if (!container.TryGetResolver(_key, out _lastResolver))
+                    if (!container.TryGetResolver(_key, out resolver))
                     {
                         return context.ResolvingContainer.Get<IIssueResolver>().CannotResolve(container, _key);
                     }
 
-                    _lastContainer = container;
+                    if (!_isDisposingContainer)
+                    {
+                        _lastContainer = container;
+                        _lastResolver = resolver;
+                    }
+                }
+                else
+                {
+                    resolver = _lastResolver;
                 }
 
-                return _lastResolver.Resolve(container, _contractType);
+                try
+                {
+                    return resolver.Resolve(container, _contractType);
+                }
+                finally
+                {
+                    if (_isDisposingContainer)
+                    {
+                        container.Dispose();
+                    }
+                }
             }
+
+            private delegate IContainer ContainerSelector(Context context);
         }
     }
 }

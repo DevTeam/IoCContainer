@@ -27,11 +27,7 @@
             _name = name ?? throw new ArgumentNullException(nameof(name));
             _parentContainer = parentContainer ?? throw new ArgumentNullException(nameof(parentContainer));
 
-            if (root)
-            {
-                AddResource(parentContainer);
-            }
-            else
+            if (!root)
             {
                 if (parentContainer.TryGet<IResourceStore>(out var parentResourceStore))
                 {

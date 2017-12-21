@@ -6,6 +6,6 @@
 
         Parent,
 
-        Child
+        Child,
     }
 }

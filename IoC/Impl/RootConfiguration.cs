@@ -53,10 +53,7 @@
             yield return container
                 .Map<IContainer>()
                 .Tag(Scope.Parent)
-                .To(ctx =>
-                {
-                    return Normalize(ctx.ResolvingContainer.Parent);
-                });
+                .To(ctx => Normalize(ctx.ResolvingContainer.Parent));
 
             yield return container
                 .Map<IResourceStore>()
