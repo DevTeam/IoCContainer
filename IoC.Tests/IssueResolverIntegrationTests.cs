@@ -1,4 +1,6 @@
-﻿namespace IoC.Tests
+﻿#if NET45
+#else
+namespace IoC.Tests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
@@ -75,3 +77,4 @@
         }
     }
 }
+#endif
