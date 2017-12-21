@@ -296,7 +296,7 @@
 
                 // When
                 using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Dependency.Arg<string>(0, 0, "name")))
+                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>(0, "name")))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>("abc");
@@ -318,7 +318,7 @@
 
                 // When
                 using (container.Map<IMyService1>().Tag(33).Lifetime(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Dependency.Arg<string>(0, 0, "name"), Dependency.Ref<IMyService1>(33, 1, "someRef")))
+                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>(0, "name"), Has.Ref<IMyService1>("someRef", 33)))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>("abc");
@@ -411,7 +411,7 @@
 
                 // When
                 using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Dependency.Arg<string>(0, 0, "name")))
+                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>(0, "name")))
                 {
                     // Then
                     var func = container.Get<Func<string, IMyService>>();
@@ -476,6 +476,110 @@
             }
         }
 
+        [Fact]
+        public void ContainerShouldResolveWhenHasInitializerMethod()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedRef = Mock.Of<IMyService>();
+
+                // When
+                using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(
+                    typeof(MyService),
+                    Has.Arg<string>(0, "name"),
+                    Has.Method(
+                        "Init",
+                        Has.Arg<string>(1, "intiValue"))))
+                {
+                    // Then
+                    var actualInstance = container.Get<IMyService>("abc", "xyz");
+
+                    actualInstance.ShouldBeOfType<MyService>();
+                    ((MyService)actualInstance).Name.ShouldBe("xyz");
+                    ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenHasInitializerMethodWithNotSpecifiedTypeOfArg()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedRef = Mock.Of<IMyService>();
+
+                // When
+                using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(
+                    typeof(MyService),
+                    Has.Arg<string>(0, "name"),
+                    Has.Method(
+                        "Init",
+                        Has.Arg(1, "intiValue"))))
+                {
+                    // Then
+                    var actualInstance = container.Get<IMyService>("abc", "xyz");
+
+                    actualInstance.ShouldBeOfType<MyService>();
+                    ((MyService)actualInstance).Name.ShouldBe("xyz");
+                    ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenHasInitializerSetterWithNotSpecifiedTypeOfProperty()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedRef = Mock.Of<IMyService>();
+
+                // When
+                using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(
+                    typeof(MyService),
+                    Has.Arg(0, "name"),
+                    Has.Property(1, "Name")))
+                {
+                    // Then
+                    var actualInstance = container.Get<IMyService>("abc", "xyz");
+
+                    actualInstance.ShouldBeOfType<MyService>();
+                    ((MyService)actualInstance).Name.ShouldBe("xyz");
+                    ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenHasInitializerSetter()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedRef = Mock.Of<IMyService>();
+
+                // When
+                using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(
+                    typeof(MyService),
+                    Has.Arg(0, "name"),
+                    Has.Property<string>(1, "Name")))
+                {
+                    // Then
+                    var actualInstance = container.Get<IMyService>("abc", "xyz");
+
+                    actualInstance.ShouldBeOfType<MyService>();
+                    ((MyService)actualInstance).Name.ShouldBe("xyz");
+                    ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
+                }
+            }
+        }
+
         public interface IMyService: IMyService1
         {
         }
@@ -484,6 +588,7 @@
         {
         }
 
+        [SuppressMessage("ReSharper", "UnusedMember.Global")]
         public class MyService: IMyService
         {
             public MyService(string name, IMyService1 someRef)
@@ -492,8 +597,14 @@
                 SomeRef = someRef;
             }
 
-            public string Name { get; }
+            public string Name { get; set; }
+
             public IMyService1 SomeRef { get; }
+
+            public void Init(IMyService1 someRef2, IMyService1 someRef3, string intiValue)
+            {
+                Name = intiValue;
+            }
         }
 
         public class MyGenericService<T1, T2> : IMyGenericService<T1, T2>

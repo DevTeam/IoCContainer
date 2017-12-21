@@ -13,11 +13,13 @@
         IResolver CannotGetResolver([NotNull] IContainer container, Key key);
 
         [NotNull]
-        ConstructorInfo CannotFindConsructor([NotNull] TypeInfo typeInfo, [NotNull] params Dependency[] dependencies);
+        ConstructorInfo CannotFindConsructor([NotNull] TypeInfo typeInfo, [NotNull] params Has[] dependencies);
 
         [NotNull]
         Type[] CannotGetGenericTypeArguments([NotNull] Type type);
 
-        void CannotBeCeated(Type instanceType);
+        IFactory CannotBeCeated(Type instanceType);
+
+        int CannotFindParameter([NotNull] ParameterInfo[] parameters, Parameter parameter);
     }
 }

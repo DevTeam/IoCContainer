@@ -21,9 +21,9 @@
             throw new InvalidOperationException($"Cannot get resolver for the key \"{key}\" from the container \"{container}\".");
         }
 
-        public ConstructorInfo CannotFindConsructor(TypeInfo typeInfo, params Dependency[] dependencies)
+        public ConstructorInfo CannotFindConsructor(TypeInfo typeInfo, params Has[] dependencies)
         {
-            throw new InvalidOperationException($"Cannot find an appropriate constructor in the type \"{typeInfo.Name}\" using dependencies: {string.Join(",", "dependencies")}.");
+            throw new InvalidOperationException($"Cannot find an appropriate constructor in the type \"{typeInfo.Name}\" using dependencies: {string.Join(",", dependencies)}.");
         }
 
         public Type[] CannotGetGenericTypeArguments(Type type)
@@ -31,9 +31,14 @@
             throw new InvalidOperationException($"Cannot get generic type arguments from the type \"{type.Name}\".");
         }
 
-        public void CannotBeCeated(Type instanceType)
+        public IFactory CannotBeCeated(Type instanceType)
         {
             throw new InvalidOperationException($"An instance of the type \"{instanceType}\" cannot be created.");
+        }
+
+        public int CannotFindParameter(ParameterInfo[] parameters, Parameter parameter)
+        {
+            throw new InvalidOperationException($"The parameter \"{parameter}\" was not found.");
         }
     }
 }

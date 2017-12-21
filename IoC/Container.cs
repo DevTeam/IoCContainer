@@ -173,15 +173,14 @@
             return registration.To(new FuncFactory<T>(factory));
         }
 
-        public static RegistrationToken To<T>(this Registration<T> registration, [NotNull] Type instanceType, [NotNull] params Dependency[] dependencies)
+        public static RegistrationToken To<T>(this Registration<T> registration, [NotNull] Type instanceType, [NotNull] params Has[] dependencies)
         {
             if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
             if (dependencies == null) throw new ArgumentNullException(nameof(dependencies));
             var typeInfo = instanceType.GetTypeInfo();
             if (typeInfo.IsAbstract || typeInfo.IsInterface)
             {
-                registration.Container.GetIssueResolver().CannotBeCeated(instanceType);
-                throw new InvalidOperationException($"An instance of the type \"{instanceType}\" cannot be created.");
+                return registration.To(registration.Container.GetIssueResolver().CannotBeCeated(instanceType));
             }
 
             var factory = registration.Container.Get<IFactory>(instanceType, dependencies);

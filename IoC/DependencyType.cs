@@ -4,6 +4,8 @@
     {
         Arg,
 
-        Ref
+        Ref,
+
+        Method
     }
 }

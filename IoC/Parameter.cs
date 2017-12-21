@@ -5,15 +5,18 @@
     [PublicAPI]
     public struct Parameter
     {
-        [NotNull] public readonly Type Type;
-        public readonly int Position;
-        [CanBeNull] public readonly string Name;
+        [NotNull] public readonly string Name;
+        [CanBeNull] public readonly Type Type;
 
-        public Parameter([NotNull] Type type, int position, [CanBeNull] string name)
+        public Parameter([NotNull] string name, [CanBeNull] Type type = null)
         {
-            Type = type ?? throw new ArgumentNullException(nameof(type));
-            Position = position;
-            Name = name;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                throw new ArgumentException("Value cannot be null or whitespace.", nameof(name));
+            }
+
+            Type = type;
         }
 
         public override bool Equals(object obj)
@@ -26,21 +29,20 @@
         {
             unchecked
             {
-                var hashCode = (Type.GetHashCode());
-                hashCode = (hashCode * 397) ^ Position;
-                hashCode = (hashCode * 397) ^ (Name != null ? Name.GetHashCode() : 0);
+                var hashCode = Name.GetHashCode();
+                hashCode = (hashCode * 397) ^ (Type != null ? Type.GetHashCode() : 0);
                 return hashCode;
             }
         }
 
         public override string ToString()
         {
-            return $"Parameter: [{Type.Name} {Name ?? "_"} at {Position}]";
+            return $"Parameter: [{Type?.Name ?? "AnyType"} {Name}]";
         }
 
         private bool Equals(Parameter other)
         {
-            return Type == other.Type && Position == other.Position && string.Equals(Name, other.Name);
+            return Type == other.Type && string.Equals(Name, other.Name);
         }
     }
 }

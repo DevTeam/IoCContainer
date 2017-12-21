@@ -50,7 +50,7 @@
                 .To(ctx => new AutowiringFactory(
                     ctx.ResolvingContainer.Get<IIssueResolver>(),
                     (Type) ctx.Args[0],
-                    (Dependency[]) ctx.Args[1]));
+                    (Has[]) ctx.Args[1]));
 
             foreach (var reg in ApplyFeatures(container).SelectMany(i => i))
             {

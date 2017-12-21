@@ -14,7 +14,7 @@
 
         public override string ToString()
         {
-            return $"Contract: {Type.Name ?? "null"}";
+            return $"Contract: {Type.Name}";
         }
     }
 }

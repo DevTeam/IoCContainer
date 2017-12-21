@@ -8,14 +8,14 @@
     {
         [NotNull] private readonly IIssueResolver _issueResolver;
         [NotNull] private readonly Type _instanceType;
-        [NotNull] private readonly Dependency[] _dependencies;
+        [NotNull] private readonly Has[] _dependencies;
         private readonly IFactory _instanceFactory;
         private readonly Dictionary<Type, IFactory> _factories;
 
         public AutowiringFactory(
             [NotNull] IIssueResolver issueResolver,
             [NotNull] Type instanceType,
-            [NotNull] params Dependency[] dependencies)
+            [NotNull] params Has[] dependencies)
         {
             _issueResolver = issueResolver ?? throw new ArgumentNullException(nameof(issueResolver));
             _instanceType = instanceType ?? throw new ArgumentNullException(nameof(instanceType));
