@@ -1,5 +1,4 @@
-﻿#if NET45
-#else
+﻿#if !NET45
 namespace IoC.Tests
 {
     using System;

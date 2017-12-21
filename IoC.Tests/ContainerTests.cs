@@ -81,25 +81,6 @@
         }
 
         [Fact]
-        public void ContainerShouldResolveRootContainer()
-        {
-            // Given
-
-            // When
-            using (var container = Container.Create())
-            using (var child1 = container.CreateChild())
-            using (var child2 = child1.CreateChild())
-            using (var child3 = child2.CreateChild())
-            {
-                // When
-                var rootContainer = child3.Tag(Scope.Root).Get<IContainer>();
-
-                // Then
-                rootContainer.ShouldBe(container);
-            }
-        }
-
-        [Fact]
         public void ShouldRegisterCustomChildContainer()
         {
             // Given

@@ -13,6 +13,7 @@
 
             // Configure base container and base logger
             using (var baseContainer = Container.Create("base"))
+            using (baseContainer.Map<IConsole>().To(ctx => console.Object))
             // And add base logger
             using (baseContainer.Map<ILogger>().To(typeof(Logger)))
             {

@@ -56,11 +56,6 @@
                 .To(ctx => Normalize(ctx.ResolvingContainer.Parent));
 
             yield return container
-                .Map<IContainer>()
-                .Tag(Scope.Root)
-                .To(ctx => Normalize(ctx.RegistrationContainer));
-
-            yield return container
                 .Map<IResourceStore>()
                 .To(ctx => (IResourceStore)ctx.ResolvingContainer);
 

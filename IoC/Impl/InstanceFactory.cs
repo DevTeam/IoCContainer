@@ -12,19 +12,21 @@
         private delegate void MethodFunc([NotNull] object instance, [NotNull][ItemCanBeNull] params object[] args);
 
         [NotNull] private readonly IIssueResolver _issueResolver;
+        [NotNull] private readonly TypeInfo _typeInfo;
         private readonly MethodData _ctorData;
         private readonly ConstructorFunc _ctor;
         private readonly int _methodsCount;
         private readonly Tuple<MethodFunc, MethodData>[] _methods;
+        private int _reentrancy;
 
         public InstanceFactory(
             [NotNull] IIssueResolver issueResolver,
             [NotNull] TypeInfo typeInfo,
             [NotNull] params Has[] dependencies)
         {
-            if (typeInfo == null) throw new ArgumentNullException(nameof(typeInfo));
             if (dependencies == null) throw new ArgumentNullException(nameof(dependencies));
             _issueResolver = issueResolver ?? throw new ArgumentNullException(nameof(issueResolver));
+            _typeInfo = typeInfo ?? throw new ArgumentNullException(nameof(typeInfo));
 
             var ctorInfo = (
                 from ctor in typeInfo.DeclaredConstructors
@@ -43,34 +45,47 @@
 
         public object Create(Context context)
         {
-            var args = _ctorData.Args;
-            var factories = _ctorData.Factories;
-            for (var position = 0; position < _ctorData.Count; position++)
+            _reentrancy++;
+            if (_reentrancy >= 32)
             {
-                args[position] = factories[position].Create(context);
+                _issueResolver.CyclicDependenceDetected(context, _typeInfo, _reentrancy);
             }
 
-            var instance = _ctor(args);
-            if (_methodsCount == 0)
+            try
             {
-                return instance;
-            }
-
-            for (var i = 0; i < _methodsCount; i++)
-            {
-                var method = _methods[i];
-                var parameters = method.Item2;
-                var methodArgs = parameters.Args;
-                var methodFactories = parameters.Factories;
-                for (var position = 0; position < parameters.Count; position++)
+                var args = _ctorData.Args;
+                var factories = _ctorData.Factories;
+                for (var position = 0; position < _ctorData.Count; position++)
                 {
-                    methodArgs[position] = methodFactories[position].Create(context);
+                    args[position] = factories[position].Create(context);
                 }
 
-                method.Item1(instance, methodArgs);
-            }
+                var instance = _ctor(args);
+                if (_methodsCount == 0)
+                {
+                    return instance;
+                }
 
-            return instance;
+                for (var i = 0; i < _methodsCount; i++)
+                {
+                    var method = _methods[i];
+                    var parameters = method.Item2;
+                    var methodArgs = parameters.Args;
+                    var methodFactories = parameters.Factories;
+                    for (var position = 0; position < parameters.Count; position++)
+                    {
+                        methodArgs[position] = methodFactories[position].Create(context);
+                    }
+
+                    method.Item1(instance, methodArgs);
+                }
+
+                return instance;
+            }
+            finally
+            {
+                _reentrancy--;
+            }
         }
 
         private Tuple<ConstructorInfo, ParameterInfo[], DepWithPosition[]> CreateCtorItem(ConstructorInfo ctor, Has[] dependencies)
@@ -288,10 +303,6 @@
                     case Scope.Child:
                         _containerSelector = context => context.ResolvingContainer.CreateChild();
                         _isDisposingContainer = true;
-                        break;
-
-                    case Scope.Root:
-                        _containerSelector = context => context.RegistrationContainer;
                         break;
 
                     default:

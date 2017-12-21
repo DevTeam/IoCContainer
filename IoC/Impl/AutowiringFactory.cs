@@ -9,6 +9,7 @@
         [NotNull] private readonly IIssueResolver _issueResolver;
         [NotNull] private readonly Type _instanceType;
         [NotNull] private readonly Has[] _dependencies;
+        private readonly object _lockObject = new object();
         private readonly IFactory _instanceFactory;
         private readonly Dictionary<Type, IFactory> _factories;
 
@@ -33,29 +34,37 @@
 
         public object Create(Context context)
         {
-            if (_instanceFactory != null)
-            {
-                return _instanceFactory.Create(context);
-            }
+            return GetOrCreateFactory(context).Create(context);
+        }
 
-            if (!_factories.TryGetValue(context.ContractType, out var factory))
+        private IFactory GetOrCreateFactory(Context context)
+        {
+            lock (_lockObject)
             {
-                Type[] genericTypeArguments;
-                if (context.ContractType.IsConstructedGenericType)
+                if (_instanceFactory != null)
                 {
-                    genericTypeArguments = context.ContractType.GenericTypeArguments;
-                }
-                else
-                {
-                    genericTypeArguments = _issueResolver.CannotGetGenericTypeArguments(context.ContractType);
+                    return _instanceFactory;
                 }
 
-                var genericInstanceType = _instanceType.MakeGenericType(genericTypeArguments);
-                factory = new InstanceFactory(_issueResolver, genericInstanceType.GetTypeInfo(), _dependencies);
-                _factories.Add(context.ContractType, factory);
-            }
+                if (!_factories.TryGetValue(context.ContractType, out var factory))
+                {
+                    Type[] genericTypeArguments;
+                    if (context.ContractType.IsConstructedGenericType)
+                    {
+                        genericTypeArguments = context.ContractType.GenericTypeArguments;
+                    }
+                    else
+                    {
+                        genericTypeArguments = _issueResolver.CannotGetGenericTypeArguments(context.ContractType);
+                    }
 
-            return factory.Create(context);
+                    var genericInstanceType = _instanceType.MakeGenericType(genericTypeArguments);
+                    factory = new InstanceFactory(_issueResolver, genericInstanceType.GetTypeInfo(), _dependencies);
+                    _factories.Add(context.ContractType, factory);
+                }
+
+                return factory;
+            }
         }
     }
 }

@@ -40,5 +40,10 @@
         {
             throw new InvalidOperationException($"The parameter \"{parameter}\" was not found.");
         }
+
+        public void CyclicDependenceDetected(Context context, TypeInfo typeInfo, int reentrancy)
+        {
+            throw new InvalidOperationException($"The cyclic dependence detected during creating instance of type \"{typeInfo.Name}\". The reentrancy is {reentrancy}.");
+        }
     }
 }
