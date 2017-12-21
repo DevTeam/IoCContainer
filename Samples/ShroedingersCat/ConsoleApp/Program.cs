@@ -17,15 +17,15 @@
             {
                 // Directly getting
                 var box1 = container.Get<IBox<ICat>>();
-                Console.WriteLine($"#1 is alive: {box1.Content.IsAlive}");
+                Console.WriteLine("#1 is alive:" + box1.Content.IsAlive);
 
                 // Func way
                 var box2 = container.FuncGet<IBox<ICat>>();
-                Console.WriteLine($"#2 is alive: {box2().Content.IsAlive}");
+                Console.WriteLine("#2 is alive:" + box2().Content.IsAlive);
 
                 // Async way
                 var box3 = await container.StartGet<IBox<ICat>>(TaskScheduler.Default);
-                Console.WriteLine($"#3 is alive: {box3.Content.IsAlive}");
+                Console.WriteLine($"#3 is alive:" + box3.Content.IsAlive);
                 return box3.Content.IsAlive;
             }
         }
