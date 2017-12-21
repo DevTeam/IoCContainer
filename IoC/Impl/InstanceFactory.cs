@@ -286,11 +286,11 @@
                         break;
 
                     case Scope.Parent:
-                        container = context.RegistrationContainer.Parent;
+                        container = context.ResolvingContainer.Parent;
                         break;
 
                     case Scope.Child:
-                        container = context.RegistrationContainer.CreateChild();
+                        container = context.ResolvingContainer.CreateChild();
                         break;
 
                     default:
