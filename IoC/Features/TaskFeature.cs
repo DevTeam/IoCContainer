@@ -1,10 +1,10 @@
-﻿namespace IoC.Internal.Features
+﻿namespace IoC.Features
 {
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    internal class TaskFeature: IConfiguration
+    public class TaskFeature: IConfiguration
     {
         public static readonly IConfiguration Shared = new TaskFeature();
 

@@ -1,15 +1,13 @@
-﻿namespace IoC.Internal
+﻿namespace IoC.Internal.Features
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using Features;
 
-    internal class RootConfiguration: IConfiguration
+    internal class CoreFeature: IConfiguration
     {
-        public static readonly IConfiguration Shared = new RootConfiguration();
+        public static readonly IConfiguration Shared = new CoreFeature();
 
-        private RootConfiguration()
+        private CoreFeature()
         {
         }
 
@@ -63,20 +61,8 @@
                 .Map<IFactory>()
                 .To(ctx => new AutowiringFactory(
                     ctx.ResolvingContainer.Get<IIssueResolver>(),
-                    (Type) ctx.Args[0],
-                    (Has[]) ctx.Args[1]));
-
-            foreach (var reg in ApplyFeatures(container).SelectMany(i => i))
-            {
-                yield return reg;
-            }
-        }
-
-        private static IEnumerable<IEnumerable<IDisposable>> ApplyFeatures(IContainer container)
-        {
-            yield return EnumerableFeature.Shared.Apply(container);
-            yield return FuncFeature.Shared.Apply(container);
-            yield return TaskFeature.Shared.Apply(container);
+                    (Type)ctx.Args[0],
+                    (Has[])ctx.Args[1]));
         }
 
         private static IContainer Normalize(IContainer container)

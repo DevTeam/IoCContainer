@@ -1,9 +1,9 @@
-﻿namespace IoC.Internal.Features
+﻿namespace IoC.Features
 {
     using System;
     using System.Collections.Generic;
 
-    internal class FuncFeature: IConfiguration
+    public class FuncFeature: IConfiguration
     {
         public static readonly IConfiguration Shared = new FuncFeature();
 

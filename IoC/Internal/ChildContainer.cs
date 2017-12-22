@@ -8,25 +8,24 @@
 
     internal class ChildContainer: IContainer, IInstanceStore, IResourceStore, IEnumerable<Key>
     {
+        private static long _registrationId;
         private readonly string _name;
-        private long _registrationId;
         [NotNull] private readonly IContainer _parentContainer;
         [NotNull] private readonly Dictionary<Key, IResolver> _resolvers = new Dictionary<Key, IResolver>();
         [NotNull] private readonly Dictionary<IInstanceKey, object> _instances = new Dictionary<IInstanceKey, object>();
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
 
-        public ChildContainer([NotNull] string name = "")
+        public ChildContainer([NotNull] string name = "", params IConfiguration[] configurations)
         {
             _name = name ?? throw new ArgumentNullException(nameof(name));
             _parentContainer = new NullContainer();
-            _resources.AddRange(RootConfiguration.Shared.Apply(this));
+            _resources.Add(this.Apply(configurations));
         }
 
-        public ChildContainer(string name, [NotNull] IContainer parentContainer, bool root)
+        public ChildContainer(string name, [NotNull] IContainer parentContainer, bool root, params IConfiguration[] configurations)
+            :this(name, configurations)
         {
-            _name = name ?? throw new ArgumentNullException(nameof(name));
             _parentContainer = parentContainer ?? throw new ArgumentNullException(nameof(parentContainer));
-
             if (!root)
             {
                 if (parentContainer.TryGet<IResourceStore>(out var parentResourceStore))
@@ -35,8 +34,6 @@
                     AddResource(Disposable.Create(() => parentResourceStore.RemoveResource(this)));
                 }
             }
-
-            _resources.AddRange(ChildConfiguration.Shared.Apply(this));
         }
 
         public IContainer Parent => _parentContainer;

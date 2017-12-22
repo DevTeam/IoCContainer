@@ -7,19 +7,39 @@
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
+    using Features;
     using Internal;
+    using Internal.Features;
 
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static class Container
     {
+        private static readonly string RootName = "container://";
         private static long _containerId;
 
         [NotNull]
         public static IContainer Create([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            var rootContainer = new ChildContainer();
-            return new ChildContainer($"container://{CreateContainerName(name)}", rootContainer, true);
+            var rootContainer = new ChildContainer(
+                RootName,
+                CoreFeature.Shared,
+                EnumerableFeature.Shared,
+                FuncFeature.Shared,
+                TaskFeature.Shared);
+
+            return new ChildContainer($"{RootName}{CreateContainerName(name)}", rootContainer, true);
+        }
+
+        [NotNull]
+        public static IContainer CreatePure([NotNull] string name = "")
+        {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            var rootContainer = new ChildContainer(
+                RootName,
+                CoreFeature.Shared);
+
+            return new ChildContainer($"{RootName}{CreateContainerName(name)}", rootContainer, true);
         }
 
         [NotNull]
@@ -317,15 +337,19 @@
         }
 
         [NotNull]
+        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] params IConfiguration[] configurations)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (configurations == null) throw new ArgumentNullException(nameof(configurations));
+            return Disposable.Create(configurations.Select(i => i.Apply(container)).SelectMany(i => i));
+        }
+
+        [NotNull]
         public static IContainer Using([NotNull] this IContainer container, [NotNull] params IConfiguration[] configurations)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
-            foreach (var configuration in configurations)
-            {
-                container.Get<IResourceStore>().AddResource(Disposable.Create(configuration.Apply(container)));
-            }
-
+            container.Get<IResourceStore>().AddResource(container.Apply(configurations));
             return container;
         }
 
