@@ -1,4 +1,4 @@
-﻿namespace IoC.Impl
+﻿namespace IoC.Internal
 {
     internal struct SingletoneInstanceKey : IInstanceKey
     {

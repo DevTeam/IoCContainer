@@ -1,4 +1,4 @@
-﻿namespace IoC.Features
+﻿namespace IoC.Internal.Features
 {
     using System;
     using System.Collections;

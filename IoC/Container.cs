@@ -7,7 +7,7 @@
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
-    using Impl;
+    using Internal;
 
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     public static class Container
@@ -111,11 +111,11 @@
             return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3), typeof(T4)).Lifetime(lifetime).Tag(tagValue).To(typeof(TT));
         }
 
-        public static Registration<object> Map([NotNull] this IContainer container, [NotNull] Type instanceType)
+        public static Registration<object> Map([NotNull] this IContainer container, [NotNull] params Type[] contractTypes)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
-            return new Registration<object>(container, instanceType);
+            if (contractTypes == null) throw new ArgumentNullException(nameof(contractTypes));
+            return new Registration<object>(container, contractTypes);
         }
 
         public static Registration<T> Map<T>([NotNull] this IContainer container)
@@ -167,12 +167,6 @@
         {
             if (tagValue == null) throw new ArgumentNullException(nameof(tagValue));
             return new Registration<T>(registration, tagValue);
-        }
-
-        public static Registration<T> State<T>(this Registration<T> registration, [NotNull] Type[] stateTypes)
-        {
-            if (stateTypes == null) throw new ArgumentNullException(nameof(stateTypes));
-            return new Registration<T>(registration, stateTypes);
         }
 
         public static RegistrationToken To<T>(this Registration<T> registration, [NotNull] IFactory factory)

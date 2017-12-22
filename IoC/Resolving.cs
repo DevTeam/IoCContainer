@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using Impl;
+    using Internal;
 
     [PublicAPI]
     public struct Resolving: IContainer, IInstanceStore

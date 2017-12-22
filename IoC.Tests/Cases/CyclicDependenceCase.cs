@@ -45,6 +45,7 @@ namespace IoC.Tests.Cases
 
     public class Link : ILink
     {
+        // ReSharper disable once UnusedParameter.Local
         public Link(ILink link)
         {
         }
