@@ -8,7 +8,7 @@
     {
         IContainer Parent { get; }
 
-        [NotNull] IDisposable Register([NotNull] IEnumerable<Key> keys, [NotNull] IFactory factory, [CanBeNull] ILifetime lifetime = null);
+        bool TryRegister([NotNull] IEnumerable<Key> keys, [NotNull] IFactory factory, [CanBeNull] ILifetime lifetime, out IDisposable registrationToken);
 
         bool TryGetResolver(Key key, out IResolver resolver);
     }

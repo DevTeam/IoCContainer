@@ -356,12 +356,17 @@
         [NotNull]
         private static IDisposable CreateRegistration<T>(this Registration<T> registration, IFactory factory)
         {
-            var keys =
+            var keys = (
                 from contract in registration.ContractsTypes
                 from tag in registration.Tags.DefaultIfEmpty(IoC.Tag.Default)
-                select new Key(contract, tag);
+                select new Key(contract, tag)).Distinct().ToArray();
 
-            return registration.Container.Register(keys, factory, registration.Lifetime);
+            if (!registration.Container.TryRegister(keys, factory, registration.Lifetime, out var registrationToken))
+            {
+                return registration.Container.GetIssueResolver().CannotRegister(registration.Container, keys);
+            }
+
+            return registrationToken;
         }
 
         [NotNull]

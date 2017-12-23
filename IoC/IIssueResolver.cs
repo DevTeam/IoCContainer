@@ -23,5 +23,8 @@
         int CannotFindParameter([NotNull] ParameterInfo[] parameters, Parameter parameter);
 
         void CyclicDependenceDetected(Context context, [NotNull] TypeInfo typeInfo, int reentrancy);
+
+        [NotNull]
+        IDisposable CannotRegister([NotNull] IContainer container, Key[] keys);
     }
 }

@@ -7,7 +7,7 @@
     {
         public IContainer Parent => throw new NotSupportedException();
 
-        public IDisposable Register(IEnumerable<Key> keys, IFactory factory, ILifetime lifetime = null)
+        public bool TryRegister(IEnumerable<Key> keys, IFactory factory, ILifetime lifetime, out IDisposable registrationToken)
         {
             throw new NotSupportedException();
         }

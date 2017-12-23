@@ -25,11 +25,11 @@
             return ((IInstanceStore) Container).GetInstances();
         }
 
-        public IDisposable Register(IEnumerable<Key> keys, IFactory factory, ILifetime lifetime = null)
+        public bool TryRegister(IEnumerable<Key> keys, IFactory factory, ILifetime lifetime, out IDisposable registrationToken)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
-            return Container.Register(keys, factory, lifetime);
+            return Container.TryRegister(keys, factory, lifetime, out registrationToken);
         }
 
         public bool TryGetResolver(Key key, out IResolver resolver)

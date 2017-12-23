@@ -45,5 +45,10 @@
         {
             throw new InvalidOperationException($"The cyclic dependence detected during creating instance of type \"{typeInfo.Name}\". The reentrancy is {reentrancy}.");
         }
+
+        public IDisposable CannotRegister(IContainer container, Key[] keys)
+        {
+            throw new InvalidOperationException($"The keys {string.Join(", ", keys)} cannot be registered in the container \"{container}\".");
+        }
     }
 }

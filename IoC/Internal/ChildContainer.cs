@@ -4,7 +4,6 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
 
     internal class ChildContainer: IContainer, IInstanceStore, IResourceStore, IEnumerable<Key>
     {
@@ -55,15 +54,23 @@
             _resources.Remove(resource);
         }
 
-        public IDisposable Register(IEnumerable<Key> keys, IFactory factory, ILifetime lifetime = null)
+        public bool TryRegister(IEnumerable<Key> keys, IFactory factory, ILifetime lifetime, out IDisposable registrationToken)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
-            var registrationId = Interlocked.Increment(ref _registrationId);
+            var keyArray = keys as Key[] ?? keys.ToArray();
+            lock (_resolvers)
+            {
+                if (keyArray.Any(key => _resolvers.ContainsKey(key)))
+                {
+                    registrationToken = default(IDisposable);
+                    return false;
+                }
 
-            return Disposable.Create(
-                from key in keys
-                select RegisterResolver(key, new Resolver(registrationId, key, this, UnregisterResolver(key), factory, lifetime)));
+                var registrationId = _registrationId++;
+                registrationToken = Disposable.Create(keyArray.Select(key => RegisterResolver(key, new Resolver(registrationId, key, this, UnregisterResolver(key), factory, lifetime))));
+                return true;
+            }
         }
 
         public bool TryGetResolver(Key key, out IResolver resolver)
@@ -121,11 +128,7 @@
 
         private IDisposable RegisterResolver(Key key, Resolver resolver)
         {
-            lock (_resolvers)
-            {
-                _resolvers.Add(key, resolver);
-            }
-
+            _resolvers.Add(key, resolver);
             return resolver;
         }
 
