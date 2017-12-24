@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    // ReSharper disable once RedundantUsingDirective
     using System.Reflection;
 
     internal sealed class AutowiringFactory : IFactory
@@ -21,10 +22,10 @@
             _issueResolver = issueResolver ?? throw new ArgumentNullException(nameof(issueResolver));
             _instanceType = instanceType ?? throw new ArgumentNullException(nameof(instanceType));
             _dependencies = dependencies ?? throw new ArgumentNullException(nameof(dependencies));
-            var typeInfo = _instanceType.GetTypeInfo();
+            var typeInfo = _instanceType.AsTypeInfo();
             if (!typeInfo.IsGenericTypeDefinition)
             {
-                _instanceFactory = new InstanceFactory(issueResolver, _instanceType.GetTypeInfo(), dependencies);
+                _instanceFactory = new InstanceFactory(issueResolver, _instanceType.AsTypeInfo(), dependencies);
             }
             else
             {
@@ -50,9 +51,9 @@
                 {
                     Type[] genericTypeArguments;
                     // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-                    if (context.ContractType.IsConstructedGenericType)
+                    if (context.ContractType.IsConstructedGenericType())
                     {
-                        genericTypeArguments = context.ContractType.GenericTypeArguments;
+                        genericTypeArguments = context.ContractType.GenericTypeArguments();
                     }
                     else
                     {
@@ -60,7 +61,7 @@
                     }
 
                     var genericInstanceType = _instanceType.MakeGenericType(genericTypeArguments);
-                    factory = new InstanceFactory(_issueResolver, genericInstanceType.GetTypeInfo(), _dependencies);
+                    factory = new InstanceFactory(_issueResolver, genericInstanceType.AsTypeInfo(), _dependencies);
                     _factories.Add(context.ContractType, factory);
                 }
 

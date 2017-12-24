@@ -12,7 +12,7 @@
 
         [NotNull] IResolver CannotGetResolver([NotNull] IContainer container, Key key);
 
-        [NotNull] ConstructorInfo CannotFindConsructor([NotNull] TypeInfo typeInfo, [NotNull] params Has[] dependencies);
+        [NotNull] ConstructorInfo CannotFindConsructor([NotNull] ITypeInfo typeInfo, [NotNull] params Has[] dependencies);
 
         [NotNull] Type[] CannotGetGenericTypeArguments([NotNull] Type type);
 
@@ -20,6 +20,6 @@
 
         int CannotFindParameter([NotNull] ParameterInfo[] parameters, Parameter parameter);
 
-        void CyclicDependenceDetected(Context context, [NotNull] TypeInfo typeInfo, int reentrancy);
+        void CyclicDependenceDetected(Context context, [NotNull] ITypeInfo typeInfo, int reentrancy);
     }
 }

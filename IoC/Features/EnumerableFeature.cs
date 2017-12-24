@@ -4,6 +4,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using Internal;
 
     public sealed class EnumerableFeature : IConfiguration
     {
@@ -30,9 +31,9 @@
 
             Type[] genericTypeArguments;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (ctx.ContractType.IsConstructedGenericType)
+            if (ctx.ContractType.IsConstructedGenericType())
             {
-                genericTypeArguments = ctx.ContractType.GenericTypeArguments;
+                genericTypeArguments = ctx.ContractType.GenericTypeArguments();
             }
             else
             {

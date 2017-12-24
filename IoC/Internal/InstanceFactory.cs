@@ -12,7 +12,7 @@
         private delegate void MethodFunc([NotNull] object instance, [NotNull][ItemCanBeNull] params object[] args);
 
         [NotNull] private readonly IIssueResolver _issueResolver;
-        [NotNull] private readonly TypeInfo _typeInfo;
+        [NotNull] private readonly ITypeInfo _typeInfo;
         private readonly MethodData _ctorData;
         private readonly ConstructorFunc _ctor;
         private readonly int _methodsCount;
@@ -21,7 +21,7 @@
 
         public InstanceFactory(
             [NotNull] IIssueResolver issueResolver,
-            [NotNull] TypeInfo typeInfo,
+            [NotNull] ITypeInfo typeInfo,
             [NotNull] params Has[] dependencies)
         {
             if (dependencies == null) throw new ArgumentNullException(nameof(dependencies));
@@ -177,7 +177,7 @@
             return result;
         }
 
-        private MethodData CreateMethodData(TypeInfo typeInfo, ParameterInfo[] parameters, DepWithPosition[] dependencies)
+        private MethodData CreateMethodData(ITypeInfo typeInfo, ParameterInfo[] parameters, DepWithPosition[] dependencies)
         {
             var paramsCount = parameters.Length;
             var factories = new IFactory[paramsCount];
@@ -200,13 +200,13 @@
                     case DependencyType.Method:
                         var methodInfo = 
                             typeInfo.DeclaredMethods.FirstOrDefault(i => i.Name == dependency.HasMethod.Name)
-                            ?? typeInfo.DeclaredProperties.FirstOrDefault(i => i.Name == dependency.HasMethod.Name)?.SetMethod
+                            ?? typeInfo.DeclaredProperties.Where(i => i.Name == dependency.HasMethod.Name).Select(i => i.SetMethod()).FirstOrDefault()
                             ?? throw new InvalidOperationException();
 
                         var methodParameters = methodInfo.GetParameters();
                         var methodDependenciesWithPosition = ConverToDependenciesWithPosition(methodParameters, dependency.HasMethod.Dependencies);
                         var methodData = CreateMethodData(typeInfo, methodInfo.GetParameters(), methodDependenciesWithPosition);
-                        methods.Add(Tuple.Create(CreateMethod(typeInfo.AsType(), methodInfo), methodData));
+                        methods.Add(Tuple.Create(CreateMethod(typeInfo.Type, methodInfo), methodData));
                         break;
 
                     default:

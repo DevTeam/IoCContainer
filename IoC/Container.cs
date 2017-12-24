@@ -4,6 +4,7 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
+    // ReSharper disable once RedundantUsingDirective
     using System.Reflection;
     using System.Threading;
     using System.Threading.Tasks;
@@ -140,12 +141,18 @@
             return new Registration<object>(container, contractTypes);
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static Registration<T> Map<T>([NotNull] this IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             return new Registration<T>(container, typeof(T));
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static Registration<T> Map<T, T1>([NotNull] this IContainer container)
             where T: T1
         {
@@ -153,6 +160,9 @@
             return new Registration<T>(container, typeof(T), typeof(T1));
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static Registration<T> Map<T, T1, T2>([NotNull] this IContainer container)
             where T : T1, T2
         {
@@ -160,6 +170,9 @@
             return new Registration<T>(container, typeof(T), typeof(T1), typeof(T2));
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static Registration<T> Map<T, T1, T2, T3>([NotNull] this IContainer container)
             where T : T1, T2, T3
         {
@@ -167,6 +180,9 @@
             return new Registration<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3));
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static Registration<T> Map<T, T1, T2, T3, T4>([NotNull] this IContainer container)
             where T : T1, T2, T3, T4
         {
@@ -174,29 +190,44 @@
             return new Registration<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static Registration<T> Lifetime<T>(this Registration<T> registration, Lifetime lifetime)
         {
             return new Registration<T>(registration, lifetime);
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static Registration<T> Lifetime<T>(this Registration<T> registration, [NotNull] ILifetime lifetime)
         {
             if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
             return new Registration<T>(registration, lifetime);
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static Registration<T> Tag<T>(this Registration<T> registration, [NotNull] object tagValue)
         {
             if (tagValue == null) throw new ArgumentNullException(nameof(tagValue));
             return new Registration<T>(registration, tagValue);
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static RegistrationToken To<T>(this Registration<T> registration, [NotNull] IFactory factory)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             return new RegistrationToken(registration.Container, CreateRegistration(registration, factory));
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static RegistrationToken To<T>(this Registration<T> registration, [NotNull] Func<Context, T> factory)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
@@ -207,7 +238,7 @@
         {
             if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
             if (dependencies == null) throw new ArgumentNullException(nameof(dependencies));
-            var typeInfo = instanceType.GetTypeInfo();
+            var typeInfo = instanceType.AsTypeInfo();
             if (typeInfo.IsAbstract || typeInfo.IsInterface)
             {
                 return registration.To(registration.Container.GetIssueResolver().CannotBeCeated(instanceType));
@@ -217,11 +248,17 @@
             return registration.To(factory);
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static void ToSelf(this RegistrationToken registrationToken)
         {
             registrationToken.Container.Get<IResourceStore>().AddResource(registrationToken);
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static Resolving Tag([NotNull] this IContainer container, [NotNull] object tag)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -244,6 +281,9 @@
             return true;
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         public static bool TryGet<T>([NotNull] this IContainer container, out T contract, [NotNull][ItemCanBeNull] params object[] args)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -258,6 +298,9 @@
             return true;
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         [NotNull]
         public static object Get([NotNull] this IContainer container, [NotNull] Type contractType, [NotNull][ItemCanBeNull] params object[] args)
         {
@@ -272,6 +315,9 @@
             return instance;
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         [NotNull]
         public static T Get<T>([NotNull] this IContainer container, [NotNull][ItemCanBeNull] params object[] args)
         {
@@ -285,6 +331,9 @@
             return instance;
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         [NotNull]
         public static Func<T> FuncGet<T>([NotNull] this IContainer container)
         {
@@ -292,6 +341,9 @@
             return container.Get<Func<T>>();
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         [NotNull]
         public static Func<T1, T> FuncGet<T1, T>([NotNull] this IContainer container, [CanBeNull] T1 arg1)
         {
@@ -299,6 +351,9 @@
             return container.Get<Func<T1, T>>(arg1);
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         [NotNull]
         public static Func<T1, T2, T> FuncGet<T1, T2, T>([NotNull] this IContainer container, [CanBeNull] T1 arg1, [CanBeNull] T2 arg2)
         {
@@ -306,6 +361,9 @@
             return container.Get<Func<T1, T2, T>>(arg1, arg2);
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         [NotNull]
         public static Func<T1, T2, T3, T> FuncGet<T1, T2, T3, T>([NotNull] this IContainer container, [CanBeNull] T1 arg1, [CanBeNull] T2 arg2, [CanBeNull] T3 arg3)
         {
@@ -313,6 +371,9 @@
             return container.Get<Func<T1, T2, T3, T>>(arg1, arg2, arg3);
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         [NotNull]
         public static Func<T1, T2, T3, T4, T> FuncGet<T1, T2, T3, T4, T>([NotNull] this IContainer container, [CanBeNull] T1 arg1, [CanBeNull] T2 arg2, [CanBeNull] T3 arg3, [CanBeNull] T4 arg4)
         {
@@ -320,6 +381,9 @@
             return container.Get<Func<T1, T2, T3, T4, T>>(arg1, arg2, arg3, arg4);
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         [NotNull]
         public static Task<T> AsyncGet<T>([NotNull] this IContainer container, [NotNull] params object[] args)
         {
@@ -328,6 +392,9 @@
             return container.Get<Task<T>>(args);
         }
 
+
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
         [NotNull]
         public static async Task<T> StartGet<T>([NotNull] this IContainer container, [NotNull] TaskScheduler taskScheduler, [NotNull] params object[] args)
         {
@@ -338,6 +405,7 @@
             task.Start(taskScheduler);
             return await task;
         }
+#endif
 
         [NotNull]
         public static IDisposable Apply([NotNull] this IContainer container, [NotNull][ItemNotNull] params IConfiguration[] configurations)
@@ -358,6 +426,9 @@
             return container;
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         [NotNull]
         private static IDisposable CreateRegistration<T>(this Registration<T> registration, IFactory factory)
         {
@@ -381,6 +452,9 @@
             return !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
         private static Key CreateKey([NotNull] this IContainer container, [NotNull] Type contractType)
         {
             object tagValue = null;

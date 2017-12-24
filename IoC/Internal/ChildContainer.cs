@@ -85,7 +85,7 @@
                 if (!hasResolver)
                 {
                     var type = key.ContractType;
-                    if (type.IsConstructedGenericType)
+                    if (type.IsConstructedGenericType())
                     {
                         var genericInstanceType = type.GetGenericTypeDefinition();
                         key = new Key(genericInstanceType, key.Tag);

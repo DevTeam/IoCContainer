@@ -3,6 +3,7 @@ namespace IoC.Tests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    // ReSharper disable once RedundantUsingDirective
     using System.Reflection;
     using Moq;
     using Xunit;
@@ -45,7 +46,7 @@ namespace IoC.Tests
             using (var container = Container.Create())
             {
                 var issueResolvere = new Mock<IIssueResolver>();
-                issueResolvere.Setup(i => i.CannotFindConsructor(typeof(MyClassWithoutCtor).GetTypeInfo())).Throws<InvalidOperationException>();
+                issueResolvere.Setup(i => i.CannotFindConsructor(It.IsAny<ITypeInfo>())).Throws<InvalidOperationException>();
 
                 // When
                 using (container.Map<IIssueResolver>().Lifetime(Lifetime.Singletone).To(ctx => issueResolvere.Object))
@@ -61,7 +62,7 @@ namespace IoC.Tests
                 }
 
                 // Then
-                issueResolvere.Verify(i => i.CannotFindConsructor(typeof(MyClassWithoutCtor).GetTypeInfo()), Times.Once);
+                issueResolvere.Verify(i => i.CannotFindConsructor(It.IsAny<ITypeInfo>()), Times.Once);
             }
         }
 

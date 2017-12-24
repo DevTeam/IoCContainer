@@ -3,15 +3,15 @@
 # Simple/powerful/fast Inversion of Control container for .NET
 
 Supported platforms:
-  - .NET 4.5+
+  - .NET 4.0+
   - .NET Core 1.0+
   - .NET Standard 1.0+
 
-[:rocket: Comparison test](https://github.com/DevTeam/IoCContainer/blob/master/IoC.Tests/ComparisonTests.cs) of some IoC containers in the synthetic test (creating a graph from 2 transient and singleton objects in the serie of 100k iterations) has the following [result](http://tcavs2015.cloudapp.net/httpAuth/app/rest/builds/buildType:DevTeam_IoCContainer_Build,status:SUCCESS/artifacts/content/reports/Comparison.zip).
+[Comparison test](https://github.com/DevTeam/IoCContainer/blob/master/IoC.Tests/ComparisonTests.cs) of some IoC containers in the synthetic test (creating a graph from 2 transient and singleton objects in the serie of 100k iterations) has the following [result](http://tcavs2015.cloudapp.net/httpAuth/app/rest/builds/buildType:DevTeam_IoCContainer_Build,status:SUCCESS/artifacts/content/reports/Comparison.zip).
 
 [Shroedingers :smiley_cat:](https://github.com/DevTeam/IoCContainer/tree/master/Samples/ShroedingersCat) shows how it works:
 
-:one: **Let's create an abstraction:**
+ ### Let's create an abstraction:
 
 ```csharp
 interface IBox<out T> { T Content { get; } }
@@ -19,7 +19,7 @@ interface IBox<out T> { T Content { get; } }
 interface ICat { int IsAlive { get; } }
 ```
 
-:two: **Here is an implementation:**
+### Here is an implementation:
 
 ![Cat](https://github.com/DevTeam/IoCContainer/blob/master/Docs/Images/cat.jpg)
 
@@ -37,7 +37,7 @@ class ShroedingersCat : ICat
 }
 ```
 
-:three: **Let's glue it together:**
+### Let's glue it together:
 
 ```csharp
 class Glue : IConfiguration
@@ -50,7 +50,7 @@ class Glue : IConfiguration
 }
 ```
 
-:four: **Just configure a container and check it works as expected:**
+### Just configure a container and check it works as expected:
 
 ```csharp
 using (var container = Container.Create().Using(new Glue()))

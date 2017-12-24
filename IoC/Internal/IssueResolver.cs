@@ -21,7 +21,7 @@
             throw new InvalidOperationException($"Cannot get resolver for the key \"{key}\" from the container \"{container}\".");
         }
 
-        public ConstructorInfo CannotFindConsructor(TypeInfo typeInfo, params Has[] dependencies)
+        public ConstructorInfo CannotFindConsructor(ITypeInfo typeInfo, params Has[] dependencies)
         {
             throw new InvalidOperationException($"Cannot find an appropriate constructor in the type \"{typeInfo.Name}\" using dependencies: {string.Join(",", dependencies)}.");
         }
@@ -41,7 +41,7 @@
             throw new InvalidOperationException($"The parameter \"{parameter}\" was not found.");
         }
 
-        public void CyclicDependenceDetected(Context context, TypeInfo typeInfo, int reentrancy)
+        public void CyclicDependenceDetected(Context context, ITypeInfo typeInfo, int reentrancy)
         {
             throw new InvalidOperationException($"The cyclic dependence detected during creating instance of type \"{typeInfo.Name}\". The reentrancy is {reentrancy}.");
         }

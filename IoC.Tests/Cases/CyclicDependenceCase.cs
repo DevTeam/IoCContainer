@@ -2,6 +2,7 @@
 namespace IoC.Tests.Cases
 {
     using System;
+    // ReSharper disable once RedundantUsingDirective
     using System.Reflection;
     using Moq;
     using Shouldly;
@@ -14,7 +15,7 @@ namespace IoC.Tests.Cases
         {
             var expectedException = new InvalidOperationException("error");
             var issueResolver = new Mock<IIssueResolver>();
-            issueResolver.Setup(i => i.CyclicDependenceDetected(It.IsAny<Context>(), It.IsAny<TypeInfo>(), 32)).Throws(expectedException);
+            issueResolver.Setup(i => i.CyclicDependenceDetected(It.IsAny<Context>(), It.IsAny<ITypeInfo>(), 32)).Throws(expectedException);
 
             using (var container = Container.Create("base"))
             using (container.Map<IIssueResolver>().To(ctx => issueResolver.Object))
@@ -35,7 +36,7 @@ namespace IoC.Tests.Cases
                 }
             }
 
-            issueResolver.Verify(i => i.CyclicDependenceDetected(It.IsAny<Context>(), It.IsAny<TypeInfo>(), 32));
+            issueResolver.Verify(i => i.CyclicDependenceDetected(It.IsAny<Context>(), It.IsAny<ITypeInfo>(), 32));
         }
     }
 
