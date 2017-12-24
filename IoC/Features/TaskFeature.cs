@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
-    public class TaskFeature: IConfiguration
+    public sealed  class TaskFeature : IConfiguration
     {
         public static readonly IConfiguration Shared = new TaskFeature();
 
@@ -23,6 +23,7 @@
         private static object CreateTask(Context ctx)
         {
             Type[] genericTypeArguments;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (ctx.ContractType.IsConstructedGenericType)
             {
                 genericTypeArguments = ctx.ContractType.GenericTypeArguments;

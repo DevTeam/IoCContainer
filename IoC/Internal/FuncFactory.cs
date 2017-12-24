@@ -2,7 +2,7 @@
 {
     using System;
 
-    internal class FuncFactory<T>: IFactory
+    internal sealed class FuncFactory<T>: IFactory
     {
         [NotNull] private readonly Func<Context, T> _factory;
 

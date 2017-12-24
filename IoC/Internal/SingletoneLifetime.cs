@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
 
-    internal class SingletoneLifetime: SingletoneBaseLifetime
+    internal sealed class SingletoneLifetime : SingletoneBaseLifetime
     {
         public static readonly ILifetime Shared = new SingletoneLifetime();
 

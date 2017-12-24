@@ -6,25 +6,20 @@
     [PublicAPI]
     public interface IIssueResolver
     {
-        [NotNull]
-        object CannotResolve([NotNull] IContainer container, Key key);
+        [NotNull] IDisposable CannotRegister([NotNull] IContainer container, Key[] keys);
 
-        [NotNull]
-        IResolver CannotGetResolver([NotNull] IContainer container, Key key);
+        [NotNull] object CannotResolve([NotNull] IContainer container, Key key);
 
-        [NotNull]
-        ConstructorInfo CannotFindConsructor([NotNull] TypeInfo typeInfo, [NotNull] params Has[] dependencies);
+        [NotNull] IResolver CannotGetResolver([NotNull] IContainer container, Key key);
 
-        [NotNull]
-        Type[] CannotGetGenericTypeArguments([NotNull] Type type);
+        [NotNull] ConstructorInfo CannotFindConsructor([NotNull] TypeInfo typeInfo, [NotNull] params Has[] dependencies);
 
-        IFactory CannotBeCeated(Type instanceType);
+        [NotNull] Type[] CannotGetGenericTypeArguments([NotNull] Type type);
+
+        [NotNull] IFactory CannotBeCeated(Type instanceType);
 
         int CannotFindParameter([NotNull] ParameterInfo[] parameters, Parameter parameter);
 
         void CyclicDependenceDetected(Context context, [NotNull] TypeInfo typeInfo, int reentrancy);
-
-        [NotNull]
-        IDisposable CannotRegister([NotNull] IContainer container, Key[] keys);
     }
 }

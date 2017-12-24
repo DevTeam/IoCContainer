@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
 
-    internal class NullContainer : IContainer
+    internal sealed class NullContainer : IContainer
     {
         public IContainer Parent => throw new NotSupportedException();
 

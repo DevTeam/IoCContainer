@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
 
-    public class FuncFeature: IConfiguration
+    public sealed  class FuncFeature : IConfiguration
     {
         public static readonly IConfiguration Shared = new FuncFeature();
 
@@ -54,6 +54,7 @@
         private static object CreateFunc(Context ctx)
         {
             Type[] genericTypeArguments;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (ctx.ContractType.IsConstructedGenericType)
             {
                 genericTypeArguments = ctx.ContractType.GenericTypeArguments;

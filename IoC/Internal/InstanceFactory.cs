@@ -6,7 +6,7 @@
     using System.Linq.Expressions;
     using System.Reflection;
 
-    internal class InstanceFactory: IFactory
+    internal sealed class InstanceFactory : IFactory
     {
         private delegate object ConstructorFunc([NotNull][ItemCanBeNull] params object[] args);
         private delegate void MethodFunc([NotNull] object instance, [NotNull][ItemCanBeNull] params object[] args);

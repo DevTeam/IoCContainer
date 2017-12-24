@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Reflection;
 
-    internal class AutowiringFactory: IFactory
+    internal sealed class AutowiringFactory : IFactory
     {
         [NotNull] private readonly IIssueResolver _issueResolver;
         [NotNull] private readonly Type _instanceType;
@@ -49,6 +49,7 @@
                 if (!_factories.TryGetValue(context.ContractType, out var factory))
                 {
                     Type[] genericTypeArguments;
+                    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
                     if (context.ContractType.IsConstructedGenericType)
                     {
                         genericTypeArguments = context.ContractType.GenericTypeArguments;

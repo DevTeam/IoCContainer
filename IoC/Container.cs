@@ -12,9 +12,10 @@
     using Internal.Features;
 
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public static class Container
     {
-        private static readonly string RootName = "container://";
+        private const string RootName = "container://";
         private static long _containerId;
 
         [NotNull]
@@ -131,10 +132,11 @@
             return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3), typeof(T4)).Lifetime(lifetime).Tag(tagValue).To(typeof(TT));
         }
 
-        public static Registration<object> Map([NotNull] this IContainer container, [NotNull] params Type[] contractTypes)
+        public static Registration<object> Map([NotNull] this IContainer container, [NotNull][ItemNotNull] params Type[] contractTypes)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (contractTypes == null) throw new ArgumentNullException(nameof(contractTypes));
+            if (contractTypes.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(contractTypes));
             return new Registration<object>(container, contractTypes);
         }
 
@@ -220,13 +222,14 @@
             registrationToken.Container.Get<IResourceStore>().AddResource(registrationToken);
         }
 
-        public static Resolving Tag([NotNull] this IContainer container, [CanBeNull] object tag)
+        public static Resolving Tag([NotNull] this IContainer container, [NotNull] object tag)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
+            if (tag == null) throw new ArgumentNullException(nameof(tag));
             return new Resolving(container, tag);
         }
 
-        public static bool TryGet([NotNull] this IContainer container, [NotNull] Type contractType, out object instance, [NotNull] params object[] args){
+        public static bool TryGet([NotNull] this IContainer container, [NotNull] Type contractType, out object instance, [NotNull][ItemCanBeNull] params object[] args){
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (contractType == null) throw new ArgumentNullException(nameof(contractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
@@ -241,7 +244,7 @@
             return true;
         }
 
-        public static bool TryGet<T>([NotNull] this IContainer container, out T contract, [NotNull] params object[] args)
+        public static bool TryGet<T>([NotNull] this IContainer container, out T contract, [NotNull][ItemCanBeNull] params object[] args)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
@@ -256,7 +259,7 @@
         }
 
         [NotNull]
-        public static object Get([NotNull] this IContainer container, [NotNull] Type contractType, [NotNull] params object[] args)
+        public static object Get([NotNull] this IContainer container, [NotNull] Type contractType, [NotNull][ItemCanBeNull] params object[] args)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (contractType == null) throw new ArgumentNullException(nameof(contractType));
@@ -270,7 +273,7 @@
         }
 
         [NotNull]
-        public static T Get<T>([NotNull] this IContainer container, [NotNull] params object[] args)
+        public static T Get<T>([NotNull] this IContainer container, [NotNull][ItemCanBeNull] params object[] args)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
@@ -337,18 +340,20 @@
         }
 
         [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] params IConfiguration[] configurations)
+        public static IDisposable Apply([NotNull] this IContainer container, [NotNull][ItemNotNull] params IConfiguration[] configurations)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
+            if (configurations.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurations));
             return Disposable.Create(configurations.Select(i => i.Apply(container)).SelectMany(i => i));
         }
 
         [NotNull]
-        public static IContainer Using([NotNull] this IContainer container, [NotNull] params IConfiguration[] configurations)
+        public static IContainer Using([NotNull] this IContainer container, [NotNull][ItemNotNull] params IConfiguration[] configurations)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
+            if (configurations.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurations));
             container.Get<IResourceStore>().AddResource(container.Apply(configurations));
             return container;
         }
@@ -370,7 +375,7 @@
         }
 
         [NotNull]
-        private static string CreateContainerName([CanBeNull] string name)
+        private static string CreateContainerName([NotNull] string name)
         {
             // ReSharper disable once AssignNullToNotNullAttribute
             return !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);

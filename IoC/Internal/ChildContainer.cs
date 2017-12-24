@@ -5,7 +5,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    internal class ChildContainer: IContainer, IInstanceStore, IResourceStore, IEnumerable<Key>
+    internal sealed class ChildContainer : IContainer, IInstanceStore, IResourceStore, IEnumerable<Key>
     {
         private static long _registrationId;
         private readonly string _name;
@@ -18,7 +18,10 @@
         {
             _name = name ?? throw new ArgumentNullException(nameof(name));
             _parentContainer = new NullContainer();
-            _resources.Add(this.Apply(configurations));
+            if (configurations.Length > 0)
+            {
+                _resources.Add(this.Apply(configurations));
+            }
         }
 
         public ChildContainer(string name, [NotNull] IContainer parentContainer, bool root, params IConfiguration[] configurations)

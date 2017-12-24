@@ -59,10 +59,11 @@
             using (var container = Container.Create())
             {
                 // When
-                var curContainer = container.Tag(scope.HasValue ? (object) scope.Value : null).Get<IContainer>();
-
-                // Then
-                curContainer.ShouldBe(container);
+                using (var curContainer = scope.HasValue ? container.Tag(scope.Value).Get<IContainer>() : container.Get<IContainer>())
+                {
+                    // Then
+                    curContainer.ShouldBe(container);
+                }
             }
         }
 

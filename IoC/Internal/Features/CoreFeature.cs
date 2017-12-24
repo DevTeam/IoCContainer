@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
 
-    internal class CoreFeature: IConfiguration
+    internal sealed class CoreFeature: IConfiguration
     {
         public static readonly IConfiguration Shared = new CoreFeature();
 

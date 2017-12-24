@@ -3,7 +3,7 @@
     using System;
     using System.Reflection;
 
-    internal class IssueResolver: IIssueResolver
+    internal sealed class IssueResolver : IIssueResolver
     {
         public static readonly IIssueResolver Shared = new IssueResolver();
 

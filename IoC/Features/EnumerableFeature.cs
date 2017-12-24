@@ -5,7 +5,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    public class EnumerableFeature: IConfiguration
+    public sealed class EnumerableFeature : IConfiguration
     {
         public static readonly IConfiguration Shared = new EnumerableFeature();
 
@@ -24,11 +24,12 @@
         private static object CreateEnumerable(Context ctx)
         {
             var keys =
-                from key in ctx.ResolvingContainer as IEnumerable<Key> ?? System.Linq.Enumerable.Empty<Key>()
+                from key in ctx.ResolvingContainer as IEnumerable<Key> ?? Enumerable.Empty<Key>()
                 where key.Contract.Type == ctx.ContractType
                 select key;
 
             Type[] genericTypeArguments;
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (ctx.ContractType.IsConstructedGenericType)
             {
                 genericTypeArguments = ctx.ContractType.GenericTypeArguments;

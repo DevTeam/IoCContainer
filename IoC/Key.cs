@@ -6,9 +6,7 @@
         internal readonly Contract Contract;
         internal readonly Tag Tag;
 
-        public Key(
-            Contract contract,
-            Tag tag)
+        public Key(Contract contract, Tag tag)
         {
             Contract = contract;
             Tag = tag;
