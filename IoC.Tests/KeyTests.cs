@@ -37,9 +37,9 @@
         {
             private readonly List<object[]> _data = new List<object[]>
             {
-                new object[] {new Key(new Contract(typeof(string)), new Tag("abc")), new Key(new Contract(typeof(string)), new Tag("abc")), true},
-                new object[] {new Key(new Contract(typeof(int)), new Tag("abc")), new Key(new Contract(typeof(string)), new Tag("abc")), false},
-                new object[] {new Key(new Contract(typeof(string)), new Tag("abc")), new Key(new Contract(typeof(string)), new Tag("xyz")), false},
+                new object[] {new Key(typeof(string), "abc"), new Key(typeof(string), "abc"), true},
+                new object[] {new Key(typeof(int), "abc"), new Key(typeof(string), "abc"), false},
+                new object[] {new Key(typeof(string), "abc"), new Key(typeof(string), "xyz"), false},
             };
 
             public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();

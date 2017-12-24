@@ -11,6 +11,7 @@
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     [SuppressMessage("ReSharper", "UnusedTypeParameter")]
+    [SuppressMessage("ReSharper", "UnusedParameter.Global")]
     public class ContainerTests
     {
         [Fact]
@@ -624,7 +625,7 @@
                 // When
                 using (var childContainer = container.CreateChild())
                 using (childContainer.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => childRef))
-                using (childContainer.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0), Has.Ref("someRef", null, Scope.Parent)))
+                using (childContainer.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0), Has.Ref("someRef", Scope.Parent)))
                 {
                     // Then
                     var actualInstance = childContainer.Get<IMyService>("abc");
@@ -644,7 +645,7 @@
             {
                 // When
                 using (var childContainer = container.CreateChild())
-                using (childContainer.Map<IMyWrapper>().To(typeof(Wrapper), Has.Ref("wrapped", null, Scope.Parent)))
+                using (childContainer.Map<IMyWrapper>().To(typeof(Wrapper), Has.Ref("wrapped", Scope.Parent)))
                 {
                     // Then
                     var actualInstance = childContainer.Get<IMyWrapper>();

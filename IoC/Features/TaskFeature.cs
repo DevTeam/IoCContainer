@@ -46,7 +46,7 @@
 
             private static Func<T> CreateFunction(Context ctx)
             {
-                var key = new Key(new Contract(typeof(T)), ctx.Key.Tag);
+                var key = new Key(typeof(T), ctx.Key.Tag);
                 if (!ctx.ResolvingContainer.TryGetResolver(key, out var resolver))
                 {
                     resolver = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetResolver(ctx.ResolvingContainer, key);

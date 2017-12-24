@@ -8,6 +8,7 @@ namespace IoC.Tests
     using Xunit;
 
     [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class IssueResolverIntegrationTests
     {
         [Fact]
@@ -17,7 +18,7 @@ namespace IoC.Tests
             using (var container = Container.Create())
             {
                 var issueResolvere = new Mock<IIssueResolver>();
-                var key = new Key(new Contract(typeof(IMyService)), Tag.Default);
+                var key = new Key(typeof(IMyService));
                 issueResolvere.Setup(i => i.CannotResolve(container, key)).Throws<InvalidOperationException>();
 
                 // When

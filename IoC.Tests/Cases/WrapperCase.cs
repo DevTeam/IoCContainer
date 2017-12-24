@@ -1,9 +1,11 @@
 ﻿namespace IoC.Tests.Cases
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Moq;
     using Xunit;
 
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class WrapperCase
     {
         [Fact]

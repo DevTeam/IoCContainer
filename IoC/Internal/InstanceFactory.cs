@@ -194,7 +194,7 @@
                         break;
 
                     case DependencyType.Ref:
-                        factories[position] = new RefFactory(parameters[position].ParameterType, dependency.Tag.Value, dependency.Scope);
+                        factories[position] = new RefFactory(parameters[position].ParameterType, dependency.Tag, dependency.Scope);
                         break;
 
                     case DependencyType.Method:
@@ -286,7 +286,7 @@
                 Scope scope)
             {
                 _contractType = contractType;
-                _key = new Key(new Contract(contractType), new Tag(tagValue));
+                _key = new Key(contractType, tagValue);
                 _lastContainer = null;
                 _lastResolver = null;
                 _isDisposingContainer = false;

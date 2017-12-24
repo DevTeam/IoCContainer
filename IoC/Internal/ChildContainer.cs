@@ -84,11 +84,11 @@
                 hasResolver = _resolvers.TryGetValue(key, out resolver);
                 if (!hasResolver)
                 {
-                    var type = key.Contract.Type;
+                    var type = key.ContractType;
                     if (type.IsConstructedGenericType)
                     {
                         var genericInstanceType = type.GetGenericTypeDefinition();
-                        key = new Key(new Contract(genericInstanceType), key.Tag);
+                        key = new Key(genericInstanceType, key.Tag);
                         hasResolver = _resolvers.TryGetValue(key, out resolver);
                     }
                 }

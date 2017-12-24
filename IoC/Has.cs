@@ -1,10 +1,12 @@
 ﻿namespace IoC
 {
+    using System;
+
     [PublicAPI]
     public struct Has
     {
         internal readonly Parameter Parameter;
-        internal readonly Tag Tag;
+        internal readonly object Tag;
         internal readonly int ArgIndex;
         internal readonly DependencyType Type;
         internal readonly HasMethod HasMethod;
@@ -20,24 +22,26 @@
             return new Has(new Parameter(name), argIndex);
         }
 
-        public static Has Ref<T>([NotNull] string name, [CanBeNull] object tag, Scope scope = Scope.Current)
+        public static Has Ref<T>([NotNull] string name, [NotNull] object tag, Scope scope = Scope.Current)
         {
-            return new Has(new Parameter(name, typeof(T)), new Tag(tag), scope);
+            if (tag == null) throw new ArgumentNullException(nameof(tag));
+            return new Has(new Parameter(name, typeof(T)), tag, scope);
         }
 
         public static Has Ref<T>([NotNull] string name, Scope scope)
         {
-            return new Has(new Parameter(name, typeof(T)), Tag.Default, scope);
+            return new Has(new Parameter(name, typeof(T)), null, scope);
         }
 
-        public static Has Ref([NotNull] string name, [CanBeNull] object tag, Scope scope = Scope.Current)
+        public static Has Ref([NotNull] string name, [NotNull] object tag, Scope scope = Scope.Current)
         {
-            return new Has(new Parameter(name), new Tag(tag), scope);
+            if (tag == null) throw new ArgumentNullException(nameof(tag));
+            return new Has(new Parameter(name), tag, scope);
         }
 
         public static Has Ref([NotNull] string name, Scope scope)
         {
-            return new Has(new Parameter(name), Tag.Default, scope);
+            return new Has(new Parameter(name), null, scope);
         }
 
         public static Has Method(string name, params Has[] dependencies)
@@ -60,12 +64,12 @@
             Type = DependencyType.Arg;
             Parameter = parameter;
             ArgIndex = argIndex;
-            Tag = Tag.Default;
+            Tag = null;
             HasMethod = default(HasMethod);
             Scope = Scope.Current;
         }
 
-        private Has(Parameter parameter, Tag tag, Scope scope)
+        private Has(Parameter parameter, object tag, Scope scope)
         {
             Type = DependencyType.Ref;
             Parameter = parameter;
@@ -79,7 +83,7 @@
         {
             Type = DependencyType.Method;
             Parameter = default(Parameter);
-            Tag = default(Tag);
+            Tag = null;
             ArgIndex = 0;
             HasMethod = hasMethod;
             Scope = Scope.Current;

@@ -25,7 +25,7 @@
         {
             var keys =
                 from key in ctx.ResolvingContainer as IEnumerable<Key> ?? Enumerable.Empty<Key>()
-                where key.Contract.Type == ctx.ContractType
+                where key.ContractType == ctx.ContractType
                 select key;
 
             Type[] genericTypeArguments;

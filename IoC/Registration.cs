@@ -8,17 +8,16 @@
     public struct Registration<T>
     {
         [NotNull] internal readonly IContainer Container;
-        [NotNull] internal readonly IEnumerable<Contract> ContractsTypes;
-        [NotNull] internal readonly IEnumerable<Tag> Tags;
+        [NotNull] internal readonly IEnumerable<Type> ContractsTypes;
+        [NotNull] internal readonly IEnumerable<object> Tags;
         [CanBeNull] internal readonly ILifetime Lifetime;
 
         public Registration([NotNull] IContainer container, [NotNull] params Type[] contractTypes)
         {
-            if (contractTypes == null) throw new ArgumentNullException(nameof(contractTypes));
             Container = container ?? throw new ArgumentNullException(nameof(container));
-            ContractsTypes = contractTypes.Select(i => new Contract(i)).ToArray();
+            ContractsTypes = contractTypes ?? throw new ArgumentNullException(nameof(contractTypes));
             Lifetime = null;
-            Tags = Enumerable.Empty<Tag>();
+            Tags = Enumerable.Empty<object>();
         }
 
         public Registration(Registration<T> registration, Lifetime lifetime)
@@ -57,7 +56,7 @@
             Container = registration.Container;
             ContractsTypes = registration.ContractsTypes;
             Lifetime = registration.Lifetime;
-            Tags = registration.Tags.Concat(Enumerable.Repeat(new Tag(tagValue), 1)).Distinct().ToArray();
+            Tags = registration.Tags.Concat(Enumerable.Repeat(tagValue, 1)).Distinct().ToArray();
         }
     }
 }

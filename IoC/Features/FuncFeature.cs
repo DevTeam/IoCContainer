@@ -127,7 +127,7 @@
             public InstanceFunc(Context ctx)
             {
                 Ctx = ctx;
-                var key = new Key(new Contract(typeof(T)), ctx.Key.Tag);
+                var key = new Key(typeof(T), ctx.Key.Tag);
                 if (!ctx.ResolvingContainer.TryGetResolver(key, out Resolver))
                 {
                     Resolver = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetResolver(ctx.ResolvingContainer, key);

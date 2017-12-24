@@ -363,7 +363,7 @@
         {
             var keys = (
                 from contract in registration.ContractsTypes
-                from tag in registration.Tags.DefaultIfEmpty(IoC.Tag.Default)
+                from tag in registration.Tags.DefaultIfEmpty(null)
                 select new Key(contract, tag)).Distinct().ToArray();
 
             if (!registration.Container.TryRegister(keys, factory, registration.Lifetime, out var registrationToken))
@@ -389,8 +389,7 @@
                 tagValue = resolving.Tag;
             }
 
-            var tag = tagValue != null ? new Tag(tagValue) : IoC.Tag.Default;
-            return new Key(new Contract(contractType), tag);
+            return new Key(contractType, tagValue);
         }
 
         private static IIssueResolver GetIssueResolver(this IContainer container)

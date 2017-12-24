@@ -1,20 +1,22 @@
 ﻿namespace IoC
 {
+    using System;
+
     [PublicAPI]
     public struct Key
     {
-        internal readonly Contract Contract;
-        internal readonly Tag Tag;
+        [NotNull] internal readonly Type ContractType;
+        [CanBeNull] internal readonly object Tag;
 
-        public Key(Contract contract, Tag tag)
+        public Key([NotNull] Type type, [CanBeNull] object tag = null)
         {
-            Contract = contract;
+            ContractType = type ?? throw new ArgumentNullException(nameof(type));
             Tag = tag;
         }
 
         public override string ToString()
         {
-            return $"Key: [{Contract}, {Tag}]";
+            return $"Key: [{ContractType.Name} {Tag ?? "empty"}]";
         }
     }
 }
