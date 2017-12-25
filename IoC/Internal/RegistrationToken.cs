@@ -1,9 +1,8 @@
-﻿namespace IoC
+﻿namespace IoC.Internal
 {
     using System;
 
-    [PublicAPI]
-    public struct RegistrationToken: IDisposable
+    internal struct RegistrationToken: IDisposable
     {
         [NotNull] internal readonly IContainer Container;
         [NotNull] private readonly IDisposable _registration;

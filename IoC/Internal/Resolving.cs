@@ -1,11 +1,9 @@
-﻿namespace IoC
+﻿namespace IoC.Internal
 {
     using System;
     using System.Collections.Generic;
-    using Internal;
 
-    [PublicAPI]
-    public struct Resolving: IContainer, IInstanceStore
+    internal struct Resolving: IContainer, IInstanceStore
     {
         [NotNull] internal readonly IContainer Container;
         [CanBeNull] internal readonly object Tag;

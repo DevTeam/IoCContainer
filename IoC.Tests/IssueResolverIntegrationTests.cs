@@ -53,7 +53,7 @@ namespace IoC.Tests
 
                 try
                 {
-                    using (container.Autowiring<MyClassWithoutCtor, IMyService>())
+                    using (container.Map<IMyService>().To(typeof(MyClassWithoutCtor)))
                     {
                     }
                 }

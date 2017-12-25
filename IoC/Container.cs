@@ -52,88 +52,7 @@
             return new ChildContainer($"{parent}/{CreateContainerName(name)}", parent, false);
         }
 
-        [NotNull]
-        public static IDisposable Autowiring([NotNull] this IContainer container, [NotNull] Type instanceType, [NotNull] Type contractType, Lifetime lifetime = IoC.Lifetime.Transient, [CanBeNull] object tagValue = null)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (contractType == null) throw new ArgumentNullException(nameof(contractType));
-            if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
-            if (tagValue == null)
-            {
-                return new Registration<object>(container, contractType).Lifetime(lifetime).To(instanceType);
-            }
-
-            return new Registration<object>(container, contractType).Lifetime(lifetime).Tag(tagValue).To(instanceType);
-        }
-
-        [NotNull]
-        public static IDisposable Autowiring([NotNull] this IContainer container, [NotNull] Type instanceType, Lifetime lifetime = IoC.Lifetime.Transient, [CanBeNull] object tagValue = null, [NotNull] params Type[] contractTypes)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (contractTypes == null) throw new ArgumentNullException(nameof(contractTypes));
-            if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
-            if (tagValue == null)
-            {
-                return new Registration<object>(container, contractTypes).Lifetime(lifetime).To(instanceType);
-            }
-
-            return new Registration<object>(container, contractTypes).Lifetime(lifetime).Tag(tagValue).To(instanceType);
-        }
-
-        [NotNull]
-        public static IDisposable Autowiring<TT, T1>([NotNull] this IContainer container, Lifetime lifetime = IoC.Lifetime.Transient, [CanBeNull] object tagValue = null)
-            where TT: T1
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (tagValue == null)
-            {
-                return new Registration<T1>(container, typeof(T1)).Lifetime(lifetime).To(typeof(TT));
-            }
-
-            return new Registration<T1>(container, typeof(T1)).Lifetime(lifetime).Tag(tagValue).To(typeof(TT));
-        }
-
-
-        [NotNull]
-        public static IDisposable Autowiring<TT, T1, T2>([NotNull] this IContainer container, Lifetime lifetime = IoC.Lifetime.Transient, [CanBeNull] object tagValue = null)
-            where TT : T1, T2
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (tagValue == null)
-            {
-                return new Registration<T1>(container, typeof(T1), typeof(T2)).Lifetime(lifetime).To(typeof(TT));
-            }
-
-            return new Registration<T1>(container, typeof(T1), typeof(T2)).Lifetime(lifetime).Tag(tagValue).To(typeof(TT));
-        }
-
-        [NotNull]
-        public static IDisposable Autowiring<TT, T1, T2, T3>([NotNull] this IContainer container, Lifetime lifetime = IoC.Lifetime.Transient, [CanBeNull] object tagValue = null)
-            where TT : T1, T2, T3
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (tagValue == null)
-            {
-                return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3)).Lifetime(lifetime).To(typeof(TT));
-            }
-
-            return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3)).Lifetime(lifetime).Tag(tagValue).To(typeof(TT));
-        }
-
-        [NotNull]
-        public static IDisposable Autowiring<TT, T1, T2, T3, T4>([NotNull] this IContainer container, Lifetime lifetime = IoC.Lifetime.Transient, [CanBeNull] object tagValue = null)
-            where TT : T1, T2, T4
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (tagValue == null)
-            {
-                return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3), typeof(T4)).Lifetime(lifetime).To(typeof(TT));
-            }
-
-            return new Registration<T1>(container, typeof(T1), typeof(T2), typeof(T3), typeof(T4)).Lifetime(lifetime).Tag(tagValue).To(typeof(TT));
-        }
-
-        public static Registration<object> Map([NotNull] this IContainer container, [NotNull][ItemNotNull] params Type[] contractTypes)
+        public static IRegistration<object> Map([NotNull] this IContainer container, [NotNull][ItemNotNull] params Type[] contractTypes)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (contractTypes == null) throw new ArgumentNullException(nameof(contractTypes));
@@ -144,7 +63,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static Registration<T> Map<T>([NotNull] this IContainer container)
+        public static IRegistration<T> Map<T>([NotNull] this IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             return new Registration<T>(container, typeof(T));
@@ -153,7 +72,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static Registration<T> Map<T, T1>([NotNull] this IContainer container)
+        public static IRegistration<T> Map<T, T1>([NotNull] this IContainer container)
             where T: T1
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -163,7 +82,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static Registration<T> Map<T, T1, T2>([NotNull] this IContainer container)
+        public static IRegistration<T> Map<T, T1, T2>([NotNull] this IContainer container)
             where T : T1, T2
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -173,7 +92,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static Registration<T> Map<T, T1, T2, T3>([NotNull] this IContainer container)
+        public static IRegistration<T> Map<T, T1, T2, T3>([NotNull] this IContainer container)
             where T : T1, T2, T3
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -183,7 +102,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static Registration<T> Map<T, T1, T2, T3, T4>([NotNull] this IContainer container)
+        public static IRegistration<T> Map<T, T1, T2, T3, T4>([NotNull] this IContainer container)
             where T : T1, T2, T3, T4
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -193,7 +112,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static Registration<T> Lifetime<T>(this Registration<T> registration, Lifetime lifetime)
+        public static IRegistration<T> Lifetime<T>(this IRegistration<T> registration, Lifetime lifetime)
         {
             return new Registration<T>(registration, lifetime);
         }
@@ -201,7 +120,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static Registration<T> Lifetime<T>(this Registration<T> registration, [NotNull] ILifetime lifetime)
+        public static IRegistration<T> Lifetime<T>(this IRegistration<T> registration, [NotNull] ILifetime lifetime)
         {
             if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
             return new Registration<T>(registration, lifetime);
@@ -210,7 +129,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static Registration<T> Tag<T>(this Registration<T> registration, [NotNull] object tagValue)
+        public static IRegistration<T> Tag<T>(this IRegistration<T> registration, [NotNull] object tagValue)
         {
             if (tagValue == null) throw new ArgumentNullException(nameof(tagValue));
             return new Registration<T>(registration, tagValue);
@@ -219,7 +138,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static RegistrationToken To<T>(this Registration<T> registration, [NotNull] IFactory factory)
+        public static IDisposable To<T>(this IRegistration<T> registration, [NotNull] IFactory factory)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             return new RegistrationToken(registration.Container, CreateRegistration(registration, factory));
@@ -228,13 +147,13 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static RegistrationToken To<T>(this Registration<T> registration, [NotNull] Func<Context, T> factory)
+        public static IDisposable To<T>(this IRegistration<T> registration, [NotNull] Func<Context, T> factory)
         {
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             return registration.To(new FuncFactory<T>(factory));
         }
 
-        public static RegistrationToken To<T>(this Registration<T> registration, [NotNull] Type instanceType, [NotNull] params Has[] dependencies)
+        public static IDisposable To<T>(this IRegistration<T> registration, [NotNull] Type instanceType, [NotNull] params Has[] dependencies)
         {
             if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
             if (dependencies == null) throw new ArgumentNullException(nameof(dependencies));
@@ -251,15 +170,32 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static void ToSelf(this RegistrationToken registrationToken)
+        public static IDisposable To<T>(this IRegistration<T> registration, [NotNull] params Has[] dependencies)
         {
-            registrationToken.Container.Get<IResourceStore>().AddResource(registrationToken);
+            if (dependencies == null) throw new ArgumentNullException(nameof(dependencies));
+            return registration.To(typeof(T), dependencies);
         }
 
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static Resolving Tag([NotNull] this IContainer container, [NotNull] object tag)
+        public static void ToSelf([NotNull] this IDisposable registrationToken)
+        {
+            if (registrationToken == null) throw new ArgumentNullException(nameof(registrationToken));
+            if (registrationToken is RegistrationToken token)
+            {
+                token.Container.Get<IResourceStore>().AddResource(registrationToken);
+            }
+            else
+            {
+                throw new NotSupportedException();
+            }
+        }
+
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
+        public static IContainer Tag([NotNull] this IContainer container, [NotNull] object tag)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (tag == null) throw new ArgumentNullException(nameof(tag));
@@ -430,7 +366,7 @@
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         [NotNull]
-        private static IDisposable CreateRegistration<T>(this Registration<T> registration, IFactory factory)
+        private static IDisposable CreateRegistration<T>(this IRegistration<T> registration, IFactory factory)
         {
             var keys = (
                 from contract in registration.ContractsTypes

@@ -57,8 +57,8 @@
         {
             public IEnumerable<IDisposable> Apply(IContainer container)
             {
-                yield return container.Autowiring(typeof(CardboardBox<>), typeof(IBox<>));
-                yield return container.Autowiring<ShroedingersCat, ICat>();
+                yield return container.Map(typeof(IBox<>)).To(typeof(CardboardBox<>));
+                yield return container.Map<ICat>().To<ShroedingersCat>();
             }
         }
     }
