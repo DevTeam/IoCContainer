@@ -57,8 +57,8 @@
         {
             public IEnumerable<IDisposable> Apply(IContainer container)
             {
-                yield return container.Map(typeof(IBox<>)).To(typeof(CardboardBox<>));
-                yield return container.Map<ICat>().To<ShroedingersCat>();
+                yield return container.Bind(typeof(IBox<>)).To(typeof(CardboardBox<>));
+                yield return container.Bind<ICat>().To<ShroedingersCat>();
             }
         }
     }

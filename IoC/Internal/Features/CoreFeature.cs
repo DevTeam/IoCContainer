@@ -16,49 +16,49 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
 
             yield return container
-                .Map<IIssueResolver>()
+                .Bind<IIssueResolver>()
                 .To(ctx => IssueResolver.Shared);
 
             yield return container
-                .Map<ILifetime>()
+                .Bind<ILifetime>()
                 .Tag(Lifetime.Transient)
                 .To(ctx => null);
 
             yield return container
-                .Map<ILifetime>()
+                .Bind<ILifetime>()
                 .Tag(Lifetime.Singletone)
                 .To(ctx => SingletoneLifetime.Shared);
 
             yield return container
-                .Map<ILifetime>()
+                .Bind<ILifetime>()
                 .Tag(Lifetime.Container)
                 .To(ctx => ContainerLifetime.Shared);
 
             yield return container
-                .Map<IContainer>()
+                .Bind<IContainer>()
                 .To(ctx => Normalize(ctx.ResolvingContainer));
 
             yield return container
-                .Map<IContainer>()
+                .Bind<IContainer>()
                 .Tag(Scope.Current)
                 .To(ctx => Normalize(ctx.ResolvingContainer));
 
             yield return container
-                .Map<IContainer>()
+                .Bind<IContainer>()
                 .Tag(Scope.Child)
                 .To(ctx => Normalize(ctx.ResolvingContainer.CreateChild()));
 
             yield return container
-                .Map<IContainer>()
+                .Bind<IContainer>()
                 .Tag(Scope.Parent)
                 .To(ctx => Normalize(ctx.ResolvingContainer.Parent));
 
             yield return container
-                .Map<IResourceStore>()
+                .Bind<IResourceStore>()
                 .To(ctx => (IResourceStore)ctx.ResolvingContainer);
 
             yield return container
-                .Map<IFactory>()
+                .Bind<IFactory>()
                 .To(ctx => new AutowiringFactory(
                     ctx.ResolvingContainer.Get<IIssueResolver>(),
                     (Type)ctx.Args[0],

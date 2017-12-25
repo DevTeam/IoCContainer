@@ -16,39 +16,39 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container
-                .Map(typeof(Func<>))
+                .Bind(typeof(Func<>))
                 .To(CreateFunc);
 
             yield return container
-                .Map(typeof(Func<,>))
+                .Bind(typeof(Func<,>))
                 .To(CreateFunc);
 
             yield return container
-                .Map(typeof(Func<,,>))
+                .Bind(typeof(Func<,,>))
                 .To(CreateFunc);
 
             yield return container
-                .Map(typeof(Func<,,,>))
+                .Bind(typeof(Func<,,,>))
                 .To(CreateFunc);
 
             yield return container
-                .Map(typeof(Func<,,,,>))
+                .Bind(typeof(Func<,,,,>))
                 .To(CreateFunc);
 
             yield return container
-                .Map(typeof(Func<,,,,,>))
+                .Bind(typeof(Func<,,,,,>))
                 .To(CreateFunc);
 
             yield return container
-                .Map(typeof(Func<,,,,,,>))
+                .Bind(typeof(Func<,,,,,,>))
                 .To(CreateFunc);
 
             yield return container
-                .Map(typeof(Func<,,,,,,,>))
+                .Bind(typeof(Func<,,,,,,,>))
                 .To(CreateFunc);
 
             yield return container
-                .Map(typeof(Func<,,,,,,,,>))
+                .Bind(typeof(Func<,,,,,,,,>))
                 .To(CreateFunc);
         }
 

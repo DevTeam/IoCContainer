@@ -18,13 +18,13 @@ namespace IoC.Tests.Cases
             issueResolver.Setup(i => i.CyclicDependenceDetected(It.IsAny<Context>(), It.IsAny<Type>(), 32)).Throws(expectedException);
 
             using (var container = Container.Create("base"))
-            using (container.Map<IIssueResolver>().To(ctx => issueResolver.Object))
-            using (container.Map<ILink>().To(typeof(Link), Has.Ref("link", 1)))
-            using (container.Map<ILink>().Tag(1).To(typeof(Link), Has.Ref("link", 2)))
-            using (container.Map<ILink>().Tag(2).To(typeof(Link), Has.Ref("link", 3)))
-            using (container.Map<ILink>().Tag(3).To(typeof(Link), Has.Ref("link", 4)))
-            using (container.Map<ILink>().Tag(4).To(typeof(Link), Has.Ref("link", 5)))
-            using (container.Map<ILink>().Tag(5).To(typeof(Link), Has.Ref("link", 1)))
+            using (container.Bind<IIssueResolver>().To(ctx => issueResolver.Object))
+            using (container.Bind<ILink>().To(typeof(Link), Has.Ref("link", 1)))
+            using (container.Bind<ILink>().Tag(1).To(typeof(Link), Has.Ref("link", 2)))
+            using (container.Bind<ILink>().Tag(2).To(typeof(Link), Has.Ref("link", 3)))
+            using (container.Bind<ILink>().Tag(3).To(typeof(Link), Has.Ref("link", 4)))
+            using (container.Bind<ILink>().Tag(4).To(typeof(Link), Has.Ref("link", 5)))
+            using (container.Bind<ILink>().Tag(5).To(typeof(Link), Has.Ref("link", 1)))
             {
                 try
                 {

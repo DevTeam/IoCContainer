@@ -52,7 +52,7 @@
             return new ChildContainer($"{parent}/{CreateContainerName(name)}", parent, false);
         }
 
-        public static IRegistration<object> Map([NotNull] this IContainer container, [NotNull][ItemNotNull] params Type[] contractTypes)
+        public static IRegistration<object> Bind([NotNull] this IContainer container, [NotNull][ItemNotNull] params Type[] contractTypes)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (contractTypes == null) throw new ArgumentNullException(nameof(contractTypes));
@@ -63,7 +63,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static IRegistration<T> Map<T>([NotNull] this IContainer container)
+        public static IRegistration<T> Bind<T>([NotNull] this IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             return new Registration<T>(container, typeof(T));
@@ -72,7 +72,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static IRegistration<T> Map<T, T1>([NotNull] this IContainer container)
+        public static IRegistration<T> Bind<T, T1>([NotNull] this IContainer container)
             where T: T1
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -82,7 +82,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static IRegistration<T> Map<T, T1, T2>([NotNull] this IContainer container)
+        public static IRegistration<T> Bind<T, T1, T2>([NotNull] this IContainer container)
             where T : T1, T2
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -92,7 +92,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static IRegistration<T> Map<T, T1, T2, T3>([NotNull] this IContainer container)
+        public static IRegistration<T> Bind<T, T1, T2, T3>([NotNull] this IContainer container)
             where T : T1, T2, T3
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -102,7 +102,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        public static IRegistration<T> Map<T, T1, T2, T3, T4>([NotNull] this IContainer container)
+        public static IRegistration<T> Bind<T, T1, T2, T3, T4>([NotNull] this IContainer container)
             where T : T1, T2, T3, T4
         {
             if (container == null) throw new ArgumentNullException(nameof(container));

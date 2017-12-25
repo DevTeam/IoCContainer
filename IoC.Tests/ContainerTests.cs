@@ -23,7 +23,7 @@
                 var expectedInstance = Mock.Of<IMyService>();
 
                 // When
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>();
@@ -41,7 +41,7 @@
                 var expectedInstance = Mock.Of<IMyService>();
 
                 // When
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
                 using (var childContainer = container.Tag(Scope.Child).Get<IContainer>())
                 {
                     // Then
@@ -91,7 +91,7 @@
             {
                 // When
                 IContainer actualChildContainer;
-                using (container.Map<IContainer>().To(ctx => childContainer.Object))
+                using (container.Bind<IContainer>().To(ctx => childContainer.Object))
                 {
                     actualChildContainer = container.Get<IContainer>();
                 }
@@ -110,7 +110,7 @@
             {
                 var childContainer = container.CreateChild("child");
                 IDisposable actualInstance;
-                using (childContainer.Map<IDisposable>().Lifetime(Lifetime.Container).To(ctx => expectedInstance.Object))
+                using (childContainer.Bind<IDisposable>().Lifetime(Lifetime.Container).To(ctx => expectedInstance.Object))
                 {
                     // When
                     actualInstance = childContainer.Get<IDisposable>();
@@ -132,7 +132,7 @@
                 var expectedInstance = Mock.Of<IMyService>();
 
                 // When
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>();
@@ -150,7 +150,7 @@
             using (var container = Container.Create())
             {
                 // When
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(ctx => Mock.Of<IMyService>()))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => Mock.Of<IMyService>()))
                 {
                     // Then
                     var instance1 = container.Get<IMyService>();
@@ -167,7 +167,7 @@
             using (var container = Container.Create())
             {
                 // When
-                using (container.Map<IMyService>().Lifetime(Lifetime.Singletone).To(ctx => Mock.Of<IMyService>()))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Singletone).To(ctx => Mock.Of<IMyService>()))
                 {
                     // Then
                     var instance1 = container.Get<IMyService>();
@@ -190,7 +190,7 @@
             using (var container = Container.Create())
             {
                 // When
-                using (container.Map<IMyService, IMyService1>().Lifetime(Lifetime.Singletone).To(ctx => Mock.Of<IMyService>()))
+                using (container.Bind<IMyService, IMyService1>().Lifetime(Lifetime.Singletone).To(ctx => Mock.Of<IMyService>()))
                 {
                     // Then
                     var instance1 = container.Get<IMyService>();
@@ -215,7 +215,7 @@
             using (var container = Container.Create())
             {
                 // When
-                using (container.Map<IMyService>().Lifetime(Lifetime.Singletone).To(ctx => Mock.Of<IMyService>()))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Singletone).To(ctx => Mock.Of<IMyService>()))
                 {
                     // Then
                     var instance1 = container.Get<IMyService>();
@@ -238,7 +238,7 @@
             using (var container = Container.Create())
             {
                 // When
-                using (container.Map<IMyService>().Lifetime(Lifetime.Container).To(ctx => Mock.Of<IMyService>()))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Container).To(ctx => Mock.Of<IMyService>()))
                 {
                     // Then
                     var instance1 = container.Get<IMyService>();
@@ -261,7 +261,7 @@
             using (var container = Container.Create())
             {
                 // When
-                using (container.Map<IMyService, IMyService1>().Lifetime(Lifetime.Container).To(ctx => Mock.Of<IMyService>()))
+                using (container.Bind<IMyService, IMyService1>().Lifetime(Lifetime.Container).To(ctx => Mock.Of<IMyService>()))
                 {
                     // Then
                     var instance1 = container.Get<IMyService>();
@@ -288,7 +288,7 @@
                 var expectedInstance = Mock.Of<IMyService>();
 
                 // When
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     using (var childContainer = container.CreateChild())
                     {
@@ -309,7 +309,7 @@
                 var expectedInstance = Mock.Of<IMyService>();
 
                 // When
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).Tag("abc").Tag(10).To(ctx => expectedInstance))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).Tag("abc").Tag(10).To(ctx => expectedInstance))
                 {
                     // Then
                     var actualInstance = container.Tag(10).Get<IMyService>();
@@ -327,8 +327,8 @@
                 var expectedRef = Mock.Of<IMyService>();
 
                 // When
-                using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0)))
+                using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0)))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>("abc");
@@ -349,8 +349,8 @@
                 var expectedRef = Mock.Of<IMyService>();
 
                 // When
-                using (container.Map<IMyService1>().Tag(33).Lifetime(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0), Has.Ref<IMyService1>("someRef", 33)))
+                using (container.Bind<IMyService1>().Tag(33).Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0), Has.Ref<IMyService1>("someRef", 33)))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>("abc");
@@ -371,7 +371,7 @@
                 var expectedInstance = Mock.Of<IMyGenericService<int, string>>();
 
                 // When
-                using (container.Map(typeof(IMyGenericService<,>)).Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind(typeof(IMyGenericService<,>)).Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
                     var actualInstance = container.Get<IMyGenericService<int, string>>();
@@ -387,7 +387,7 @@
             using (var container = Container.Create())
             {
                 // When
-                using (container.Map(typeof(IMyGenericService<,>)).Lifetime(Lifetime.Transient).To(typeof(MyGenericService<,>)))
+                using (container.Bind(typeof(IMyGenericService<,>)).Lifetime(Lifetime.Transient).To(typeof(MyGenericService<,>)))
                 {
                     // Then
                     var actualInstance = container.Get<IMyGenericService<int, string>>();
@@ -403,9 +403,9 @@
             using (var container = Container.Create())
             {
                 // When
-                using (container.Map<IMyService, IMyService1>().Lifetime(Lifetime.Transient).Tag(1).To(ctx => Mock.Of<IMyService>()))
-                using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).Tag("abc").To(ctx => Mock.Of<IMyService1>()))
-                using (container.Map<IMyService, IMyService1>().Lifetime(Lifetime.Transient).Tag("xyz").To(ctx => Mock.Of<IMyService>()))
+                using (container.Bind<IMyService, IMyService1>().Lifetime(Lifetime.Transient).Tag(1).To(ctx => Mock.Of<IMyService>()))
+                using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).Tag("abc").To(ctx => Mock.Of<IMyService1>()))
+                using (container.Bind<IMyService, IMyService1>().Lifetime(Lifetime.Transient).Tag("xyz").To(ctx => Mock.Of<IMyService>()))
                 {
                     // Then
                     var actualInstances = container.Get<IEnumerable<IMyService1>>().ToList();
@@ -423,7 +423,7 @@
                 var expectedInstance = Mock.Of<IMyService>();
 
                 // When
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
                     var func = container.Get<Func<IMyService>>();
@@ -442,8 +442,8 @@
                 var expectedRef = Mock.Of<IMyService>();
 
                 // When
-                using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0)))
+                using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0)))
                 {
                     // Then
                     var func = container.Get<Func<string, IMyService>>();
@@ -462,7 +462,7 @@
             using (var container = Container.Create())
             {
                 // When
-                using (container.Map(typeof(IMyGenericService1<>)).Lifetime(Lifetime.Singletone).To(ctx =>
+                using (container.Bind(typeof(IMyGenericService1<>)).Lifetime(Lifetime.Singletone).To(ctx =>
                 {
                     if(ctx.ContractType.GenericTypeArguments[0] == typeof(string))
                     {
@@ -497,7 +497,7 @@
                 var expectedInstance = Mock.Of<IMyService>();
 
                 // When
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
                     var task = container.Get<Task<IMyService>>();
@@ -517,8 +517,8 @@
                 var expectedRef = Mock.Of<IMyService>();
 
                 // When
-                using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(
+                using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(
                     typeof(MyService),
                     Has.Arg<string>("name", 0),
                     Has.Method(
@@ -544,8 +544,8 @@
                 var expectedRef = Mock.Of<IMyService>();
 
                 // When
-                using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(
+                using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(
                     typeof(MyService),
                     Has.Arg<string>("name", 0),
                     Has.Method(
@@ -571,8 +571,8 @@
                 var expectedRef = Mock.Of<IMyService>();
 
                 // When
-                using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(
+                using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(
                     typeof(MyService),
                     Has.Arg("name", 0),
                     Has.Property("Name", 1)))
@@ -596,8 +596,8 @@
                 var expectedRef = Mock.Of<IMyService>();
 
                 // When
-                using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Map<IMyService>().Lifetime(Lifetime.Transient).To(
+                using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(
                     typeof(MyService),
                     Has.Arg("name", 0),
                     Has.Property<string>("Name", 1)))
@@ -618,14 +618,14 @@
             // Given
             var expectedRef = Mock.Of<IMyService>();
             using (var container = Container.Create())
-            using (container.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+            using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
             {
                 var childRef = Mock.Of<IMyService>();
 
                 // When
                 using (var childContainer = container.CreateChild())
-                using (childContainer.Map<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => childRef))
-                using (childContainer.Map<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0), Has.Ref("someRef", Scope.Parent)))
+                using (childContainer.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => childRef))
+                using (childContainer.Bind<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0), Has.Ref("someRef", Scope.Parent)))
                 {
                     // Then
                     var actualInstance = childContainer.Get<IMyService>("abc");
@@ -641,11 +641,11 @@
         {
             // Given
             using (var container = Container.Create())
-            using (container.Map<IMyWrapper>().To(typeof(Wrappered)))
+            using (container.Bind<IMyWrapper>().To(typeof(Wrappered)))
             {
                 // When
                 using (var childContainer = container.CreateChild())
-                using (childContainer.Map<IMyWrapper>().To(typeof(Wrapper), Has.Ref("wrapped", Scope.Parent)))
+                using (childContainer.Bind<IMyWrapper>().To(typeof(Wrapper), Has.Ref("wrapped", Scope.Parent)))
                 {
                     // Then
                     var actualInstance = childContainer.Get<IMyWrapper>();

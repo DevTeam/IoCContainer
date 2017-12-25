@@ -23,7 +23,7 @@ namespace IoC.Tests
                 issueResolvere.Setup(i => i.CannotResolve(container, key)).Throws<InvalidOperationException>();
 
                 // When
-                using (container.Map<IIssueResolver>().Lifetime(Lifetime.Singletone).To(ctx => issueResolvere.Object))
+                using (container.Bind<IIssueResolver>().Lifetime(Lifetime.Singletone).To(ctx => issueResolvere.Object))
                 {
                     try
                     {
@@ -49,11 +49,11 @@ namespace IoC.Tests
                 issueResolvere.Setup(i => i.CannotFindConsructor(typeof(MyClassWithoutCtor))).Throws<InvalidOperationException>();
 
                 // When
-                using (container.Map<IIssueResolver>().Lifetime(Lifetime.Singletone).To(ctx => issueResolvere.Object))
+                using (container.Bind<IIssueResolver>().Lifetime(Lifetime.Singletone).To(ctx => issueResolvere.Object))
 
                 try
                 {
-                    using (container.Map<IMyService>().To(typeof(MyClassWithoutCtor)))
+                    using (container.Bind<IMyService>().To(typeof(MyClassWithoutCtor)))
                     {
                     }
                 }

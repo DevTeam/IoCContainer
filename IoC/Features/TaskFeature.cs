@@ -17,7 +17,7 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container
-                .Map(typeof(Task<>))
+                .Bind(typeof(Task<>))
                 .To(CreateTask);
         }
 

@@ -61,8 +61,8 @@ namespace IoC.Tests
         private static long This(int series)
         {
             using (var container = Container.Create())
-            using (container.Map<IService1>().To<Service1>())
-            using (container.Map<IService2>().Lifetime(Lifetime.Singletone).To<Service2>())
+            using (container.Bind<IService1>().To<Service1>())
+            using (container.Bind<IService2>().Lifetime(Lifetime.Singletone).To<Service2>())
             {
                 var stopwatch = Stopwatch.StartNew();
                 for (var i = 0; i < series; i++)
@@ -78,8 +78,8 @@ namespace IoC.Tests
         private static long ThisFunc(int series)
         {
             using (var container = Container.Create())
-            using (container.Map<IService1>().To<Service1>())
-            using (container.Map<IService2>().Lifetime(Lifetime.Singletone).To<Service2>())
+            using (container.Bind<IService1>().To<Service1>())
+            using (container.Bind<IService2>().Lifetime(Lifetime.Singletone).To<Service2>())
             {
                 var stopwatch = Stopwatch.StartNew();
                 var func = container.Get<Func<IService1>>();

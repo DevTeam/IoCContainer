@@ -15,16 +15,16 @@
 
             // Configure base container and base logger
             using (var baseContainer = Container.Create("base"))
-            using (baseContainer.Map<IConsole>().To(ctx => console.Object))
+            using (baseContainer.Bind<IConsole>().To(ctx => console.Object))
             // And add base logger
-            using (baseContainer.Map<ILogger>().To(typeof(Logger)))
+            using (baseContainer.Bind<ILogger>().To(typeof(Logger)))
             {
                 // Configure some new container
                 using (var myContainer = baseContainer.CreateChild("my"))
                 // And add some console
-                using (myContainer.Map<IConsole>().To(ctx => console.Object))
+                using (myContainer.Bind<IConsole>().To(ctx => console.Object))
                 // And add logger wrapper, specifing that resolving of the "logger" dependency should be done from the parent container
-                using (myContainer.Map<ILogger>().To(typeof(TimeLogger), Has.Ref("logger", Scope.Parent)))
+                using (myContainer.Bind<ILogger>().To(typeof(TimeLogger), Has.Ref("logger", Scope.Parent)))
                 {
                     var logger = myContainer.Get<ILogger>();
 
