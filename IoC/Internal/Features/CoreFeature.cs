@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
 
     internal sealed class CoreFeature: IConfiguration
     {
@@ -33,6 +34,13 @@
                 .Bind<ILifetime>()
                 .Tag(Lifetime.Container)
                 .To(ctx => ContainerLifetime.Shared);
+
+            long resolveLifetimeId = 0;
+            yield return container
+                .Bind<ILifetime>()
+                .Tag(Lifetime.Resolve)
+                .Lifetime(Lifetime.Singletone)
+                .To(ctx => new ResolveLifetime(Interlocked.Increment(ref resolveLifetimeId)));
 
             yield return container
                 .Bind<IContainer>()

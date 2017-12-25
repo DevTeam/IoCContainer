@@ -243,13 +243,56 @@
                     // Then
                     var instance1 = container.Get<IMyService>();
                     var instance2 = container.Get<IMyService>();
-                    using (var childContainer = container.CreateChild())
+
+                    // Then
+                    instance1.ShouldBe(instance2);
+                    IMyService instance3;
+                    using (var childContainer1 = container.CreateChild())
                     {
-                        // Then
-                        var instance3 = childContainer.Get<IMyService>();
-                        instance1.ShouldBe(instance2);
+                        instance3 = childContainer1.Get<IMyService>();
+                        var instance4 = childContainer1.Get<IMyService>();
+                        instance3.ShouldBe(instance4);
                         instance1.ShouldNotBe(instance3);
                     }
+
+                    using (var childContainer2 = container.CreateChild())
+                    {
+                        // Then
+                        var instance5 = childContainer2.Get<IMyService>();
+                        var instance6 = childContainer2.Get<IMyService>();
+                        instance5.ShouldBe(instance6);
+                        instance1.ShouldNotBe(instance5);
+                        instance3.ShouldNotBe(instance5);
+                    }
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenResolveLifetime()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyService>().To(
+                    typeof(MyService),
+                    Has.Arg<string>("name", 0),
+                    Has.Method(
+                        "Init",
+                        Has.Arg("intiValue", 1))))
+                using (container.Bind<IMyService1>().Lifetime(Lifetime.Resolve).To(ctx => Mock.Of<IMyService1>()))
+                {
+                    var instance1 = (MyService)container.Get<IMyService>("abc", "xyz");
+                    var instance2 = (MyService)container.Get<IMyService>("klm", "qrs");
+
+                    // Then
+                    instance1.SomeRef.ShouldBe(instance1.SomeRef2);
+                    instance1.SomeRef.ShouldBe(instance1.SomeRef3);
+                    instance1.SomeRef.ShouldBe(instance2.SomeRef);
+
+                    instance2.SomeRef.ShouldBe(instance2.SomeRef2);
+                    instance2.SomeRef.ShouldBe(instance2.SomeRef3);
                 }
             }
         }
@@ -676,9 +719,15 @@
 
             public IMyService1 SomeRef { get; }
 
+            public IMyService1 SomeRef2 { get; private set; }
+
+            public IMyService1 SomeRef3 { get; private set; }
+
             public void Init(IMyService1 someRef2, IMyService1 someRef3, string intiValue)
             {
                 Name = intiValue;
+                SomeRef2 = someRef2;
+                SomeRef3 = someRef3;
             }
         }
 

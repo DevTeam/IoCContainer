@@ -19,22 +19,7 @@
             Container = registration.Container;
             ContractsTypes = registration.ContractsTypes;
             Tags = registration.Tags;
-            switch (lifetime)
-            {
-                case IoC.Lifetime.Transient:
-                    Lifetime = registration.Container.Tag(IoC.Lifetime.Transient).Get<ILifetime>();
-                    break;
-
-                case IoC.Lifetime.Singletone:
-                    Lifetime = registration.Container.Tag(IoC.Lifetime.Singletone).Get<ILifetime>();
-                    break;
-
-                case IoC.Lifetime.Container:
-                    Lifetime = registration.Container.Tag(IoC.Lifetime.Container).Get<ILifetime>();
-                    break;
-
-                default: throw new NotSupportedException($"{registration.Lifetime} is not supported");
-            }
+            Lifetime = registration.Container.Tag(lifetime).Get<ILifetime>();
         }
 
         public Registration(IRegistration<T> registration, [NotNull] ILifetime lifetime)

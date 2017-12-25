@@ -16,10 +16,10 @@
         {
             if (context.ContractType.IsConstructedGenericType())
             {
-                return new SingletoneGenericInstanceKey(context.RegistrationId, context.ContractType.GenericTypeArguments());
+                return new SingletoneGenericInstanceKey<long>(context.RegistrationId, context.ContractType.GenericTypeArguments());
             }
 
-            return new SingletoneInstanceKey(context.RegistrationId);
+            return new SingletoneInstanceKey<long>(context.RegistrationId);
         }
     }
 }

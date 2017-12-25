@@ -1,13 +1,13 @@
 ﻿namespace IoC.Internal
 {
-    internal struct SingletoneInstanceKey : IInstanceKey
+    internal struct SingletoneInstanceKey<T> : IInstanceKey
     {
         // ReSharper disable once NotAccessedField.Local
-        private readonly long _contextRegistrationId;
+        private readonly T _id;
 
-        public SingletoneInstanceKey(long contextRegistrationId)
+        public SingletoneInstanceKey(T id)
         {
-            _contextRegistrationId = contextRegistrationId;
+            _id = id;
         }
     }
 }
