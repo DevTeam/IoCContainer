@@ -25,13 +25,13 @@
         {
             Type[] genericTypeArguments;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (ctx.ContractType.IsConstructedGenericType())
+            if (ctx.TargetContractType.IsConstructedGenericType())
             {
-                genericTypeArguments = ctx.ContractType.GenericTypeArguments();
+                genericTypeArguments = ctx.TargetContractType.GenericTypeArguments();
             }
             else
             {
-                genericTypeArguments = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetGenericTypeArguments(ctx.ContractType);
+                genericTypeArguments = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetGenericTypeArguments(ctx.TargetContractType);
             }
 
             var instanceType = typeof(InstanceTask<>).MakeGenericType(genericTypeArguments);

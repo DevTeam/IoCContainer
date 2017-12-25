@@ -202,18 +202,18 @@
             return new Resolving(container, tag);
         }
 
-        public static bool TryGet([NotNull] this IContainer container, [NotNull] Type contractType, out object instance, [NotNull][ItemCanBeNull] params object[] args){
+        public static bool TryGet([NotNull] this IContainer container, [NotNull] Type targetContractType, out object instance, [NotNull][ItemCanBeNull] params object[] args){
             if (container == null) throw new ArgumentNullException(nameof(container));
-            if (contractType == null) throw new ArgumentNullException(nameof(contractType));
+            if (targetContractType == null) throw new ArgumentNullException(nameof(targetContractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            var key = container.CreateKey(contractType);
+            var key = container.CreateKey(targetContractType);
             if (!container.TryGetResolver(key, out var resolver))
             {
                 instance = null;
                 return false;
             }
 
-            instance = resolver.Resolve(container, contractType, args);
+            instance = resolver.Resolve(container, targetContractType, args);
             return true;
         }
 
@@ -238,14 +238,14 @@
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
         [NotNull]
-        public static object Get([NotNull] this IContainer container, [NotNull] Type contractType, [NotNull][ItemCanBeNull] params object[] args)
+        public static object Get([NotNull] this IContainer container, [NotNull] Type targetContractType, [NotNull][ItemCanBeNull] params object[] args)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            if (contractType == null) throw new ArgumentNullException(nameof(contractType));
+            if (targetContractType == null) throw new ArgumentNullException(nameof(targetContractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            if (!container.TryGet(contractType, out var instance, args))
+            if (!container.TryGet(targetContractType, out var instance, args))
             {
-                return container.GetIssueResolver().CannotResolve(container, container.CreateKey(contractType));
+                return container.GetIssueResolver().CannotResolve(container, container.CreateKey(targetContractType));
             }
 
             return instance;
@@ -391,7 +391,7 @@
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
-        private static Key CreateKey([NotNull] this IContainer container, [NotNull] Type contractType)
+        private static Key CreateKey([NotNull] this IContainer container, [NotNull] Type targetContractType)
         {
             object tagValue = null;
             if (container is Resolving resolving)
@@ -399,7 +399,7 @@
                 tagValue = resolving.Tag;
             }
 
-            return new Key(contractType, tagValue);
+            return new Key(targetContractType, tagValue);
         }
 
         private static IIssueResolver GetIssueResolver(this IContainer container)

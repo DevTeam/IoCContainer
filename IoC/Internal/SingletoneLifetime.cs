@@ -14,9 +14,9 @@
 
         protected override IInstanceKey CeateKey(Context context)
         {
-            if (context.ContractType.IsConstructedGenericType())
+            if (context.TargetContractType.IsConstructedGenericType())
             {
-                return new SingletoneGenericInstanceKey<long>(context.RegistrationId, context.ContractType.GenericTypeArguments());
+                return new SingletoneGenericInstanceKey<long>(context.RegistrationId, context.TargetContractType.GenericTypeArguments());
             }
 
             return new SingletoneInstanceKey<long>(context.RegistrationId);

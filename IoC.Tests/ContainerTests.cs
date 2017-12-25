@@ -507,12 +507,12 @@
                 // When
                 using (container.Bind(typeof(IMyGenericService1<>)).Lifetime(Lifetime.Singletone).To(ctx =>
                 {
-                    if(ctx.ContractType.GenericTypeArguments[0] == typeof(string))
+                    if(ctx.TargetContractType.GenericTypeArguments[0] == typeof(string))
                     {
                         return Mock.Of<IMyGenericService1<string>>();
                     }
 
-                    if (ctx.ContractType.GenericTypeArguments[0] == typeof(int))
+                    if (ctx.TargetContractType.GenericTypeArguments[0] == typeof(int))
                     {
                         return Mock.Of<IMyGenericService1<int>>();
                     }

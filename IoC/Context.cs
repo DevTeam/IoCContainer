@@ -12,7 +12,7 @@
         public readonly Key Key;
         [NotNull] public readonly IContainer RegistrationContainer;
         [NotNull] public readonly IContainer ResolvingContainer;
-        [NotNull] public readonly Type ContractType;
+        [NotNull] public readonly Type TargetContractType;
         [NotNull] public readonly object[] Args;
 
         public Context(
@@ -20,14 +20,14 @@
             Key key,
             [NotNull] IContainer registrationContainer,
             [NotNull] IContainer resolvingContainer,
-            [NotNull] Type contractType,
+            [NotNull] Type targetContractType,
             [NotNull] params object[] args)
         {
             RegistrationId = registrationId;
             Key = key;
             RegistrationContainer = registrationContainer;
             ResolvingContainer = resolvingContainer;
-            ContractType = contractType;
+            TargetContractType = targetContractType;
             Args = args;
         }
     }

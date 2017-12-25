@@ -32,12 +32,12 @@
             _registrationToken.Dispose();
         }
 
-        public object Resolve(IContainer resolvingContainer, Type contractType, params object[] args)
+        public object Resolve(IContainer resolvingContainer, Type targetContractType, params object[] args)
         {
             if (resolvingContainer == null) throw new ArgumentNullException(nameof(resolvingContainer));
-            if (contractType == null) throw new ArgumentNullException(nameof(contractType));
+            if (targetContractType == null) throw new ArgumentNullException(nameof(targetContractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            var context = new Context(_registrationId, _key, _registrationContainer, resolvingContainer, contractType, args);
+            var context = new Context(_registrationId, _key, _registrationContainer, resolvingContainer, targetContractType, args);
             return _lifetime?.GetOrCreate(context, _factory) ?? _factory.Create(context);
         }
     }

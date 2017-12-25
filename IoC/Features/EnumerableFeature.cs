@@ -26,18 +26,18 @@
         {
             var keys =
                 from key in ctx.ResolvingContainer as IEnumerable<Key> ?? Enumerable.Empty<Key>()
-                where key.ContractType == ctx.ContractType
+                where key.ContractType == ctx.TargetContractType
                 select key;
 
             Type[] genericTypeArguments;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (ctx.ContractType.IsConstructedGenericType())
+            if (ctx.TargetContractType.IsConstructedGenericType())
             {
-                genericTypeArguments = ctx.ContractType.GenericTypeArguments();
+                genericTypeArguments = ctx.TargetContractType.GenericTypeArguments();
             }
             else
             {
-                genericTypeArguments = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetGenericTypeArguments(ctx.ContractType);
+                genericTypeArguments = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetGenericTypeArguments(ctx.TargetContractType);
             }
 
             var instanceType = typeof(InstanceEnumerable<>).MakeGenericType(genericTypeArguments);
@@ -72,7 +72,7 @@
                         continue;
                     }
 
-                    yield return (T)resolver.Resolve(context.ResolvingContainer, context.ContractType, context.Args);
+                    yield return (T)resolver.Resolve(context.ResolvingContainer, context.TargetContractType, context.Args);
                 }
             }
         }
