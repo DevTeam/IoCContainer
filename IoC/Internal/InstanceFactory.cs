@@ -35,7 +35,7 @@
                 let dependenciesWithPosition = ConverToDependenciesWithPosition(ctorItem.Item2, dependencies)
                 where IsCtorMatched(ctorItem.Item2, dependenciesWithPosition)
                 select ctorItem).FirstOrDefault()
-                ?? CreateCtorItem(issueResolver.CannotFindConsructor(typeInfo, dependencies), dependencies);
+                ?? CreateCtorItem(issueResolver.CannotFindConsructor(typeInfo.Type, dependencies), dependencies);
 
             _ctorData = CreateMethodData(typeInfo, ctorInfo.Item2, ctorInfo.Item3);
             _ctor = CreateConstructor(ctorInfo.Item1);
@@ -48,7 +48,7 @@
             _reentrancy++;
             if (_reentrancy >= 32)
             {
-                _issueResolver.CyclicDependenceDetected(context, _typeInfo, _reentrancy);
+                _issueResolver.CyclicDependenceDetected(context, _typeInfo.Type, _reentrancy);
             }
 
             try
@@ -201,7 +201,7 @@
                         var methodInfo = 
                             typeInfo.DeclaredMethods.FirstOrDefault(i => i.Name == dependency.HasMethod.Name)
                             ?? typeInfo.DeclaredProperties.Where(i => i.Name == dependency.HasMethod.Name).Select(i => i.SetMethod()).FirstOrDefault()
-                            ?? throw new InvalidOperationException();
+                            ?? _issueResolver.CannotFindMethod(typeInfo.Type, dependency.HasMethod);
 
                         var methodParameters = methodInfo.GetParameters();
                         var methodDependenciesWithPosition = ConverToDependenciesWithPosition(methodParameters, dependency.HasMethod.Dependencies);

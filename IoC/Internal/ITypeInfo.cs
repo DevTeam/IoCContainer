@@ -1,10 +1,10 @@
-﻿namespace IoC
+﻿namespace IoC.Internal
 {
     using System;
     using System.Collections.Generic;
     using System.Reflection;
 
-    public interface ITypeInfo
+    internal interface ITypeInfo
     {
         Type Type { get; }
 

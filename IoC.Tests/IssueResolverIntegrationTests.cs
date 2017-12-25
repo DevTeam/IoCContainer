@@ -46,7 +46,7 @@ namespace IoC.Tests
             using (var container = Container.Create())
             {
                 var issueResolvere = new Mock<IIssueResolver>();
-                issueResolvere.Setup(i => i.CannotFindConsructor(It.IsAny<ITypeInfo>())).Throws<InvalidOperationException>();
+                issueResolvere.Setup(i => i.CannotFindConsructor(typeof(MyClassWithoutCtor))).Throws<InvalidOperationException>();
 
                 // When
                 using (container.Map<IIssueResolver>().Lifetime(Lifetime.Singletone).To(ctx => issueResolvere.Object))
@@ -62,7 +62,7 @@ namespace IoC.Tests
                 }
 
                 // Then
-                issueResolvere.Verify(i => i.CannotFindConsructor(It.IsAny<ITypeInfo>()), Times.Once);
+                issueResolvere.Verify(i => i.CannotFindConsructor(typeof(MyClassWithoutCtor)), Times.Once);
             }
         }
 
