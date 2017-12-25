@@ -1,27 +1,18 @@
 ﻿namespace IoC.Internal
 {
-    using System.Collections.Generic;
+    using System.Collections.Concurrent;
 
     internal abstract class SingletoneBaseLifetime: ILifetime
     {
         public object GetOrCreate(Context context, IFactory factory)
         {
-            var key = CeateKey(context);
-            var instances = GetInstances(context);
-            if (instances.TryGetValue(key, out var instance))
-            {
-                return instance;
-            }
-
-            instance = factory.Create(context);
-            instances.Add(key, instance);
-            return instance;
+            return GetInstances(context).GetOrAdd(CeateKey(context), i => factory.Create(context));
         }
 
         [NotNull]
         protected abstract IInstanceKey CeateKey(Context context);
 
         [NotNull]
-        protected abstract IDictionary<IInstanceKey, object> GetInstances(Context context);
+        protected abstract ConcurrentDictionary<IInstanceKey, object> GetInstances(Context context);
     }
 }

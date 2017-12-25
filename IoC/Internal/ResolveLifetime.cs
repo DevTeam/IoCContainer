@@ -1,7 +1,7 @@
 ﻿namespace IoC.Internal
 {
     using System;
-    using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using System.Diagnostics.CodeAnalysis;
 
     internal class ResolveLifetime: SingletoneBaseLifetime
@@ -13,7 +13,7 @@
             _id = id;
         }
 
-        protected override IDictionary<IInstanceKey, object> GetInstances(Context context)
+        protected override ConcurrentDictionary<IInstanceKey, object> GetInstances(Context context)
         {
             return (context.ResolvingContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container")).GetInstances();
         }

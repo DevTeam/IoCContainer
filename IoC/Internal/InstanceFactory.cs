@@ -53,14 +53,19 @@
 
             try
             {
-                var args = _ctorData.Args;
                 var factories = _ctorData.Factories;
-                for (var position = 0; position < _ctorData.Count; position++)
+                var args = _ctorData.Args;
+                object instance;
+                lock (args)
                 {
-                    args[position] = factories[position].Create(context);
+                    for (var position = 0; position < _ctorData.Count; position++)
+                    {
+                        args[position] = factories[position].Create(context);
+                    }
+
+                    instance = _ctor(args);
                 }
 
-                var instance = _ctor(args);
                 if (_methodsCount == 0)
                 {
                     return instance;
@@ -70,14 +75,17 @@
                 {
                     var method = _methods[i];
                     var parameters = method.Item2;
-                    var methodArgs = parameters.Args;
                     var methodFactories = parameters.Factories;
-                    for (var position = 0; position < parameters.Count; position++)
+                    var methodArgs = parameters.Args;
+                    lock (methodArgs)
                     {
-                        methodArgs[position] = methodFactories[position].Create(context);
-                    }
+                        for (var position = 0; position < parameters.Count; position++)
+                        {
+                            methodArgs[position] = methodFactories[position].Create(context);
+                        }
 
-                    method.Item1(instance, methodArgs);
+                        method.Item1(instance, methodArgs);
+                    }
                 }
 
                 return instance;

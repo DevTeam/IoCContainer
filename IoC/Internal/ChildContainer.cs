@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -11,7 +12,7 @@
         private readonly string _name;
         [NotNull] private readonly IContainer _parentContainer;
         [NotNull] private readonly Dictionary<Key, IResolver> _resolvers = new Dictionary<Key, IResolver>();
-        [NotNull] private readonly Dictionary<IInstanceKey, object> _instances = new Dictionary<IInstanceKey, object>();
+        [NotNull] private readonly ConcurrentDictionary<IInstanceKey, object> _instances = new ConcurrentDictionary<IInstanceKey, object>();
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
 
         public ChildContainer([NotNull] string name = "", params IConfiguration[] configurations)
@@ -40,7 +41,7 @@
 
         public IContainer Parent => _parentContainer;
 
-        public IDictionary<IInstanceKey, object> GetInstances()
+        public ConcurrentDictionary<IInstanceKey, object> GetInstances()
         {
             return _instances;
         }

@@ -1,10 +1,10 @@
 ﻿namespace IoC.Internal
 {
-    using System.Collections.Generic;
+    using System.Collections.Concurrent;
 
     internal interface IInstanceStore
     {
         [NotNull]
-        IDictionary<IInstanceKey, object> GetInstances();
+        ConcurrentDictionary<IInstanceKey, object> GetInstances();
     }
 }

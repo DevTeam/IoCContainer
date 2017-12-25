@@ -1,13 +1,13 @@
 ﻿namespace IoC.Internal
 {
     using System;
-    using System.Collections.Generic;
+    using System.Collections.Concurrent;
 
     internal sealed class SingletoneLifetime : SingletoneBaseLifetime
     {
         public static readonly ILifetime Shared = new SingletoneLifetime();
 
-        protected override IDictionary<IInstanceKey, object> GetInstances(Context context)
+        protected override ConcurrentDictionary<IInstanceKey, object> GetInstances(Context context)
         {
             return (context.RegistrationContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container")).GetInstances();
         }

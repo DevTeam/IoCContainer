@@ -1,6 +1,7 @@
 ﻿namespace IoC.Internal
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
 
     internal struct Resolving: IContainer, IInstanceStore
@@ -18,7 +19,7 @@
 
         public IContainer Parent => Container.Parent;
 
-        IDictionary<IInstanceKey, object> IInstanceStore.GetInstances()
+        ConcurrentDictionary<IInstanceKey, object> IInstanceStore.GetInstances()
         {
             return ((IInstanceStore) Container).GetInstances();
         }
