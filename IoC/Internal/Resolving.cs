@@ -1,7 +1,6 @@
 ﻿namespace IoC.Internal
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
 
     internal struct Resolving: IContainer, IInstanceStore
@@ -13,15 +12,15 @@
         public Resolving([NotNull] IContainer container, [CanBeNull] object tag)
         {
             Container = container ?? throw new ArgumentNullException(nameof(container));
-            _instanceStore = Container as IInstanceStore;
+            _instanceStore = Container as IInstanceStore ?? throw new ArgumentException($"The {nameof(container)} must implement the interface {typeof(IInstanceStore).Name}");
             Tag = tag;
         }
 
         public IContainer Parent => Container.Parent;
 
-        ConcurrentDictionary<IInstanceKey, object> IInstanceStore.GetInstances()
+        public object GetOrAdd(IInstanceKey key, Context context, IFactory factory)
         {
-            return ((IInstanceStore) Container).GetInstances();
+            return _instanceStore.GetOrAdd(key, context, factory);
         }
 
         public bool TryRegister(IEnumerable<Key> keys, IFactory factory, ILifetime lifetime, out IDisposable registrationToken)

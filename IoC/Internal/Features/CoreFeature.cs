@@ -18,29 +18,29 @@
 
             yield return container
                 .Bind<IIssueResolver>()
-                .To(ctx => IssueResolver.Shared);
+                .To(() => IssueResolver.Shared);
 
             yield return container
                 .Bind<ILifetime>()
                 .Tag(Lifetime.Transient)
-                .To(ctx => null);
+                .To(() => null);
 
             yield return container
                 .Bind<ILifetime>()
                 .Tag(Lifetime.Singletone)
-                .To(ctx => SingletoneLifetime.Shared);
+                .To(() => SingletoneLifetime.Shared);
 
             yield return container
                 .Bind<ILifetime>()
                 .Tag(Lifetime.Container)
-                .To(ctx => ContainerLifetime.Shared);
+                .To(() => ContainerLifetime.Shared);
 
             long resolveLifetimeId = 0;
             yield return container
                 .Bind<ILifetime>()
                 .Tag(Lifetime.Resolve)
                 .Lifetime(Lifetime.Singletone)
-                .To(ctx => new ResolveLifetime(Interlocked.Increment(ref resolveLifetimeId)));
+                .To(() => new ResolveLifetime(Interlocked.Increment(ref resolveLifetimeId)));
 
             yield return container
                 .Bind<IContainer>()

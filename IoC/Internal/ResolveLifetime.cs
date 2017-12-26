@@ -1,10 +1,9 @@
 ﻿namespace IoC.Internal
 {
     using System;
-    using System.Collections.Concurrent;
     using System.Diagnostics.CodeAnalysis;
 
-    internal class ResolveLifetime: SingletoneBaseLifetime
+    internal class ResolveLifetime: ILifetime
     {
         private readonly long _id;
 
@@ -13,19 +12,20 @@
             _id = id;
         }
 
-        protected override ConcurrentDictionary<IInstanceKey, object> GetInstances(Context context)
+        public object GetOrCreate(Context context, IFactory factory)
         {
-            return (context.ResolvingContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container")).GetInstances();
-        }
-
-        protected override IInstanceKey CeateKey(Context context)
-        {
-            if (context.TargetContractType.IsConstructedGenericType())
+            IInstanceKey key;
+            if (context.IsConstructedGenericTargetContractType)
             {
-                return new SingletoneGenericInstanceKey<Id>(new Id(_id, context.RegistrationId), context.TargetContractType.GenericTypeArguments());
+                key = new SingletoneGenericInstanceKey<Id>(new Id(_id, context.RegistrationId), context.TargetContractType.GenericTypeArguments());
+            }
+            else
+            {
+                key = new SingletoneInstanceKey<Id>(new Id(_id, context.RegistrationId));
             }
 
-            return new SingletoneInstanceKey<Id>(new Id(_id, context.RegistrationId));
+            var store = context.ResolvingContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container");
+            return store.GetOrAdd(key, context, factory);
         }
 
         [SuppressMessage("ReSharper", "NotAccessedField.Local")]
@@ -33,11 +33,31 @@
         {
             private readonly long _id;
             private readonly long _registrationId;
+            private readonly int _hashCode;
 
             public Id(long id, long registrationId)
             {
                 _id = id;
                 _registrationId = registrationId;
+                unchecked
+                {
+                    _hashCode = (id.GetHashCode() * 397) ^ registrationId.GetHashCode();
+                }
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                return obj is Id id && Equals(id);
+            }
+
+            public override int GetHashCode()
+            {
+                return _hashCode;
+            }
+            private bool Equals(Id other)
+            {
+                return _id == other._id && _registrationId == other._registrationId;
             }
         }
     }

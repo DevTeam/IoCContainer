@@ -2,8 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    // ReSharper disable once RedundantUsingDirective
-    using System.Reflection;
 
     internal sealed class AutowiringFactory : IFactory
     {
@@ -35,38 +33,36 @@
 
         public object Create(Context context)
         {
-            return GetOrCreateFactory(context).Create(context);
-        }
-
-        private IFactory GetOrCreateFactory(Context context)
-        {
+            IFactory factory;
             lock (_lockObject)
             {
                 if (_instanceFactory != null)
                 {
-                    return _instanceFactory;
+                    factory = _instanceFactory;
                 }
-
-                if (!_factories.TryGetValue(context.TargetContractType, out var factory))
+                else
                 {
-                    Type[] genericTypeArguments;
-                    // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-                    if (context.TargetContractType.IsConstructedGenericType())
+                    if (!_factories.TryGetValue(context.TargetContractType, out factory))
                     {
-                        genericTypeArguments = context.TargetContractType.GenericTypeArguments();
-                    }
-                    else
-                    {
-                        genericTypeArguments = _issueResolver.CannotGetGenericTypeArguments(context.TargetContractType);
-                    }
+                        Type[] genericTypeArguments;
+                        // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+                        if (context.IsConstructedGenericTargetContractType)
+                        {
+                            genericTypeArguments = context.TargetContractType.GenericTypeArguments();
+                        }
+                        else
+                        {
+                            genericTypeArguments = _issueResolver.CannotGetGenericTypeArguments(context.TargetContractType);
+                        }
 
-                    var genericInstanceType = _instanceType.MakeGenericType(genericTypeArguments);
-                    factory = new InstanceFactory(_issueResolver, genericInstanceType.AsTypeInfo(), _dependencies);
-                    _factories.Add(context.TargetContractType, factory);
+                        var genericInstanceType = _instanceType.MakeGenericType(genericTypeArguments);
+                        factory = new InstanceFactory(_issueResolver, genericInstanceType.AsTypeInfo(), _dependencies);
+                        _factories.Add(context.TargetContractType, factory);
+                    }
                 }
-
-                return factory;
             }
+
+            return factory.Create(context);
         }
     }
 }

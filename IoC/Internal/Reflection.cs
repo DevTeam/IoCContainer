@@ -6,9 +6,6 @@
 
     internal static class Reflection
     {
-#if !NET40
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         public static ITypeInfo AsTypeInfo(this Type type)
         {
 #if NET40
@@ -18,9 +15,6 @@
 #endif
         }
 
-#if !NET40
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         public static bool IsConstructedGenericType(this Type type)
         {
 #if NET40
@@ -30,9 +24,6 @@
 #endif
         }
 
-#if !NET40
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         public static Type[] GenericTypeArguments(this Type type)
         {
 #if NET40
@@ -42,9 +33,6 @@
 #endif
         }
 
-#if !NET40
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
         public static MethodInfo SetMethod(this PropertyInfo propertyInfo)
         {
 #if NET40

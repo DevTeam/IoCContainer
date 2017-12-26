@@ -1,25 +1,25 @@
 ﻿namespace IoC.Internal
 {
     using System;
-    using System.Collections.Concurrent;
 
-    internal sealed class SingletoneLifetime : SingletoneBaseLifetime
+    internal sealed class SingletoneLifetime : ILifetime
     {
         public static readonly ILifetime Shared = new SingletoneLifetime();
 
-        protected override ConcurrentDictionary<IInstanceKey, object> GetInstances(Context context)
+        public object GetOrCreate(Context context, IFactory factory)
         {
-            return (context.RegistrationContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container")).GetInstances();
-        }
-
-        protected override IInstanceKey CeateKey(Context context)
-        {
-            if (context.TargetContractType.IsConstructedGenericType())
+            IInstanceKey key;
+            if (context.IsConstructedGenericTargetContractType)
             {
-                return new SingletoneGenericInstanceKey<long>(context.RegistrationId, context.TargetContractType.GenericTypeArguments());
+                key = new SingletoneGenericInstanceKey<long>(context.RegistrationId, context.TargetContractType.GenericTypeArguments());
+            }
+            else
+            {
+                key = new SingletoneInstanceKey<long>(context.RegistrationId);
             }
 
-            return new SingletoneInstanceKey<long>(context.RegistrationId);
+            var store = context.RegistrationContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container");
+            return store.GetOrAdd(key, context, factory);
         }
     }
 }

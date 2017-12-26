@@ -1,6 +1,6 @@
 [<img src="http://tcavs2015.cloudapp.net/app/rest/builds/buildType:(id:DevTeam_IoCContainer_Build)/statusIcon"/>](http://tcavs2015.cloudapp.net/viewType.html?buildTypeId=DevTeam_IoCContainer_Build&guest=1) [<img src="https://www.nuget.org/Content/Logos/nugetlogo.png" height="18">](https://www.nuget.org/packages/IoC.Container)
 
-# Simple/powerful/fast Inversion of Control container for .NET
+# Simple/powerful/darting Inversion of Control container
 
 Supported platforms:
   - .NET 4.0+
@@ -16,7 +16,7 @@ Supported platforms:
 ```csharp
 interface IBox<out T> { T Content { get; } }
 
-interface ICat { int IsAlive { get; } }
+interface ICat { bool IsAlive { get; } }
 ```
 
 ### Here is an implementation:
@@ -33,7 +33,7 @@ class CardboardBox<T> : IBox<T>
 
 class ShroedingersCat : ICat
 {
-  public int IsAlive => new Random().Next(2);
+  public bool IsAlive => new Random().Next(2) == 1;
 }
 ```
 
@@ -57,14 +57,14 @@ using (var container = Container.Create().Using(new Glue()))
 {
   // Directly getting
   var box1 = container.Get<IBox<ICat>>();
-  Console.WriteLine("#1 is alive:" + box1.Content.IsAlive);
+  Console.WriteLine("#1 is alive: " + box1.Content.IsAlive);
 
   // Func way
   var box2 = container.FuncGet<IBox<ICat>>();
-  Console.WriteLine("#2 is alive:" + box2().Content.IsAlive);
+  Console.WriteLine("#2 is alive: " + box2().Content.IsAlive);
 
   // Async way
   var box3 = await container.StartGet<IBox<ICat>>(TaskScheduler.Default);
-  Console.WriteLine("#3 is alive:" + box3.Content.IsAlive);
+  Console.WriteLine("#3 is alive: " + box3.Content.IsAlive);
 }
 ```

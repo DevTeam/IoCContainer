@@ -13,7 +13,7 @@
     class Program
     {
 #if !NET40
-        public static async Task<int> Main()
+        public static async Task Main()
 #else
         public static void Main()
 #endif
@@ -22,24 +22,23 @@
             {
                 // Directly getting
                 var box1 = container.Get<IBox<ICat>>();
-                Console.WriteLine("#1 is alive:" + box1.Content.IsAlive);
+                Console.WriteLine("#1 is alive: " + box1.Content.IsAlive);
 
                 // Func way
                 var box2 = container.FuncGet<IBox<ICat>>();
-                Console.WriteLine("#2 is alive:" + box2().Content.IsAlive);
+                Console.WriteLine("#2 is alive: " + box2().Content.IsAlive);
 
 #if !NET40
                 // Async way
                 var box3 = await container.StartGet<IBox<ICat>>(TaskScheduler.Default);
-                Console.WriteLine("#3 is alive:" + box3.Content.IsAlive);
-                return box3.Content.IsAlive;
+                Console.WriteLine("#3 is alive: " + box3.Content.IsAlive);
 #endif
             }
         }
 
         interface IBox<out T> { T Content { get; } }
 
-        interface ICat { int IsAlive { get; } }
+        interface ICat { bool IsAlive { get; } }
 
         class CardboardBox<T> : IBox<T>
         {
@@ -50,7 +49,7 @@
 
         class ShroedingersCat : ICat
         {
-            public int IsAlive => new Random().Next(2);
+            public bool IsAlive => new Random().Next(2) == 1;
         }
 
         class Glue : IConfiguration

@@ -6,11 +6,16 @@
     {
         private readonly T _id;
         private readonly Type[] _contractTypeGenericTypeArguments;
+        private readonly int _hashCode;
 
         public SingletoneGenericInstanceKey(T id, Type[] contractTypeGenericTypeArguments)
         {
             _id = id;
             _contractTypeGenericTypeArguments = contractTypeGenericTypeArguments;
+            unchecked
+            {
+                _hashCode = (id.GetHashCode() * 397) ^ (contractTypeGenericTypeArguments != null ? GetHashCode(_contractTypeGenericTypeArguments) : 0);
+            }
         }
 
         public override bool Equals(object obj)
@@ -21,10 +26,7 @@
 
         public override int GetHashCode()
         {
-            unchecked
-            {
-                return (_id.GetHashCode() * 397) ^ (_contractTypeGenericTypeArguments != null ? GetHashCode(_contractTypeGenericTypeArguments) : 0);
-            }
+            return _hashCode;
         }
         private bool Equals(SingletoneGenericInstanceKey<T> other)
         {

@@ -2,14 +2,15 @@
 {
     using System;
 
-    internal struct Resolver : IDisposable, IResolver
+    internal class Resolver: IDisposable, IResolver
     {
         private readonly long _registrationId;
         private readonly Key _key;
         [NotNull] private readonly IContainer _registrationContainer;
         [NotNull] private readonly IDisposable _registrationToken;
         [NotNull] private readonly IFactory _factory;
-        [CanBeNull] private readonly ILifetime _lifetime;
+        private Type _prevTargetContractType;
+        private bool _prevIsConstructedGenericTargetContractType;
 
         public Resolver(
             long registrationId,
@@ -24,7 +25,7 @@
             _registrationContainer = registrationContainer;
             _registrationToken = registrationToken;
             _factory = factory;
-            _lifetime = lifetime;
+            _factory = lifetime != null ? new LifetimeBaseFactory(lifetime, factory) :_factory;
         }
 
         public void Dispose()
@@ -37,8 +38,15 @@
             if (resolvingContainer == null) throw new ArgumentNullException(nameof(resolvingContainer));
             if (targetContractType == null) throw new ArgumentNullException(nameof(targetContractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            var context = new Context(_registrationId, _key, _registrationContainer, resolvingContainer, targetContractType, args);
-            return _lifetime?.GetOrCreate(context, _factory) ?? _factory.Create(context);
+
+            if (_prevTargetContractType != targetContractType)
+            {
+                _prevTargetContractType = targetContractType;
+                _prevIsConstructedGenericTargetContractType = targetContractType.IsConstructedGenericType();
+            }
+
+            var context = new Context(_registrationId, _key, _registrationContainer, resolvingContainer, targetContractType, _prevIsConstructedGenericTargetContractType, args);
+            return _factory.Create(context);
         }
     }
 }

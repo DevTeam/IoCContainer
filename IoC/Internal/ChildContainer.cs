@@ -2,9 +2,9 @@
 {
     using System;
     using System.Collections;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading;
 
     internal sealed class ChildContainer : IContainer, IInstanceStore, IResourceStore, IEnumerable<Key>
     {
@@ -12,7 +12,7 @@
         private readonly string _name;
         [NotNull] private readonly IContainer _parentContainer;
         [NotNull] private readonly Dictionary<Key, IResolver> _resolvers = new Dictionary<Key, IResolver>();
-        [NotNull] private readonly ConcurrentDictionary<IInstanceKey, object> _instances = new ConcurrentDictionary<IInstanceKey, object>();
+        [NotNull] private readonly Dictionary<IInstanceKey, Lazy<object>> _instances = new Dictionary<IInstanceKey, Lazy<object>>();
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
 
         public ChildContainer([NotNull] string name = "", params IConfiguration[] configurations)
@@ -41,9 +41,21 @@
 
         public IContainer Parent => _parentContainer;
 
-        public ConcurrentDictionary<IInstanceKey, object> GetInstances()
+        public object GetOrAdd(IInstanceKey key, Context context, IFactory factory)
         {
-            return _instances;
+            Lazy<object> instanceHolder;
+            lock (_instances)
+            {
+                if (_instances.TryGetValue(key, out instanceHolder))
+                {
+                    return instanceHolder.Value;
+                }
+
+                instanceHolder = new Lazy<object>(() => factory.Create(context), LazyThreadSafetyMode.ExecutionAndPublication);
+                _instances.Add(key, instanceHolder);
+            }
+
+            return instanceHolder.Value;
         }
 
         public void AddResource(IDisposable resource)
@@ -103,7 +115,7 @@
             lock (_resolvers)
             {
                 Disposable.Create(
-                    _instances.Values.OfType<IDisposable>()
+                    _instances.Values.Where(i => i.IsValueCreated).Select(i => i.Value).OfType<IDisposable>()
                     .Concat(_resources)
                     .Concat(_resolvers.Values.Cast<IDisposable>()))
                     .Dispose();

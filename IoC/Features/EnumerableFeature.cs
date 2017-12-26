@@ -31,7 +31,7 @@
 
             Type[] genericTypeArguments;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (ctx.TargetContractType.IsConstructedGenericType())
+            if (ctx.IsConstructedGenericTargetContractType)
             {
                 genericTypeArguments = ctx.TargetContractType.GenericTypeArguments();
             }
