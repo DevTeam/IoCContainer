@@ -1,4 +1,4 @@
-﻿namespace IoC.Internal
+﻿namespace IoC.Internal.Lifetimes
 {
     using System;
 

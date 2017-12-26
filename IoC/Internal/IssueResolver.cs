@@ -1,6 +1,7 @@
 ﻿namespace IoC.Internal
 {
     using System;
+    using System.Linq;
     using System.Reflection;
 
     internal sealed class IssueResolver : IIssueResolver
@@ -53,7 +54,7 @@
 
         public IDisposable CannotRegister(IContainer container, Key[] keys)
         {
-            throw new InvalidOperationException($"Keys {string.Join(", ", keys)} cannot be registered in the container \"{container}\".");
+            throw new InvalidOperationException($"Keys {string.Join(", ", keys.Select(i => i.ToString()))} cannot be registered in the container \"{container}\".");
         }
     }
 }

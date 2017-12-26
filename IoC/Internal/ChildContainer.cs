@@ -4,15 +4,15 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Threading;
 
     internal sealed class ChildContainer : IContainer, IInstanceStore, IResourceStore, IEnumerable<Key>
     {
         private static long _registrationId;
         private readonly string _name;
+        private readonly object _lockObject = new object();
         [NotNull] private readonly IContainer _parentContainer;
         [NotNull] private readonly Dictionary<Key, IResolver> _resolvers = new Dictionary<Key, IResolver>();
-        [NotNull] private readonly Dictionary<IInstanceKey, Lazy<object>> _instances = new Dictionary<IInstanceKey, Lazy<object>>();
+        [NotNull] private readonly Dictionary<IInstanceKey, object> _instances = new Dictionary<IInstanceKey, object>();
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
 
         public ChildContainer([NotNull] string name = "", params IConfiguration[] configurations)
@@ -43,19 +43,14 @@
 
         public object GetOrAdd(IInstanceKey key, Context context, IFactory factory)
         {
-            Lazy<object> instanceHolder;
-            lock (_instances)
+            if (_instances.TryGetValue(key, out var instance))
             {
-                if (_instances.TryGetValue(key, out instanceHolder))
-                {
-                    return instanceHolder.Value;
-                }
-
-                instanceHolder = new Lazy<object>(() => factory.Create(context), LazyThreadSafetyMode.ExecutionAndPublication);
-                _instances.Add(key, instanceHolder);
+                return instance;
             }
 
-            return instanceHolder.Value;
+            instance = factory.Create(context);
+            _instances.Add(key, instance);
+            return instance;
         }
 
         public void AddResource(IDisposable resource)
@@ -75,7 +70,7 @@
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             var keyArray = keys as Key[] ?? keys.ToArray();
-            lock (_resolvers)
+            lock (_lockObject)
             {
                 if (keyArray.Any(key => _resolvers.ContainsKey(key)))
                 {
@@ -84,7 +79,7 @@
                 }
 
                 var registrationId = _registrationId++;
-                registrationToken = Disposable.Create(keyArray.Select(key => RegisterResolver(key, new Resolver(registrationId, key, this, UnregisterResolver(key), factory, lifetime))));
+                registrationToken = Disposable.Create(keyArray.Select(key => RegisterResolver(key, new Resolver(_lockObject, registrationId, key, this, UnregisterResolver(key), factory, lifetime))));
                 return true;
             }
         }
@@ -92,7 +87,7 @@
         public bool TryGetResolver(Key key, out IResolver resolver)
         {
             bool hasResolver;
-            lock (_resolvers)
+            lock (_lockObject)
             {
                 hasResolver = _resolvers.TryGetValue(key, out resolver);
                 if (!hasResolver)
@@ -112,10 +107,10 @@
 
         public void Dispose()
         {
-            lock (_resolvers)
+            lock (_lockObject)
             {
                 Disposable.Create(
-                    _instances.Values.Where(i => i.IsValueCreated).Select(i => i.Value).OfType<IDisposable>()
+                    _instances.Values.OfType<IDisposable>()
                     .Concat(_resources)
                     .Concat(_resolvers.Values.Cast<IDisposable>()))
                     .Dispose();
@@ -134,7 +129,7 @@
         public IEnumerator<Key> GetEnumerator()
         {
             List<Key> keys;
-            lock (_resolvers)
+            lock (_lockObject)
             {
                 keys = _resolvers.Keys.ToList();
             }
@@ -152,7 +147,7 @@
         {
             return Disposable.Create(() =>
             {
-                lock (_resolvers)
+                lock (_lockObject)
                 {
                     _resolvers.Remove(key);
                 }

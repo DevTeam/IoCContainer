@@ -1,21 +1,27 @@
-﻿namespace IoC.Internal
+﻿namespace IoC.Internal.Lifetimes
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
 
-    internal sealed class ContainerLifetime : ILifetime
+    internal class ResolveLifetime: ILifetime
     {
-        public static readonly ILifetime Shared = new ContainerLifetime();
+        private readonly long _id;
+
+        public ResolveLifetime(long id)
+        {
+            _id = id;
+        }
 
         public object GetOrCreate(Context context, IFactory factory)
         {
             IInstanceKey key;
             if (context.IsConstructedGenericTargetContractType)
             {
-                key = new SingletoneGenericInstanceKey<long>(context.RegistrationId, context.TargetContractType.GenericTypeArguments());
+                key = new SingletoneGenericInstanceKey<ResolveId>(new ResolveId(_id, context.RegistrationId), context.TargetContractType.GenericTypeArguments());
             }
             else
             {
-                key = new SingletoneInstanceKey<long>(context.RegistrationId);
+                key = new SingletoneInstanceKey<ResolveId>(new ResolveId(_id, context.RegistrationId));
             }
 
             var store = context.ResolvingContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container");

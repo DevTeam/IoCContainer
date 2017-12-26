@@ -10,6 +10,7 @@
     using System.Threading.Tasks;
     using Features;
     using Internal;
+    using Internal.Factories;
     using Internal.Features;
 
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
@@ -169,11 +170,12 @@
             return new Resolving(container, tag);
         }
 
-        public static bool TryGet([NotNull] this IContainer container, [NotNull] Type targetContractType, out object instance, [NotNull][ItemCanBeNull] params object[] args){
+        public static bool TryGet([NotNull] this IContainer container, [NotNull] Type targetContractType, out object instance, [NotNull][ItemCanBeNull] params object[] args)
+        {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (targetContractType == null) throw new ArgumentNullException(nameof(targetContractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            var key = container.CreateKey(targetContractType);
+            var key = new Key(targetContractType, (container as Resolving?)?.Tag);
             if (!container.TryGetResolver(key, out var resolver))
             {
                 instance = null;
@@ -184,17 +186,18 @@
             return true;
         }
 
-        public static bool TryGet<T>([NotNull] this IContainer container, out T contract, [NotNull][ItemCanBeNull] params object[] args)
+        public static bool TryGet<T>([NotNull] this IContainer container, out T instance, [NotNull][ItemCanBeNull] params object[] args)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            if (!container.TryGet(typeof(T), out var instanceObject, args))
+            var key = new Key(typeof(T), (container as Resolving?)?.Tag);
+            if (!container.TryGetResolver(key, out var resolver))
             {
-                contract = default(T);
+                instance = default(T);
                 return false;
             }
 
-            contract = (T) instanceObject;
+            instance = (T)resolver.Resolve(container, typeof(T), args);
             return true;
         }
 
@@ -204,12 +207,13 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (targetContractType == null) throw new ArgumentNullException(nameof(targetContractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            if (!container.TryGet(targetContractType, out var instance, args))
+            var key = new Key(targetContractType, (container as Resolving?)?.Tag);
+            if (!container.TryGetResolver(key, out var resolver))
             {
-                return container.GetIssueResolver().CannotResolve(container, container.CreateKey(targetContractType));
+                return container.GetIssueResolver().CannotResolve(container, key);
             }
 
-            return instance;
+            return resolver.Resolve(container, targetContractType, args);
         }
 
         [NotNull]
@@ -217,12 +221,13 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            if (!container.TryGet<T>(out var instance, args))
+            var key = new Key(typeof(T), (container as Resolving?)?.Tag);
+            if (!container.TryGetResolver(key, out var resolver))
             {
-                return (T)container.GetIssueResolver().CannotResolve(container, container.CreateKey(typeof(T)));
+                return (T)container.GetIssueResolver().CannotResolve(container, key);
             }
 
-            return instance;
+            return (T)resolver.Resolve(container, typeof(T), args);
         }
 
         [NotNull]
@@ -322,17 +327,6 @@
         {
             // ReSharper disable once AssignNullToNotNullAttribute
             return !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
-        }
-
-        private static Key CreateKey([NotNull] this IContainer container, [NotNull] Type targetContractType)
-        {
-            object tagValue = null;
-            if (container is Resolving resolving)
-            {
-                tagValue = resolving.Tag;
-            }
-
-            return new Key(targetContractType, tagValue);
         }
 
         private static IIssueResolver GetIssueResolver(this IContainer container)

@@ -1,6 +1,6 @@
-﻿namespace IoC.Internal
+﻿namespace IoC.Internal.Factories
 {
-    internal struct ArgFactory : IFactory
+    internal class ArgFactory : IFactory
     {
         private readonly int _argIndex;
 

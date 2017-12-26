@@ -26,18 +26,13 @@
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            return obj is Key key && Equals(key);
+            // if (ReferenceEquals(null, obj)) return false;
+            return obj is Key key && ContractType == key.ContractType && Equals(Tag, key.Tag);
         }
 
         public override int GetHashCode()
         {
             return _hashCode;
-        }
-
-        private bool Equals(Key other)
-        {
-            return ContractType == other.ContractType && Equals(Tag, other.Tag);
         }
     }
 }

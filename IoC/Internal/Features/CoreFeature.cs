@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Threading;
+    using Factories;
+    using Lifetimes;
 
     internal sealed class CoreFeature: IConfiguration
     {

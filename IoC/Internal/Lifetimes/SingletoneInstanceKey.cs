@@ -1,10 +1,10 @@
-﻿namespace IoC.Internal
+﻿namespace IoC.Internal.Lifetimes
 {
     using System.Collections.Generic;
 
     internal struct SingletoneInstanceKey<T> : IInstanceKey
     {
-        // ReSharper disable once NotAccessedField.Local
+        private static readonly EqualityComparer<T> Comparer = EqualityComparer<T>.Default;
         private readonly T _id;
         private readonly int _hashCode;
 
@@ -16,18 +16,13 @@
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            return obj is SingletoneInstanceKey<T> key && Equals(key);
+            // if (ReferenceEquals(null, obj)) return false;
+            return obj is SingletoneInstanceKey<T> key && Comparer.Equals(_id, key._id);
         }
 
         public override int GetHashCode()
         {
             return _hashCode;
-        }
-
-        private bool Equals(SingletoneInstanceKey<T> other)
-        {
-            return EqualityComparer<T>.Default.Equals(_id, other._id);
         }
     }
 }

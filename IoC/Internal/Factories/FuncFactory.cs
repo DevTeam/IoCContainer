@@ -1,4 +1,4 @@
-﻿namespace IoC.Internal
+﻿namespace IoC.Internal.Factories
 {
     using System;
 

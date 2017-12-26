@@ -1,4 +1,4 @@
-﻿namespace IoC.Internal
+﻿namespace IoC.Internal.Factories
 {
     using System;
     using System.Collections.Generic;
@@ -32,7 +32,7 @@
                 from ctor in typeInfo.DeclaredConstructors
                 where ctor.IsPublic
                 let ctorItem = CreateCtorItem(ctor, dependencies)
-                let dependenciesWithPosition = ConverToDependenciesWithPosition(ctorItem.Item2, dependencies)
+                let dependenciesWithPosition = ConvertToDependenciesWithPosition(ctorItem.Item2, dependencies)
                 where IsCtorMatched(ctorItem.Item2, dependenciesWithPosition)
                 select ctorItem).FirstOrDefault()
                 ?? CreateCtorItem(issueResolver.CannotFindConsructor(typeInfo.Type, dependencies), dependencies);
@@ -53,19 +53,8 @@
 
             try
             {
-                var factories = _ctorData.Factories;
-                var args = _ctorData.Args;
-                object instance;
-                lock (args)
-                {
-                    for (var position = 0; position < _ctorData.Count; position++)
-                    {
-                        args[position] = factories[position].Create(context);
-                    }
-
-                    instance = _ctor(args);
-                }
-
+                FillArgs(_ctorData, context);
+                var instance = _ctor(_ctorData.Args);
                 if (_methodsCount == 0)
                 {
                     return instance;
@@ -74,18 +63,8 @@
                 for (var i = 0; i < _methodsCount; i++)
                 {
                     var method = _methods[i];
-                    var parameters = method.Item2;
-                    var methodFactories = parameters.Factories;
-                    var methodArgs = parameters.Args;
-                    lock (methodArgs)
-                    {
-                        for (var position = 0; position < parameters.Count; position++)
-                        {
-                            methodArgs[position] = methodFactories[position].Create(context);
-                        }
-
-                        method.Item1(instance, methodArgs);
-                    }
+                    FillArgs(method.Item2, context);
+                    method.Item1(instance, method.Item2.Args);
                 }
 
                 return instance;
@@ -96,14 +75,27 @@
             }
         }
 
+#if !NET40
+        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
+#endif
+        private void FillArgs(MethodData methodData, Context context)
+        {
+            var args = methodData.Args;
+            var factories = methodData.Factories;
+            for (var position = 0; position < methodData.Count; position++)
+            {
+                args[position] = factories[position].Create(context);
+            }
+        }
+
         private Tuple<ConstructorInfo, ParameterInfo[], DepWithPosition[]> CreateCtorItem(ConstructorInfo ctor, Has[] dependencies)
         {
             var parameters = ctor.GetParameters();
-            var dependenciesWithPosition = ConverToDependenciesWithPosition(parameters, dependencies);
+            var dependenciesWithPosition = ConvertToDependenciesWithPosition(parameters, dependencies);
             return Tuple.Create(ctor, ctor.GetParameters(), dependenciesWithPosition);
         }
 
-        private static ConstructorFunc CreateConstructor(ConstructorInfo constructor)
+        private ConstructorFunc CreateConstructor(ConstructorInfo constructor)
         {
             var argsParameter = Expression.Parameter(typeof(object[]), "args");
             var paramsExpression = CreateParameterExpressions(constructor, argsParameter);
@@ -127,7 +119,7 @@
             return lambda.Compile();
         }
 
-        private static bool IsCtorMatched(ParameterInfo[] parameters, DepWithPosition[] dependencies)
+        private bool IsCtorMatched(ParameterInfo[] parameters, DepWithPosition[] dependencies)
         {
             return dependencies.Where(i => i.Dependency.Type == DependencyType.Arg).All(i =>
             {
@@ -149,7 +141,8 @@
                     parameter.ParameterType)).ToArray();
         }
 
-        private DepWithPosition[] ConverToDependenciesWithPosition(ParameterInfo[] parameters, Has[] dependencies)
+
+        private DepWithPosition[] ConvertToDependenciesWithPosition(ParameterInfo[] parameters, Has[] dependencies)
         {
             var result = new DepWithPosition[dependencies.Length];
             for (var index = 0; index < result.Length; index++)
@@ -202,7 +195,7 @@
                         break;
 
                     case DependencyType.Ref:
-                        factories[position] = new RefFactory(parameters[position].ParameterType, dependency.Tag, dependency.Scope);
+                        factories[position] = CreateRefFactory(parameters[position].ParameterType, dependency.Tag, dependency.Scope);
                         break;
 
                     case DependencyType.Method:
@@ -212,7 +205,7 @@
                             ?? _issueResolver.CannotFindMethod(typeInfo.Type, dependency.HasMethod);
 
                         var methodParameters = methodInfo.GetParameters();
-                        var methodDependenciesWithPosition = ConverToDependenciesWithPosition(methodParameters, dependency.HasMethod.Dependencies);
+                        var methodDependenciesWithPosition = ConvertToDependenciesWithPosition(methodParameters, dependency.HasMethod.Dependencies);
                         var methodData = CreateMethodData(typeInfo, methodInfo.GetParameters(), methodDependenciesWithPosition);
                         methods.Add(Tuple.Create(CreateMethod(typeInfo.Type, methodInfo), methodData));
                         break;
@@ -230,10 +223,29 @@
                 }
 
                 var parameter = parameters[position];
-                factories[position] = new RefFactory(parameter.ParameterType, null, Scope.Current);
+                factories[position] = CreateRefFactory(parameter.ParameterType, null, Scope.Current);
             }
 
-            return new MethodData(paramsCount, factories, args, methods.ToArray());
+            return new MethodData(factories, args, methods.ToArray());
+        }
+
+        private IFactory CreateRefFactory([NotNull] Type contractType, object tagValue, Scope scope)
+        {
+            var key = new Key(contractType, tagValue);
+            switch (scope)
+            {
+                case Scope.Current:
+                    return new RefFactory(key);
+
+                case Scope.Parent:
+                    return new ParentRefFactory(key);
+
+                case Scope.Child:
+                    return new ChildRefFactory(key);
+
+                default:
+                    throw new NotSupportedException($"The scope \"{scope}\" is not supported.");
+            }
         }
 
         private struct DepWithPosition
@@ -248,19 +260,19 @@
             }
         }
 
-        private struct MethodData
+        private class MethodData
         {
-            internal readonly int Count;
             internal readonly IFactory[] Factories;
+            internal readonly int Count;
             internal readonly object[] Args;
             internal readonly Tuple<MethodFunc, MethodData>[] Methods;
 
-            public MethodData(int count, IFactory[] factories, object[] args, Tuple<MethodFunc, MethodData>[] methods)
+            public MethodData(IFactory[] factories, object[] args, Tuple<MethodFunc, MethodData>[] methods)
             {
-                Count = count;
                 Factories = factories;
                 Args = args;
                 Methods = methods;
+                Count = args.Length;
             }
         }
     }

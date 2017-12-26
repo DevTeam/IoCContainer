@@ -13,8 +13,8 @@
         [NotNull] public readonly IContainer RegistrationContainer;
         [NotNull] public readonly IContainer ResolvingContainer;
         [NotNull] public readonly Type TargetContractType;
-        internal readonly bool IsConstructedGenericTargetContractType;
         [NotNull] public readonly object[] Args;
+        internal readonly bool IsConstructedGenericTargetContractType;
 
         internal Context(
             long registrationId,
@@ -22,8 +22,8 @@
             [NotNull] IContainer registrationContainer,
             [NotNull] IContainer resolvingContainer,
             [NotNull] Type targetContractType,
-            bool isConstructedGenericTargetContractType,
-            [NotNull] params object[] args)
+            [NotNull] object[] args,
+            bool isConstructedGenericTargetContractType)
         {
             RegistrationId = registrationId;
             Key = key;
