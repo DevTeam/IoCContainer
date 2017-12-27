@@ -5,15 +5,19 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    internal sealed class ChildContainer : IContainer, IInstanceStore, IResourceStore, IEnumerable<Key>
+    internal sealed class ChildContainer:
+        IContainer,
+        IInstanceStore,
+        IResourceStore,
+        IEnumerable<Key>
     {
-        private static long _registrationId;
+        private static int _registrationId;
         private readonly string _name;
         private readonly object _lockObject = new object();
         [NotNull] private readonly IContainer _parentContainer;
         [NotNull] private readonly Dictionary<Key, IResolver> _resolvers = new Dictionary<Key, IResolver>();
-        [NotNull] private readonly Dictionary<IInstanceKey, object> _instances = new Dictionary<IInstanceKey, object>();
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
+        private readonly Dictionary<object, object> _instances = new Dictionary<object, object>();
 
         public ChildContainer([NotNull] string name = "", params IConfiguration[] configurations)
         {
@@ -41,7 +45,7 @@
 
         public IContainer Parent => _parentContainer;
 
-        public object GetOrAdd(IInstanceKey key, Context context, IFactory factory)
+        public object GetOrAdd(object key, Context context, IFactory factory)
         {
             if (_instances.TryGetValue(key, out var instance))
             {
@@ -111,7 +115,7 @@
             {
                 Disposable.Create(
                     _instances.Values.OfType<IDisposable>()
-                    .Concat(_resources)
+                     .Concat(_resources)
                     .Concat(_resolvers.Values.Cast<IDisposable>()))
                     .Dispose();
 

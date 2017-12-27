@@ -5,7 +5,7 @@
     internal class Resolver: IDisposable, IResolver, IFactory
     {
         private readonly object _lockObject;
-        private readonly long _registrationId;
+        private readonly int _registrationId;
         private readonly Key _key;
         [NotNull] private readonly IContainer _registrationContainer;
         [NotNull] private readonly IDisposable _registrationToken;
@@ -17,7 +17,7 @@
 
         public Resolver(
             object lockObject,
-            long registrationId,
+            int registrationId,
             Key key,
             [NotNull] IContainer registrationContainer,
             [NotNull] IDisposable registrationToken,

@@ -6,16 +6,16 @@
     internal struct ResolveId
     {
         private readonly long _id;
-        private readonly long _registrationId;
+        private readonly int _registrationId;
         private readonly int _hashCode;
 
-        public ResolveId(long id, long registrationId)
+        public ResolveId(long id, int registrationId)
         {
             _id = id;
             _registrationId = registrationId;
             unchecked
             {
-                _hashCode = (id.GetHashCode() * 397) ^ registrationId.GetHashCode();
+                _hashCode = (id.GetHashCode() * 397) ^ registrationId;
             }
         }
 

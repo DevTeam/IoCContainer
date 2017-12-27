@@ -8,18 +8,14 @@
 
         public object GetOrCreate(Context context, IFactory factory)
         {
-            IInstanceKey key;
+            var store = context.ResolvingContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container");
             if (context.IsConstructedGenericTargetContractType)
             {
-                key = new SingletoneGenericInstanceKey<long>(context.RegistrationId, context.TargetContractType.GenericTypeArguments());
-            }
-            else
-            {
-                key = new SingletoneInstanceKey<long>(context.RegistrationId);
+                var key = new SingletoneGenericInstanceKey<int>(context.RegistrationId, context.TargetContractType.GenericTypeArguments());
+                return store.GetOrAdd(key, context, factory);
             }
 
-            var store = context.ResolvingContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container");
-            return store.GetOrAdd(key, context, factory);
+            return store.GetOrAdd(context.RegistrationId, context, factory);
         }
     }
 }

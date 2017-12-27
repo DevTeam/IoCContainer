@@ -3,7 +3,7 @@
     using System;
 
     [PublicAPI]
-    public struct Key
+    public class Key
     {
         [NotNull] internal readonly Type ContractType;
         [CanBeNull] internal readonly object Tag;

@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
 
-    internal struct SingletoneGenericInstanceKey<T> : IInstanceKey
+    internal struct SingletoneGenericInstanceKey<T>
     {
         private static readonly EqualityComparer<T> Comparer = EqualityComparer<T>.Default;
         private readonly T _id;

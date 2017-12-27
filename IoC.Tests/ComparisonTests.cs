@@ -5,6 +5,7 @@ namespace IoC.Tests
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Reflection;
@@ -33,13 +34,13 @@ namespace IoC.Tests
 
         public ComparisonTests(ITestOutputHelper output)
         {
-            JetBrains.dotMemoryUnit.DotMemoryUnitTestOutput.SetOutputMethod(output.WriteLine);
+            DotMemoryUnitTestOutput.SetOutputMethod(output.WriteLine);
         }
 
         [Fact]
         public void PerformanceTest()
         {
-            const int series = 200000;
+            const int series = 100000;
             var results = new List<TestResult>();
             foreach (var ioc in Iocs)
             {
@@ -93,6 +94,7 @@ namespace IoC.Tests
             using (var container = Container.Create())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().Lifetime(Lifetime.Singletone).To<Service2>())
+            using (container.Bind<IService3>().To<Service3>())
             using (performanceCounter.Run())
             {
                 for (var i = 0; i < series; i++)
@@ -107,6 +109,7 @@ namespace IoC.Tests
             using (var container = Container.Create())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().Lifetime(Lifetime.Singletone).To<Service2>())
+            using (container.Bind<IService3>().To<Service3>())
             using (performanceCounter.Run())
             {
                 var func = container.Get<Func<IService1>>();
@@ -123,6 +126,7 @@ namespace IoC.Tests
             {
                 container.RegisterType<IService1, Service1>();
                 container.RegisterType<IService2, Service2>(new ContainerControlledLifetimeManager());
+                container.RegisterType<IService3, Service3>();
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -139,6 +143,7 @@ namespace IoC.Tests
             {
                 kernel.Bind<IService1>().To<Service1>();
                 kernel.Bind<IService2>().To<Service2>().InSingletonScope();
+                kernel.Bind<IService3>().To<Service3>();
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -154,6 +159,7 @@ namespace IoC.Tests
             var builder = new ContainerBuilder();
             builder.RegisterType<Service1>().As<IService1>();
             builder.RegisterType<Service2>().As<IService2>().SingleInstance();
+            builder.RegisterType<Service3>().As<IService3>();
             using (var container = builder.Build())
             using (performanceCounter.Run())
             {
@@ -170,6 +176,7 @@ namespace IoC.Tests
             {
                 container.Register(Component.For<IService1>().ImplementedBy<Service1>());
                 container.Register(Component.For<IService2>().ImplementedBy<Service2>().LifestyleSingleton());
+                container.Register(Component.For<IService3>().ImplementedBy<Service3>());
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -191,10 +198,10 @@ namespace IoC.Tests
     }
 
     // ReSharper disable once ClassNeverInstantiated.Global
+    [SuppressMessage("ReSharper", "UnusedParameter.Local")]
     public class Service1 : IService1
     {
-        // ReSharper disable once UnusedParameter.Local
-        public Service1([NotNull] IService2 service2)
+        public Service1(IService2 service2, IService3 service3)
         {
         }
     }
@@ -205,6 +212,15 @@ namespace IoC.Tests
 
     // ReSharper disable once ClassNeverInstantiated.Global
     public class Service2 : IService2
+    {
+    }
+
+    public interface IService3
+    {
+    }
+
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public class Service3 : IService3
     {
     }
 }

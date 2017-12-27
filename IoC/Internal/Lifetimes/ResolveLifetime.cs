@@ -13,7 +13,8 @@
 
         public object GetOrCreate(Context context, IFactory factory)
         {
-            IInstanceKey key;
+            var store = context.ResolvingContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container");
+            object key;
             if (context.IsConstructedGenericTargetContractType)
             {
                 key = new SingletoneGenericInstanceKey<ResolveId>(new ResolveId(_id, context.RegistrationId), context.TargetContractType.GenericTypeArguments());
@@ -23,7 +24,6 @@
                 key = new SingletoneInstanceKey<ResolveId>(new ResolveId(_id, context.RegistrationId));
             }
 
-            var store = context.ResolvingContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container");
             return store.GetOrAdd(key, context, factory);
         }
     }

@@ -46,22 +46,22 @@
 
             yield return container
                 .Bind<IContainer>()
-                .To(ctx => Normalize(ctx.ResolvingContainer));
+                .To(ctx => ctx.ResolvingContainer);
 
             yield return container
                 .Bind<IContainer>()
                 .Tag(Scope.Current)
-                .To(ctx => Normalize(ctx.ResolvingContainer));
+                .To(ctx => ctx.ResolvingContainer);
 
             yield return container
                 .Bind<IContainer>()
                 .Tag(Scope.Child)
-                .To(ctx => Normalize(ctx.ResolvingContainer.CreateChild()));
+                .To(ctx => ctx.ResolvingContainer.CreateChild());
 
             yield return container
                 .Bind<IContainer>()
                 .Tag(Scope.Parent)
-                .To(ctx => Normalize(ctx.ResolvingContainer.Parent));
+                .To(ctx => ctx.ResolvingContainer.Parent);
 
             yield return container
                 .Bind<IResourceStore>()
@@ -73,18 +73,6 @@
                     ctx.ResolvingContainer.Get<IIssueResolver>(),
                     (Type)ctx.Args[0],
                     (Has[])ctx.Args[1]));
-        }
-
-        private static IContainer Normalize(IContainer container)
-        {
-            switch (container)
-            {
-                case Resolving resolving:
-                    return resolving.Container;
-
-                default:
-                    return container;
-            }
         }
     }
 }

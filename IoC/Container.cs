@@ -166,8 +166,8 @@
         public static IContainer Tag([NotNull] this IContainer container, [NotNull] object tag)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            if (tag == null) throw new ArgumentNullException(nameof(tag));
-            return new Resolving(container, tag);
+            ResolvingContext.TagValue = tag;
+            return container;
         }
 
         public static bool TryGet([NotNull] this IContainer container, [NotNull] Type targetContractType, out object instance, [NotNull][ItemCanBeNull] params object[] args)
@@ -175,7 +175,8 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (targetContractType == null) throw new ArgumentNullException(nameof(targetContractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            var key = new Key(targetContractType, (container as Resolving?)?.Tag);
+            var key = new Key(targetContractType, ResolvingContext.TagValue);
+            ResolvingContext.TagValue = null;
             if (!container.TryGetResolver(key, out var resolver))
             {
                 instance = null;
@@ -190,7 +191,8 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            var key = new Key(typeof(T), (container as Resolving?)?.Tag);
+            var key = new Key(typeof(T), ResolvingContext.TagValue);
+            ResolvingContext.TagValue = null;
             if (!container.TryGetResolver(key, out var resolver))
             {
                 instance = default(T);
@@ -207,7 +209,8 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (targetContractType == null) throw new ArgumentNullException(nameof(targetContractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            var key = new Key(targetContractType, (container as Resolving?)?.Tag);
+            var key = new Key(targetContractType, ResolvingContext.TagValue);
+            ResolvingContext.TagValue = null;
             if (!container.TryGetResolver(key, out var resolver))
             {
                 return container.GetIssueResolver().CannotResolve(container, key);
@@ -221,7 +224,8 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            var key = new Key(typeof(T), (container as Resolving?)?.Tag);
+            var key = new Key(typeof(T), ResolvingContext.TagValue);
+            ResolvingContext.TagValue = null;
             if (!container.TryGetResolver(key, out var resolver))
             {
                 return (T)container.GetIssueResolver().CannotResolve(container, key);
@@ -332,6 +336,12 @@
         private static IIssueResolver GetIssueResolver(this IContainer container)
         {
             return container.Get<IIssueResolver>();
+        }
+
+        private class ResolvingContext
+        {
+            [ThreadStatic]
+            public static object TagValue;
         }
     }
 }

@@ -8,7 +8,7 @@
     [PublicAPI]
     public struct Context
     {
-        public readonly long RegistrationId;
+        public readonly int RegistrationId;
         public readonly Key Key;
         [NotNull] public readonly IContainer RegistrationContainer;
         [NotNull] public readonly IContainer ResolvingContainer;
@@ -17,7 +17,7 @@
         internal readonly bool IsConstructedGenericTargetContractType;
 
         internal Context(
-            long registrationId,
+            int registrationId,
             Key key,
             [NotNull] IContainer registrationContainer,
             [NotNull] IContainer resolvingContainer,
