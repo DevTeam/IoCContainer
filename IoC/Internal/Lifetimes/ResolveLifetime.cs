@@ -1,7 +1,6 @@
 ﻿namespace IoC.Internal.Lifetimes
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
 
     internal class ResolveLifetime: ILifetime
     {

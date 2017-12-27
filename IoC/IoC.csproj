@@ -5,7 +5,6 @@
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
-    <TreatSpecificWarningsAsErrors />
     <PackageId>IoC.Container</PackageId>
     <Authors>NikolayP</Authors>
     <Description>Simple/powerful/darting Inversion of Control container</Description>

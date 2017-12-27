@@ -5,21 +5,23 @@ namespace IoC.Tests
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
     using System.Linq;
     using System.Reflection;
     using Autofac;
     using Castle.MicroKernel.Registration;
     using Castle.Windsor;
+    using JetBrains.dotMemoryUnit;
+    using JetBrains.dotMemoryUnit.Kernel;
     using Ninject;
     using Unity;
     using Unity.Lifetime;
     using Xunit;
+    using Xunit.Abstractions;
 
     public class ComparisonTests
     {
-        private static readonly Dictionary<string, Func<int, long>> Iocs = new Dictionary<string, Func<int, long>>()
+        private static readonly Dictionary<string, Action<int, IPerformanceCounter>> Iocs = new Dictionary<string, Action<int, IPerformanceCounter>>()
         {
             { "Castle.Windsor", CastleWindsor },
             { "Unity", Unity },
@@ -29,133 +31,152 @@ namespace IoC.Tests
             { "Autofac", Autofac },
         };
 
-        [Fact]
-        public void ComparisonTest()
+        public ComparisonTests(ITestOutputHelper output)
         {
-            const int warmupSeries = 2;
-            const int series = 300000;
-            const double error = .80;
-
-            var results = new Dictionary<string, long>();
-            foreach (var ioc in Iocs)
-            {
-                ioc.Value(warmupSeries);
-                var elapsedMilliseconds = ioc.Value(series);
-                Trace.WriteLine($"{ioc.Key}: {elapsedMilliseconds}");
-                results.Add(ioc.Key, elapsedMilliseconds);
-            }
-
-            var resultsStr = string.Join(Environment.NewLine, results.Select(i => $"{i.Key}: {i.Value}").ToArray());
-            var resultFileName = Path.Combine(GetBinDirectory(), "ComparisonTest.txt");
-            File.WriteAllText(resultFileName, resultsStr);
-            var actualElapsedMilliseconds = results["This"];
-            foreach (var result in results.Where(i => !i.Key.StartsWith("This")))
-            {
-                Assert.True(actualElapsedMilliseconds * error <= result.Value, $"{result.Key} is better: {result.Value}, our result is : {actualElapsedMilliseconds}.\nResults:\n{resultsStr}");
-            }
+            JetBrains.dotMemoryUnit.DotMemoryUnitTestOutput.SetOutputMethod(output.WriteLine);
         }
 
-        private static long This(int series)
+        [Fact]
+        public void PerformanceTest()
+        {
+            const int series = 200000;
+            var results = new List<TestResult>();
+            foreach (var ioc in Iocs)
+            {
+                // Warmup
+                ioc.Value(2, new TotalTimePerformanceCounter());
+
+                var performanceCounter = new TotalTimePerformanceCounter();
+                ioc.Value(series, performanceCounter);
+
+                var result = new TestResult(ioc.Key, performanceCounter.Result);
+                results.Add(result);
+            }
+
+            SaveResults(results, $"Performance{series}");
+        }
+
+#if !NET45
+        [Fact]
+        [DotMemoryUnit(CollectAllocations = true)]
+        public void MemoryTest()
+        {
+            if (!dotMemoryApi.IsEnabled)
+            {
+                return;
+            }
+
+            const int series = 10;
+            var results = new List<TestResult>();
+            foreach (var ioc in Iocs)
+            {
+                var performanceCounter = new MemoryPerformanceCounter();
+                ioc.Value(series, performanceCounter);
+
+                var result = new TestResult(ioc.Key, performanceCounter.Result);
+                results.Add(result);
+            }
+
+            SaveResults(results, $"Memory{series}");
+        }
+#endif
+
+        private static void SaveResults(IEnumerable<TestResult> results, string name)
+        {
+            var resultsStr = string.Join(Environment.NewLine, results.OrderBy(i => i).Select((item, index) => $"{index + 1:00} {item}"));
+            var resultFileName = Path.Combine(GetBinDirectory(), $"{name}Report.txt");
+            File.WriteAllText(resultFileName, resultsStr);
+        }
+
+        private static void This(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = Container.Create())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().Lifetime(Lifetime.Singletone).To<Service2>())
+            using (performanceCounter.Run())
             {
-                var stopwatch = Stopwatch.StartNew();
                 for (var i = 0; i < series; i++)
                 {
                     container.Get<IService1>();
                 }
-
-                stopwatch.Stop();
-                return stopwatch.ElapsedMilliseconds;
             }
         }
 
-        private static long ThisByFunc(int series)
+        private static void ThisByFunc(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = Container.Create())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().Lifetime(Lifetime.Singletone).To<Service2>())
+            using (performanceCounter.Run())
             {
-                var stopwatch = Stopwatch.StartNew();
                 var func = container.Get<Func<IService1>>();
                 for (var i = 0; i < series; i++)
                 {
                     func();
                 }
-
-                stopwatch.Stop();
-                return stopwatch.ElapsedMilliseconds;
             }
         }
 
-        private static long Unity(int series)
+        private static void Unity(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = new UnityContainer())
             {
                 container.RegisterType<IService1, Service1>();
                 container.RegisterType<IService2, Service2>(new ContainerControlledLifetimeManager());
-                var stopwatch = Stopwatch.StartNew();
-                for (var i = 0; i < series; i++)
+                using (performanceCounter.Run())
                 {
-                    container.Resolve(typeof(IService1));
+                    for (var i = 0; i < series; i++)
+                    {
+                        container.Resolve(typeof(IService1));
+                    }
                 }
-
-                stopwatch.Stop();
-                return stopwatch.ElapsedMilliseconds;
             }
         }
 
-        private static long Ninject(int series)
+        private static void Ninject(int series, IPerformanceCounter performanceCounter)
         {
             using (var kernel = new StandardKernel())
             {
                 kernel.Bind<IService1>().To<Service1>();
                 kernel.Bind<IService2>().To<Service2>().InSingletonScope();
-                var stopwatch = Stopwatch.StartNew();
-                for (var i = 0; i < series; i++)
+                using (performanceCounter.Run())
                 {
-                    kernel.Get<IService1>();
+                    for (var i = 0; i < series; i++)
+                    {
+                        kernel.Get<IService1>();
+                    }
                 }
-
-                stopwatch.Stop();
-                return stopwatch.ElapsedMilliseconds;
             }
         }
 
-        private static long Autofac(int series)
+        private static void Autofac(int series, IPerformanceCounter performanceCounter)
         {
             var builder = new ContainerBuilder();
             builder.RegisterType<Service1>().As<IService1>();
             builder.RegisterType<Service2>().As<IService2>().SingleInstance();
             using (var container = builder.Build())
+            using (performanceCounter.Run())
             {
-                var stopwatch = Stopwatch.StartNew();
                 for (var i = 0; i < series; i++)
                 {
                     container.Resolve<IService1>();
                 }
-
-                stopwatch.Stop();
-                return stopwatch.ElapsedMilliseconds;
             }
         }
 
-        private static long CastleWindsor(int series)
+        private static void CastleWindsor(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = new WindsorContainer())
             {
                 container.Register(Component.For<IService1>().ImplementedBy<Service1>());
                 container.Register(Component.For<IService2>().ImplementedBy<Service2>().LifestyleSingleton());
-                var stopwatch = Stopwatch.StartNew();
-                for (var i = 0; i < series; i++)
+                using (performanceCounter.Run())
                 {
-                    container.Resolve<IService1>();
+                    for (var i = 0; i < series; i++)
+                    {
+                        container.Resolve<IService1>();
+                    }
                 }
-
-                stopwatch.Stop();
-                return stopwatch.ElapsedMilliseconds;
             }
         }
 
