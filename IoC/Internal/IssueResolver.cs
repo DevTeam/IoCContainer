@@ -69,5 +69,10 @@
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             throw new InvalidOperationException($"Keys {string.Join(", ", keys.Select(i => i.ToString()))} cannot be registered in the container \"{container}\".");
         }
+
+        public object CannotResolveParameter(Type type, Has dependency, ParameterInfo parameter)
+        {
+            throw new InvalidOperationException($"Cannot resolve the parameter \"{parameter.ParameterType} {parameter.Name}\" for \"{parameter.Member.Name}\" creating an instance of type \"{type.Name}\" from args[{dependency.ArgIndex}].");
+        }
     }
 }

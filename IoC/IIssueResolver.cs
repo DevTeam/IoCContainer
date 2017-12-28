@@ -23,5 +23,7 @@
         int CannotFindParameter([NotNull][ItemNotNull] ParameterInfo[] parameters, Parameter parameter);
 
         void CyclicDependenceDetected(Context context, [NotNull] Type type, int reentrancy);
+
+        [CanBeNull] object CannotResolveParameter([NotNull] Type type, Has dependency, [NotNull] ParameterInfo parameter);
     }
 }

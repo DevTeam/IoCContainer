@@ -193,14 +193,15 @@
             {
                 var dependency = dependencyWithPosition.Dependency;
                 var position = dependencyWithPosition.Position;
+                var parameter = parameters[position];
                 switch (dependency.Type)
                 {
                     case DependencyType.Arg:
-                        factories[position] = new ArgFactory(dependency.ArgIndex);
+                        factories[position] = new ArgFactory(typeInfo, dependency, parameter);
                         break;
 
                     case DependencyType.Ref:
-                        factories[position] = CreateRefFactory(parameters[position].ParameterType, dependency.Tag, dependency.Scope, dependency.ArgsIndexOffset);
+                        factories[position] = CreateRefFactory(parameter.ParameterType, dependency.Tag, dependency.Scope, dependency.ArgsIndexOffset);
                         break;
 
                     case DependencyType.Method:
