@@ -11,6 +11,7 @@
 
         public object Create(Context context)
         {
+            // ReSharper disable once AssignNullToNotNullAttribute
             return context.Args[_argIndex];
         }
     }

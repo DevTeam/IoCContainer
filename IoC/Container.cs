@@ -95,43 +95,52 @@
             return new Registration<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
         }
 
-        public static IRegistration<T> Lifetime<T>(this IRegistration<T> registration, Lifetime lifetime)
+        public static IRegistration<T> Lifetime<T>([NotNull] this IRegistration<T> registration, Lifetime lifetime)
         {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
             return new Registration<T>(registration, lifetime);
         }
 
-        public static IRegistration<T> Lifetime<T>(this IRegistration<T> registration, [NotNull] ILifetime lifetime)
+        public static IRegistration<T> Lifetime<T>([NotNull] this IRegistration<T> registration, [NotNull] ILifetime lifetime)
         {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
             if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
             return new Registration<T>(registration, lifetime);
         }
 
-        public static IRegistration<T> Tag<T>(this IRegistration<T> registration, [NotNull] object tagValue)
+        public static IRegistration<T> Tag<T>([NotNull] this IRegistration<T> registration, [NotNull] object tagValue)
         {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
             if (tagValue == null) throw new ArgumentNullException(nameof(tagValue));
             return new Registration<T>(registration, tagValue);
         }
 
-        public static IDisposable To<T>(this IRegistration<T> registration, [NotNull] IFactory factory)
+        public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [NotNull] IFactory factory)
         {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             return new RegistrationToken(registration.Container, CreateRegistration(registration, factory));
         }
 
-        public static IDisposable To<T>(this IRegistration<T> registration, [NotNull] Func<Context, T> factory)
+        public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [NotNull] Func<Context, T> factory, [NotNull] string description = "")
         {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
-            return registration.To(new FuncFactory<T>(factory));
+            if (description == null) throw new ArgumentNullException(nameof(description));
+            return registration.To(new FuncFactory<T>(description, factory));
         }
 
-        public static IDisposable To<T>(this IRegistration<T> registration, [NotNull] Func<T> factory)
+        public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [NotNull] Func<T> factory, [NotNull] string description = "")
         {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
-            return registration.To(new FuncFactory<T>(ctx => factory()));
+            if (description == null) throw new ArgumentNullException(nameof(description));
+            return registration.To(new FuncFactory<T>(description, ctx => factory()));
         }
 
-        public static IDisposable To<T>(this IRegistration<T> registration, [NotNull] Type instanceType, [NotNull] params Has[] dependencies)
+        public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [NotNull] Type instanceType, [NotNull] params Has[] dependencies)
         {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
             if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
             if (dependencies == null) throw new ArgumentNullException(nameof(dependencies));
             var typeInfo = instanceType.AsTypeInfo();
@@ -144,8 +153,9 @@
             return registration.To(factory);
         }
 
-        public static IDisposable To<T>(this IRegistration<T> registration, [NotNull] params Has[] dependencies)
+        public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [NotNull] params Has[] dependencies)
         {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
             if (dependencies == null) throw new ArgumentNullException(nameof(dependencies));
             return registration.To(typeof(T), dependencies);
         }
@@ -166,7 +176,7 @@
         public static IContainer Tag([NotNull] this IContainer container, [NotNull] object tag)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            ResolvingContext.TagValue = tag;
+            ResolvingContext.TagValue = tag ?? throw new ArgumentNullException(nameof(tag));
             return container;
         }
 
@@ -270,7 +280,7 @@
         }
 
         [NotNull]
-        public static Task<T> AsyncGet<T>([NotNull] this IContainer container, [NotNull] params object[] args)
+        public static Task<T> AsyncGet<T>([NotNull] this IContainer container, [NotNull][ItemCanBeNull] params object[] args)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
@@ -280,7 +290,7 @@
 
 #if !NET40
         [NotNull]
-        public static async Task<T> StartGet<T>([NotNull] this IContainer container, [NotNull] TaskScheduler taskScheduler, [NotNull] params object[] args)
+        public static async Task<T> StartGet<T>([NotNull] this IContainer container, [NotNull] TaskScheduler taskScheduler, [NotNull][ItemCanBeNull] params object[] args)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (taskScheduler == null) throw new ArgumentNullException(nameof(taskScheduler));
@@ -311,7 +321,7 @@
         }
 
         [NotNull]
-        private static IDisposable CreateRegistration<T>(this IRegistration<T> registration, IFactory factory)
+        private static IDisposable CreateRegistration<T>([NotNull] this IRegistration<T> registration, [NotNull] IFactory factory)
         {
             var keys = (
                 from contract in registration.ContractsTypes
@@ -338,7 +348,7 @@
             return container.Get<IIssueResolver>();
         }
 
-        private class ResolvingContext
+        private static class ResolvingContext
         {
             [ThreadStatic]
             public static object TagValue;

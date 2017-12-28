@@ -6,7 +6,7 @@
     public struct Has
     {
         internal readonly Parameter Parameter;
-        internal readonly object Tag;
+        [CanBeNull] internal readonly object Tag;
         internal readonly int ArgIndex;
         internal readonly DependencyType Type;
         internal readonly HasMethod HasMethod;
@@ -14,53 +14,68 @@
 
         public static Has Arg<T>([NotNull] string name, int argIndex)
         {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (argIndex < 0) throw new ArgumentOutOfRangeException(nameof(argIndex));
             return new Has(new Parameter(name, typeof(T)), argIndex);
         }
 
         public static Has Arg([NotNull] string name, int argIndex)
         {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (argIndex < 0) throw new ArgumentOutOfRangeException(nameof(argIndex));
             return new Has(new Parameter(name), argIndex);
         }
 
         public static Has Ref<T>([NotNull] string name, [NotNull] object tag, Scope scope = Scope.Current)
         {
+            if (name == null) throw new ArgumentNullException(nameof(name));
             if (tag == null) throw new ArgumentNullException(nameof(tag));
             return new Has(new Parameter(name, typeof(T)), tag, scope);
         }
 
         public static Has Ref<T>([NotNull] string name, Scope scope)
         {
+            if (name == null) throw new ArgumentNullException(nameof(name));
             return new Has(new Parameter(name, typeof(T)), null, scope);
         }
 
         public static Has Ref([NotNull] string name, [NotNull] object tag, Scope scope = Scope.Current)
         {
+            if (name == null) throw new ArgumentNullException(nameof(name));
             if (tag == null) throw new ArgumentNullException(nameof(tag));
             return new Has(new Parameter(name), tag, scope);
         }
 
         public static Has Ref([NotNull] string name, Scope scope)
         {
+            if (name == null) throw new ArgumentNullException(nameof(name));
             return new Has(new Parameter(name), null, scope);
         }
 
-        public static Has Method(string name, params Has[] dependencies)
+        public static Has Method([NotNull] string name, [NotNull] params Has[] dependencies)
         {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (dependencies == null) throw new ArgumentNullException(nameof(dependencies));
             return new Has(new HasMethod(name, dependencies));
         }
 
-        public static Has Property<T>(string propertyName, int argIndex)
+        public static Has Property<T>([NotNull] string propertyName, int argIndex)
         {
+            if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
+            if (argIndex < 0) throw new ArgumentOutOfRangeException(nameof(argIndex));
             return new Has(new HasMethod("set_" + propertyName, Arg<T>("value", argIndex)));
         }
 
-        public static Has Property(string propertyName, int argIndex)
+        public static Has Property([NotNull] string propertyName, int argIndex)
         {
+            if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
+            if (argIndex < 0) throw new ArgumentOutOfRangeException(nameof(argIndex));
             return new Has(new HasMethod("set_" + propertyName, Arg("value", argIndex)));
         }
 
         private Has(Parameter parameter, int argIndex)
         {
+            if (argIndex < 0) throw new ArgumentOutOfRangeException(nameof(argIndex));
             Type = DependencyType.Arg;
             Parameter = parameter;
             ArgIndex = argIndex;
@@ -69,7 +84,7 @@
             Scope = Scope.Current;
         }
 
-        private Has(Parameter parameter, object tag, Scope scope)
+        private Has(Parameter parameter, [CanBeNull] object tag, Scope scope)
         {
             Type = DependencyType.Ref;
             Parameter = parameter;

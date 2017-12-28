@@ -60,5 +60,10 @@
 
             return factory.Create(context);
         }
+
+        public override string ToString()
+        {
+            return $"AutowiringFactory of \"{_instanceType.Name}\"";
+        }
     }
 }

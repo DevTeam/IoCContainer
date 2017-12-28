@@ -1,14 +1,16 @@
 ﻿namespace IoC
 {
+    using System;
+
     public struct HasMethod
     {
         internal readonly string Name;
         internal readonly Has[] Dependencies;
 
-        public HasMethod(string name, params Has[] dependencies)
+        public HasMethod([NotNull] string name, [NotNull] params Has[] dependencies)
         {
-            Name = name;
-            Dependencies = dependencies;
+            Name = name ?? throw new ArgumentNullException(nameof(name));
+            Dependencies = dependencies ?? throw new ArgumentNullException(nameof(dependencies));
         }
 
         public override string ToString()

@@ -75,6 +75,11 @@
             }
         }
 
+        public override string ToString()
+        {
+            return $"InstanceFactory of \"{_typeInfo.Type.Name}\"";
+        }
+
 #if !NET40
         [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
 #endif
@@ -211,7 +216,7 @@
                         break;
 
                     default:
-                        throw new ArgumentOutOfRangeException($"{dependency.Type}");
+                        throw new NotSupportedException($"The dependency \"{dependency.Type}\" is not supported.");
                 }
             }
 

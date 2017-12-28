@@ -7,12 +7,12 @@
     // ReSharper disable once UnusedTypeParameter
     public interface IRegistration<in T>
     {
-        IContainer Container { get; }
+        [NotNull] IContainer Container { get; }
 
-        IEnumerable<Type> ContractsTypes { get; }
+        [NotNull][ItemNotNull] IEnumerable<Type> ContractsTypes { get; }
 
-        IEnumerable<object> Tags { get; }
+        [NotNull][ItemCanBeNull] IEnumerable<object> Tags { get; }
 
-        ILifetime Lifetime { get; }
+        [CanBeNull] ILifetime Lifetime { get; }
     }
 }

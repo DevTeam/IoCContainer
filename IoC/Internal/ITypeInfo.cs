@@ -8,8 +8,6 @@
     {
         Type Type { get; }
 
-        string Name { get; }
-
         bool IsGenericTypeDefinition { get; }
 
         IEnumerable<ConstructorInfo> DeclaredConstructors { get; }

@@ -54,8 +54,6 @@
 
             public Type Type => _type;
 
-            public string Name => _type.Name;
-
             public bool IsGenericTypeDefinition => _type.IsGenericTypeDefinition;
 
             public IEnumerable<ConstructorInfo> DeclaredConstructors => _type.GetConstructors();
@@ -80,8 +78,6 @@
             }
 
             public Type Type { get; }
-
-            public string Name => Type.Name;
 
             public bool IsGenericTypeDefinition => _typeInfo.Value.IsGenericTypeDefinition;
 
