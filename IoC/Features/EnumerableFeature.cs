@@ -72,7 +72,7 @@
                         continue;
                     }
 
-                    yield return (T)resolver.Resolve(context.ResolvingContainer, context.TargetContractType, context.Args);
+                    yield return (T)resolver.Resolve(context.ResolvingContainer, context.TargetContractType, 0, context.Args);
                 }
             }
         }

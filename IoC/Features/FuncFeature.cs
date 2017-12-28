@@ -143,56 +143,56 @@
         {
             public InstanceFunc(Context ctx) : base(ctx) { }
             public override object Create() { return CreateFunc(); }
-            private Func<T1, T> CreateFunc() { return arg1 => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), arg1); }
+            private Func<T1, T> CreateFunc() { return arg1 => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), 0, arg1); }
         }
 
         private class InstanceFunc<T1, T2, T> : InstanceFunc<T>
         {
             public InstanceFunc(Context ctx) : base(ctx) { }
             public override object Create() { return CreateFunc(); }
-            private Func<T1, T2, T> CreateFunc() { return (arg1, arg2) => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), arg1, arg2); }
+            private Func<T1, T2, T> CreateFunc() { return (arg1, arg2) => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), 0, arg1, arg2); }
         }
 
         private class InstanceFunc<T1, T2, T3, T> : InstanceFunc<T>
         {
             public InstanceFunc(Context ctx) : base(ctx) { }
             public override object Create() { return CreateFunc(); }
-            private Func<T1, T2, T3, T> CreateFunc() { return (arg1, arg2, arg3) => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), arg1, arg2, arg3); }
+            private Func<T1, T2, T3, T> CreateFunc() { return (arg1, arg2, arg3) => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), 0, arg1, arg2, arg3); }
         }
 
         private class InstanceFunc<T1, T2, T3, T4, T> : InstanceFunc<T>
         {
             public InstanceFunc(Context ctx) : base(ctx) { }
             public override object Create() { return CreateFunc(); }
-            private Func<T1, T2, T3, T4, T> CreateFunc() { return (arg1, arg2, arg3, arg4) => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), arg1, arg2, arg3, arg4); }
+            private Func<T1, T2, T3, T4, T> CreateFunc() { return (arg1, arg2, arg3, arg4) => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), 0, arg1, arg2, arg3, arg4); }
         }
 
         private class InstanceFunc<T1, T2, T3, T4, T5, T> : InstanceFunc<T>
         {
             public InstanceFunc(Context ctx) : base(ctx) { }
             public override object Create() { return CreateFunc(); }
-            private Func<T1, T2, T3, T4, T5, T> CreateFunc() { return (arg1, arg2, arg3, arg4, arg5) => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), arg1, arg2, arg3, arg4, arg5); }
+            private Func<T1, T2, T3, T4, T5, T> CreateFunc() { return (arg1, arg2, arg3, arg4, arg5) => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), 0, arg1, arg2, arg3, arg4, arg5); }
         }
 
         private class InstanceFunc<T1, T2, T3, T4, T5, T6, T> : InstanceFunc<T>
         {
             public InstanceFunc(Context ctx) : base(ctx) { }
             public override object Create() { return CreateFunc(); }
-            private Func<T1, T2, T3, T4, T5, T6, T> CreateFunc() { return (arg1, arg2, arg3, arg4, arg5, arg6) => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), arg1, arg2, arg3, arg4, arg5, arg6); }
+            private Func<T1, T2, T3, T4, T5, T6, T> CreateFunc() { return (arg1, arg2, arg3, arg4, arg5, arg6) => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), 0, arg1, arg2, arg3, arg4, arg5, arg6); }
         }
 
         private class InstanceFunc<T1, T2, T3, T4, T5, T6, T7, T> : InstanceFunc<T>
         {
             public InstanceFunc(Context ctx) : base(ctx) { }
             public override object Create() { return CreateFunc(); }
-            private Func<T1, T2, T3, T4, T5, T6, T7, T> CreateFunc() { return (arg1, arg2, arg3, arg4, arg5, arg6, arg7) => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), arg1, arg2, arg3, arg4, arg5, arg6, arg7); }
+            private Func<T1, T2, T3, T4, T5, T6, T7, T> CreateFunc() { return (arg1, arg2, arg3, arg4, arg5, arg6, arg7) => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), 0, arg1, arg2, arg3, arg4, arg5, arg6, arg7); }
         }
 
         private class InstanceFunc<T1, T2, T3, T4, T5, T6, T7, T8, T> : InstanceFunc<T>
         {
             public InstanceFunc(Context ctx) : base(ctx) { }
             public override object Create() { return CreateFunc(); }
-            private Func<T1, T2, T3, T4, T5, T6, T7, T8, T> CreateFunc() { return (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8); }
+            private Func<T1, T2, T3, T4, T5, T6, T7, T8, T> CreateFunc() { return (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => (T)Resolver.Resolve(Ctx.ResolvingContainer, typeof(T), 0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8); }
         }
     }
 }

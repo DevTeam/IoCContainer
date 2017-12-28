@@ -384,6 +384,30 @@
         }
 
         [Fact]
+        public void ContainerShouldResolveWhenHasStateInDependency()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedRef = Mock.Of<IMyService>();
+
+                // When
+                using (container.Bind<IMyService1>().To(ctx => expectedRef))
+                using (container.Bind<IMyService>().To(typeof(MyService), Has.Arg<string>("name", 0)))
+                using (container.Bind(typeof(IMyGenericService<>)).To(typeof(MyGenericService<>), Has.Arg("value", 0), Has.Ref("service", Scope.Current, 1)))
+                {
+                    // Then
+                    var actualInstance = container.Get<IMyGenericService<int>>(99, "abc");
+
+                    actualInstance.ShouldBeOfType<MyGenericService<int>>();
+                    actualInstance.Value.ShouldBe(99);
+                    actualInstance.Service.ShouldBeOfType<MyService>();
+                    ((MyService)actualInstance.Service).Name.ShouldBe("abc");
+                }
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveWhenHasStateAndRefTag()
         {
             // Given
@@ -704,6 +728,27 @@
 
         public interface IMyService1
         {
+        }
+
+        [SuppressMessage("ReSharper", "UnusedMember.Global")]
+        public class MyGenericService<T> : IMyGenericService<T>
+        {
+            public MyGenericService(T value, IMyService service)
+            {
+                Value = value;
+                Service = service;
+            }
+
+            public T Value { get; }
+
+            public IMyService Service { get; }
+        }
+
+        public interface IMyGenericService<out T>
+        {
+            T Value { get; }
+
+            IMyService Service { get; }
         }
 
         [SuppressMessage("ReSharper", "UnusedMember.Global")]

@@ -193,7 +193,7 @@
                 return false;
             }
 
-            instance = resolver.Resolve(container, targetContractType, args);
+            instance = resolver.Resolve(container, targetContractType, 0, args);
             return true;
         }
 
@@ -209,7 +209,7 @@
                 return false;
             }
 
-            instance = (T)resolver.Resolve(container, typeof(T), args);
+            instance = (T)resolver.Resolve(container, typeof(T), 0, args);
             return true;
         }
 
@@ -226,7 +226,7 @@
                 return container.GetIssueResolver().CannotResolve(container, key);
             }
 
-            return resolver.Resolve(container, targetContractType, args);
+            return resolver.Resolve(container, targetContractType, 0, args);
         }
 
         [NotNull]
@@ -241,7 +241,7 @@
                 return (T)container.GetIssueResolver().CannotResolve(container, key);
             }
 
-            return (T)resolver.Resolve(container, typeof(T), args);
+            return (T)resolver.Resolve(container, typeof(T), 0, args);
         }
 
         [NotNull]

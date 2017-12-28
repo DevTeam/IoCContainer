@@ -39,7 +39,7 @@
             _registrationToken.Dispose();
         }
 
-        public object Resolve(IContainer resolvingContainer, Type targetContractType, params object[] args)
+        public object Resolve(IContainer resolvingContainer, Type targetContractType, int argsIndexOffset = 0, params object[] args)
         {
             lock (_lockObject)
             {
@@ -47,6 +47,14 @@
                 {
                     _prevTargetContractType = targetContractType;
                     _prevIsConstructedGenericTargetContractType = targetContractType.IsConstructedGenericType();
+                }
+
+                if (argsIndexOffset > 0)
+                {
+                    var newLength = args.Length - argsIndexOffset;
+                    var newArgs = new object[newLength];
+                    Array.Copy(args, argsIndexOffset, newArgs, 0, newLength);
+                    args = newArgs;
                 }
 
                 var context = new Context(_registrationId, _key, _registrationContainer, resolvingContainer, targetContractType, args, _prevIsConstructedGenericTargetContractType);

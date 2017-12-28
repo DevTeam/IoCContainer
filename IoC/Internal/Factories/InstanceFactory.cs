@@ -200,7 +200,7 @@
                         break;
 
                     case DependencyType.Ref:
-                        factories[position] = CreateRefFactory(parameters[position].ParameterType, dependency.Tag, dependency.Scope);
+                        factories[position] = CreateRefFactory(parameters[position].ParameterType, dependency.Tag, dependency.Scope, dependency.ArgsIndexOffset);
                         break;
 
                     case DependencyType.Method:
@@ -228,25 +228,25 @@
                 }
 
                 var parameter = parameters[position];
-                factories[position] = CreateRefFactory(parameter.ParameterType, null, Scope.Current);
+                factories[position] = CreateRefFactory(parameter.ParameterType, null, Scope.Current, 0);
             }
 
             return new MethodData(factories, args, methods.ToArray());
         }
 
-        private IFactory CreateRefFactory([NotNull] Type contractType, object tagValue, Scope scope)
+        private IFactory CreateRefFactory([NotNull] Type contractType, object tagValue, Scope scope, int argsIndexOffset)
         {
             var key = new Key(contractType, tagValue);
             switch (scope)
             {
                 case Scope.Current:
-                    return new RefFactory(key);
+                    return new RefFactory(key, argsIndexOffset);
 
                 case Scope.Parent:
-                    return new ParentRefFactory(key);
+                    return new ParentRefFactory(key, argsIndexOffset);
 
                 case Scope.Child:
-                    return new ChildRefFactory(key);
+                    return new ChildRefFactory(key, argsIndexOffset);
 
                 default:
                     throw new NotSupportedException($"The scope \"{scope}\" is not supported.");

@@ -11,6 +11,7 @@
         internal readonly DependencyType Type;
         internal readonly HasMethod HasMethod;
         internal readonly Scope Scope;
+        internal readonly int ArgsIndexOffset;
 
         public static Has Arg<T>([NotNull] string name, int argIndex)
         {
@@ -26,30 +27,30 @@
             return new Has(new Parameter(name), argIndex);
         }
 
-        public static Has Ref<T>([NotNull] string name, [NotNull] object tag, Scope scope = Scope.Current)
+        public static Has Ref<T>([NotNull] string name, [NotNull] object tag, Scope scope = Scope.Current, int argsIndexOffset = 0)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (tag == null) throw new ArgumentNullException(nameof(tag));
-            return new Has(new Parameter(name, typeof(T)), tag, scope);
+            return new Has(new Parameter(name, typeof(T)), tag, scope, argsIndexOffset);
         }
 
-        public static Has Ref<T>([NotNull] string name, Scope scope)
+        public static Has Ref<T>([NotNull] string name, Scope scope, int argsIndexOffset)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return new Has(new Parameter(name, typeof(T)), null, scope);
+            return new Has(new Parameter(name, typeof(T)), null, scope, argsIndexOffset);
         }
 
-        public static Has Ref([NotNull] string name, [NotNull] object tag, Scope scope = Scope.Current)
+        public static Has Ref([NotNull] string name, [NotNull] object tag, Scope scope = Scope.Current, int argsIndexOffset = 0)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (tag == null) throw new ArgumentNullException(nameof(tag));
-            return new Has(new Parameter(name), tag, scope);
+            return new Has(new Parameter(name), tag, scope, argsIndexOffset);
         }
 
-        public static Has Ref([NotNull] string name, Scope scope)
+        public static Has Ref([NotNull] string name, Scope scope, int argsIndexOffset = 0)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return new Has(new Parameter(name), null, scope);
+            return new Has(new Parameter(name), null, scope, argsIndexOffset);
         }
 
         public static Has Method([NotNull] string name, [NotNull] params Has[] dependencies)
@@ -59,14 +60,14 @@
             return new Has(new HasMethod(name, dependencies));
         }
 
-        public static Has Property<T>([NotNull] string propertyName, int argIndex)
+        public static Has Property<T>([NotNull] string propertyName, int argIndex, int argsIndexOffset = 0)
         {
             if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
             if (argIndex < 0) throw new ArgumentOutOfRangeException(nameof(argIndex));
             return new Has(new HasMethod("set_" + propertyName, Arg<T>("value", argIndex)));
         }
 
-        public static Has Property([NotNull] string propertyName, int argIndex)
+        public static Has Property([NotNull] string propertyName, int argIndex, int argsIndexOffset = 0)
         {
             if (propertyName == null) throw new ArgumentNullException(nameof(propertyName));
             if (argIndex < 0) throw new ArgumentOutOfRangeException(nameof(argIndex));
@@ -82,9 +83,10 @@
             Tag = null;
             HasMethod = default(HasMethod);
             Scope = Scope.Current;
+            ArgsIndexOffset = 0;
         }
 
-        private Has(Parameter parameter, [CanBeNull] object tag, Scope scope)
+        private Has(Parameter parameter, [CanBeNull] object tag, Scope scope, int argsIndexOffset)
         {
             Type = DependencyType.Ref;
             Parameter = parameter;
@@ -92,6 +94,7 @@
             ArgIndex = 0;
             HasMethod = default(HasMethod);
             Scope = scope;
+            ArgsIndexOffset = argsIndexOffset;
         }
 
         private Has(HasMethod hasMethod)
@@ -102,6 +105,7 @@
             ArgIndex = 0;
             HasMethod = hasMethod;
             Scope = Scope.Current;
+            ArgsIndexOffset = 0;
         }
 
         public override string ToString()

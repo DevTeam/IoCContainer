@@ -3,12 +3,14 @@
     internal class ParentRefFactory : IFactory
     {
         private readonly Key _key;
+        private readonly int _argsIndexOffset;
         [CanBeNull] private IContainer _lastContainer;
         private IResolver _lastResolver;
 
-        public ParentRefFactory(Key key)
+        public ParentRefFactory(Key key, int argsIndexOffset)
         {
             _key = key;
+            _argsIndexOffset = argsIndexOffset;
         }
 
         public object Create(Context context)
@@ -30,7 +32,7 @@
                 resolver = _lastResolver;
             }
 
-            return resolver.Resolve(context.ResolvingContainer, _key.ContractType);
+            return resolver.Resolve(context.ResolvingContainer, _key.ContractType, _argsIndexOffset, context.Args);
         }
     }
 }
