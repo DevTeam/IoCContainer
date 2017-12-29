@@ -24,11 +24,6 @@
 
         private static object CreateEnumerable(Context ctx)
         {
-            var keys =
-                from key in ctx.ResolvingContainer as IEnumerable<Key> ?? Enumerable.Empty<Key>()
-                where key.ContractType == ctx.TargetContractType
-                select key;
-
             Type[] genericTypeArguments;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (ctx.IsConstructedGenericTargetContractType)
@@ -40,8 +35,15 @@
                 genericTypeArguments = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetGenericTypeArguments(ctx.TargetContractType);
             }
 
+            var targetContractType = genericTypeArguments[0];
+            var keys =
+                from key in ctx.ResolvingContainer as IEnumerable<Key> ?? Enumerable.Empty<Key>()
+                where key.ContractType == targetContractType
+                select key;
+
             var instanceType = typeof(InstanceEnumerable<>).MakeGenericType(genericTypeArguments);
-            return Activator.CreateInstance(instanceType, keys, ctx);
+            var newContext = new Context(ctx.RegistrationId, ctx.Key, ctx.RegistrationContainer, ctx.ResolvingContainer, targetContractType, ctx.Args, targetContractType.IsConstructedGenericType());
+            return Activator.CreateInstance(instanceType, keys, newContext);
         }
 
         private class InstanceEnumerable<T> : IEnumerable<T>

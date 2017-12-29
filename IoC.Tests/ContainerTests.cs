@@ -470,13 +470,13 @@
             using (var container = Container.Create())
             {
                 // When
-                using (container.Bind<IMyService, IMyService1>().Lifetime(Lifetime.Transient).Tag(1).To(ctx => Mock.Of<IMyService>()))
-                using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).Tag("abc").To(ctx => Mock.Of<IMyService1>()))
+                using (container.Bind<IMyService, IMyService1>().Lifetime(Lifetime.Singletone).Tag(1).To(ctx => Mock.Of<IMyService>()))
+                using (container.Bind<IMyService1>().Tag("abc").To(ctx => Mock.Of<IMyService1>()))
                 using (container.Bind<IMyService, IMyService1>().Lifetime(Lifetime.Transient).Tag("xyz").To(ctx => Mock.Of<IMyService>()))
                 {
                     // Then
                     var actualInstances = container.Get<IEnumerable<IMyService1>>().ToList();
-                    actualInstances.Count.ShouldNotBe(3);
+                    actualInstances.Count.ShouldBe(3);
                 }
             }
         }
