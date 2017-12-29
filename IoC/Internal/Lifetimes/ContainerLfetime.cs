@@ -9,9 +9,9 @@
         public object GetOrCreate(Context context, IFactory factory)
         {
             var store = context.ResolvingContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container");
-            if (context.IsConstructedGenericTargetContractType)
+            if (context.IsConstructedGenericResolvingContractType)
             {
-                var key = new SingletoneGenericInstanceKey<int>(context.RegistrationId, context.TargetContractType.GenericTypeArguments());
+                var key = new SingletoneGenericInstanceKey<int>(context.RegistrationId, context.ResolvingKey.ContractType.GenericTypeArguments());
                 return store.GetOrAdd(key, context, factory);
             }
 

@@ -45,7 +45,7 @@
 
         public IContainer Parent => _parentContainer;
 
-        public object GetOrAdd(object key, Context context, IFactory factory)
+        public object GetOrAdd<T>(T key, Context context, IFactory factory)
         {
             if (_instances.TryGetValue(key, out var instance))
             {
@@ -100,8 +100,8 @@
                     if (type.IsConstructedGenericType())
                     {
                         var genericInstanceType = type.GetGenericTypeDefinition();
-                        key = new Key(genericInstanceType, key.Tag);
-                        hasResolver = _resolvers.TryGetValue(key, out resolver);
+                        var genericKey = new Key(genericInstanceType, key.Tag);
+                        hasResolver = _resolvers.TryGetValue(genericKey, out resolver);
                     }
                 }
             }

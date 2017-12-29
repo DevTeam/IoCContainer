@@ -70,7 +70,7 @@ using (var container = Container.Create().Using(new Glue()))
   Console.WriteLine("#2 is alive: " + box2().Content.IsAlive);
 
   // Async way
-  var box3 = await container.StartGet<IBox<ICat>>(TaskScheduler.Default);
+  var box3 = await container.AsyncGet<IBox<ICat>>(TaskScheduler.Default);
   Console.WriteLine("#3 is alive: " + box3.Content.IsAlive);
 }
 ```

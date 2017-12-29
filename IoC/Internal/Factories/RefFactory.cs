@@ -32,7 +32,7 @@
                 resolver = _lastResolver;
             }
 
-            return resolver.Resolve(context.ResolvingContainer, _key.ContractType, _argsIndexOffset, context.Args);
+            return resolver.Resolve(_key, context.ResolvingContainer, _argsIndexOffset, context.Args);
         }
     }
 }

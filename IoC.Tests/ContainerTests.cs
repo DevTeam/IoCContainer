@@ -33,6 +33,24 @@
         }
 
         [Fact]
+        public void ContainerShouldResolveFunc()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedInstance = Mock.Of<IMyService>();
+
+                // When
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
+                {
+                    // Then
+                    var actualInstance = container.FuncGet<IMyService>();
+                    actualInstance().ShouldBe(expectedInstance);
+                }
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveChildContainer()
         {
             // Given
@@ -384,6 +402,50 @@
         }
 
         [Fact]
+        public void ContainerShouldResolveWhenHasStateUsingFunc()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedRef = Mock.Of<IMyService>();
+
+                // When
+                using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0)))
+                {
+                    // Then
+                    var actualInstance = container.FuncGet<string, IMyService>()("abc");
+
+                    actualInstance.ShouldBeOfType<MyService>();
+                    ((MyService)actualInstance).Name.ShouldBe("abc");
+                    ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenHasStateUsingFuncWithTag()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedRef = Mock.Of<IMyService>();
+
+                // When
+                using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).Tag(33).To(typeof(MyService), Has.Arg<string>("name", 0)))
+                {
+                    // Then
+                    var actualInstance = container.Tag(33).FuncGet<string, IMyService>()("abc");
+
+                    actualInstance.ShouldBeOfType<MyService>();
+                    ((MyService)actualInstance).Name.ShouldBe("abc");
+                    ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
+                }
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveWhenHasStateInDependency()
         {
             // Given
@@ -531,12 +593,12 @@
                 // When
                 using (container.Bind(typeof(IMyGenericService1<>)).Lifetime(Lifetime.Singletone).To(ctx =>
                 {
-                    if(ctx.TargetContractType.GenericTypeArguments[0] == typeof(string))
+                    if(Equals(ctx.ResolvingKey, new Key(typeof(IMyGenericService1<string>))))
                     {
                         return Mock.Of<IMyGenericService1<string>>();
                     }
 
-                    if (ctx.TargetContractType.GenericTypeArguments[0] == typeof(int))
+                    if (Equals(ctx.ResolvingKey, new Key(typeof(IMyGenericService1<int>))))
                     {
                         return Mock.Of<IMyGenericService1<int>>();
                     }

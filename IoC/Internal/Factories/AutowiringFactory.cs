@@ -39,22 +39,22 @@
             }
             else
             {
-                if (!_factories.TryGetValue(context.TargetContractType, out factory))
+                if (!_factories.TryGetValue(context.ResolvingKey.ContractType, out factory))
                 {
                     Type[] genericTypeArguments;
                     // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-                    if (context.IsConstructedGenericTargetContractType)
+                    if (context.IsConstructedGenericResolvingContractType)
                     {
-                        genericTypeArguments = context.TargetContractType.GenericTypeArguments();
+                        genericTypeArguments = context.ResolvingKey.ContractType.GenericTypeArguments();
                     }
                     else
                     {
-                        genericTypeArguments = _issueResolver.CannotGetGenericTypeArguments(context.TargetContractType);
+                        genericTypeArguments = _issueResolver.CannotGetGenericTypeArguments(context.ResolvingKey.ContractType);
                     }
 
                     var genericInstanceType = _instanceType.MakeGenericType(genericTypeArguments);
                     factory = new InstanceFactory(_issueResolver, genericInstanceType.AsTypeInfo(), _dependencies);
-                    _factories.Add(context.TargetContractType, factory);
+                    _factories.Add(context.ResolvingKey.ContractType, factory);
                 }
             }
 

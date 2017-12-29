@@ -31,9 +31,11 @@
             var ctorInfo = (
                 from ctor in typeInfo.DeclaredConstructors
                 where ctor.IsPublic
-                let ctorItem = CreateCtorItem(ctor, dependencies)
-                let dependenciesWithPosition = ConvertToDependenciesWithPosition(ctorItem.Item2, dependencies)
-                where IsCtorMatched(ctorItem.Item2, dependenciesWithPosition)
+                let parameters = ctor.GetParameters()
+                let dependenciesWithPosition = ConvertToDependenciesWithPosition(parameters, dependencies)
+                where dependenciesWithPosition != null
+                where IsCtorMatched(parameters, dependenciesWithPosition)
+                let ctorItem = CreateCtorItem(ctor, parameters, dependencies)
                 select ctorItem).FirstOrDefault()
                 ?? CreateCtorItem(issueResolver.CannotFindConsructor(typeInfo.Type, dependencies), dependencies);
 
@@ -53,7 +55,13 @@
 
             try
             {
-                FillArgs(_ctorData, context);
+                var args = _ctorData.Args;
+                var factories = _ctorData.Factories;
+                for (var position = 0; position < _ctorData.Count; position++)
+                {
+                    args[position] = factories[position].Create(context);
+                }
+
                 var instance = _ctor(_ctorData.Args);
                 if (_methodsCount == 0)
                 {
@@ -63,7 +71,13 @@
                 for (var i = 0; i < _methodsCount; i++)
                 {
                     var method = _methods[i];
-                    FillArgs(method.Item2, context);
+                    args = method.Item2.Args;
+                    factories = method.Item2.Factories;
+                    for (var position = 0; position < method.Item2.Count; position++)
+                    {
+                        args[position] = factories[position].Create(context);
+                    }
+
                     method.Item1(instance, method.Item2.Args);
                 }
 
@@ -80,24 +94,16 @@
             return $"InstanceFactory of \"{_typeInfo.Type.Name}\"";
         }
 
-#if !NET40
-        [System.Runtime.CompilerServices.MethodImpl(System.Runtime.CompilerServices.MethodImplOptions.AggressiveInlining)]
-#endif
-        private void FillArgs(MethodData methodData, Context context)
+        private Tuple<ConstructorInfo, ParameterInfo[], DepWithPosition[]> CreateCtorItem(ConstructorInfo ctor, ParameterInfo[] parameters, Has[] dependencies)
         {
-            var args = methodData.Args;
-            var factories = methodData.Factories;
-            for (var position = 0; position < methodData.Count; position++)
-            {
-                args[position] = factories[position].Create(context);
-            }
+            var dependenciesWithPosition = ConvertToDependenciesWithPosition(parameters, dependencies);
+            return Tuple.Create(ctor, parameters, dependenciesWithPosition);
         }
 
         private Tuple<ConstructorInfo, ParameterInfo[], DepWithPosition[]> CreateCtorItem(ConstructorInfo ctor, Has[] dependencies)
         {
             var parameters = ctor.GetParameters();
-            var dependenciesWithPosition = ConvertToDependenciesWithPosition(parameters, dependencies);
-            return Tuple.Create(ctor, ctor.GetParameters(), dependenciesWithPosition);
+            return CreateCtorItem(ctor, parameters, dependencies);
         }
 
         private ConstructorFunc CreateConstructor(ConstructorInfo constructor)
@@ -146,7 +152,7 @@
                     parameter.ParameterType)).ToArray();
         }
 
-
+        [CanBeNull]
         private DepWithPosition[] ConvertToDependenciesWithPosition(ParameterInfo[] parameters, Has[] dependencies)
         {
             var result = new DepWithPosition[dependencies.Length];
@@ -175,8 +181,7 @@
 
                 if (!hasParameter)
                 {
-                    var position = _issueResolver.CannotFindParameter(parameters, dependency.Parameter);
-                    result[index] = new DepWithPosition(dependency, position);
+                    return null;
                 }
             }
 

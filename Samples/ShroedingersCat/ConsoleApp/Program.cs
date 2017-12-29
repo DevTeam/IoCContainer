@@ -30,7 +30,7 @@
 
 #if !NET40
                 // Async way
-                var box3 = await container.StartGet<IBox<ICat>>(TaskScheduler.Default);
+                var box3 = await container.AsyncGet<IBox<ICat>>(TaskScheduler.Default);
                 Console.WriteLine("#3 is alive: " + box3.Content.IsAlive);
 #endif
             }

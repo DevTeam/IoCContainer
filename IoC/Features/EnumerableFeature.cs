@@ -22,27 +22,28 @@
                 .To(CreateEnumerable);
         }
 
-        private static object CreateEnumerable(Context ctx)
+        private static object CreateEnumerable(Context context)
         {
             Type[] genericTypeArguments;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (ctx.IsConstructedGenericTargetContractType)
+            if (context.IsConstructedGenericResolvingContractType)
             {
-                genericTypeArguments = ctx.TargetContractType.GenericTypeArguments();
+                genericTypeArguments = context.ResolvingKey.ContractType.GenericTypeArguments();
             }
             else
             {
-                genericTypeArguments = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetGenericTypeArguments(ctx.TargetContractType);
+                genericTypeArguments = context.ResolvingContainer.Get<IIssueResolver>().CannotGetGenericTypeArguments(context.ResolvingKey.ContractType);
             }
 
             var targetContractType = genericTypeArguments[0];
             var keys =
-                from key in ctx.ResolvingContainer as IEnumerable<Key> ?? Enumerable.Empty<Key>()
+                from key in context.ResolvingContainer as IEnumerable<Key> ?? Enumerable.Empty<Key>()
                 where key.ContractType == targetContractType
                 select key;
 
             var instanceType = typeof(InstanceEnumerable<>).MakeGenericType(genericTypeArguments);
-            var newContext = new Context(ctx.RegistrationId, ctx.Key, ctx.RegistrationContainer, ctx.ResolvingContainer, targetContractType, ctx.Args, targetContractType.IsConstructedGenericType());
+            var resolvingKey = new Key(targetContractType, context.ResolvingKey.Tag);
+            var newContext = new Context(context.RegistrationId, context.RegistrationKey, context.RegistrationContainer, resolvingKey, context.ResolvingContainer, context.Args, targetContractType.IsConstructedGenericType());
             return Activator.CreateInstance(instanceType, keys, newContext);
         }
 
@@ -74,7 +75,7 @@
                         continue;
                     }
 
-                    yield return (T)resolver.Resolve(context.ResolvingContainer, context.TargetContractType, 0, context.Args);
+                    yield return (T)resolver.Resolve(context.ResolvingKey, context.ResolvingContainer, 0, context.Args);
                 }
             }
         }

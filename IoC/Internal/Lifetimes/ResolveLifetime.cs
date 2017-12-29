@@ -15,9 +15,9 @@
         {
             var store = context.ResolvingContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container");
             object key;
-            if (context.IsConstructedGenericTargetContractType)
+            if (context.IsConstructedGenericResolvingContractType)
             {
-                key = new SingletoneGenericInstanceKey<ResolveId>(new ResolveId(_id, context.RegistrationId), context.TargetContractType.GenericTypeArguments());
+                key = new SingletoneGenericInstanceKey<ResolveId>(new ResolveId(_id, context.RegistrationId), context.ResolvingKey.ContractType.GenericTypeArguments());
             }
             else
             {

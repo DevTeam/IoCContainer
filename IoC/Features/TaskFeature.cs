@@ -18,42 +18,47 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container
                 .Bind(typeof(Task<>))
+                .AnyTag()
+                .EmptyTag()
                 .To(CreateTask);
         }
 
-        private static object CreateTask(Context ctx)
+        private static object CreateTask(Context context)
         {
             Type[] genericTypeArguments;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (ctx.IsConstructedGenericTargetContractType)
+            if (context.IsConstructedGenericResolvingContractType)
             {
-                genericTypeArguments = ctx.TargetContractType.GenericTypeArguments();
+                genericTypeArguments = context.ResolvingKey.ContractType.GenericTypeArguments();
             }
             else
             {
-                genericTypeArguments = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetGenericTypeArguments(ctx.TargetContractType);
+                genericTypeArguments = context.ResolvingContainer.Get<IIssueResolver>().CannotGetGenericTypeArguments(context.ResolvingKey.ContractType);
             }
 
-            var instanceType = typeof(InstanceTask<>).MakeGenericType(genericTypeArguments);
-            return Activator.CreateInstance(instanceType, ctx);
+            var targetContractType = genericTypeArguments[0];
+            var instanceType = typeof(InstanceTask<>).MakeGenericType(targetContractType);
+            var resolvingKey = new Key(targetContractType, context.ResolvingKey.Tag);
+            var newContext = new Context(context.RegistrationId, context.RegistrationKey, context.RegistrationContainer, resolvingKey, context.ResolvingContainer, context.Args, targetContractType.IsConstructedGenericType());
+            return Activator.CreateInstance(instanceType, newContext);
         }
 
         private sealed class InstanceTask<T> : Task<T>
         {
-            public InstanceTask(Context ctx)
-                :base(CreateFunction(ctx))
+            public InstanceTask(Context context)
+                :base(CreateFunction(context))
             {
             }
 
-            private static Func<T> CreateFunction(Context ctx)
+            private static Func<T> CreateFunction(Context context)
             {
-                var key = new Key(typeof(T), ctx.Key.Tag);
-                if (!ctx.ResolvingContainer.TryGetResolver(key, out var resolver))
+                var key = new Key(typeof(T), context.RegistrationKey.Tag);
+                if (!context.ResolvingContainer.TryGetResolver(key, out var resolver))
                 {
-                    resolver = ctx.ResolvingContainer.Get<IIssueResolver>().CannotGetResolver(ctx.ResolvingContainer, key);
+                    resolver = context.ResolvingContainer.Get<IIssueResolver>().CannotGetResolver(context.ResolvingContainer, key);
                 }
 
-                return () => (T) resolver.Resolve(ctx.ResolvingContainer, typeof(T));
+                return () => (T) resolver.Resolve(context.ResolvingKey, context.ResolvingContainer);
             }
         }
     }

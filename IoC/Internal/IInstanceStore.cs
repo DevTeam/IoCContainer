@@ -2,6 +2,6 @@
 {
     internal interface IInstanceStore
     {
-        [NotNull] object GetOrAdd(object key, Context context, [NotNull] IFactory factory);
+        [NotNull] object GetOrAdd<T>(T key, Context context, [NotNull] IFactory factory);
     }
 }

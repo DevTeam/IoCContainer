@@ -37,6 +37,10 @@
         {
             private readonly List<object[]> _data = new List<object[]>
             {
+                new object[] {new Key(typeof(string)), new Key(typeof(string), Key.AnyTag), false},
+                new object[] {new Key(typeof(string)), new Key(typeof(string), 10), false},
+                new object[] {new Key(typeof(string), "abc"), new Key(typeof(string), Key.AnyTag), true},
+                new object[] {new Key(typeof(int), "abc"), new Key(typeof(string), Key.AnyTag), false},
                 new object[] {new Key(typeof(string), "abc"), new Key(typeof(string), "abc"), true},
                 new object[] {new Key(typeof(int), "abc"), new Key(typeof(string), "abc"), false},
                 new object[] {new Key(typeof(string), "abc"), new Key(typeof(string), "xyz"), false},

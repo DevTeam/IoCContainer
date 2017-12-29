@@ -1,6 +1,5 @@
 ﻿namespace IoC
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     [SuppressMessage("ReSharper", "NotAccessedField.Global")]
@@ -9,29 +8,29 @@
     public struct Context
     {
         public readonly int RegistrationId;
-        [NotNull] public readonly Key Key;
+        [NotNull] public readonly Key RegistrationKey;
         [NotNull] public readonly IContainer RegistrationContainer;
+        [NotNull] public readonly Key ResolvingKey;
         [NotNull] public readonly IContainer ResolvingContainer;
-        [NotNull] public readonly Type TargetContractType;
         [NotNull][ItemCanBeNull] public readonly object[] Args;
-        internal readonly bool IsConstructedGenericTargetContractType;
+        internal readonly bool IsConstructedGenericResolvingContractType;
 
         internal Context(
             int registrationId,
-            [NotNull] Key key,
+            [NotNull] Key registrationKey,
             [NotNull] IContainer registrationContainer,
+            [NotNull] Key resolvingKey,
             [NotNull] IContainer resolvingContainer,
-            [NotNull] Type targetContractType,
             [NotNull][ItemCanBeNull] object[] args,
-            bool isConstructedGenericTargetContractType)
+            bool isConstructedGenericResolvingContractType)
         {
             RegistrationId = registrationId;
-            Key = key;
+            RegistrationKey = registrationKey;
             RegistrationContainer = registrationContainer;
+            ResolvingKey = resolvingKey;
             ResolvingContainer = resolvingContainer;
-            TargetContractType = targetContractType;
             Args = args;
-            IsConstructedGenericTargetContractType = isConstructedGenericTargetContractType;
+            IsConstructedGenericResolvingContractType = isConstructedGenericResolvingContractType;
         }
     }
 }

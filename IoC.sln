@@ -11,7 +11,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Samples", "Samples", "{AE30
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ShroedingersCat", "ShroedingersCat", "{325325CB-136F-4D27-AB07-188CE08DAE48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp", "Samples\ShroedingersCat\ConsoleApp\ConsoleApp.csproj", "{B7AB43FA-8157-4775-AE2B-BF02E64E72BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp", "Samples\ShroedingersCat\ConsoleApp\ConsoleApp.csproj", "{B7AB43FA-8157-4775-AE2B-BF02E64E72BD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{92E2673B-946B-4C2E-BC7C-8E3394730720}"
+	ProjectSection(SolutionItems) = preProject
+		LICENSE = LICENSE
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

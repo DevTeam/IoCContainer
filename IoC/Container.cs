@@ -7,6 +7,7 @@
     // ReSharper disable once RedundantUsingDirective
     using System.Reflection;
     using System.Threading;
+    // ReSharper disable once RedundantUsingDirective
     using System.Threading.Tasks;
     using Features;
     using Internal;
@@ -115,6 +116,18 @@
             return new Registration<T>(registration, tagValue);
         }
 
+        public static IRegistration<T> EmptyTag<T>([NotNull] this IRegistration<T> registration)
+        {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
+            return new Registration<T>(registration, (object)null);
+        }
+
+        public static IRegistration<T> AnyTag<T>([NotNull] this IRegistration<T> registration)
+        {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
+            return new Registration<T>(registration, Key.AnyTag);
+        }
+
         public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [NotNull] IFactory factory)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
@@ -185,15 +198,15 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (targetContractType == null) throw new ArgumentNullException(nameof(targetContractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            var key = new Key(targetContractType, ResolvingContext.TagValue);
+            var resolvingKey = new Key(targetContractType, ResolvingContext.TagValue);
             ResolvingContext.TagValue = null;
-            if (!container.TryGetResolver(key, out var resolver))
+            if (!container.TryGetResolver(resolvingKey, out var resolver))
             {
                 instance = null;
                 return false;
             }
 
-            instance = resolver.Resolve(container, targetContractType, 0, args);
+            instance = resolver.Resolve(resolvingKey, container, 0, args);
             return true;
         }
 
@@ -201,15 +214,15 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            var key = new Key(typeof(T), ResolvingContext.TagValue);
+            var resolvingKey = new Key(typeof(T), ResolvingContext.TagValue);
             ResolvingContext.TagValue = null;
-            if (!container.TryGetResolver(key, out var resolver))
+            if (!container.TryGetResolver(resolvingKey, out var resolver))
             {
                 instance = default(T);
                 return false;
             }
 
-            instance = (T)resolver.Resolve(container, typeof(T), 0, args);
+            instance = (T)resolver.Resolve(resolvingKey, container, 0, args);
             return true;
         }
 
@@ -219,14 +232,14 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (targetContractType == null) throw new ArgumentNullException(nameof(targetContractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            var key = new Key(targetContractType, ResolvingContext.TagValue);
+            var resolvingKey = new Key(targetContractType, ResolvingContext.TagValue);
             ResolvingContext.TagValue = null;
-            if (!container.TryGetResolver(key, out var resolver))
+            if (!container.TryGetResolver(resolvingKey, out var resolver))
             {
-                return container.GetIssueResolver().CannotResolve(container, key);
+                return container.GetIssueResolver().CannotResolve(container, resolvingKey);
             }
 
-            return resolver.Resolve(container, targetContractType, 0, args);
+            return resolver.Resolve(resolvingKey, container, 0, args);
         }
 
         [NotNull]
@@ -234,14 +247,14 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
-            var key = new Key(typeof(T), ResolvingContext.TagValue);
+            var resolvingKey = new Key(typeof(T), ResolvingContext.TagValue);
             ResolvingContext.TagValue = null;
-            if (!container.TryGetResolver(key, out var resolver))
+            if (!container.TryGetResolver(resolvingKey, out var resolver))
             {
-                return (T)container.GetIssueResolver().CannotResolve(container, key);
+                return (T)container.GetIssueResolver().CannotResolve(container, resolvingKey);
             }
 
-            return (T)resolver.Resolve(container, typeof(T), 0, args);
+            return (T)resolver.Resolve(resolvingKey, container, 0, args);
         }
 
         [NotNull]
@@ -252,51 +265,44 @@
         }
 
         [NotNull]
-        public static Func<T1, T> FuncGet<T1, T>([NotNull] this IContainer container, [CanBeNull] T1 arg1)
+        public static Func<T1, T> FuncGet<T1, T>([NotNull] this IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return container.Get<Func<T1, T>>(arg1);
+            return container.Get<Func<T1, T>>();
         }
 
         [NotNull]
-        public static Func<T1, T2, T> FuncGet<T1, T2, T>([NotNull] this IContainer container, [CanBeNull] T1 arg1, [CanBeNull] T2 arg2)
+        public static Func<T1, T2, T> FuncGet<T1, T2, T>([NotNull] this IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return container.Get<Func<T1, T2, T>>(arg1, arg2);
+            return container.Get<Func<T1, T2, T>>();
         }
 
         [NotNull]
-        public static Func<T1, T2, T3, T> FuncGet<T1, T2, T3, T>([NotNull] this IContainer container, [CanBeNull] T1 arg1, [CanBeNull] T2 arg2, [CanBeNull] T3 arg3)
+        public static Func<T1, T2, T3, T> FuncGet<T1, T2, T3, T>([NotNull] this IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return container.Get<Func<T1, T2, T3, T>>(arg1, arg2, arg3);
+            return container.Get<Func<T1, T2, T3, T>>();
         }
 
         [NotNull]
-        public static Func<T1, T2, T3, T4, T> FuncGet<T1, T2, T3, T4, T>([NotNull] this IContainer container, [CanBeNull] T1 arg1, [CanBeNull] T2 arg2, [CanBeNull] T3 arg3, [CanBeNull] T4 arg4)
+        public static Func<T1, T2, T3, T4, T> FuncGet<T1, T2, T3, T4, T>([NotNull] this IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return container.Get<Func<T1, T2, T3, T4, T>>(arg1, arg2, arg3, arg4);
+            return container.Get<Func<T1, T2, T3, T4, T>>();
         }
-
-        [NotNull]
-        public static Task<T> AsyncGet<T>([NotNull] this IContainer container, [NotNull][ItemCanBeNull] params object[] args)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            return container.Get<Task<T>>(args);
-        }
-
 
 #if !NET40
         [NotNull]
-        public static async Task<T> StartGet<T>([NotNull] this IContainer container, [NotNull] TaskScheduler taskScheduler, [NotNull][ItemCanBeNull] params object[] args)
+        public static async Task<T> AsyncGet<T>([NotNull] this IContainer container, [CanBeNull] TaskScheduler taskScheduler = null)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            if (taskScheduler == null) throw new ArgumentNullException(nameof(taskScheduler));
-            if (args == null) throw new ArgumentNullException(nameof(args));
-            var task = container.AsyncGet<T>(args);
-            task.Start(taskScheduler);
+            var task = container.Get<Task<T>>();
+            if (taskScheduler != null)
+            {
+                task.Start(taskScheduler);
+            }
+
             return await task;
         }
 #endif

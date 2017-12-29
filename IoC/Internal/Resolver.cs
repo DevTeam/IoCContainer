@@ -39,14 +39,18 @@
             _registrationToken.Dispose();
         }
 
-        public object Resolve(IContainer resolvingContainer, Type targetContractType, int argsIndexOffset = 0, params object[] args)
+        public object Resolve(
+            Key resolvingKey,
+            IContainer resolvingContainer,
+            int argsIndexOffset = 0,
+            params object[] args)
         {
             lock (_lockObject)
             {
-                if (_prevTargetContractType != targetContractType)
+                if (_prevTargetContractType != resolvingKey.ContractType)
                 {
-                    _prevTargetContractType = targetContractType;
-                    _prevIsConstructedGenericTargetContractType = targetContractType.IsConstructedGenericType();
+                    _prevTargetContractType = resolvingKey.ContractType;
+                    _prevIsConstructedGenericTargetContractType = resolvingKey.ContractType.IsConstructedGenericType();
                 }
 
                 if (argsIndexOffset > 0)
@@ -57,7 +61,7 @@
                     args = newArgs;
                 }
 
-                var context = new Context(_registrationId, _key, _registrationContainer, resolvingContainer, targetContractType, args, _prevIsConstructedGenericTargetContractType);
+                var context = new Context(_registrationId, _key, _registrationContainer, resolvingKey, resolvingContainer, args, _prevIsConstructedGenericTargetContractType);
                 return _factory.Create(context);
             }
         }
