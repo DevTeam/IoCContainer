@@ -109,23 +109,16 @@
             return new Registration<T>(registration, lifetime);
         }
 
-        public static IRegistration<T> Tag<T>([NotNull] this IRegistration<T> registration, [NotNull] object tagValue)
+        public static IRegistration<T> Tag<T>([NotNull] this IRegistration<T> registration, [CanBeNull] object tagValue)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (tagValue == null) throw new ArgumentNullException(nameof(tagValue));
             return new Registration<T>(registration, tagValue);
-        }
-
-        public static IRegistration<T> EmptyTag<T>([NotNull] this IRegistration<T> registration)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            return new Registration<T>(registration, (object)null);
         }
 
         public static IRegistration<T> AnyTag<T>([NotNull] this IRegistration<T> registration)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
-            return new Registration<T>(registration, Key.AnyTag);
+            return registration.Tag(null).Tag(Key.AnyTag);
         }
 
         public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [NotNull] IFactory factory)
@@ -324,6 +317,14 @@
             if (configurations.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurations));
             container.Get<IResourceStore>().AddResource(container.Apply(configurations));
             return container;
+        }
+
+        [NotNull]
+        public static IContainer Using<T>([NotNull] this IContainer container)
+            where T: IConfiguration, new()
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return container.Using(new T());
         }
 
         [NotNull]

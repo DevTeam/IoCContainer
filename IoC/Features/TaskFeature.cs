@@ -19,7 +19,6 @@
             yield return container
                 .Bind(typeof(Task<>))
                 .AnyTag()
-                .EmptyTag()
                 .To(CreateTask);
         }
 

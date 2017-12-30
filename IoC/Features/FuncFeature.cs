@@ -17,56 +17,47 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container
                 .Bind(typeof(Func<>))
-                .Tag(Key.AnyTag)
-                .EmptyTag()
+                .AnyTag()
                 .To(CreateFunc);
 
             yield return container
                 .Bind(typeof(Func<,>))
                 .AnyTag()
-                .EmptyTag()
                 .To(CreateFunc);
 
             yield return container
                 .Bind(typeof(Func<,,>))
                 .AnyTag()
-                .EmptyTag()
                 .To(CreateFunc);
 
             yield return container
                 .Bind(typeof(Func<,,,>))
                 .AnyTag()
-                .EmptyTag()
                 .To(CreateFunc);
 
             yield return container
                 .Bind(typeof(Func<,,,,>))
                 .AnyTag()
-                .EmptyTag()
                 .To(CreateFunc);
 
             yield return container
                 .Bind(typeof(Func<,,,,,>))
                 .AnyTag()
-                .EmptyTag()
                 .To(CreateFunc);
 
             yield return container
                 .Bind(typeof(Func<,,,,,,>))
                 .AnyTag()
-                .EmptyTag()
                 .To(CreateFunc);
 
             yield return container
                 .Bind(typeof(Func<,,,,,,,>))
                 .AnyTag()
-                .EmptyTag()
                 .To(CreateFunc);
 
             yield return container
                 .Bind(typeof(Func<,,,,,,,,>))
                 .AnyTag()
-                .EmptyTag()
                 .To(CreateFunc);
         }
 
@@ -127,32 +118,29 @@
             }
 
             var instanceType = instanceFuncType.MakeGenericType(genericTypeArguments);
-            return ((IFactory)Activator.CreateInstance(instanceType, context)).Create(context);
+            var targetContractType = genericTypeArguments[genericTypeArguments.Length - 1];
+            var resolvingKey = new Key(targetContractType, context.ResolvingKey.Tag);
+            var newContext = new Context(context.RegistrationId, context.RegistrationKey, context.RegistrationContainer, resolvingKey, context.ResolvingContainer, context.Args, targetContractType.IsConstructedGenericType());
+            return ((IFactory)Activator.CreateInstance(instanceType, newContext)).Create(newContext);
         }
 
 
         private class InstanceFunc<T> : IFactory
         {
-            protected readonly Context Context;
             protected readonly IResolver Resolver;
 
             // ReSharper disable once MemberCanBeProtected.Local
             public InstanceFunc(Context context)
             {
-                Context = context;
-                var resolvingKey = new Key(typeof(T), context.ResolvingKey.Tag);
-                if (!context.ResolvingContainer.TryGetResolver(resolvingKey, out Resolver))
+                if (!context.ResolvingContainer.TryGetResolver(context.ResolvingKey, out Resolver))
                 {
-                    Resolver = context.ResolvingContainer.Get<IIssueResolver>().CannotGetResolver(context.ResolvingContainer, resolvingKey);
+                    Resolver = context.ResolvingContainer.Get<IIssueResolver>().CannotGetResolver(context.ResolvingContainer, context.ResolvingKey);
                 }
             }
 
             public virtual object Create(Context context)
             {
-                return new Func<T>(() =>
-                {
-                    return (T) Resolver.Resolve(Context.ResolvingKey, Context.ResolvingContainer);
-                });
+                return new Func<T>(() => (T) Resolver.Resolve(context.ResolvingKey, context.ResolvingContainer));
             }
         }
 
@@ -162,7 +150,7 @@
 
             public override object Create(Context context)
             {
-                return new Func<T1, T>((arg1) => (T) Resolver.Resolve(Context.ResolvingKey, Context.ResolvingContainer, 0, arg1));
+                return new Func<T1, T>(arg1 => (T) Resolver.Resolve(context.ResolvingKey, context.ResolvingContainer, 0, arg1));
             }
         }
 
@@ -172,7 +160,7 @@
 
             public override object Create(Context context)
             {
-                return new Func<T1, T2, T>((arg1, arg2) => (T)Resolver.Resolve(Context.ResolvingKey, Context.ResolvingContainer, 0, arg1, arg2));
+                return new Func<T1, T2, T>((arg1, arg2) => (T)Resolver.Resolve(context.ResolvingKey, context.ResolvingContainer, 0, arg1, arg2));
             }
         }
 
@@ -182,10 +170,7 @@
 
             public override object Create(Context context)
             {
-                return new Func<T1, T2, T3, T>((arg1, arg2, arg3) =>
-                {
-                    return (T) Resolver.Resolve(Context.ResolvingKey, Context.ResolvingContainer, 0, arg1, arg2, arg3);
-                });
+                return new Func<T1, T2, T3, T>((arg1, arg2, arg3) => (T) Resolver.Resolve(context.ResolvingKey, context.ResolvingContainer, 0, arg1, arg2, arg3));
             }
         }
 
@@ -195,7 +180,7 @@
 
             public override object Create(Context context)
             {
-                return new Func<T1, T2, T3, T4, T>((arg1, arg2, arg3, arg4) => (T)Resolver.Resolve(Context.ResolvingKey, Context.ResolvingContainer, 0, arg1, arg2, arg3, arg4));
+                return new Func<T1, T2, T3, T4, T>((arg1, arg2, arg3, arg4) => (T)Resolver.Resolve(context.ResolvingKey, context.ResolvingContainer, 0, arg1, arg2, arg3, arg4));
             }
         }
 
@@ -205,7 +190,7 @@
 
             public override object Create(Context context)
             {
-                return new Func<T1, T2, T3, T4, T5, T>((arg1, arg2, arg3, arg4, arg5) => (T)Resolver.Resolve(Context.ResolvingKey, Context.ResolvingContainer, 0, arg1, arg2, arg3, arg4, arg5));
+                return new Func<T1, T2, T3, T4, T5, T>((arg1, arg2, arg3, arg4, arg5) => (T)Resolver.Resolve(context.ResolvingKey, context.ResolvingContainer, 0, arg1, arg2, arg3, arg4, arg5));
             }
         }
 
@@ -215,7 +200,7 @@
 
             public override object Create(Context context)
             {
-                return new Func<T1, T2, T3, T4, T5, T6, T>((arg1, arg2, arg3, arg4, arg5, arg6) => (T)Resolver.Resolve(Context.ResolvingKey, Context.ResolvingContainer, 0, arg1, arg2, arg3, arg4, arg5, arg6));
+                return new Func<T1, T2, T3, T4, T5, T6, T>((arg1, arg2, arg3, arg4, arg5, arg6) => (T)Resolver.Resolve(context.ResolvingKey, context.ResolvingContainer, 0, arg1, arg2, arg3, arg4, arg5, arg6));
             }
         }
 
@@ -225,7 +210,7 @@
 
             public override object Create(Context context)
             {
-                return new Func<T1, T2, T3, T4, T5, T6, T7, T>((arg1, arg2, arg3, arg4, arg5, arg6, arg7) => (T)Resolver.Resolve(Context.ResolvingKey, Context.ResolvingContainer, 0, arg1, arg2, arg3, arg4, arg5, arg6, arg7));
+                return new Func<T1, T2, T3, T4, T5, T6, T7, T>((arg1, arg2, arg3, arg4, arg5, arg6, arg7) => (T)Resolver.Resolve(context.ResolvingKey, context.ResolvingContainer, 0, arg1, arg2, arg3, arg4, arg5, arg6, arg7));
             }
         }
 
@@ -235,7 +220,7 @@
 
             public override object Create(Context context)
             {
-                return new Func<T1, T2, T3, T4, T5, T6, T7, T8, T>((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => (T)Resolver.Resolve(Context.ResolvingKey, Context.ResolvingContainer, 0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8));
+                return new Func<T1, T2, T3, T4, T5, T6, T7, T8, T>((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => (T)Resolver.Resolve(context.ResolvingKey, context.ResolvingContainer, 0, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8));
             }
         }
     }

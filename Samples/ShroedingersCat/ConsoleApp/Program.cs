@@ -3,22 +3,17 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    // ReSharper disable once RedundantUsingDirective
     using System.Threading.Tasks;
     using IoC;
 
     // ReSharper disable once ClassNeverInstantiated.Global
     [SuppressMessage("ReSharper", "ArrangeTypeMemberModifiers")]
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Local")]
-    class Program
+    public class Program
     {
-#if !NET40
         public static async Task Main()
-#else
-        public static void Main()
-#endif
         {
-            using (var container = Container.Create().Using(new Glue()))
+            using (var container = Container.Create().Using<Glue>())
             {
                 // Directly getting
                 var box1 = container.Get<IBox<ICat>>();
@@ -28,11 +23,9 @@
                 var box2 = container.FuncGet<IBox<ICat>>();
                 Console.WriteLine("#2 is alive: " + box2().Content.IsAlive);
 
-#if !NET40
                 // Async way
                 var box3 = await container.AsyncGet<IBox<ICat>>(TaskScheduler.Default);
                 Console.WriteLine("#3 is alive: " + box3.Content.IsAlive);
-#endif
             }
         }
 

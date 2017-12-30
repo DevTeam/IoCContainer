@@ -1,17 +1,19 @@
-[<img src="http://tcavs2015.cloudapp.net/app/rest/builds/buildType:(id:DevTeam_IoCContainer_Build)/statusIcon"/>](http://tcavs2015.cloudapp.net/viewType.html?buildTypeId=DevTeam_IoCContainer_Build&guest=1) [![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container)
-
 # Simple, powerful and fast IoC container
+
+[![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container)
 
 Supported platforms:
   - .NET 4.0+
   - .NET Core 1.0+
   - .NET Standard 1.0+
 
-[Results](http://tcavs2015.cloudapp.net/httpAuth/app/rest/builds/buildType:DevTeam_IoCContainer_Build,status:SUCCESS/artifacts/content/reports.zip) of [comparison tests](https://github.com/DevTeam/IoCContainer/blob/master/IoC.Tests/ComparisonTests.cs) for some popular IoC containers. 
+## [Shroedingers cat](https://github.com/DevTeam/IoCContainer/tree/master/Samples/ShroedingersCat) shows how it works
 
-[Shroedingers :smiley_cat:](https://github.com/DevTeam/IoCContainer/tree/master/Samples/ShroedingersCat) shows how it works:
+### The reality is that
 
- ### Let's create an abstraction:
+![Cat](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/Docs/Images/cat.jpg)
+
+### Let's create an abstraction
 
 ```csharp
 interface IBox<out T> { T Content { get; } }
@@ -19,9 +21,7 @@ interface IBox<out T> { T Content { get; } }
 interface ICat { bool IsAlive { get; } }
 ```
 
-### Here is an implementation:
-
-![Cat](https://github.com/DevTeam/IoCContainer/blob/master/Docs/Images/cat.jpg)
+### Here is our implementation
 
 ```csharp
 class CardboardBox<T> : IBox<T>
@@ -37,13 +37,29 @@ class ShroedingersCat : ICat
 }
 ```
 
-### Add a [<img src="https://www.nuget.org/Content/Logos/nugetlogo.png" height="18">](https://www.nuget.org/packages/IoC.Container) reference to the IoC.Container library
+_**It is important to note that our abstraction and our implementation do not know anything about IoC containers**_
 
-```
-dotnet add package IoC.Container
-```
+### Add a [![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) reference to the IoC.Container library by one of these ways:
 
-### Let's glue it together:
+- Package Manager
+
+  ```
+  Install-Package IoC.Container
+  ```
+  
+- .NET CLI
+  
+  ```
+  dotnet add package IoC.Container
+  ```
+  
+- Packet CLI
+
+  ```
+  paket add IoC.Container
+  ```
+
+### Let's glue our abstraction and our implementation
 
 ```csharp
 class Glue : IConfiguration
@@ -56,10 +72,10 @@ class Glue : IConfiguration
 }
 ```
 
-### Just configure a container and check it works as expected:
+### Just configure the container and check it works as expected
 
 ```csharp
-using (var container = Container.Create().Using(new Glue()))
+using (var container = Container.Create().Using<Glue>())
 {
   // Directly getting
   var box1 = container.Get<IBox<ICat>>();
@@ -74,3 +90,11 @@ using (var container = Container.Create().Using(new Glue()))
   Console.WriteLine("#3 is alive: " + box3.Content.IsAlive);
 }
 ```
+
+## Why this one?
+
+See the [results](http://tcavs2015.cloudapp.net/httpAuth/app/rest/builds/buildType:DevTeam_IoCContainer_Build,status:SUCCESS/artifacts/content/reports.zip) of the [comparison tests](https://github.com/DevTeam/IoCContainer/blob/master/IoC.Tests/ComparisonTests.cs) for some popular IoC containers like Castle Windsor, Autofac, Unity, Ninject ...
+
+## The build state
+
+[<img src="http://tcavs2015.cloudapp.net/app/rest/builds/buildType:(id:DevTeam_IoCContainer_Build)/statusIcon"/>](http://tcavs2015.cloudapp.net/viewType.html?buildTypeId=DevTeam_IoCContainer_Build&guest=1)

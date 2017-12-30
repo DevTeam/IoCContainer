@@ -1,6 +1,8 @@
 ﻿namespace IoC.Tests.Cases
 {
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Threading.Tasks;
     using Shouldly;
     using Xunit;
@@ -46,6 +48,10 @@
                 // ... using async way
                 var service = await container.Tag("singletone created manually").AsyncGet<IService>(TaskScheduler.Default);
                 service.ShouldBe(byHand);
+
+                // Resolve all possible
+                var all = container.Get<IEnumerable<IService>>("some name").ToList();
+                all.Count.ShouldBe(4);
             }
         }
 
