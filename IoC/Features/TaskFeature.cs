@@ -22,7 +22,7 @@
                 .To(CreateTask);
         }
 
-        private static object CreateTask(Context context)
+        private static object CreateTask(ResolvingContext context)
         {
             Type[] genericTypeArguments;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
@@ -38,20 +38,20 @@
             var targetContractType = genericTypeArguments[0];
             var instanceType = typeof(InstanceTask<>).MakeGenericType(targetContractType);
             var resolvingKey = new Key(targetContractType, context.ResolvingKey.Tag);
-            var newContext = new Context(context.RegistrationId, context.RegistrationKey, context.RegistrationContainer, resolvingKey, context.ResolvingContainer, context.Args, targetContractType.IsConstructedGenericType());
+            var newContext = new ResolvingContext(context.RegistrationContext, resolvingKey, context.ResolvingContainer, context.Args, targetContractType.IsConstructedGenericType());
             return Activator.CreateInstance(instanceType, newContext);
         }
 
         private sealed class InstanceTask<T> : Task<T>
         {
-            public InstanceTask(Context context)
+            public InstanceTask(ResolvingContext context)
                 :base(CreateFunction(context))
             {
             }
 
-            private static Func<T> CreateFunction(Context context)
+            private static Func<T> CreateFunction(ResolvingContext context)
             {
-                var key = new Key(typeof(T), context.RegistrationKey.Tag);
+                var key = new Key(typeof(T), context.RegistrationContext.RegistrationKey.Tag);
                 if (!context.ResolvingContainer.TryGetResolver(key, out var resolver))
                 {
                     resolver = context.ResolvingContainer.Get<IIssueResolver>().CannotGetResolver(context.ResolvingContainer, key);

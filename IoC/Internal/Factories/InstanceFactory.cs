@@ -45,7 +45,7 @@
             _methodsCount = _methods.Length;
         }
 
-        public object Create(Context context)
+        public object Create(ResolvingContext context)
         {
             _reentrancy++;
             if (_reentrancy >= 32)

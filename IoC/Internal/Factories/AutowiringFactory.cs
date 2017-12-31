@@ -30,7 +30,7 @@
             }
         }
 
-        public object Create(Context context)
+        public object Create(ResolvingContext context)
         {
             InstanceFactory factory;
             if (_instanceFactory != null)

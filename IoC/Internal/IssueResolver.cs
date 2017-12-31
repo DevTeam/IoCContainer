@@ -54,7 +54,7 @@
             throw new InvalidOperationException($"The parameter \"{parameter}\" was not found.");
         }
 
-        public void CyclicDependenceDetected(Context context, Type type, int reentrancy)
+        public void CyclicDependenceDetected(ResolvingContext context, Type type, int reentrancy)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
             if (reentrancy <= 0) throw new ArgumentOutOfRangeException(nameof(reentrancy));

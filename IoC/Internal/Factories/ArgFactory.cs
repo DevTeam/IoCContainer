@@ -18,7 +18,7 @@
             _argIndex = _dependency.ArgIndex;
         }
 
-        public object Create(Context context)
+        public object Create(ResolvingContext context)
         {
             try
             {

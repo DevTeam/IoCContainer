@@ -4,10 +4,7 @@
 
     internal class Resolver: IDisposable, IResolver, IFactory
     {
-        private readonly object _lockObject;
-        private readonly int _registrationId;
-        private readonly Key _key;
-        [NotNull] private readonly IContainer _registrationContainer;
+        private readonly RegistrationContext _registrationContext;
         [NotNull] private readonly IDisposable _registrationToken;
         [NotNull] private readonly IFactory _factory;
         private readonly IFactory _baseFactory;
@@ -18,16 +15,13 @@
         public Resolver(
             object lockObject,
             int registrationId,
-            Key key,
+            Key registrationKey,
             [NotNull] IContainer registrationContainer,
             [NotNull] IDisposable registrationToken,
             [NotNull] IFactory factory,
             [CanBeNull] ILifetime lifetime = null)
         {
-            _lockObject = lockObject;
-            _registrationId = registrationId;
-            _key = key;
-            _registrationContainer = registrationContainer;
+            _registrationContext = new RegistrationContext(registrationId, registrationKey, registrationContainer);
             _registrationToken = registrationToken;
             _lifetime = lifetime;
             _baseFactory = factory;
@@ -45,7 +39,7 @@
             int argsIndexOffset = 0,
             params object[] args)
         {
-            lock (_lockObject)
+            lock (_registrationContext)
             {
                 if (_prevTargetContractType != resolvingKey.ContractType)
                 {
@@ -61,12 +55,12 @@
                     args = newArgs;
                 }
 
-                var context = new Context(_registrationId, _key, _registrationContainer, resolvingKey, resolvingContainer, args, _prevIsConstructedGenericTargetContractType);
+                var context = new ResolvingContext(_registrationContext, resolvingKey, resolvingContainer, args, _prevIsConstructedGenericTargetContractType);
                 return _factory.Create(context);
             }
         }
 
-        public object Create(Context context)
+        public object Create(ResolvingContext context)
         {
             // ReSharper disable once PossibleNullReferenceException
             return _lifetime.GetOrCreate(context, _baseFactory);

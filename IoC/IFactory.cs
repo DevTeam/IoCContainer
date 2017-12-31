@@ -3,6 +3,6 @@
     [PublicAPI]
     public interface IFactory
     {
-        [NotNull] object Create(Context context);
+        [NotNull] object Create(ResolvingContext context);
     }
 }

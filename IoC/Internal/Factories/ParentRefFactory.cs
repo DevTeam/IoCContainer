@@ -13,7 +13,7 @@
             _argsIndexOffset = argsIndexOffset;
         }
 
-        public object Create(Context context)
+        public object Create(ResolvingContext context)
         {
             var container = context.ResolvingContainer.Parent;
             IResolver resolver;

@@ -128,7 +128,7 @@
             return new RegistrationToken(registration.Container, CreateRegistration(registration, factory));
         }
 
-        public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [NotNull] Func<Context, T> factory, [NotNull] string description = "")
+        public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [NotNull] Func<IoC.ResolvingContext, T> factory, [NotNull] string description = "")
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
             if (factory == null) throw new ArgumentNullException(nameof(factory));

@@ -11,17 +11,17 @@
             _id = id;
         }
 
-        public object GetOrCreate(Context context, IFactory factory)
+        public object GetOrCreate(ResolvingContext context, IFactory factory)
         {
             var store = context.ResolvingContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container");
             object key;
             if (context.IsConstructedGenericResolvingContractType)
             {
-                key = new SingletoneGenericInstanceKey<ResolveId>(new ResolveId(_id, context.RegistrationId), context.ResolvingKey.ContractType.GenericTypeArguments());
+                key = new SingletoneGenericInstanceKey<ResolveId>(new ResolveId(_id, context.RegistrationContext.RegistrationId), context.ResolvingKey.ContractType.GenericTypeArguments());
             }
             else
             {
-                key = new SingletoneInstanceKey<ResolveId>(new ResolveId(_id, context.RegistrationId));
+                key = new SingletoneInstanceKey<ResolveId>(new ResolveId(_id, context.RegistrationContext.RegistrationId));
             }
 
             return store.GetOrAdd(key, context, factory);

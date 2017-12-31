@@ -11,7 +11,7 @@
             _argsIndexOffset = argsIndexOffset;
         }
 
-        public object Create(Context context)
+        public object Create(ResolvingContext context)
         {
             using (var childContainer = context.ResolvingContainer.CreateChild())
             {

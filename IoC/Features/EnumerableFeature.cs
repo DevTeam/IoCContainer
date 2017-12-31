@@ -22,7 +22,7 @@
                 .To(CreateEnumerable);
         }
 
-        private static object CreateEnumerable(Context context)
+        private static object CreateEnumerable(ResolvingContext context)
         {
             Type[] genericTypeArguments;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
@@ -43,7 +43,7 @@
 
             var instanceType = typeof(InstanceEnumerable<>).MakeGenericType(genericTypeArguments);
             var resolvingKey = new Key(targetContractType, context.ResolvingKey.Tag);
-            var newContext = new Context(context.RegistrationId, context.RegistrationKey, context.RegistrationContainer, resolvingKey, context.ResolvingContainer, context.Args, targetContractType.IsConstructedGenericType());
+            var newContext = new ResolvingContext(context.RegistrationContext, resolvingKey, context.ResolvingContainer, context.Args, targetContractType.IsConstructedGenericType());
             return Activator.CreateInstance(instanceType, keys, newContext);
         }
 
@@ -51,7 +51,7 @@
         {
             private readonly IEnumerable<T> _instances;
 
-            public InstanceEnumerable(IEnumerable<Key> key, Context context)
+            public InstanceEnumerable(IEnumerable<Key> key, ResolvingContext context)
             {
                 _instances = GetInstances(key, context);
             }
@@ -66,7 +66,7 @@
                 return GetEnumerator();
             }
 
-            private static IEnumerable<T> GetInstances(IEnumerable<Key> keys, Context context)
+            private static IEnumerable<T> GetInstances(IEnumerable<Key> keys, ResolvingContext context)
             {
                 foreach (var key in keys)
                 {

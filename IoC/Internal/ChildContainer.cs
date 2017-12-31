@@ -45,7 +45,7 @@
 
         public IContainer Parent => _parentContainer;
 
-        public object GetOrAdd<T>(T key, Context context, IFactory factory)
+        public object GetOrAdd<T>(T key, ResolvingContext context, IFactory factory)
         {
             if (_instances.TryGetValue(key, out var instance))
             {
