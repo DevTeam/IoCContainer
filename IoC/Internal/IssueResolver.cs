@@ -15,14 +15,12 @@
         public object CannotResolve(IContainer container, Key key)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            if (key == null) throw new ArgumentNullException(nameof(key));
             throw new InvalidOperationException($"Cannot resolve instance for the key \"{key}\" from  the container \"{container}\".");
         }
 
         public IResolver CannotGetResolver(IContainer container, Key key)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            if (key == null) throw new ArgumentNullException(nameof(key));
             throw new InvalidOperationException($"Cannot get resolver for the key \"{key}\" from the container \"{container}\".");
         }
 

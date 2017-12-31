@@ -3,7 +3,7 @@
     using System;
 
     [PublicAPI]
-    public class Key
+    public struct Key
     {
         public static readonly object AnyTag = new AnyTagObject();
 

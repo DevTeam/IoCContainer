@@ -8,18 +8,18 @@
     public struct Context
     {
         public readonly int RegistrationId;
-        [NotNull] public readonly Key RegistrationKey;
+        public readonly Key RegistrationKey;
         [NotNull] public readonly IContainer RegistrationContainer;
-        [NotNull] public readonly Key ResolvingKey;
+        public readonly Key ResolvingKey;
         [NotNull] public readonly IContainer ResolvingContainer;
         [NotNull][ItemCanBeNull] public readonly object[] Args;
         internal readonly bool IsConstructedGenericResolvingContractType;
 
         internal Context(
             int registrationId,
-            [NotNull] Key registrationKey,
+            Key registrationKey,
             [NotNull] IContainer registrationContainer,
-            [NotNull] Key resolvingKey,
+            Key resolvingKey,
             [NotNull] IContainer resolvingContainer,
             [NotNull][ItemCanBeNull] object[] args,
             bool isConstructedGenericResolvingContractType)
