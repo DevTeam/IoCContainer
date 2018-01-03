@@ -1,10 +1,7 @@
-﻿#if !NET45
-namespace IoC.Tests
+﻿namespace IoC.Tests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    // ReSharper disable once RedundantUsingDirective
-    using System.Reflection;
     using Moq;
     using Xunit;
 
@@ -78,4 +75,3 @@ namespace IoC.Tests
         }
     }
 }
-#endif

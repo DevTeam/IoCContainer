@@ -1,5 +1,4 @@
 ﻿// ReSharper disable HeuristicUnreachableCode
-// ReSharper disable RedundantUsingDirective
 #pragma warning disable 162
 namespace IoC.Tests
 {
@@ -8,7 +7,6 @@ namespace IoC.Tests
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
-    using System.Reflection;
     using Autofac;
     using Castle.MicroKernel.Registration;
     using Castle.Windsor;
@@ -87,7 +85,6 @@ namespace IoC.Tests
             results.Clear();
         }
 
-#if !NET45
         [Fact]
         [Trait("Category", "Memory")]
         [DotMemoryUnit(CollectAllocations = true)]
@@ -125,7 +122,6 @@ namespace IoC.Tests
             SaveResults(results, $"Memory_GraphOf3TransientObjects_{series}Times");
             results.Clear();
         }
-#endif
 
         private static void ThisGraphOf3ObjectsWithSingletone(int series, IPerformanceCounter performanceCounter)
         {
@@ -325,7 +321,7 @@ namespace IoC.Tests
 
         private static string GetBinDirectory()
         {
-            return Path.GetDirectoryName(typeof(ComparisonTests).GetTypeInfo().Assembly.Location);
+            return Environment.CurrentDirectory;
         }
 
         private static void SaveResults(IEnumerable<TestResult> results, string name)
