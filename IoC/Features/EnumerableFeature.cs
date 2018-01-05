@@ -17,66 +17,52 @@
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
+
             yield return container
                 .Bind(typeof(IEnumerable<>))
-                .To(CreateEnumerable);
+                .To(typeof(InstanceEnumerable<>));
         }
 
-        private static object CreateEnumerable(ResolvingContext context)
+        private sealed class InstanceEnumerable<T> : IEnumerable<T>
         {
-            Type[] genericTypeArguments;
-            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (context.IsConstructedGenericResolvingContractType)
+            private static readonly Key ResolvingKey = new Key(typeof(T));
+            private static readonly bool IsGenericResolvingType = typeof(T).IsConstructedGenericType();
+            private readonly IEnumerable<Key> _allKeys;
+            private readonly ResolvingContext _resolvingContext;
+
+            public InstanceEnumerable(ResolvingContext context)
             {
-                genericTypeArguments = context.ResolvingKey.ContractType.GenericTypeArguments();
-            }
-            else
-            {
-                genericTypeArguments = context.ResolvingContainer.Get<IIssueResolver>().CannotGetGenericTypeArguments(context.ResolvingKey.ContractType);
-            }
-
-            var targetContractType = genericTypeArguments[0];
-            var keys =
-                from key in context.ResolvingContainer as IEnumerable<Key> ?? Enumerable.Empty<Key>()
-                where key.ContractType == targetContractType
-                select key;
-
-            var instanceType = typeof(InstanceEnumerable<>).MakeGenericType(genericTypeArguments);
-            var resolvingKey = new Key(targetContractType, context.ResolvingKey.Tag);
-            var newContext = new ResolvingContext(context.RegistrationContext, resolvingKey, context.ResolvingContainer, context.Args, targetContractType.IsConstructedGenericType());
-            return Activator.CreateInstance(instanceType, keys, newContext);
-        }
-
-        private class InstanceEnumerable<T> : IEnumerable<T>
-        {
-            private readonly IEnumerable<T> _instances;
-
-            public InstanceEnumerable(IEnumerable<Key> key, ResolvingContext context)
-            {
-                _instances = GetInstances(key, context);
+                _allKeys = context.ResolvingContainer as IEnumerable<Key>;
+                _resolvingContext = new ResolvingContext(context.RegistrationContext)
+                {
+                    ResolvingKey = ResolvingKey,
+                    ResolvingContainer = context.ResolvingContainer,
+                    Args = context.Args,
+                    IsGenericResolvingType = IsGenericResolvingType
+                };
             }
 
             public IEnumerator<T> GetEnumerator()
             {
-                return _instances.GetEnumerator();
+                var keys =
+                    from key in _allKeys
+                    where key.ContractType == _resolvingContext.ResolvingKey.ContractType
+                    select key;
+
+                foreach (var key in keys)
+                {
+                    if (!_resolvingContext.ResolvingContainer.TryGetResolver(key, out var resolver))
+                    {
+                        continue;
+                    }
+
+                    yield return (T)resolver.Resolve(_resolvingContext.ResolvingKey, _resolvingContext.ResolvingContainer, 0, _resolvingContext.Args);
+                }
             }
 
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();
-            }
-
-            private static IEnumerable<T> GetInstances(IEnumerable<Key> keys, ResolvingContext context)
-            {
-                foreach (var key in keys)
-                {
-                    if (!context.ResolvingContainer.TryGetResolver(key, out var resolver))
-                    {
-                        continue;
-                    }
-
-                    yield return (T)resolver.Resolve(context.ResolvingKey, context.ResolvingContainer, 0, context.Args);
-                }
             }
         }
     }

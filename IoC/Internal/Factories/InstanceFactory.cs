@@ -24,9 +24,13 @@
             [NotNull] ITypeInfo typeInfo,
             [NotNull] Has[] dependencies)
         {
+#if DEBUG
+            if (issueResolver == null) throw new ArgumentNullException(nameof(issueResolver));
+            if (typeInfo == null) throw new ArgumentNullException(nameof(typeInfo));
             if (dependencies == null) throw new ArgumentNullException(nameof(dependencies));
-            _issueResolver = issueResolver ?? throw new ArgumentNullException(nameof(issueResolver));
-            _typeInfo = typeInfo ?? throw new ArgumentNullException(nameof(typeInfo));
+#endif
+            _issueResolver = issueResolver;
+            _typeInfo = typeInfo;
 
             var ctorInfo = (
                 from ctor in typeInfo.DeclaredConstructors
@@ -234,6 +238,12 @@
                 }
 
                 var parameter = parameters[position];
+                if (parameter.ParameterType == typeof(ResolvingContext))
+                {
+                    factories[position] = ResolvingContextFactory.Shared;
+                    continue;
+                }
+
                 factories[position] = CreateRefFactory(parameter.ParameterType, null, Scope.Current, 0);
             }
 

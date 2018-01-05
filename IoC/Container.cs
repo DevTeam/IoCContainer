@@ -12,7 +12,6 @@
     using Features;
     using Internal;
     using Internal.Factories;
-    using Internal.Features;
 
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
@@ -39,10 +38,7 @@
         public static IContainer CreatePure([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            var rootContainer = new ChildContainer(
-                RootName,
-                CoreFeature.Shared);
-
+            var rootContainer = new ChildContainer(RootName, CoreFeature.Shared);
             return new ChildContainer($"{RootName}{CreateContainerName(name)}", rootContainer, true);
         }
 
@@ -179,18 +175,22 @@
             }
         }
 
-        public static IContainer Tag([NotNull] this IContainer container, [NotNull] object tag)
+        public static IContainer Tag([NotNull] this IContainer container, [CanBeNull] object tag)
         {
+#if DEBUG
             if (container == null) throw new ArgumentNullException(nameof(container));
-            ResolvingContext.TagValue = tag ?? throw new ArgumentNullException(nameof(tag));
+#endif
+            ResolvingContext.TagValue = tag;
             return container;
         }
 
         public static bool TryGet([NotNull] this IContainer container, [NotNull] Type targetContractType, out object instance, [NotNull][ItemCanBeNull] params object[] args)
         {
+#if DEBUG
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (targetContractType == null) throw new ArgumentNullException(nameof(targetContractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
+#endif
             var resolvingKey = new Key(targetContractType, ResolvingContext.TagValue);
             ResolvingContext.TagValue = null;
             if (!container.TryGetResolver(resolvingKey, out var resolver))
@@ -205,8 +205,10 @@
 
         public static bool TryGet<T>([NotNull] this IContainer container, out T instance, [NotNull][ItemCanBeNull] params object[] args)
         {
+#if DEBUG
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
+#endif
             var resolvingKey = new Key(typeof(T), ResolvingContext.TagValue);
             ResolvingContext.TagValue = null;
             if (!container.TryGetResolver(resolvingKey, out var resolver))
@@ -222,9 +224,11 @@
         [NotNull]
         public static object Get([NotNull] this IContainer container, [NotNull] Type targetContractType, [NotNull][ItemCanBeNull] params object[] args)
         {
+#if DEBUG
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (targetContractType == null) throw new ArgumentNullException(nameof(targetContractType));
             if (args == null) throw new ArgumentNullException(nameof(args));
+#endif
             var resolvingKey = new Key(targetContractType, ResolvingContext.TagValue);
             ResolvingContext.TagValue = null;
             if (!container.TryGetResolver(resolvingKey, out var resolver))
@@ -238,8 +242,10 @@
         [NotNull]
         public static T Get<T>([NotNull] this IContainer container, [NotNull][ItemCanBeNull] params object[] args)
         {
+#if DEBUG
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
+#endif
             var resolvingKey = new Key(typeof(T), ResolvingContext.TagValue);
             ResolvingContext.TagValue = null;
             if (!container.TryGetResolver(resolvingKey, out var resolver))
@@ -253,35 +259,45 @@
         [NotNull]
         public static Func<T> FuncGet<T>([NotNull] this IContainer container)
         {
+#if DEBUG
             if (container == null) throw new ArgumentNullException(nameof(container));
+#endif
             return container.Get<Func<T>>();
         }
 
         [NotNull]
         public static Func<T1, T> FuncGet<T1, T>([NotNull] this IContainer container)
         {
+#if DEBUG
             if (container == null) throw new ArgumentNullException(nameof(container));
+#endif
             return container.Get<Func<T1, T>>();
         }
 
         [NotNull]
         public static Func<T1, T2, T> FuncGet<T1, T2, T>([NotNull] this IContainer container)
         {
+#if DEBUG
             if (container == null) throw new ArgumentNullException(nameof(container));
+#endif
             return container.Get<Func<T1, T2, T>>();
         }
 
         [NotNull]
         public static Func<T1, T2, T3, T> FuncGet<T1, T2, T3, T>([NotNull] this IContainer container)
         {
+#if DEBUG
             if (container == null) throw new ArgumentNullException(nameof(container));
+#endif
             return container.Get<Func<T1, T2, T3, T>>();
         }
 
         [NotNull]
         public static Func<T1, T2, T3, T4, T> FuncGet<T1, T2, T3, T4, T>([NotNull] this IContainer container)
         {
+#if DEBUG
             if (container == null) throw new ArgumentNullException(nameof(container));
+#endif
             return container.Get<Func<T1, T2, T3, T4, T>>();
         }
 
@@ -289,7 +305,9 @@
         [NotNull]
         public static async Task<T> AsyncGet<T>([NotNull] this IContainer container, [CanBeNull] TaskScheduler taskScheduler = null)
         {
+#if DEBUG
             if (container == null) throw new ArgumentNullException(nameof(container));
+#endif
             var task = container.Get<Task<T>>();
             if (taskScheduler != null)
             {

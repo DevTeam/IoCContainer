@@ -10,7 +10,7 @@
         {
             var registrationContext = context.RegistrationContext;
             var store = registrationContext.RegistrationContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container");
-            if (context.IsConstructedGenericResolvingContractType)
+            if (context.IsGenericResolvingType)
             {
                 var key = new SingletoneGenericInstanceKey<int>(registrationContext.RegistrationId, context.ResolvingKey.ContractType.GenericTypeArguments());
                 return store.GetOrAdd(key, context, factory);

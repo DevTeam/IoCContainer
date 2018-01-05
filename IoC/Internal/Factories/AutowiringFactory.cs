@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
 
     internal sealed class AutowiringFactory : IFactory
     {
@@ -10,15 +11,21 @@
         [NotNull] private readonly Has[] _dependencies;
         private readonly InstanceFactory _instanceFactory;
         private readonly Dictionary<Type, InstanceFactory> _factories;
+        [CanBeNull] private Func<Type[], Type[]> _typeSelector;
 
         public AutowiringFactory(
             [NotNull] IIssueResolver issueResolver,
             [NotNull] Type instanceType,
             [NotNull] params Has[] dependencies)
         {
-            _issueResolver = issueResolver ?? throw new ArgumentNullException(nameof(issueResolver));
-            _instanceType = instanceType ?? throw new ArgumentNullException(nameof(instanceType));
-            _dependencies = dependencies ?? throw new ArgumentNullException(nameof(dependencies));
+#if DEBUG
+            if (issueResolver == null) throw new ArgumentNullException(nameof(issueResolver));
+            if (instanceType == null) throw new ArgumentNullException(nameof(instanceType));
+            if (dependencies == null) throw new ArgumentNullException(nameof(dependencies));
+#endif
+            _issueResolver = issueResolver;
+            _instanceType = instanceType;
+            _dependencies = dependencies;
             var typeInfo = _instanceType.AsTypeInfo();
             if (!typeInfo.IsGenericTypeDefinition)
             {
@@ -28,6 +35,8 @@
             {
                 _factories = new Dictionary<Type, InstanceFactory>();
             }
+
+            _typeSelector = dependencies.Where(i => i.Type == DependencyType.Generics).Select(i => i.TypeSelector).FirstOrDefault();
         }
 
         public object Create(ResolvingContext context)
@@ -43,7 +52,7 @@
                 {
                     Type[] genericTypeArguments;
                     // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-                    if (context.IsConstructedGenericResolvingContractType)
+                    if (context.IsGenericResolvingType)
                     {
                         genericTypeArguments = context.ResolvingKey.ContractType.GenericTypeArguments();
                     }
@@ -52,7 +61,7 @@
                         genericTypeArguments = _issueResolver.CannotGetGenericTypeArguments(context.ResolvingKey.ContractType);
                     }
 
-                    var genericInstanceType = _instanceType.MakeGenericType(genericTypeArguments);
+                    var genericInstanceType = _instanceType.MakeGenericType(_typeSelector?.Invoke(genericTypeArguments) ?? genericTypeArguments);
                     factory = new InstanceFactory(_issueResolver, genericInstanceType.AsTypeInfo(), _dependencies);
                     _factories.Add(context.ResolvingKey.ContractType, factory);
                 }

@@ -1,7 +1,9 @@
 ﻿namespace IoC
 {
+    using System;
+
     [PublicAPI]
-    public interface IResolver
+    public interface IResolver: IDisposable
     {
         [NotNull] object Resolve(
             Key resolvingKey,

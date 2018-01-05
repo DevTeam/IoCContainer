@@ -39,7 +39,7 @@ class ShroedingersCat : ICat
 
 _**It is important to note that our abstraction and our implementation do not know anything about IoC containers**_
 
-### Add a [![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) reference to the IoC.Container library by one of these ways:
+### Add a [package reference](https://www.nuget.org/packages/IoC.Container)
 
 - Package Manager
 

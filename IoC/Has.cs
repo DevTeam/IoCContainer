@@ -12,6 +12,12 @@
         internal readonly HasMethod HasMethod;
         internal readonly Scope Scope;
         internal readonly int ArgsIndexOffset;
+        internal readonly Func<Type[], Type[]> TypeSelector;
+
+        public static Has Generics([NotNull] Func<Type[], Type[]> typeSelector)
+        {
+            return new Has(typeSelector);
+        }
 
         public static Has Arg<T>([NotNull] string name, int argIndex)
         {
@@ -84,6 +90,7 @@
             HasMethod = default(HasMethod);
             Scope = Scope.Current;
             ArgsIndexOffset = 0;
+            TypeSelector = types => types;
         }
 
         private Has(Parameter parameter, [CanBeNull] object tag, Scope scope, int argsIndexOffset)
@@ -95,6 +102,7 @@
             HasMethod = default(HasMethod);
             Scope = scope;
             ArgsIndexOffset = argsIndexOffset;
+            TypeSelector = types => types;
         }
 
         private Has(HasMethod hasMethod)
@@ -106,6 +114,19 @@
             HasMethod = hasMethod;
             Scope = Scope.Current;
             ArgsIndexOffset = 0;
+            TypeSelector = types => types;
+        }
+
+        private Has(Func<Type[], Type[]> typeSelector)
+        {
+            Type = DependencyType.Generics;
+            Parameter = default(Parameter);
+            Tag = null;
+            ArgIndex = 0;
+            HasMethod = default(HasMethod);
+            Scope = Scope.Current;
+            ArgsIndexOffset = 0;
+            TypeSelector = typeSelector;
         }
 
         public override string ToString()
@@ -120,6 +141,7 @@
 
                 case DependencyType.Method:
                     return $"{HasMethod}";
+
 
                 default:
                     return base.ToString();

@@ -3,7 +3,7 @@
     using System;
     using System.Reflection;
 
-    internal class ArgFactory : IFactory
+    internal sealed class ArgFactory : IFactory
     {
         private readonly ITypeInfo _typeInfo;
         private readonly Has _dependency;

@@ -2,35 +2,45 @@
 {
     using System;
 
-    internal class Resolver: IDisposable, IResolver, IFactory
+    internal sealed class Resolver: IResolver, IFactory
     {
-        private readonly RegistrationContext _registrationContext;
+        [NotNull] private readonly object _lockObject;
         [NotNull] private readonly IDisposable _registrationToken;
         [NotNull] private readonly IFactory _factory;
-        private readonly IFactory _baseFactory;
+        [NotNull] private readonly IFactory _baseFactory;
         [CanBeNull] private readonly ILifetime _lifetime;
-        private Type _prevTargetContractType;
-        private bool _prevIsConstructedGenericTargetContractType;
+        [NotNull] private readonly ResolvingContext _context;
+        private Key _prevRresolvingKey;
+        private bool _isDisposed;
 
         public Resolver(
             object lockObject,
             int registrationId,
-            Key registrationKey,
             [NotNull] IContainer registrationContainer,
             [NotNull] IDisposable registrationToken,
             [NotNull] IFactory factory,
             [CanBeNull] ILifetime lifetime = null)
         {
-            _registrationContext = new RegistrationContext(registrationId, registrationKey, registrationContainer);
+#if DEBUG
+            if (registrationContainer == null) throw new ArgumentNullException(nameof(registrationContainer));
+            if (registrationToken == null) throw new ArgumentNullException(nameof(registrationToken));
+            if (factory == null) throw new ArgumentNullException(nameof(factory));
+#endif
+            _lockObject = lockObject;
             _registrationToken = registrationToken;
             _lifetime = lifetime;
             _baseFactory = factory;
             _factory = lifetime != null ? this : factory;
+            _context = new ResolvingContext(new RegistrationContext(registrationId, registrationContainer));
         }
 
         public void Dispose()
         {
-            _registrationToken.Dispose();
+            lock (_lockObject)
+            {
+                _isDisposed = true;
+                _registrationToken.Dispose();
+            }
         }
 
         public object Resolve(
@@ -39,12 +49,18 @@
             int argsIndexOffset = 0,
             params object[] args)
         {
-            lock (_registrationContext)
+            lock (_lockObject)
             {
-                if (_prevTargetContractType != resolvingKey.ContractType)
+                if (_isDisposed)
                 {
-                    _prevTargetContractType = resolvingKey.ContractType;
-                    _prevIsConstructedGenericTargetContractType = resolvingKey.ContractType.IsConstructedGenericType();
+                    throw new ObjectDisposedException($"This instance of \"{nameof(Resolver)}\" was disposed.");
+                }
+
+                if (_prevRresolvingKey.GetHashCode() != resolvingKey.GetHashCode() && !Equals(_prevRresolvingKey, resolvingKey))
+                {
+                    _prevRresolvingKey = resolvingKey;
+                    _context.ResolvingKey = _prevRresolvingKey;
+                    _context.IsGenericResolvingType = _prevRresolvingKey.ContractType.IsConstructedGenericType();
                 }
 
                 if (argsIndexOffset > 0)
@@ -55,8 +71,9 @@
                     args = newArgs;
                 }
 
-                var context = new ResolvingContext(_registrationContext, resolvingKey, resolvingContainer, args, _prevIsConstructedGenericTargetContractType);
-                return _factory.Create(context);
+                _context.ResolvingContainer = resolvingContainer;
+                _context.Args = args;
+                return _factory.Create(_context);
             }
         }
 

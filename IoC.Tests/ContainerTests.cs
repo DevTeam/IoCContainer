@@ -585,6 +585,36 @@
         }
 
         [Fact]
+        public void ContainerShouldResolveWithReferencesAftreChangeBindings()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var firstRef = Mock.Of<IMyService>();
+                var expectedRef = Mock.Of<IMyService>();
+
+                // When
+                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(typeof(MyService), Has.Arg<string>("name", 0)))
+                {
+                    using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => firstRef))
+                    {
+                        var actualInstance = container.Get<IMyService>("xyz");
+                        ((MyService) actualInstance).Name.ShouldBe("xyz");
+                        ((MyService) actualInstance).SomeRef.ShouldBe(firstRef);
+                    }
+
+                    using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                    {
+                        // Then
+                        var actualInstance = container.Get<IMyService>("abc");
+                        ((MyService)actualInstance).Name.ShouldBe("abc");
+                        ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
+                    }
+                }
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveWhenSingletonLifetimeWithGenerics()
         {
             // Given

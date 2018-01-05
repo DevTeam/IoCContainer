@@ -1,18 +1,20 @@
 ﻿namespace IoC
 {
-    public class RegistrationContext
+    using System;
+
+    public sealed class RegistrationContext
     {
         public readonly int RegistrationId;
-        public readonly Key RegistrationKey;
         [NotNull] public readonly IContainer RegistrationContainer;
 
-        internal RegistrationContext(
+        public RegistrationContext(
             int registrationId,
-            Key registrationKey,
             [NotNull] IContainer registrationContainer)
         {
+#if DEBUG
+            if (registrationContainer == null) throw new ArgumentNullException(nameof(registrationContainer));
+#endif
             RegistrationId = registrationId;
-            RegistrationKey = registrationKey;
             RegistrationContainer = registrationContainer;
         }
     }

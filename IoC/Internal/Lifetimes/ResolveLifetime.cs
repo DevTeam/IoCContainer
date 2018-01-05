@@ -2,7 +2,7 @@
 {
     using System;
 
-    internal class ResolveLifetime: ILifetime
+    internal sealed class ResolveLifetime : ILifetime
     {
         private readonly long _id;
 
@@ -15,7 +15,7 @@
         {
             var store = context.ResolvingContainer as IInstanceStore ?? throw new NotSupportedException($"The lifetime \"{GetType().Name}\" is not supported for specified container");
             object key;
-            if (context.IsConstructedGenericResolvingContractType)
+            if (context.IsGenericResolvingType)
             {
                 key = new SingletoneGenericInstanceKey<ResolveId>(new ResolveId(_id, context.RegistrationContext.RegistrationId), context.ResolvingKey.ContractType.GenericTypeArguments());
             }

@@ -19,31 +19,14 @@
             yield return container
                 .Bind(typeof(Task<>))
                 .AnyTag()
-                .To(CreateTask);
-        }
-
-        private static object CreateTask(ResolvingContext context)
-        {
-            Type[] genericTypeArguments;
-            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (context.IsConstructedGenericResolvingContractType)
-            {
-                genericTypeArguments = context.ResolvingKey.ContractType.GenericTypeArguments();
-            }
-            else
-            {
-                genericTypeArguments = context.ResolvingContainer.Get<IIssueResolver>().CannotGetGenericTypeArguments(context.ResolvingKey.ContractType);
-            }
-
-            var targetContractType = genericTypeArguments[0];
-            var instanceType = typeof(InstanceTask<>).MakeGenericType(targetContractType);
-            var resolvingKey = new Key(targetContractType, context.ResolvingKey.Tag);
-            var newContext = new ResolvingContext(context.RegistrationContext, resolvingKey, context.ResolvingContainer, context.Args, targetContractType.IsConstructedGenericType());
-            return Activator.CreateInstance(instanceType, newContext);
+                .To(typeof(InstanceTask<>));
         }
 
         private sealed class InstanceTask<T> : Task<T>
         {
+            private static readonly Key ResolvingKey = new Key(typeof(T));
+            private static readonly bool IsGenericResolvingType = typeof(T).IsConstructedGenericType();
+
             public InstanceTask(ResolvingContext context)
                 :base(CreateFunction(context))
             {
@@ -51,13 +34,21 @@
 
             private static Func<T> CreateFunction(ResolvingContext context)
             {
-                var key = new Key(typeof(T), context.RegistrationContext.RegistrationKey.Tag);
-                if (!context.ResolvingContainer.TryGetResolver(key, out var resolver))
+                var resolvingKey = context.ResolvingKey.Tag == null ? ResolvingKey : new Key(typeof(T), context.ResolvingKey.Tag);
+                var resolvingContext = new ResolvingContext(context.RegistrationContext)
                 {
-                    resolver = context.ResolvingContainer.Get<IIssueResolver>().CannotGetResolver(context.ResolvingContainer, key);
+                    ResolvingKey = resolvingKey,
+                    ResolvingContainer = context.ResolvingContainer,
+                    Args = context.Args,
+                    IsGenericResolvingType = IsGenericResolvingType
+                };
+
+                if (!resolvingContext.ResolvingContainer.TryGetResolver(resolvingKey, out var resolver))
+                {
+                    resolver = resolvingContext.ResolvingContainer.Get<IIssueResolver>().CannotGetResolver(resolvingContext.ResolvingContainer, resolvingKey);
                 }
 
-                return () => (T) resolver.Resolve(context.ResolvingKey, context.ResolvingContainer);
+                return () => (T) resolver.Resolve(resolvingContext.ResolvingKey, resolvingContext.ResolvingContainer);
             }
         }
     }

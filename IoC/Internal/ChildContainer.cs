@@ -83,7 +83,7 @@
                 }
 
                 var registrationId = _registrationId++;
-                registrationToken = Disposable.Create(keyArray.Select(key => RegisterResolver(key, new Resolver(_lockObject, registrationId, key, this, UnregisterResolver(key), factory, lifetime))));
+                registrationToken = Disposable.Create(keyArray.Select(key => RegisterResolver(key, new Resolver(_lockObject, registrationId, this, UnregisterResolver(key), factory, lifetime))));
                 return true;
             }
         }
@@ -115,8 +115,8 @@
             {
                 Disposable.Create(
                     _instances.Values.OfType<IDisposable>()
-                     .Concat(_resources)
-                    .Concat(_resolvers.Values.Cast<IDisposable>()))
+                    .Concat(_resources)
+                    .Concat(_resolvers.Values))
                     .Dispose();
 
                 _instances.Clear();

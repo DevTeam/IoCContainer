@@ -6,6 +6,8 @@
 
         Ref,
 
-        Method
+        Method,
+
+        Generics
     }
 }

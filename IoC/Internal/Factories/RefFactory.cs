@@ -1,6 +1,8 @@
 ﻿namespace IoC.Internal.Factories
 {
-    internal class RefFactory : IFactory
+    using System;
+
+    internal sealed class RefFactory : IFactory
     {
         private readonly Key _key;
         private readonly int _argsIndexOffset;
@@ -32,7 +34,15 @@
                 resolver = _lastResolver;
             }
 
-            return resolver.Resolve(_key, context.ResolvingContainer, _argsIndexOffset, context.Args);
+            try
+            {
+                return resolver.Resolve(_key, context.ResolvingContainer, _argsIndexOffset, context.Args);
+            }
+            catch (ObjectDisposedException)
+            {
+                _lastContainer = null;
+                return Create(context);
+            }
         }
     }
 }

@@ -13,7 +13,10 @@
 
         public Key([NotNull] Type type, [CanBeNull] object tag = null)
         {
-            ContractType = type ?? throw new ArgumentNullException(nameof(type));
+#if DEBUG
+            if (type == null) throw new ArgumentNullException(nameof(type));
+#endif
+            ContractType = type;
             Tag = tag;
             _hashCode = type.GetHashCode();
         }
@@ -43,7 +46,7 @@
 
             public override bool Equals(object obj)
             {
-                return !ReferenceEquals(obj, null);
+                return !(obj is null);
             }
 
             public override string ToString()
