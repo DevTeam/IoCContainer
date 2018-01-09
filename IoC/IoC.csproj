@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;net40;net45;net46;net47;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(Configuration)'=='Debug'">net40;net47;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(Configuration)'=='Release'">netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;net40;net45;net46;net47;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
     <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
@@ -18,5 +19,4 @@
     <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
     <NeutralLanguage />	
   </PropertyGroup>
-
 </Project>

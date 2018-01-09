@@ -72,5 +72,20 @@
         {
             throw new InvalidOperationException($"Cannot resolve the parameter \"{parameter.ParameterType} {parameter.Name}\" for \"{parameter.Member.Name}\" creating an instance of type \"{type.Name}\" from args[{dependency.ArgIndex}].");
         }
+
+        public Type CannotParseType(string statementText, int statementLineNumber, int statementPosition, string typeName)
+        {
+            throw new InvalidOperationException($"Cannot parse the type \"{typeName}\" in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
+        }
+
+        public Lifetime CannotParseLifetime(string statementText, int statementLineNumber, int statementPosition, string lifetimeName)
+        {
+            throw new InvalidOperationException($"Cannot parse the lifetime \"{lifetimeName}\" in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
+        }
+
+        public object CannotParseTag(string statementText, int statementLineNumber, int statementPosition, string tag)
+        {
+            throw new InvalidOperationException($"Cannot parse the tag \"{tag}\" in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
+        }
     }
 }

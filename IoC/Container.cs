@@ -3,6 +3,7 @@
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     // ReSharper disable once RedundantUsingDirective
     using System.Reflection;
@@ -29,7 +30,8 @@
                 CoreFeature.Shared,
                 EnumerableFeature.Shared,
                 FuncFeature.Shared,
-                TaskFeature.Shared);
+                TaskFeature.Shared,
+                ConfigurationFeature.Shared);
 
             return new ChildContainer($"{RootName}{CreateContainerName(name)}", rootContainer, true);
         }
@@ -175,7 +177,7 @@
             }
         }
 
-        public static IContainer Tag([NotNull] this IContainer container, [CanBeNull] object tag)
+        public static IContainer Tag([NotNull] this IContainer container, [CanBeNull] object tag = null)
         {
 #if DEBUG
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -317,6 +319,41 @@
             return await task;
         }
 #endif
+        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return container.ApplyData(configurationText);
+        }
+
+        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return container.ApplyData(configurationStreams);
+        }
+
+        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return container.ApplyData(configurationReaders);
+        }
+
+        public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return container.UsingData(configurationText);
+        }
+
+        public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return container.UsingData(configurationStreams);
+        }
+
+        public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return container.UsingData(configurationReaders);
+        }
 
         [NotNull]
         public static IDisposable Apply([NotNull] this IContainer container, [NotNull][ItemNotNull] params IConfiguration[] configurations)
@@ -343,6 +380,20 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             return container.Using(new T());
+        }
+
+        private static IDisposable ApplyData<T>([NotNull] this IContainer container, [NotNull][ItemNotNull] params T[] configurationData)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (configurationData == null) throw new ArgumentNullException(nameof(configurationData));
+            return container.Apply(configurationData.Select(configurationItem => container.Get<IConfiguration>(configurationItem)).ToArray());
+        }
+
+        private static IContainer UsingData<T>([NotNull] this IContainer container, [NotNull][ItemNotNull] params T[] configurationData)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (configurationData == null) throw new ArgumentNullException(nameof(configurationData));
+            return container.Using(configurationData.Select(configurationItem => container.Get<IConfiguration>(configurationItem)).ToArray());
         }
 
         [NotNull]

@@ -25,5 +25,11 @@
         void CyclicDependenceDetected(ResolvingContext context, [NotNull] Type type, int reentrancy);
 
         [CanBeNull] object CannotResolveParameter([NotNull] Type type, Has dependency, [NotNull] ParameterInfo parameter);
+
+        [NotNull] Type CannotParseType([NotNull] string statementText, int statementLineNumber, int statementPosition, [NotNull] string typeName);
+
+        Lifetime CannotParseLifetime([NotNull] string statementText, int statementLineNumber, int statementPosition, [NotNull] string lifetimeName);
+
+        [CanBeNull] object CannotParseTag(string statementText, int statementLineNumber, int statementPosition, [NotNull] string tag);
     }
 }

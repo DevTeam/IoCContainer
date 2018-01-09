@@ -6,6 +6,11 @@
 
     internal static class Reflection
     {
+        public static Assembly LoadAssembly(string assemblyName)
+        {
+            return Assembly.Load(new AssemblyName(assemblyName));
+        }
+
         public static ITypeInfo AsTypeInfo(this Type type)
         {
 #if NET40

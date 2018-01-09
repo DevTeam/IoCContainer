@@ -2,7 +2,12 @@
 
   <PropertyGroup>
     <TargetFrameworks>netcoreapp2.0;net47</TargetFrameworks>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
     <IsPackable>false</IsPackable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <WarningsAsErrors />
+    <NoWarn>1701;1702;1705;8002</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>
