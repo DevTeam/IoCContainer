@@ -9,3 +9,4 @@ packages
 .vs/
 *.user
 _ReSharper.Caches/
+IoC/README_TEMPLATE.md

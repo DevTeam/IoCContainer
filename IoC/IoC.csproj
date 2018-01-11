@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks Condition="'$(Configuration)'=='Debug'">net40;net47;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks Condition="'$(Configuration)'=='Debug'">net40;net47;netstandard1.0;netcoreapp2.0</TargetFrameworks>
     <TargetFrameworks Condition="'$(Configuration)'=='Release'">netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;net40;net45;net46;net47;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
@@ -19,4 +19,20 @@
     <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
     <NeutralLanguage />	
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="README_TEMPLATE.md">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>README_TEMPLATE.tt</DependentUpon>
+    </None>
+    <None Update="README_TEMPLATE.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>README_TEMPLATE.md</LastGenOutput>
+    </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
 </Project>

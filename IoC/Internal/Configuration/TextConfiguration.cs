@@ -7,6 +7,7 @@
 
     internal sealed class TextConfiguration : IConfiguration
     {
+        private static readonly string StatementSeparator = "" + Separators.Statement;
         [NotNull] private readonly IConverter<IEnumerable<Statement>, BindingContext, BindingContext> _bindingsConverter;
         [NotNull] private readonly IEnumerable<Statement> _statements;
 
@@ -40,7 +41,7 @@
             do
             {
                 var curLine = textReader.ReadLine();
-                if (!string.IsNullOrWhiteSpace(curLine) && curLine.TrimEnd().Last() != Separators.Statement)
+                if (!string.IsNullOrWhiteSpace(curLine) && !curLine.TrimEnd().EndsWith(StatementSeparator))
                 {
                     line += curLine;
                     continue;

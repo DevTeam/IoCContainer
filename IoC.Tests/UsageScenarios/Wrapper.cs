@@ -1,4 +1,4 @@
-﻿namespace IoC.Tests.Cases
+﻿namespace IoC.Tests.UsageScenarios
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
@@ -6,27 +6,32 @@
     using Xunit;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public class WrapperCase
+    public class Wrapper
     {
         [Fact]
+        // $visible=true
+        // $group=09
+        // $priority=00
+        // $description=Wrapper
+        // {
         public void Run()
         {
             var console = new Mock<IConsole>();
 
-            // Configure base container and base logger
+            // Create the base container
             using (var baseContainer = Container.Create("base"))
+            // Configure the base container for base logger
             using (baseContainer.Bind<IConsole>().To(ctx => console.Object))
-            // And add base logger
             using (baseContainer.Bind<ILogger>().To(typeof(Logger)))
             {
                 // Configure some new container
-                using (var myContainer = baseContainer.CreateChild("my"))
+                using (var childContainer = baseContainer.CreateChild("child"))
                 // And add some console
-                using (myContainer.Bind<IConsole>().To(ctx => console.Object))
-                // And add logger wrapper, specifing that resolving of the "logger" dependency should be done from the parent container
-                using (myContainer.Bind<ILogger>().To(typeof(TimeLogger), Has.Ref("logger", Scope.Parent)))
+                using (childContainer.Bind<IConsole>().To(ctx => console.Object))
+                // And add logger's wrapper, specifing that resolving of the "logger" dependency should be done from the parent container
+                using (childContainer.Bind<ILogger>().To(typeof(TimeLogger), Has.Ref("logger", Scope.Parent)))
                 {
-                    var logger = myContainer.Get<ILogger>();
+                    var logger = childContainer.Get<ILogger>();
 
                     // Log message
                     logger.Log("Hello");
@@ -64,17 +69,18 @@
 
         public class TimeLogger: ILogger
         {
-            private readonly ILogger _logger;
+            private readonly ILogger _baseLogger;
 
-            public TimeLogger(ILogger logger)
+            public TimeLogger(ILogger baseLogger)
             {
-                _logger = logger;
+                _baseLogger = baseLogger;
             }
 
             public void Log(string message)
             {
-                _logger.Log(DateTimeOffset.Now + ": " + message);
+                _baseLogger.Log(DateTimeOffset.Now + ": " + message);
             }
         }
+        // }
     }
 }

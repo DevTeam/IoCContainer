@@ -46,17 +46,14 @@
 
             yield return container
                 .Bind<IContainer>()
-                .To(ctx => ctx.ResolvingContainer);
-
-            yield return container
-                .Bind<IContainer>()
+                .Tag()
                 .Tag(Scope.Current)
                 .To(ctx => ctx.ResolvingContainer);
 
             yield return container
                 .Bind<IContainer>()
                 .Tag(Scope.Child)
-                .To(ctx => ctx.ResolvingContainer.CreateChild());
+                .To(ctx => new ChildContainer(ctx.Args.Length == 1 ? Container.CreateContainerName(ctx.Args[0] as string) : Container.CreateContainerName(), ctx.ResolvingContainer, false));
 
             yield return container
                 .Bind<IContainer>()

@@ -49,7 +49,7 @@
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return new ChildContainer($"{parent}/{CreateContainerName(name)}", parent, false);
+            return parent.Tag(Scope.Child).Get<IContainer>(name);
         }
 
         public static IRegistration<object> Bind([NotNull] this IContainer container, [NotNull][ItemNotNull] params Type[] contractTypes)
@@ -107,7 +107,7 @@
             return new Registration<T>(registration, lifetime);
         }
 
-        public static IRegistration<T> Tag<T>([NotNull] this IRegistration<T> registration, [CanBeNull] object tagValue)
+        public static IRegistration<T> Tag<T>([NotNull] this IRegistration<T> registration, [CanBeNull] object tagValue = null)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
             return new Registration<T>(registration, tagValue);
@@ -116,7 +116,7 @@
         public static IRegistration<T> AnyTag<T>([NotNull] this IRegistration<T> registration)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
-            return registration.Tag(null).Tag(Key.AnyTag);
+            return registration.Tag().Tag(Key.AnyTag);
         }
 
         public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [NotNull] IFactory factory)
@@ -413,7 +413,7 @@
         }
 
         [NotNull]
-        private static string CreateContainerName([NotNull] string name)
+        internal static string CreateContainerName([CanBeNull] string name = "")
         {
             // ReSharper disable once AssignNullToNotNullAttribute
             return !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);

@@ -15,7 +15,6 @@
         {
             using (var container = Container.Create().Using<Glue>())
             {
-                // Directly getting
                 var box1 = container.Get<IBox<ICat>>();
                 Console.WriteLine("#1 is alive: " + box1.Content.IsAlive);
 

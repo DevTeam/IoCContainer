@@ -28,7 +28,7 @@
 
         public override string ToString()
         {
-            return $"{_name.Width(20)} {_testResult}";
+            return $"<td>{_name}</td><td>{_testResult}</td>";
         }
     }
 

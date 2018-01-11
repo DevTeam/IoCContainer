@@ -1,29 +1,41 @@
-﻿namespace IoC.Tests.Cases
+﻿namespace IoC.Tests.UsageScenarios
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using Moq;
     using Xunit;
 
-    public class MultipleResolvingCase
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+    public class SimpleInstantMessenger
     {
         [Fact]
+        // $visible=true
+        // $group=09
+        // $priority=00
+        // $description=Instant Messenger
+        // {
         public void Run()
         {
             var observer = new Mock<IObserver<IMessage>>();
 
+            // Initial message id
             var id = 33;
+
+            // Create the container
             using (var container = Container.Create())
+            // Configure the container
             using (container.Bind<int>().Tag("IdGenerator").To(() => id++))
-            using (container.Bind(typeof(IInstanceMessanger<>)).To(typeof(InstanceMessanger<>)))
+            using (container.Bind(typeof(IInstantMessenger<>)).To(typeof(InstantMessenger<>)))
             using (container.Bind<IMessage>().To<Message>(Has.Arg("address", 0), Has.Arg("text", 1), Has.Ref("id", "IdGenerator")))
             {
-                var instanceMessanger = container.Get<IInstanceMessanger<IMessage>>();
-                using (instanceMessanger.Subscribe(observer.Object))
+                var instantMessenger = container.Get<IInstantMessenger<IMessage>>();
+                using (instantMessenger.Subscribe(observer.Object))
                 {
                     for (var i = 0; i < 10; i++)
                     {
-                        instanceMessanger.SendMessage("John", "Hello");
+                        instantMessenger.SendMessage("John", "Hello");
                     }
                 }
             }
@@ -31,7 +43,7 @@
             observer.Verify(i => i.OnNext(It.Is<IMessage>(message => message.Id >= 33 && message.Address == "John" && message.Text == "Hello")), Times.Exactly(10));
         }
 
-        public interface IInstanceMessanger<out T>: IObservable<T>
+        public interface IInstantMessenger<out T>: IObservable<T>
         {
             void SendMessage(string address, string text);
         }
@@ -61,12 +73,12 @@
             public string Text { get; }
         }
 
-        public class InstanceMessanger<T> : IInstanceMessanger<T>
+        public class InstantMessenger<T> : IInstantMessenger<T>
         {
             private readonly Func<string, string, T> _createMessage;
             private readonly List<IObserver<T>> _observers = new List<IObserver<T>>();
 
-            public InstanceMessanger(Func<string, string, T> createMessage)
+            public InstantMessenger(Func<string, string, T> createMessage)
             {
                 _createMessage = createMessage;
             }
@@ -82,5 +94,6 @@
                 _observers.ForEach(observer => observer.OnNext(_createMessage(address, text)));
             }
         }
+        // }
     }
 }

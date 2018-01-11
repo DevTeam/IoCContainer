@@ -1,0 +1,111 @@
+﻿<#@ template debug="false" hostspecific="true" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.IO" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".md" #>
+
+<#
+    var currentPath = this.Host.ResolvePath("");
+    var solutionPath = Path.Combine(currentPath, "..");
+    var scenariousPath = Path.Combine(Path.Combine(solutionPath, "IoC.Tests"), "UsageScenarios");
+
+    var infos = new List<Dictionary<string, string>>();
+    foreach(var file in Directory.GetFiles(scenariousPath, "*.cs"))
+    {
+        var isBody = false;
+        var vars = new Dictionary<string, string>();
+        var body = new StringBuilder();
+        var bodyOffset = -1;
+        foreach(var line in File.ReadAllLines(file))
+        {
+            if(vars.Count == 0)
+            {
+                vars["visible"] = "false";
+                vars["group"] = string.Empty;
+                vars["priority"] = string.Empty;
+                vars["description"] = Path.GetFileNameWithoutExtension(file);
+                vars["file"] = file;
+                vars["url"] = "https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/" + Path.GetFileName(file);
+                infos.Add(vars);
+            }
+
+            var str = line.Trim();
+            if (str == "// {")
+            {
+                isBody = true;
+                bodyOffset = line.Length - line.TrimStart().Length;
+                continue;
+            }
+
+            if (str == "// }")
+            {
+                isBody = false;
+                continue;
+            }
+
+            if (str.StartsWith("// $"))
+            {
+                var parts = str.Substring(4, str.Length - 4).Split('=');
+                if (parts.Length == 2)
+                {
+                    vars[parts[0]] = parts[1];
+                }
+
+                continue;
+            }
+
+            if (isBody)
+            {
+                if (bodyOffset < line.Length)
+                {
+                    body.AppendLine(line.Substring(bodyOffset, line.Length - bodyOffset));
+                }
+                else
+                {
+                    body.AppendLine(line.TrimStart());
+                }
+            }
+        }
+
+        vars["body"] = body.ToString();
+    }#>
+## Usage Scenarios
+
+<#
+    var orderedInfos = infos.OrderBy(i => i["group"] + i["priority"]).Where(info => info["visible"] == "true").ToList();
+    foreach(var info in orderedInfos)
+    {
+        var description = info["description"];
+        var reference = "#" + description.Replace(" ", "-").Replace("'", string.Empty).ToLowerInvariant();
+#>* [<#=description#>](<#=reference#>)
+<#
+    }
+#>
+
+<#
+    foreach(var info in orderedInfos)
+    {
+#>### <#=info["description"]#>
+
+``` CSharp
+<#=info["body"]#>```
+[C#](<#=info["url"]#>)
+
+<#
+    }
+
+    var readmeHeaderFile = Path.Combine(currentPath, "README_HEADER.md");
+    var readmeFooterFile = Path.Combine(currentPath, "README_FOOTER.md");
+    var readmeFile = Path.Combine(solutionPath, "README.md");
+    var scenariousFile = Path.Combine(currentPath, "README_TEMPLATE.md");
+
+    File.Copy(readmeHeaderFile, readmeFile, true);
+
+    var scenarious = File.ReadAllText(scenariousFile);
+    File.AppendAllText(readmeFile, scenarious);
+
+    var footer = File.ReadAllText(readmeFooterFile);
+    File.AppendAllText(readmeFile, footer);
+#>

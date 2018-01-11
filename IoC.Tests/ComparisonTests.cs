@@ -7,6 +7,7 @@ namespace IoC.Tests
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
+    using System.Text;
     using Autofac;
     using Castle.MicroKernel.Registration;
     using Castle.Windsor;
@@ -20,14 +21,15 @@ namespace IoC.Tests
 
     public class ComparisonTests
     {
-        private const string ThisIocName = "This";
+        private const string ThisIocName = "this";
+        private const string ReportFileName = "REPORT.html";
 
         private static readonly Dictionary<string, Action<int, IPerformanceCounter>> IocsGraphOf3ObjectsWithSingletone = new Dictionary<string, Action<int, IPerformanceCounter>>()
         {
             { "Castle.Windsor", CastleWindsorGraphOf3ObjectsWithSingletone },
             { "Unity", UnityGraphOf3ObjectsWithSingletone },
             { "Ninject", NinjectGraphOf3ObjectsWithSingletone },
-            { $"{ThisIocName} by Func", ThisByFuncGraphOf3ObjectsWithSingletone },
+            { $"{ThisIocName} using Func", ThisByFuncGraphOf3ObjectsWithSingletone },
             { ThisIocName, ThisGraphOf3ObjectsWithSingletone },
             { "Autofac", AutofacGraphOf3ObjectsWithSingletone },
         };
@@ -37,7 +39,7 @@ namespace IoC.Tests
             { "Castle.Windsor", CastleWindsorGraphOf3TransientObjects },
             { "Unity", UnityGraphOf3TransientObjects },
             { "Ninject", NinjectGraphOf3TransientObjects },
-            { $"{ThisIocName} by Func", ThisByFuncGraphOf3TransientObjects },
+            { $"{ThisIocName} using Func", ThisByFuncGraphOf3TransientObjects },
             { ThisIocName, ThisGraphOf3TransientObjects },
             { "Autofac", AutofacGraphOf3TransientObjects },
         };
@@ -66,7 +68,7 @@ namespace IoC.Tests
                 results.Add(result);
             }
 
-            SaveResults(results, $"Performance_GraphOf3ObjectsWithSingletone_{series}Times");
+            SaveResults(results, $"Speed: 2 objects and 1 singletone {series} times");
             results.Clear();
 
             foreach (var ioc in IocsGraphOf3TransientObjects)
@@ -81,7 +83,7 @@ namespace IoC.Tests
                 results.Add(result);
             }
 
-            SaveResults(results, $"Performance_GraphOf3TransientObjects_{series}Times");
+            SaveResults(results, $"Speed: 3 objects {series} times");
             results.Clear();
         }
 
@@ -107,7 +109,7 @@ namespace IoC.Tests
                 results.Add(result);
             }
 
-            SaveResults(results, $"Memory_GraphOf3ObjectsWithSingletone_{series}Times");
+            SaveResults(results, $"Memory usage: 2 objects and 1 singletone {series} times");
             results.Clear();
 
             foreach (var ioc in IocsGraphOf3TransientObjects)
@@ -119,7 +121,7 @@ namespace IoC.Tests
                 results.Add(result);
             }
 
-            SaveResults(results, $"Memory_GraphOf3TransientObjects_{series}Times");
+            SaveResults(results, $"Memory usage: 3 objects {series} times");
             results.Clear();
         }
 
@@ -324,11 +326,35 @@ namespace IoC.Tests
             return Environment.CurrentDirectory;
         }
 
+        private static string GetFramework()
+        {
+            return Path.GetFileName(GetBinDirectory());
+        }
+
+        private static string GetReportFilePath()
+        {
+            return Path.Combine(Path.Combine(GetBinDirectory(), ".."), ReportFileName);
+        }
+
         private static void SaveResults(IEnumerable<TestResult> results, string name)
         {
-            var resultsStr = string.Join(Environment.NewLine, results.OrderBy(i => i).Select((item, index) => $"{index + 1:00} {item}"));
-            var resultFileName = Path.Combine(GetBinDirectory(), $"{name}_Report.txt");
-            File.WriteAllText(resultFileName, resultsStr);
+            var body = new StringBuilder();
+            body.AppendLine($"<h2>{name}</h2>");
+            body.AppendLine($"<h3>{GetFramework()}</h3>");
+            body.AppendLine("<table border='1'>");
+            body.AppendLine("<tr>");
+            body.AppendLine("<th>Position</th>");
+            body.AppendLine("<th>IoC Container</th>");
+            body.AppendLine("<th>Index</th>");
+            body.AppendLine("</tr>");
+            foreach (var line in results.OrderBy(i => i).Select((item, index) => $"<td>{index + 1:00}</td>{item}"))
+            {
+                body.AppendLine("<tr>");
+                body.AppendLine(line);
+                body.AppendLine("</tr>");
+            }
+            body.AppendLine("</table>");
+            File.AppendAllText(GetReportFilePath(), body.ToString());
         }
     }
 

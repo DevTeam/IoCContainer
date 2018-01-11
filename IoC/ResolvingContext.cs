@@ -1,5 +1,6 @@
 ﻿namespace IoC
 {
+    // ReSharper disable once RedundantUsingDirective
     using System;
     using System.Diagnostics.CodeAnalysis;
 
