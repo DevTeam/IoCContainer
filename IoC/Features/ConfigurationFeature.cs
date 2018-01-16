@@ -3,8 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using Internal.Configuration;
+    using Core.Configuration;
 
+    [PublicAPI]
     public sealed class ConfigurationFeature : IConfiguration
     {
         public static readonly IConfiguration Shared = new ConfigurationFeature();
@@ -16,7 +17,6 @@
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-
             yield return container
                 .Bind<IConverter<IEnumerable<Statement>, BindingContext, BindingContext>>()
                 .Lifetime(Lifetime.Container)
@@ -57,16 +57,16 @@
 
             yield return container
                 .Bind<IConfiguration>()
-                .To(ctx =>
+                .ToFactory((key, curContainer, args) =>
                 {
-                    if (ctx.Args.Length != 1)
+                    if (args.Length != 1)
                     {
                         // ReSharper disable once NotResolvedInText
                         throw new ArgumentOutOfRangeException("Should have one argument.");
                     }
 
                     TextReader reader;
-                    switch (ctx.Args[0])
+                    switch (args[0])
                     {
                         case string text:
                             reader = new StringReader(text);
@@ -84,7 +84,7 @@
                             throw new ArgumentException("Invalid type of argument.");
                     }
 
-                    return new TextConfiguration(reader, ctx.ResolvingContainer.Get<IConverter<IEnumerable<Statement>, BindingContext, BindingContext>>());
+                    return new TextConfiguration(reader, curContainer.Get<IConverter<IEnumerable<Statement>, BindingContext, BindingContext>>());
                 });
         }
     }

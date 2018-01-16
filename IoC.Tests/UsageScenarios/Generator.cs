@@ -39,10 +39,10 @@
             {
                 var value = 0;
                 // The "value++" operation is tread safe
-                yield return container.Bind<int>().Tag(GeneratorType.Sequential).To(() => value++);
+                yield return container.Bind<int>().Tag(GeneratorType.Sequential).ToFunc(() => value++);
 
                 var random = new Random();
-                yield return container.Bind<int>().Tag(GeneratorType.Random).To(() => random.Next());
+                yield return container.Bind<int>().Tag(GeneratorType.Random).ToFunc(() => random.Next());
             }
         }
         // }

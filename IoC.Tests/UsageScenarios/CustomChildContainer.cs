@@ -1,7 +1,9 @@
 ﻿namespace IoC.Tests.UsageScenarios
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using Shouldly;
     using Xunit;
 
@@ -33,6 +35,7 @@
             }
         }
 
+        [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         public class MyContainer: IContainer
         {
             public MyContainer(IContainer currentContainer)
@@ -42,19 +45,37 @@
 
             public IContainer Parent { get; }
 
-            public bool TryRegister(IEnumerable<Key> keys, IFactory factory, ILifetime lifetime, out IDisposable registrationToken)
+            public bool TryRegister(IEnumerable<Key> keys, IoC.IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
             {
-                // Add your logic here or just ...
-                return Parent.TryRegister(keys, factory, lifetime, out registrationToken);
+                return Parent.TryRegister(keys, dependency, lifetime, out registrationToken);
             }
 
-            public bool TryGetResolver(Key key, out IResolver resolver)
+            public bool TryGetDependency(Key key, out IoC.IDependency dependency)
             {
-                // Add your logic here or just ...
-                return Parent.TryGetResolver(key, out resolver);
+                return Parent.TryGetDependency(key, out dependency);
+            }
+
+            public bool TryGetResolver<T>(Key key, out Resolver<T> resolver, IContainer container = null)
+            {
+                return Parent.TryGetResolver(key, out resolver, container);
             }
 
             public void Dispose() { }
+
+            IEnumerator IEnumerable.GetEnumerator()
+            {
+                return GetEnumerator();
+            }
+
+            public IEnumerator<Key> GetEnumerator()
+            {
+                return Parent.GetEnumerator();
+            }
+
+            public IDisposable Subscribe(IObserver<ContainerEvent> observer)
+            {
+                return Parent.Subscribe(observer);
+            }
         }
         // }
     }

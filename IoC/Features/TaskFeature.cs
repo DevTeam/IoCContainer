@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
-    using Internal;
 
+    [PublicAPI]
     public sealed  class TaskFeature : IConfiguration
     {
         public static readonly IConfiguration Shared = new TaskFeature();
@@ -24,31 +24,20 @@
 
         private sealed class InstanceTask<T> : Task<T>
         {
-            private static readonly Key ResolvingKey = new Key(typeof(T));
-            private static readonly bool IsGenericResolvingType = typeof(T).IsConstructedGenericType();
-
-            public InstanceTask(ResolvingContext context)
+            public InstanceTask(Context context)
                 :base(CreateFunction(context))
             {
             }
 
-            private static Func<T> CreateFunction(ResolvingContext context)
+            private static Func<T> CreateFunction(Context context)
             {
-                var resolvingKey = context.ResolvingKey.Tag == null ? ResolvingKey : new Key(typeof(T), context.ResolvingKey.Tag);
-                var resolvingContext = new ResolvingContext(context.RegistrationContext)
+                var resolvingKey = Key.Create<T>(context.Key.Tag);
+                if (!context.Container.TryGetResolver<T>(resolvingKey, out var resolver, context.Container))
                 {
-                    ResolvingKey = resolvingKey,
-                    ResolvingContainer = context.ResolvingContainer,
-                    Args = context.Args,
-                    IsGenericResolvingType = IsGenericResolvingType
-                };
-
-                if (!resolvingContext.ResolvingContainer.TryGetResolver(resolvingKey, out var resolver))
-                {
-                    resolver = resolvingContext.ResolvingContainer.Get<IIssueResolver>().CannotGetResolver(resolvingContext.ResolvingContainer, resolvingKey);
+                    resolver = context.Container.Get<IIssueResolver>().CannotGetResolver<T>(context.Container, resolvingKey);
                 }
 
-                return () => (T) resolver.Resolve(resolvingContext.ResolvingKey, resolvingContext.ResolvingContainer);
+                return () => resolver(context.Container);
             }
         }
     }

@@ -1,6 +1,7 @@
 ﻿namespace IoC.Tests
 {
     using System;
+    using Core;
     using JetBrains.dotMemoryUnit;
 
     public class MemoryPerformanceCounter: IPerformanceCounter

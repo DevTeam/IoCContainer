@@ -3,7 +3,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Reflection;
-    using Internal.Configuration;
+    using Core.Configuration;
     using Shouldly;
     using Xunit;
 

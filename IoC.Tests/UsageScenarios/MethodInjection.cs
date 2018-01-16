@@ -18,7 +18,7 @@
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<INamedService>().To<InitializingNamedService>(Has.Method("Initialize", Has.Arg("name", 0))))
+            using (container.Bind<INamedService>().To<InitializingNamedService>(Has.Method("Initialize", Has.Argument<string>(0).For("name"))))
             {
                 // Resolve the instance "alpha"
                 var instance = container.Get<INamedService>("alpha");

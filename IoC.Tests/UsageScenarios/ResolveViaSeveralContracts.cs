@@ -1,8 +1,10 @@
 ﻿namespace IoC.Tests.UsageScenarios
 {
+    using System.Diagnostics.CodeAnalysis;
     using Shouldly;
     using Xunit;
 
+    [SuppressMessage("ReSharper", "RedundantTypeArgumentsOfMethod")]
     public class ResolveViaSeveralContracts
     {
         [Fact]

@@ -9,7 +9,7 @@
     {
         [NotNull] IContainer Container { get; }
 
-        [NotNull][ItemNotNull] IEnumerable<Type> ContractsTypes { get; }
+        [NotNull][ItemNotNull] IEnumerable<Type> Types { get; }
 
         [NotNull][ItemCanBeNull] IEnumerable<object> Tags { get; }
 

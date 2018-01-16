@@ -6,6 +6,6 @@
     [PublicAPI]
     public interface IConfiguration
     {
-        [NotNull] IEnumerable<IDisposable> Apply([NotNull] IContainer container);
+        [NotNull][ItemNotNull] IEnumerable<IDisposable> Apply([NotNull] IContainer container);
     }
 }

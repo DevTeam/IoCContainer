@@ -14,6 +14,7 @@
     <PackageReference Include="Autofac" Version="4.6.2" />
     <PackageReference Include="Castle.Windsor" Version="4.1.0" />
     <PackageReference Include="JetBrains.dotMemoryUnit" Version="3.0.20171219.105559" />
+    <PackageReference Include="LightInject" Version="5.1.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.5.0" />
     <PackageReference Include="Moq" Version="4.8.0" />
     <PackageReference Include="Ninject" Version="3.3.4" />
@@ -36,10 +37,6 @@
     <None Update="UsageScenarios\README.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
     </None>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
 
 </Project>

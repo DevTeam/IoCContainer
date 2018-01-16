@@ -3,19 +3,18 @@
 [![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Key features:
-  - One of the fastest
+  - One of the fastest, almost as fast as without IoC
   - Produces minimal memory trafic
-  - Auto-wiring without any changes in a design of code
-  - Auto-wiring using a text metadata
-  - Supports custom factories/lifetimes/containers
+  - Flexible auto-wiring without any changes in a design of code
+  - Auto-wiring using a simple text metadata
+  - Fully extensible, supports custom lifetimes/containers
   - Reconfigurable on-the-fly
   - Supports concurrent and asynchronous resolving
-  - Has no additional dependencies
 
 Supported platforms:
-  - .NET 4.0+
+  - .NET 4.5+
   - .NET Core 1.0+
-  - .NET Standard 1.0+
+  - .NET Standard 1.1+
 
 ## [Schrödinger's cat](https://github.com/DevTeam/IoCContainer/tree/master/Samples/ShroedingersCat) shows how it works
 

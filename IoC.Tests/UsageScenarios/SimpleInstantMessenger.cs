@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using Core;
     using Moq;
     using Xunit;
 
@@ -26,9 +27,9 @@
             // Create the container
             using (var container = Container.Create())
             // Configure the container
-            using (container.Bind<int>().Tag("IdGenerator").To(() => id++))
+            using (container.Bind<int>().Tag("IdGenerator").ToFunc(() => id++))
             using (container.Bind(typeof(IInstantMessenger<>)).To(typeof(InstantMessenger<>)))
-            using (container.Bind<IMessage>().To<Message>(Has.Arg("address", 0), Has.Arg("text", 1), Has.Ref("id", "IdGenerator")))
+            using (container.Bind<IMessage>().To<Message>(Has.Constructor(Has.Argument<string>(0).For("address"), Has.Argument<string>(1).For("text"), Has.Dependency<int>("IdGenerator").For("id"))))
             {
                 var instantMessenger = container.Get<IInstantMessenger<IMessage>>();
                 using (instantMessenger.Subscribe(observer.Object))

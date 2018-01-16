@@ -16,7 +16,7 @@
             // Create the container
             using (var container = Container.Create())
             // Configure the container
-            using (container.Bind<IService>().To(() => new Service(new Dependency())))
+            using (container.Bind<IService>().ToFunc(() => new Service(new Dependency())))
             // Each dependency cound be resolve also using a resolving context
             // using (container.Bind<IService>().To(ctx => new Service(ctx.ResolvingContainer.Get<IDependency>())))
             {

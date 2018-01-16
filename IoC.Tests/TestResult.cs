@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
 
-    internal class TestResult : IComparable<TestResult>
+    internal sealed class TestResult : IComparable<TestResult>
     {
         private readonly string _name;
         [NotNull] private readonly ITestResult _testResult;

@@ -19,16 +19,16 @@
         {
             var expectedException = new InvalidOperationException("error");
             var issueResolver = new Mock<IIssueResolver>();
-            issueResolver.Setup(i => i.CyclicDependenceDetected(It.IsAny<ResolvingContext>(), It.IsAny<Type>(), 32)).Throws(expectedException);
+            issueResolver.Setup(i => i.CyclicDependenceDetected(It.IsAny<Key>(), 128)).Throws(expectedException);
 
             // Create the container
             using (var container = Container.Create())
             // Configure the container
-            using (container.Bind<IIssueResolver>().To(ctx => issueResolver.Object))
-            using (container.Bind<ILink>().To(typeof(Link), Has.Ref("link", 1)))
-            using (container.Bind<ILink>().Tag(1).To(typeof(Link), Has.Ref("link", 2)))
-            using (container.Bind<ILink>().Tag(2).To(typeof(Link), Has.Ref("link", 3)))
-            using (container.Bind<ILink>().Tag(3).To(typeof(Link), Has.Ref("link", 1)))
+            using (container.Bind<IIssueResolver>().ToValue(issueResolver.Object))
+            using (container.Bind<ILink>().To<Link>(Has.Constructor(Has.Dependency<ILink>(1).For("link"))))
+            using (container.Bind<ILink>().Tag(1).To<Link>(Has.Constructor(Has.Dependency<ILink>(2).For("link"))))
+            using (container.Bind<ILink>().Tag(2).To<Link>(Has.Constructor(Has.Dependency<ILink>(3).For("link"))))
+            using (container.Bind<ILink>().Tag(3).To<Link>(Has.Constructor(Has.Dependency<ILink>(1).For("link"))))
             {
                 try
                 {
@@ -41,7 +41,7 @@
                 }
             }
 
-            issueResolver.Verify(i => i.CyclicDependenceDetected(It.IsAny<ResolvingContext>(), It.IsAny<Type>(), 32));
+            issueResolver.Verify(i => i.CyclicDependenceDetected(Key.Create<ILink>(1), 128));
         }
 
         public interface ILink

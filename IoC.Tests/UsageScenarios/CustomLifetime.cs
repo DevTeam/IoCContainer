@@ -28,9 +28,9 @@
 
         public class MyTransientLifetime : ILifetime
         {
-            public object GetOrCreate(ResolvingContext context, IFactory factory)
+            public T GetOrCreate<T>(Key key, IContainer container, object[] args, Resolver<T> resolver)
             {
-                return factory.Create(context);
+                return resolver(container, args);
             }
         }
         // }

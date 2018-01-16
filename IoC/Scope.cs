@@ -1,5 +1,6 @@
 ﻿namespace IoC
 {
+    [PublicAPI]
     public enum Scope
     {
         Current,

@@ -3,19 +3,18 @@
 [![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Key features:
-  - One of the fastest
+  - One of the fastest, almost as fast as without IoC
   - Produces minimal memory trafic
-  - Auto-wiring without any changes in a design of code
-  - Auto-wiring using a text metadata
-  - Supports custom factories/lifetimes/containers
+  - Flexible auto-wiring without any changes in a design of code
+  - Auto-wiring using a simple text metadata
+  - Fully extensible, supports custom lifetimes/containers
   - Reconfigurable on-the-fly
   - Supports concurrent and asynchronous resolving
-  - Has no additional dependencies
 
 Supported platforms:
-  - .NET 4.0+
+  - .NET 4.5+
   - .NET Core 1.0+
-  - .NET Standard 1.0+
+  - .NET Standard 1.1+
 
 ## [Schrödinger's cat](https://github.com/DevTeam/IoCContainer/tree/master/Samples/ShroedingersCat) shows how it works
 
@@ -293,19 +292,11 @@ public void Run()
     // Create the container
     using (var container = Container.Create())
     // Configure the container
-    using (container.Bind<IService>().To(new Factory()))
+    using (container.Bind<IService>().ToFactory((key, cutContainer, args) => new Service(new Dependency())))
     {
         // Resolve the instance
         var instance = container.Get<IService>();
         instance.ShouldBeOfType<Service>();
-    }
-}
-
-public class Factory: IFactory
-{
-    public object Create(ResolvingContext context)
-    {
-        return new Service(new Dependency());
     }
 }
 ```
@@ -317,7 +308,7 @@ public class Factory: IFactory
 // Create the container
 using (var container = Container.Create())
 // Configure the container
-using (container.Bind<IService>().To(() => new Service(new Dependency())))
+using (container.Bind<IService>().ToFunc(() => new Service(new Dependency())))
 // Each dependency cound be resolve also using a resolving context
 // using (container.Bind<IService>().To(ctx => new Service(ctx.ResolvingContainer.Get<IDependency>())))
 {
@@ -336,7 +327,7 @@ using (container.Bind<IService>().To(() => new Service(new Dependency())))
 using (var container = Container.Create())
 // Configure the container
 using (container.Bind<IDependency>().Tag("MyDep").To<Dependency>())
-using (container.Bind<IService>().To<Service>(Has.Ref("dependency", "MyDep")))
+using (container.Bind<IService>().To<Service>(Has.Constructor(Has.Dependency<IDependency>("MyDep").For("dependency"))))
 {
     // Resolve the instance
     var instance = container.Get<IService>();
@@ -351,7 +342,7 @@ using (container.Bind<IService>().To<Service>(Has.Ref("dependency", "MyDep")))
 using (var container = Container.Create())
 // Configure the container
 using (container.Bind<IDependency>().To<Dependency>())
-using (container.Bind<INamedService>().To<InitializingNamedService>(Has.Method("Initialize", Has.Arg("name", 0))))
+using (container.Bind<INamedService>().To<InitializingNamedService>(Has.Method("Initialize", Has.Argument<string>(0).For("name"))))
 {
     // Resolve the instance "alpha"
     var instance = container.Get<INamedService>("alpha");
@@ -374,7 +365,7 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(Has.Method("
 using (var container = Container.Create())
 // Configure the container
 using (container.Bind<IDependency>().To<Dependency>())
-using (container.Bind<INamedService>().To<InitializingNamedService>(Has.Property("Name", 0)))
+using (container.Bind<INamedService>().To<InitializingNamedService>(Has.Property("Name", Has.Argument<string>(0).At(0))))
 {
     // Resolve the instance "alpha"
     var instance = container.Get<INamedService>("alpha");
@@ -397,7 +388,7 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(Has.Property
 using (var container = Container.Create())
 // Configure the container
 using (container.Bind<IDependency>().To<Dependency>())
-using (container.Bind<INamedService>().To(ctx => new NamedService(ctx.ResolvingContainer.Get<IDependency>(), (string)ctx.Args[0])))
+using (container.Bind<INamedService>().ToFunc(ctx => new NamedService(ctx.Container.Get<IDependency>(), (string)ctx.Args[0])))
 {
     // Resolve the instance "alpha"
     var instance = container.Get<INamedService>("alpha");
@@ -420,7 +411,7 @@ using (container.Bind<INamedService>().To(ctx => new NamedService(ctx.ResolvingC
 using (var container = Container.Create())
 // Configure the container
 using (container.Bind<IDependency>().To<Dependency>())
-using (container.Bind<INamedService>().To<NamedService>(Has.Arg("name", 0)))
+using (container.Bind<INamedService>().To<NamedService>(Has.Constructor(Has.Argument<string>(0).For("name"))))
 {
     // Resolve the instance "alpha"
     var instance = container.Get<INamedService>("alpha");
@@ -445,7 +436,7 @@ var disposableService = new Mock<IDisposableService>();
 using (var container = Container.Create())
 {
     // Configure the container
-    container.Bind<IService>().Lifetime(Lifetime.Singletone).To(() => disposableService.Object).ToSelf();
+    container.Bind<IService>().Lifetime(Lifetime.Singletone).ToFunc(() => disposableService.Object).ToSelf();
 
     // Resolve instances
     var instance1 = container.Get<IService>();
@@ -556,6 +547,7 @@ public void Run()
     }
 }
 
+[SuppressMessage("ReSharper", "PossibleNullReferenceException")]
 public class MyContainer: IContainer
 {
     public MyContainer(IContainer currentContainer)
@@ -565,19 +557,37 @@ public class MyContainer: IContainer
 
     public IContainer Parent { get; }
 
-    public bool TryRegister(IEnumerable<Key> keys, IFactory factory, ILifetime lifetime, out IDisposable registrationToken)
+    public bool TryRegister(IEnumerable<Key> keys, IoC.IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
     {
-        // Add your logic here or just ...
-        return Parent.TryRegister(keys, factory, lifetime, out registrationToken);
+        return Parent.TryRegister(keys, dependency, lifetime, out registrationToken);
     }
 
-    public bool TryGetResolver(Key key, out IResolver resolver)
+    public bool TryGetDependency(Key key, out IoC.IDependency dependency)
     {
-        // Add your logic here or just ...
-        return Parent.TryGetResolver(key, out resolver);
+        return Parent.TryGetDependency(key, out dependency);
+    }
+
+    public bool TryGetResolver<T>(Key key, out Resolver<T> resolver, IContainer container = null)
+    {
+        return Parent.TryGetResolver(key, out resolver, container);
     }
 
     public void Dispose() { }
+
+    IEnumerator IEnumerable.GetEnumerator()
+    {
+        return GetEnumerator();
+    }
+
+    public IEnumerator<Key> GetEnumerator()
+    {
+        return Parent.GetEnumerator();
+    }
+
+    public IDisposable Subscribe(IObserver<ContainerEvent> observer)
+    {
+        return Parent.Subscribe(observer);
+    }
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomChildContainer.cs)
@@ -602,9 +612,9 @@ public void Run()
 
 public class MyTransientLifetime : ILifetime
 {
-    public object GetOrCreate(ResolvingContext context, IFactory factory)
+    public T GetOrCreate<T>(Key key, IContainer container, object[] args, Resolver<T> resolver)
     {
-        return factory.Create(context);
+        return resolver(container, args);
     }
 }
 ```
@@ -619,9 +629,9 @@ public void Run()
 
     // Create the container
     using (var container = Container.Create())
-    using (container.Bind<ICounter>().To(() => counter.Object))
+    using (container.Bind<ICounter>().ToFunc(() => counter.Object))
     // Replace the Singletone lifetime
-    using (container.Bind<ILifetime>().Tag(Lifetime.Singletone).To<MySingletoneLifetime>(Has.Ref("baseSingletineLifetime", Lifetime.Singletone, Scope.Parent)))
+    using (container.Bind<ILifetime>().Tag(Lifetime.Singletone).To<MySingletoneLifetime>(Has.Constructor(Has.Dependency<ILifetime>(Lifetime.Singletone, Scope.Parent).For("baseSingletoneLifetime"))))
     // Configure the container
     using (container.Bind<IDependency>().To<Dependency>())
     using (container.Bind<IService>().Lifetime(Lifetime.Singletone).To<Service>())
@@ -652,10 +662,10 @@ public class MySingletoneLifetime : ILifetime
         _counter = counter;
     }
 
-    public object GetOrCreate(ResolvingContext context, IFactory factory)
+    public T GetOrCreate<T>(Key key, IContainer container, object[] args, Resolver<T> resolver)
     {
         _counter.Increment();
-        return _baseSingletoneLifetime.GetOrCreate(context, factory);
+        return _baseSingletoneLifetime.GetOrCreate(key, container, args, resolver);
     }
 }
 ```
@@ -688,10 +698,10 @@ public class Generators: IConfiguration
     {
         var value = 0;
         // The "value++" operation is tread safe
-        yield return container.Bind<int>().Tag(GeneratorType.Sequential).To(() => value++);
+        yield return container.Bind<int>().Tag(GeneratorType.Sequential).ToFunc(() => value++);
 
         var random = new Random();
-        yield return container.Bind<int>().Tag(GeneratorType.Random).To(() => random.Next());
+        yield return container.Bind<int>().Tag(GeneratorType.Random).ToFunc(() => random.Next());
     }
 }
 ```
@@ -710,9 +720,9 @@ public void Run()
     // Create the container
     using (var container = Container.Create())
     // Configure the container
-    using (container.Bind<int>().Tag("IdGenerator").To(() => id++))
+    using (container.Bind<int>().Tag("IdGenerator").ToFunc(() => id++))
     using (container.Bind(typeof(IInstantMessenger<>)).To(typeof(InstantMessenger<>)))
-    using (container.Bind<IMessage>().To<Message>(Has.Arg("address", 0), Has.Arg("text", 1), Has.Ref("id", "IdGenerator")))
+    using (container.Bind<IMessage>().To<Message>(Has.Constructor(Has.Argument<string>(0).For("address"), Has.Argument<string>(1).For("text"), Has.Dependency<int>("IdGenerator").For("id"))))
     {
         var instantMessenger = container.Get<IInstantMessenger<IMessage>>();
         using (instantMessenger.Subscribe(observer.Object))
@@ -791,15 +801,15 @@ public void Run()
     // Create the base container
     using (var baseContainer = Container.Create("base"))
     // Configure the base container for base logger
-    using (baseContainer.Bind<IConsole>().To(ctx => console.Object))
-    using (baseContainer.Bind<ILogger>().To(typeof(Logger)))
+    using (baseContainer.Bind<IConsole>().ToFunc(ctx => console.Object))
+    using (baseContainer.Bind<ILogger>().To<Logger>())
     {
         // Configure some new container
         using (var childContainer = baseContainer.CreateChild("child"))
         // And add some console
-        using (childContainer.Bind<IConsole>().To(ctx => console.Object))
+        using (childContainer.Bind<IConsole>().ToFunc(ctx => console.Object))
         // And add logger's wrapper, specifing that resolving of the "logger" dependency should be done from the parent container
-        using (childContainer.Bind<ILogger>().To(typeof(TimeLogger), Has.Ref("logger", Scope.Parent)))
+        using (childContainer.Bind<ILogger>().To<TimeLogger>(Has.Constructor(Has.Dependency<ILogger>(null, Scope.Parent).For("baseLogger"))))
         {
             var logger = childContainer.Get<ILogger>();
 
@@ -861,16 +871,16 @@ public void Run()
 {
     var expectedException = new InvalidOperationException("error");
     var issueResolver = new Mock<IIssueResolver>();
-    issueResolver.Setup(i => i.CyclicDependenceDetected(It.IsAny<ResolvingContext>(), It.IsAny<Type>(), 32)).Throws(expectedException);
+    issueResolver.Setup(i => i.CyclicDependenceDetected(It.IsAny<Key>(), 128)).Throws(expectedException);
 
     // Create the container
     using (var container = Container.Create())
     // Configure the container
-    using (container.Bind<IIssueResolver>().To(ctx => issueResolver.Object))
-    using (container.Bind<ILink>().To(typeof(Link), Has.Ref("link", 1)))
-    using (container.Bind<ILink>().Tag(1).To(typeof(Link), Has.Ref("link", 2)))
-    using (container.Bind<ILink>().Tag(2).To(typeof(Link), Has.Ref("link", 3)))
-    using (container.Bind<ILink>().Tag(3).To(typeof(Link), Has.Ref("link", 1)))
+    using (container.Bind<IIssueResolver>().ToValue(issueResolver.Object))
+    using (container.Bind<ILink>().To<Link>(Has.Constructor(Has.Dependency<ILink>(1).For("link"))))
+    using (container.Bind<ILink>().Tag(1).To<Link>(Has.Constructor(Has.Dependency<ILink>(2).For("link"))))
+    using (container.Bind<ILink>().Tag(2).To<Link>(Has.Constructor(Has.Dependency<ILink>(3).For("link"))))
+    using (container.Bind<ILink>().Tag(3).To<Link>(Has.Constructor(Has.Dependency<ILink>(1).For("link"))))
     {
         try
         {
@@ -883,7 +893,7 @@ public void Run()
         }
     }
 
-    issueResolver.Verify(i => i.CyclicDependenceDetected(It.IsAny<ResolvingContext>(), It.IsAny<Type>(), 32));
+    issueResolver.Verify(i => i.CyclicDependenceDetected(Key.Create<ILink>(1), 128));
 }
 
 public interface ILink

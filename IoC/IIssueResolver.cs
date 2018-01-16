@@ -1,30 +1,21 @@
 ﻿namespace IoC
 {
     using System;
-    using System.Reflection;
 
     [PublicAPI]
     public interface IIssueResolver
     {
-        [NotNull] IDisposable CannotRegister([NotNull] IContainer container, [NotNull] Key[] keys);
+        [NotNull] IDisposable CannotRegister([NotNull] IContainer container, [NotNull][ItemNotNull] Key[] keys);
 
-        [NotNull] object CannotResolve([NotNull] IContainer container, Key key);
+        [NotNull] object CannotResolve([NotNull] IContainer container, [NotNull] Key key);
 
-        [NotNull] IResolver CannotGetResolver([NotNull] IContainer container, Key key);
+        [NotNull] Resolver<T> CannotGetResolver<T>([NotNull] IContainer container, [NotNull] Key key);
 
-        [NotNull] ConstructorInfo CannotFindConsructor([NotNull] Type type, [NotNull] params Has[] dependencies);
+        [NotNull][ItemNotNull] Type[] CannotGetGenericTypeArguments([NotNull] Type type);
 
-        [NotNull] MethodInfo CannotFindMethod([NotNull] Type type, HasMethod method);
+        [NotNull] Factory<T> CannotBeCreated<T>([NotNull] Type type);
 
-        [NotNull] Type[] CannotGetGenericTypeArguments([NotNull] Type type);
-
-        [NotNull] IFactory CannotBeCeated([NotNull] Type type);
-
-        int CannotFindParameter([NotNull][ItemNotNull] ParameterInfo[] parameters, Parameter parameter);
-
-        void CyclicDependenceDetected(ResolvingContext context, [NotNull] Type type, int reentrancy);
-
-        [CanBeNull] object CannotResolveParameter([NotNull] Type type, Has dependency, [NotNull] ParameterInfo parameter);
+        void CyclicDependenceDetected([NotNull] Key key, int reentrancy);
 
         [NotNull] Type CannotParseType([NotNull] string statementText, int statementLineNumber, int statementPosition, [NotNull] string typeName);
 

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Diagnostics;
+    using Core;
 
     public class TotalTimePerformanceCounter: IPerformanceCounter
     {

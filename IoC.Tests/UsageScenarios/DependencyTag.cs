@@ -18,7 +18,7 @@
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().Tag("MyDep").To<Dependency>())
-            using (container.Bind<IService>().To<Service>(Has.Ref("dependency", "MyDep")))
+            using (container.Bind<IService>().To<Service>(Has.Constructor(Has.Dependency<IDependency>("MyDep").For("dependency"))))
             {
                 // Resolve the instance
                 var instance = container.Get<IService>();

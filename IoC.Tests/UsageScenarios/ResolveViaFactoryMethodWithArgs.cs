@@ -18,7 +18,7 @@
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<INamedService>().To(ctx => new NamedService(ctx.ResolvingContainer.Get<IDependency>(), (string)ctx.Args[0])))
+            using (container.Bind<INamedService>().ToFunc(ctx => new NamedService(ctx.Container.Get<IDependency>(), (string)ctx.Args[0])))
             {
                 // Resolve the instance "alpha"
                 var instance = container.Get<INamedService>("alpha");

@@ -16,19 +16,11 @@
             // Create the container
             using (var container = Container.Create())
             // Configure the container
-            using (container.Bind<IService>().To(new Factory()))
+            using (container.Bind<IService>().ToFactory((key, cutContainer, args) => new Service(new Dependency())))
             {
                 // Resolve the instance
                 var instance = container.Get<IService>();
                 instance.ShouldBeOfType<Service>();
-            }
-        }
-
-        public class Factory: IFactory
-        {
-            public object Create(ResolvingContext context)
-            {
-                return new Service(new Dependency());
             }
         }
         // }

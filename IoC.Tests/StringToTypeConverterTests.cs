@@ -4,7 +4,7 @@ namespace IoC.Tests
     using System;
     using System.Linq;
     using System.Reflection;
-    using Internal.Configuration;
+    using Core.Configuration;
     using IoC;
     using Shouldly;
     using Xunit;
@@ -22,9 +22,9 @@ namespace IoC.Tests
         [InlineData("", "", "System.Func<>", true, typeof(Func<>))]
         [InlineData("", "System", "Func<int, string>", true, typeof(Func<int,string>))]
         [InlineData("", "", "System.Func<int, string>", true, typeof(Func<int, string>))]
-        [InlineData("IoC", "IoC, System", "Func<IResolver, string>", true, typeof(Func<IResolver, string>))]
-        [InlineData("IoC", "IoC", "IResolver", true, typeof(IResolver))]
-        [InlineData("IoC", "", "IoC.IResolver", true, typeof(IResolver))]
+        [InlineData("IoC", "IoC, System", "Func<IContainer, string>", true, typeof(Func<IContainer, string>))]
+        [InlineData("IoC", "IoC", "IContainer", true, typeof(IContainer))]
+        [InlineData("IoC", "", "IoC.IContainer", true, typeof(IContainer))]
         [InlineData("IoC.Tests", "IoC.Tests", "IService<>", true, typeof(IService<>))]
         [InlineData("IoC.Tests", "", "IoC.Tests.IService<>", true, typeof(IService<>))]
         [InlineData("IoC.Tests", "IoC.Tests", "IService<int,string>", true, typeof(IService<int, string>))]

@@ -18,9 +18,9 @@
 
             // Create the container
             using (var container = Container.Create())
-            using (container.Bind<ICounter>().To(() => counter.Object))
+            using (container.Bind<ICounter>().ToFunc(() => counter.Object))
             // Replace the Singletone lifetime
-            using (container.Bind<ILifetime>().Tag(Lifetime.Singletone).To<MySingletoneLifetime>(Has.Ref("baseSingletineLifetime", Lifetime.Singletone, Scope.Parent)))
+            using (container.Bind<ILifetime>().Tag(Lifetime.Singletone).To<MySingletoneLifetime>(Has.Constructor(Has.Dependency<ILifetime>(Lifetime.Singletone, Scope.Parent).For("baseSingletoneLifetime"))))
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().Lifetime(Lifetime.Singletone).To<Service>())
@@ -51,10 +51,10 @@
                 _counter = counter;
             }
 
-            public object GetOrCreate(ResolvingContext context, IFactory factory)
+            public T GetOrCreate<T>(Key key, IContainer container, object[] args, Resolver<T> resolver)
             {
                 _counter.Increment();
-                return _baseSingletoneLifetime.GetOrCreate(context, factory);
+                return _baseSingletoneLifetime.GetOrCreate(key, container, args, resolver);
             }
         }
         // }
