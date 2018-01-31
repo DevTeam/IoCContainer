@@ -114,7 +114,7 @@ The results of the [comparison tests](https://github.com/DevTeam/IoCContainer/bl
 * [Auto-wiring hints](#auto-wiring-hints)
 * [Resolve all possible items as IEnumerable<>](#resolve-all-possible-items-as-ienumerable<>)
 * [Func get](#func-get)
-* [Singletone](#singletone)
+* [Singletone lifetime](#singletone-lifetime)
 * [Tags](#tags)
 * [Factory Method](#factory-method)
 * [Func](#func)
@@ -130,8 +130,10 @@ The results of the [comparison tests](https://github.com/DevTeam/IoCContainer/bl
 * [Configuration text](#configuration-text)
 * [Change configuration on-the-fly](#change-configuration-on-the-fly)
 * [Custom Child Container](#custom-child-container)
+* [Custom Dependency](#custom-dependency)
 * [Custom Lifetime](#custom-lifetime)
 * [Replace Lifetime](#replace-lifetime)
+* [Scope lifetime](#scope-lifetime)
 * [Generator](#generator)
 * [Instant Messenger](#instant-messenger)
 * [Wrapper](#wrapper)
@@ -265,7 +267,7 @@ using (container.Bind<IService>().To<Service>())
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FuncGet.cs)
 
-### Singletone
+### Singletone lifetime
 
 ``` CSharp
 // Create the container
@@ -284,9 +286,9 @@ using (container.Bind<IService>().Lifetime(Lifetime.Singletone).To<Service>())
 // Other lifetimes are:
 // Transient - A new instance each time
 // Container - Singletone per container
-// Resolve - Singletone per resolve
+// Scope - Singletone per scope
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Singletone.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SingletoneLifetime.cs)
 
 ### Tags
 
@@ -613,14 +615,24 @@ public class MyContainer: IContainer
         return Parent.TryRegister(keys, dependency, lifetime, out registrationToken);
     }
 
-    public bool TryGetDependency(Key key, out IoC.IDependency dependency)
+    public bool TryGetDependency(Key key, out IoC.IDependency dependency, out ILifetime lifetime)
     {
-        return Parent.TryGetDependency(key, out dependency);
+        return Parent.TryGetDependency(key, out dependency, out lifetime);
     }
 
     public bool TryGetResolver<T>(Key key, out Resolver<T> resolver, IContainer container = null)
     {
         return Parent.TryGetResolver(key, out resolver, container);
+    }
+
+    public bool TryGet(Type type, object tag, out object instance, params object[] args)
+    {
+        return Parent.TryGet(type, tag, out instance, args);
+    }
+
+    public bool TryGet<T>(object tag, out T instance, params object[] args)
+    {
+        return Parent.TryGet(tag, out instance, args);
     }
 
     public void Dispose() { }
@@ -643,6 +655,43 @@ public class MyContainer: IContainer
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomChildContainer.cs)
 
+### Custom Dependency
+
+``` CSharp
+public void Run()
+{
+    // Create the container
+    using (var container = Container.Create())
+    // Configure the container
+    using (container.Bind<string>().To(new ConstDependency<string>("abc")))
+    {
+        // Resolve the instance
+        var contsVal = container.Get<string>();
+
+        contsVal.ShouldBe("abc");
+    }
+}
+
+// Custom dependency should implement 2 interfaces.
+public class ConstDependency<T> : IoC.IDependency, IEmitable
+{
+    private readonly T _constValue;
+
+    public ConstDependency(T constValue)
+    {
+        _constValue = constValue;
+    }
+
+    public Type Type => typeof(T);
+
+    public Expression Emit(Expression baseExpression)
+    {
+        return Expression.Constant(_constValue);
+    }
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomDependency.cs)
+
 ### Custom Lifetime
 
 ``` CSharp
@@ -663,7 +712,7 @@ public void Run()
 
 public class MyTransientLifetime : ILifetime
 {
-    public T GetOrCreate<T>(Key key, IContainer container, object[] args, Resolver<T> resolver)
+    public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
     {
         return resolver(container, args);
     }
@@ -713,14 +762,63 @@ public class MySingletoneLifetime : ILifetime
         _counter = counter;
     }
 
-    public T GetOrCreate<T>(Key key, IContainer container, object[] args, Resolver<T> resolver)
+    public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
     {
         _counter.Increment();
-        return _baseSingletoneLifetime.GetOrCreate(key, container, args, resolver);
+        return _baseSingletoneLifetime.GetOrCreate(container, args, resolver);
     }
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ReplaceLifetime.cs)
+
+### Scope lifetime
+
+``` CSharp
+// Create the container
+using (var container = Container.Create())
+// Configure the container
+using (container.Bind<IDependency>().Lifetime(Lifetime.Scope).To<Dependency>())
+{
+    using (container.Bind<IService>().Lifetime(Lifetime.Scope).To<Service>())
+    {
+        // Default resolving scope
+        var instance1 = container.Get<IService>();
+        var instance2 = container.Get<IService>();
+        instance1.ShouldBe(instance2);
+
+        // Resolving in scope "1"
+        using (new ResolvingScope("1"))
+        {
+            var instance3 = container.Get<IService>();
+            var instance4 = container.Get<IService>();
+
+            instance3.ShouldBe(instance4);
+            instance3.ShouldNotBe(instance1);
+        }
+
+        // Default resolving scope again
+        var instance5 = container.Get<IService>();
+        instance5.ShouldBe(instance1);
+    }
+
+    // Reconfigure to check dependencies only
+    using (container.Bind<IService>().Lifetime(Lifetime.Transient).To<Service>())
+    {
+        // Default resolving scope
+        var instance1 = container.Get<IService>();
+        var instance2 = container.Get<IService>();
+        instance1.Dependency.ShouldBe(instance2.Dependency);
+
+        // Resolving in scope "1"
+        using (new ResolvingScope("1"))
+        {
+            var instance3 = container.Get<IService>();
+            instance3.Dependency.ShouldNotBe(instance1.Dependency);
+        }
+    }
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ScopeLifetime.cs)
 
 ### Generator
 
@@ -748,8 +846,7 @@ public class Generators: IConfiguration
     public IEnumerable<IDisposable> Apply(IContainer container)
     {
         var value = 0;
-        // The "value++" operation is tread safe
-        yield return container.Bind<int>().Tag(GeneratorType.Sequential).ToFunc(() => value++);
+        yield return container.Bind<int>().Tag(GeneratorType.Sequential).ToFunc(() => Interlocked.Increment(ref value));
 
         var random = new Random();
         yield return container.Bind<int>().Tag(GeneratorType.Random).ToFunc(() => random.Next());
@@ -970,18 +1067,31 @@ public class Dependency : IDependency { }
 
 public interface IService
 {
+    IDependency Dependency { get; }
+
     string State { get; }
 }
 
 public interface IAnotherService { }
 
-public interface IDisposableService : IService, IDisposable { }
+public interface IDisposableService : IService, IDisposable
+{
+}
 
 public class Service : IService, IAnotherService
 {
-    public Service(IDependency dependency) { }
+    public Service(IDependency dependency)
+    {
+        Dependency = dependency;
+    }
 
-    public Service(IDependency dependency, string state) { State = state; }
+    public Service(IDependency dependency, string state)
+    {
+        Dependency = dependency;
+        State = state;
+    }
+
+    public IDependency Dependency { get; }
 
     public string State { get; }
 }

@@ -1,7 +1,7 @@
 ﻿namespace IoC.Tests
 {
     using Core;
-    using Core.Emiters;
+    using Core.Emitters;
     using Dependencies;
     using Moq;
     using Shouldly;
@@ -29,7 +29,7 @@
         {
             // Given
             var resolverGenerator = CreateInstance();
-            using (var resolver = resolverGenerator.Generate<object>(Key.Create<int>(), Mock.Of<IContainer>(), Has.Argument<int>(1)))
+            using (var resolver = resolverGenerator.Generate<int>(Key.Create<int>(), Mock.Of<IContainer>(), Has.Argument<int>(1)))
             {
                 // When
                 var instance = resolver.Resolve(Mock.Of<IContainer>(), 10, 20);
@@ -79,11 +79,12 @@
         {
             return new ResolverGenerator(
                 new DependencyEmitter(
-                    Mock.Of<IEmitter<Value>>(),
+                    Mock.Of<IDependencyEmitter<Value>>(),
                     new ArgumentEmitter(),
-                    Mock.Of<IEmitter<FactoryMethod>>(),
-                    Mock.Of<IEmitter<StaticMethod>>(),
-                    Mock.Of<IEmitter<Autowiring>>()));
+                    Mock.Of<IDependencyEmitter<FactoryMethod>>(),
+                    Mock.Of<IDependencyEmitter<StaticMethod>>(),
+                    Mock.Of<IDependencyEmitter<Autowiring>>()),
+                Mock.Of<ILifetimeEmitter>());
         }
     }
 }

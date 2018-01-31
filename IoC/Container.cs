@@ -1,32 +1,35 @@
 ﻿namespace IoC
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
+    using System.Collections;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Globalization;
-    using System.IO;
     using System.Linq;
     using System.Runtime.CompilerServices;
-    // ReSharper disable once RedundantUsingDirective
     using System.Threading;
-    // ReSharper disable once RedundantUsingDirective
-    using System.Threading.Tasks;
     using Core;
+    using Core.Collections;
     using Features;
 
-    [SuppressMessage("ReSharper", "UnusedMember.Global")]
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     [PublicAPI]
-    public static class Container
+    public sealed class Container: IContainer, IResourceStore, IObserver<ContainerEvent>
     {
         private const string RootName = "container://";
         private static long _containerId;
-        [ThreadStatic] private static object _tagValue;
+        [NotNull] private readonly ConcurrentDictionary<Key, RegistrationEntry> _registrationEntries = new ConcurrentDictionary<Key, RegistrationEntry>();
+        [NotNull] private readonly IContainer _parent;
+        [NotNull] private readonly string _name;
+        [NotNull] private readonly Subject<ContainerEvent> _eventSubject = new Subject<ContainerEvent>();
+        [NotNull] private readonly System.Collections.Generic.List<IDisposable> _resources = new System.Collections.Generic.List<IDisposable>();
+        [NotNull] private volatile HashTable<Key, object> _resolversByKey = HashTable<Key, object>.Empty;
+        [NotNull] private volatile HashTable<Type, object> _resolversByType = HashTable<Type, object>.Empty;
 
         [NotNull]
-        public static IContainer Create([NotNull] string name = "")
+        public static Container Create([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            var rootContainer = new ChildContainer(
+            var rootContainer = new Container(
                 RootName,
                 CoreFeature.Shared,
                 EnumerableFeature.Shared,
@@ -34,524 +37,357 @@
                 TaskFeature.Shared,
                 ConfigurationFeature.Shared);
 
-            return new ChildContainer($"{RootName}{CreateContainerName(name)}", rootContainer, true);
+            return new Container($"{RootName}{CreateContainerName(name)}", rootContainer, true);
         }
 
         [NotNull]
-        public static IContainer CreatePure([NotNull] string name = "")
+        public static Container CreatePure([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            var rootContainer = new ChildContainer(RootName, CoreFeature.Shared);
-            return new ChildContainer($"{RootName}{CreateContainerName(name)}", rootContainer, true);
+            var rootContainer = new Container(RootName, CoreFeature.Shared);
+            return new Container($"{RootName}{CreateContainerName(name)}", rootContainer, true);
         }
 
-        [NotNull]
-        public static IContainer CreateChild([NotNull] this IContainer parent, [NotNull] string name = "")
+        internal Container([NotNull] string name = "", [NotNull][ItemNotNull] params IConfiguration[] configurations)
         {
-            if (parent == null) throw new ArgumentNullException(nameof(parent));
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            return parent.Tag(Scope.Child).Get<IContainer>(name);
+            if (configurations == null) throw new ArgumentNullException(nameof(configurations));
+            _name = name ?? throw new ArgumentNullException(nameof(name));
+            _parent = new NullContainer();
+            if (configurations.Length > 0)
+            {
+                _resources.Add(this.Apply(configurations));
+            }
         }
 
-        [NotNull]
-        public static IRegistration<object> Bind([NotNull] this IContainer container, [NotNull][ItemNotNull] params Type[] types)
+        internal Container([NotNull] string name, [NotNull] IContainer parent, bool root, [NotNull][ItemNotNull] params IConfiguration[] configurations)
         {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (types == null) throw new ArgumentNullException(nameof(types));
-            if (types.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(types));
-            return new Registration<object>(container, types);
+            if (configurations == null) throw new ArgumentNullException(nameof(configurations));
+            _name = name ?? throw new ArgumentNullException(nameof(name));
+            _parent = parent ?? throw new ArgumentNullException(nameof(parent));
+
+            // Subscribe to events from the parent container
+            ((IResourceStore)this).AddResource(_parent.Subscribe(_eventSubject));
+
+            // Subscribe to reset resolvers
+            ((IResourceStore)this).AddResource(_eventSubject.Subscribe(this));
+
+            if (_parent is IResourceStore resourceStore)
+            {
+                resourceStore.AddResource(this);
+            }
         }
 
-        [NotNull]
-        public static IRegistration<T> Bind<T>([NotNull] this IContainer container)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Registration<T>(container, typeof(T));
-        }
+        public IContainer Parent => _parent;
 
-        [NotNull]
-        public static IRegistration<T> Bind<T, T1>([NotNull] this IContainer container)
-            where T: T1
+        public bool TryRegister(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
         {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Registration<T>(container, typeof(T), typeof(T1));
-        }
-
-        [NotNull]
-        public static IRegistration<T> Bind<T, T1, T2>([NotNull] this IContainer container)
-            where T : T1, T2
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Registration<T>(container, typeof(T), typeof(T1), typeof(T2));
-        }
-
-        [NotNull]
-        public static IRegistration<T> Bind<T, T1, T2, T3>([NotNull] this IContainer container)
-            where T : T1, T2, T3
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Registration<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3));
-        }
-
-        [NotNull]
-        public static IRegistration<T> Bind<T, T1, T2, T3, T4>([NotNull] this IContainer container)
-            where T : T1, T2, T3, T4
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Registration<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
-        }
-
-        [NotNull]
-        public static IRegistration<T> Lifetime<T>([NotNull] this IRegistration<T> registration, Lifetime lifetime)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            return new Registration<T>(registration, lifetime);
-        }
-
-        [NotNull]
-        public static IRegistration<T> Lifetime<T>([NotNull] this IRegistration<T> registration, [NotNull] ILifetime lifetime)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
-            return new Registration<T>(registration, lifetime);
-        }
-
-        [NotNull]
-        public static IRegistration<T> Tag<T>([NotNull] this IRegistration<T> registration, [CanBeNull] object tagValue = null)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            return new Registration<T>(registration, tagValue);
-        }
-
-        [NotNull]
-        public static IRegistration<T> AnyTag<T>([NotNull] this IRegistration<T> registration)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            return registration.Tag().Tag(Key.AnyTag);
-        }
-
-        [NotNull]
-        public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [NotNull] IDependency dependency)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
+            if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
-            return new RegistrationToken(registration.Container, CreateRegistration(registration, dependency));
-        }
-
-        [NotNull]
-        public static IDisposable ToValue<T>([NotNull] this IRegistration<T> registration, [CanBeNull] T value)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            return registration.To(Has.Value(value));
-        }
-
-        [NotNull]
-        public static IDisposable ToFactory<T>([NotNull] this IRegistration<T> registration, [NotNull] Factory<T> factory)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (factory == null) throw new ArgumentNullException(nameof(factory));
-            return registration.To(Has.Factory(factory));
-        }
-
-        [NotNull]
-        public static IDisposable ToFunc<T>([NotNull] this IRegistration<T> registration, [NotNull] Func<T> func)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (func == null) throw new ArgumentNullException(nameof(func));
-            return registration.To(Has.Func(func));
-        }
-
-        [NotNull]
-        public static IDisposable ToFunc<T>([NotNull] this IRegistration<T> registration, [NotNull] Func<Context, T> func)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (func == null) throw new ArgumentNullException(nameof(func));
-            return registration.To(Has.Func(func));
-        }
-
-        [NotNull]
-        public static IDisposable To(
-            [NotNull] this IRegistration<object> registration,
-            [NotNull] Type type,
-            Has.ConstructorData constructor,
-            [NotNull] params Has.MethodData[] methods)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            if (methods == null) throw new ArgumentNullException(nameof(methods));
-            return registration.To(Has.Autowiring(type, constructor, methods));
-        }
-
-        [NotNull]
-        public static IDisposable To(
-            [NotNull] this IRegistration<object> registration,
-            [NotNull] Type type,
-            [NotNull] params Has.MethodData[] methods)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            if (methods == null) throw new ArgumentNullException(nameof(methods));
-            return registration.To(Has.Autowiring(type, methods));
-        }
-
-        [NotNull]
-        public static IDisposable To<T>(
-            [NotNull] this IRegistration<T> registration,
-            Has.ConstructorData constructor,
-            [NotNull] params Has.MethodData[] methods)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (methods == null) throw new ArgumentNullException(nameof(methods));
-            return registration.To(Has.Autowiring<T>(constructor, methods));
-        }
-
-        [NotNull]
-        public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [NotNull] params Has.MethodData[] methods)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (methods == null) throw new ArgumentNullException(nameof(methods));
-            return registration.To(Has.Autowiring<T>(methods));
-        }
-
-        public static void ToSelf([NotNull] this IDisposable registrationToken)
-        {
-            if (registrationToken == null) throw new ArgumentNullException(nameof(registrationToken));
-            if (registrationToken is RegistrationToken token)
+            var isRegistered = true;
+            var resolvers = new System.Collections.Generic.List<IDisposable>();
+            try
             {
-                token.Container.Get<IResourceStore>().AddResource(registrationToken);
+                foreach (var key in keys)
+                {
+                    var resolver = new RegistrationEntry(ResolverGenerator.Shared, dependency, lifetime, Disposable.Create(() => TryUnregister(key)));
+                    resolvers.Add(resolver);
+                    isRegistered &= TryRegister(key, resolver);
+                }
             }
-            else
+            catch (Exception)
             {
-                throw new NotSupportedException();
+                isRegistered = false;
+                throw;
             }
+            finally
+            {
+                var token = Disposable.Create(resolvers);
+                if (isRegistered)
+                {
+                    registrationToken = token;
+                    if (lifetime is IDisposable disposableLifetime)
+                    {
+                        _resources.Add(disposableLifetime);
+                    }
+                }
+                else
+                {
+                    token.Dispose();
+                    registrationToken = default(IDisposable);
+                }
+            }
+
+            return isRegistered;
         }
 
-        [NotNull]
-        public static IContainer Tag([NotNull] this IContainer container, [CanBeNull] object tag = null)
+        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
         {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            _tagValue = tag;
-            return container;
+            
+
+            if (!TryGetResolver(new Key(type, tag), out resolver, container))
+            {
+                return false;
+            }
+
+            lock (_resources)
+            {
+                _resolversByType = _resolversByType.Add(type, resolver);
+            }
+
+            return true;
+
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryGetResolver<T>([NotNull] this IContainer container, out Resolver<T> resolver)
+        public bool TryGetResolver<T>(Key key, out Resolver<T> resolver, IContainer container = null)
         {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            Key key;
-            if (_tagValue == null)
+            var tagIsNull = key.Tag is null;
+            var hashCode = key.HashCode;
+            if (tagIsNull)
             {
-                key = Key.KeyContainer<T>.Shared;
-            }
-            else
-            {
-                key = new Key(typeof(T), _tagValue);
-                _tagValue = null;
+                var type = key.Type;
+                var typeTree = _resolversByType.Buckets[hashCode & (_resolversByType.Divisor - 1)];
+                while (typeTree.Height != 0 && typeTree.HashCode != hashCode)
+                {
+                    typeTree = hashCode < typeTree.HashCode ? typeTree.Left : typeTree.Right;
+                }
+
+                if (typeTree.Height != 0 && ReferenceEquals(typeTree.Key, type))
+                {
+                    resolver = (Resolver<T>)typeTree.Value;
+                    return true;
+                }
+
+                if (typeTree.Duplicates.Items.Length > 0)
+                {
+                    foreach (var keyValue in typeTree.Duplicates.Items)
+                    {
+                        if (ReferenceEquals(keyValue.Key, type))
+                        {
+                            resolver = (Resolver<T>)keyValue.Value;
+                            return true;
+                        }
+                    }
+                }
             }
 
-            return container.TryGetResolver(key, out resolver, container);
+            var keyTree = _resolversByKey.Buckets[hashCode & (_resolversByKey.Divisor - 1)];
+            while (keyTree.Height != 0 && keyTree.HashCode != hashCode)
+            {
+                keyTree = hashCode < keyTree.HashCode ? keyTree.Left : keyTree.Right;
+            }
+
+            if (keyTree.Height != 0 && Key.Equals(keyTree.Key, key))
+            {
+                resolver = (Resolver<T>)keyTree.Value;
+            }
+
+            if (keyTree.Duplicates.Items.Length > 0)
+            {
+                foreach (var keyValue in keyTree.Duplicates.Items)
+                {
+                    if (Key.Equals(keyValue.Key, key))
+                    {
+                        resolver = (Resolver<T>)keyValue.Value;
+                    }
+                }
+            }
+
+            if (TryGetRegistrationEntry(key, out var registrationEntry))
+            {
+                resolver = registrationEntry.CreateResolver<T>(key, container ?? this);
+                lock(_resources)
+                {
+                    _resolversByKey = _resolversByKey.Add(key, resolver);
+                    if (tagIsNull)
+                    {
+                        _resolversByType = _resolversByType.Add(key.Type, resolver);
+                    }
+                }
+
+                return true;
+            }
+
+            if (_parent.TryGetResolver(key, out resolver))
+            {
+                lock (_resources)
+                {
+                    _resolversByKey = _resolversByKey.Add(key, resolver);
+                    if (tagIsNull)
+                    {
+                        _resolversByType = _resolversByType.Add(key.Type, resolver);
+                    }
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
+        {
+            if (key == null) throw new ArgumentNullException(nameof(key));
+            if (TryGetRegistrationEntry(key, out var registrationEntry))
+            {
+                dependency = registrationEntry.Dependency;
+                lifetime = registrationEntry.Lifetime;
+                return true;
+            }
+
+            return _parent.TryGetDependency(key, out dependency, out lifetime);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryGet([NotNull] this IContainer container, [NotNull] Type type, out object instance, [NotNull][ItemCanBeNull] params object[] args)
+        public bool TryGet(Type type, object tag, out object instance, params object[] args)
         {
 #if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
             if (type == null) throw new ArgumentNullException(nameof(type));
             if (args == null) throw new ArgumentNullException(nameof(args));
 #endif
-            Key key;
-            if (_tagValue == null)
-            {
-                key = new Key(type);
-            }
-            else
-            {
-                key = new Key(type, _tagValue);
-                _tagValue = null;
-            }
-
-            if (!container.TryGetResolver<object>(key, out var resolver, container))
+            var key = tag is null ? new Key(type) : new Key(type, tag);
+            if (!TryGetResolver<object>(key, out var resolver, this))
             {
                 instance = null;
                 return false;
             }
 
-            instance = resolver(container, args);
+            instance = resolver(this, args);
             return true;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool TryGet<T>([NotNull] this IContainer container, out T instance, [NotNull][ItemCanBeNull] params object[] args)
+        public bool TryGet<T>(object tag, out T instance, params object[] args)
         {
 #if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
 #endif
-            Key key;
-            if (_tagValue == null)
-            {
-                key = Key.KeyContainer<T>.Shared;
-            }
-            else
-            {
-                key = new Key(typeof(T), _tagValue);
-                _tagValue = null;
-            }
-
-            if (!container.TryGetResolver<T>(key, out var resolver, container))
+            var key = tag is null ? Key.KeyContainer<T>.Shared : Key.Create<T>(tag);
+            if (!TryGetResolver<T>(key, out var resolver, this))
             {
                 instance = default(T);
                 return false;
             }
 
-            instance = resolver(container, args);
+            instance = resolver(this, args);
             return true;
         }
 
-        [NotNull]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static object Get([NotNull] this IContainer container, [NotNull] Type type, [NotNull][ItemCanBeNull] params object[] args)
+        private bool TryGetRegistrationEntry(Key key, out RegistrationEntry registrationEntry)
         {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            if (args == null) throw new ArgumentNullException(nameof(args));
-#endif
-            Key key;
-            if (_tagValue == null)
+            if (_registrationEntries.TryGetValue(key, out registrationEntry))
             {
-                key = new Key(type);
-            }
-            else
-            {
-                key = new Key(type, _tagValue);
-                _tagValue = null;
+                return true;
             }
 
-            if (!container.TryGetResolver<object>(key, out var resolver, container))
+            var typeInfo = key.Type.Info();
+            if (typeInfo.IsConstructedGenericType)
             {
-                return container.GetIssueResolver().CannotResolve(container, key);
+                var genericTypeDefinition = typeInfo.GetGenericTypeDefinition();
+                var genericTypeDefinitionKey = new Key(genericTypeDefinition, key.Tag);
+                if (_registrationEntries.TryGetValue(genericTypeDefinitionKey, out registrationEntry))
+                {
+                    return true;
+                }
             }
 
-            return resolver(container, args);
+            return false;
         }
 
-        [NotNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static T Get<T>([NotNull] this IContainer container, [NotNull][ItemCanBeNull] params object[] args)
+        public void Dispose()
         {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (args == null) throw new ArgumentNullException(nameof(args));
-#endif
-            Key key;
-            if (_tagValue == null)
+            if (_parent is IResourceStore resourceStore)
             {
-                key = Key.KeyContainer<T>.Shared;
-            }
-            else
-            {
-                key = new Key(typeof(T), _tagValue);
-                _tagValue = null;
+                resourceStore.RemoveResource(this);
             }
 
-            if (!container.TryGetResolver<T>(key, out var resolver, container))
+            lock (_resources)
             {
-                return (T)container.GetIssueResolver().CannotResolve(container, key);
+                Disposable.Create(_registrationEntries.Values).Dispose();
+                _registrationEntries.Clear();
+
+                Disposable.Create(_resources).Dispose();
+                _resources.Clear();
+            }
+        }
+
+        void IResourceStore.AddResource(IDisposable resource)
+        {
+            if (resource == null) throw new ArgumentNullException(nameof(resource));
+            lock (_resources)
+            {
+                _resources.Add(resource);
+            }
+        }
+
+        void IResourceStore.RemoveResource(IDisposable resource)
+        {
+            if (resource == null) throw new ArgumentNullException(nameof(resource));
+            lock (_resources)
+            {
+                _resources.Remove(resource);
+            }
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        public IEnumerator<Key> GetEnumerator()
+        {
+            var keys = _registrationEntries.Keys.ToList();
+            return keys.Concat(_parent).GetEnumerator();
+        }
+
+        public IDisposable Subscribe(IObserver<ContainerEvent> observer)
+        {
+            return _eventSubject.Subscribe(observer);
+        }
+
+        private bool TryRegister([NotNull] Key key, [NotNull] RegistrationEntry registrationEntry)
+        {
+            if (_registrationEntries.TryAdd(key, registrationEntry))
+            {
+                _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Registration, key));
+                return true;
             }
 
-            return resolver(container, args);
+            return false;
         }
 
-        [NotNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Func<T> FuncGet<T>([NotNull] this IContainer container)
+        private bool TryUnregister([NotNull] Key key)
         {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            return container.Get<Func<T>>();
-        }
-
-        [NotNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Func<T1, T> FuncGet<T1, T>([NotNull] this IContainer container)
-        {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            return container.Get<Func<T1, T>>();
-        }
-
-        [NotNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Func<T1, T2, T> FuncGet<T1, T2, T>([NotNull] this IContainer container)
-        {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            return container.Get<Func<T1, T2, T>>();
-        }
-
-        [NotNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Func<T1, T2, T3, T> FuncGet<T1, T2, T3, T>([NotNull] this IContainer container)
-        {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            return container.Get<Func<T1, T2, T3, T>>();
-        }
-
-        [NotNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Func<T1, T2, T3, T4, T> FuncGet<T1, T2, T3, T4, T>([NotNull] this IContainer container)
-        {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            return container.Get<Func<T1, T2, T3, T4, T>>();
-        }
-
-#if !NET40
-        [NotNull]
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static async Task<T> AsyncGet<T>([NotNull] this IContainer container, [CanBeNull] TaskScheduler taskScheduler = null)
-        {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            var task = container.Get<Task<T>>();
-            if (taskScheduler != null)
+            if (_registrationEntries.TryRemove(key, out var _))
             {
-                task.Start(taskScheduler);
+                _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Unregistration, key));
             }
 
-            return await task;
-        }
-#endif
-
-        [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (configurationText == null) throw new ArgumentNullException(nameof(configurationText));
-            if (configurationText.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationText));
-            return container.ApplyData(configurationText);
+            return false;
         }
 
-        [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
+        void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
         {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (configurationStreams == null) throw new ArgumentNullException(nameof(configurationStreams));
-            if (configurationStreams.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationStreams));
-            return container.ApplyData(configurationStreams);
-        }
-
-        [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (configurationReaders == null) throw new ArgumentNullException(nameof(configurationReaders));
-            if (configurationReaders.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationReaders));
-            return container.ApplyData(configurationReaders);
-        }
-
-        [NotNull]
-        public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (configurationText == null) throw new ArgumentNullException(nameof(configurationText));
-            if (configurationText.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationText));
-            return container.UsingData(configurationText);
-        }
-
-        [NotNull]
-        public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (configurationStreams == null) throw new ArgumentNullException(nameof(configurationStreams));
-            if (configurationStreams.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationStreams));
-            return container.UsingData(configurationStreams);
-        }
-
-        [NotNull]
-        public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (configurationReaders == null) throw new ArgumentNullException(nameof(configurationReaders));
-            if (configurationReaders.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationReaders));
-            return container.UsingData(configurationReaders);
-        }
-
-        [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull][ItemNotNull] params IConfiguration[] configurations)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (configurations == null) throw new ArgumentNullException(nameof(configurations));
-            if (configurations.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurations));
-            return Disposable.Create(configurations.Select(i => i.Apply(container)).SelectMany(i => i));
-        }
-
-        [NotNull]
-        public static IContainer Using([NotNull] this IContainer container, [NotNull][ItemNotNull] params IConfiguration[] configurations)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (configurations == null) throw new ArgumentNullException(nameof(configurations));
-            if (configurations.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurations));
-            container.Get<IResourceStore>().AddResource(container.Apply(configurations));
-            return container;
-        }
-
-        [NotNull]
-        public static IContainer Using<T>([NotNull] this IContainer container)
-            where T: IConfiguration, new()
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return container.Using(new T());
-        }
-
-        [NotNull]
-        private static IDisposable ApplyData<T>([NotNull] this IContainer container, [NotNull][ItemNotNull] params T[] configurationData)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (configurationData == null) throw new ArgumentNullException(nameof(configurationData));
-            if (configurationData.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationData));
-            return container.Apply(configurationData.Select(configurationItem => container.Get<IConfiguration>(configurationItem)).ToArray());
-        }
-
-        [NotNull]
-        private static IContainer UsingData<T>([NotNull] this IContainer container, [NotNull][ItemNotNull] params T[] configurationData)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (configurationData == null) throw new ArgumentNullException(nameof(configurationData));
-            if (configurationData.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationData));
-            return container.Using(configurationData.Select(configurationItem => container.Get<IConfiguration>(configurationItem)).ToArray());
-        }
-
-        [NotNull]
-        private static IDisposable CreateRegistration<T>([NotNull] this IRegistration<T> registration, [NotNull] IDependency dependency)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (dependency == null) throw new ArgumentNullException(nameof(dependency));
-
-            var keys = (
-                from contract in registration.Types
-                from tag in registration.Tags.DefaultIfEmpty(null)
-                select new Key(contract, tag)).Distinct().ToArray();
-
-            if (!registration.Container.TryRegister(keys, dependency, registration.Lifetime, out var registrationToken))
+            if (!TryGetRegistrationEntry(value.Key, out var registrationEntry))
             {
-                return registration.Container.GetIssueResolver().CannotRegister(registration.Container, keys);
+                return;
             }
 
-            return registrationToken;
+            registrationEntry.Reset();
+            lock (_resources)
+            {
+                _resolversByKey = HashTable<Key, object>.Empty;
+                _resolversByType = HashTable<Type, object>.Empty;
+            }
+        }
+
+        void IObserver<ContainerEvent>.OnError(Exception error)
+        {
+        }
+
+        void IObserver<ContainerEvent>.OnCompleted()
+        {
         }
 
         [NotNull]
@@ -561,11 +397,5 @@
             return !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
         }
 
-        [NotNull]
-        private static IIssueResolver GetIssueResolver([NotNull] this IContainer container)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return container.Get<IIssueResolver>();
-        }
     }
 }

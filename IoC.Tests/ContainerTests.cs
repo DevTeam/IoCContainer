@@ -39,11 +39,11 @@
             using (var container = Container.CreatePure())
             {
                 // When
-                using (container.Bind<MySympleClass>().To())
+                using (container.Bind<MySimpleClass>().To())
                 {
                     // Then
-                    var actualInstance = container.Get<MySympleClass>();
-                    actualInstance.ShouldBeOfType<MySympleClass>();
+                    var actualInstance = container.Get<MySimpleClass>();
+                    actualInstance.ShouldBeOfType<MySimpleClass>();
                 }
             }
         }
@@ -55,13 +55,13 @@
             using (var container = Container.CreatePure())
             {
                 // When
-                using (container.Bind<MySympleClass>().Lifetime(Lifetime.Singletone).To())
+                using (container.Bind<MySimpleClass>().Lifetime(Lifetime.Singletone).To())
                 {
                     // Then
-                    var actualInstance1 = container.Get<MySympleClass>();
-                    var actualInstance2 = container.Get<MySympleClass>();
+                    var actualInstance1 = container.Get<MySimpleClass>();
+                    var actualInstance2 = container.Get<MySimpleClass>();
 
-                    actualInstance1.ShouldBeOfType<MySympleClass>();
+                    actualInstance1.ShouldBeOfType<MySimpleClass>();
                     actualInstance1.ShouldBe(actualInstance2);
                 }
             }
@@ -248,6 +248,7 @@
                     {
                         // Then
                         var instance3 = childContainer.Get<IMyService>();
+                        instance1.ShouldNotBeNull();
                         instance1.ShouldBe(instance2);
                         instance1.ShouldBe(instance3);
                     }
@@ -340,36 +341,41 @@
             }
         }
 
-/*
         [Fact]
-        public void ContainerShouldResolveWhenResolveLifetime()
+        public void ContainerShouldResolveWhenScopeLifetime()
         {
             // Given
             using (var container = Container.Create())
             {
                 // When
-                using (container.Bind<IMyService>().To(
-                    typeof(MyService),
-                    Has.Arg<string>("name", 0),
-                    Has.Method(
-                        "Init",
-                        Has.Arg("intiValue", 1))))
-                using (container.Bind<IMyService1>().Lifetime(Lifetime.Resolve).To(() => Mock.Of<IMyService1>()))
+                using (container.Bind<IMyService>().To<MyService>(
+                    Has.Constructor(Has.Argument<string>(0).For("name")),
+                    Has.Property("SomeRef2", Has.Dependency<IMyService1>().At(0)),
+                    Has.Property("SomeRef3", Has.Dependency<IMyService1>().At(0))))
+                using (container.Bind<IMyService1>().Lifetime(Lifetime.Scope).ToFunc(Mock.Of<IMyService1>))
                 {
-                    var instance1 = (MyService)container.Get<IMyService>("abc", "xyz");
-                    var instance2 = (MyService)container.Get<IMyService>("klm", "qrs");
+                    // Default resolving scope
+                    var instance1 = (MyService)container.Get<IMyService>("abc");
+
+                    // Resolving scope 2
+                    MyService instance2;
+                    using (new ResolvingScope(2))
+                    {
+                        instance2 = (MyService)container.Get<IMyService>("xyz");
+                    }
 
                     // Then
                     instance1.SomeRef.ShouldBe(instance1.SomeRef2);
                     instance1.SomeRef.ShouldBe(instance1.SomeRef3);
-                    instance1.SomeRef.ShouldBe(instance2.SomeRef);
 
                     instance2.SomeRef.ShouldBe(instance2.SomeRef2);
                     instance2.SomeRef.ShouldBe(instance2.SomeRef3);
+
+                    instance1.SomeRef.ShouldNotBe(instance2.SomeRef);
                 }
             }
         }
-*/
+
         [Fact]
         public void ContainerShouldResolveWhenContainerLifetimeAndSeveralContracts()
         {
@@ -608,7 +614,7 @@
                 var expectedInstance = Mock.Of<IMyService>();
 
                 // When
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).ToFunc(() => expectedInstance))
+                using (container.Bind<IMyService>().ToFunc(() => expectedInstance))
                 {
                     // Then
                     var func = container.Get<Func<IMyService>>();
@@ -871,6 +877,15 @@
 */
         public interface IMyService: IMyService1
         {
+            string Name { get; set; }
+
+            IMyService1 SomeRef { get; }
+
+            IMyService1 SomeRef2 { get; set; }
+
+            IMyService1 SomeRef3 { get; set; }
+
+            void Init(IMyService1 someRef2, IMyService1 someRef3, string intiValue);
         }
 
         public interface IMyService1
@@ -911,9 +926,9 @@
 
             public IMyService1 SomeRef { get; }
 
-            public IMyService1 SomeRef2 { get; private set; }
+            public IMyService1 SomeRef2 { get; set; }
 
-            public IMyService1 SomeRef3 { get; private set; }
+            public IMyService1 SomeRef3 { get; set; }
 
             public void Init(IMyService1 someRef2, IMyService1 someRef3, string intiValue)
             {
@@ -955,7 +970,7 @@
             public IMyWrapper Wrapped { get; }
         }
 
-        public class MySympleClass
+        public class MySimpleClass
         {
         }
     }

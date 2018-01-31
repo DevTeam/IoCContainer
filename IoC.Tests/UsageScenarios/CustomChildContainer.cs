@@ -50,14 +50,24 @@
                 return Parent.TryRegister(keys, dependency, lifetime, out registrationToken);
             }
 
-            public bool TryGetDependency(Key key, out IoC.IDependency dependency)
+            public bool TryGetDependency(Key key, out IoC.IDependency dependency, out ILifetime lifetime)
             {
-                return Parent.TryGetDependency(key, out dependency);
+                return Parent.TryGetDependency(key, out dependency, out lifetime);
             }
 
             public bool TryGetResolver<T>(Key key, out Resolver<T> resolver, IContainer container = null)
             {
                 return Parent.TryGetResolver(key, out resolver, container);
+            }
+
+            public bool TryGet(Type type, object tag, out object instance, params object[] args)
+            {
+                return Parent.TryGet(type, tag, out instance, args);
+            }
+
+            public bool TryGet<T>(object tag, out T instance, params object[] args)
+            {
+                return Parent.TryGet(tag, out instance, args);
             }
 
             public void Dispose() { }

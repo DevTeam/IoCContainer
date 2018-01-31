@@ -28,7 +28,7 @@
 
         public class MyTransientLifetime : ILifetime
         {
-            public T GetOrCreate<T>(Key key, IContainer container, object[] args, Resolver<T> resolver)
+            public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
             {
                 return resolver(container, args);
             }

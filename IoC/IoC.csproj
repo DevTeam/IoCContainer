@@ -17,11 +17,10 @@
     <PackageTags>IoC inversionofcontrol Container DI dependencyinjection</PackageTags>
     <Product>IoC Container</Product>
     <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
-    <NeutralLanguage />	
+    <DebugType Condition="'$(Configuration)'=='Release'">none</DebugType>
+    <DebugSymbols Condition="'$(Configuration)'=='Release'">false</DebugSymbols>
   </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="System.Reflection.Emit.Lightweight" Version="4.3.0" />
-  </ItemGroup>
+
   <ItemGroup>
     <None Update="README_TEMPLATE.md">
       <DesignTime>True</DesignTime>
@@ -33,6 +32,7 @@
       <LastGenOutput>README_TEMPLATE.md</LastGenOutput>
     </None>
   </ItemGroup>
+
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>

@@ -3,22 +3,28 @@
     using System;
     using System.Collections.Concurrent;
     using System.Linq;
+    using Core;
 
     internal sealed class ContainerLifetime: ILifetime, IDisposable
     {
-        private readonly ConcurrentDictionary<IContainer, ILifetime> _lifetimes = new ConcurrentDictionary<IContainer, ILifetime>();
+        private readonly ConcurrentDictionary<IContainer, SingletoneLifetime> _lifetimes = new ConcurrentDictionary<IContainer, SingletoneLifetime>();
 
-        public T GetOrCreate<T>(Key key, IContainer container, object[] args, Resolver<T> resolver)
+        public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
         {
-            var lifetime = _lifetimes.GetOrAdd(container, container.Tag(Lifetime.Singletone).Get<ILifetime>());
-            return lifetime.GetOrCreate(key, container, args, resolver);
+            var lifetime = _lifetimes.GetOrAdd(container, new SingletoneLifetime());
+            return lifetime.GetOrCreate(container, args, resolver);
         }
 
         public void Dispose()
         {
             var items = _lifetimes.Values.ToList();
             _lifetimes.Clear();
-            Disposable.Create(items.OfType<IDisposable>()).Dispose();
+            Disposable.Create(items).Dispose();
+        }
+
+        public override string ToString()
+        {
+            return Lifetime.Container.ToString();
         }
     }
 }

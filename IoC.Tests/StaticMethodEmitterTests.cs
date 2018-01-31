@@ -2,7 +2,7 @@
 {
     using System.Diagnostics.CodeAnalysis;
     using Core;
-    using Core.Emiters;
+    using Core.Emitters;
     using Dependencies;
     using Moq;
     using Shouldly;
@@ -16,7 +16,7 @@
         {
             // Given
             var resolverGenerator = CreateInstance();
-            using (var resolver = resolverGenerator.Generate<object>(Key.Create<MyClass>(), Mock.Of<IContainer>(), Has.StaticMethod<int, MyClass>("CreateInt")))
+            using (var resolver = resolverGenerator.Generate<int>(Key.Create<int>(), Mock.Of<IContainer>(), Has.StaticMethod<int, MyClass>("CreateInt")))
             {
                 // When
                 var instance = resolver.Resolve(Mock.Of<IContainer>());
@@ -31,7 +31,7 @@
         {
             // Given
             var resolverGenerator = CreateInstance();
-            using (var resolver = resolverGenerator.Generate<object>(Key.Create<MyClass>(), Mock.Of<IContainer>(), Has.StaticMethod<string, MyClass>("CreateString")))
+            using (var resolver = resolverGenerator.Generate<object>(Key.Create<string>(), Mock.Of<IContainer>(), Has.StaticMethod<string, MyClass>("CreateString")))
             {
                 // When
                 var instance = resolver.Resolve(Mock.Of<IContainer>());
@@ -61,10 +61,11 @@
             return new ResolverGenerator(
                 new DependencyEmitter(
                     new ValueEmitter(),
-                    Mock.Of<IEmitter<Argument>>(),
-                    Mock.Of<IEmitter<FactoryMethod>>(),
+                    Mock.Of<IDependencyEmitter<Argument>>(),
+                    Mock.Of<IDependencyEmitter<FactoryMethod>>(),
                     new StaticMethodEmitter(),
-                    new AutowiringEmitter()));
+                    new AutowiringEmitter()),
+                Mock.Of<ILifetimeEmitter>());
         }
 
         public class MyClass

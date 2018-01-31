@@ -5,17 +5,18 @@ namespace IoC.Core.Collections
     internal static class HashTableExtensions
     {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-
-        public static TValue Search<TValue>(this HashTable<Key, TValue> hashTable, Key key)
+        public static TValue Search<TKey, TValue>(this HashTable<TKey, TValue> hashTable, TKey key)
         {
-            var hashCode = key.HashCode;
-            var tree = hashTable.Buckets[hashCode & (hashTable.Divisor - 1)];
+            var hashCode = key.GetHashCode();
+            var bucketIndex = hashCode & (hashTable.Divisor - 1);
+            var tree = hashTable.Buckets[bucketIndex];
+
             while (tree.Height != 0 && tree.HashCode != hashCode)
             {
                 tree = hashCode < tree.HashCode ? tree.Left : tree.Right;
             }
 
-            if (tree.Height != 0 && (ReferenceEquals(tree.Key, key) || tree.Key.Equals(key)))
+            if (tree.Height != 0 && (ReferenceEquals(tree.Key, key) || Equals(tree.Key, key)))
             {
                 return tree.Value;
             }
@@ -24,7 +25,7 @@ namespace IoC.Core.Collections
             {
                 foreach (var keyValue in tree.Duplicates.Items)
                 {
-                    if (ReferenceEquals(keyValue.Key, key) || keyValue.Key.Equals(key))
+                    if (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key))
                     {
                         return keyValue.Value;
                     }
@@ -33,6 +34,7 @@ namespace IoC.Core.Collections
 
             return default(TValue);
         }
+
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static HashTable<TKey, TValue> Add<TKey, TValue>(this HashTable<TKey, TValue> hashTable, TKey key, TValue value)

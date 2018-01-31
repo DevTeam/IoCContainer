@@ -3,6 +3,6 @@
     [PublicAPI]
     public interface ILifetime
     {
-        [NotNull] T GetOrCreate<T>([NotNull] Key key, [NotNull] IContainer container, [NotNull][ItemCanBeNull] object[] args, [NotNull] Resolver<T> resolver);
+        [NotNull] T GetOrCreate<T>([NotNull] IContainer container, [NotNull] object[] args, [NotNull] Resolver<T> resolver);
     }
 }

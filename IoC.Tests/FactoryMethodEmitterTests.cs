@@ -1,7 +1,7 @@
 ﻿namespace IoC.Tests
 {
     using Core;
-    using Core.Emiters;
+    using Core.Emitters;
     using Dependencies;
     using Moq;
     using Shouldly;
@@ -14,7 +14,7 @@
         {
             // Given
             var resolverGenerator = CreateInstance();
-            using (var resolver = resolverGenerator.Generate<int>(Key.Create<int>(), Mock.Of<IContainer>(), Has.Factory<object>((key, container, args) => 10)))
+            using (var resolver = resolverGenerator.Generate<int>(Key.Create<int>(), Mock.Of<IContainer>(), Has.Factory((key, container, args) => 10)))
             {
                 // When
                 var instance = resolver.Resolve(Mock.Of<IContainer>());
@@ -29,7 +29,7 @@
         {
             // Given
             var resolverGenerator = CreateInstance();
-            using (var resolver = resolverGenerator.Generate<object>(Key.Create<int>(), Mock.Of<IContainer>(), Has.Factory((key, container, args) => 10)))
+            using (var resolver = resolverGenerator.Generate<int>(Key.Create<int>(), Mock.Of<IContainer>(), Has.Factory((key, container, args) => 10)))
             {
                 // When
                 var instance = resolver.Resolve(Mock.Of<IContainer>());
@@ -44,7 +44,7 @@
         {
             // Given
             var resolverGenerator = CreateInstance();
-            using (var resolver = resolverGenerator.Generate<string>(Key.Create<string>(), Mock.Of<IContainer>(), Has.Factory<object>((key, container, args) => "abc")))
+            using (var resolver = resolverGenerator.Generate<string>(Key.Create<string>(), Mock.Of<IContainer>(), Has.Factory((key, container, args) => "abc")))
             {
                 // When
                 var instance = resolver.Resolve(Mock.Of<IContainer>());
@@ -81,7 +81,7 @@
         {
             // Given
             var resolverGenerator = CreateInstance();
-            using (var resolver = resolverGenerator.Generate<IMyClass>(Key.Create<MyClass>(), Mock.Of<IContainer>(), Has.Factory<object>((key, container, args) => new MyClass())))
+            using (var resolver = resolverGenerator.Generate<IMyClass>(Key.Create<MyClass>(), Mock.Of<IContainer>(), Has.Factory((key, container, args) => new MyClass())))
             {
                 // When
                 var instance = resolver.Resolve(Mock.Of<IContainer>());
@@ -103,11 +103,12 @@
         {
             return new ResolverGenerator(
                 new DependencyEmitter(
-                    Mock.Of<IEmitter<Value>>(),
-                    Mock.Of<IEmitter<Argument>>(),
+                    Mock.Of<IDependencyEmitter<Value>>(),
+                    Mock.Of<IDependencyEmitter<Argument>>(),
                     new FactoryMethodEmitter(),
-                    Mock.Of<IEmitter<StaticMethod>>(),
-                    Mock.Of<IEmitter<Autowiring>>()));
+                    Mock.Of<IDependencyEmitter<StaticMethod>>(),
+                    Mock.Of<IDependencyEmitter<Autowiring>>()),
+                Mock.Of<ILifetimeEmitter>());
         }
     }
 }

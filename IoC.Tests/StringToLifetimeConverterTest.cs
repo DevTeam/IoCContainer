@@ -30,7 +30,7 @@
             {
                 new object[] {".Lifetime(Lifetime.Transient)", true, Lifetime.Transient},
                 new object[] { ".Lifetime(Lifetime.Singletone)", true, Lifetime.Singletone},
-                new object[] { ".Lifetime(Lifetime.Resolve)", true, Lifetime.Resolve},
+                new object[] { ".Lifetime(Lifetime.Scope)", true, Lifetime.Scope},
                 new object[] { ".Lifetime(Lifetime.Container)", true, Lifetime.Container},
                 new object[] { ".Lifetime(Lifetime.container)", true, Lifetime.Container},
                 new object[] { ".LifeTime(Container)", true, Lifetime.Container},

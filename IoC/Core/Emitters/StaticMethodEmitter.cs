@@ -1,15 +1,15 @@
-﻿namespace IoC.Core.Emiters
+﻿namespace IoC.Core.Emitters
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using Dependencies;
 
-    internal sealed class StaticMethodEmitter : IEmitter<StaticMethod>
+    internal sealed class StaticMethodEmitter : IDependencyEmitter<StaticMethod>
     {
-        public static readonly IEmitter<StaticMethod> Shared = new StaticMethodEmitter();
+        public static readonly IDependencyEmitter<StaticMethod> Shared = new StaticMethodEmitter();
 
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-        public EmitResult Emit(EmitContext ctx, StaticMethod method)
+        public void Emit(EmitContext ctx, StaticMethod method)
         {
             if (ctx == null) throw new ArgumentNullException(nameof(ctx));
             if (method == null) throw new ArgumentNullException(nameof(method));
@@ -19,7 +19,6 @@
             }
 
             ctx.Emitter.Call(method.Info);
-            return new EmitResult(method.TypeInfo);
         }
     }
 }

@@ -14,18 +14,31 @@ namespace IoC.Tests.UsageScenarios
 
     public interface IService
     {
+        IDependency Dependency { get; }
+
         string State { get; }
     }
 
     public interface IAnotherService { }
 
-    public interface IDisposableService : IService, IDisposable { }
+    public interface IDisposableService : IService, IDisposable
+    {
+    }
 
     public class Service : IService, IAnotherService
     {
-        public Service(IDependency dependency) { }
+        public Service(IDependency dependency)
+        {
+            Dependency = dependency;
+        }
 
-        public Service(IDependency dependency, string state) { State = state; }
+        public Service(IDependency dependency, string state)
+        {
+            Dependency = dependency;
+            State = state;
+        }
+
+        public IDependency Dependency { get; }
 
         public string State { get; }
     }

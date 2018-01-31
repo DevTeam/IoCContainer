@@ -20,7 +20,7 @@
             Container = registration.Container;
             Types = registration.Types;
             Tags = registration.Tags;
-            Lifetime = registration.Container.Tag(lifetime).Get<ILifetime>();
+            Lifetime = lifetime != IoC.Lifetime.Transient ? registration.Container.Tag(lifetime).Get<ILifetime>() : null;
         }
 
         public Registration([NotNull] IRegistration<T> registration, [NotNull] ILifetime lifetime)

@@ -21,11 +21,6 @@
 
             yield return container
                 .Bind<ILifetime>()
-                .Tag(Lifetime.Transient)
-                .ToValue(null);
-
-            yield return container
-                .Bind<ILifetime>()
                 .Tag(Lifetime.Singletone)
                 .ToFactory((key, curContainer, args) => new SingletoneLifetime());
 
@@ -36,8 +31,8 @@
 
             yield return container
                 .Bind<ILifetime>()
-                .Tag(Lifetime.Resolve)
-                .ToFactory((key, curContainer, args) => new ResolveLifetime());
+                .Tag(Lifetime.Scope)
+                .ToFactory((key, curContainer, args) => new ScopeLifetime());
 
             yield return container
                 .Bind<IContainer>()
@@ -48,12 +43,12 @@
             yield return container
                 .Bind<IContainer>()
                 .Tag(Scope.Child)
-                .ToFactory((key, curContainer, args) => new ChildContainer(args.Length == 1 ? Container.CreateContainerName(args[0] as string) : Container.CreateContainerName(), curContainer, false));
+                .ToFactory((key, curContainer, args) => new Container(args.Length == 1 ? Container.CreateContainerName(args[0] as string) : Container.CreateContainerName(), curContainer, false));
 
             yield return container
                 .Bind<IContainer>()
                 .Tag(Scope.Parent)
-                .ToFactory((key, curContainer, args) => curContainer.Parent);
+                .ToFactory((key, curContainer, args) => curContainer.Parent ?? throw new NotSupportedException());
 
             yield return container
                 .Bind<IResourceStore>()

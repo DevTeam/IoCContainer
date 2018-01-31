@@ -1,15 +1,15 @@
-﻿namespace IoC.Core.Emiters
+﻿namespace IoC.Core.Emitters
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
     using Dependencies;
 
-    internal sealed class AutowiringEmitter: IEmitter<Autowiring>
+    internal sealed class AutowiringEmitter: IDependencyEmitter<Autowiring>
     {
-        public static readonly IEmitter<Autowiring> Shared = new AutowiringEmitter();
+        public static readonly IDependencyEmitter<Autowiring> Shared = new AutowiringEmitter();
 
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-        public EmitResult Emit(EmitContext ctx, Autowiring autowiring)
+        public void Emit(EmitContext ctx, Autowiring autowiring)
         {
             if (ctx == null) throw new ArgumentNullException(nameof(ctx));
             if (autowiring == null) throw new ArgumentNullException(nameof(autowiring));
@@ -31,12 +31,12 @@
             var methods = autowiring.Methods(typeInfo.GenericTypeArguments);
             if (methods.Length > 0)
             {
-                var instanceLocal = ctx.Emitter.DeclareLocal(typeInfo.Type);
-                ctx.Emitter.Stloc(instanceLocal);
+                var instanceParam = ctx.Emitter.DeclareLocal(constructorInfo.DeclaringType ?? throw new InvalidOperationException());
+                ctx.Emitter.Store(instanceParam);
                 for (var methodIndex = 0; methodIndex < methods.Length; methodIndex++)
                 {
                     var method = methods[methodIndex];
-                    ctx.Emitter.Ldloc(instanceLocal);
+                    ctx.Emitter.Push(instanceParam);
                     for (var dependencyIndex = 0; dependencyIndex < method.Dependencies.Length; dependencyIndex++)
                     {
                         ctx.DependencyEmitter.Emit(ctx, method.Dependencies[dependencyIndex]);
@@ -44,16 +44,11 @@
 
                     var methodInfo = method.Info;
                     ctx.Emitter.Call(methodInfo);
-                    if (methodInfo.ReturnType != typeof(void))
-                    {
-                        ctx.Emitter.Pop();
-                    }
                 }
 
-                ctx.Emitter.Ldloc(instanceLocal);
+                ctx.Emitter.Push(instanceParam);
+                ctx.Emitter.Block(methods.Length + 2);
             }
-
-            return new EmitResult(typeInfo);
         }
     }
 }

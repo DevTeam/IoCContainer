@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Threading;
     using Shouldly;
     using Xunit;
 
@@ -38,8 +39,7 @@
             public IEnumerable<IDisposable> Apply(IContainer container)
             {
                 var value = 0;
-                // The "value++" operation is tread safe
-                yield return container.Bind<int>().Tag(GeneratorType.Sequential).ToFunc(() => value++);
+                yield return container.Bind<int>().Tag(GeneratorType.Sequential).ToFunc(() => Interlocked.Increment(ref value));
 
                 var random = new Random();
                 yield return container.Bind<int>().Tag(GeneratorType.Random).ToFunc(() => random.Next());

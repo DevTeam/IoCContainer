@@ -3,7 +3,7 @@
     [PublicAPI]
     public enum Lifetime
     {
-        // New instance each time
+        // Default lifetime. New instance each time.
         Transient,
 
         // Single instance per registration
@@ -12,7 +12,7 @@
         // Singletone per container
         Container,
 
-        // Singletone per resolve
-        Resolve
+        // Singletone per scope
+        Scope
     }
 }

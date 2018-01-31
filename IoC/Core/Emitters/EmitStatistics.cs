@@ -1,4 +1,4 @@
-﻿namespace IoC.Core.Emiters
+﻿namespace IoC.Core.Emitters
 {
     using System.Collections.Generic;
 

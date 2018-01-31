@@ -10,14 +10,20 @@
         [NotNull] public readonly Type Type;
         [CanBeNull] public readonly object Tag;
         internal readonly int HashCode;
-        
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static Key Create<T>([CanBeNull] object tag = null)
+        public static Key Create<T>([CanBeNull] object tag)
         {
             return tag == null ? KeyContainer<T>.Shared : new Key(typeof(T), tag);
         }
 
-        public Key([NotNull] Type type, [CanBeNull] object tag = null)
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+        public static Key Create<T>()
+        {
+            return KeyContainer<T>.Shared;
+        }
+
+        public Key([NotNull] Type type, [CanBeNull] object tag)
         {
 #if DEBUG
             if (type == null) throw new ArgumentNullException(nameof(type));
@@ -27,21 +33,35 @@
             HashCode = type.GetHashCode();
         }
 
+        public Key([NotNull] Type type)
+        {
+#if DEBUG
+            if (type == null) throw new ArgumentNullException(nameof(type));
+#endif
+            Type = type;
+            HashCode = type.GetHashCode();
+        }
+
         public override string ToString()
         {
-            return $"{Type.Name} {Tag ?? "empty"}";
+            return $"{Type.FullName} {Tag ?? "empty"}";
         }
 
         public override bool Equals(object obj)
         {
             // if (ReferenceEquals(null, obj)) return false;
-            return obj is Key key && Equals(key);
+            return obj is Key key && Equals(this, key);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public bool Equals(Key key)
+        internal static bool Equals(Key key1, Key key2)
         {
-            return ReferenceEquals(Type, key.Type) && (ReferenceEquals(key.Tag, Tag) || ReferenceEquals(Tag, key.Tag) || Equals(key.Tag, Tag) || Equals(Tag, key.Tag));
+            return ReferenceEquals(key1.Type, key2.Type) 
+                   && (
+                       ReferenceEquals(key1.Tag, key2.Tag)
+                       || Equals(key1.Tag, key2.Tag)
+                       || ReferenceEquals(key1.Tag, AnyTag)
+                       || ReferenceEquals(key2.Tag, AnyTag));
         }
 
         public override int GetHashCode()
@@ -56,16 +76,6 @@
 
         private sealed class AnyTagObject
         {
-            public override int GetHashCode()
-            {
-                return 0;
-            }
-
-            public override bool Equals(object obj)
-            {
-                return !(obj is null);
-            }
-
             public override string ToString()
             {
                 return "any";

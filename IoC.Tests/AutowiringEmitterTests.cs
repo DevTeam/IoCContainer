@@ -1,7 +1,7 @@
 ﻿namespace IoC.Tests
 {
     using Core;
-    using Core.Emiters;
+    using Core.Emitters;
     using Dependencies;
     using Moq;
     using Shouldly;
@@ -143,10 +143,11 @@
             return new ResolverGenerator(
                 new DependencyEmitter(
                     new ValueEmitter(),
-                    Mock.Of<IEmitter<Argument>>(),
-                    Mock.Of<IEmitter<FactoryMethod>>(),
-                    Mock.Of<IEmitter<StaticMethod>>(),
-                    new AutowiringEmitter()));
+                    Mock.Of<IDependencyEmitter<Argument>>(),
+                    Mock.Of<IDependencyEmitter<FactoryMethod>>(),
+                    Mock.Of<IDependencyEmitter<StaticMethod>>(),
+                    new AutowiringEmitter()),
+                Mock.Of<ILifetimeEmitter>());
         }
 
         public class MyClassWithoutConstructor

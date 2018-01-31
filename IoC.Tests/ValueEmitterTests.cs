@@ -2,7 +2,7 @@
 {
     using System.Diagnostics.CodeAnalysis;
     using Core;
-    using Core.Emiters;
+    using Core.Emitters;
     using Dependencies;
     using Moq;
     using Shouldly;
@@ -32,7 +32,7 @@
         {
             // Given
             var resolverGenerator = CreateInstance();
-            using (var resolver = resolverGenerator.Generate<object>(Key.Create<long>(), Mock.Of<IContainer>(), Has.Value(10L)))
+            using (var resolver = resolverGenerator.Generate<long>(Key.Create<long>(), Mock.Of<IContainer>(), Has.Value(10L)))
             {
                 // When
                 var instance = resolver.Resolve(Mock.Of<IContainer>());
@@ -142,7 +142,7 @@
         {
             // Given
             var resolverGenerator = CreateInstance();
-            var val = new MyBaseClass();
+            var val = new MyClass();
             using (var resolver = resolverGenerator.Generate<MyBaseClass>(Key.Create<MyClass>(), Mock.Of<IContainer>(), Has.Value(val)))
             {
                 // When
@@ -173,10 +173,11 @@
             return new ResolverGenerator(
                 new DependencyEmitter(
                     new ValueEmitter(),
-                    Mock.Of<IEmitter<Argument>>(),
-                    Mock.Of<IEmitter<FactoryMethod>>(),
-                    Mock.Of<IEmitter<StaticMethod>>(),
-                    Mock.Of<IEmitter<Autowiring>>()));
+                    Mock.Of<IDependencyEmitter<Argument>>(),
+                    Mock.Of<IDependencyEmitter<FactoryMethod>>(),
+                    Mock.Of<IDependencyEmitter<StaticMethod>>(),
+                    Mock.Of<IDependencyEmitter<Autowiring>>()),
+                Mock.Of<ILifetimeEmitter>());
         }
     }
 }

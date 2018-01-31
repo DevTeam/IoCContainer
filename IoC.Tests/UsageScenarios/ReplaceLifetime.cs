@@ -51,10 +51,10 @@
                 _counter = counter;
             }
 
-            public T GetOrCreate<T>(Key key, IContainer container, object[] args, Resolver<T> resolver)
+            public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
             {
                 _counter.Increment();
-                return _baseSingletoneLifetime.GetOrCreate(key, container, args, resolver);
+                return _baseSingletoneLifetime.GetOrCreate(container, args, resolver);
             }
         }
         // }

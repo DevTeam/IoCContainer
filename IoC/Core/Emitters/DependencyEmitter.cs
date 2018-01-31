@@ -1,28 +1,29 @@
-﻿namespace IoC.Core.Emiters
+﻿namespace IoC.Core.Emitters
 {
     using System;
     using System.Linq;
     using System.Reflection;
     using Dependencies;
+    using IoC.Lifetimes;
 
-    internal sealed class DependencyEmitter : IEmitter<IDependency>
+    internal sealed class DependencyEmitter : IDependencyEmitter<IDependency>
     {
-        public static readonly IEmitter<IDependency> Shared = new DependencyEmitter(ValueEmitter.Shared, ArgumentEmitter.Shared, FactoryMethodEmitter.Shared, StaticMethodEmitter.Shared, AutowiringEmitter.Shared);
+        public static readonly IDependencyEmitter<IDependency> Shared = new DependencyEmitter(ValueEmitter.Shared, ArgumentEmitter.Shared, FactoryMethodEmitter.Shared, StaticMethodEmitter.Shared, AutowiringEmitter.Shared);
         private static readonly Key ContextKey = Key.Create<Context>();
         private static readonly ITypeInfo ContextInfo = Type<Context>.Info;
         private static readonly ConstructorInfo ContextConstructor = ContextInfo.DeclaredConstructors.Single();
-        [NotNull] private readonly IEmitter<Value> _valueEmitter;
-        [NotNull] private readonly IEmitter<Argument> _argumentEmitter;
-        [NotNull] private readonly IEmitter<FactoryMethod> _factoryMethodEmitter;
-        [NotNull] private readonly IEmitter<StaticMethod> _staticMethodEmitter;
-        [NotNull] private readonly IEmitter<Autowiring> _autowiringEmitter;
+        [NotNull] private readonly IDependencyEmitter<Value> _valueEmitter;
+        [NotNull] private readonly IDependencyEmitter<Argument> _argumentEmitter;
+        [NotNull] private readonly IDependencyEmitter<FactoryMethod> _factoryMethodEmitter;
+        [NotNull] private readonly IDependencyEmitter<StaticMethod> _staticMethodEmitter;
+        [NotNull] private readonly IDependencyEmitter<Autowiring> _autowiringEmitter;
 
         public DependencyEmitter(
-            [NotNull] IEmitter<Value> valueEmitter,
-            [NotNull] IEmitter<Argument> argumentEmitter,
-            [NotNull] IEmitter<FactoryMethod> factoryMethodEmitter,
-            [NotNull] IEmitter<StaticMethod> staticMethodEmitter,
-            [NotNull] IEmitter<Autowiring> autowiringEmitter)
+            [NotNull] IDependencyEmitter<Value> valueEmitter,
+            [NotNull] IDependencyEmitter<Argument> argumentEmitter,
+            [NotNull] IDependencyEmitter<FactoryMethod> factoryMethodEmitter,
+            [NotNull] IDependencyEmitter<StaticMethod> staticMethodEmitter,
+            [NotNull] IDependencyEmitter<Autowiring> autowiringEmitter)
         {
             _valueEmitter = valueEmitter ?? throw new ArgumentNullException(nameof(valueEmitter));
             _argumentEmitter = argumentEmitter ?? throw new ArgumentNullException(nameof(argumentEmitter));
@@ -31,31 +32,30 @@
             _autowiringEmitter = autowiringEmitter ?? throw new ArgumentNullException(nameof(autowiringEmitter));
         }
 
-        public EmitResult Emit(EmitContext ctx, IDependency dependency)
+        public void Emit(EmitContext ctx, IDependency dependency)
         {
             if (ctx == null) throw new ArgumentNullException(nameof(ctx));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
-            EmitResult emitResult;
             switch (dependency)
             {
                 case Value value:
-                    emitResult = _valueEmitter.Emit(ctx, value);
+                    _valueEmitter.Emit(ctx, value);
                     break;
 
                 case Argument argument:
-                    emitResult = _argumentEmitter.Emit(ctx, argument);
+                    _argumentEmitter.Emit(ctx, argument);
                     break;
 
                 case FactoryMethod function:
-                    emitResult = _factoryMethodEmitter.Emit(ctx, function);
+                    _factoryMethodEmitter.Emit(ctx, function);
                     break;
 
                 case StaticMethod staticMethod:
-                    emitResult = _staticMethodEmitter.Emit(ctx, staticMethod);
+                    _staticMethodEmitter.Emit(ctx, staticMethod);
                     break;
 
                 case Autowiring autowiring:
-                    emitResult = _autowiringEmitter.Emit(ctx, autowiring);
+                    _autowiringEmitter.Emit(ctx, autowiring);
                     break;
 
                 case Dependency dep:
@@ -83,7 +83,7 @@
                         container = ctx.Container;
                     }
 
-                    if (container.TryGetDependency(dep.Key, out var nestedDependency))
+                    if (container.TryGetDependency(dep.Key, out var nestedDependency, out var lifetime))
                     {
                         var reentrancy = ctx.Statistics.EmitDependency(dep.Key);
                         if (reentrancy >= 128)
@@ -91,30 +91,45 @@
                             ctx.Container.Get<IIssueResolver>().CyclicDependenceDetected(dep.Key, reentrancy);
                         }
 
-                        ctx = new EmitContext(dep.Key, container, ctx.DependencyEmitter, ctx.Emitter, ctx.Statistics);
-                        emitResult = Emit(ctx, nestedDependency);
+                        ctx = new EmitContext(
+                            dep.Key,
+                            container,
+                            ctx.DependencyEmitter,
+                            ctx.LifetimeEmitter,
+                            ctx.Emitter,
+                            ctx.Statistics);
+
+                        Emit(ctx, nestedDependency);
+                        if (!(lifetime is null))
+                        {
+                            ctx.LifetimeEmitter.Emit(ctx, lifetime);
+                        }
+
                         break;
                     }
 
-                    if (dep.Key.Equals(ContextKey))
+                    if (dep.Key.HashCode == ContextKey.HashCode && dep.Key.Equals(ContextKey))
                     {
                         ctx.Emitter
-                            .Ldobj(ctx.Key)
-                            .Ldarg(Arguments.Container)
-                            .Ldarg(Arguments.Args)
+                            .LoadConst(ctx.Key)
+                            .LoadArg(Arguments.Container)
+                            .LoadArg(Arguments.Args)
                             .Newobj(ContextConstructor);
-
-                        emitResult = new EmitResult(ContextInfo);
                         break;
                     }
 
                     throw new InvalidOperationException($"Cannot resolve the dependency \"{dep.Key}\".");
 
                 default:
-                    throw new NotSupportedException();
-            }
+                    // ReSharper disable once SuspiciousTypeConversion.Global
+                    if (dependency is IEmitable emitable)
+                    {
+                        ctx.Emitter.Push(emitable.Emit(null));
+                        break;
+                    }
 
-            return emitResult;
+                    throw new NotSupportedException($"Unknow dependecy \"{dependency}\" or the interface \"{nameof(IEmitable)}\" is not supported.");
+            }
         }
     }
 }

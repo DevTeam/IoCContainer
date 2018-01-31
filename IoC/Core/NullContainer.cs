@@ -14,15 +14,34 @@
             throw new NotSupportedException();
         }
 
-        public bool TryGetDependency(Key key, out IDependency dependency)
+        public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
         {
             dependency = default(IDependency);
+            lifetime = default(ILifetime);
             return false;
         }
 
         public bool TryGetResolver<T>(Key key, out Resolver<T> resolver, IContainer container = null)
         {
             resolver = default(Resolver<T>);
+            return false;
+        }
+
+        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
+        {
+            resolver = default(Resolver<T>);
+            return false;
+        }
+
+        public bool TryGet(Type type, object tag, out object instance, params object[] args)
+        {
+            instance = default(object);
+            return false;
+        }
+
+        public bool TryGet<T>(object tag, out T instance, params object[] args)
+        {
+            instance = default(T);
             return false;
         }
 
