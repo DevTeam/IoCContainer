@@ -107,24 +107,27 @@ The results of the [comparison tests](https://github.com/DevTeam/IoCContainer/bl
 
 ## Usage Scenarios
 
-* [Resolve from Container](#resolve-from-container)
+* [Auto-wiring](#auto-wiring)
 * [Generics](#generics)
-* [Several Contracts](#several-contracts)
-* [Asynchronous Resolve](#asynchronous-resolve)
-* [Resolve All Possible](#resolve-all-possible)
-* [Func](#func)
+* [Several contracts](#several-contracts)
+* [Asynchronous get](#asynchronous-get)
+* [Auto-wiring hints](#auto-wiring-hints)
+* [Resolve all possible items as IEnumerable<>](#resolve-all-possible-items-as-ienumerable<>)
+* [Func get](#func-get)
 * [Singletone](#singletone)
 * [Tags](#tags)
-* [Factory](#factory)
 * [Factory Method](#factory-method)
+* [Func](#func)
+* [Func with context](#func-with-context)
+* [Value](#value)
 * [Dependency Tag](#dependency-tag)
+* [Func With Arguments](#func-with-arguments)
 * [Method Injection](#method-injection)
 * [Property Injection](#property-injection)
-* [Factory Method With Arguments](#factory-method-with-arguments)
 * [Resolve Using Arguments](#resolve-using-arguments)
 * [Auto dispose singletone during container's dispose](#auto-dispose-singletone-during-containers-dispose)
-* [Configure Via Configuration class](#configure-via-configuration-class)
-* [Configure Via Text](#configure-via-text)
+* [Configuration class](#configuration-class)
+* [Configuration text](#configuration-text)
 * [Change configuration on-the-fly](#change-configuration-on-the-fly)
 * [Custom Child Container](#custom-child-container)
 * [Custom Lifetime](#custom-lifetime)
@@ -135,7 +138,7 @@ The results of the [comparison tests](https://github.com/DevTeam/IoCContainer/bl
 * [Cyclic Dependence](#cyclic-dependence)
 * [Interfaces and classes for samples](#interfaces-and-classes-for-samples)
 
-### Resolve from Container
+### Auto-wiring
 
 ``` CSharp
 // Create the container
@@ -150,7 +153,7 @@ using (container.Bind<IService>().To<Service>())
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveFromContainer.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Autowiring.cs)
 
 ### Generics
 
@@ -167,9 +170,9 @@ using (container.Bind(typeof(IService<>)).To(typeof(Service<>)))
     instance.ShouldBeOfType<Service<int>>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveGeneric.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Generics.cs)
 
-### Several Contracts
+### Several contracts
 
 ``` CSharp
 // Create the container
@@ -186,9 +189,9 @@ using (container.Bind<Service, IService, IAnotherService>().To<Service>())
     instance2.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveViaSeveralContracts.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SeveralContracts.cs)
 
-### Asynchronous Resolve
+### Asynchronous get
 
 ``` CSharp
 // Create the container
@@ -203,9 +206,27 @@ using (container.Bind<IService>().To<Service>())
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveAsync.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsyncGet.cs)
 
-### Resolve All Possible
+### Auto-wiring hints
+
+``` CSharp
+// Create the container
+using (var container = Container.Create())
+// Configure the container
+using (container.Bind<IDependency>().To<Dependency>())
+using (container.Bind<IService>().To<Service>(Has.Constructor(Has.Value("some state").For("state"))))
+{
+    // Resolve the instance
+    var instance = container.Get<IService>();
+
+    instance.ShouldBeOfType<Service>();
+    instance.State.ShouldBe("some state");
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutowiringHints.cs)
+
+### Resolve all possible items as IEnumerable<>
 
 ``` CSharp
 // Create the container
@@ -223,9 +244,9 @@ using (container.Bind<IService>().Tag(3).To<Service>())
     instances.ForEach(instance => instance.ShouldBeOfType<Service>());
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveEnumerable.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Enumerables.cs)
 
-### Func
+### Func get
 
 ``` CSharp
 // Create the container
@@ -242,7 +263,7 @@ using (container.Bind<IService>().To<Service>())
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveViaFunc.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FuncGet.cs)
 
 ### Singletone
 
@@ -265,7 +286,7 @@ using (container.Bind<IService>().Lifetime(Lifetime.Singletone).To<Service>())
 // Container - Singletone per container
 // Resolve - Singletone per resolve
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveSingletone.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Singletone.cs)
 
 ### Tags
 
@@ -284,25 +305,7 @@ using (container.Bind<IService>().Tag(10).Tag().Tag("abc").To<Service>())
     var instance3 = container.Get<IService>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveUsingTags.cs)
-
-### Factory
-
-``` CSharp
-public void Run()
-{
-    // Create the container
-    using (var container = Container.Create())
-    // Configure the container
-    using (container.Bind<IService>().ToFactory((key, cutContainer, args) => new Service(new Dependency())))
-    {
-        // Resolve the instance
-        var instance = container.Get<IService>();
-        instance.ShouldBeOfType<Service>();
-    }
-}
-```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveViaFactory.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Tags.cs)
 
 ### Factory Method
 
@@ -310,9 +313,7 @@ public void Run()
 // Create the container
 using (var container = Container.Create())
 // Configure the container
-using (container.Bind<IService>().ToFunc(() => new Service(new Dependency())))
-// Each dependency cound be resolve also using a resolving context
-// using (container.Bind<IService>().To(ctx => new Service(ctx.ResolvingContainer.Get<IDependency>())))
+using (container.Bind<IService>().ToFactory((key, curContainer, args) => new Service(new Dependency())))
 {
     // Resolve the instance
     var instance = container.Get<IService>();
@@ -320,7 +321,55 @@ using (container.Bind<IService>().ToFunc(() => new Service(new Dependency())))
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveViaFactoryMethod.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FactoryMethod.cs)
+
+### Func
+
+``` CSharp
+// Create the container
+using (var container = Container.Create())
+// Configure the container
+using (container.Bind<IService>().ToFunc(() => new Service(new Dependency())))
+{
+    // Resolve the instance
+    var instance = container.Get<IService>();
+
+    instance.ShouldBeOfType<Service>();
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Func.cs)
+
+### Func with context
+
+``` CSharp
+// Create the container
+using (var container = Container.Create())
+// Configure the container
+using (container.Bind<IService>().ToFunc(ctx => new Service(new Dependency())))
+{
+    // Resolve the instance
+    var instance = container.Get<IService>();
+
+    instance.ShouldBeOfType<Service>();
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FuncWithContext.cs)
+
+### Value
+
+``` CSharp
+// Create the container
+using (var container = Container.Create())
+// Configure the container
+using (container.Bind<IService>().ToValue(new Service(new Dependency())))
+{
+    // Resolve the instance
+    var instance = container.Get<IService>();
+
+    instance.ShouldBeOfType<Service>();
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Value.cs)
 
 ### Dependency Tag
 
@@ -336,6 +385,29 @@ using (container.Bind<IService>().To<Service>(Has.Constructor(Has.Dependency<IDe
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/DependencyTag.cs)
+
+### Func With Arguments
+
+``` CSharp
+// Create the container
+using (var container = Container.Create())
+// Configure the container
+using (container.Bind<IDependency>().To<Dependency>())
+using (container.Bind<INamedService>().ToFunc(ctx => new NamedService(ctx.Container.Get<IDependency>(), (string)ctx.Args[0])))
+{
+    // Resolve the instance "alpha"
+    var instance = container.Get<INamedService>("alpha");
+
+    instance.ShouldBeOfType<NamedService>();
+    instance.Name.ShouldBe("alpha");
+
+    // Resolve the instance "beta"
+    var func = container.Get<Func<string, INamedService>>();
+    var otherInstance = func("beta");
+    otherInstance.Name.ShouldBe("beta");
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FuncWithArguments.cs)
 
 ### Method Injection
 
@@ -383,29 +455,6 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(Has.Property
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/PropertyInjection.cs)
 
-### Factory Method With Arguments
-
-``` CSharp
-// Create the container
-using (var container = Container.Create())
-// Configure the container
-using (container.Bind<IDependency>().To<Dependency>())
-using (container.Bind<INamedService>().ToFunc(ctx => new NamedService(ctx.Container.Get<IDependency>(), (string)ctx.Args[0])))
-{
-    // Resolve the instance "alpha"
-    var instance = container.Get<INamedService>("alpha");
-
-    instance.ShouldBeOfType<NamedService>();
-    instance.Name.ShouldBe("alpha");
-
-    // Resolve the instance "beta"
-    var func = container.Get<Func<string, INamedService>>();
-    var otherInstance = func("beta");
-    otherInstance.Name.ShouldBe("beta");
-}
-```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveViaFactoryMethodWithArgs.cs)
-
 ### Resolve Using Arguments
 
 ``` CSharp
@@ -451,7 +500,7 @@ disposableService.Verify(i => i.Dispose(), Times.Once);
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoDisposeSingletoneDuringContainersDispose.cs)
 
-### Configure Via Configuration class
+### Configuration class
 
 ``` CSharp
 public void Run()
@@ -475,9 +524,9 @@ public class Glue : IConfiguration
     }
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConfigureViaConfigurationClass.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConfigurationClass.cs)
 
-### Configure Via Text
+### Configuration text
 
 ``` CSharp
 // Create the container and configure from the metadata string
@@ -493,7 +542,7 @@ using (var container = Container.Create().Using(
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConfigureViaText.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConfigurationText.cs)
 
 ### Change configuration on-the-fly
 
@@ -919,7 +968,10 @@ public interface IDependency { }
 
 public class Dependency : IDependency { }
 
-public interface IService { }
+public interface IService
+{
+    string State { get; }
+}
 
 public interface IAnotherService { }
 
@@ -928,6 +980,10 @@ public interface IDisposableService : IService, IDisposable { }
 public class Service : IService, IAnotherService
 {
     public Service(IDependency dependency) { }
+
+    public Service(IDependency dependency, string state) { State = state; }
+
+    public string State { get; }
 }
 
 // Generic

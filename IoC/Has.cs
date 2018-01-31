@@ -400,10 +400,12 @@
             return dependency != default(IDependency);
         }
 
-        private static int GetMethodWeight([NotNull][ItemNotNull] IEnumerable<ParameterInfo> paramaters, DependencyPosition[] dependencyPositions)
+        private static int GetMethodWeight([NotNull][ItemNotNull] ParameterInfo[] paramaters, DependencyPosition[] dependencyPositions)
         {
             if (paramaters == null) throw new ArgumentNullException(nameof(paramaters));
-            return paramaters.Count(paramater => TryFindDependency(paramater, out var _, dependencyPositions));
+            return 
+                paramaters.Count(paramater => TryFindDependency(paramater, out var _, dependencyPositions)) 
+                - paramaters.Count(paramater => !TryFindDependency(paramater, out var _, dependencyPositions));
         }
 
     }

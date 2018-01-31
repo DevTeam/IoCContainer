@@ -12,7 +12,10 @@ namespace IoC.Tests.UsageScenarios
 
     public class Dependency : IDependency { }
 
-    public interface IService { }
+    public interface IService
+    {
+        string State { get; }
+    }
 
     public interface IAnotherService { }
 
@@ -21,6 +24,10 @@ namespace IoC.Tests.UsageScenarios
     public class Service : IService, IAnotherService
     {
         public Service(IDependency dependency) { }
+
+        public Service(IDependency dependency, string state) { State = state; }
+
+        public string State { get; }
     }
 
     // Generic

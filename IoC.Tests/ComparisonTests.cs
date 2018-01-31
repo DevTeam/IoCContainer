@@ -20,6 +20,7 @@ namespace IoC.Tests
     using Xunit;
     using Xunit.Abstractions;
 
+    [SuppressMessage("ReSharper", "UnusedMember.Local")]
     public class ComparisonTests
     {
         private const string ThisIocName = "this";
@@ -27,30 +28,30 @@ namespace IoC.Tests
 
         private static readonly Dictionary<string, Action<int, IPerformanceCounter>> IocsGraphOf3ObjectsWithSingletone = new Dictionary<string, Action<int, IPerformanceCounter>>()
         {
-            { "Without IoC", CtorGraphOf5ObjectsWithSingletone },
+            { "Without IoC", CtorSingletone },
 #if NETCOREAPP2_0
-            { "LightInject", LightInjectGraphOf5ObjectsWithSingletone },
+            { "LightInject", LightInjectSingletone },
 #endif
-            { $"{ThisIocName} for actual scenario", ThisByFuncGraphOf5ObjectsWithSingletone },
-            { ThisIocName, ThisGraphOf5ObjectsWithSingletone },
-            { "Castle.Windsor", CastleWindsorGraphOf5ObjectsWithSingletone },
-            { "Unity", UnityGraphOf5ObjectsWithSingletone },
-            { "Ninject", NinjectGraphOf5ObjectsWithSingletone },
-            { "Autofac", AutofacGraphOf5ObjectsWithSingletone },
+            { $"{ThisIocName} for actual scenario", ThisByFuncSingletone },
+            { ThisIocName, ThisSingletone },
+            { "Castle.Windsor", CastleWindsorSingletone },
+            { "Unity", UnitySingletone },
+            { "Ninject", NinjectSingletone },
+            { "Autofac", AutofacSingletone },
         };
 
-        private static readonly Dictionary<string, Action<int, IPerformanceCounter>> IocsGraphOf3TransientObjects = new Dictionary<string, Action<int, IPerformanceCounter>>()
+        private static readonly Dictionary<string, Action<int, IPerformanceCounter>> IocsGraphOf3Transient = new Dictionary<string, Action<int, IPerformanceCounter>>()
         {
-            { "Without IoC", CtorGraphOf6TransientObjects },
+            { "Without IoC", CtorTransient },
 #if NETCOREAPP2_0
-            { "LightInject", LightInjectGraphOf6TransientObjects },
+            { "LightInject", LightInjectTransient },
 #endif
-            { $"{ThisIocName} for actual scenario", ThisByFuncGraphOf6TransientObjects },
-            { ThisIocName, ThisGraphOf6TransientObjects },
-            { "Castle.Windsor", CastleWindsorGraphOf6TransientObjects },
-            { "Unity", UnityGraphOf6TransientObjects },
-            { "Ninject", NinjectGraphOf6TransientObjects },
-            { "Autofac", AutofacGraphOf6TransientObjects },
+            { $"{ThisIocName} for actual scenario", ThisByFuncTransient },
+            { ThisIocName, ThisTransient },
+            { "Castle.Windsor", CastleWindsorTransient },
+            { "Unity", UnityTransient },
+            { "Ninject", NinjectTransient },
+            { "Autofac", AutofacTransient },
         };
 
         public ComparisonTests(ITestOutputHelper output)
@@ -82,7 +83,7 @@ namespace IoC.Tests
             SaveResults(results, $"Speed: 5 objects and 1 singletone {series} times");
             results.Clear();
 
-            foreach (var ioc in IocsGraphOf3TransientObjects)
+            foreach (var ioc in IocsGraphOf3Transient)
             {
                 // Warmup
                 GC.Collect();
@@ -125,7 +126,7 @@ namespace IoC.Tests
             SaveResults(results, $"Memory usage: 5 objects and 1 singletone {series} times");
             results.Clear();
 
-            foreach (var ioc in IocsGraphOf3TransientObjects)
+            foreach (var ioc in IocsGraphOf3Transient)
             {
                 GC.Collect();
                 var performanceCounter = new MemoryPerformanceCounter();
@@ -139,7 +140,7 @@ namespace IoC.Tests
             results.Clear();
         }
 
-        private static void ThisGraphOf5ObjectsWithSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void ThisSingletone(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = Container.Create())
             using (container.Bind<IService1>().To<Service1>())
@@ -154,7 +155,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void ThisGraphOf6TransientObjects(int series, IPerformanceCounter performanceCounter)
+        private static void ThisTransient(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = Container.Create())
             using (container.Bind<IService1>().To<Service1>())
@@ -169,7 +170,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void ThisByFuncGraphOf5ObjectsWithSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void ThisByFuncSingletone(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = Container.Create())
             using (container.Bind<IService1>().To<Service1>())
@@ -187,7 +188,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void ThisByFuncGraphOf6TransientObjects(int series, IPerformanceCounter performanceCounter)
+        private static void ThisByFuncTransient(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = Container.Create())
             using (container.Bind<IService1>().To<Service1>())
@@ -205,7 +206,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void UnityGraphOf5ObjectsWithSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void UnitySingletone(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = new UnityContainer())
             {
@@ -222,7 +223,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void UnityGraphOf6TransientObjects(int series, IPerformanceCounter performanceCounter)
+        private static void UnityTransient(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = new UnityContainer())
             {
@@ -239,7 +240,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void NinjectGraphOf5ObjectsWithSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void NinjectSingletone(int series, IPerformanceCounter performanceCounter)
         {
             using (var kernel = new StandardKernel())
             {
@@ -256,7 +257,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void NinjectGraphOf6TransientObjects(int series, IPerformanceCounter performanceCounter)
+        private static void NinjectTransient(int series, IPerformanceCounter performanceCounter)
         {
             using (var kernel = new StandardKernel())
             {
@@ -273,7 +274,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void AutofacGraphOf5ObjectsWithSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void AutofacSingletone(int series, IPerformanceCounter performanceCounter)
         {
             var builder = new ContainerBuilder();
             builder.RegisterType<Service1>().As<IService1>();
@@ -289,7 +290,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void AutofacGraphOf6TransientObjects(int series, IPerformanceCounter performanceCounter)
+        private static void AutofacTransient(int series, IPerformanceCounter performanceCounter)
         {
             var builder = new ContainerBuilder();
             builder.RegisterType<Service1>().As<IService1>();
@@ -305,7 +306,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void CastleWindsorGraphOf5ObjectsWithSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void CastleWindsorSingletone(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = new WindsorContainer())
             {
@@ -316,13 +317,13 @@ namespace IoC.Tests
                 {
                     for (var i = 0; i < series; i++)
                     {
-                        container.Resolve<IService1>().DoSomething(); ;
+                        container.Resolve<IService1>().DoSomething();
                     }
                 }
             }
         }
 
-        private static void CastleWindsorGraphOf6TransientObjects(int series, IPerformanceCounter performanceCounter)
+        private static void CastleWindsorTransient(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = new WindsorContainer())
             {
@@ -333,13 +334,13 @@ namespace IoC.Tests
                 {
                     for (var i = 0; i < series; i++)
                     {
-                        container.Resolve<IService1>().DoSomething(); ;
+                        container.Resolve<IService1>().DoSomething();
                     }
                 }
             }
         }
 
-        private static void LightInjectGraphOf5ObjectsWithSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void LightInjectSingletone(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = new ServiceContainer())
             {
@@ -350,13 +351,13 @@ namespace IoC.Tests
                 {
                     for (var i = 0; i < series; i++)
                     {
-                        container.GetInstance<IService1>().DoSomething(); ;
+                        container.GetInstance<IService1>().DoSomething();
                     }
                 }
             }
         }
 
-        private static void LightInjectGraphOf6TransientObjects(int series, IPerformanceCounter performanceCounter)
+        private static void LightInjectTransient(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = new ServiceContainer())
             {
@@ -373,7 +374,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void CtorGraphOf5ObjectsWithSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void CtorSingletone(int series, IPerformanceCounter performanceCounter)
         {
             using (performanceCounter.Run())
             {
@@ -386,7 +387,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void CtorGraphOf6TransientObjects(int series, IPerformanceCounter performanceCounter)
+        private static void CtorTransient(int series, IPerformanceCounter performanceCounter)
         {
             using (performanceCounter.Run())
             {
