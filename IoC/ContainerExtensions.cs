@@ -4,6 +4,7 @@
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using Core;
@@ -121,6 +122,14 @@
             if (registration == null) throw new ArgumentNullException(nameof(registration));
             if (factory == null) throw new ArgumentNullException(nameof(factory));
             return registration.To(Has.Factory(factory));
+        }
+
+        [NotNull]
+        public static IDisposable ToExpression<T>([NotNull] this IRegistration<T> registration, [NotNull] Expression<Resolver<T>> expression)
+        {
+            if (registration == null) throw new ArgumentNullException(nameof(registration));
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            return registration.To(Has.Expression(expression));
         }
 
         [NotNull]

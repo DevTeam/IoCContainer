@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Reflection;
     using Core;
     using Dependencies;
@@ -22,6 +23,13 @@
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
             if (string.IsNullOrWhiteSpace(parameterName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(parameterName));
             return new DependencyPosition(dependency, parameterName);
+        }
+
+        [NotNull]
+        public static ResolverExpression<T> Expression<T>([NotNull] Expression<Resolver<T>> expression)
+        {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            return new ResolverExpression<T>(expression);
         }
 
         [NotNull]

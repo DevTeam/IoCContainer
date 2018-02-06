@@ -27,7 +27,7 @@
                 throw new ArgumentException($"The type {typeof(T)} is generic type definition and cannot be constructed.");
             }
 
-            var emitter = new Emitter(Arguments.ResolverArgsuments);
+            var emitter = new Emitter(Arguments.ResolverParameters);
             var ctx = new EmitContext(key, container, _dependencyEmitter, _lifetimeEmitter, emitter, new EmitStatistics());
 
             // Emit resolver
@@ -52,7 +52,7 @@
                 body = emitter.Pop();
             }
 
-            var expression = Expression.Lambda<Resolver<T>>(body, true, Arguments.ResolverArgsuments);
+            var expression = Expression.Lambda<Resolver<T>>(body, true, Arguments.ResolverParameters);
             return new ResolverHolder<T>(expression.Compile());
         }
     }

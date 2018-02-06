@@ -113,6 +113,7 @@ The results of the [comparison tests](https://github.com/DevTeam/IoCContainer/bl
 * [Asynchronous get](#asynchronous-get)
 * [Auto-wiring hints](#auto-wiring-hints)
 * [Resolve all possible items as IEnumerable<>](#resolve-all-possible-items-as-ienumerable<>)
+* [Expressions](#expressions)
 * [Func get](#func-get)
 * [Singletone lifetime](#singletone-lifetime)
 * [Tags](#tags)
@@ -247,6 +248,24 @@ using (container.Bind<IService>().Tag(3).To<Service>())
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Enumerables.cs)
+
+### Expressions
+
+``` CSharp
+// Create the container
+using (var container = Container.Create())
+// Configure the container
+using (container.Bind<IDependency>().To<Dependency>())
+using (container.Bind<IService>().ToExpression<Service>((curContainer, args) => new Service(new Dependency(), (string)args[0])))
+{
+    // Resolve the instance
+    var instance = container.Get<IService>("abc");
+
+    instance.ShouldBeOfType<Service>();
+    instance.State.ShouldBe("abc");
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Expressions.cs)
 
 ### Func get
 

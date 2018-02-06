@@ -28,7 +28,7 @@
                     .MakeGenericMethod(body.Type);
 
                 var resolverType = typeof(Resolver<>).MakeGenericType(body.Type);
-                var resolver = Expression.Lambda(resolverType, body, true, Arguments.ResolverArgsuments).Compile();
+                var resolver = Expression.Lambda(resolverType, body, true, Arguments.ResolverParameters).Compile();
                 ctx.Emitter
                     .LoadConst(lifetimeType, lifetime)
                     .LoadArg(Arguments.Container)
