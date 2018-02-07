@@ -3,7 +3,7 @@
     using Shouldly;
     using Xunit;
 
-    public class Expressions
+    public class GenericAutowiring
     {
         [Fact]
         public void Run()
@@ -11,19 +11,21 @@
             // $visible=true
             // $group=01
             // $priority=02
-            // $description=Expressions
+            // $description=Generic Auto-wiring
             // {
             // Create the container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<IService>().ToExpression<Service>((curContainer, args) => new Service(new Dependency(), (string)args[0])))
+            // Configure auto-wiring
+            using (container.Bind<IService<TT>>().To<Service<TT>>(
+                // Configure the constructor to use
+                ctx => new Service<TT>(ctx.Container.Inject<IDependency>())))
             {
-                // Resolve the instance
-                var instance = container.Get<IService>("abc");
+                // Resolve the generic instance
+                var instance = container.Get<IService<int>>();
 
-                instance.ShouldBeOfType<Service>();
-                instance.State.ShouldBe("abc");
+                instance.ShouldBeOfType<Service<int>>();
             }
             // }
         }

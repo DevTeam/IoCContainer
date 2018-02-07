@@ -1,10 +1,10 @@
 ﻿namespace IoC
 {
-    using System;
+    using System.Linq.Expressions;
 
     [PublicAPI]
     public interface IDependency
     {
-        [NotNull] Type Type { get; }
+        [NotNull] Expression Expression { get; }
     }
 }

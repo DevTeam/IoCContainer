@@ -11,7 +11,7 @@
 
         public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
         {
-            var lifetime = _lifetimes.GetOrAdd(ResolvingScope.Current.ScopeKey, new SingletoneLifetime());
+            var lifetime = _lifetimes.GetOrAdd(Scope.Current.ScopeKey, new SingletoneLifetime());
             return lifetime.GetOrCreate(container, args, resolver);
         }
 
@@ -20,6 +20,11 @@
             var items = _lifetimes.Values.ToList();
             _lifetimes.Clear();
             Disposable.Create(items).Dispose();
+        }
+
+        public ILifetime Clone()
+        {
+            return new ScopeLifetime();
         }
 
         public override string ToString()

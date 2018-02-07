@@ -15,10 +15,16 @@
             // $description=Func With Arguments
             // {
             // Create the container
+            Func<IDependency, string, INamedService> func = 
+                (dependency, name) => new NamedService(dependency, name);
+
             using (var container = Container.Create())
             // Configure the container
+            // Use full auto-wiring
             using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<INamedService>().ToFunc(ctx => new NamedService(ctx.Container.Get<IDependency>(), (string)ctx.Args[0])))
+            // Configure auto-wiring for constructor and use element from index as a second argument
+            using (container.Bind<INamedService>().To(
+                ctx => func(ctx.Container.Inject<IDependency>(), (string)ctx.Args[0])))
             {
                 // Resolve the instance "alpha"
                 var instance = container.Get<INamedService>("alpha");
@@ -27,8 +33,8 @@
                 instance.Name.ShouldBe("alpha");
 
                 // Resolve the instance "beta"
-                var func = container.Get<Func<string, INamedService>>();
-                var otherInstance = func("beta");
+                var getterFunc = container.Get<Func<string, INamedService>>();
+                var otherInstance = getterFunc("beta");
                 otherInstance.Name.ShouldBe("beta");
             }
             // }

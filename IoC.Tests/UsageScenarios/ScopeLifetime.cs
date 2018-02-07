@@ -26,7 +26,7 @@
                     instance1.ShouldBe(instance2);
 
                     // Resolving in scope "1"
-                    using (new ResolvingScope("1"))
+                    using (new Scope("1"))
                     {
                         var instance3 = container.Get<IService>();
                         var instance4 = container.Get<IService>();
@@ -49,7 +49,7 @@
                     instance1.Dependency.ShouldBe(instance2.Dependency);
 
                     // Resolving in scope "1"
-                    using (new ResolvingScope("1"))
+                    using (new Scope("1"))
                     {
                         var instance3 = container.Get<IService>();
                         instance3.Dependency.ShouldNotBe(instance1.Dependency);

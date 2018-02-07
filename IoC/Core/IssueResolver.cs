@@ -29,17 +29,14 @@
             throw new InvalidOperationException($"Cannot get generic type arguments from the type \"{type.Name}\".");
         }
 
-        public Factory<T> CannotBeCreated<T>(Type type)
-        {
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            throw new InvalidOperationException($"An instance of the type \"{type}\" cannot be created.");
-        }
-
         public void CyclicDependenceDetected(Key key, int reentrancy)
         {
             if (key == null) throw new ArgumentNullException(nameof(key));
             if (reentrancy <= 0) throw new ArgumentOutOfRangeException(nameof(reentrancy));
-            throw new InvalidOperationException($"The cyclic dependence detected resolving the dependency \"{key}\". The reentrancy is {reentrancy}.");
+            if (reentrancy >= 256)
+            {
+                throw new InvalidOperationException($"The cyclic dependence detected resolving the dependency \"{key}\". The reentrancy is {reentrancy}.");
+            }
         }
 
         public IDisposable CannotRegister(IContainer container, Key[] keys)

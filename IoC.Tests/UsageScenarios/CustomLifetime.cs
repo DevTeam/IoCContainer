@@ -32,6 +32,11 @@
             {
                 return resolver(container, args);
             }
+
+            public ILifetime Clone()
+            {
+                return new MyTransientLifetime();
+            }
         }
         // }
     }

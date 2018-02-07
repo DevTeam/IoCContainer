@@ -3,11 +3,14 @@
 [![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
 Key features:
-  - One of the fastest, almost as fast as without IoC
+  - One of the fastest, almost as fast as operators `new`
   - Produces minimal memory trafic
-  - Flexible auto-wiring without any changes in a design of code
-  - Auto-wiring using a simple text metadata
-  - Fully extensible, supports custom lifetimes/containers
+  - Powerful auto-wiring
+    - Checks the auto-wiring configuration at the compile time
+    - Allows to not change a code design to use IoC
+    - Clear generic types' mapping
+    - The simple text metadata is supported
+  - Fully extensible and supports custom containers/lifetimes
   - Reconfigurable on-the-fly
   - Supports concurrent and asynchronous resolving
 

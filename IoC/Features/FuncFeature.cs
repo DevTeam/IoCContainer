@@ -39,7 +39,7 @@
                 yield return container
                     .Bind(curFactory.Key)
                     .AnyTag()
-                    .ToFactory((key, curContainer, args) => CreateFunc(key, curContainer, curFactory.Value));
+                    .To(ctx => CreateFunc(ctx.Key, ctx.Container, curFactory.Value));
             }
         }
 

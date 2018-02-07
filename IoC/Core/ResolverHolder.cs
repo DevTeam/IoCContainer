@@ -2,14 +2,15 @@
 {
     using System;
 
-    internal struct ResolverHolder<T>: IDisposable
+    internal struct ResolverHolder<T>: IResolverHolder<T>
     {
-        [NotNull] public readonly Resolver<T> Resolve;
-
         public ResolverHolder([NotNull] Resolver<T> resolver)
         {
             Resolve = resolver ?? throw new ArgumentNullException(nameof(resolver));
         }
+
+        [NotNull]
+        public Resolver<T> Resolve { get; }
 
         public void Dispose()
         {

@@ -10,12 +10,13 @@
         {
             // $visible=true
             // $group=01
-            // $priority=01
+            // $priority=02
             // $description=Generics
             // {
             // Create the container
             using (var container = Container.Create())
             // Configure the container
+            // Use full auto-wiring
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind(typeof(IService<>)).To(typeof(Service<>)))
             {

@@ -17,42 +17,42 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container
                 .Bind<IIssueResolver>()
-                .ToValue(IssueResolver.Shared);
+                .To(ctx => IssueResolver.Shared);
 
             yield return container
                 .Bind<ILifetime>()
                 .Tag(Lifetime.Singletone)
-                .ToFactory((key, curContainer, args) => new SingletoneLifetime());
+                .To(ctx => new SingletoneLifetime());
 
             yield return container
                 .Bind<ILifetime>()
                 .Tag(Lifetime.Container)
-                .ToFactory((key, curContainer, args) => new ContainerLifetime());
+                .To(ctx => new ContainerLifetime());
 
             yield return container
                 .Bind<ILifetime>()
                 .Tag(Lifetime.Scope)
-                .ToFactory((key, curContainer, args) => new ScopeLifetime());
+                .To(ctx => new ScopeLifetime());
 
             yield return container
                 .Bind<IContainer>()
                 .Tag()
-                .Tag(Scope.Current)
-                .ToFactory((key, curContainer, args) => curContainer);
+                .Tag(ContainerReference.Current)
+                .To(ctx => ctx.Container);
 
             yield return container
                 .Bind<IContainer>()
-                .Tag(Scope.Child)
-                .ToFactory((key, curContainer, args) => new Container(args.Length == 1 ? Container.CreateContainerName(args[0] as string) : Container.CreateContainerName(), curContainer, false));
+                .Tag(ContainerReference.Child)
+                .To(ctx => new Container(ctx.Args.Length == 1 ? Container.CreateContainerName(ctx.Args[0] as string) : Container.CreateContainerName(string.Empty), ctx.Container, false));
 
             yield return container
                 .Bind<IContainer>()
-                .Tag(Scope.Parent)
-                .ToFactory((key, curContainer, args) => curContainer.Parent ?? throw new NotSupportedException());
+                .Tag(ContainerReference.Parent)
+                .To(ctx => ctx.Container.Parent);
 
             yield return container
                 .Bind<IResourceStore>()
-                .ToFactory((key, curContainer, args) => (IResourceStore)curContainer);
+                .To(ctx => (IResourceStore)ctx.Container);
         }
     }
 }

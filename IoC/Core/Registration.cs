@@ -6,12 +6,33 @@
 
     internal struct Registration<T>: IRegistration<T>
     {
-        public Registration([NotNull] IContainer container, [NotNull][ItemNotNull] params Type[] contractTypes)
+        // ReSharper disable once StaticMemberInGenericType
+        private static readonly ITypeInfo GenericTypeArgumentInfo = Type<GenericTypeArgument>.Info;
+
+        public Registration([NotNull] IContainer container, [NotNull][ItemNotNull] params Type[] types)
         {
             Container = container ?? throw new ArgumentNullException(nameof(container));
-            Types = contractTypes ?? throw new ArgumentNullException(nameof(contractTypes));
+            Types = (types ?? throw new ArgumentNullException(nameof(types))).Select(ConvertType).ToArray();
             Lifetime = null;
             Tags = Enumerable.Empty<object>();
+        }
+
+        [NotNull]
+        private static Type ConvertType([NotNull] Type type)
+        {
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            var typeInfo = type.Info();
+            if (!typeInfo.IsConstructedGenericType)
+            {
+                return type;
+            }
+
+            if (typeInfo.GenericTypeArguments.Any(t => GenericTypeArgumentInfo.IsAssignableFrom(t.Info())))
+            {
+                return typeInfo.GetGenericTypeDefinition();
+            }
+
+            return type;
         }
 
         public Registration([NotNull] IRegistration<T> registration, Lifetime lifetime)

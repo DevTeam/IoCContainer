@@ -87,9 +87,16 @@
             var resolvers = new System.Collections.Generic.List<IDisposable>();
             try
             {
+                var resolver = new RegistrationEntry(ResolverGenerator.Shared, dependency, lifetime, Disposable.Create(() =>
+                {
+                    foreach (var key in keys)
+                    {
+                        TryUnregister(key);
+                    }
+                }));
+
                 foreach (var key in keys)
                 {
-                    var resolver = new RegistrationEntry(ResolverGenerator.Shared, dependency, lifetime, Disposable.Create(() => TryUnregister(key)));
                     resolvers.Add(resolver);
                     isRegistered &= TryRegister(key, resolver);
                 }
@@ -369,14 +376,13 @@
 
         void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
         {
-            if (!TryGetRegistrationEntry(value.Key, out var registrationEntry))
-            {
-                return;
-            }
-
-            registrationEntry.Reset();
             lock (_resources)
             {
+                foreach (var registration in _registrationEntries.Values)
+                {
+                    registration.Reset();
+                }
+
                 _resolversByKey = HashTable<Key, object>.Empty;
                 _resolversByType = HashTable<Type, object>.Empty;
             }
@@ -396,6 +402,5 @@
             // ReSharper disable once AssignNullToNotNullAttribute
             return !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
         }
-
     }
 }

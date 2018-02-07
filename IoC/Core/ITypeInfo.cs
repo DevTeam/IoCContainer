@@ -9,7 +9,11 @@
         [NotNull]
         Type Type { get; }
 
+        Guid Id { get; }
+
         bool IsValueType { get; }
+
+        bool IsInterface { get; }
 
         bool IsConstructedGenericType { get; }
 
@@ -19,10 +23,20 @@
         Type[] GenericTypeArguments { get; }
 
         [NotNull][ItemNotNull]
+        Type[] GenericTypeParameters { get; }
+
+        [NotNull][ItemNotNull]
         IEnumerable<ConstructorInfo> DeclaredConstructors { get; }
 
         [NotNull][ItemNotNull]
         IEnumerable<MethodInfo> DeclaredMethods { get; }
+
+        [NotNull][ItemNotNull]
+        IEnumerable<MemberInfo> DeclaredMembers { get; }
+
+        Type BaseType { get; }
+
+        IEnumerable<Type> ImplementedInterfaces { get; }
 
         bool IsAssignableFrom([NotNull] ITypeInfo typeInfo);
 

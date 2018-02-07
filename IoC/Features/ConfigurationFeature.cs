@@ -57,35 +57,37 @@
 
             yield return container
                 .Bind<IConfiguration>()
-                .ToFactory((key, curContainer, args) =>
-                {
-                    if (args.Length != 1)
-                    {
-                        // ReSharper disable once NotResolvedInText
-                        throw new ArgumentOutOfRangeException("Should have one argument.");
-                    }
+                .To(ctx => CreateTextConfiguration(ctx));
+        }
 
-                    TextReader reader;
-                    switch (args[0])
-                    {
-                        case string text:
-                            reader = new StringReader(text);
-                            break;
+        private static TextConfiguration CreateTextConfiguration(Context ctx)
+        {
+            if (ctx.Args.Length != 1)
+            {
+                // ReSharper disable once NotResolvedInText
+                throw new ArgumentOutOfRangeException("Should have one argument.");
+            }
 
-                        case Stream stream:
-                            reader = new StreamReader(stream);
-                            break;
+            TextReader reader;
+            switch (ctx.Args[0])
+            {
+                case string text:
+                    reader = new StringReader(text);
+                    break;
 
-                        case TextReader textReader:
-                            reader = textReader;
-                            break;
+                case Stream stream:
+                    reader = new StreamReader(stream);
+                    break;
 
-                        default:
-                            throw new ArgumentException("Invalid type of argument.");
-                    }
+                case TextReader textReader:
+                    reader = textReader;
+                    break;
 
-                    return new TextConfiguration(reader, curContainer.Get<IConverter<IEnumerable<Statement>, BindingContext, BindingContext>>());
-                });
+                default:
+                    throw new ArgumentException("Invalid type of argument.");
+            }
+
+            return new TextConfiguration(reader, ctx.Container.Get<IConverter<IEnumerable<Statement>, BindingContext, BindingContext>>());
         }
     }
 }

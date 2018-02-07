@@ -10,7 +10,7 @@
     {
         [Fact]
         // $visible=true
-        // $group=09
+        // $group=08
         // $priority=00
         // $description=Wrapper
         // {
@@ -21,15 +21,16 @@
             // Create the base container
             using (var baseContainer = Container.Create("base"))
             // Configure the base container for base logger
-            using (baseContainer.Bind<IConsole>().ToFunc(ctx => console.Object))
+            using (baseContainer.Bind<IConsole>().To(ctx => console.Object))
             using (baseContainer.Bind<ILogger>().To<Logger>())
             {
                 // Configure some new container
                 using (var childContainer = baseContainer.CreateChild("child"))
                 // And add some console
-                using (childContainer.Bind<IConsole>().ToFunc(ctx => console.Object))
-                // And add logger's wrapper, specifing that resolving of the "logger" dependency should be done from the parent container
-                using (childContainer.Bind<ILogger>().To<TimeLogger>(Has.Constructor(Has.Dependency<ILogger>(null, Scope.Parent).For("baseLogger"))))
+                using (childContainer.Bind<IConsole>().To(ctx => console.Object))
+                using (childContainer.Bind<ILogger>().To<TimeLogger>(
+                    // Inject the logger from the parent container to wrapp
+                    ctx => new TimeLogger(ctx.Container.Parent.Inject<ILogger>())))
                 {
                     var logger = childContainer.Get<ILogger>();
 

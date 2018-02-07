@@ -11,14 +11,18 @@
         {
             // $visible=true
             // $group=01
-            // $priority=05
+            // $priority=03
             // $description=Property Injection
             // {
             // Create the container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<INamedService>().To<InitializingNamedService>(Has.Property("Name", Has.Argument<string>(0).At(0))))
+            using (container.Bind<INamedService>().To<InitializingNamedService>(
+                // Configure the constructor to use
+                ctx => new InitializingNamedService(ctx.Container.Inject<IDependency>()),
+                // Configure the property to initialize
+                ctx => ctx.Container.Inject(ctx.It.Name, (string)ctx.Args[0])))
             {
                 // Resolve the instance "alpha"
                 var instance = container.Get<INamedService>("alpha");

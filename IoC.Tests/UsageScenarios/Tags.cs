@@ -11,7 +11,7 @@
         {
             // $visible=true
             // $group=01
-            // $priority=03
+            // $priority=02
             // $description=Tags
             // {
             // Create the container

@@ -5,6 +5,7 @@
     using System.IO;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using Core;
@@ -21,7 +22,7 @@
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return parent.Tag(Scope.Child).Get<IContainer>(name);
+            return parent.Tag(ContainerReference.Child).Get<IContainer>(name);
         }
 
         [NotNull]
@@ -73,6 +74,30 @@
         }
 
         [NotNull]
+        public static IRegistration<T> Bind<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container)
+            where T : T1, T2, T3, T4, T5
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Registration<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
+        }
+
+        [NotNull]
+        public static IRegistration<T> Bind<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container)
+            where T : T1, T2, T3, T4, T5, T6
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Registration<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
+        }
+
+        [NotNull]
+        public static IRegistration<T> Bind<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container)
+            where T : T1, T2, T3, T4, T5, T6, T7
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Registration<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
+        }
+
+        [NotNull]
         public static IRegistration<T> Lifetime<T>([NotNull] this IRegistration<T> registration, Lifetime lifetime)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
@@ -102,94 +127,28 @@
         }
 
         [NotNull]
-        public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [NotNull] IDependency dependency)
+        public static IDisposable To([NotNull] this IRegistration<object> registration, [NotNull] Type type, [CanBeNull] Predicate<ConstructorInfo> constructorFilter = null)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (dependency == null) throw new ArgumentNullException(nameof(dependency));
-            return new RegistrationToken(registration.Container, CreateRegistration(registration, dependency));
+            return new RegistrationToken(registration.Container, CreateRegistration(registration, new FullAutowring(type, constructorFilter)));
         }
 
         [NotNull]
-        public static IDisposable ToValue<T>([NotNull] this IRegistration<T> registration, [CanBeNull] T value)
+        public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [CanBeNull] Predicate<ConstructorInfo> constructorFilter = null)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
-            return registration.To(Has.Value(value));
-        }
-
-        [NotNull]
-        public static IDisposable ToFactory<T>([NotNull] this IRegistration<T> registration, [NotNull] Factory<T> factory)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (factory == null) throw new ArgumentNullException(nameof(factory));
-            return registration.To(Has.Factory(factory));
-        }
-
-        [NotNull]
-        public static IDisposable ToExpression<T>([NotNull] this IRegistration<T> registration, [NotNull] Expression<Resolver<T>> expression)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (expression == null) throw new ArgumentNullException(nameof(expression));
-            return registration.To(Has.Expression(expression));
-        }
-
-        [NotNull]
-        public static IDisposable ToFunc<T>([NotNull] this IRegistration<T> registration, [NotNull] Func<T> func)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (func == null) throw new ArgumentNullException(nameof(func));
-            return registration.To(Has.Func(func));
-        }
-
-        [NotNull]
-        public static IDisposable ToFunc<T>([NotNull] this IRegistration<T> registration, [NotNull] Func<Context, T> func)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (func == null) throw new ArgumentNullException(nameof(func));
-            return registration.To(Has.Func(func));
-        }
-
-        [NotNull]
-        public static IDisposable To(
-            [NotNull] this IRegistration<object> registration,
-            [NotNull] Type type,
-            Has.ConstructorData constructor,
-            [NotNull] params Has.MethodData[] methods)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            if (methods == null) throw new ArgumentNullException(nameof(methods));
-            return registration.To(Has.Autowiring(type, constructor, methods));
-        }
-
-        [NotNull]
-        public static IDisposable To(
-            [NotNull] this IRegistration<object> registration,
-            [NotNull] Type type,
-            [NotNull] params Has.MethodData[] methods)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            if (methods == null) throw new ArgumentNullException(nameof(methods));
-            return registration.To(Has.Autowiring(type, methods));
+            return new RegistrationToken(registration.Container, CreateRegistration(registration, new FullAutowring(typeof(T), constructorFilter)));
         }
 
         [NotNull]
         public static IDisposable To<T>(
             [NotNull] this IRegistration<T> registration,
-            Has.ConstructorData constructor,
-            [NotNull] params Has.MethodData[] methods)
+            [NotNull] Expression<Func<Context, T>> factory,
+            [NotNull][ItemNotNull] params Expression<Action<Context<T>>>[] statements)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (methods == null) throw new ArgumentNullException(nameof(methods));
-            return registration.To(Has.Autowiring<T>(constructor, methods));
-        }
-
-        [NotNull]
-        public static IDisposable To<T>([NotNull] this IRegistration<T> registration, [NotNull] params Has.MethodData[] methods)
-        {
-            if (registration == null) throw new ArgumentNullException(nameof(registration));
-            if (methods == null) throw new ArgumentNullException(nameof(methods));
-            return registration.To(Has.Autowiring<T>(methods));
+            // ReSharper disable once CoVariantArrayConversion
+            return new RegistrationToken(registration.Container, CreateRegistration(registration, new Autowring(factory, statements)));
         }
 
         public static void ToSelf([NotNull] this IDisposable registrationToken)

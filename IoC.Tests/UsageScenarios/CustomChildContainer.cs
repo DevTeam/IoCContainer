@@ -20,7 +20,7 @@
             // Create the container
             using (var container = Container.Create())
             // Configure current container to use a custom container's class to create a child container
-            using (container.Bind<IContainer>().Tag(Scope.Child).To<MyContainer>())
+            using (container.Bind<IContainer>().Tag(ContainerReference.Child).To<MyContainer>())
             // Create our child container
             using (var childContainer = container.CreateChild("abc"))
             // Configure the child container

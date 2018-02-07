@@ -17,7 +17,7 @@
         }
 
         [NotNull]
-        public static IDisposable Create([NotNull] IEnumerable<IDisposable> disposables)
+        public static IDisposable Create([NotNull][ItemCanBeNull] IEnumerable<IDisposable> disposables)
         {
             if (disposables == null) throw new ArgumentNullException(nameof(disposables));
             return new CompositeDisposable(disposables);
@@ -59,7 +59,7 @@
             {
                 foreach (var disposable in _disposables)
                 {
-                    disposable.Dispose();
+                    disposable?.Dispose();
                 }
 
                 _disposables.Clear();

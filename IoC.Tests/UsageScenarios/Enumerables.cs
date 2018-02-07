@@ -12,7 +12,7 @@
         {
             // $visible=true
             // $group=01
-            // $priority=02
+            // $priority=05
             // $description=Resolve all possible items as IEnumerable<>
             // {
             // Create the container

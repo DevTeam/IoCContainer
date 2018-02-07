@@ -13,8 +13,6 @@
 
         [NotNull][ItemNotNull] Type[] CannotGetGenericTypeArguments([NotNull] Type type);
 
-        [NotNull] Factory<T> CannotBeCreated<T>([NotNull] Type type);
-
         void CyclicDependenceDetected([NotNull] Key key, int reentrancy);
 
         [NotNull] Type CannotParseType([NotNull] string statementText, int statementLineNumber, int statementPosition, [NotNull] string typeName);

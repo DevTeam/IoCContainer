@@ -23,12 +23,12 @@
 
             // Create the container
             using (var container = Container.Create())
-            // Configure the container
-            using (container.Bind<IIssueResolver>().ToValue(issueResolver.Object))
-            using (container.Bind<ILink>().To<Link>(Has.Constructor(Has.Dependency<ILink>(1).For("link"))))
-            using (container.Bind<ILink>().Tag(1).To<Link>(Has.Constructor(Has.Dependency<ILink>(2).For("link"))))
-            using (container.Bind<ILink>().Tag(2).To<Link>(Has.Constructor(Has.Dependency<ILink>(3).For("link"))))
-            using (container.Bind<ILink>().Tag(3).To<Link>(Has.Constructor(Has.Dependency<ILink>(1).For("link"))))
+            // Configure the container. 1,2,3 are tags of binding
+            using (container.Bind<IIssueResolver>().To(ctx => issueResolver.Object))
+            using (container.Bind<ILink>().To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(1))))
+            using (container.Bind<ILink>().Tag(1).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(2))))
+            using (container.Bind<ILink>().Tag(2).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(3))))
+            using (container.Bind<ILink>().Tag(3).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(1))))
             {
                 try
                 {
@@ -41,7 +41,7 @@
                 }
             }
 
-            issueResolver.Verify(i => i.CyclicDependenceDetected(Key.Create<ILink>(1), 128));
+            issueResolver.Verify(i => i.CyclicDependenceDetected(It.IsAny<Key>(), 128));
         }
 
         public interface ILink

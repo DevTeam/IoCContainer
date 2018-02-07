@@ -22,6 +22,11 @@
             Disposable.Create(items).Dispose();
         }
 
+        public ILifetime Clone()
+        {
+            return new ContainerLifetime();
+        }
+
         public override string ToString()
         {
             return Lifetime.Container.ToString();

@@ -1,7 +1,7 @@
 ﻿namespace IoC
 {
     [PublicAPI]
-    public struct Context
+    public class Context
     {
         [NotNull] public readonly Key Key;
         [NotNull] public readonly IContainer Container;

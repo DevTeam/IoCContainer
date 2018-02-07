@@ -7,9 +7,8 @@
     using System.Runtime.CompilerServices;
     using System.Threading;
     using Core;
-    using IoC.Lifetimes;
 
-    internal sealed class SingletoneLifetime : ILifetime, IDisposable, IEmitable
+    internal sealed class SingletoneLifetime : ILifetime, IDisposable, IExpressionBuilder
     {
         [NotNull] private object _lockObject = new object();
         private volatile object _instance;
@@ -44,6 +43,11 @@
             }
         }
 
+        public ILifetime Clone()
+        {
+            return new SingletoneLifetime();
+        }
+
         public override string ToString()
         {
             return Lifetime.Singletone.ToString();
@@ -54,7 +58,7 @@
         private static readonly ParameterExpression LockWasTakenVar = Expression.Variable(typeof(bool), "lockWasTaken");
         private static readonly Expression NullConst = Expression.Constant(null);
 
-        public Expression Emit(Expression baseExpression)
+        public Expression Build(Expression baseExpression)
         {
             if (baseExpression == null) throw new NotSupportedException($"The argument {nameof(baseExpression)} should not be null for lifetime.");
 

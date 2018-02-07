@@ -18,11 +18,18 @@
 
             // Create the container
             using (var container = Container.Create())
-            using (container.Bind<ICounter>().ToFunc(() => counter.Object))
+            using (container.Bind<ICounter>().To(ctx => counter.Object))
             // Replace the Singletone lifetime
-            using (container.Bind<ILifetime>().Tag(Lifetime.Singletone).To<MySingletoneLifetime>(Has.Constructor(Has.Dependency<ILifetime>(Lifetime.Singletone, Scope.Parent).For("baseSingletoneLifetime"))))
+            using (container.Bind<ILifetime>().Tag(Lifetime.Singletone).To<MySingletoneLifetime>(
+                    // Configure the constructor to use
+                    ctx => new MySingletoneLifetime(
+                        // Inject the singletone lifetime from the parent container to use a base logic
+                        ctx.Container.Parent.Inject<ILifetime>(Lifetime.Singletone),
+                        // Inject a counter
+                        ctx.Container.Inject<ICounter>())))
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
+            // Custom Singletone lifetime is using
             using (container.Bind<IService>().Lifetime(Lifetime.Singletone).To<Service>())
             {
                 // Resolve the instance twice using the wrapped Singletine lifetime
@@ -53,8 +60,14 @@
 
             public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
             {
+                // Just counting the number of calls
                 _counter.Increment();
                 return _baseSingletoneLifetime.GetOrCreate(container, args, resolver);
+            }
+
+            public ILifetime Clone()
+            {
+                return new MySingletoneLifetime(_baseSingletoneLifetime.Clone(), _counter);
             }
         }
         // }

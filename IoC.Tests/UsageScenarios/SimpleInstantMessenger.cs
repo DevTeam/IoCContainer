@@ -13,7 +13,7 @@
     {
         [Fact]
         // $visible=true
-        // $group=09
+        // $group=10
         // $priority=00
         // $description=Instant Messenger
         // {
@@ -23,13 +23,14 @@
 
             // Initial message id
             var id = 33;
+            Func<int> generator = () => id++;
 
             // Create the container
             using (var container = Container.Create())
             // Configure the container
-            using (container.Bind<int>().Tag("IdGenerator").ToFunc(() => id++))
+            using (container.Bind<int>().Tag("IdGenerator").To(ctx => generator()))
             using (container.Bind(typeof(IInstantMessenger<>)).To(typeof(InstantMessenger<>)))
-            using (container.Bind<IMessage>().To<Message>(Has.Constructor(Has.Argument<string>(0).For("address"), Has.Argument<string>(1).For("text"), Has.Dependency<int>("IdGenerator").For("id"))))
+            using (container.Bind<IMessage>().To<Message>(ctx => new Message(ctx.Container.Inject<int>("IdGenerator"), (string)ctx.Args[0], (string)ctx.Args[1])))
             {
                 var instantMessenger = container.Get<IInstantMessenger<IMessage>>();
                 using (instantMessenger.Subscribe(observer.Object))

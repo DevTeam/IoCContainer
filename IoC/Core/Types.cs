@@ -30,7 +30,11 @@
 
             public Type Type => _type;
 
+            public Guid Id => _typeInfo.Value.GUID;
+
             public bool IsValueType => _typeInfo.Value.IsValueType;
+
+            public bool IsInterface => _typeInfo.Value.IsInterface;
 
             public bool IsConstructedGenericType => _type.IsConstructedGenericType;
 
@@ -38,9 +42,17 @@
 
             public Type[] GenericTypeArguments => _typeInfo.Value.GenericTypeArguments;
 
+            public Type[] GenericTypeParameters => _typeInfo.Value.GenericTypeParameters;
+
             public IEnumerable<ConstructorInfo> DeclaredConstructors => _typeInfo.Value.DeclaredConstructors;
 
             public IEnumerable<MethodInfo> DeclaredMethods => _typeInfo.Value.DeclaredMethods;
+
+            public IEnumerable<MemberInfo> DeclaredMembers => _typeInfo.Value.DeclaredMembers;
+
+            public Type BaseType => _typeInfo.Value.BaseType;
+
+            public IEnumerable<Type> ImplementedInterfaces => _typeInfo.Value.ImplementedInterfaces;
 
             public bool IsAssignableFrom(ITypeInfo typeInfo)
             {
