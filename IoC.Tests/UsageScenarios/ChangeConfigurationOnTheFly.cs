@@ -28,8 +28,8 @@
                     instance1.ShouldNotBe(instance2);
                 }
 
-                // Reconfigure the container using the Singletone lifetime
-                using (container.Bind<IService>().Lifetime(Lifetime.Singletone).To<Service>())
+                // Reconfigure the container using the Singleton lifetime
+                using (container.Bind<IService>().Lifetime(Lifetime.Singleton).To<Service>())
                 {
                     // Resolve the instance twice
                     var instance1 = container.Get<IService>();

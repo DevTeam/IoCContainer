@@ -8,12 +8,14 @@
     using System.Threading;
     using Core;
 
-    internal sealed class SingletoneLifetime : ILifetime, IDisposable, IExpressionBuilder
+    internal sealed class SingletonLifetime : ILifetime, IDisposable, IExpressionBuilder
     {
         [NotNull] private object _lockObject = new object();
         private volatile object _instance;
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
         {
             if (_instance != null)
@@ -21,6 +23,14 @@
                 return (T) _instance;
             }
 
+            return CreateInstance(container, args, resolver);
+        }
+
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public T CreateInstance<T>(IContainer container, object[] args, Resolver<T> resolver)
+        {
             lock (_lockObject)
             {
                 if (_instance == null)
@@ -34,51 +44,40 @@
 
         public void Dispose()
         {
-            lock (_lockObject)
+            if (_instance is IDisposable disposable)
             {
-                if (_instance is IDisposable disposable)
-                {
-                    disposable.Dispose();
-                }
+                disposable.Dispose();
             }
         }
 
         public ILifetime Clone()
         {
-            return new SingletoneLifetime();
+            return new SingletonLifetime();
         }
 
         public override string ToString()
         {
-            return Lifetime.Singletone.ToString();
+            return Lifetime.Singleton.ToString();
         }
 
-        private static readonly MethodInfo EnterMethod = typeof(Monitor).Info().DeclaredMethods.Single(i => i.Name == "Enter" && i.GetParameters().Length == 2);
-        private static readonly MethodInfo ExitMethod = typeof(Monitor).Info().DeclaredMethods.Single(i => i.Name == "Exit");
-        private static readonly ParameterExpression LockWasTakenVar = Expression.Variable(typeof(bool), "lockWasTaken");
+        private static readonly MethodInfo CreateInstanceMethodInfo = Type<SingletonLifetime>.Info.DeclaredMethods.Single(i => i.Name == nameof(CreateInstance));
         private static readonly Expression NullConst = Expression.Constant(null);
+        private static readonly ITypeInfo ResolverTypeInfo = typeof(Resolver<>).Info();
 
         public Expression Build(Expression baseExpression)
         {
             if (baseExpression == null) throw new NotSupportedException($"The argument {nameof(baseExpression)} should not be null for lifetime.");
-
             var instanceField = Expression.Field(Expression.Constant(this), nameof(_instance));
             var typedInstance = Expression.Convert(instanceField, baseExpression.Type);
-            var lockObject = Expression.Constant(_lockObject);
-            
-            var underLockStatement = Expression.TryFinally(
-                Expression.Block(
-                    baseExpression.Type,
-                    Expression.Call(null, EnterMethod, lockObject, LockWasTakenVar),
-                    Expression.IfThen(Expression.Equal(instanceField, NullConst), Expression.Assign(instanceField, baseExpression)),
-                    typedInstance),
-                Expression.IfThen(Expression.IsTrue(LockWasTakenVar), Expression.Call(null, ExitMethod, lockObject))
-            );
+            var methodInfo = CreateInstanceMethodInfo.MakeGenericMethod(baseExpression.Type);
+            var resolverType = ResolverTypeInfo.MakeGenericType(baseExpression.Type);
+            var resolverExpression = Expression.Lambda(resolverType, baseExpression, true, ResolverGenerator.Parameters);
+            var resolver = resolverExpression.Compile();
 
             var lifetimeBody = Expression.Condition(
                 Expression.NotEqual(instanceField, NullConst),
                 typedInstance,
-                Expression.Block(new[] { LockWasTakenVar }, underLockStatement));
+                Expression.Call(Expression.Constant(this), methodInfo, ResolverGenerator.ContainerParameter, ResolverGenerator.ArgsParameter, Expression.Constant(resolver)));
 
             return lifetimeBody;
         }

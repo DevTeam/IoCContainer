@@ -41,13 +41,13 @@
         }
 
         [Fact]
-        public void ContainerShouldResolveAutowiringSingletoneWhenPureContainer()
+        public void ContainerShouldResolveAutowiringSingletonWhenPureContainer()
         {
             // Given
             using (var container = Container.CreatePure())
             {
                 // When
-                using (container.Bind<MySimpleClass>().Lifetime(Lifetime.Singletone).To())
+                using (container.Bind<MySimpleClass>().Lifetime(Lifetime.Singleton).To())
                 {
                     // Then
                     var actualInstance1 = container.Get<MySimpleClass>();

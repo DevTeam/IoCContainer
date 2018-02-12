@@ -33,7 +33,9 @@ namespace IoC.Core.Collections
             Buckets[bucketIndex] = Buckets[bucketIndex].Add(key, value);
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private HashTable()
         {
             Buckets = new HashTree<TKey, TValue>[2];
@@ -41,7 +43,9 @@ namespace IoC.Core.Collections
             InitializeBuckets(0, 2);
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private void AddExistingValues(HashTable<TKey, TValue> previous)
         {
             foreach (HashTree<TKey, TValue> bucket in previous.Buckets)
@@ -55,7 +59,9 @@ namespace IoC.Core.Collections
             }
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private void InitializeBuckets(int startIndex, int count)
         {
             for (var i = startIndex; i < count; i++)

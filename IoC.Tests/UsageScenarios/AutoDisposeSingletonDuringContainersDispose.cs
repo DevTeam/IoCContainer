@@ -4,7 +4,7 @@
     using Shouldly;
     using Xunit;
 
-    public class AutoDisposeSingletoneDuringContainersDispose
+    public class AutoDisposeSingletonDuringContainersDispose
     {
         [Fact]
         public void Run()
@@ -12,7 +12,7 @@
             // $visible=true
             // $group=01
             // $priority=06
-            // $description=Auto dispose singletone during container's dispose
+            // $description=Auto dispose singleton during container's dispose
             // {
             var disposableService = new Mock<IDisposableService>();
 
@@ -20,7 +20,7 @@
             using (var container = Container.Create())
             {
                 // Configure the container
-                container.Bind<IService>().Lifetime(Lifetime.Singletone).To<IDisposableService>(ctx => disposableService.Object).ToSelf();
+                container.Bind<IService>().Lifetime(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object).ToSelf();
 
                 // Resolve instances
                 var instance1 = container.Get<IService>();

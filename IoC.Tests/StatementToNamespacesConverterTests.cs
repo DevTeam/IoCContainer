@@ -1,4 +1,5 @@
-﻿namespace IoC.Tests
+﻿#if !NET40
+namespace IoC.Tests
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -39,3 +40,4 @@
         }
     }
 }
+#endif

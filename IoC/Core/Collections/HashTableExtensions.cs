@@ -4,7 +4,9 @@ namespace IoC.Core.Collections
 
     internal static class HashTableExtensions
     {
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static TValue Search<TKey, TValue>(this HashTable<TKey, TValue> hashTable, TKey key)
         {
             var hashCode = key.GetHashCode();
@@ -36,7 +38,9 @@ namespace IoC.Core.Collections
         }
 
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static HashTable<TKey, TValue> Add<TKey, TValue>(this HashTable<TKey, TValue> hashTable, TKey key, TValue value)
         {
             return new HashTable<TKey, TValue>(hashTable, key, value);

@@ -6,6 +6,13 @@
 
     public class TotalTimePerformanceCounter: IPerformanceCounter
     {
+        private readonly double _prformanceRate;
+
+        public TotalTimePerformanceCounter(double prformanceRate = 1)
+        {
+            _prformanceRate = prformanceRate;
+        }
+
         public ITestResult Result { get; private set; }
 
         public IDisposable Run()
@@ -13,7 +20,7 @@
             var stopwatch = Stopwatch.StartNew();
             return Disposable.Create(() =>
             {
-                Result = new TestResult(stopwatch.ElapsedMilliseconds);
+                Result = new TestResult((long)(stopwatch.ElapsedMilliseconds * _prformanceRate));
                 stopwatch.Stop();
             });
         }

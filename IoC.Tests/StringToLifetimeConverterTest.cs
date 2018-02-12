@@ -1,4 +1,5 @@
-﻿namespace IoC.Tests
+﻿#if !NET40
+namespace IoC.Tests
 {
     using System.Collections;
     using System.Collections.Generic;
@@ -29,14 +30,14 @@
             private readonly List<object[]> _data = new List<object[]>
             {
                 new object[] {".Lifetime(Lifetime.Transient)", true, Lifetime.Transient},
-                new object[] { ".Lifetime(Lifetime.Singletone)", true, Lifetime.Singletone},
+                new object[] { ".Lifetime(Lifetime.Singleton)", true, Lifetime.Singleton},
                 new object[] { ".Lifetime(Lifetime.Scope)", true, Lifetime.Scope},
                 new object[] { ".Lifetime(Lifetime.Container)", true, Lifetime.Container},
                 new object[] { ".Lifetime(Lifetime.container)", true, Lifetime.Container},
                 new object[] { ".LifeTime(Container)", true, Lifetime.Container},
                 new object[] { ".Lifetime(container)", true, Lifetime.Container},
-                new object[] { ".Lifetime(Lifetime.Transient).Lifetime(Lifetime.Singletone)", true, Lifetime.Singletone},
-                new object[] { " . Lifetime  (  Lifetime.Singletone  )  ", true, Lifetime.Singletone},
+                new object[] { ".Lifetime(Lifetime.Transient).Lifetime(Lifetime.Singleton)", true, Lifetime.Singleton},
+                new object[] { " . Lifetime  (  Lifetime.Singleton  )  ", true, Lifetime.Singleton},
             };
 
             public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
@@ -45,3 +46,4 @@
         }
     }
 }
+#endif

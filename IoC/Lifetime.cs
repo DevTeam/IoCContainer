@@ -7,12 +7,12 @@
         Transient,
 
         // Single instance per registration
-        Singletone,
+        Singleton,
 
-        // Singletone per container
+        // Singleton per container
         Container,
 
-        // Singletone per scope
+        // Singleton per scope
         Scope
     }
 }

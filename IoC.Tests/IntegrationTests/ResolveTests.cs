@@ -8,7 +8,7 @@
     using Shouldly;
     using Xunit;
 
-    public class ResolveTests
+    public partial class ResolveTests
     {
         [Fact]
         public void ContainerShouldResolveWhenTransientLifetime()
@@ -98,26 +98,6 @@
                     // Then
                     var actualInstance = container.Get<IMyGenericService<int, string>>();
                     actualInstance.ShouldBe(expectedInstance);
-                }
-            }
-        }
-
-        [Fact]
-        public void ContainerShouldResolveEnumerable()
-        {
-            // Given
-            using (var container = Container.Create())
-            {
-                Func<IMyService> func = Mock.Of<IMyService>;
-                Func<IMyService1> func1 = Mock.Of<IMyService1>;
-                // When
-                using (container.Bind<IMyService, IMyService1>().Lifetime(Lifetime.Singletone).Tag(1).To(ctx => func()))
-                using (container.Bind<IMyService1>().Tag("abc").To(ctx => func1()))
-                using (container.Bind<IMyService, IMyService1>().Lifetime(Lifetime.Transient).Tag("xyz").To(ctx => func()))
-                {
-                    // Then
-                    var actualInstances = container.Get<IEnumerable<IMyService1>>().ToList();
-                    actualInstances.Count.ShouldBe(3);
                 }
             }
         }

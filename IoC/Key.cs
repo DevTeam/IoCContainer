@@ -11,13 +11,17 @@
         [CanBeNull] public readonly object Tag;
         internal readonly int HashCode;
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static Key Create<T>([CanBeNull] object tag)
         {
             return tag == null ? KeyContainer<T>.Shared : new Key(typeof(T), tag);
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static Key Create<T>()
         {
             return KeyContainer<T>.Shared;
@@ -53,7 +57,9 @@
             return obj is Key key && Equals(this, key);
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         internal static bool Equals(Key key1, Key key2)
         {
             return ReferenceEquals(key1.Type, key2.Type) 

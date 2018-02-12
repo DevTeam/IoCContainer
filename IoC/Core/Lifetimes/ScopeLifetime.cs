@@ -1,45 +1,29 @@
 ﻿namespace IoC.Core.Lifetimes
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Core;
 
-    internal sealed class ScopeLifetime: ILifetime, IDisposable
+    internal sealed class ScopeLifetime: KeyBasedLifetime<object>
     {
-        private readonly Dictionary<object, SingletoneLifetime> _lifetimes = new Dictionary<object, SingletoneLifetime>();
+        [NotNull] private readonly Func<ILifetime> _singletonLifetimeFactory;
 
-        public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
+        public ScopeLifetime([NotNull] Func<ILifetime> singletonLifetimeFactory) : base(singletonLifetimeFactory)
         {
-            SingletoneLifetime lifetime;
-            var scopeKey = Scope.Current.ScopeKey;
-            lock (_lifetimes)
-            {
-                if (!_lifetimes.TryGetValue(scopeKey, out lifetime))
-                {
-                    lifetime = new SingletoneLifetime();
-                    _lifetimes.Add(scopeKey, lifetime);
-                }
-            }
-
-            return lifetime.GetOrCreate(container, args, resolver);
+            _singletonLifetimeFactory = singletonLifetimeFactory ?? throw new ArgumentNullException(nameof(singletonLifetimeFactory));
         }
 
-        public void Dispose()
+        protected override object CreateKey(IContainer container, object[] args)
         {
-            var items = _lifetimes.Values.ToList();
-            _lifetimes.Clear();
-            Disposable.Create(items).Dispose();
-        }
-
-        public ILifetime Clone()
-        {
-            return new ScopeLifetime();
+            return Scope.Current.ScopeKey;
         }
 
         public override string ToString()
         {
             return Lifetime.Scope.ToString();
+        }
+
+        public override ILifetime Clone()
+        {
+            return new ScopeLifetime(_singletonLifetimeFactory);
         }
     }
 }

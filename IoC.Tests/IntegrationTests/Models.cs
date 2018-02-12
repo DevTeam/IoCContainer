@@ -67,6 +67,13 @@
 
     public class MyGenericService<T1, T2> : IMyGenericService<T1, T2>
     {
+        public MyGenericService()
+        {
+        }
+
+        public MyGenericService(string name)
+        {
+        }
     }
 
     public interface IMyGenericService<T1, T2> : IMyGenericService1<T1>

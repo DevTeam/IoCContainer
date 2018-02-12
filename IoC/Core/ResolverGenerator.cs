@@ -13,30 +13,39 @@
         public static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]), nameof(Context.Args));
         public static readonly ParameterExpression[] Parameters = { ContainerParameter, ArgsParameter };
 
-        public IResolverHolder<T> Generate<T>(Key key, IContainer container, IDependency dependency, ILifetime lifetime = null)
+        public bool TryGenerate<T>(Key key, IContainer container, IDependency dependency, ILifetime lifetime, out IResolverHolder<T> resolverHolder)
         {
-            var typesMap = new Dictionary<Type, Type>();
-            var dependencyExpression = ExpressionBuilder.Shared.PrepareExpression(dependency.Expression, key, typesMap);
-            var expressionVisitor = new InjectingExpressionVisitor(key, container, null);
-            var injectedExpression = expressionVisitor.Visit(dependencyExpression) ?? throw new InvalidOperationException();
-            switch (dependency)
+            try
             {
-                case Autowring autowring:
-                    if (autowring.Statements.Length == 0)
-                    {
+                var typesMap = new Dictionary<Type, Type>();
+                var dependencyExpression = ExpressionBuilder.Shared.PrepareExpression(dependency.Expression, key, typesMap);
+                var expressionVisitor = new InjectingExpressionVisitor(key, container, null);
+                var injectedExpression = expressionVisitor.Visit(dependencyExpression) ?? throw new BuildExpressionException("Null expression", new InvalidOperationException());
+                switch (dependency)
+                {
+                    case Autowring autowring:
+                        if (autowring.Statements.Length == 0)
+                        {
+                            break;
+                        }
+
+                        var vars = new Collection<ParameterExpression>();
+                        var statements = CreateAutowringStatements(key, container, autowring, injectedExpression, vars, typesMap).ToList();
+                        injectedExpression = Expression.Block(vars, statements);
                         break;
-                    }
+                }
 
-                    var vars = new Collection<ParameterExpression>();
-                    var statements = CreateAutowringStatements(key, container, autowring, injectedExpression, vars, typesMap).ToList();
-                    injectedExpression = Expression.Block(vars, statements);
-                    break;
+                injectedExpression = ExpressionBuilder.Shared.Convert(injectedExpression, key.Type);
+                injectedExpression = ExpressionBuilder.Shared.AddLifetime(injectedExpression, lifetime, key.Type, expressionVisitor);
+                var resolverExpression = Expression.Lambda<Resolver<T>>(injectedExpression, true, Parameters);
+                resolverHolder = new ResolverHolder<T>(resolverExpression.Compile());
+                return true;
             }
-
-            injectedExpression = ExpressionBuilder.Shared.Convert(injectedExpression, key.Type);
-            injectedExpression = ExpressionBuilder.Shared.AddLifetime(injectedExpression, lifetime, key.Type, expressionVisitor);
-            var resolverExpression = Expression.Lambda<Resolver<T>>(injectedExpression, true, Parameters);
-            return new ResolverHolder<T>(resolverExpression.Compile());
+            catch (BuildExpressionException)
+            {
+                resolverHolder = default(ResolverHolder<T>);
+                return false;
+            }
         }
 
         private IEnumerable<Expression> CreateAutowringStatements(

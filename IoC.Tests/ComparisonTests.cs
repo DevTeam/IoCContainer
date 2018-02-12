@@ -1,4 +1,5 @@
 ﻿// ReSharper disable HeuristicUnreachableCode
+// ReSharper disable RedundantUsingDirective
 #pragma warning disable 162
 namespace IoC.Tests
 {
@@ -22,86 +23,99 @@ namespace IoC.Tests
 
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
     [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
+    [SuppressMessage("ReSharper", "EmptyConstructor")]
     public class ComparisonTests
     {
         private const string ThisIocName = "this";
         private const string ReportFileName = "REPORT.html";
 
-        private static readonly Dictionary<string, Action<int, IPerformanceCounter>> IocsGraphOf3ObjectsWithSingletone = new Dictionary<string, Action<int, IPerformanceCounter>>()
+        private static readonly List<TestInfo> IocsGraphOf3ObjectsWithSingleton = new List<TestInfo>
         {
-            { "Without IoC", CtorSingletone },
-            { $"{ThisIocName} for actual scenario", ThisByFuncSingletone },
-            { ThisIocName, ThisSingletone },
+            new TestInfo( "Without IoC", CtorSingleton),
+            new TestInfo($"{ThisIocName} for actual scenario", ThisByFuncSingleton),
+            new TestInfo(ThisIocName, ThisSingleton),
 #if NETCOREAPP2_0
-            { "LightInject", LightInjectSingletone },
+            new TestInfo("LightInject", LightInjectSingleton),
 #endif
-#if !TEST
-            { "Castle Windsor", CastleWindsorSingletone },
-            { "Unity", UnitySingletone },
-            { "Ninject", NinjectSingletone },
-            { "Autofac", AutofacSingletone },
-#endif
+            new TestInfo("Castle Windsor", CastleWindsorSingleton){ PerformanceRate = 10 },
+            new TestInfo("Unity", UnitySingleton){ PerformanceRate = 800 },
+            new TestInfo("Ninject", NinjectSingleton) { PerformanceRate = 1000 },
+            new TestInfo("Autofac", AutofacSingleton) { PerformanceRate = 100 },
         };
 
-        private static readonly Dictionary<string, Action<int, IPerformanceCounter>> IocsGraphOf3Transient = new Dictionary<string, Action<int, IPerformanceCounter>>()
+        private static readonly List<TestInfo> IocsGraphOf3Transient = new List<TestInfo>
         {
-            { "Without IoC", CtorTransient },
-            { $"{ThisIocName} for actual scenario", ThisByFuncTransient },
-            { ThisIocName, ThisTransient },
+            new TestInfo("Without IoC", CtorTransient),
+            new TestInfo($"{ThisIocName} for actual scenario", ThisByFuncTransient),
+            new TestInfo(ThisIocName, ThisTransient),
 #if NETCOREAPP2_0
-            { "LightInject", LightInjectTransient },
+            new TestInfo("LightInject", LightInjectTransient),
 #endif
-#if !TEST
-            { "Castle Windsor", CastleWindsorTransient },
-            { "Unity", UnityTransient },
-            { "Ninject", NinjectTransient },
-            { "Autofac", AutofacTransient },
-#endif
+            new TestInfo("Castle Windsor", CastleWindsorTransient) { PerformanceRate = 10 },
+            new TestInfo("Unity", UnityTransient) { PerformanceRate = 800 },
+            new TestInfo("Ninject", NinjectTransient) { PerformanceRate = 1000 },
+            new TestInfo("Autofac", AutofacTransient) { PerformanceRate = 100 },
         };
 
+#if !NET40
         public ComparisonTests(ITestOutputHelper output)
         {
             DotMemoryUnitTestOutput.SetOutputMethod(output.WriteLine);
+        }
+#else
+        public ComparisonTests()
+        {
+        }
+#endif
+
+        [Fact]
+        public void ConfigureContainerTest()
+        {
+            var performanceCounter = new TotalTimePerformanceCounter();
+            for (var i = 0; i < 1000; i++)
+            {
+                ThisSingleton(2, performanceCounter);
+            }
         }
 
         [Fact]
         [Trait("Category", "Performance")]
         public void PerformanceTest()
         {
-#if TEST
-            var series = 1000000;
-#else
-            var series = 1000000;
-#endif
+            if (!int.TryParse(Environment.GetEnvironmentVariable("SERIES"), out var series))
+            {
+                series = 1000000;
+            }
+
             var results = new List<TestResult>();
-            foreach (var ioc in IocsGraphOf3ObjectsWithSingletone)
+            foreach (var ioc in IocsGraphOf3ObjectsWithSingleton)
             {
                 // Warmup
-                ioc.Value(2, new TotalTimePerformanceCounter());
+                ioc.Test(2, new TotalTimePerformanceCounter());
                 GC.Collect();
                 GC.WaitForFullGCComplete();
 
-                var performanceCounter = new TotalTimePerformanceCounter();
-                ioc.Value(series, performanceCounter);
+                var performanceCounter = new TotalTimePerformanceCounter(ioc.PerformanceRate);
+                ioc.Test((int)(series/ioc.PerformanceRate), performanceCounter);
 
-                var result = new TestResult(ioc.Key, performanceCounter.Result);
+                var result = new TestResult(ioc.Name, performanceCounter.Result);
                 results.Add(result);
             }
 
-            SaveResults(results, $"Performance for 5 objects and 1 singletone {series} times");
+            SaveResults(results, $"Performance for 5 objects and 1 singleton {series} times");
             results.Clear();
 
             foreach (var ioc in IocsGraphOf3Transient)
             {
                 // Warmup
-                ioc.Value(2, new TotalTimePerformanceCounter());
+                ioc.Test(2, new TotalTimePerformanceCounter());
                 GC.Collect();
                 GC.WaitForFullGCComplete();
 
-                var performanceCounter = new TotalTimePerformanceCounter();
-                ioc.Value(series, performanceCounter);
+                var performanceCounter = new TotalTimePerformanceCounter(ioc.PerformanceRate);
+                ioc.Test((int)(series / ioc.PerformanceRate), performanceCounter);
 
-                var result = new TestResult(ioc.Key, performanceCounter.Result);
+                var result = new TestResult(ioc.Name, performanceCounter.Result);
                 results.Add(result);
             }
 
@@ -122,18 +136,18 @@ namespace IoC.Tests
             const int series = 10;
 
             var results = new List<TestResult>();
-            foreach (var ioc in IocsGraphOf3ObjectsWithSingletone)
+            foreach (var ioc in IocsGraphOf3ObjectsWithSingleton)
             {
                 GC.Collect();
                 GC.WaitForFullGCComplete();
                 var performanceCounter = new MemoryPerformanceCounter();
-                ioc.Value(series, performanceCounter);
+                ioc.Test(series, performanceCounter);
 
-                var result = new TestResult(ioc.Key, performanceCounter.Result);
+                var result = new TestResult(ioc.Name, performanceCounter.Result);
                 results.Add(result);
             }
 
-            SaveResults(results, $"Memory usage for 5 objects and 1 singletone {series} times");
+            SaveResults(results, $"Memory usage for 5 objects and 1 singleton {series} times");
             results.Clear();
 
             foreach (var ioc in IocsGraphOf3Transient)
@@ -141,9 +155,9 @@ namespace IoC.Tests
                 GC.Collect();
                 GC.WaitForFullGCComplete();
                 var performanceCounter = new MemoryPerformanceCounter();
-                ioc.Value(series, performanceCounter);
+                ioc.Test(series, performanceCounter);
 
-                var result = new TestResult(ioc.Key, performanceCounter.Result);
+                var result = new TestResult(ioc.Name, performanceCounter.Result);
                 results.Add(result);
             }
 
@@ -151,11 +165,11 @@ namespace IoC.Tests
             results.Clear();
         }
 
-        private static void ThisSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void ThisSingleton(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = Container.Create())
             using (container.Bind<IService1>().To<Service1>())
-            using (container.Bind<IService2>().Lifetime(Lifetime.Singletone).To<Service2>())
+            using (container.Bind<IService2>().Lifetime(Lifetime.Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
             using (performanceCounter.Run())
             {
@@ -183,11 +197,11 @@ namespace IoC.Tests
             }
         }
 
-        private static void ThisByFuncSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void ThisByFuncSingleton(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = Container.Create())
             using (container.Bind<IService1>().To<Service1>())
-            using (container.Bind<IService2>().Lifetime(Lifetime.Singletone).To<Service2>())
+            using (container.Bind<IService2>().Lifetime(Lifetime.Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
             {
                 container.TryGetResolver<IService1>(Key.Create<IService1>(), out var resolver);
@@ -219,7 +233,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void UnitySingletone(int series, IPerformanceCounter performanceCounter)
+        private static void UnitySingleton(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = new UnityContainer())
             {
@@ -253,7 +267,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void NinjectSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void NinjectSingleton(int series, IPerformanceCounter performanceCounter)
         {
             using (var kernel = new StandardKernel())
             {
@@ -287,7 +301,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void AutofacSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void AutofacSingleton(int series, IPerformanceCounter performanceCounter)
         {
             var builder = new ContainerBuilder();
             builder.RegisterType<Service1>().As<IService1>();
@@ -319,7 +333,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void CastleWindsorSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void CastleWindsorSingleton(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = new WindsorContainer())
             {
@@ -353,7 +367,7 @@ namespace IoC.Tests
             }
         }
 
-        private static void LightInjectSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void LightInjectSingleton(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = new ServiceContainer())
             {
@@ -390,7 +404,7 @@ namespace IoC.Tests
         private static readonly object LockObject = new object();
         private static volatile Service2 _service2;
 
-        private static void CtorSingletone(int series, IPerformanceCounter performanceCounter)
+        private static void CtorSingleton(int series, IPerformanceCounter performanceCounter)
         {
             lock (LockObject)
             {
@@ -401,21 +415,27 @@ namespace IoC.Tests
             {
                 for (var i = 0; i < series; i++)
                 {
-                    if (_service2 == null)
-                    {
-                        lock (LockObject)
-                        {
-                            if (_service2 == null)
-                            {
-                                _service2 = new Service2(new Service3());
-                            }
-                        }
-                    }
-
-                    IService1 service1 = new Service1(_service2, new Service3(), new Service3(), new Service3());
+                    var service1 = CreateSingleton();
                     service1.DoSomething();
                 }
             }
+        }
+
+        private static IService1 CreateSingleton()
+        {
+            if (_service2 == null)
+            {
+                lock (LockObject)
+                {
+                    if (_service2 == null)
+                    {
+                        _service2 = new Service2(new Service3());
+                    }
+                }
+            }
+
+            IService1 service1 = new Service1(_service2, new Service3(), new Service3(), new Service3());
+            return service1;
         }
 
         private static void CtorTransient(int series, IPerformanceCounter performanceCounter)
@@ -424,10 +444,15 @@ namespace IoC.Tests
             {
                 for (var i = 0; i < series; i++)
                 {
-                    IService1 service1 = new Service1(new Service2(new Service3()), new Service3(), new Service3(), new Service3());
+                    var service1 = CreateTransient();
                     service1.DoSomething();
                 }
             }
+        }
+
+        private static Service1 CreateTransient()
+        {
+            return new Service1(new Service2(new Service3()), new Service3(), new Service3(), new Service3());
         }
 
         private static string GetBinDirectory()

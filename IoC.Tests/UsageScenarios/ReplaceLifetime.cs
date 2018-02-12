@@ -19,18 +19,18 @@
             // Create the container
             using (var container = Container.Create())
             using (container.Bind<ICounter>().To(ctx => counter.Object))
-            // Replace the Singletone lifetime
-            using (container.Bind<ILifetime>().Tag(Lifetime.Singletone).To<MySingletoneLifetime>(
+            // Replace the Singleton lifetime
+            using (container.Bind<ILifetime>().Tag(Lifetime.Singleton).To<MySingletonLifetime>(
                     // Configure the constructor to use
-                    ctx => new MySingletoneLifetime(
-                        // Inject the singletone lifetime from the parent container to use a base logic
-                        ctx.Container.Parent.Inject<ILifetime>(Lifetime.Singletone),
+                    ctx => new MySingletonLifetime(
+                        // Inject the singleton lifetime from the parent container to use a base logic
+                        ctx.Container.Parent.Inject<ILifetime>(Lifetime.Singleton),
                         // Inject a counter
                         ctx.Container.Inject<ICounter>())))
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
-            // Custom Singletone lifetime is using
-            using (container.Bind<IService>().Lifetime(Lifetime.Singletone).To<Service>())
+            // Custom Singleton lifetime is using
+            using (container.Bind<IService>().Lifetime(Lifetime.Singleton).To<Service>())
             {
                 // Resolve the instance twice using the wrapped Singletine lifetime
                 var instance1 = container.Get<IService>();
@@ -47,14 +47,14 @@
             void Increment();
         }
 
-        public class MySingletoneLifetime : ILifetime
+        public class MySingletonLifetime : ILifetime
         {
-            private readonly ILifetime _baseSingletoneLifetime;
+            private readonly ILifetime _baseSingletonLifetime;
             private readonly ICounter _counter;
 
-            public MySingletoneLifetime(ILifetime baseSingletoneLifetime, ICounter counter)
+            public MySingletonLifetime(ILifetime baseSingletonLifetime, ICounter counter)
             {
-                _baseSingletoneLifetime = baseSingletoneLifetime;
+                _baseSingletonLifetime = baseSingletonLifetime;
                 _counter = counter;
             }
 
@@ -62,12 +62,12 @@
             {
                 // Just counting the number of calls
                 _counter.Increment();
-                return _baseSingletoneLifetime.GetOrCreate(container, args, resolver);
+                return _baseSingletonLifetime.GetOrCreate(container, args, resolver);
             }
 
             public ILifetime Clone()
             {
-                return new MySingletoneLifetime(_baseSingletoneLifetime.Clone(), _counter);
+                return new MySingletonLifetime(_baseSingletonLifetime.Clone(), _counter);
             }
         }
         // }

@@ -19,37 +19,30 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container
                 .Bind(typeof(IEnumerable<>))
+                .Lifetime(Lifetime.Container)
                 .To(typeof(InstanceEnumerable<>));
         }
 
-        private sealed class InstanceEnumerable<T> : IEnumerable<T>
+        private sealed class InstanceEnumerable<T> : IEnumerable<T>, IDisposable, IObserver<ContainerEvent>
         {
             private readonly object[] _args;
             private static readonly Key ResolvingKey = Key.Create<T>();
-            private readonly IEnumerable<Key> _allKeys;
             private readonly IContainer _container;
+            private readonly object _lockObject = new object();
+            private readonly IDisposable _eventsSubscription;
+            private volatile IEnumerable<Resolver<T>> _resolvers;
 
             public InstanceEnumerable(Context context)
             {
                 _container = context.Container;
                 _args = context.Args;
-                _allKeys = context.Container;
+                _eventsSubscription = _container.Subscribe(this);
             }
 
             public IEnumerator<T> GetEnumerator()
             {
-                var keys =
-                    from key in _allKeys
-                    where key.Type == ResolvingKey.Type
-                    select key;
-
-                foreach (var key in keys)
+                foreach (var resolver in GetResolvers())
                 {
-                    if (!_container.TryGetResolver<T>(key, out var resolver, _container))
-                    {
-                        continue;
-                    }
-
                     yield return resolver(_container, _args);
                 }
             }
@@ -57,6 +50,53 @@
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();
+            }
+
+            public void Dispose()
+            {
+                _eventsSubscription.Dispose();
+            }
+
+            void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
+            {
+                lock (_lockObject)
+                {
+                    _resolvers = null;
+                }
+            }
+
+            void IObserver<ContainerEvent>.OnError(Exception error)
+            {
+            }
+
+            void IObserver<ContainerEvent>.OnCompleted()
+            {
+            }
+
+            private IEnumerable<Resolver<T>> GetResolvers()
+            {
+                if (_resolvers != null)
+                {
+                    return _resolvers;
+                }
+
+                if (_resolvers == null)
+                {
+                    lock (_lockObject)
+                    {
+                        if (_resolvers == null)
+                        {
+                            Resolver<T> resolver = null;
+                            _resolvers = (
+                                from key in _container
+                                where key.Type == ResolvingKey.Type
+                                where _container.TryGetResolver(key, out resolver, _container)
+                                select resolver).ToList();
+                        }
+                    }
+                }
+
+                return _resolvers;
             }
         }
     }

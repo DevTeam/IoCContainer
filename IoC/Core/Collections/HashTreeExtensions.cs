@@ -5,7 +5,9 @@ namespace IoC.Core.Collections
 
     internal static class HashTreeExtensions
     {
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static HashTree<TKey, TValue> Add<TKey, TValue>(this HashTree<TKey, TValue> tree, TKey key, TValue value)
         {
             if (tree.IsEmpty)
@@ -28,7 +30,9 @@ namespace IoC.Core.Collections
             return new HashTree<TKey, TValue>(key, value, tree);
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static IEnumerable<KeyValue<TKey, TValue>> InOrder<TKey, TValue>(this HashTree<TKey, TValue> hashTree)
         {
             if (!hashTree.IsEmpty)
@@ -53,13 +57,17 @@ namespace IoC.Core.Collections
             }
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private static HashTree<TKey, TValue> AddToLeftBranch<TKey, TValue>(HashTree<TKey, TValue> tree, TKey key, TValue value)
         {
             return new HashTree<TKey, TValue>(tree.Key, tree.Value, tree.Left.Add(key, value), tree.Right);
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private static HashTree<TKey, TValue> AddToRightBranch<TKey, TValue>(HashTree<TKey, TValue> tree, TKey key, TValue value)
         {
             return new HashTree<TKey, TValue>(tree.Key, tree.Value, tree.Left, tree.Right.Add(key, value));

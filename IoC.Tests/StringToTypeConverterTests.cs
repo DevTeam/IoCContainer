@@ -1,4 +1,5 @@
-﻿// ReSharper disable UnusedTypeParameter
+﻿#if !NET40
+// ReSharper disable UnusedTypeParameter
 namespace IoC.Tests
 {
     using System;
@@ -92,3 +93,4 @@ namespace IoC.Tests
     {
     }
 }
+#endif

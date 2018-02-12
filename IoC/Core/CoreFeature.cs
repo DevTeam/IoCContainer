@@ -21,18 +21,23 @@
 
             yield return container
                 .Bind<ILifetime>()
-                .Tag(Lifetime.Singletone)
-                .To(ctx => new SingletoneLifetime());
+                .Tag(Lifetime.Singleton)
+                .To(ctx => new SingletonLifetime());
+
+            yield return container
+                .Bind<Func<ILifetime>>()
+                .Tag(Lifetime.Singleton)
+                .To(ctx => (() => new SingletonLifetime()));
 
             yield return container
                 .Bind<ILifetime>()
                 .Tag(Lifetime.Container)
-                .To(ctx => new ContainerLifetime());
+                .To(ctx => new ContainerLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)));
 
             yield return container
                 .Bind<ILifetime>()
                 .Tag(Lifetime.Scope)
-                .To(ctx => new ScopeLifetime());
+                .To(ctx => new ScopeLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)));
 
             yield return container
                 .Bind<IContainer>()

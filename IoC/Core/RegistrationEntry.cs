@@ -25,7 +25,7 @@
             _resource = resource ?? throw new ArgumentNullException(nameof(resource));
         }
 
-        public Resolver<T> CreateResolver<T>(Key key, [NotNull] IContainer container)
+        public bool TryCreateResolver<T>([NotNull] Key key, [NotNull] IContainer container, out Resolver<T> resolver)
         {
             var typeInfo = key.Type.Info();
             var resolverKey = typeInfo.IsConstructedGenericType ? new ResolverKey(typeof(T), typeInfo.GenericTypeArguments) : new ResolverKey(typeof(T), new Type[0]);
@@ -34,7 +34,12 @@
             {
                 if (!_resolvers.TryGetValue(resolverKey, out var resolverHolderObject))
                 {
-                    resolverHolder = _resolverGenerator.Generate<T>(key, container, Dependency, GetLifetime(typeInfo));
+                    if (!_resolverGenerator.TryGenerate(key, container, Dependency, GetLifetime(typeInfo), out resolverHolder))
+                    {
+                        resolver = default(Resolver<T>);
+                        return false;
+                    }
+
                     _resolvers.Add(resolverKey, resolverHolder);
                 }
                 else
@@ -43,7 +48,8 @@
                 }
             }
 
-            return resolverHolder.Resolve;
+            resolver = resolverHolder.Resolve;
+            return true;
         }
 
         [CanBeNull]

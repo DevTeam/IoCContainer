@@ -1,10 +1,15 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Threading.Tasks;
     using Moq;
     using Shouldly;
     using Xunit;
 
+    [SuppressMessage("ReSharper", "UnusedParameter.Local")]
+    [SuppressMessage("ReSharper", "UnusedVariable")]
+    [SuppressMessage("ReSharper", "RedundantAssignment")]
     public class ComplexAutowiringTests
     {
         [Fact]
@@ -16,6 +21,54 @@
             {
                 // When
                 using (container.Bind<MyClass>().Lifetime(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(ctx.Container.Inject<MyClass3>().ToString()))))
+                {
+                    // Then
+                    var actualInstance = container.Get<MyClass>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenArrayForInjectedInstance()
+        {
+            // Given
+            using (var container = Container.Create())
+            using (container.Bind<MyClass3>().To())
+            {
+                // When
+                using (container.Bind<MyClass>().Lifetime(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(new []{ ctx.Container.Inject<MyClass3>(), ctx.Container.Inject<MyClass3>() }))))
+                {
+                    // Then
+                    var actualInstance = container.Get<MyClass>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenArrayOfFuncForInjectedInstance()
+        {
+            // Given
+            using (var container = Container.Create())
+            using (container.Bind<MyClass3>().To())
+            {
+                // When
+                using (container.Bind<MyClass>().Lifetime(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(new Func<MyClass3>[] { () => ctx.Container.Inject<MyClass3>(), () => ctx.Container.Inject<MyClass3>() }))))
+                {
+                    // Then
+                    var actualInstance = container.Get<MyClass>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenArrayOfTaskForInjectedInstance()
+        {
+            // Given
+            using (var container = Container.Create())
+            using (container.Bind<MyClass3>().To())
+            {
+                // When
+                using (container.Bind<MyClass>().Lifetime(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(new[] { ctx.Container.Inject<Task<MyClass3>>(), ctx.Container.Inject<Task<MyClass3>>() }))))
                 {
                     // Then
                     var actualInstance = container.Get<MyClass>();
@@ -78,16 +131,80 @@
             }
         }
 
+        [Fact]
+        public void ContainerShouldResolveWhenGenericIntiMethodCall()
+        {
+            // Given
+            using (var container = Container.Create())
+            using (container.Bind<MyClass3>().To())
+            {
+                // When
+                using (container.Bind<MyClass>().Lifetime(Lifetime.Transient).To(
+                    ctx => new MyClass(new MyClass2(ctx.Container.Inject<MyClass3>().ToString())),
+                    ctx => ctx.It.Initialize("aaa")))
+                {
+                    // Then
+                    var actualInstance = container.Get<MyClass>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenGenericIntiMethodCallWithRef()
+        {
+            // Given
+            var val = "abc";
+            using (var container = Container.Create())
+            using (container.Bind<MyClass3>().To())
+            {
+                // When
+                using (container.Bind<MyClass>().Lifetime(Lifetime.Transient).To(
+                    ctx => new MyClass(new MyClass2(ctx.Container.Inject<MyClass3>().ToString())),
+                    ctx => ctx.It.Initialize2(ref val)))
+                {
+                    // Then
+                    var actualInstance = container.Get<MyClass>();
+                    val.ShouldBe(default(string));
+                }
+            }
+        }
+
         public class MyClass
         {
             public MyClass(MyClass2 myClass2)
             {
             }
+
+            public T Initialize<T>(T value)
+            {
+                return value;
+            }
+
+            public void Initialize2<T>(ref T value)
+            {
+                value = default(T);
+            }
         }
 
         public class MyClass2
         {
-            public MyClass2(string myClass3Name)
+            public MyClass2(string str)
+            {
+            }
+
+            public MyClass2(MyClass3[] arr)
+            {
+            }
+
+            public MyClass2(Func<MyClass3>[] arr)
+            {
+                foreach (var func in arr)
+                {
+                    func();
+                }
+            }
+
+            public MyClass2(Task<MyClass3>[] arr)
             {
             }
         }

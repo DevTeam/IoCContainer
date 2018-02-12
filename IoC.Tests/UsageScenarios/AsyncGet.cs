@@ -1,4 +1,5 @@
-﻿namespace IoC.Tests.UsageScenarios
+﻿#if !NET40
+namespace IoC.Tests.UsageScenarios
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Threading.Tasks;
@@ -32,3 +33,4 @@
         }
     }
 }
+#endif

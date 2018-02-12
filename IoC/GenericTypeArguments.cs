@@ -2,6 +2,9 @@
 // ReSharper disable ClassNeverInstantiated.Global
 namespace IoC
 {
+    using System;
+    using Core;
+
     [PublicAPI]
     public abstract class GenericTypeArgument { }
 
@@ -31,4 +34,10 @@ namespace IoC
 
     [PublicAPI]
     public abstract class TT8 : GenericTypeArgument { }
+
+
+    internal static class GenericTypeArguments
+    {
+        public static readonly Type[] Types = {typeof(TT), typeof(TT1), typeof(TT2), typeof(TT3), typeof(TT4), typeof(TT5), typeof(TT6), typeof(TT7), typeof(TT8)};
+    }
 }

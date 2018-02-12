@@ -25,6 +25,7 @@
             }
         }
 
+#if !NET40
         [Theory]
         [InlineData(null)]
         [InlineData(ContainerReference.Current)]
@@ -41,6 +42,7 @@
                 }
             }
         }
+#endif
 
         [Fact]
         public void ContainerShouldResolveParentContainer()

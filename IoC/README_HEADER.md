@@ -13,9 +13,10 @@ Key features:
   - Fully extensible and supports custom containers/lifetimes
   - Reconfigurable on-the-fly
   - Supports concurrent and asynchronous resolving
+  - Does not need additional dependencies
 
 Supported platforms:
-  - .NET 4.5+
+  - .NET 4.0+
   - .NET Core 1.0+
   - .NET Standard 1.0+
 
@@ -64,12 +65,6 @@ _**It is important to note that our abstraction and our implementation do not kn
   ```
   dotnet add package IoC.Container
   ```
-  
-- Packet CLI
-
-  ```
-  paket add IoC.Container
-  ```
 
 ### Let's glue our abstraction and our implementation
 
@@ -102,8 +97,25 @@ using (var container = Container.Create().Using<Glue>())
 }
 ```
 
+### Under the hood
+
+Actually these getters are represented just as set of operators `new` that allow to create required instances.
+
+```csharp
+var box = new CardboardBox<ShroedingersCat>(new ShroedingersCat());
+```
+
+There is only one difference - this getter are wrapped to compiled lambda function and the each call of these lambdas spends some minimal time in the operator `call`, but in actual scenarios it is not required to make these lambdas each time to create an instance.
+When some dependencies are injected to an instance they are injected without any lambdas at all but just as a minimal set of instruction to create these dependencies:
+
+```csharp
+new ShroedingersCat()
+```
+
+Thus this IoC container makes the minimal impact in terms of perfomrance and of memory trafic on a creation of instances of classes and might be used everywhere and everytime in accordance with the [SOLID principles](https://en.wikipedia.org/wiki/SOLID_\(object-oriented_design\)).
+
 ## Why this one?
 
 The results of the [comparison tests](https://github.com/DevTeam/IoCContainer/blob/master/IoC.Tests/ComparisonTests.cs) for some popular IoC containers like Castle Windsor, Autofac, Unity, Ninject ...
 
-![Cat](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_Build,status:SUCCESS/artifacts/content/REPORT.jpg)
+![Cat](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,status:SUCCESS/artifacts/content/REPORT.jpg)

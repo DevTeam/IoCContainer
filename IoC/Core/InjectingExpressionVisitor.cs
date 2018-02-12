@@ -8,6 +8,8 @@
 
     internal class InjectingExpressionVisitor: ExpressionVisitor
     {
+        [NotNull] private static readonly ITypeInfo ContextTypeInfo = Type<Context>.Info;
+        [NotNull] private static readonly ITypeInfo InstanceContextTypeInfo = typeof(Context<>).Info();
         [NotNull] private static readonly MethodInfo InjectMethodInfo;
         [NotNull] private static readonly MethodInfo InjectWithTagMethodInfo;
         private static readonly MethodInfo AssigmentCallExpressionMethodInfo;
@@ -106,7 +108,7 @@
             var typeInfo = node.Type.Info();
             if (typeInfo.IsConstructedGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Context<>))
             {
-                var contextType = typeof(Context<>).Info().MakeGenericType(typeInfo.GenericTypeArguments).Info();
+                var contextType = InstanceContextTypeInfo.MakeGenericType(typeInfo.GenericTypeArguments).Info();
                 var ctor = contextType.DeclaredConstructors.Single();
                 return Expression.New(
                     ctor,
@@ -141,7 +143,7 @@
                     break;
 
                 default:
-                    var expression = Visit(tagExpression) ?? throw new InvalidOperationException();
+                    var expression = Visit(tagExpression) ?? throw new BuildExpressionException("Null expression", new InvalidOperationException());
                     var tagFunc = Expression.Lambda<Func<object>>(expression, true).Compile();
                     tag = tagFunc();
                     break;
@@ -161,6 +163,11 @@
         {
             if (containerExpression != null)
             {
+                if (containerExpression is ParameterExpression parameterExpression && parameterExpression.Type == typeof(IContainer))
+                {
+                    return _container;
+                }
+
                 var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, ResolverGenerator.ContainerParameter);
                 var selectContainer = containerSelectorExpression.Compile();
                 return selectContainer(_container);
@@ -182,9 +189,19 @@
             }
             else
             {
-                if (!SelectedContainer(containerExpression).TryGetDependency(key, out var dependency, out lifetime))
+                var selectedContainer = SelectedContainer(containerExpression);
+                if (!selectedContainer.TryGetDependency(key, out var dependency, out lifetime))
                 {
-                    throw new InvalidOperationException();
+                    try
+                    {
+                        var dependenctyInfo = _container.Get<IIssueResolver>().CannotResolveDependency(selectedContainer, key);
+                        dependency = dependenctyInfo.Item1;
+                        lifetime = dependenctyInfo.Item2;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new BuildExpressionException($"Cannot find dependency {key}.", ex);
+                    }
                 }
 
                 dependencyExpression = dependency.Expression;
@@ -215,7 +232,7 @@
                 dependencyExpression = ExpressionBuilder.Shared.PrepareExpression(dependencyExpression, key, typesMap);
                 dependencyExpression = ExpressionBuilder.Shared.Convert(dependencyExpression, key.Type);
                 dependencyExpression = ExpressionBuilder.Shared.AddLifetime(dependencyExpression, lifetime, key.Type, this);
-                return Visit(dependencyExpression) ?? throw new InvalidOperationException();
+                return Visit(dependencyExpression) ?? throw new BuildExpressionException("Null expression", new InvalidOperationException());
             }
             finally
             {
@@ -227,7 +244,7 @@
         private bool TryReplaceContextFields([NotNull] Type type, string name, out Expression expression)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            if (Type<Context>.Info.IsAssignableFrom(type.Info()))
+            if (ContextTypeInfo.IsAssignableFrom(type.Info()))
             {
                 // ctx.Key
                 if (name == nameof(Context.Key))

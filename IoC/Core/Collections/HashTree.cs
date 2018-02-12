@@ -69,14 +69,18 @@ namespace IoC.Core.Collections
             HashCode = Key.GetHashCode();
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private HashTree()
         {
             IsEmpty = true;
             Duplicates = List<KeyValue<TKey, TValue>>.Empty;
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private static HashTree<TKey, TValue> RotateLeft(HashTree<TKey, TValue> left)
         {
             return new HashTree<TKey, TValue>(
@@ -86,7 +90,9 @@ namespace IoC.Core.Collections
                 left.Right.Right);
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private static HashTree<TKey, TValue> RotateRight(HashTree<TKey, TValue> right)
         {
             return new HashTree<TKey, TValue>(
@@ -96,13 +102,17 @@ namespace IoC.Core.Collections
                 new HashTree<TKey, TValue>(right.Key, right.Value, right.Left.Right, right.Right));
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private bool IsLeftHeavy()
         {
             return Left.Height > Right.Height;
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private bool IsRightHeavy()
         {
             return Right.Height > Left.Height;

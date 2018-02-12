@@ -49,7 +49,7 @@
 
             if (lifetime is IExpressionBuilder builder)
             {
-                return builder.Build(expression);
+                return builder.Build(injectingExpressionVisitor.Visit(expression));
             }
 
             var getOrCreateMethodInfo = LifetimeGenericGetOrCreateMethodInfo.MakeGenericMethod(type);
@@ -59,6 +59,27 @@
             var resolver = resolverExpression.Compile();
             var lifetimeCall = Expression.Call(Expression.Constant(lifetime), getOrCreateMethodInfo, ResolverGenerator.ContainerParameter, ResolverGenerator.ArgsParameter, Expression.Constant(resolver));
             return lifetimeCall;
+        }
+
+        [NotNull]
+        public Type CreateDefinedGenericType([NotNull] Type type)
+        {
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            var typeInfo = type.Info();
+            if (!typeInfo.IsGenericTypeDefinition)
+            {
+                return type;
+            }
+
+            var genericTypeParameters = typeInfo.GenericTypeParameters;
+            var typesMap = genericTypeParameters.Distinct().Zip(GenericTypeArguments.Types, Tuple.Create).ToDictionary(i => i.Item1, i => i.Item2);
+            var genericTypeArguments = new Type[genericTypeParameters.Length];
+            for (var position = 0; position < genericTypeParameters.Length; position++)
+            {
+                genericTypeArguments[position] = typesMap[genericTypeParameters[position]];
+            }
+
+            return typeInfo.MakeGenericType(genericTypeArguments);
         }
     }
 }

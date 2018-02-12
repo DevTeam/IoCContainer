@@ -143,7 +143,9 @@
 
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public bool TryGetResolver<T>(Key key, out Resolver<T> resolver, IContainer container = null)
         {
             var tagIsNull = key.Tag is null;
@@ -200,7 +202,11 @@
 
             if (TryGetRegistrationEntry(key, out var registrationEntry))
             {
-                resolver = registrationEntry.CreateResolver<T>(key, container ?? this);
+                if (!registrationEntry.TryCreateResolver(key, container ?? this, out resolver))
+                {
+                    return false;
+                }
+
                 lock (_lockObject)
                 {
                     _resolversByKey = _resolversByKey.Add(key, resolver);
@@ -243,7 +249,9 @@
             return _parent.TryGetDependency(key, out dependency, out lifetime);
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public bool TryGet(Type type, object tag, out object instance, params object[] args)
         {
 #if DEBUG
@@ -261,7 +269,9 @@
             return true;
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public bool TryGet<T>(object tag, out T instance, params object[] args)
         {
 #if DEBUG
@@ -278,7 +288,9 @@
             return true;
         }
 
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         private bool TryGetRegistrationEntry(Key key, out RegistrationEntry registrationEntry)
         {
             lock (_lockObject)

@@ -13,9 +13,10 @@ Key features:
   - Fully extensible and supports custom containers/lifetimes
   - Reconfigurable on-the-fly
   - Supports concurrent and asynchronous resolving
+  - Does not need additional dependencies
 
 Supported platforms:
-  - .NET 4.5+
+  - .NET 4.0+
   - .NET Core 1.0+
   - .NET Standard 1.0+
 
@@ -64,12 +65,6 @@ _**It is important to note that our abstraction and our implementation do not kn
   ```
   dotnet add package IoC.Container
   ```
-  
-- Packet CLI
-
-  ```
-  paket add IoC.Container
-  ```
 
 ### Let's glue our abstraction and our implementation
 
@@ -102,11 +97,28 @@ using (var container = Container.Create().Using<Glue>())
 }
 ```
 
+### Under the hood
+
+Actually these getters are represented just as set of operators `new` that allow to create required instances.
+
+```csharp
+var box = new CardboardBox<ShroedingersCat>(new ShroedingersCat());
+```
+
+There is only one difference - this getter are wrapped to compiled lambda function and the each call of these lambdas spends some minimal time in the operator `call`, but in actual scenarios it is not required to make these lambdas each time to create an instance.
+When some dependencies are injected to an instance they are injected without any lambdas at all but just as a minimal set of instruction to create these dependencies:
+
+```csharp
+new ShroedingersCat()
+```
+
+Thus this IoC container makes the minimal impact in terms of perfomrance and of memory trafic on a creation of instances of classes and might be used everywhere and everytime in accordance with the [SOLID principles](https://en.wikipedia.org/wiki/SOLID_\(object-oriented_design\)).
+
 ## Why this one?
 
 The results of the [comparison tests](https://github.com/DevTeam/IoCContainer/blob/master/IoC.Tests/ComparisonTests.cs) for some popular IoC containers like Castle Windsor, Autofac, Unity, Ninject ...
 
-![Cat](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_Build,status:SUCCESS/artifacts/content/REPORT.jpg)
+![Cat](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,status:SUCCESS/artifacts/content/REPORT.jpg)
 
 ## Usage Scenarios
 
@@ -122,13 +134,13 @@ The results of the [comparison tests](https://github.com/DevTeam/IoCContainer/bl
 * [Auto-wiring](#auto-wiring)
 * [Method Injection](#method-injection)
 * [Property Injection](#property-injection)
-* [Singletone lifetime](#singletone-lifetime)
+* [Singleton lifetime](#singleton-lifetime)
 * [Constructor Auto-wiring](#constructor-auto-wiring)
 * [Flexible Auto-wiring](#flexible-auto-wiring)
 * [Resolve all possible items as IEnumerable<>](#resolve-all-possible-items-as-ienumerable<>)
 * [Func With Arguments](#func-with-arguments)
 * [Resolve Using Arguments](#resolve-using-arguments)
-* [Auto dispose singletone during container's dispose](#auto-dispose-singletone-during-containers-dispose)
+* [Auto dispose singleton during container's dispose](#auto-dispose-singleton-during-containers-dispose)
 * [Configuration class](#configuration-class)
 * [Configuration text](#configuration-text)
 * [Change configuration on-the-fly](#change-configuration-on-the-fly)
@@ -379,14 +391,14 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/PropertyInjection.cs)
 
-### Singletone lifetime
+### Singleton lifetime
 
 ``` CSharp
 // Create the container
 using (var container = Container.Create())
 // Configure the container
 using (container.Bind<IDependency>().To<Dependency>())
-using (container.Bind<IService>().Lifetime(Lifetime.Singletone).To<Service>())
+using (container.Bind<IService>().Lifetime(Lifetime.Singleton).To<Service>())
 {
     // Resolve the instance twice
     var instance1 = container.Get<IService>();
@@ -397,10 +409,10 @@ using (container.Bind<IService>().Lifetime(Lifetime.Singletone).To<Service>())
 
 // Other lifetimes are:
 // Transient - A new instance each time
-// Container - Singletone per container
-// Scope - Singletone per scope
+// Container - Singleton per container
+// Scope - Singleton per scope
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SingletoneLifetime.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SingletonLifetime.cs)
 
 ### Constructor Auto-wiring
 
@@ -522,7 +534,7 @@ using (container.Bind<INamedService>().To<NamedService>(
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveWithArgs.cs)
 
-### Auto dispose singletone during container's dispose
+### Auto dispose singleton during container's dispose
 
 ``` CSharp
 var disposableService = new Mock<IDisposableService>();
@@ -531,8 +543,7 @@ var disposableService = new Mock<IDisposableService>();
 using (var container = Container.Create())
 {
     // Configure the container
-    container.Bind<IService>().Lifetime(Lifetime.Singletone)
-        .To<IDisposableService>(ctx => disposableService.Object).ToSelf();
+    container.Bind<IService>().Lifetime(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object).ToSelf();
 
     // Resolve instances
     var instance1 = container.Get<IService>();
@@ -543,7 +554,7 @@ using (var container = Container.Create())
 
 disposableService.Verify(i => i.Dispose(), Times.Once);
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoDisposeSingletoneDuringContainersDispose.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoDisposeSingletonDuringContainersDispose.cs)
 
 ### Configuration class
 
@@ -608,8 +619,8 @@ using (container.Bind<IDependency>().To<Dependency>())
         instance1.ShouldNotBe(instance2);
     }
 
-    // Reconfigure the container using the Singletone lifetime
-    using (container.Bind<IService>().Lifetime(Lifetime.Singletone).To<Service>())
+    // Reconfigure the container using the Singleton lifetime
+    using (container.Bind<IService>().Lifetime(Lifetime.Singleton).To<Service>())
     {
         // Resolve the instance twice
         var instance1 = container.Get<IService>();
@@ -629,7 +640,7 @@ public void Run()
     // Create the container
     using (var container = Container.Create())
     // Configure current container to use a custom container's class to create a child container
-    using (container.Bind<IContainer>().Tag(Scope.Child).To<MyContainer>())
+    using (container.Bind<IContainer>().Tag(ContainerReference.Child).To<MyContainer>())
     // Create our child container
     using (var childContainer = container.CreateChild("abc"))
     // Configure the child container
@@ -723,6 +734,11 @@ public class MyTransientLifetime : ILifetime
     {
         return resolver(container, args);
     }
+
+    public ILifetime Clone()
+    {
+        return new MyTransientLifetime();
+    }
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomLifetime.cs)
@@ -737,18 +753,18 @@ public void Run()
     // Create the container
     using (var container = Container.Create())
     using (container.Bind<ICounter>().To(ctx => counter.Object))
-    // Replace the Singletone lifetime
-    using (container.Bind<ILifetime>().Tag(Lifetime.Singletone).To<MySingletoneLifetime>(
+    // Replace the Singleton lifetime
+    using (container.Bind<ILifetime>().Tag(Lifetime.Singleton).To<MySingletonLifetime>(
             // Configure the constructor to use
-            ctx => new MySingletoneLifetime(
-                // Inject the singletone lifetime from the parent container to use a base logic
-                ctx.Container.Parent.Inject<ILifetime>(Lifetime.Singletone),
+            ctx => new MySingletonLifetime(
+                // Inject the singleton lifetime from the parent container to use a base logic
+                ctx.Container.Parent.Inject<ILifetime>(Lifetime.Singleton),
                 // Inject a counter
                 ctx.Container.Inject<ICounter>())))
     // Configure the container
     using (container.Bind<IDependency>().To<Dependency>())
-    // Custom Singletone lifetime is using
-    using (container.Bind<IService>().Lifetime(Lifetime.Singletone).To<Service>())
+    // Custom Singleton lifetime is using
+    using (container.Bind<IService>().Lifetime(Lifetime.Singleton).To<Service>())
     {
         // Resolve the instance twice using the wrapped Singletine lifetime
         var instance1 = container.Get<IService>();
@@ -765,14 +781,14 @@ public interface ICounter
     void Increment();
 }
 
-public class MySingletoneLifetime : ILifetime
+public class MySingletonLifetime : ILifetime
 {
-    private readonly ILifetime _baseSingletoneLifetime;
+    private readonly ILifetime _baseSingletonLifetime;
     private readonly ICounter _counter;
 
-    public MySingletoneLifetime(ILifetime baseSingletoneLifetime, ICounter counter)
+    public MySingletonLifetime(ILifetime baseSingletonLifetime, ICounter counter)
     {
-        _baseSingletoneLifetime = baseSingletoneLifetime;
+        _baseSingletonLifetime = baseSingletonLifetime;
         _counter = counter;
     }
 
@@ -780,7 +796,12 @@ public class MySingletoneLifetime : ILifetime
     {
         // Just counting the number of calls
         _counter.Increment();
-        return _baseSingletoneLifetime.GetOrCreate(container, args, resolver);
+        return _baseSingletonLifetime.GetOrCreate(container, args, resolver);
+    }
+
+    public ILifetime Clone()
+    {
+        return new MySingletonLifetime(_baseSingletonLifetime.Clone(), _counter);
     }
 }
 ```
@@ -802,7 +823,7 @@ using (container.Bind<IDependency>().Lifetime(Lifetime.Scope).To<Dependency>())
         instance1.ShouldBe(instance2);
 
         // Resolving in scope "1"
-        using (new ResolvingScope("1"))
+        using (new Scope("1"))
         {
             var instance3 = container.Get<IService>();
             var instance4 = container.Get<IService>();
@@ -825,7 +846,7 @@ using (container.Bind<IDependency>().Lifetime(Lifetime.Scope).To<Dependency>())
         instance1.Dependency.ShouldBe(instance2.Dependency);
 
         // Resolving in scope "1"
-        using (new ResolvingScope("1"))
+        using (new Scope("1"))
         {
             var instance3 = container.Get<IService>();
             instance3.Dependency.ShouldNotBe(instance1.Dependency);

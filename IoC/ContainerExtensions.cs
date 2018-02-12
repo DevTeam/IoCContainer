@@ -175,7 +175,9 @@
         }
 
         [NotNull]
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static object Get([NotNull] this IContainer container, [NotNull] Type type, [NotNull][ItemCanBeNull] params object[] args)
         {
 #if DEBUG
@@ -190,11 +192,13 @@
                 return instance;
             }
 
-            return container.GetIssueResolver().CannotResolve(container, new Key(type, tag));
+            return container.GetIssueResolver().CannotResolveDependency(container, new Key(type, tag));
         }
 
         [NotNull]
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static object Get([NotNull] this Container container, [NotNull] Type type, [NotNull][ItemCanBeNull] params object[] args)
         {
 #if DEBUG
@@ -209,11 +213,13 @@
                 return instance;
             }
 
-            return container.GetIssueResolver().CannotResolve(container, new Key(type, tag));
+            return container.GetIssueResolver().CannotResolveDependency(container, new Key(type, tag));
         }
 
         [NotNull]
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static T Get<T>([NotNull] this IContainer container, [NotNull][ItemCanBeNull] params object[] args)
         {
 #if DEBUG
@@ -227,11 +233,13 @@
                 return instance;
             }
 
-            return (T)container.GetIssueResolver().CannotResolve(container, Key.Create<T>(tag));
+            return (T)container.GetIssueResolver().CannotResolveInstance(container, Key.Create<T>(tag));
         }
 
         [NotNull]
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static T Get<T>([NotNull] this Container container, [NotNull][ItemCanBeNull] params object[] args)
         {
 #if DEBUG
@@ -245,11 +253,13 @@
                 return instance;
             }
 
-            return (T)container.GetIssueResolver().CannotResolve(container, Key.Create<T>(tag));
+            return (T)container.GetIssueResolver().CannotResolveInstance(container, Key.Create<T>(tag));
         }
 
         [NotNull]
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static Func<T> FuncGet<T>([NotNull] this IContainer container)
         {
 #if DEBUG
@@ -259,7 +269,9 @@
         }
 
         [NotNull]
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static Func<T1, T> FuncGet<T1, T>([NotNull] this IContainer container)
         {
 #if DEBUG
@@ -269,7 +281,9 @@
         }
 
         [NotNull]
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static Func<T1, T2, T> FuncGet<T1, T2, T>([NotNull] this IContainer container)
         {
 #if DEBUG
@@ -279,7 +293,9 @@
         }
 
         [NotNull]
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static Func<T1, T2, T3, T> FuncGet<T1, T2, T3, T>([NotNull] this IContainer container)
         {
 #if DEBUG
@@ -289,7 +305,9 @@
         }
 
         [NotNull]
+#if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static Func<T1, T2, T3, T4, T> FuncGet<T1, T2, T3, T4, T>([NotNull] this IContainer container)
         {
 #if DEBUG
@@ -395,6 +413,12 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             return container.Using(new T());
+        }
+
+        public static PrepareResult Prepare([NotNull] this IContainer container)
+        {
+            // ReSharper disable once InvokeAsExtensionMethod
+            return PrepareUtils.Prepare(container);
         }
 
         [NotNull]
