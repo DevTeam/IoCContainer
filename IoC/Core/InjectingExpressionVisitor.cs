@@ -83,7 +83,7 @@
                 return Expression.Call(methodCall.Method, InjectAll(methodCall.Arguments));
             }
 
-            return Expression.Call(methodCall.Object, methodCall.Method, InjectAll(methodCall.Arguments));
+            return Expression.Call(Visit(methodCall.Object), methodCall.Method, InjectAll(methodCall.Arguments));
         }
 
         protected override Expression VisitMember(MemberExpression node)

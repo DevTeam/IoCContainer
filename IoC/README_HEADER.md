@@ -17,7 +17,7 @@ Key features:
 Supported platforms:
   - .NET 4.5+
   - .NET Core 1.0+
-  - .NET Standard 1.1+
+  - .NET Standard 1.0+
 
 ## [Schrödinger's cat](https://github.com/DevTeam/IoCContainer/tree/master/Samples/ShroedingersCat) shows how it works
 

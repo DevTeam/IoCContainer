@@ -1,7 +1,7 @@
 ﻿namespace IoC.Core
 {
     using System;
-    using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Linq;
 
     internal sealed class RegistrationEntry : IDisposable
@@ -10,8 +10,8 @@
         [NotNull] internal readonly IDependency Dependency;
         [CanBeNull] internal readonly ILifetime Lifetime;
         [NotNull] private readonly IDisposable _resource;
-        private readonly ConcurrentDictionary<ResolverKey, object> _resolvers = new ConcurrentDictionary<ResolverKey, object>();
-        private readonly ConcurrentDictionary<LifetimeKey, ILifetime> _lifetimes = new ConcurrentDictionary<LifetimeKey, ILifetime>();
+        private readonly Dictionary<ResolverKey, object> _resolvers = new Dictionary<ResolverKey, object>();
+        private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
 
         public RegistrationEntry(
             [NotNull] IResolverGenerator resolverGenerator,
@@ -29,14 +29,38 @@
         {
             var typeInfo = key.Type.Info();
             var resolverKey = typeInfo.IsConstructedGenericType ? new ResolverKey(typeof(T), typeInfo.GenericTypeArguments) : new ResolverKey(typeof(T), new Type[0]);
-            var resolverHolder = (IResolverHolder<T>)_resolvers.GetOrAdd(resolverKey, i => _resolverGenerator.Generate<T>(key, container, Dependency, GetLifetime(typeInfo)));
+            IResolverHolder<T> resolverHolder;
+            lock (_resolvers)
+            {
+                if (!_resolvers.TryGetValue(resolverKey, out var resolverHolderObject))
+                {
+                    resolverHolder = _resolverGenerator.Generate<T>(key, container, Dependency, GetLifetime(typeInfo));
+                    _resolvers.Add(resolverKey, resolverHolder);
+                }
+                else
+                {
+                    resolverHolder = (IResolverHolder<T>)resolverHolderObject;
+                }
+            }
+
             return resolverHolder.Resolve;
         }
 
+        [CanBeNull]
         private ILifetime GetLifetime(ITypeInfo typeInfo)
         {
             var lifetimeKey = typeInfo.IsConstructedGenericType ? new LifetimeKey(typeInfo.GenericTypeArguments) : new LifetimeKey(new Type[0]);
-            return _lifetimes.GetOrAdd(lifetimeKey, i => Lifetime?.Clone());
+            ILifetime lifetime;
+            lock (_lifetimes)
+            {
+                if (!_lifetimes.TryGetValue(lifetimeKey, out lifetime))
+                {
+                    lifetime = Lifetime?.Clone();
+                    _lifetimes.Add(lifetimeKey, lifetime);
+                }
+            }
+
+            return lifetime;
         }
 
         public void Reset()

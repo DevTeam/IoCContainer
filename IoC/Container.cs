@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
@@ -17,7 +16,8 @@
     {
         private const string RootName = "container://";
         private static long _containerId;
-        [NotNull] private readonly ConcurrentDictionary<Key, RegistrationEntry> _registrationEntries = new ConcurrentDictionary<Key, RegistrationEntry>();
+        [NotNull] private readonly object _lockObject = new object();
+        [NotNull] private readonly Dictionary<Key, RegistrationEntry> _registrationEntries = new Dictionary<Key, RegistrationEntry>();
         [NotNull] private readonly IContainer _parent;
         [NotNull] private readonly string _name;
         [NotNull] private readonly Subject<ContainerEvent> _eventSubject = new Subject<ContainerEvent>();
@@ -129,14 +129,12 @@
 
         public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
         {
-            
-
             if (!TryGetResolver(new Key(type, tag), out resolver, container))
             {
                 return false;
             }
 
-            lock (_resources)
+            lock (_lockObject)
             {
                 _resolversByType = _resolversByType.Add(type, resolver);
             }
@@ -203,7 +201,7 @@
             if (TryGetRegistrationEntry(key, out var registrationEntry))
             {
                 resolver = registrationEntry.CreateResolver<T>(key, container ?? this);
-                lock(_resources)
+                lock (_lockObject)
                 {
                     _resolversByKey = _resolversByKey.Add(key, resolver);
                     if (tagIsNull)
@@ -217,7 +215,7 @@
 
             if (_parent.TryGetResolver(key, out resolver))
             {
-                lock (_resources)
+                lock (_lockObject)
                 {
                     _resolversByKey = _resolversByKey.Add(key, resolver);
                     if (tagIsNull)
@@ -283,23 +281,26 @@
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private bool TryGetRegistrationEntry(Key key, out RegistrationEntry registrationEntry)
         {
-            if (_registrationEntries.TryGetValue(key, out registrationEntry))
+            lock (_lockObject)
             {
-                return true;
-            }
-
-            var typeInfo = key.Type.Info();
-            if (typeInfo.IsConstructedGenericType)
-            {
-                var genericTypeDefinition = typeInfo.GetGenericTypeDefinition();
-                var genericTypeDefinitionKey = new Key(genericTypeDefinition, key.Tag);
-                if (_registrationEntries.TryGetValue(genericTypeDefinitionKey, out registrationEntry))
+                if (_registrationEntries.TryGetValue(key, out registrationEntry))
                 {
                     return true;
                 }
-            }
 
-            return false;
+                var typeInfo = key.Type.Info();
+                if (typeInfo.IsConstructedGenericType)
+                {
+                    var genericTypeDefinition = typeInfo.GetGenericTypeDefinition();
+                    var genericTypeDefinitionKey = new Key(genericTypeDefinition, key.Tag);
+                    if (_registrationEntries.TryGetValue(genericTypeDefinitionKey, out registrationEntry))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
+            }
         }
 
         public void Dispose()
@@ -309,7 +310,7 @@
                 resourceStore.RemoveResource(this);
             }
 
-            lock (_resources)
+            lock (_lockObject)
             {
                 Disposable.Create(_registrationEntries.Values).Dispose();
                 _registrationEntries.Clear();
@@ -322,7 +323,7 @@
         void IResourceStore.AddResource(IDisposable resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
-            lock (_resources)
+            lock (_lockObject)
             {
                 _resources.Add(resource);
             }
@@ -331,7 +332,7 @@
         void IResourceStore.RemoveResource(IDisposable resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
-            lock (_resources)
+            lock (_lockObject)
             {
                 _resources.Remove(resource);
             }
@@ -344,7 +345,12 @@
 
         public IEnumerator<Key> GetEnumerator()
         {
-            var keys = _registrationEntries.Keys.ToList();
+            System.Collections.Generic.List<Key> keys;
+            lock (_lockObject)
+            {
+                keys = _registrationEntries.Keys.ToList();
+            }
+
             return keys.Concat(_parent).GetEnumerator();
         }
 
@@ -355,7 +361,17 @@
 
         private bool TryRegister([NotNull] Key key, [NotNull] RegistrationEntry registrationEntry)
         {
-            if (_registrationEntries.TryAdd(key, registrationEntry))
+            bool added;
+            lock (_lockObject)
+            {
+                added = !_registrationEntries.ContainsKey(key);
+                if (added)
+                {
+                    _registrationEntries.Add(key, registrationEntry);
+                }
+            }
+
+            if (added)
             {
                 _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Registration, key));
                 return true;
@@ -366,7 +382,13 @@
 
         private bool TryUnregister([NotNull] Key key)
         {
-            if (_registrationEntries.TryRemove(key, out var _))
+            bool removed;
+            lock (_lockObject)
+            {
+                removed = _registrationEntries.Remove(key);
+            }
+
+            if (removed)
             {
                 _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Unregistration, key));
             }
@@ -376,7 +398,7 @@
 
         void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
         {
-            lock (_resources)
+            lock (_lockObject)
             {
                 foreach (var registration in _registrationEntries.Values)
                 {
