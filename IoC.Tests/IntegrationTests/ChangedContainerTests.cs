@@ -1,6 +1,5 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using Moq;
     using Shouldly;
@@ -21,17 +20,17 @@
                 var expectedRef = Mock.Of<IMyService>();
 
                 // When
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(
                     ctx => new MyService((string)ctx.Args[0], ctx.Container.Inject<IMyService1>())))
                 {
-                    using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => firstRef))
+                    using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => firstRef))
                     {
                         var actualInstance = container.Get<IMyService>("xyz");
                         ((MyService) actualInstance).Name.ShouldBe("xyz");
                         ((MyService) actualInstance).SomeRef.ShouldBe(firstRef);
                     }
 
-                    using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
+                    using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => expectedRef))
                     {
                         // Then
                         var actualInstance = container.Get<IMyService>("abc");

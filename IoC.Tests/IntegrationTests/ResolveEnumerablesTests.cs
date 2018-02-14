@@ -18,9 +18,9 @@
                 Func<IMyService> func = Mock.Of<IMyService>;
                 Func<IMyService1> func1 = Mock.Of<IMyService1>;
                 // When
-                using (container.Bind<IMyService, IMyService1>().Lifetime(Lifetime.Singleton).Tag(1).To(ctx => func()))
+                using (container.Bind<IMyService, IMyService1>().As(Lifetime.Singleton).Tag(1).To(ctx => func()))
                 using (container.Bind<IMyService1>().Tag("abc").To(ctx => func1()))
-                using (container.Bind<IMyService, IMyService1>().Lifetime(Lifetime.Transient).Tag("xyz").To(ctx => func()))
+                using (container.Bind<IMyService, IMyService1>().As(Lifetime.Transient).Tag("xyz").To(ctx => func()))
                 {
                     // Then
                     var actualInstances = container.Get<IEnumerable<IMyService1>>().ToList();
@@ -37,9 +37,9 @@
             {
                 Func<IMyService> func = Mock.Of<IMyService>;
                 Func<IMyService1> func1 = Mock.Of<IMyService1>;
-                using (container.Bind<IMyService, IMyService1>().Lifetime(Lifetime.Singleton).Tag(1).To(ctx => func()))
+                using (container.Bind<IMyService, IMyService1>().As(Lifetime.Singleton).Tag(1).To(ctx => func()))
                 using (container.Bind<IMyService1>().Tag("abc").To(ctx => func1()))
-                using (container.Bind<IMyService, IMyService1>().Lifetime(Lifetime.Transient).Tag("xyz").To(ctx => func()))
+                using (container.Bind<IMyService, IMyService1>().As(Lifetime.Transient).Tag("xyz").To(ctx => func()))
                 {
                     var actualInstances = container.Get<IEnumerable<IMyService1>>().ToList();
                     actualInstances.Count.ShouldBe(3);

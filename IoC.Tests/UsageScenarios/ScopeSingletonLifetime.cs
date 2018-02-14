@@ -3,7 +3,7 @@
     using Shouldly;
     using Xunit;
 
-    public class ScopeLifetime
+    public class ScopeSingletonLifetime
     {
         [Fact]
         public void Run()
@@ -11,14 +11,14 @@
             // $visible=true
             // $group=08
             // $priority=00
-            // $description=Scope lifetime
+            // $description=Scope Singleton lifetime
             // {
             // Create the container
             using (var container = Container.Create())
             // Configure the container
-            using (container.Bind<IDependency>().Lifetime(Lifetime.Scope).To<Dependency>())
+            using (container.Bind<IDependency>().As(Lifetime.ScopeSingleton).To<Dependency>())
             {
-                using (container.Bind<IService>().Lifetime(Lifetime.Scope).To<Service>())
+                using (container.Bind<IService>().As(Lifetime.ScopeSingleton).To<Service>())
                 {
                     // Default resolving scope
                     var instance1 = container.Get<IService>();
@@ -41,7 +41,7 @@
                 }
 
                 // Reconfigure to check dependencies only
-                using (container.Bind<IService>().Lifetime(Lifetime.Transient).To<Service>())
+                using (container.Bind<IService>().As(Lifetime.Transient).To<Service>())
                 {
                     // Default resolving scope
                     var instance1 = container.Get<IService>();

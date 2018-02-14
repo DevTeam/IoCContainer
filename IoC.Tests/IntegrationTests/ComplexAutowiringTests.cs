@@ -20,7 +20,7 @@
             using (container.Bind<MyClass3>().To())
             {
                 // When
-                using (container.Bind<MyClass>().Lifetime(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(ctx.Container.Inject<MyClass3>().ToString()))))
+                using (container.Bind<MyClass>().As(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(ctx.Container.Inject<MyClass3>().ToString()))))
                 {
                     // Then
                     var actualInstance = container.Get<MyClass>();
@@ -36,7 +36,7 @@
             using (container.Bind<MyClass3>().To())
             {
                 // When
-                using (container.Bind<MyClass>().Lifetime(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(new []{ ctx.Container.Inject<MyClass3>(), ctx.Container.Inject<MyClass3>() }))))
+                using (container.Bind<MyClass>().As(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(new []{ ctx.Container.Inject<MyClass3>(), ctx.Container.Inject<MyClass3>() }))))
                 {
                     // Then
                     var actualInstance = container.Get<MyClass>();
@@ -52,7 +52,7 @@
             using (container.Bind<MyClass3>().To())
             {
                 // When
-                using (container.Bind<MyClass>().Lifetime(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(new Func<MyClass3>[] { () => ctx.Container.Inject<MyClass3>(), () => ctx.Container.Inject<MyClass3>() }))))
+                using (container.Bind<MyClass>().As(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(new Func<MyClass3>[] { () => ctx.Container.Inject<MyClass3>(), () => ctx.Container.Inject<MyClass3>() }))))
                 {
                     // Then
                     var actualInstance = container.Get<MyClass>();
@@ -68,7 +68,7 @@
             using (container.Bind<MyClass3>().To())
             {
                 // When
-                using (container.Bind<MyClass>().Lifetime(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(new[] { ctx.Container.Inject<Task<MyClass3>>(), ctx.Container.Inject<Task<MyClass3>>() }))))
+                using (container.Bind<MyClass>().As(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(new[] { ctx.Container.Inject<Task<MyClass3>>(), ctx.Container.Inject<Task<MyClass3>>() }))))
                 {
                     // Then
                     var actualInstance = container.Get<MyClass>();
@@ -84,15 +84,15 @@
             Func<IMyService1> func = () => expectedRef;
 
             using (var container = Container.Create())
-            using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => func()))
+            using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
             {
                 var childRef = Mock.Of<IMyService>();
                 Func<IMyService1> childFunc = () => childRef;
 
                 // When
                 using (var childContainer = container.CreateChild())
-                using (childContainer.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => childFunc()))
-                using (childContainer.Bind<IMyService>().Lifetime(Lifetime.Transient).To(
+                using (childContainer.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => childFunc()))
+                using (childContainer.Bind<IMyService>().As(Lifetime.Transient).To(
                     ctx => new MyService((string)ctx.Args[0], ctx.Container.Parent.Inject<IMyService1>())))
                 {
                     // Then
@@ -111,7 +111,7 @@
             Func<IMyService1> func = () => expectedRef;
 
             using (var container = Container.Create())
-            using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => func()))
+            using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
             {
                 var childRef = Mock.Of<IMyService>();
                 Func<IMyService1> childFunc = () => childRef;
@@ -119,8 +119,8 @@
                 // When
                 using (var childContainer1 = container.CreateChild())
                 using (var childContainer2 = childContainer1.CreateChild())
-                using (childContainer2.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => childFunc()))
-                using (childContainer2.Bind<IMyService>().Lifetime(Lifetime.Transient).To(
+                using (childContainer2.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => childFunc()))
+                using (childContainer2.Bind<IMyService>().As(Lifetime.Transient).To(
                     ctx => new MyService((string)ctx.Args[0], ctx.Container.Parent.Parent.Inject<IMyService1>())))
                 {
                     // Then
@@ -139,7 +139,7 @@
             using (container.Bind<MyClass3>().To())
             {
                 // When
-                using (container.Bind<MyClass>().Lifetime(Lifetime.Transient).To(
+                using (container.Bind<MyClass>().As(Lifetime.Transient).To(
                     ctx => new MyClass(new MyClass2(ctx.Container.Inject<MyClass3>().ToString())),
                     ctx => ctx.It.Initialize("aaa")))
                 {
@@ -158,7 +158,7 @@
             using (container.Bind<MyClass3>().To())
             {
                 // When
-                using (container.Bind<MyClass>().Lifetime(Lifetime.Transient).To(
+                using (container.Bind<MyClass>().As(Lifetime.Transient).To(
                     ctx => new MyClass(new MyClass2(ctx.Container.Inject<MyClass3>().ToString())),
                     ctx => ctx.It.Initialize2(ref val)))
                 {

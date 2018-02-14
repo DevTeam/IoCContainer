@@ -17,7 +17,7 @@
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<IService>().Lifetime(Lifetime.Singleton).To<Service>())
+            using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
             {
                 // Resolve the instance twice
                 var instance1 = container.Get<IService>();
@@ -27,9 +27,10 @@
             }
 
             // Other lifetimes are:
-            // Transient - A new instance each time
-            // Container - Singleton per container
-            // Scope - Singleton per scope
+            // Transient - A new instance each time (default)
+            // ContainerSingleton - Singleton per container
+            // ScopeSingleton - Singleton per scope
+            // ThreadSingleton - Singleton per thread
             // }
         }
     }

@@ -1,6 +1,7 @@
 ﻿namespace IoC
 {
     using System;
+    // ReSharper disable once RedundantUsingDirective
     using System.Runtime.CompilerServices;
 
     [PublicAPI]

@@ -5,12 +5,12 @@
     using System.Linq;
     using Core;
 
-    internal abstract class KeyBasedLifetime<TKey>: ILifetime, IDisposable
+    internal abstract class SingletonBasedLifetime<TKey>: ILifetime, IDisposable
     {
         private readonly Func<ILifetime> _singletonLifetimeFactory;
         private readonly Dictionary<TKey, ILifetime> _lifetimes = new Dictionary<TKey, ILifetime>();
 
-        protected KeyBasedLifetime(Func<ILifetime> singletonLifetimeFactory)
+        protected SingletonBasedLifetime(Func<ILifetime> singletonLifetimeFactory)
         {
             _singletonLifetimeFactory = singletonLifetimeFactory;
         }

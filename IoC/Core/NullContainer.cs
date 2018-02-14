@@ -21,27 +21,37 @@
             return false;
         }
 
+        public Resolver<T> GetResolver<T>(Type type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TryGetResolver<T>(Type type, out Resolver<T> resolver)
+        {
+            resolver = default(Resolver<T>);
+            return false;
+        }
+
+        public Resolver<T> GetResolver<T>(Type type, object tag)
+        {
+            throw new NotImplementedException();
+        }
+
+        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver)
+        {
+            resolver = default(Resolver<T>);
+            return false;
+        }
+
         public bool TryGetResolver<T>(Key key, out Resolver<T> resolver, IContainer container = null)
         {
             resolver = default(Resolver<T>);
             return false;
         }
 
-        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
+        public bool TryGetResolver<T>(IContainer container, Type type, object tag, out Resolver<T> resolver)
         {
             resolver = default(Resolver<T>);
-            return false;
-        }
-
-        public bool TryGet(Type type, object tag, out object instance, params object[] args)
-        {
-            instance = default(object);
-            return false;
-        }
-
-        public bool TryGet<T>(object tag, out T instance, params object[] args)
-        {
-            instance = default(T);
             return false;
         }
 

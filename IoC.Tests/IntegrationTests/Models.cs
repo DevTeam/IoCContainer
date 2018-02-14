@@ -1,4 +1,5 @@
-﻿namespace IoC.Tests.IntegrationTests
+﻿// ReSharper disable All
+namespace IoC.Tests.IntegrationTests
 {
     using System.Diagnostics.CodeAnalysis;
 
@@ -65,6 +66,7 @@
         }
     }
 
+    [SuppressMessage("ReSharper", "UnusedParameter.Local")]
     public class MyGenericService<T1, T2> : IMyGenericService<T1, T2>
     {
         public MyGenericService()

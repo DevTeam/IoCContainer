@@ -19,40 +19,40 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container
                 .Bind<IConverter<IEnumerable<Statement>, BindingContext, BindingContext>>()
-                .Lifetime(Lifetime.Container)
+                .As(Lifetime.ContainerSingleton)
                 .To<StatementsToBindingContextConverter>();
 
             yield return container
                 .Bind<IConverter<Statement, BindingContext, BindingContext>>()
                 .Tag("Bind")
-                .Lifetime(Lifetime.Container)
+                .As(Lifetime.ContainerSingleton)
                 .To<StatementToBindingConverter>();
 
             yield return container
                 .Bind<IConverter<Statement, BindingContext, BindingContext>>()
                 .Tag("using")
-                .Lifetime(Lifetime.Container)
+                .As(Lifetime.ContainerSingleton)
                 .To<StatementToNamespacesConverter>();
 
             yield return container
                 .Bind<IConverter<Statement, BindingContext, BindingContext>>()
                 .Tag("ref")
-                .Lifetime(Lifetime.Container)
+                .As(Lifetime.ContainerSingleton)
                 .To<StatementToReferencesConverter>();
 
             yield return container
                 .Bind<IConverter<string, BindingContext, Type>>()
-                .Lifetime(Lifetime.Container)
+                .As(Lifetime.ContainerSingleton)
                 .To<StringToTypeConverter>();
 
             yield return container
                 .Bind<IConverter<string, Statement, Lifetime>>()
-                .Lifetime(Lifetime.Container)
+                .As(Lifetime.ContainerSingleton)
                 .To<StringToLifetimeConverter>();
 
             yield return container
                 .Bind<IConverter<string, Statement, IEnumerable<object>>>()
-                .Lifetime(Lifetime.Container)
+                .As(Lifetime.ContainerSingleton)
                 .To<StringToTagsConverter>();
 
             yield return container

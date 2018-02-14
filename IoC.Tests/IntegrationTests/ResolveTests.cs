@@ -1,14 +1,12 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Threading.Tasks;
     using Moq;
     using Shouldly;
     using Xunit;
 
-    public partial class ResolveTests
+    public class ResolveTests
     {
         [Fact]
         public void ContainerShouldResolveWhenTransientLifetime()
@@ -18,7 +16,7 @@
             {
                 Func<IMyService> func = Mock.Of<IMyService>;
                 // When
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => func()))
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => func()))
                 {
                     // Then
                     var instance1 = container.Get<IMyService>();
@@ -37,10 +35,10 @@
                 var expectedInstance = Mock.Of<IMyService>();
 
                 // When
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
-                    var actualInstance = container.FuncGet<IMyService>();
+                    var actualInstance = container.Get<Func<IMyService>>();
                     actualInstance().ShouldBe(expectedInstance);
                 }
             }
@@ -55,7 +53,7 @@
                 var expectedInstance = Mock.Of<IMyService>();
 
                 // When
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>();
@@ -73,7 +71,7 @@
                 var expectedInstance = Mock.Of<IMyService>();
 
                 // When
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>();
@@ -93,7 +91,7 @@
                 var expectedInstance = Mock.Of<IMyGenericService<int, string>>();
 
                 // When
-                using (container.Bind(typeof(IMyGenericService<,>)).Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind(typeof(IMyGenericService<,>)).As(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
                     var actualInstance = container.Get<IMyGenericService<int, string>>();
@@ -132,7 +130,7 @@
                 Func<IMyService> func = () => expectedInstance;
 
                 // When
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => func()))
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => func()))
                 {
                     // Then
                     var task = container.Get<Task<IMyService>>();
@@ -152,8 +150,8 @@
                 var expectedRef = Mock.Of<IMyService>();
 
                 // When
-                using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => new MyService((string)ctx.Args[0], ctx.Container.Inject<IMyService1>())))
+                using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => expectedRef))
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => new MyService((string)ctx.Args[0], ctx.Container.Inject<IMyService1>())))
                 {
                     // Then
                     var func = container.Get<Func<string, IMyService>>();

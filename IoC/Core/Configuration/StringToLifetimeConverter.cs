@@ -7,7 +7,7 @@
     internal sealed class StringToLifetimeConverter: IConverter<string, Statement, Lifetime>
     {
         [NotNull] private readonly IIssueResolver _issueResolver;
-        private static readonly Regex Regex = new Regex(@"(?:\s*\.\s*Lifetime\s*\(\s*([\w.^)]+)\s*\)\s*)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline);
+        private static readonly Regex Regex = new Regex(@"(?:\s*\.\s*As\s*\(\s*([\w.^)]+)\s*\)\s*)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline);
 
         public StringToLifetimeConverter([NotNull] IIssueResolver issueResolver)
         {

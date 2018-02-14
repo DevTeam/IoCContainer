@@ -5,6 +5,7 @@
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
+    // ReSharper disable once RedundantUsingDirective
     using System.Runtime.CompilerServices;
     using System.Threading;
     using Core;
@@ -16,6 +17,8 @@
     {
         private const string RootName = "container://";
         private static long _containerId;
+        [NotNull] private static readonly Lazy<Container> RootContainer = new Lazy<Container>(CreateRootContainer, true);
+        [NotNull] private static readonly Lazy<Container> PureRootContainer = new Lazy<Container>(CreatePureRootContainer, true);
         [NotNull] private readonly object _lockObject = new object();
         [NotNull] private readonly Dictionary<Key, RegistrationEntry> _registrationEntries = new Dictionary<Key, RegistrationEntry>();
         [NotNull] private readonly IContainer _parent;
@@ -24,31 +27,39 @@
         [NotNull] private readonly System.Collections.Generic.List<IDisposable> _resources = new System.Collections.Generic.List<IDisposable>();
         [NotNull] private volatile HashTable<Key, object> _resolversByKey = HashTable<Key, object>.Empty;
         [NotNull] private volatile HashTable<Type, object> _resolversByType = HashTable<Type, object>.Empty;
+        private volatile bool _hasResolver;
 
-        [NotNull]
-        public static Container Create([NotNull] string name = "")
+        private static Container CreateRootContainer()
         {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            var rootContainer = new Container(
+            return new Container(
                 RootName,
                 CoreFeature.Shared,
                 EnumerableFeature.Shared,
                 FuncFeature.Shared,
                 TaskFeature.Shared,
                 ConfigurationFeature.Shared);
+        }
 
-            return new Container($"{RootName}{CreateContainerName(name)}", rootContainer, true);
+        private static Container CreatePureRootContainer()
+        {
+            return new Container(RootName, CoreFeature.Shared);
+        }
+
+        [NotNull]
+        public static Container Create([NotNull] string name = "")
+        {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            return new Container($"{RootName}{CreateContainerName(name)}", RootContainer.Value, true);
         }
 
         [NotNull]
         public static Container CreatePure([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            var rootContainer = new Container(RootName, CoreFeature.Shared);
-            return new Container($"{RootName}{CreateContainerName(name)}", rootContainer, true);
+            return new Container($"{RootName}{CreateContainerName(name)}", PureRootContainer.Value, true);
         }
 
-        internal Container([NotNull] string name = "", [NotNull][ItemNotNull] params IConfiguration[] configurations)
+        private Container([NotNull] string name = "", [NotNull][ItemNotNull] params IConfiguration[] configurations)
         {
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
             _name = name ?? throw new ArgumentNullException(nameof(name));
@@ -71,13 +82,15 @@
             // Subscribe to reset resolvers
             ((IResourceStore)this).AddResource(_eventSubject.Subscribe(this));
 
-            if (_parent is IResourceStore resourceStore)
+            if (!root && _parent is IResourceStore resourceStore)
             {
                 resourceStore.AddResource(this);
             }
         }
 
         public IContainer Parent => _parent;
+
+        private IIssueResolver IssueResolver => GetResolver<IIssueResolver>(typeof(IIssueResolver))(this);
 
         public bool TryRegister(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
         {
@@ -87,7 +100,7 @@
             var resolvers = new System.Collections.Generic.List<IDisposable>();
             try
             {
-                var resolver = new RegistrationEntry(ResolverGenerator.Shared, dependency, lifetime, Disposable.Create(() =>
+                var resolver = new RegistrationEntry(ResolverExpressionBuilder.Shared, dependency, lifetime, Disposable.Create(() =>
                 {
                     foreach (var key in keys)
                     {
@@ -127,57 +140,73 @@
             return isRegistered;
         }
 
-        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public Resolver<T> GetResolver<T>(Type type)
         {
-            if (!TryGetResolver(new Key(type, tag), out resolver, container))
+            if (!TryGetResolver<T>(type, out var resolver))
             {
-                return false;
+                return IssueResolver.CannotGetResolver<T>(this, new Key(type, null));
             }
 
-            lock (_lockObject)
-            {
-                _resolversByType = _resolversByType.Add(type, resolver);
-            }
-
-            return true;
-
+            return resolver;
         }
 
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        public bool TryGetResolver<T>(Key key, out Resolver<T> resolver, IContainer container = null)
+        public bool TryGetResolver<T>(Type type, out Resolver<T> resolver)
         {
-            var tagIsNull = key.Tag is null;
-            var hashCode = key.HashCode;
-            if (tagIsNull)
+            var hashCode = type.GetHashCode();
+            var typeTree = _resolversByType.Buckets[hashCode & (_resolversByType.Divisor - 1)];
+            while (typeTree.Height != 0 && typeTree.HashCode != hashCode)
             {
-                var type = key.Type;
-                var typeTree = _resolversByType.Buckets[hashCode & (_resolversByType.Divisor - 1)];
-                while (typeTree.Height != 0 && typeTree.HashCode != hashCode)
-                {
-                    typeTree = hashCode < typeTree.HashCode ? typeTree.Left : typeTree.Right;
-                }
+                typeTree = hashCode < typeTree.HashCode ? typeTree.Left : typeTree.Right;
+            }
 
-                if (typeTree.Height != 0 && ReferenceEquals(typeTree.Key, type))
-                {
-                    resolver = (Resolver<T>)typeTree.Value;
-                    return true;
-                }
+            if (typeTree.Height != 0 && ReferenceEquals(typeTree.Key, type))
+            {
+                resolver = (Resolver<T>)typeTree.Value;
+                return true;
+            }
 
-                if (typeTree.Duplicates.Items.Length > 0)
+            if (typeTree.Duplicates.Items.Length > 0)
+            {
+                for (var index = 0; index < typeTree.Duplicates.Items.Length; index++)
                 {
-                    foreach (var keyValue in typeTree.Duplicates.Items)
+                    var keyValue = typeTree.Duplicates.Items[index];
+                    if (ReferenceEquals(keyValue.Key, type))
                     {
-                        if (ReferenceEquals(keyValue.Key, type))
-                        {
-                            resolver = (Resolver<T>)keyValue.Value;
-                            return true;
-                        }
+                        resolver = (Resolver<T>) keyValue.Value;
+                        return true;
                     }
                 }
             }
 
+            return TryCreateResolver(type, out resolver, null, this);
+        }
+
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public Resolver<T> GetResolver<T>(Type type, object tag)
+        {
+            if (!TryGetResolver<T>(type, tag, out var resolver))
+            {
+                return IssueResolver.CannotGetResolver<T>(this, new Key(type, tag));
+            }
+
+            return resolver;
+        }
+
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver)
+        {
+            var key = new Key(type, tag);
+            var hashCode = key.HashCode;
             var keyTree = _resolversByKey.Buckets[hashCode & (_resolversByKey.Divisor - 1)];
             while (keyTree.Height != 0 && keyTree.HashCode != hashCode)
             {
@@ -187,19 +216,40 @@
             if (keyTree.Height != 0 && Key.Equals(keyTree.Key, key))
             {
                 resolver = (Resolver<T>)keyTree.Value;
+                return true;
             }
 
             if (keyTree.Duplicates.Items.Length > 0)
             {
-                foreach (var keyValue in keyTree.Duplicates.Items)
+                for (var index = 0; index < keyTree.Duplicates.Items.Length; index++)
                 {
+                    var keyValue = keyTree.Duplicates.Items[index];
                     if (Key.Equals(keyValue.Key, key))
                     {
-                        resolver = (Resolver<T>)keyValue.Value;
+                        resolver = (Resolver<T>) keyValue.Value;
+                        return true;
                     }
                 }
             }
 
+            return TryCreateResolver(type, out resolver, tag, null);
+        }
+
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public bool TryGetResolver<T>(IContainer container, Type type, object tag, out Resolver<T> resolver)
+        {
+            return tag is null ? TryGetResolver(type, out resolver) : TryGetResolver(type, tag, out resolver);
+        }
+
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        private bool TryCreateResolver<T>(Type type, out Resolver<T> resolver, object tag, IContainer container)
+        {
+            var tagIsNull = tag is null;
+            var key = new Key(type, tag);
             if (TryGetRegistrationEntry(key, out var registrationEntry))
             {
                 if (!registrationEntry.TryCreateResolver(key, container ?? this, out resolver))
@@ -209,20 +259,22 @@
 
                 lock (_lockObject)
                 {
+                    _hasResolver = true;
                     _resolversByKey = _resolversByKey.Add(key, resolver);
                     if (tagIsNull)
                     {
-                        _resolversByType = _resolversByType.Add(key.Type, resolver);
+                        _resolversByType = _resolversByType.Add(type, resolver);
                     }
                 }
 
                 return true;
             }
 
-            if (_parent.TryGetResolver(key, out resolver))
+            if (_parent.TryGetResolver(container, type, tag, out resolver))
             {
                 lock (_lockObject)
                 {
+                    _hasResolver = true;
                     _resolversByKey = _resolversByKey.Add(key, resolver);
                     if (tagIsNull)
                     {
@@ -242,50 +294,11 @@
             if (TryGetRegistrationEntry(key, out var registrationEntry))
             {
                 dependency = registrationEntry.Dependency;
-                lifetime = registrationEntry.Lifetime;
+                lifetime = registrationEntry.GetLifetime(key.Type);
                 return true;
             }
 
             return _parent.TryGetDependency(key, out dependency, out lifetime);
-        }
-
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        public bool TryGet(Type type, object tag, out object instance, params object[] args)
-        {
-#if DEBUG
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            if (args == null) throw new ArgumentNullException(nameof(args));
-#endif
-            var key = tag is null ? new Key(type) : new Key(type, tag);
-            if (!TryGetResolver<object>(key, out var resolver, this))
-            {
-                instance = null;
-                return false;
-            }
-
-            instance = resolver(this, args);
-            return true;
-        }
-
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        public bool TryGet<T>(object tag, out T instance, params object[] args)
-        {
-#if DEBUG
-            if (args == null) throw new ArgumentNullException(nameof(args));
-#endif
-            var key = tag is null ? Key.KeyContainer<T>.Shared : Key.Create<T>(tag);
-            if (!TryGetResolver<T>(key, out var resolver, this))
-            {
-                instance = default(T);
-                return false;
-            }
-
-            instance = resolver(this, args);
-            return true;
         }
 
 #if !NET40
@@ -326,6 +339,10 @@
             {
                 Disposable.Create(_registrationEntries.Values).Dispose();
                 _registrationEntries.Clear();
+
+                _resolversByKey = HashTable<Key, object>.Empty;
+                _resolversByType = HashTable<Type, object>.Empty;
+
 
                 Disposable.Create(_resources).Dispose();
                 _resources.Clear();
@@ -385,6 +402,7 @@
 
             if (added)
             {
+                ResetResolvers();
                 _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Registration, key));
                 return true;
             }
@@ -402,14 +420,20 @@
 
             if (removed)
             {
+                ResetResolvers();
                 _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Unregistration, key));
             }
 
             return false;
         }
 
-        void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
+        private void ResetResolvers()
         {
+            if (!_hasResolver)
+            {
+                return;
+            }
+
             lock (_lockObject)
             {
                 foreach (var registration in _registrationEntries.Values)
@@ -419,6 +443,14 @@
 
                 _resolversByKey = HashTable<Key, object>.Empty;
                 _resolversByType = HashTable<Type, object>.Empty;
+            }
+        }
+
+        void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
+        {
+            if (value.Container != this)
+            {
+                ResetResolvers();
             }
         }
 

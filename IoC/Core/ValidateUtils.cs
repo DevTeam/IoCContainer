@@ -4,11 +4,11 @@
     using System.Linq;
     using System.Reflection;
 
-    internal static class PrepareUtils
+    internal static class ValidateUtils
     {
-        private static readonly MethodInfo TryGetResolverInternalMethodInfo = typeof(PrepareUtils).Info().DeclaredMethods.Single(i => i.Name == nameof(TryGetResolverInternal));
+        private static readonly MethodInfo TryGetResolverInternalMethodInfo = typeof(ValidateUtils).Info().DeclaredMethods.Single(i => i.Name == nameof(TryGetResolverInternal));
 
-        public static PrepareResult Prepare([NotNull] this IContainer container)
+        public static ValidationResult Validate([NotNull] this IContainer container)
         {
             var resolvedKeys = new List<Key>();
             var unresolvedKeys = new List<Key>();
@@ -27,13 +27,13 @@
                 }
             }
 
-            return new PrepareResult(resolvedKeys, unresolvedKeys);
+            return new ValidationResult(resolvedKeys, unresolvedKeys);
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
         public static bool TryGetResolverInternal<T>(IContainer container, Key key)
         {
-            return container.TryGetResolver<T>(key, out var _);
+            return container.TryGetResolver<T>(container, key.Type, key.Tag, out var _);
         }
     }
 }

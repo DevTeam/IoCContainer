@@ -15,7 +15,7 @@
                 var expectedInstance = Mock.Of<IMyService>();
 
                 // When
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
                     var actualInstance = container.Get<IMyService>();
@@ -47,7 +47,7 @@
             using (var container = Container.CreatePure())
             {
                 // When
-                using (container.Bind<MySimpleClass>().Lifetime(Lifetime.Singleton).To())
+                using (container.Bind<MySimpleClass>().As(Lifetime.Singleton).To())
                 {
                     // Then
                     var actualInstance1 = container.Get<MySimpleClass>();

@@ -19,7 +19,7 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container
                 .Bind(typeof(IEnumerable<>))
-                .Lifetime(Lifetime.Container)
+                .As(Lifetime.ContainerSingleton)
                 .To(typeof(InstanceEnumerable<>));
         }
 
@@ -30,7 +30,7 @@
             private readonly IContainer _container;
             private readonly object _lockObject = new object();
             private readonly IDisposable _eventsSubscription;
-            private volatile IEnumerable<Resolver<T>> _resolvers;
+            private volatile IEnumerable<T> _resolvers;
 
             public InstanceEnumerable(Context context)
             {
@@ -41,10 +41,30 @@
 
             public IEnumerator<T> GetEnumerator()
             {
-                foreach (var resolver in GetResolvers())
+                if (_resolvers != null)
                 {
-                    yield return resolver(_container, _args);
+                    return _resolvers.GetEnumerator();
                 }
+
+                if (_resolvers == null)
+                {
+                    lock (_lockObject)
+                    {
+                        if (_resolvers == null)
+                        {
+                            Resolver<T> resolver = null;
+                            _resolvers = (
+                                    from key in _container
+                                    where key.Type == ResolvingKey.Type
+                                    where _container.TryGetResolver(_container, key.Type, key.Tag, out resolver)
+                                    select resolver)
+                                .ToList()
+                                .Select(r => r(_container, _args));
+                        }
+                    }
+                }
+
+                return _resolvers.GetEnumerator();
             }
 
             IEnumerator IEnumerable.GetEnumerator()
@@ -71,32 +91,6 @@
 
             void IObserver<ContainerEvent>.OnCompleted()
             {
-            }
-
-            private IEnumerable<Resolver<T>> GetResolvers()
-            {
-                if (_resolvers != null)
-                {
-                    return _resolvers;
-                }
-
-                if (_resolvers == null)
-                {
-                    lock (_lockObject)
-                    {
-                        if (_resolvers == null)
-                        {
-                            Resolver<T> resolver = null;
-                            _resolvers = (
-                                from key in _container
-                                where key.Type == ResolvingKey.Type
-                                where _container.TryGetResolver(key, out resolver, _container)
-                                select resolver).ToList();
-                        }
-                    }
-                }
-
-                return _resolvers;
             }
         }
     }

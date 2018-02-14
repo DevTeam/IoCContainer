@@ -16,7 +16,7 @@
                 var expectedInstance = Mock.Of<IMyService>();
                 Func<IMyService> func = () => expectedInstance;
                 // When
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).Tag("abc").Tag(10).To(ctx => func()))
+                using (container.Bind<IMyService>().As(Lifetime.Transient).Tag("abc").Tag(10).To(ctx => func()))
                 {
                     // Then
                     var actualInstance = container.Tag(10).Get<IMyService>();
@@ -35,8 +35,8 @@
                 Func<IMyService> func = () => expectedRef;
 
                 // When
-                using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => func()))
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(
+                using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(
                     ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>())))
                 {
                     // Then
@@ -59,12 +59,12 @@
                 Func<IMyService> func = () => expectedRef;
 
                 // When
-                using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => func()))
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(
+                using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(
                     ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>())))
                 {
                     // Then
-                    var actualInstance = container.FuncGet<string, IMyService>()("abc");
+                    var actualInstance = container.Get<Func<string, IMyService>>()("abc");
 
                     actualInstance.ShouldBeOfType<MyService>();
                     ((MyService) actualInstance).Name.ShouldBe("abc");
@@ -83,12 +83,12 @@
                 Func<IMyService> func = () => expectedRef;
 
                 // When
-                using (container.Bind<IMyService1>().Lifetime(Lifetime.Transient).To(ctx => func()))
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).Tag(33).To(
+                using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
+                using (container.Bind<IMyService>().As(Lifetime.Transient).Tag(33).To(
                     ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>())))
                 {
                     // Then
-                    var actualInstance = container.Tag(33).FuncGet<string, IMyService>()("abc");
+                    var actualInstance = container.Tag(33).Get<Func<string, IMyService>>()("abc");
 
                     actualInstance.ShouldBeOfType<MyService>();
                     ((MyService) actualInstance).Name.ShouldBe("abc");
@@ -108,7 +108,7 @@
 
                 // When
                 using (container.Bind<IMyService1>().To(ctx => func()))
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(
                     ctx => new MyService((string) ctx.Args[1], ctx.Container.Inject<IMyService1>())))
                 using (container.Bind(typeof(IMyGenericService<TT>)).To(
                     ctx => new MyGenericService<TT>((TT) ctx.Args[0], ctx.Container.Inject<IMyService>())))
@@ -134,7 +134,7 @@
                 Func<IMyService> func = () => expectedRef;
 
                 // When
-                using (container.Bind<IMyService1>().Tag(33).Lifetime(Lifetime.Transient).To(ctx => func()))
+                using (container.Bind<IMyService1>().Tag(33).As(Lifetime.Transient).To(ctx => func()))
                 using (container.Bind<IMyService>().To(
                     ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>(33))))
                 {
@@ -174,7 +174,7 @@
             using (var container = Container.Create())
             {
                 // When
-                using (container.Bind(typeof(IMyGenericService<,>)).Lifetime(Lifetime.Transient).To(typeof(MyGenericService<,>)))
+                using (container.Bind(typeof(IMyGenericService<,>)).As(Lifetime.Transient).To(typeof(MyGenericService<,>)))
                 {
                     // Then
                     var actualInstance = container.Get<IMyGenericService<int, string>>();

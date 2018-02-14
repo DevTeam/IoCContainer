@@ -2,6 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    // ReSharper disable once RedundantUsingDirective
     using System.Runtime.CompilerServices;
 
     internal static class Arrays

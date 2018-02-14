@@ -6,7 +6,9 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    // ReSharper disable once RedundantUsingDirective
     using System.Runtime.CompilerServices;
+    // ReSharper disable once RedundantUsingDirective
     using System.Threading.Tasks;
     using Core;
 
@@ -15,14 +17,12 @@
     [PublicAPI]
     public static class ContainerExtensions
     {
-        [ThreadStatic] private static object _tagValue;
-
         [NotNull]
         public static IContainer CreateChild([NotNull] this IContainer parent, [NotNull] string name = "")
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return parent.Tag(ContainerReference.Child).Get<IContainer>(name);
+            return parent.GetResolver<IContainer>(typeof(IContainer), ContainerReference.Child)(parent, name);
         }
 
         [NotNull]
@@ -98,7 +98,7 @@
         }
 
         [NotNull]
-        public static IRegistration<T> Lifetime<T>([NotNull] this IRegistration<T> registration, Lifetime lifetime)
+        public static IRegistration<T> As<T>([NotNull] this IRegistration<T> registration, Lifetime lifetime)
         {
             if (registration == null) throw new ArgumentNullException(nameof(registration));
             return new Registration<T>(registration, lifetime);
@@ -164,175 +164,45 @@
             }
         }
 
-        [NotNull]
-        public static IContainer Tag([NotNull] this IContainer container, [CanBeNull] object tag = null)
-        {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            _tagValue = tag;
-            return container;
-        }
-
-        [NotNull]
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        public static object Get([NotNull] this IContainer container, [NotNull] Type type, [NotNull][ItemCanBeNull] params object[] args)
-        {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            if (args == null) throw new ArgumentNullException(nameof(args));
-#endif
-            var tag = _tagValue;
-            _tagValue = null;
-            if (container.TryGet(type, tag, out var instance, args))
-            {
-                return instance;
-            }
-
-            return container.GetIssueResolver().CannotResolveDependency(container, new Key(type, tag));
-        }
-
-        [NotNull]
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        public static object Get([NotNull] this Container container, [NotNull] Type type, [NotNull][ItemCanBeNull] params object[] args)
-        {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            if (args == null) throw new ArgumentNullException(nameof(args));
-#endif
-            var tag = _tagValue;
-            _tagValue = null;
-            if (container.TryGet(type, tag, out var instance, args))
-            {
-                return instance;
-            }
-
-            return container.GetIssueResolver().CannotResolveDependency(container, new Key(type, tag));
-        }
-
-        [NotNull]
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
         public static T Get<T>([NotNull] this IContainer container, [NotNull][ItemCanBeNull] params object[] args)
         {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (args == null) throw new ArgumentNullException(nameof(args));
-#endif
-            var tag = _tagValue;
-            _tagValue = null;
-            if (container.TryGet<T>(tag, out var instance, args))
-            {
-                return instance;
-            }
-
-            return (T)container.GetIssueResolver().CannotResolveInstance(container, Key.Create<T>(tag));
-        }
-
-        [NotNull]
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        public static T Get<T>([NotNull] this Container container, [NotNull][ItemCanBeNull] params object[] args)
-        {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (args == null) throw new ArgumentNullException(nameof(args));
-#endif
-            var tag = _tagValue;
-            _tagValue = null;
-            if (container.TryGet<T>(tag, out var instance, args))
-            {
-                return instance;
-            }
-
-            return (T)container.GetIssueResolver().CannotResolveInstance(container, Key.Create<T>(tag));
-        }
-
-        [NotNull]
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        public static Func<T> FuncGet<T>([NotNull] this IContainer container)
-        {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            return container.Get<Func<T>>();
-        }
-
-        [NotNull]
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        public static Func<T1, T> FuncGet<T1, T>([NotNull] this IContainer container)
-        {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            return container.Get<Func<T1, T>>();
-        }
-
-        [NotNull]
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        public static Func<T1, T2, T> FuncGet<T1, T2, T>([NotNull] this IContainer container)
-        {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            return container.Get<Func<T1, T2, T>>();
-        }
-
-        [NotNull]
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        public static Func<T1, T2, T3, T> FuncGet<T1, T2, T3, T>([NotNull] this IContainer container)
-        {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            return container.Get<Func<T1, T2, T3, T>>();
-        }
-
-        [NotNull]
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        public static Func<T1, T2, T3, T4, T> FuncGet<T1, T2, T3, T4, T>([NotNull] this IContainer container)
-        {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            return container.Get<Func<T1, T2, T3, T4, T>>();
+            return container.GetResolver<T>(typeof(T))(container, args);
         }
 
 #if !NET40
-        [NotNull]
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static async Task<T> AsyncGet<T>([NotNull] this IContainer container, [CanBeNull] TaskScheduler taskScheduler = null)
+#endif
+        public static object Get([NotNull] this IContainer container, [NotNull] Type type, [NotNull][ItemCanBeNull] params object[] args)
         {
-#if DEBUG
-            if (container == null) throw new ArgumentNullException(nameof(container));
-#endif
-            var task = container.Get<Task<T>>();
-            if (taskScheduler != null)
-            {
-                task.Start(taskScheduler);
-            }
-
-            return await task;
+            return container.GetResolver<object>(type)(container, args);
         }
+
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
+        public static Resolving Tag([NotNull] this IContainer container, [CanBeNull] object tag)
+        {
+            return new Resolving(container, tag);
+        }
+
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public static T Get<T>(this Resolving resolving, [NotNull][ItemCanBeNull] params object[] args)
+        {
+            return resolving.Container.GetResolver<T>(typeof(T), resolving.Tag)(resolving.Container, args);
+        }
+
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public static object Get(this Resolving resolving, [NotNull] Type type, [NotNull][ItemCanBeNull] params object[] args)
+        {
+            return resolving.Container.GetResolver<object>(type, resolving.Tag)(resolving.Container, args);
+        }
 
         [NotNull]
         public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
@@ -415,10 +285,10 @@
             return container.Using(new T());
         }
 
-        public static PrepareResult Prepare([NotNull] this IContainer container)
+        public static ValidationResult Validate([NotNull] this IContainer container)
         {
             // ReSharper disable once InvokeAsExtensionMethod
-            return PrepareUtils.Prepare(container);
+            return ValidateUtils.Validate(container);
         }
 
         [NotNull]
@@ -463,6 +333,18 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             return container.Get<IIssueResolver>();
+        }
+
+        public struct Resolving
+        {
+            [NotNull] public readonly IContainer Container;
+            [CanBeNull] public readonly object Tag;
+
+            internal Resolving([NotNull] IContainer container, [CanBeNull]object tag)
+            {
+                Container = container;
+                Tag = tag;
+            }
         }
     }
 }

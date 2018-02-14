@@ -4,8 +4,8 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    // ReSharper disable once RedundantUsingDirective
     using System.Runtime.CompilerServices;
-    using System.Threading;
     using Core;
 
     internal sealed class SingletonLifetime : ILifetime, IDisposable, IExpressionBuilder
@@ -71,13 +71,13 @@
             var typedInstance = Expression.Convert(instanceField, baseExpression.Type);
             var methodInfo = CreateInstanceMethodInfo.MakeGenericMethod(baseExpression.Type);
             var resolverType = ResolverTypeInfo.MakeGenericType(baseExpression.Type);
-            var resolverExpression = Expression.Lambda(resolverType, baseExpression, true, ResolverGenerator.Parameters);
+            var resolverExpression = Expression.Lambda(resolverType, baseExpression, true, ResolverExpressionBuilder.Parameters);
             var resolver = resolverExpression.Compile();
 
             var lifetimeBody = Expression.Condition(
                 Expression.NotEqual(instanceField, NullConst),
                 typedInstance,
-                Expression.Call(Expression.Constant(this), methodInfo, ResolverGenerator.ContainerParameter, ResolverGenerator.ArgsParameter, Expression.Constant(resolver)));
+                Expression.Call(Expression.Constant(this), methodInfo, ResolverExpressionBuilder.ContainerParameter, ResolverExpressionBuilder.ArgsParameter, Expression.Constant(resolver)));
 
             return lifetimeBody;
         }

@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
     <TargetFrameworks Condition="'$(Configuration)'=='Debug'">net40;net45;netstandard1.0;netcoreapp2.0</TargetFrameworks>
     <TargetFrameworks Condition="'$(Configuration)'=='Release'">net40;netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;net45;net46;net47;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
@@ -19,8 +18,19 @@
     <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
     <DebugType Condition="'$(Configuration)'=='Release'">none</DebugType>
     <DebugSymbols Condition="'$(Configuration)'=='Release'">false</DebugSymbols>
+    <FileUpgradeFlags>
+    </FileUpgradeFlags>
+    <UpgradeBackupLocation>
+    </UpgradeBackupLocation>
+    <OldToolsVersion>2.0</OldToolsVersion>
+    <ProjectGuid>{F03C8294-327B-48E6-94CE-550E7305B278}</ProjectGuid>
   </PropertyGroup>
-
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
     <None Update="README_TEMPLATE.md">
       <DesignTime>True</DesignTime>
@@ -32,7 +42,6 @@
       <LastGenOutput>README_TEMPLATE.md</LastGenOutput>
     </None>
   </ItemGroup>
-
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>

@@ -23,7 +23,7 @@
             return new CompositeDisposable(disposables);
         }
 
-        private struct DisposableAction: IDisposable
+        private class DisposableAction : IDisposable
         {
             [NotNull] private readonly Action _action;
             private bool _disposed;
@@ -46,7 +46,7 @@
             }
         }
 
-        private struct CompositeDisposable: IDisposable
+        private class CompositeDisposable: IDisposable
         {
             private readonly List<IDisposable> _disposables;
 

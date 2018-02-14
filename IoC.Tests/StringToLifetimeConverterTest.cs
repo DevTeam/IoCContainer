@@ -29,15 +29,16 @@ namespace IoC.Tests
         {
             private readonly List<object[]> _data = new List<object[]>
             {
-                new object[] {".Lifetime(Lifetime.Transient)", true, Lifetime.Transient},
-                new object[] { ".Lifetime(Lifetime.Singleton)", true, Lifetime.Singleton},
-                new object[] { ".Lifetime(Lifetime.Scope)", true, Lifetime.Scope},
-                new object[] { ".Lifetime(Lifetime.Container)", true, Lifetime.Container},
-                new object[] { ".Lifetime(Lifetime.container)", true, Lifetime.Container},
-                new object[] { ".LifeTime(Container)", true, Lifetime.Container},
-                new object[] { ".Lifetime(container)", true, Lifetime.Container},
-                new object[] { ".Lifetime(Lifetime.Transient).Lifetime(Lifetime.Singleton)", true, Lifetime.Singleton},
-                new object[] { " . Lifetime  (  Lifetime.Singleton  )  ", true, Lifetime.Singleton},
+                new object[] {".As(Lifetime.Transient)", true, Lifetime.Transient},
+                new object[] { ".As(Lifetime.Singleton)", true, Lifetime.Singleton},
+                new object[] { ".As(Lifetime.ScopeSingleton)", true, Lifetime.ScopeSingleton},
+                new object[] { ".As(Lifetime.ContainerSingleton)", true, Lifetime.ContainerSingleton},
+                new object[] { ".As(Lifetime.containerSingleton)", true, Lifetime.ContainerSingleton},
+                new object[] { ".As(Lifetime.ThreadSingleton)", true, Lifetime.ThreadSingleton},
+                new object[] { ".As(ContainerSingleton)", true, Lifetime.ContainerSingleton},
+                new object[] { ".As(containerSingleton)", true, Lifetime.ContainerSingleton},
+                new object[] { ".As(Lifetime.Transient).As(Lifetime.Singleton)", true, Lifetime.Singleton},
+                new object[] { " . As  (  Lifetime.Singleton  )  ", true, Lifetime.Singleton},
             };
 
             public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();

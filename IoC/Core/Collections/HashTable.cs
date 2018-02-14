@@ -1,6 +1,7 @@
 namespace IoC.Core.Collections
 {
     using System;
+    // ReSharper disable once RedundantUsingDirective
     using System.Runtime.CompilerServices;
 
     internal sealed class HashTable<TKey, TValue>
@@ -48,7 +49,7 @@ namespace IoC.Core.Collections
 #endif
         private void AddExistingValues(HashTable<TKey, TValue> previous)
         {
-            foreach (HashTree<TKey, TValue> bucket in previous.Buckets)
+            foreach (var bucket in previous.Buckets)
             {
                 foreach (var keyValue in bucket.InOrder())
                 {

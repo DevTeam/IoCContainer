@@ -6,50 +6,56 @@
 
     internal sealed class RegistrationEntry : IDisposable
     {
-        [NotNull] private readonly IResolverGenerator _resolverGenerator;
+        [NotNull] private readonly IResolverExpressionBuilder _resolverExpressionBuilder;
         [NotNull] internal readonly IDependency Dependency;
-        [CanBeNull] internal readonly ILifetime Lifetime;
+        [CanBeNull] private readonly ILifetime _lifetime;
         [NotNull] private readonly IDisposable _resource;
+        private readonly object _lockObject = new object();
         private readonly Dictionary<ResolverKey, object> _resolvers = new Dictionary<ResolverKey, object>();
         private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
 
         public RegistrationEntry(
-            [NotNull] IResolverGenerator resolverGenerator,
+            [NotNull] IResolverExpressionBuilder resolverExpressionBuilder,
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource)
         {
-            _resolverGenerator = resolverGenerator ?? throw new ArgumentNullException(nameof(resolverGenerator));
+            _resolverExpressionBuilder = resolverExpressionBuilder ?? throw new ArgumentNullException(nameof(resolverExpressionBuilder));
             Dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
-            Lifetime = lifetime;
+            _lifetime = lifetime;
             _resource = resource ?? throw new ArgumentNullException(nameof(resource));
         }
 
         public bool TryCreateResolver<T>([NotNull] Key key, [NotNull] IContainer container, out Resolver<T> resolver)
         {
             var typeInfo = key.Type.Info();
-            var resolverKey = typeInfo.IsConstructedGenericType ? new ResolverKey(typeof(T), typeInfo.GenericTypeArguments) : new ResolverKey(typeof(T), new Type[0]);
-            IResolverHolder<T> resolverHolder;
-            lock (_resolvers)
+            var resolverKey = typeInfo.IsConstructedGenericType ? new ResolverKey(key, typeInfo.GenericTypeArguments) : new ResolverKey(key, new Type[0]);
+            lock (_lockObject)
             {
-                if (!_resolvers.TryGetValue(resolverKey, out var resolverHolderObject))
+                if (!_resolvers.TryGetValue(resolverKey, out var resolverObject))
                 {
-                    if (!_resolverGenerator.TryGenerate(key, container, Dependency, GetLifetime(typeInfo), out resolverHolder))
+                    if (!_resolverExpressionBuilder.TryBuild<T>(key, container, Dependency, GetLifetime(typeInfo), out var resolverExpression))
                     {
                         resolver = default(Resolver<T>);
                         return false;
                     }
 
-                    _resolvers.Add(resolverKey, resolverHolder);
+                    resolver = resolverExpression.Compile();
+                    _resolvers.Add(resolverKey, resolver);
                 }
                 else
                 {
-                    resolverHolder = (IResolverHolder<T>)resolverHolderObject;
+                    resolver = (Resolver<T>)resolverObject;
                 }
             }
 
-            resolver = resolverHolder.Resolve;
             return true;
+        }
+
+        [CanBeNull]
+        public ILifetime GetLifetime([NotNull] Type type)
+        {
+            return GetLifetime(type.Info());
         }
 
         [CanBeNull]
@@ -57,11 +63,11 @@
         {
             var lifetimeKey = typeInfo.IsConstructedGenericType ? new LifetimeKey(typeInfo.GenericTypeArguments) : new LifetimeKey(new Type[0]);
             ILifetime lifetime;
-            lock (_lifetimes)
+            lock (_lockObject)
             {
                 if (!_lifetimes.TryGetValue(lifetimeKey, out lifetime))
                 {
-                    lifetime = Lifetime?.Clone();
+                    lifetime = _lifetime?.Clone();
                     _lifetimes.Add(lifetimeKey, lifetime);
                 }
             }
@@ -71,10 +77,20 @@
 
         public void Reset()
         {
-            Disposable.Create(_lifetimes.Values.OfType<IDisposable>()).Dispose();
-            _lifetimes.Clear();
-            Disposable.Create(_resolvers.Values.OfType<IDisposable>()).Dispose();
-            _resolvers.Clear();
+            lock (_lockObject)
+            {
+                if (_lifetimes.Any())
+                {
+                    Disposable.Create(_lifetimes.Values.OfType<IDisposable>().Concat(_resolvers.Values.OfType<IDisposable>())).Dispose();
+                    _lifetimes.Clear();
+                }
+
+                if (_resolvers.Any())
+                {
+                    Disposable.Create(_resolvers.Values.OfType<IDisposable>()).Dispose();
+                    _resolvers.Clear();
+                }
+            }
         }
 
         public void Dispose()
@@ -85,12 +101,12 @@
 
         private struct ResolverKey
         {
-            private readonly Type _type;
+            private readonly Key _key;
             private readonly Type[] _genericTypes;
 
-            public ResolverKey(Type type, Type [] genericTypes)
+            public ResolverKey(Key key, Type [] genericTypes)
             {
-                _type = type;
+                _key = key;
                 _genericTypes = genericTypes;
             }
 
@@ -104,13 +120,13 @@
             {
                 unchecked
                 {
-                    return ((_type != null ? _type.GetHashCode() : 0) * 397) ^ (_genericTypes != null ? _genericTypes.GetHash() : 0);
+                    return ((_key != null ? _key.GetHashCode() : 0) * 397) ^ (_genericTypes != null ? _genericTypes.GetHash() : 0);
                 }
             }
 
             private bool Equals(ResolverKey other)
             {
-                return _type == other._type && Arrays.SequenceEqual(_genericTypes, other._genericTypes);
+                return Equals(_key, other._key) && Arrays.SequenceEqual(_genericTypes, other._genericTypes);
             }
         }
 

@@ -88,11 +88,11 @@ using (var container = Container.Create().Using<Glue>())
   Console.WriteLine("#1 is alive: " + box1.Content.IsAlive);
 
   // Func way
-  var box2 = container.FuncGet<IBox<ICat>>();
+  var box2 = container.Get<Func<IBox<ICat>>>();
   Console.WriteLine("#2 is alive: " + box2().Content.IsAlive);
 
   // Async way
-  var box3 = await container.AsyncGet<IBox<ICat>>(TaskScheduler.Default);
+  var box3 = await container.Get<Task<IBox<ICat>>>();
   Console.WriteLine("#3 is alive: " + box3.Content.IsAlive);
 }
 ```
@@ -180,11 +180,12 @@ using (container.Bind<Service, IService, IAnotherService>().To<Service>())
 // Create the container
 using (var container = Container.Create())
 // Configure the container
+using (container.Bind<TaskScheduler>().To(ctx => TaskScheduler.Default))
 using (container.Bind<IDependency>().To<Dependency>())
 using (container.Bind<IService>().To<Service>())
 {
     // Resolve the instance asynchronously
-    var instance = await container.AsyncGet<IService>(TaskScheduler.Default);
+    var instance = await container.Get<Task<IService>>();
 
     instance.ShouldBeOfType<Service>();
 }
@@ -398,7 +399,7 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(
 using (var container = Container.Create())
 // Configure the container
 using (container.Bind<IDependency>().To<Dependency>())
-using (container.Bind<IService>().Lifetime(Lifetime.Singleton).To<Service>())
+using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
 {
     // Resolve the instance twice
     var instance1 = container.Get<IService>();
@@ -543,7 +544,7 @@ var disposableService = new Mock<IDisposableService>();
 using (var container = Container.Create())
 {
     // Configure the container
-    container.Bind<IService>().Lifetime(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object).ToSelf();
+    container.Bind<IService>().As(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object).ToSelf();
 
     // Resolve instances
     var instance1 = container.Get<IService>();
@@ -620,7 +621,7 @@ using (container.Bind<IDependency>().To<Dependency>())
     }
 
     // Reconfigure the container using the Singleton lifetime
-    using (container.Bind<IService>().Lifetime(Lifetime.Singleton).To<Service>())
+    using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
     {
         // Resolve the instance twice
         var instance1 = container.Get<IService>();
@@ -675,19 +676,29 @@ public class MyContainer: IContainer
         return Parent.TryGetDependency(key, out dependency, out lifetime);
     }
 
-    public bool TryGetResolver<T>(Key key, out Resolver<T> resolver, IContainer container = null)
+    public Resolver<T> GetResolver<T>(Type type)
     {
-        return Parent.TryGetResolver(key, out resolver, container);
+        return Parent.GetResolver<T>(type);
     }
 
-    public bool TryGet(Type type, object tag, out object instance, params object[] args)
+    public bool TryGetResolver<T>(Type type, out Resolver<T> resolver)
     {
-        return Parent.TryGet(type, tag, out instance, args);
+        return Parent.TryGetResolver(type, out resolver);
     }
 
-    public bool TryGet<T>(object tag, out T instance, params object[] args)
+    public Resolver<T> GetResolver<T>(Type type, object tag)
     {
-        return Parent.TryGet(tag, out instance, args);
+        return Parent.GetResolver<T>(type, tag);
+    }
+
+    public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver)
+    {
+        return Parent.TryGetResolver<T>(type, tag, out resolver);
+    }
+
+    public bool TryGetResolver<T>(IContainer container, Type type, object tag, out Resolver<T> resolver)
+    {
+        return Parent.TryGetResolver(container, type, tag, out resolver);
     }
 
     public void Dispose() { }
@@ -764,7 +775,7 @@ public void Run()
     // Configure the container
     using (container.Bind<IDependency>().To<Dependency>())
     // Custom Singleton lifetime is using
-    using (container.Bind<IService>().Lifetime(Lifetime.Singleton).To<Service>())
+    using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
     {
         // Resolve the instance twice using the wrapped Singletine lifetime
         var instance1 = container.Get<IService>();
@@ -813,9 +824,9 @@ public class MySingletonLifetime : ILifetime
 // Create the container
 using (var container = Container.Create())
 // Configure the container
-using (container.Bind<IDependency>().Lifetime(Lifetime.Scope).To<Dependency>())
+using (container.Bind<IDependency>().As(Lifetime.Scope).To<Dependency>())
 {
-    using (container.Bind<IService>().Lifetime(Lifetime.Scope).To<Service>())
+    using (container.Bind<IService>().As(Lifetime.Scope).To<Service>())
     {
         // Default resolving scope
         var instance1 = container.Get<IService>();
@@ -838,7 +849,7 @@ using (container.Bind<IDependency>().Lifetime(Lifetime.Scope).To<Dependency>())
     }
 
     // Reconfigure to check dependencies only
-    using (container.Bind<IService>().Lifetime(Lifetime.Transient).To<Service>())
+    using (container.Bind<IService>().As(Lifetime.Transient).To<Service>())
     {
         // Default resolving scope
         var instance1 = container.Get<IService>();

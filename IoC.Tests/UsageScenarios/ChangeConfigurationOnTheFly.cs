@@ -29,7 +29,7 @@
                 }
 
                 // Reconfigure the container using the Singleton lifetime
-                using (container.Bind<IService>().Lifetime(Lifetime.Singleton).To<Service>())
+                using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
                 {
                     // Resolve the instance twice
                     var instance1 = container.Get<IService>();

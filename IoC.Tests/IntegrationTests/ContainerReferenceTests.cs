@@ -15,7 +15,7 @@
                 var expectedInstance = Mock.Of<IMyService>();
 
                 // When
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
                 using (var childContainer = container.Tag(ContainerReference.Child).Get<IContainer>())
                 {
                     // Then

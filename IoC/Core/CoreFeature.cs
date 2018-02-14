@@ -31,13 +31,20 @@
 
             yield return container
                 .Bind<ILifetime>()
-                .Tag(Lifetime.Container)
-                .To(ctx => new ContainerLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)));
+                .Tag(Lifetime.ContainerSingleton)
+                .To(ctx => new ContainerSingletonLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)));
 
             yield return container
                 .Bind<ILifetime>()
-                .Tag(Lifetime.Scope)
-                .To(ctx => new ScopeLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)));
+                .Tag(Lifetime.ScopeSingleton)
+                .To(ctx => new ScopeSingletonLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)));
+
+#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_5 && !NETSTANDARD1_6
+            yield return container
+                .Bind<ILifetime>()
+                .Tag(Lifetime.ThreadSingleton)
+                .To(ctx => new ThreadSingletonLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)));
+#endif
 
             yield return container
                 .Bind<IContainer>()

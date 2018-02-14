@@ -55,9 +55,9 @@
             var getOrCreateMethodInfo = LifetimeGenericGetOrCreateMethodInfo.MakeGenericMethod(type);
             var resolverType = ResolverGenericTypeInfo.MakeGenericType(type);
             expression = injectingExpressionVisitor.Visit(expression);
-            var resolverExpression = Expression.Lambda(resolverType, expression, true, ResolverGenerator.Parameters);
+            var resolverExpression = Expression.Lambda(resolverType, expression, true, ResolverExpressionBuilder.Parameters);
             var resolver = resolverExpression.Compile();
-            var lifetimeCall = Expression.Call(Expression.Constant(lifetime), getOrCreateMethodInfo, ResolverGenerator.ContainerParameter, ResolverGenerator.ArgsParameter, Expression.Constant(resolver));
+            var lifetimeCall = Expression.Call(Expression.Constant(lifetime), getOrCreateMethodInfo, ResolverExpressionBuilder.ContainerParameter, ResolverExpressionBuilder.ArgsParameter, Expression.Constant(resolver));
             return lifetimeCall;
         }
 

@@ -20,7 +20,7 @@
             using (var container = Container.Create())
             {
                 // Configure the container
-                container.Bind<IService>().Lifetime(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object).ToSelf();
+                container.Bind<IService>().As(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object).ToSelf();
 
                 // Resolve instances
                 var instance1 = container.Get<IService>();

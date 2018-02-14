@@ -7,8 +7,6 @@
     {
         [NotNull] IDisposable CannotRegister([NotNull] IContainer container, [NotNull][ItemNotNull] Key[] keys);
 
-        object CannotResolveInstance([NotNull] IContainer container, [NotNull] Key key);
-
         [NotNull] Tuple<IDependency, ILifetime> CannotResolveDependency([NotNull] IContainer container, [NotNull] Key key);
 
         [NotNull] Resolver<T> CannotGetResolver<T>([NotNull] IContainer container, [NotNull] Key key);

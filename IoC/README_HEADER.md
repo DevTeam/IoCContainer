@@ -88,11 +88,11 @@ using (var container = Container.Create().Using<Glue>())
   Console.WriteLine("#1 is alive: " + box1.Content.IsAlive);
 
   // Func way
-  var box2 = container.FuncGet<IBox<ICat>>();
+  var box2 = container.Get<Func<IBox<ICat>>>();
   Console.WriteLine("#2 is alive: " + box2().Content.IsAlive);
 
   // Async way
-  var box3 = await container.AsyncGet<IBox<ICat>>(TaskScheduler.Default);
+  var box3 = await container.Get<Task<IBox<ICat>>>();
   Console.WriteLine("#3 is alive: " + box3.Content.IsAlive);
 }
 ```

@@ -21,11 +21,12 @@ namespace IoC.Tests.UsageScenarios
             // Create the container
             using (var container = Container.Create())
             // Configure the container
+            using (container.Bind<TaskScheduler>().To(ctx => TaskScheduler.Default))
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
             {
                 // Resolve the instance asynchronously
-                var instance = await container.AsyncGet<IService>(TaskScheduler.Default);
+                var instance = await container.Get<Task<IService>>();
 
                 instance.ShouldBeOfType<Service>();
             }

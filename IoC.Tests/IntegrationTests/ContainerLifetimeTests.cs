@@ -15,7 +15,7 @@
             {
                 Func<IMyService> func = Mock.Of<IMyService>;
                 // When
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Container).To(ctx => func()))
+                using (container.Bind<IMyService>().As(Lifetime.ContainerSingleton).To(ctx => func()))
                 {
                     // Then
                     var instance1 = container.Get<IMyService>();
@@ -53,7 +53,7 @@
             {
                 Func<IMyService> func = Mock.Of<IMyService>;
                 // When
-                using (container.Bind<IMyService, IMyService1>().Lifetime(Lifetime.Container).To(ctx => func()))
+                using (container.Bind<IMyService, IMyService1>().As(Lifetime.ContainerSingleton).To(ctx => func()))
                 {
                     // Then
                     var instance1 = container.Get<IMyService>();

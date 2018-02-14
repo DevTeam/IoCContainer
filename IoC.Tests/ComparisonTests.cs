@@ -26,13 +26,13 @@ namespace IoC.Tests
     [SuppressMessage("ReSharper", "EmptyConstructor")]
     public class ComparisonTests
     {
-        private const string ThisIocName = "this";
+        private const string ThisIocName = "IoC.Container";
         private const string ReportFileName = "REPORT.html";
 
         private static readonly List<TestInfo> IocsGraphOf3ObjectsWithSingleton = new List<TestInfo>
         {
-            new TestInfo( "Without IoC", CtorSingleton),
-            new TestInfo($"{ThisIocName} for actual scenario", ThisByFuncSingleton),
+            new TestInfo( "operators 'new'", CtorSingleton),
+            new TestInfo($"{ThisIocName} actual DI", ThisByFuncSingleton),
             new TestInfo(ThisIocName, ThisSingleton),
 #if NETCOREAPP2_0
             new TestInfo("LightInject", LightInjectSingleton),
@@ -45,8 +45,8 @@ namespace IoC.Tests
 
         private static readonly List<TestInfo> IocsGraphOf3Transient = new List<TestInfo>
         {
-            new TestInfo("Without IoC", CtorTransient),
-            new TestInfo($"{ThisIocName} for actual scenario", ThisByFuncTransient),
+            new TestInfo("operators 'new'", CtorTransient),
+            new TestInfo($"{ThisIocName} actual DI", ThisByFuncTransient),
             new TestInfo(ThisIocName, ThisTransient),
 #if NETCOREAPP2_0
             new TestInfo("LightInject", LightInjectTransient),
@@ -102,7 +102,7 @@ namespace IoC.Tests
                 results.Add(result);
             }
 
-            SaveResults(results, $"Performance for 5 objects and 1 singleton {series} times");
+            SaveResults(results, $"5 instances and 1 singleton {series.ToShortString()} times");
             results.Clear();
 
             foreach (var ioc in IocsGraphOf3Transient)
@@ -119,7 +119,7 @@ namespace IoC.Tests
                 results.Add(result);
             }
 
-            SaveResults(results, $"Performance for 6 objects {series} times");
+            SaveResults(results, $"6 instances {series.ToShortString()} times");
             results.Clear();
         }
 
@@ -147,7 +147,7 @@ namespace IoC.Tests
                 results.Add(result);
             }
 
-            SaveResults(results, $"Memory usage for 5 objects and 1 singleton {series} times");
+            SaveResults(results, $"Memory usage 5 instances and 1 singleton {series} times");
             results.Clear();
 
             foreach (var ioc in IocsGraphOf3Transient)
@@ -161,7 +161,7 @@ namespace IoC.Tests
                 results.Add(result);
             }
 
-            SaveResults(results, $"Memory usage for 6 objects {series} times");
+            SaveResults(results, $"Memory usage 6 instances {series} times");
             results.Clear();
         }
 
@@ -169,14 +169,14 @@ namespace IoC.Tests
         {
             using (var container = Container.Create())
             using (container.Bind<IService1>().To<Service1>())
-            using (container.Bind<IService2>().Lifetime(Lifetime.Singleton).To<Service2>())
+            using (container.Bind<IService2>().As(Lifetime.Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
             using (performanceCounter.Run())
             {
                 for (var i = 0; i < series; i++)
                 {
-                    container.TryGet<IService1>(null, out var service);
-                    service.DoSomething();
+                    container.TryGetResolver<IService1>(typeof(IService1), out var resolver);
+                    resolver(container).DoSomething();
                 }
             }
         }
@@ -191,8 +191,8 @@ namespace IoC.Tests
             {
                 for (var i = 0; i < series; i++)
                 {
-                    container.TryGet<IService1>(null, out var service);
-                    service.DoSomething();
+                    container.TryGetResolver<IService1>(typeof(IService1), out var resolver);
+                    resolver(container).DoSomething();
                 }
             }
         }
@@ -201,10 +201,10 @@ namespace IoC.Tests
         {
             using (var container = Container.Create())
             using (container.Bind<IService1>().To<Service1>())
-            using (container.Bind<IService2>().Lifetime(Lifetime.Singleton).To<Service2>())
+            using (container.Bind<IService2>().As(Lifetime.Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
             {
-                container.TryGetResolver<IService1>(Key.Create<IService1>(), out var resolver);
+                container.TryGetResolver<IService1>(typeof(IService1), null, out var resolver);
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -222,7 +222,7 @@ namespace IoC.Tests
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
             {
-                container.TryGetResolver<IService1>(Key.Create<IService1>(), out var resolver);
+                container.TryGetResolver<IService1>(typeof(IService1), null, out var resolver);
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -474,8 +474,9 @@ namespace IoC.Tests
         {
             var body = new StringBuilder();
             body.AppendLine($"<h2>{name}</h2>");
-            body.AppendLine($"<h3>{GetFramework()}</h3>");
-            body.AppendLine("<table border='1'>");
+            body.AppendLine($"{GetFramework()}");
+            body.AppendLine("<style type='text/css'>TABLE {width: 300px; border-collapse: collapse;} TD, TH {padding: 3px; border: 1px solid black;} TH { background: #A0A0A0; } </style> ");
+            body.AppendLine("<table border='1px' border-style:solid>");
             body.AppendLine("<tr>");
             body.AppendLine("<th>#</th>");
             body.AppendLine("<th>IoC</th>");

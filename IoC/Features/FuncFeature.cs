@@ -58,8 +58,13 @@
             }
 
             var instanceType = factoryType.MakeGenericType(genericTypeArguments);
-            var tag = key.Tag;
-            return ((IFuncFactory)container.Tag(tag).Get(instanceType)).Create();
+            if (!container.TryGetResolver<IFuncFactory>(container, instanceType, key.Tag, out var resolver))
+            {
+                var objectResolver = container.Get<IIssueResolver>().CannotGetResolver<object>(container, new Key(instanceType, key.Tag));
+                return ((IFuncFactory)objectResolver(container)).Create();
+            }
+
+            return resolver(container).Create();
         }
 
         private interface IFuncFactory
@@ -75,10 +80,10 @@
             // ReSharper disable once MemberCanBeProtected.Local
             public FuncFactory(Context context)
             {
-                var key = Key.Create<T>(context.Key.Tag);
                 Container = context.Container;
-                if (!context.Container.TryGetResolver(key, out Resolver, Container))
+                if (!context.Container.TryGetResolver(Container, typeof(T), context.Key.Tag, out Resolver))
                 {
+                    var key = Key.Create<T>(context.Key.Tag);
                     Resolver = context.Container.Get<IIssueResolver>().CannotGetResolver<T>(Container, key);
                 }
             }

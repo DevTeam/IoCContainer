@@ -27,14 +27,17 @@
             public InstanceTask(Context context)
                 :base(CreateFunction(context))
             {
+                if (context.Container.TryGetResolver<TaskScheduler>(typeof(TaskScheduler), out var taskSchedulerResolver))
+                {
+                    Start(taskSchedulerResolver(context.Container));
+                }
             }
 
             private static Func<T> CreateFunction(Context context)
             {
-                var resolvingKey = Key.Create<T>(context.Key.Tag);
-                if (!context.Container.TryGetResolver<T>(resolvingKey, out var resolver, context.Container))
+                if (!context.Container.TryGetResolver<T>(context.Container, typeof(T), context.Key.Tag, out var resolver))
                 {
-                    resolver = context.Container.Get<IIssueResolver>().CannotGetResolver<T>(context.Container, resolvingKey);
+                    resolver = context.Container.Get<IIssueResolver>().CannotGetResolver<T>(context.Container, Key.Create<T>(context.Key.Tag));
                 }
 
                 return () => resolver(context.Container);

@@ -2,11 +2,11 @@
 {
     using System;
 
-    internal sealed class ContainerLifetime: KeyBasedLifetime<IContainer>
+    internal sealed class ContainerSingletonLifetime: SingletonBasedLifetime<IContainer>
     {
         [NotNull] private readonly Func<ILifetime> _singletonLifetimeFactory;
 
-        public ContainerLifetime([NotNull] Func<ILifetime> singletonLifetimeFactory)
+        public ContainerSingletonLifetime([NotNull] Func<ILifetime> singletonLifetimeFactory)
             : base(singletonLifetimeFactory)
         {
             _singletonLifetimeFactory = singletonLifetimeFactory ?? throw new ArgumentNullException(nameof(singletonLifetimeFactory));
@@ -19,12 +19,12 @@
 
         public override string ToString()
         {
-            return Lifetime.Container.ToString();
+            return Lifetime.ContainerSingleton.ToString();
         }
 
         public override ILifetime Clone()
         {
-            return new ContainerLifetime(_singletonLifetimeFactory);
+            return new ContainerSingletonLifetime(_singletonLifetimeFactory);
         }
     }
 }

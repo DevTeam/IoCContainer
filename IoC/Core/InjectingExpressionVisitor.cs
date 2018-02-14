@@ -9,6 +9,7 @@
     internal class InjectingExpressionVisitor: ExpressionVisitor
     {
         [NotNull] private static readonly ITypeInfo ContextTypeInfo = Type<Context>.Info;
+        [NotNull] private static readonly ITypeInfo GenericContextTypeInfo = typeof(Context<>).Info();
         [NotNull] private static readonly ITypeInfo InstanceContextTypeInfo = typeof(Context<>).Info();
         [NotNull] private static readonly MethodInfo InjectMethodInfo;
         [NotNull] private static readonly MethodInfo InjectWithTagMethodInfo;
@@ -114,8 +115,8 @@
                     ctor,
                     _thisExpression,
                     Expression.Constant(_keys.Peek()),
-                    ResolverGenerator.ContainerParameter,
-                    ResolverGenerator.ArgsParameter);
+                    ResolverExpressionBuilder.ContainerParameter,
+                    ResolverExpressionBuilder.ArgsParameter);
             }
 
             return base.VisitParameter(node);
@@ -127,8 +128,8 @@
             return Expression.New(
                 ContextConstructor,
                 Expression.Constant(_keys.Peek()),
-                ResolverGenerator.ContainerParameter,
-                ResolverGenerator.ArgsParameter);
+                ResolverExpressionBuilder.ContainerParameter,
+                ResolverExpressionBuilder.ArgsParameter);
         }
 
         [CanBeNull]
@@ -168,7 +169,7 @@
                     return _container;
                 }
 
-                var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, ResolverGenerator.ContainerParameter);
+                var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, ResolverExpressionBuilder.ContainerParameter);
                 var selectContainer = containerSelectorExpression.Compile();
                 return selectContainer(_container);
             }
@@ -244,7 +245,8 @@
         private bool TryReplaceContextFields([NotNull] Type type, string name, out Expression expression)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            if (ContextTypeInfo.IsAssignableFrom(type.Info()))
+            var typeInfo = type.Info();
+            if (ContextTypeInfo.IsAssignableFrom(typeInfo))
             {
                 // ctx.Key
                 if (name == nameof(Context.Key))
@@ -256,15 +258,28 @@
                 // ctx.Container
                 if (name == nameof(Context.Container))
                 {
-                    expression = ResolverGenerator.ContainerParameter;
+                    expression = ResolverExpressionBuilder.ContainerParameter;
                     return true;
                 }
 
                 // ctx.Args
                 if (name == nameof(Context.Args))
                 {
-                    expression = ResolverGenerator.ArgsParameter;
+                    expression = ResolverExpressionBuilder.ArgsParameter;
                     return true;
+                }
+            }
+
+            if (typeInfo.IsConstructedGenericType)
+            {
+                if (GenericContextTypeInfo.IsAssignableFrom(typeInfo.GetGenericTypeDefinition().Info()))
+                {
+                    // ctx.It
+                    if (name == nameof(Context<object>.It))
+                    {
+                        expression = _thisExpression;
+                        return true;
+                    }
                 }
             }
 

@@ -19,7 +19,7 @@
                     ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>()),
                     ctx => ctx.Container.Inject(ctx.It.SomeRef2, ctx.Container.Inject<IMyService1>()),
                     ctx => ctx.Container.Inject(ctx.It.SomeRef3, ctx.Container.Inject<IMyService1>())))
-                using (container.Bind<IMyService1>().Lifetime(Lifetime.Scope).To(ctx => func()))
+                using (container.Bind<IMyService1>().As(Lifetime.ScopeSingleton).To(ctx => func()))
                 {
                     // Default resolving scope
                     var instance1 = (MyService) container.Get<IMyService>("abc");

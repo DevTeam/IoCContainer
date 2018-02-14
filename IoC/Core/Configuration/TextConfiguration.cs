@@ -27,9 +27,9 @@
                 return
                     from binding in context.Bindings
                     let registration = binding.Tags.Aggregate(
-                        container.Bind(binding.Types).Lifetime(binding.Lifetime),
+                        container.Bind(binding.Types).As(binding.Lifetime),
                         (current, tag) => current.Tag(tag))
-                    select registration.Lifetime(binding.Lifetime).To(binding.InstanceType);
+                    select registration.As(binding.Lifetime).To(binding.InstanceType);
             }
 
             return Enumerable.Empty<IDisposable>();

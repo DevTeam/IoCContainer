@@ -1,6 +1,7 @@
 namespace IoC.Core.Collections
 {
     using System;
+    // ReSharper disable once RedundantUsingDirective
     using System.Runtime.CompilerServices;
 
     internal sealed class HashTree<TKey, TValue>

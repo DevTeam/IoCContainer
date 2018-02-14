@@ -11,12 +11,6 @@
         {
         }
 
-        public object CannotResolveInstance(IContainer container, Key key)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            throw new InvalidOperationException($"Cannot resolver the instance for the key \"{key}\" from  the container \"{container}\".");
-        }
-
         public Tuple<IDependency, ILifetime> CannotResolveDependency(IContainer container, Key key)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));

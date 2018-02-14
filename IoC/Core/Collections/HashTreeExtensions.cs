@@ -1,6 +1,7 @@
 namespace IoC.Core.Collections
 {
     using System.Collections.Generic;
+    // ReSharper disable once RedundantUsingDirective
     using System.Runtime.CompilerServices;
 
     internal static class HashTreeExtensions

@@ -15,6 +15,11 @@
 
         public void OnNext(T value)
         {
+            if (_observers.Count == 0)
+            {
+                return;
+            }
+
             foreach (var observer in _observers)
             {
                 observer.OnNext(value);

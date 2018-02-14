@@ -8,9 +8,9 @@ namespace IoC.Tests
     public class ConfigurationTests
     {
         [Theory]
-        [InlineData("ref IoC.Tests; using IoC.Tests; Bind<IMyService33<>>().Tag(33).Tag().Lifetime(Lifetime.Singleton).Tag(\"abc\").To<MyService33<>>();")]
-        [InlineData("using IoC.Tests; ref IoC.Tests; Bind<IMyService33<>>().Tag().Tag(33).Lifetime(Singleton).Tag(\"abc\").To<MyService33<>>();")]
-        [InlineData("ref IoC.Tests;\nusing IoC.Tests;\nBind<IMyService33<>>().Tag(33)\n.Tag().Lifetime(Lifetime.Singleton).Tag(\"abc\").To<MyService33<>>();\n")]
+        [InlineData("ref IoC.Tests; using IoC.Tests; Bind<IMyService33<>>().Tag(33).Tag().As(Lifetime.Singleton).Tag(\"abc\").To<MyService33<>>();")]
+        [InlineData("using IoC.Tests; ref IoC.Tests; Bind<IMyService33<>>().Tag().Tag(33).As(Singleton).Tag(\"abc\").To<MyService33<>>();")]
+        [InlineData("ref IoC.Tests;\nusing IoC.Tests;\nBind<IMyService33<>>().Tag(33)\n.Tag().As(Lifetime.Singleton).Tag(\"abc\").To<MyService33<>>();\n")]
         public void ShouldConfigureViaText(string configurationText)
         {
             // Given

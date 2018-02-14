@@ -3,7 +3,6 @@
 namespace IoC
 {
     using System;
-    using Core;
 
     [PublicAPI]
     public abstract class GenericTypeArgument { }

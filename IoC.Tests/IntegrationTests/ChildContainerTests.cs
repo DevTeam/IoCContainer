@@ -36,7 +36,7 @@
             {
                 var childContainer = container.CreateChild("child");
                 IDisposable actualInstance;
-                using (childContainer.Bind<IDisposable>().Lifetime(Lifetime.Container).To(ctx => expectedInstance.Object))
+                using (childContainer.Bind<IDisposable>().As(Lifetime.ContainerSingleton).To(ctx => expectedInstance.Object))
                 {
                     // When
                     actualInstance = childContainer.Get<IDisposable>();
@@ -58,7 +58,7 @@
                 var expectedInstance = Mock.Of<IMyService>();
                 Func<IMyService> func = () => expectedInstance;
                 // When
-                using (container.Bind<IMyService>().Lifetime(Lifetime.Transient).To(ctx => func()))
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => func()))
                 {
                     using (var childContainer = container.CreateChild())
                     {

@@ -2,11 +2,11 @@
 {
     using System;
 
-    internal sealed class ScopeLifetime: KeyBasedLifetime<object>
+    internal sealed class ScopeSingletonLifetime: SingletonBasedLifetime<object>
     {
         [NotNull] private readonly Func<ILifetime> _singletonLifetimeFactory;
 
-        public ScopeLifetime([NotNull] Func<ILifetime> singletonLifetimeFactory) : base(singletonLifetimeFactory)
+        public ScopeSingletonLifetime([NotNull] Func<ILifetime> singletonLifetimeFactory) : base(singletonLifetimeFactory)
         {
             _singletonLifetimeFactory = singletonLifetimeFactory ?? throw new ArgumentNullException(nameof(singletonLifetimeFactory));
         }
@@ -18,12 +18,12 @@
 
         public override string ToString()
         {
-            return Lifetime.Scope.ToString();
+            return Lifetime.ScopeSingleton.ToString();
         }
 
         public override ILifetime Clone()
         {
-            return new ScopeLifetime(_singletonLifetimeFactory);
+            return new ScopeSingletonLifetime(_singletonLifetimeFactory);
         }
     }
 }

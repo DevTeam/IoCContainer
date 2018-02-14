@@ -41,7 +41,7 @@
 
             public override string ToString()
             {
-                return $"TotalTime(ms): {_elapsedMilliseconds}";
+                return $"{_elapsedMilliseconds} ms";
             }
         }
     }

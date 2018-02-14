@@ -6,14 +6,14 @@
     using System.Linq;
     using System.Linq.Expressions;
 
-    internal class ResolverGenerator: IResolverGenerator
+    internal class ResolverExpressionBuilder: IResolverExpressionBuilder
     {
-        public static readonly IResolverGenerator Shared = new ResolverGenerator();
+        public static readonly IResolverExpressionBuilder Shared = new ResolverExpressionBuilder();
         public static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer), nameof(Context.Container));
         public static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]), nameof(Context.Args));
         public static readonly ParameterExpression[] Parameters = { ContainerParameter, ArgsParameter };
 
-        public bool TryGenerate<T>(Key key, IContainer container, IDependency dependency, ILifetime lifetime, out IResolverHolder<T> resolverHolder)
+        public bool TryBuild<T>(Key key, IContainer container, IDependency dependency, ILifetime lifetime, out Expression<Resolver<T>> resolverExpression)
         {
             try
             {
@@ -37,13 +37,12 @@
 
                 injectedExpression = ExpressionBuilder.Shared.Convert(injectedExpression, key.Type);
                 injectedExpression = ExpressionBuilder.Shared.AddLifetime(injectedExpression, lifetime, key.Type, expressionVisitor);
-                var resolverExpression = Expression.Lambda<Resolver<T>>(injectedExpression, true, Parameters);
-                resolverHolder = new ResolverHolder<T>(resolverExpression.Compile());
+                resolverExpression = Expression.Lambda<Resolver<T>>(injectedExpression, true, Parameters);
                 return true;
             }
             catch (BuildExpressionException)
             {
-                resolverHolder = default(ResolverHolder<T>);
+                resolverExpression = default(Expression<Resolver<T>>);
                 return false;
             }
         }
