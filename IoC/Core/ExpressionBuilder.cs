@@ -42,7 +42,7 @@
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (type == null) throw new ArgumentNullException(nameof(type));
-            if (lifetime is null)
+            if (lifetime == null)
             {
                 return expression;
             }

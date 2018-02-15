@@ -10,6 +10,7 @@
         [NotNull] internal readonly IDependency Dependency;
         [CanBeNull] private readonly ILifetime _lifetime;
         [NotNull] private readonly IDisposable _resource;
+        [NotNull] public readonly List<Key> Keys;
         private readonly object _lockObject = new object();
         private readonly Dictionary<ResolverKey, object> _resolvers = new Dictionary<ResolverKey, object>();
         private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
@@ -18,12 +19,14 @@
             [NotNull] IResolverExpressionBuilder resolverExpressionBuilder,
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
-            [NotNull] IDisposable resource)
+            [NotNull] IDisposable resource,
+            [NotNull] List<Key> keys)
         {
             _resolverExpressionBuilder = resolverExpressionBuilder ?? throw new ArgumentNullException(nameof(resolverExpressionBuilder));
             Dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
             _lifetime = lifetime;
             _resource = resource ?? throw new ArgumentNullException(nameof(resource));
+            Keys = keys ?? throw new ArgumentNullException(nameof(keys));
         }
 
         public bool TryCreateResolver<T>([NotNull] Key key, [NotNull] IContainer container, out Resolver<T> resolver)

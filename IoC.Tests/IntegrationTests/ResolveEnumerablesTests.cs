@@ -19,7 +19,7 @@
                 Func<IMyService1> func1 = Mock.Of<IMyService1>;
                 // When
                 using (container.Bind<IMyService, IMyService1>().As(Lifetime.Singleton).Tag(1).To(ctx => func()))
-                using (container.Bind<IMyService1>().Tag("abc").To(ctx => func1()))
+                using (container.Bind<IMyService1>().Tag("abc").Tag(99).To(ctx => func1()))
                 using (container.Bind<IMyService, IMyService1>().As(Lifetime.Transient).Tag("xyz").To(ctx => func()))
                 {
                     // Then

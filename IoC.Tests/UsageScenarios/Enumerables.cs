@@ -13,14 +13,14 @@
             // $visible=true
             // $group=01
             // $priority=05
-            // $description=Resolve all possible items as IEnumerable<>
+            // $description=Resolve all possible items as IEnumerable
             // {
             // Create the container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().Tag(1).To<Service>())
-            using (container.Bind<IService>().Tag(2).To<Service>())
+            using (container.Bind<IService>().Tag(2).Tag("abc").To<Service>())
             using (container.Bind<IService>().Tag(3).To<Service>())
             {
                 // Resolve all possible instances

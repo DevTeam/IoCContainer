@@ -4,7 +4,7 @@
     using System.Collections.Generic;
 
     [PublicAPI]
-    public interface IContainer: IEnumerable<Key>, IObservable<ContainerEvent>, IDisposable
+    public interface IContainer: IEnumerable<IEnumerable<Key>>, IObservable<ContainerEvent>, IDisposable
     {
         [CanBeNull] IContainer Parent { get; }
 

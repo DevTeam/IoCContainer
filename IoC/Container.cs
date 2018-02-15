@@ -3,6 +3,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     // ReSharper disable once RedundantUsingDirective
@@ -27,6 +28,7 @@
         [NotNull] private readonly System.Collections.Generic.List<IDisposable> _resources = new System.Collections.Generic.List<IDisposable>();
         [NotNull] private volatile HashTable<Key, object> _resolversByKey = HashTable<Key, object>.Empty;
         [NotNull] private volatile HashTable<Type, object> _resolversByType = HashTable<Type, object>.Empty;
+        private volatile System.Collections.Generic.List<IEnumerable<Key>> _allKeys;
         private volatile bool _hasResolver;
 
         private static Container CreateRootContainer()
@@ -100,18 +102,30 @@
             var resolvers = new System.Collections.Generic.List<IDisposable>();
             try
             {
-                var resolver = new RegistrationEntry(ResolverExpressionBuilder.Shared, dependency, lifetime, Disposable.Create(() =>
+                var registeredKeys = new System.Collections.Generic.List<Key>();
+
+                void UnregisterKeys()
                 {
-                    foreach (var key in keys)
+                    foreach (var key in registeredKeys)
                     {
                         TryUnregister(key);
                     }
-                }));
+                }
 
+                var resource = Disposable.Create(UnregisterKeys);
+                var resolver = new RegistrationEntry(ResolverExpressionBuilder.Shared, dependency, lifetime, resource, registeredKeys);
                 foreach (var key in keys)
                 {
                     resolvers.Add(resolver);
                     isRegistered &= TryRegister(key, resolver);
+                    if (isRegistered)
+                    {
+                        registeredKeys.Add(key);
+                    }
+                    else
+                    {
+                        break;
+                    }
                 }
             }
             catch (Exception)
@@ -156,6 +170,7 @@
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
+        [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(Type type, out Resolver<T> resolver)
         {
             var hashCode = type.GetHashCode();
@@ -203,6 +218,7 @@
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
+        [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver)
         {
             var key = new Key(type, tag);
@@ -240,7 +256,7 @@
 #endif
         public bool TryGetResolver<T>(IContainer container, Type type, object tag, out Resolver<T> resolver)
         {
-            return tag is null ? TryGetResolver(type, out resolver) : TryGetResolver(type, tag, out resolver);
+            return tag == null ? TryGetResolver(type, out resolver) : TryGetResolver(type, tag, out resolver);
         }
 
 #if !NET40
@@ -248,7 +264,6 @@
 #endif
         private bool TryCreateResolver<T>(Type type, out Resolver<T> resolver, object tag, IContainer container)
         {
-            var tagIsNull = tag is null;
             var key = new Key(type, tag);
             if (TryGetRegistrationEntry(key, out var registrationEntry))
             {
@@ -261,7 +276,7 @@
                 {
                     _hasResolver = true;
                     _resolversByKey = _resolversByKey.Add(key, resolver);
-                    if (tagIsNull)
+                    if (tag == null)
                     {
                         _resolversByType = _resolversByType.Add(type, resolver);
                     }
@@ -276,7 +291,7 @@
                 {
                     _hasResolver = true;
                     _resolversByKey = _resolversByKey.Add(key, resolver);
-                    if (tagIsNull)
+                    if (tag == null)
                     {
                         _resolversByType = _resolversByType.Add(key.Type, resolver);
                     }
@@ -372,15 +387,20 @@
             return GetEnumerator();
         }
 
-        public IEnumerator<Key> GetEnumerator()
+        public IEnumerator<IEnumerable<Key>> GetEnumerator()
         {
-            System.Collections.Generic.List<Key> keys;
-            lock (_lockObject)
+            if (_allKeys == null)
             {
-                keys = _registrationEntries.Keys.ToList();
+                lock (_lockObject)
+                {
+                    if (_allKeys == null)
+                    {
+                        _allKeys = _registrationEntries.Values.Distinct().Select(i => (IEnumerable<Key>) i.Keys).ToList();
+                    }
+                }
             }
 
-            return keys.Concat(_parent).GetEnumerator();
+            return _allKeys.Concat(_parent).GetEnumerator();
         }
 
         public IDisposable Subscribe(IObserver<ContainerEvent> observer)
@@ -397,12 +417,13 @@
                 if (added)
                 {
                     _registrationEntries.Add(key, registrationEntry);
+                    ResetResolvers();
+                    _allKeys = null;
                 }
             }
 
             if (added)
             {
-                ResetResolvers();
                 _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Registration, key));
                 return true;
             }
@@ -416,11 +437,15 @@
             lock (_lockObject)
             {
                 removed = _registrationEntries.Remove(key);
+                if (removed)
+                {
+                    ResetResolvers();
+                    _allKeys = null;
+                }
             }
 
             if (removed)
             {
-                ResetResolvers();
                 _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Unregistration, key));
             }
 
@@ -434,21 +459,23 @@
                 return;
             }
 
-            lock (_lockObject)
+            foreach (var registration in _registrationEntries.Values)
             {
-                foreach (var registration in _registrationEntries.Values)
-                {
-                    registration.Reset();
-                }
-
-                _resolversByKey = HashTable<Key, object>.Empty;
-                _resolversByType = HashTable<Type, object>.Empty;
+                registration.Reset();
             }
+
+            _resolversByKey = HashTable<Key, object>.Empty;
+            _resolversByType = HashTable<Type, object>.Empty;
         }
 
         void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
         {
-            if (value.Container != this)
+            if (value.Container == this)
+            {
+                return;
+            }
+
+            lock (_lockObject)
             {
                 ResetResolvers();
             }

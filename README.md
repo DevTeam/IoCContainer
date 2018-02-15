@@ -137,7 +137,7 @@ The results of the [comparison tests](https://github.com/DevTeam/IoCContainer/bl
 * [Singleton lifetime](#singleton-lifetime)
 * [Constructor Auto-wiring](#constructor-auto-wiring)
 * [Flexible Auto-wiring](#flexible-auto-wiring)
-* [Resolve all possible items as IEnumerable<>](#resolve-all-possible-items-as-ienumerable<>)
+* [Resolve all possible items as IEnumerable](#resolve-all-possible-items-as-ienumerable)
 * [Func With Arguments](#func-with-arguments)
 * [Resolve Using Arguments](#resolve-using-arguments)
 * [Auto dispose singleton during container's dispose](#auto-dispose-singleton-during-containers-dispose)
@@ -147,7 +147,7 @@ The results of the [comparison tests](https://github.com/DevTeam/IoCContainer/bl
 * [Custom Child Container](#custom-child-container)
 * [Custom Lifetime](#custom-lifetime)
 * [Replace Lifetime](#replace-lifetime)
-* [Scope lifetime](#scope-lifetime)
+* [Scope Singleton lifetime](#scope-singleton-lifetime)
 * [Wrapper](#wrapper)
 * [Generator](#generator)
 * [Cyclic Dependence](#cyclic-dependence)
@@ -409,9 +409,10 @@ using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
 }
 
 // Other lifetimes are:
-// Transient - A new instance each time
-// Container - Singleton per container
-// Scope - Singleton per scope
+// Transient - A new instance each time (default)
+// ContainerSingleton - Singleton per container
+// ScopeSingleton - Singleton per scope
+// ThreadSingleton - Singleton per thread
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SingletonLifetime.cs)
 
@@ -461,7 +462,7 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FlexibleAutowiring.cs)
 
-### Resolve all possible items as IEnumerable<>
+### Resolve all possible items as IEnumerable
 
 ``` CSharp
 // Create the container
@@ -469,7 +470,7 @@ using (var container = Container.Create())
 // Configure the container
 using (container.Bind<IDependency>().To<Dependency>())
 using (container.Bind<IService>().Tag(1).To<Service>())
-using (container.Bind<IService>().Tag(2).To<Service>())
+using (container.Bind<IService>().Tag(2).Tag("abc").To<Service>())
 using (container.Bind<IService>().Tag(3).To<Service>())
 {
     // Resolve all possible instances
@@ -693,7 +694,7 @@ public class MyContainer: IContainer
 
     public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver)
     {
-        return Parent.TryGetResolver<T>(type, tag, out resolver);
+        return Parent.TryGetResolver(type, tag, out resolver);
     }
 
     public bool TryGetResolver<T>(IContainer container, Type type, object tag, out Resolver<T> resolver)
@@ -708,7 +709,7 @@ public class MyContainer: IContainer
         return GetEnumerator();
     }
 
-    public IEnumerator<Key> GetEnumerator()
+    public IEnumerator<IEnumerable<Key>> GetEnumerator()
     {
         return Parent.GetEnumerator();
     }
@@ -818,15 +819,15 @@ public class MySingletonLifetime : ILifetime
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ReplaceLifetime.cs)
 
-### Scope lifetime
+### Scope Singleton lifetime
 
 ``` CSharp
 // Create the container
 using (var container = Container.Create())
 // Configure the container
-using (container.Bind<IDependency>().As(Lifetime.Scope).To<Dependency>())
+using (container.Bind<IDependency>().As(Lifetime.ScopeSingleton).To<Dependency>())
 {
-    using (container.Bind<IService>().As(Lifetime.Scope).To<Service>())
+    using (container.Bind<IService>().As(Lifetime.ScopeSingleton).To<Service>())
     {
         // Default resolving scope
         var instance1 = container.Get<IService>();
@@ -865,7 +866,7 @@ using (container.Bind<IDependency>().As(Lifetime.Scope).To<Dependency>())
     }
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ScopeLifetime.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ScopeSingletonLifetime.cs)
 
 ### Wrapper
 
@@ -1167,11 +1168,15 @@ public class Service : IService, IAnotherService
 }
 
 // Generic
-public interface IService<T> { }
+public interface IService<T>: IService { }
 
 public class Service<T> : IService<T>
 {
     public Service(IDependency dependency) { }
+
+    public IDependency Dependency { get; }
+
+    public string State { get; }
 }
 
 // Named

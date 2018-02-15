@@ -64,9 +64,9 @@
             return GetEnumerator();
         }
 
-        public IEnumerator<Key> GetEnumerator()
+        public IEnumerator<IEnumerable<Key>> GetEnumerator()
         {
-            return Enumerable.Empty<Key>().GetEnumerator();
+            return Enumerable.Empty<IEnumerable<Key>>().GetEnumerator();
         }
 
         public IDisposable Subscribe(IObserver<ContainerEvent> observer)

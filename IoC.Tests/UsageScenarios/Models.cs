@@ -44,11 +44,15 @@ namespace IoC.Tests.UsageScenarios
     }
 
     // Generic
-    public interface IService<T> { }
+    public interface IService<T>: IService { }
 
     public class Service<T> : IService<T>
     {
         public Service(IDependency dependency) { }
+
+        public IDependency Dependency { get; }
+
+        public string State { get; }
     }
 
     // Named

@@ -72,7 +72,7 @@
 
             public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver)
             {
-                return Parent.TryGetResolver<T>(type, tag, out resolver);
+                return Parent.TryGetResolver(type, tag, out resolver);
             }
 
             public bool TryGetResolver<T>(IContainer container, Type type, object tag, out Resolver<T> resolver)
@@ -87,7 +87,7 @@
                 return GetEnumerator();
             }
 
-            public IEnumerator<Key> GetEnumerator()
+            public IEnumerator<IEnumerable<Key>> GetEnumerator()
             {
                 return Parent.GetEnumerator();
             }
