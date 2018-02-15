@@ -17,17 +17,17 @@
         // {
         public void Run()
         {
-            // Create the container
+            // Create a root container
             using (var container = Container.Create())
-            // Configure current container to use a custom container's class to create a child container
+            // Configure the root container to use a custom container as a child container
             using (container.Bind<IContainer>().Tag(ContainerReference.Child).To<MyContainer>())
-            // Create our child container
+            // Create the custom child container
             using (var childContainer = container.CreateChild("abc"))
-            // Configure the child container
+            // Configure our container
             using (childContainer.Bind<IDependency>().To<Dependency>())
             using (childContainer.Bind<IService>().To<Service>())
             {
-                // Resolve the instance
+                // Resolve an instance
                 var instance = childContainer.Get<IService>();
 
                 childContainer.ShouldBeOfType<MyContainer>();

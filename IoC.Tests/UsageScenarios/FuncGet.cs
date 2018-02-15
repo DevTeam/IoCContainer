@@ -16,7 +16,7 @@
             // $priority=02
             // $description=Func get
             // {
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
@@ -24,7 +24,7 @@
             {
                 // Resolve Func
                 var func = container.Get<Func<IService>>();
-                // Get the instance
+                // Get the instance via Func
                 var instance = func();
 
                 instance.ShouldBeOfType<Service>();

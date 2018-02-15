@@ -25,7 +25,7 @@
             var id = 33;
             Func<int> generator = () => id++;
 
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<int>().Tag("IdGenerator").To(ctx => generator()))

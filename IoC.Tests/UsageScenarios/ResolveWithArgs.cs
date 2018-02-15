@@ -14,12 +14,12 @@
             // $priority=05
             // $description=Resolve Using Arguments
             // {
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<INamedService>().To<NamedService>(
-                // Configure the constructor to use
+                // Select the constructor and inject its parameters
                 ctx => new NamedService(ctx.Container.Inject<IDependency>(), (string)ctx.Args[0])))
             {
                 // Resolve the instance "alpha"

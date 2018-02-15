@@ -3,12 +3,17 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    // ReSharper disable once RedundantUsingDirective
+    using System.Runtime.CompilerServices;
 
     internal static class Disposable
     {
         [NotNull]
         public static readonly IDisposable Empty = new EmptyDisposable();
 
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         [NotNull]
         public static IDisposable Create([NotNull] Action action)
         {
@@ -16,6 +21,9 @@
             return new DisposableAction(action);
         }
 
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         [NotNull]
         public static IDisposable Create([NotNull][ItemCanBeNull] IEnumerable<IDisposable> disposables)
         {
@@ -23,7 +31,17 @@
             return new CompositeDisposable(disposables);
         }
 
-        private class DisposableAction : IDisposable
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        [NotNull]
+        public static IDisposable Create([NotNull][ItemCanBeNull] params IDisposable[] disposables)
+        {
+            if (disposables == null) throw new ArgumentNullException(nameof(disposables));
+            return new CompositeDisposable(disposables);
+        }
+
+        private sealed class DisposableAction : IDisposable
         {
             [NotNull] private readonly Action _action;
             private bool _disposed;
@@ -46,7 +64,7 @@
             }
         }
 
-        private class CompositeDisposable: IDisposable
+        private sealed class CompositeDisposable : IDisposable
         {
             private readonly List<IDisposable> _disposables;
 

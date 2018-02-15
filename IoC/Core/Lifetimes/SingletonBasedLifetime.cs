@@ -3,12 +3,13 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Collections;
     using Core;
 
     internal abstract class SingletonBasedLifetime<TKey>: ILifetime, IDisposable
     {
         private readonly Func<ILifetime> _singletonLifetimeFactory;
-        private readonly Dictionary<TKey, ILifetime> _lifetimes = new Dictionary<TKey, ILifetime>();
+        private HashTable<TKey, ILifetime> _lifetimes = HashTable<TKey, ILifetime>.Empty;
 
         protected SingletonBasedLifetime(Func<ILifetime> singletonLifetimeFactory)
         {
@@ -21,10 +22,11 @@
             var key = CreateKey(container, args);
             lock (_lifetimes)
             {
-                if (!_lifetimes.TryGetValue(key, out lifetime))
+                lifetime = _lifetimes.Find(key);
+                if (lifetime == null)
                 {
                     lifetime = _singletonLifetimeFactory();
-                    _lifetimes.Add(key, lifetime);
+                    _lifetimes = _lifetimes.Add(key, lifetime);
                 }
             }
 
@@ -33,11 +35,11 @@
 
         public void Dispose()
         {
-            List<ILifetime> items;
+            System.Collections.Generic.List<ILifetime> items;
             lock (_lifetimes)
             { 
-                items = _lifetimes.Values.ToList();
-                _lifetimes.Clear();
+                items = _lifetimes.Enumerate().Select(i => i.Value).ToList();
+                _lifetimes = HashTable<TKey, ILifetime>.Empty;
             }
 
             Disposable.Create(items.OfType<IDisposable>()).Dispose();

@@ -13,13 +13,13 @@
         // {
         public void Run()
         {
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().Lifetime(new MyTransientLifetime()).To<Service>())
             {
-                // Resolve the instance
+                // Resolve an instance
                 var instance = container.Get<IService>();
 
                 instance.ShouldBeOfType<Service>();

@@ -16,23 +16,23 @@
         {
             var counter = new Mock<ICounter>();
 
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             using (container.Bind<ICounter>().To(ctx => counter.Object))
             // Replace the Singleton lifetime
             using (container.Bind<ILifetime>().Tag(Lifetime.Singleton).To<MySingletonLifetime>(
-                    // Configure the constructor to use
+                    // Select the constructor
                     ctx => new MySingletonLifetime(
-                        // Inject the singleton lifetime from the parent container to use a base logic
+                        // Inject the singleton lifetime from the parent container to use its logic
                         ctx.Container.Parent.Inject<ILifetime>(Lifetime.Singleton),
                         // Inject a counter
                         ctx.Container.Inject<ICounter>())))
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
-            // Custom Singleton lifetime is using
+            // Use the custom implementation of Singleton lifetime
             using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
             {
-                // Resolve the instance twice using the wrapped Singletine lifetime
+                // Resolve one instance twice using the custom Singletine lifetime
                 var instance1 = container.Get<IService>();
                 var instance2 = container.Get<IService>();
 

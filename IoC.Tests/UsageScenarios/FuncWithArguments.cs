@@ -19,14 +19,13 @@
                 (dependency, name) => new NamedService(dependency, name);
 
             using (var container = Container.Create())
-            // Configure the container
-            // Use full auto-wiring
+            // Configure a container, using full auto-wiring
             using (container.Bind<IDependency>().To<Dependency>())
-            // Configure auto-wiring for constructor and use element from index as a second argument
+            // Select the constructor and inject argument[0] as the second parameter of type 'string'
             using (container.Bind<INamedService>().To(
                 ctx => func(ctx.Container.Inject<IDependency>(), (string)ctx.Args[0])))
             {
-                // Resolve the instance "alpha"
+                // Resolve the instance "alpha" passing the array of arguments
                 var instance = container.Get<INamedService>("alpha");
 
                 instance.ShouldBeOfType<NamedService>();

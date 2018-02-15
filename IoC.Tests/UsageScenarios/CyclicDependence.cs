@@ -1,4 +1,5 @@
-﻿namespace IoC.Tests.UsageScenarios
+﻿// ReSharper disable UnusedParameter.Local
+namespace IoC.Tests.UsageScenarios
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
@@ -21,9 +22,9 @@
             var issueResolver = new Mock<IIssueResolver>();
             issueResolver.Setup(i => i.CyclicDependenceDetected(It.IsAny<Key>(), 128)).Throws(expectedException);
 
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
-            // Configure the container. 1,2,3 are tags of binding
+            // Configure the container: 1,2,3 are tags to produce cyclic dependencies
             using (container.Bind<IIssueResolver>().To(ctx => issueResolver.Object))
             using (container.Bind<ILink>().To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(1))))
             using (container.Bind<ILink>().Tag(1).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(2))))
@@ -50,7 +51,6 @@
 
         public class Link : ILink
         {
-            // ReSharper disable once UnusedParameter.Local
             public Link(ILink link)
             {
             }

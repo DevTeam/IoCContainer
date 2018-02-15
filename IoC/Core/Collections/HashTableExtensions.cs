@@ -4,6 +4,7 @@ using System.Linq;
 namespace IoC.Core.Collections
 {
     // ReSharper disable once RedundantUsingDirective
+    using System;
     using System.Runtime.CompilerServices;
 
     internal static class HashTableExtensions
@@ -11,7 +12,7 @@ namespace IoC.Core.Collections
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        public static TValue Search<TKey, TValue>(this HashTable<TKey, TValue> hashTable, TKey key)
+        public static TValue Find<TKey, TValue>(this HashTable<TKey, TValue> hashTable, TKey key)
         {
             var hashCode = key.GetHashCode();
             var bucketIndex = hashCode & (hashTable.Divisor - 1);
@@ -41,7 +42,6 @@ namespace IoC.Core.Collections
             return default(TValue);
         }
 
-
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
@@ -53,9 +53,45 @@ namespace IoC.Core.Collections
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
+        public static HashTable<TKey, TValue> Remove<TKey, TValue>(this HashTable<TKey, TValue> hashTable, TKey key, out bool removed)
+        {
+            removed = false;
+            foreach (var keyValue in hashTable.Enumerate())
+            {
+                if (Equals(keyValue.Key, key))
+                {
+                    removed = true;
+                    continue;
+                }
+
+                hashTable = new HashTable<TKey, TValue>(hashTable, keyValue.Key, keyValue.Value);
+            }
+
+            return hashTable;
+        }
+
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
         public static IEnumerable<KeyValue<TKey, TValue>> Enumerate<TKey, TValue>(this HashTable<TKey, TValue> hashTable)
         {
-            return hashTable.Buckets.SelectMany(t => t.Duplicates.Items);
+            var buckets = hashTable.Buckets;
+            for (var bucketIndex = 0; bucketIndex < buckets.Length; bucketIndex++)
+            {
+                var bucket = buckets[bucketIndex];
+                if (bucket.IsEmpty)
+                {
+                    continue;
+                }
+
+                yield return new KeyValue<TKey, TValue>(bucket.Key, bucket.Value);
+
+                var duplicates = bucket.Duplicates.Items;
+                for (var duplicateIndex = 0; duplicateIndex < bucket.Duplicates.Count; duplicateIndex++)
+                {
+                    yield return duplicates[duplicateIndex];
+                }
+            }
         }
     }
 }

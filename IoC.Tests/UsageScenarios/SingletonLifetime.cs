@@ -13,24 +13,24 @@
             // $priority=03
             // $description=Singleton lifetime
             // {
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
             {
-                // Resolve the instance twice
+                // Resolve one instance twice
                 var instance1 = container.Get<IService>();
                 var instance2 = container.Get<IService>();
 
                 instance1.ShouldBe(instance2);
             }
 
-            // Other lifetimes are:
+            // Other lifetimes:
             // Transient - A new instance each time (default)
             // ContainerSingleton - Singleton per container
             // ScopeSingleton - Singleton per scope
-            // ThreadSingleton - Singleton per thread
+            // ThreadSingleton - Singleton per thread for NET 4.0+, .NET Core 1.0+, .NET Standard 2.0+
             // }
         }
     }

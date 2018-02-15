@@ -16,7 +16,7 @@
             // {
             var disposableService = new Mock<IDisposableService>();
 
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             {
                 // Configure the container

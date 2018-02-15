@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Collections;
 
     internal sealed class RegistrationEntry : IDisposable
     {
@@ -10,17 +11,17 @@
         [NotNull] internal readonly IDependency Dependency;
         [CanBeNull] private readonly ILifetime _lifetime;
         [NotNull] private readonly IDisposable _resource;
-        [NotNull] public readonly List<Key> Keys;
+        [NotNull] public readonly System.Collections.Generic.List<Key> Keys;
         private readonly object _lockObject = new object();
-        private readonly Dictionary<ResolverKey, object> _resolvers = new Dictionary<ResolverKey, object>();
-        private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
+        private HashTable<ResolverKey, object> _resolvers = HashTable<ResolverKey, object>.Empty;
+        private HashTable<LifetimeKey, ILifetime> _lifetimes = HashTable<LifetimeKey, ILifetime>.Empty;
 
         public RegistrationEntry(
             [NotNull] IResolverExpressionBuilder resolverExpressionBuilder,
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource,
-            [NotNull] List<Key> keys)
+            [NotNull] System.Collections.Generic.List<Key> keys)
         {
             _resolverExpressionBuilder = resolverExpressionBuilder ?? throw new ArgumentNullException(nameof(resolverExpressionBuilder));
             Dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
@@ -35,7 +36,8 @@
             var resolverKey = typeInfo.IsConstructedGenericType ? new ResolverKey(key, typeInfo.GenericTypeArguments) : new ResolverKey(key, new Type[0]);
             lock (_lockObject)
             {
-                if (!_resolvers.TryGetValue(resolverKey, out var resolverObject))
+                var resolverObject = _resolvers.Find(resolverKey);
+                if (resolverObject == null)
                 {
                     if (!_resolverExpressionBuilder.TryBuild<T>(key, container, Dependency, GetLifetime(typeInfo), out var resolverExpression))
                     {
@@ -44,7 +46,7 @@
                     }
 
                     resolver = resolverExpression.Compile();
-                    _resolvers.Add(resolverKey, resolver);
+                    _resolvers = _resolvers.Add(resolverKey, resolver);
                 }
                 else
                 {
@@ -64,14 +66,20 @@
         [CanBeNull]
         private ILifetime GetLifetime(ITypeInfo typeInfo)
         {
-            var lifetimeKey = typeInfo.IsConstructedGenericType ? new LifetimeKey(typeInfo.GenericTypeArguments) : new LifetimeKey(new Type[0]);
+            if (!typeInfo.IsConstructedGenericType)
+            {
+                return _lifetime;
+            }
+
+            var lifetimeKey = new LifetimeKey(typeInfo.GenericTypeArguments);
             ILifetime lifetime;
             lock (_lockObject)
             {
-                if (!_lifetimes.TryGetValue(lifetimeKey, out lifetime))
+                lifetime = _lifetimes.Find(lifetimeKey);
+                if (lifetime == null)
                 {
                     lifetime = _lifetime?.Clone();
-                    _lifetimes.Add(lifetimeKey, lifetime);
+                    _lifetimes = _lifetimes.Add(lifetimeKey, lifetime);
                 }
             }
 
@@ -80,25 +88,36 @@
 
         public void Reset()
         {
+            IDisposable[] lifetimesToDispose;
             lock (_lockObject)
             {
-                if (_lifetimes.Any())
+                _resolvers = HashTable<ResolverKey, object>.Empty;
+                if (_lifetimes.Count > 0)
                 {
-                    Disposable.Create(_lifetimes.Values.OfType<IDisposable>().Concat(_resolvers.Values.OfType<IDisposable>())).Dispose();
-                    _lifetimes.Clear();
+                    lifetimesToDispose =  _lifetimes.Enumerate().Select(i => i.Value).OfType<IDisposable>().ToArray();
+                    _lifetimes = HashTable<LifetimeKey, ILifetime>.Empty;
                 }
+                else
+                {
+                    return;
+                }
+            }
 
-                if (_resolvers.Any())
-                {
-                    Disposable.Create(_resolvers.Values.OfType<IDisposable>()).Dispose();
-                    _resolvers.Clear();
-                }
+            foreach (var lifetime in lifetimesToDispose)
+            {
+                lifetime.Dispose();
             }
         }
 
         public void Dispose()
         {
             Reset();
+
+            if (_lifetime is IDisposable disposableLifetime)
+            {
+                disposableLifetime.Dispose();
+            }
+
             _resource.Dispose();
         }
 

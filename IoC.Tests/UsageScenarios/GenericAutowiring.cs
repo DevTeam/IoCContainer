@@ -13,16 +13,16 @@
             // $priority=02
             // $description=Generic Auto-wiring
             // {
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             // Configure auto-wiring
             using (container.Bind<IService<TT>>().To<Service<TT>>(
-                // Configure the constructor to use
+                // Select the constructor
                 ctx => new Service<TT>(ctx.Container.Inject<IDependency>())))
             {
-                // Resolve the generic instance
+                // Resolve a generic instance
                 var instance = container.Get<IService<int>>();
 
                 instance.ShouldBeOfType<Service<int>>();

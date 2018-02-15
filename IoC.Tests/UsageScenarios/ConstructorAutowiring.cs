@@ -15,15 +15,15 @@
             // {
             // Create the container
             using (var container = Container.Create())
-            // Configure the container
+            // Configure a container
             // Use full auto-wiring
             using (container.Bind<IDependency>().To<Dependency>())
-            // Configure auto-wiring
+            // Configure via auto-wiring
             using (container.Bind<IService>().To<Service>(
-                // Configure the constructor to use
+                // Select the constructor and specify its arguments
                 ctx => new Service(ctx.Container.Inject<IDependency>(), "some state")))
             {
-                // Resolve the instance
+                // Resolve an instance
                 var instance = container.Get<IService>();
 
                 instance.ShouldBeOfType<Service>();

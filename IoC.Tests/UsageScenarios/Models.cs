@@ -6,7 +6,7 @@ namespace IoC.Tests.UsageScenarios
     // $visible=true
     // $group=99
     // $priority=00
-    // $description=Interfaces and classes for samples
+    // $description=Samples Model
     // {
     public interface IDependency { }
 

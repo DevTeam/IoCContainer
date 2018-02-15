@@ -13,12 +13,12 @@
             // $priority=02
             // $description=Constant
             // {
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IService>().To(ctx => new Service(new Dependency())))
             {
-                // Resolve the instance
+                // Resolve an instance
                 var instance = container.Get<IService>();
 
                 instance.ShouldBeOfType<Service>();

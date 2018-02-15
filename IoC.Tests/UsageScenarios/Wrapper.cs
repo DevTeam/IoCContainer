@@ -18,18 +18,18 @@
         {
             var console = new Mock<IConsole>();
 
-            // Create the base container
+            // Create a base container
             using (var baseContainer = Container.Create("base"))
-            // Configure the base container for base logger
+            // Configure it for base logger
             using (baseContainer.Bind<IConsole>().To(ctx => console.Object))
             using (baseContainer.Bind<ILogger>().To<Logger>())
             {
-                // Configure some new container
+                // Configure some child container
                 using (var childContainer = baseContainer.CreateChild("child"))
-                // And add some console
+                // Configure console
                 using (childContainer.Bind<IConsole>().To(ctx => console.Object))
                 using (childContainer.Bind<ILogger>().To<TimeLogger>(
-                    // Inject the logger from the parent container to wrapp
+                    // Inject the logger from the parent container to our new logger
                     ctx => new TimeLogger(ctx.Container.Parent.Inject<ILogger>())))
                 {
                     var logger = childContainer.Get<ILogger>();

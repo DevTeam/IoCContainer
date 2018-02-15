@@ -15,10 +15,10 @@
         // {
         public void Run()
         {
-            // Create the container and configure it
+            // Create a container and configure it
             using (var container = Container.Create().Using<Glue>())
             {
-                // Resolve the instance
+                // Resolve an instance
                 var instance = container.Get<IService>();
 
                 instance.ShouldBeOfType<Service>();

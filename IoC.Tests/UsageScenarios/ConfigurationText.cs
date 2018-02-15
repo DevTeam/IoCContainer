@@ -11,16 +11,16 @@
             // $visible=true
             // $group=02
             // $priority=00
-            // $description=Configuration text
+            // $description=Configuration via a text metadata
             // {
-            // Create the container and configure from the metadata string
+            // Create a container and configure it from the metadata string
             using (var container = Container.Create().Using(
                 "ref IoC.Tests;" +
                 "using IoC.Tests.UsageScenarios;" +
                 "Bind<IDependency>().To<Dependency>();" +
                 "Bind<IService>().To<Service>();"))
             {
-                // Resolve the instance
+                // Resolve an instance
                 var instance = container.Get<IService>();
 
                 instance.ShouldBeOfType<Service>();

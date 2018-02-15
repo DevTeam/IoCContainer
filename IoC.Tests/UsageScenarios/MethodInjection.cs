@@ -14,15 +14,17 @@
             // $priority=03
             // $description=Method Injection
             // {
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             // Configure the container
             // Use full auto-wiring
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<INamedService>().To<InitializingNamedService>(
-                // Configure the constructor to use
+                // Select the constructor
                 ctx => new InitializingNamedService(ctx.Container.Inject<IDependency>()),
-                // Configure the method to initialize
+                // Select the method and inject its parameters
+                // First as arguments[0]
+                // Second as just dependency of type IDependency
                 ctx => ctx.It.Initialize((string)ctx.Args[0], ctx.Container.Inject<IDependency>())))
             {
                 // Resolve the instance "alpha"

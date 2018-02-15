@@ -13,12 +13,12 @@
             // $priority=01
             // $description=Change configuration on-the-fly
             // {
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             {
-                // Configure the container using the Transient lifetime
+                // Configure the container using the Transient (default) lifetime
                 using (container.Bind<IService>().To<Service>())
                 {
                     // Resolve instances

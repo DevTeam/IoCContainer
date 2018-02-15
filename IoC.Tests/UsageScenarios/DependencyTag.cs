@@ -14,16 +14,16 @@
             // $priority=02
             // $description=Dependency Tag
             // {
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             // Configure the container
             // Mark binding by tag "MyDep"
             using (container.Bind<IDependency>().Tag("MyDep").To<Dependency>())
-            // Configure auto-wiring and use dependency with tag "MyDep"
+            // Configure auto-wiring and inject dependency by tag "MyDep"
             using (container.Bind<IService>().To<Service>(
                 ctx => new Service(ctx.Container.Inject<IDependency>("MyDep"))))
             {
-                // Resolve the instance
+                // Resolve an instance
                 var instance = container.Get<IService>();
             }
             // }

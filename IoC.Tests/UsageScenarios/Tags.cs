@@ -14,7 +14,7 @@
             // $priority=02
             // $description=Tags
             // {
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())

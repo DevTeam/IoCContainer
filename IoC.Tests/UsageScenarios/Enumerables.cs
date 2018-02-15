@@ -13,9 +13,9 @@
             // $visible=true
             // $group=01
             // $priority=05
-            // $description=Resolve all possible items as IEnumerable
+            // $description=Resolve all appropriate instances as IEnumerable
             // {
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
@@ -23,7 +23,7 @@
             using (container.Bind<IService>().Tag(2).Tag("abc").To<Service>())
             using (container.Bind<IService>().Tag(3).To<Service>())
             {
-                // Resolve all possible instances
+                // Resolve all appropriate instances
                 var instances = container.Get<IEnumerable<IService>>().ToList();
 
                 instances.Count.ShouldBe(3);

@@ -28,7 +28,7 @@
         [NotNull] private readonly System.Collections.Generic.List<IDisposable> _resources = new System.Collections.Generic.List<IDisposable>();
         [NotNull] private volatile HashTable<Key, object> _resolversByKey = HashTable<Key, object>.Empty;
         [NotNull] private volatile HashTable<Type, object> _resolversByType = HashTable<Type, object>.Empty;
-        private volatile System.Collections.Generic.List<IEnumerable<Key>> _allKeys;
+        private IEnumerable<Key>[] _allKeys;
         private volatile bool _hasResolver;
 
         private static Container CreateRootContainer()
@@ -99,25 +99,27 @@
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
             var isRegistered = true;
-            var resolvers = new System.Collections.Generic.List<IDisposable>();
+            var registeredKeys = new System.Collections.Generic.List<Key>();
+            void UnregisterKeys()
+            {
+                foreach (var key in registeredKeys)
+                {
+                    TryUnregister(key);
+                }
+            }
+
+            var registrationEntry = new RegistrationEntry(
+                ResolverExpressionBuilder.Shared,
+                dependency,
+                lifetime,
+                Disposable.Create(UnregisterKeys),
+                registeredKeys);
+
             try
             {
-                var registeredKeys = new System.Collections.Generic.List<Key>();
-
-                void UnregisterKeys()
-                {
-                    foreach (var key in registeredKeys)
-                    {
-                        TryUnregister(key);
-                    }
-                }
-
-                var resource = Disposable.Create(UnregisterKeys);
-                var resolver = new RegistrationEntry(ResolverExpressionBuilder.Shared, dependency, lifetime, resource, registeredKeys);
                 foreach (var key in keys)
                 {
-                    resolvers.Add(resolver);
-                    isRegistered &= TryRegister(key, resolver);
+                    isRegistered &= TryRegister(key, registrationEntry);
                     if (isRegistered)
                     {
                         registeredKeys.Add(key);
@@ -135,18 +137,13 @@
             }
             finally
             {
-                var token = Disposable.Create(resolvers);
                 if (isRegistered)
                 {
-                    registrationToken = token;
-                    if (lifetime is IDisposable disposableLifetime)
-                    {
-                        _resources.Add(disposableLifetime);
-                    }
+                    registrationToken = registrationEntry;
                 }
                 else
                 {
-                    token.Dispose();
+                    registrationEntry.Dispose();
                     registrationToken = default(IDisposable);
                 }
             }
@@ -350,18 +347,19 @@
                 resourceStore.RemoveResource(this);
             }
 
+            IDisposable resource;
             lock (_lockObject)
             {
-                Disposable.Create(_registrationEntries.Values).Dispose();
                 _registrationEntries.Clear();
 
                 _resolversByKey = HashTable<Key, object>.Empty;
                 _resolversByType = HashTable<Type, object>.Empty;
 
-
-                Disposable.Create(_resources).Dispose();
+                resource = Disposable.Create(_resources);
                 _resources.Clear();
             }
+
+            resource.Dispose();
         }
 
         void IResourceStore.AddResource(IDisposable resource)
@@ -389,18 +387,15 @@
 
         public IEnumerator<IEnumerable<Key>> GetEnumerator()
         {
-            if (_allKeys == null)
+            lock (_lockObject)
             {
-                lock (_lockObject)
+                if (_allKeys == null)
                 {
-                    if (_allKeys == null)
-                    {
-                        _allKeys = _registrationEntries.Values.Distinct().Select(i => (IEnumerable<Key>) i.Keys).ToList();
-                    }
+                    _allKeys = _registrationEntries.Values.Distinct().Select(i => (IEnumerable<Key>) i.Keys).ToArray();
                 }
-            }
 
-            return _allKeys.Concat(_parent).GetEnumerator();
+                return _allKeys.Concat(_parent).GetEnumerator();
+            }
         }
 
         public IDisposable Subscribe(IObserver<ContainerEvent> observer)
@@ -459,6 +454,7 @@
                 return;
             }
 
+            _hasResolver = false;
             foreach (var registration in _registrationEntries.Values)
             {
                 registration.Reset();

@@ -13,12 +13,11 @@
             // $visible=true
             // $group=01
             // $priority=01
-            // $description=Several contracts
+            // $description=Several Contracts
             // {
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
-            // Configure the container
-            // Use full auto-wiring
+            // Configure the container, using full auto-wiring
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<Service, IService, IAnotherService>().To<Service>())
             {

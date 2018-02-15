@@ -14,14 +14,15 @@
             // $priority=03
             // $description=Property Injection
             // {
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<INamedService>().To<InitializingNamedService>(
-                // Configure the constructor to use
+                // Select the constructor to use
                 ctx => new InitializingNamedService(ctx.Container.Inject<IDependency>()),
-                // Configure the property to initialize
+                // Select the property to inject
+                // And inject arguments[0]
                 ctx => ctx.Container.Inject(ctx.It.Name, (string)ctx.Args[0])))
             {
                 // Resolve the instance "alpha"

@@ -20,11 +20,11 @@
         {
             Func<int, int, (int, int)> valueGetter = (sequential, random) => (sequential, random);
 
-            // Create the container and configure it using configuration class
+            // Create a container and configure it using a configuration class
             using (var container = Container.Create().Using<Generators>())
-            // Configure binding to get a set of numbers as (int, int).
-            // Inject dependency of sequential number to the first item
-            // Inject dependency of random number to the second item
+            // Configure a binding to inject 2 number from different generators to result (int, int) of the Func.
+            // Inject the dependency of sequential number to the first element
+            // Inject the dependency of random number to the second element
             using (container.Bind<(int, int)>().To(
                 ctx => valueGetter(
                     ctx.Container.Inject<int>(GeneratorType.Sequential),

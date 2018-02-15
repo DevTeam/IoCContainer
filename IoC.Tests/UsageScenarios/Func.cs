@@ -15,12 +15,12 @@
             // $description=Func
             // {
             Func<IService> func = () => new Service(new Dependency());
-            // Create the container
+            // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IService>().To(ctx => func()))
             {
-                // Resolve the instance
+                // Resolve an instance
                 var instance = container.Get<IService>();
 
                 instance.ShouldBeOfType<Service>();
