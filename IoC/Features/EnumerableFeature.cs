@@ -26,7 +26,7 @@
         private sealed class InstanceEnumerable<T> : IEnumerable<T>, IDisposable, IObserver<ContainerEvent>
         {
             private readonly object[] _args;
-            private static readonly Key ResolvingKey = Key.Create<T>();
+            private static readonly Key ResolvingKey = new Key(typeof(T));
             private readonly IContainer _container;
             private readonly object _lockObject = new object();
             private readonly IDisposable _eventsSubscription;

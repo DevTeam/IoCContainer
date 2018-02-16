@@ -21,19 +21,23 @@ namespace IoC.Core.Collections
                 tree = hashCode < tree.HashCode ? tree.Left : tree.Right;
             }
 
-            if (tree.Height != 0 && (ReferenceEquals(tree.Key, key) || Equals(tree.Key, key)))
+            if (tree.Height != 0 && tree.HashCode == hashCode && (ReferenceEquals(tree.Key, key) || Equals(tree.Key, key)))
             {
                 return tree.Value;
             }
 
-            if (tree.Duplicates.Items.Length > 0)
+            var items = tree.Duplicates.Items;
+            if (items.Length == 0)
             {
-                foreach (var keyValue in tree.Duplicates.Items)
+                return default(TValue);
+            }
+
+            for (var index = 0; index < items.Length; index++)
+            {
+                var keyValue = items[index];
+                if (keyValue.KeyHashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
                 {
-                    if (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key))
-                    {
-                        return keyValue.Value;
-                    }
+                    return keyValue.Value;
                 }
             }
 
@@ -55,9 +59,10 @@ namespace IoC.Core.Collections
         {
             removed = false;
             var result = HashTable<TKey, TValue>.Empty;
+            var hashCode = key.GetHashCode();
             foreach (var keyValue in hashTable.Enumerate())
             {
-                if (Equals(keyValue.Key, key))
+                if (keyValue.KeyHashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
                 {
                     removed = true;
                     continue;

@@ -6,22 +6,22 @@ namespace IoC.Core.Collections
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     internal sealed class List<T>
     {
+        private static readonly T[] EmptyArray = new T[0];
         public static readonly List<T> Empty = new List<T>();
         public readonly T[] Items;
-        public readonly int Count;
 
         public List(List<T> previousList, T value)
         {
-            Items = new T[previousList.Items.Length + 1];
-            Array.Copy(previousList.Items, Items, previousList.Items.Length);
-            var count = Items.Length;
-            Items[count - 1] = value;
-            Count = count;
+            var items = previousList.Items;
+            var count = items.Length;
+            Items = new T[count + 1];
+            Array.Copy(items, Items, count);
+            Items[count] = value;
         }
 
         private List()
         {
-            Items = new T[0];
+            Items = EmptyArray;
         }
 
         public List<T> Add(T value)

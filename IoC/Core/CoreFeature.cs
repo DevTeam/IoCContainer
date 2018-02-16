@@ -49,17 +49,17 @@
             yield return container
                 .Bind<IContainer>()
                 .Tag()
-                .Tag(ContainerReference.Current)
+                .Tag(WellknownContainer.Current)
                 .To(ctx => ctx.Container);
 
             yield return container
                 .Bind<IContainer>()
-                .Tag(ContainerReference.Child)
+                .Tag(WellknownContainer.Child)
                 .To(ctx => new Container(ctx.Args.Length == 1 ? Container.CreateContainerName(ctx.Args[0] as string) : Container.CreateContainerName(string.Empty), ctx.Container, false));
 
             yield return container
                 .Bind<IContainer>()
-                .Tag(ContainerReference.Parent)
+                .Tag(WellknownContainer.Parent)
                 .To(ctx => ctx.Container.Parent);
 
             yield return container

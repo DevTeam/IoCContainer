@@ -83,7 +83,7 @@
                 Container = context.Container;
                 if (!context.Container.TryGetResolver(Container, typeof(T), context.Key.Tag, out Resolver))
                 {
-                    var key = Key.Create<T>(context.Key.Tag);
+                    var key = new Key(typeof(T), context.Key.Tag);
                     Resolver = context.Container.Get<IIssueResolver>().CannotGetResolver<T>(Container, key);
                 }
             }

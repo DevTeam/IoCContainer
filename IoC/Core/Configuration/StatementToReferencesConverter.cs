@@ -15,7 +15,7 @@
             var match = Regex.Match(statement.Text);
             if (match.Success)
             {
-                var assemblies = match.Groups[1].Value.Split(Separators.Assembly).Select(Types.LoadAssembly);
+                var assemblies = match.Groups[1].Value.Split(Separators.Assembly).Select(TypeExtensions.LoadAssembly);
                 context = new BindingContext(
                     baseContext.Assemblies.Concat(assemblies).Distinct(),
                     baseContext.Namespaces,

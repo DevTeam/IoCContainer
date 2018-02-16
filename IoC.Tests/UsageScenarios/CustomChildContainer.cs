@@ -20,7 +20,7 @@
             // Create a root container
             using (var container = Container.Create())
             // Configure the root container to use a custom container as a child container
-            using (container.Bind<IContainer>().Tag(ContainerReference.Child).To<MyContainer>())
+            using (container.Bind<IContainer>().Tag(WellknownContainer.Child).To<MyContainer>())
             // Create the custom child container
             using (var childContainer = container.CreateChild("abc"))
             // Configure our container

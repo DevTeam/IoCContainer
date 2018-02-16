@@ -36,25 +36,27 @@ namespace IoC.Core.Collections
 #endif
         public static IEnumerable<KeyValue<TKey, TValue>> Enumerate<TKey, TValue>(this HashTree<TKey, TValue> hashTree)
         {
-            if (!hashTree.IsEmpty)
+            if (hashTree.IsEmpty)
             {
-                foreach (var left in Enumerate(hashTree.Left))
-                {
-                    yield return new KeyValue<TKey, TValue>(left.Key, left.Value);
-                }
+                yield break;
+            }
 
-                yield return new KeyValue<TKey, TValue>(hashTree.Key, hashTree.Value);
+            foreach (var left in Enumerate(hashTree.Left))
+            {
+                yield return new KeyValue<TKey, TValue>(left.Key, left.Value);
+            }
 
-                // ReSharper disable once ForCanBeConvertedToForeach
-                for (var i = 0; i < hashTree.Duplicates.Items.Length; i++)
-                {
-                    yield return hashTree.Duplicates.Items[i];
-                }
+            yield return new KeyValue<TKey, TValue>(hashTree.Key, hashTree.Value);
 
-                foreach (var right in Enumerate(hashTree.Right))
-                {
-                    yield return new KeyValue<TKey, TValue>(right.Key, right.Value);
-                }
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var i = 0; i < hashTree.Duplicates.Items.Length; i++)
+            {
+                yield return hashTree.Duplicates.Items[i];
+            }
+
+            foreach (var right in Enumerate(hashTree.Right))
+            {
+                yield return new KeyValue<TKey, TValue>(right.Key, right.Value);
             }
         }
 

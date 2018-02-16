@@ -37,7 +37,7 @@
             {
                 if (!context.Container.TryGetResolver<T>(context.Container, typeof(T), context.Key.Tag, out var resolver))
                 {
-                    resolver = context.Container.Get<IIssueResolver>().CannotGetResolver<T>(context.Container, Key.Create<T>(context.Key.Tag));
+                    resolver = context.Container.Get<IIssueResolver>().CannotGetResolver<T>(context.Container, new Key(typeof(T), context.Key.Tag));
                 }
 
                 return () => resolver(context.Container);

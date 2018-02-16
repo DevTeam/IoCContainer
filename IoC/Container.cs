@@ -13,7 +13,7 @@
     using Core.Collections;
     using Features;
 
-    using FullKey = System.Tuple<System.Type, object>;
+    using FullKey = Core.Collections.KeyValue<System.Type, object>;
     using ShortKey = System.Type;
 
     [PublicAPI]
@@ -123,7 +123,7 @@
                     }
                     else
                     {
-                        TryUnregister(key, Tuple.Create(key.Type, key.Tag), ref registrationEntries);
+                        TryUnregister(key, new FullKey(key.Type, key.Tag), ref registrationEntries);
                     }
                 }
 
@@ -151,7 +151,7 @@
                     }
                     else
                     {
-                        isRegistered &= TryRegister(key, Tuple.Create(key.Type, key.Tag), registrationEntry, ref registrationEntries);
+                        isRegistered &= TryRegister(key, new FullKey(key.Type, key.Tag), registrationEntry, ref registrationEntries);
                     }
 
                     if (isRegistered)
@@ -238,7 +238,7 @@
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver)
         {
-            if (tag == null)
+            if (tag == null && _resolversByType.Count > 0)
             {
                 resolver = (Resolver<T>) _resolversByType.Get(type);
                 if (resolver != null)
@@ -247,7 +247,7 @@
                 }
             }
 
-            resolver = (Resolver<T>)_resolvers.Get(Tuple.Create(type, tag));
+            resolver = (Resolver<T>)_resolvers.Get(new FullKey(type, tag));
             if (resolver != null)
             {
                 return true;
@@ -269,43 +269,40 @@
 #endif
         private bool TryCreateResolver<T>(Type type, [CanBeNull] object tag, out Resolver<T> resolver, IContainer container)
         {
-            var key = new Key(type, tag);
             if (TryGetRegistrationEntry(type, tag, out var registrationEntry))
             {
-                if (!registrationEntry.TryCreateResolver(key, container ?? this, out resolver))
+                if (!registrationEntry.TryCreateResolver(type, tag, container ?? this, out resolver))
                 {
                     return false;
                 }
 
-                lock (_lockObject)
-                {
-                    _hasResolver = true;
-                    _resolvers = _resolvers.Add(Tuple.Create(type, tag), resolver);
-                    if (tag == null)
-                    {
-                        _resolversByType = _resolversByType.Add(type, resolver);
-                    }
-                }
-
+                AddResolver(type, tag, resolver);
                 return true;
             }
 
-            if (_parent.TryGetResolver(container, type, tag, out resolver))
+            if (!_parent.TryGetResolver(container, type, tag, out resolver))
             {
-                lock (_lockObject)
-                {
-                    _hasResolver = true;
-                    _resolvers = _resolvers.Add(Tuple.Create(type, tag), resolver);
-                    if (tag == null)
-                    {
-                        _resolversByType = _resolversByType.Add(key.Type, resolver);
-                    }
-                }
-
-                return true;
+                return false;
             }
 
-            return false;
+            AddResolver(type, tag, resolver);
+            return true;
+        }
+
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        private void AddResolver<T>(Type type, object tag, Resolver<T> resolver)
+        {
+            lock (_lockObject)
+            {
+                _hasResolver = true;
+                _resolvers = _resolvers.Add(new FullKey(type, tag), resolver);
+                if (tag == null)
+                {
+                    _resolversByType = _resolversByType.Add(type, resolver);
+                }
+            }
         }
 
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
@@ -327,7 +324,7 @@
         {
             lock (_lockObject)
             {
-                registrationEntry = _registrationEntries.Get(Tuple.Create(type, tag));
+                registrationEntry = _registrationEntries.Get(new FullKey(type, tag));
                 if (registrationEntry != null)
                 {
                     return true;
@@ -337,7 +334,7 @@
                 if (typeInfo.IsConstructedGenericType)
                 {
                     var genericType = typeInfo.GetGenericTypeDefinition();
-                    registrationEntry = _registrationEntries.Get(Tuple.Create(genericType, tag));
+                    registrationEntry = _registrationEntries.Get(new FullKey(genericType, tag));
                     if (registrationEntry != null)
                     {
                         return true;

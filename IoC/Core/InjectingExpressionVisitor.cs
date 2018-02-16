@@ -8,6 +8,7 @@
 
     internal class InjectingExpressionVisitor: ExpressionVisitor
     {
+        private static readonly Key ContextKey = new Key(typeof(Context));
         [NotNull] private static readonly ITypeInfo ContextTypeInfo = Type<Context>.Info;
         [NotNull] private static readonly ITypeInfo GenericContextTypeInfo = typeof(Context<>).Info();
         [NotNull] private static readonly ITypeInfo InstanceContextTypeInfo = typeof(Context<>).Info();
@@ -184,7 +185,7 @@
         {
             Expression dependencyExpression;
             ILifetime lifetime = null;
-            if (Equals(key, Key.Create<Context>()))
+            if (Equals(key, ContextKey))
             {
                 dependencyExpression = CreateNewContextExpression();
             }

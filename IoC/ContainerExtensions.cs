@@ -22,7 +22,7 @@
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return parent.GetResolver<IContainer>(typeof(IContainer), ContainerReference.Child)(parent, name);
+            return parent.GetResolver<IContainer>(typeof(IContainer), WellknownContainer.Child)(parent, name);
         }
 
         [NotNull]

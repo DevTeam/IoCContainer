@@ -29,16 +29,16 @@
             Keys = keys ?? throw new ArgumentNullException(nameof(keys));
         }
 
-        public bool TryCreateResolver<T>(Key key, [NotNull] IContainer container, out Resolver<T> resolver)
+        public bool TryCreateResolver<T>(Type type, [CanBeNull] object tag, [NotNull] IContainer container, out Resolver<T> resolver)
         {
-            var typeInfo = key.Type.Info();
-            var resolverKey = typeInfo.IsConstructedGenericType ? new ResolverKey(key, typeInfo.GenericTypeArguments) : new ResolverKey(key, new Type[0]);
+            var typeInfo = type.Info();
+            var resolverKey = typeInfo.IsConstructedGenericType ? new ResolverKey(type, typeInfo.GenericTypeArguments) : new ResolverKey(type, new Type[0]);
             lock (_lockObject)
             {
                 var resolverObject = _resolvers.Get(resolverKey);
                 if (resolverObject == null)
                 {
-                    if (!_resolverExpressionBuilder.TryBuild<T>(key, container, Dependency, GetLifetime(typeInfo), out var resolverExpression))
+                    if (!_resolverExpressionBuilder.TryBuild<T>(new Key(type, tag), container, Dependency, GetLifetime(typeInfo), out var resolverExpression))
                     {
                         resolver = default(Resolver<T>);
                         return false;
@@ -91,15 +91,13 @@
             lock (_lockObject)
             {
                 _resolvers = HashTable<ResolverKey, object>.Empty;
-                if (_lifetimes.Count > 0)
-                {
-                    lifetimesToDispose =  _lifetimes.Enumerate().Select(i => i.Value).OfType<IDisposable>().ToArray();
-                    _lifetimes = HashTable<LifetimeKey, ILifetime>.Empty;
-                }
-                else
+                if (_lifetimes.Count == 0)
                 {
                     return;
                 }
+
+                lifetimesToDispose = _lifetimes.Enumerate().Select(i => i.Value).OfType<IDisposable>().ToArray();
+                _lifetimes = HashTable<LifetimeKey, ILifetime>.Empty;
             }
 
             foreach (var lifetime in lifetimesToDispose)
@@ -127,12 +125,12 @@
 
         private struct ResolverKey
         {
-            private readonly Key _key;
+            private readonly Type _type;
             private readonly Type[] _genericTypes;
 
-            public ResolverKey(Key key, Type [] genericTypes)
+            public ResolverKey(Type type, Type [] genericTypes)
             {
-                _key = key;
+                _type = type;
                 _genericTypes = genericTypes;
             }
 
@@ -146,13 +144,13 @@
             {
                 unchecked
                 {
-                    return (_key.GetHashCode() * 397) ^ (_genericTypes != null ? _genericTypes.GetHash() : 0);
+                    return (_type.GetHashCode() * 397) ^ (_genericTypes != null ? _genericTypes.GetHash() : 0);
                 }
             }
 
             private bool Equals(ResolverKey other)
             {
-                return Equals(_key, other._key) && Arrays.SequenceEqual(_genericTypes, other._genericTypes);
+                return _type == other._type && ArrayExtensions.SequenceEqual(_genericTypes, other._genericTypes);
             }
         }
 
@@ -178,7 +176,7 @@
 
             private bool Equals(LifetimeKey other)
             {
-                return Arrays.SequenceEqual(_genericTypes, other._genericTypes);
+                return ArrayExtensions.SequenceEqual(_genericTypes, other._genericTypes);
             }
         }
     }

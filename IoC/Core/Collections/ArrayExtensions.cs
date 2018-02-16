@@ -1,11 +1,11 @@
-﻿namespace IoC.Core
+﻿namespace IoC.Core.Collections
 {
     using System.Collections.Generic;
     using System.Linq;
     // ReSharper disable once RedundantUsingDirective
     using System.Runtime.CompilerServices;
 
-    internal static class Arrays
+    internal static class ArrayExtensions
     {
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

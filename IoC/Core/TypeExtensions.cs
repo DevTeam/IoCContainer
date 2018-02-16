@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Reflection;
 
-    internal static class Types
+    internal static class TypeExtensions
     {
         private static readonly Dictionary<Type, ITypeInfo> TypeInfos = new Dictionary<Type, ITypeInfo>();
 

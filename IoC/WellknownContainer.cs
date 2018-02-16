@@ -1,7 +1,7 @@
 ﻿namespace IoC
 {
     [PublicAPI]
-    public enum ContainerReference
+    public enum WellknownContainer
     {
         Current = 1,
 
