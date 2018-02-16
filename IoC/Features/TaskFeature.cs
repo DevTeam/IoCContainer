@@ -35,7 +35,7 @@
 
             private static Func<T> CreateFunction(Context context)
             {
-                if (!context.Container.TryGetResolver<T>(context.Container, typeof(T), context.Key.Tag, out var resolver))
+                if (!context.Container.TryGetResolver<T>(typeof(T), context.Key.Tag, out var resolver, context.Container))
                 {
                     resolver = context.Container.Get<IIssueResolver>().CannotGetResolver<T>(context.Container, new Key(typeof(T), context.Key.Tag));
                 }

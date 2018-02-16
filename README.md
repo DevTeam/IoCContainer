@@ -127,9 +127,10 @@ The results of the [comparison tests](https://github.com/DevTeam/IoCContainer/bl
 * [Constant](#constant)
 * [Dependency Tag](#dependency-tag)
 * [Func](#func)
-* [Func get](#func-get)
 * [Generic Auto-wiring](#generic-auto-wiring)
 * [Generics](#generics)
+* [Get Func](#get-func)
+* [Get Tuple](#get-tuple)
 * [Tags](#tags)
 * [Auto-wiring](#auto-wiring)
 * [Method Injection](#method-injection)
@@ -242,25 +243,6 @@ using (container.Bind<IService>().To(ctx => func()))
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Func.cs)
 
-### Func get
-
-``` CSharp
-// Create a container
-using (var container = Container.Create())
-// Configure the container
-using (container.Bind<IDependency>().To<Dependency>())
-using (container.Bind<IService>().To<Service>())
-{
-    // Resolve Func
-    var func = container.Get<Func<IService>>();
-    // Get the instance via Func
-    var instance = func();
-
-    instance.ShouldBeOfType<Service>();
-}
-```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FuncGet.cs)
-
 ### Generic Auto-wiring
 
 ``` CSharp
@@ -298,6 +280,45 @@ using (container.Bind(typeof(IService<>)).To(typeof(Service<>)))
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Generics.cs)
+
+### Get Func
+
+``` CSharp
+// Create a container
+using (var container = Container.Create())
+// Configure the container
+using (container.Bind<IDependency>().To<Dependency>())
+using (container.Bind<IService>().To<Service>())
+{
+    // Resolve Func
+    var func = container.Get<Func<IService>>();
+    // Get the instance via Func
+    var instance = func();
+
+    instance.ShouldBeOfType<Service>();
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GetFunc.cs)
+
+### Get Tuple
+
+``` CSharp
+// Create a container
+using (var container = Container.Create())
+// Configure the container
+using (container.Bind<IDependency>().To<Dependency>())
+using (container.Bind<IService>().To<Service>())
+using (container.Bind<INamedService>().To<NamedService>(
+    ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name")))
+{
+    // Resolve Tuple
+    var tuple = container.Get<Tuple<IService, INamedService>>();
+
+    tuple.Item1.ShouldBeOfType<Service>();
+    tuple.Item2.ShouldBeOfType<NamedService>();
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GetTuple.cs)
 
 ### Tags
 
@@ -643,7 +664,7 @@ public void Run()
     // Create a root container
     using (var container = Container.Create())
     // Configure the root container to use a custom container as a child container
-    using (container.Bind<IContainer>().Tag(ContainerReference.Child).To<MyContainer>())
+    using (container.Bind<IContainer>().Tag(WellknownContainer.Child).To<MyContainer>())
     // Create the custom child container
     using (var childContainer = container.CreateChild("abc"))
     // Configure our container
@@ -678,29 +699,24 @@ public class MyContainer: IContainer
         return Parent.TryGetDependency(key, out dependency, out lifetime);
     }
 
-    public Resolver<T> GetResolver<T>(Type type)
+    public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, IContainer container = null)
     {
-        return Parent.GetResolver<T>(type);
+        return Parent.TryGetResolver(type, out resolver, container);
     }
 
-    public bool TryGetResolver<T>(Type type, out Resolver<T> resolver)
+    public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
     {
-        return Parent.TryGetResolver(type, out resolver);
+        return Parent.TryGetResolver(type, tag, out resolver, container);
     }
 
-    public Resolver<T> GetResolver<T>(Type type, object tag)
+    public Resolver<T> GetResolver<T>(Type type, IContainer container = null)
     {
-        return Parent.GetResolver<T>(type, tag);
+        return Parent.GetResolver<T>(type, container);
     }
 
-    public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver)
+    public Resolver<T> GetResolver<T>(Type type, object tag, IContainer container = null)
     {
-        return Parent.TryGetResolver(type, tag, out resolver);
-    }
-
-    public bool TryGetResolver<T>(IContainer container, Type type, object tag, out Resolver<T> resolver)
-    {
-        return Parent.TryGetResolver(container, type, tag, out resolver);
+        return Parent.GetResolver<T>(type, tag, container);
     }
 
     public void Dispose() { }

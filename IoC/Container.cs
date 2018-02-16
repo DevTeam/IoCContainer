@@ -44,6 +44,7 @@
                 EnumerableFeature.Shared,
                 FuncFeature.Shared,
                 TaskFeature.Shared,
+                TupleFeature.Shared,
                 ConfigurationFeature.Shared);
         }
 
@@ -194,53 +195,12 @@
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        public Resolver<T> GetResolver<T>(Type type)
-        {
-            if (!TryGetResolver<T>(type, out var resolver))
-            {
-                return IssueResolver.CannotGetResolver<T>(this, new Key(type));
-            }
-
-            return resolver;
-        }
-
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-        public bool TryGetResolver<T>(Type type, out Resolver<T> resolver)
-        {
-            resolver = (Resolver<T>) _resolversByType.Get(type);
-            if (resolver != null)
-            {
-                return true;
-            }
-
-            return TryCreateResolver(type, null, out resolver, this);
-        }
-
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        public Resolver<T> GetResolver<T>(Type type, object tag)
-        {
-            if (!TryGetResolver<T>(type, tag, out var resolver))
-            {
-                return IssueResolver.CannotGetResolver<T>(this, new Key(type, tag));
-            }
-
-            return resolver;
-        }
-
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver)
+        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
         {
             if (tag == null && _resolversByType.Count > 0)
             {
-                resolver = (Resolver<T>) _resolversByType.Get(type);
+                resolver = (Resolver<T>)_resolversByType.Get(type);
                 if (resolver != null)
                 {
                     return true;
@@ -253,15 +213,48 @@
                 return true;
             }
 
-            return TryCreateResolver(type, tag, out resolver, null);
+            return TryCreateResolver(type, tag, out resolver, container ?? this);
         }
 
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        public bool TryGetResolver<T>(IContainer container, Type type, object tag, out Resolver<T> resolver)
+        [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
+        public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, IContainer container = null)
         {
-            return tag == null ? TryGetResolver(type, out resolver) : TryGetResolver(type, tag, out resolver);
+            resolver = (Resolver<T>) _resolversByType.Get(type);
+            if (resolver != null)
+            {
+                return true;
+            }
+
+            return TryCreateResolver(type, null, out resolver, container ?? this);
+        }
+
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public Resolver<T> GetResolver<T>(Type type, object tag, IContainer container = null)
+        {
+            if (!TryGetResolver<T>(type, tag, out var resolver, container))
+            {
+                return IssueResolver.CannotGetResolver<T>(this, new Key(type, tag));
+            }
+
+            return resolver;
+        }
+
+#if !NET40
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
+#endif
+        public Resolver<T> GetResolver<T>(Type type, IContainer container = null)
+        {
+            if (!TryGetResolver<T>(type, out var resolver, container))
+            {
+                return IssueResolver.CannotGetResolver<T>(this, new Key(type));
+            }
+
+            return resolver;
         }
 
 #if !NET40
@@ -271,7 +264,7 @@
         {
             if (TryGetRegistrationEntry(type, tag, out var registrationEntry))
             {
-                if (!registrationEntry.TryCreateResolver(type, tag, container ?? this, out resolver))
+                if (!registrationEntry.TryCreateResolver(type, tag, container, out resolver))
                 {
                     return false;
                 }
@@ -280,7 +273,7 @@
                 return true;
             }
 
-            if (!_parent.TryGetResolver(container, type, tag, out resolver))
+            if (!_parent.TryGetResolver(type, tag, out resolver, container))
             {
                 return false;
             }

@@ -6,7 +6,7 @@
     using Xunit;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public class FuncGet
+    public class GetFunc
     {
         [Fact]
         public void Run()
@@ -14,7 +14,7 @@
             // $visible=true
             // $group=01
             // $priority=02
-            // $description=Func get
+            // $description=Get Func
             // {
             // Create a container
             using (var container = Container.Create())

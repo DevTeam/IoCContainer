@@ -33,7 +33,7 @@
         // ReSharper disable once MemberCanBePrivate.Global
         public static bool TryGetResolverInternal<T>(IContainer container, Key key)
         {
-            return container.TryGetResolver<T>(container, key.Type, key.Tag, out var _);
+            return container.TryGetResolver<T>(key.Type, key.Tag, out var _, container);
         }
     }
 }

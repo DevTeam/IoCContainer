@@ -58,7 +58,7 @@
             }
 
             var instanceType = factoryType.MakeGenericType(genericTypeArguments);
-            if (!container.TryGetResolver<IFuncFactory>(container, instanceType, key.Tag, out var resolver))
+            if (!container.TryGetResolver<IFuncFactory>(instanceType, key.Tag, out var resolver, container))
             {
                 var objectResolver = container.Get<IIssueResolver>().CannotGetResolver<object>(container, new Key(instanceType, key.Tag));
                 return ((IFuncFactory)objectResolver(container)).Create();
@@ -81,7 +81,7 @@
             public FuncFactory(Context context)
             {
                 Container = context.Container;
-                if (!context.Container.TryGetResolver(Container, typeof(T), context.Key.Tag, out Resolver))
+                if (!context.Container.TryGetResolver(typeof(T), context.Key.Tag, out Resolver, Container))
                 {
                     var key = new Key(typeof(T), context.Key.Tag);
                     Resolver = context.Container.Get<IIssueResolver>().CannotGetResolver<T>(Container, key);

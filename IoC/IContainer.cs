@@ -12,14 +12,12 @@
 
         bool TryGetDependency(Key key, out IDependency dependency, [CanBeNull] out ILifetime lifetime);
 
-        bool TryGetResolver<T>([CanBeNull] IContainer container, [NotNull] Type type, [CanBeNull] object tag, out Resolver<T> resolver);
+        bool TryGetResolver<T>([NotNull] Type type, [CanBeNull] object tag, out Resolver<T> resolver, [CanBeNull] IContainer container = null);
 
-        [NotNull] Resolver<T> GetResolver<T>([NotNull] Type type);
+        bool TryGetResolver<T>([NotNull] Type type, out Resolver<T> resolver, [CanBeNull] IContainer container = null);
 
-        bool TryGetResolver<T>([NotNull] Type type, out Resolver<T> resolver);
+        [NotNull] Resolver<T> GetResolver<T>([NotNull] Type type, [CanBeNull] object tag, [CanBeNull] IContainer container = null);
 
-        [NotNull] Resolver<T> GetResolver<T>([NotNull] Type type, [CanBeNull] object tag);
-
-        bool TryGetResolver<T>([NotNull] Type type, [CanBeNull] object tag, out Resolver<T> resolver);
+        [NotNull] Resolver<T> GetResolver<T>([NotNull] Type type, [CanBeNull] IContainer container = null);
     }
 }

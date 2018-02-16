@@ -57,7 +57,7 @@
                                     from keyGroup in _container
                                     let key = keyGroup.FirstOrDefault(key => ReferenceEquals(key.Type, ResolvingKey.Type))
                                     where !Equals(key, default(Key))
-                                    where _container.TryGetResolver(_container, key.Type, key.Tag, out resolver)
+                                    where _container.TryGetResolver(key.Type, key.Tag, out resolver, _container)
                                     select resolver)
                                 .ToList()
                                 .Select(r => r(_container, _args));

@@ -55,29 +55,24 @@
                 return Parent.TryGetDependency(key, out dependency, out lifetime);
             }
 
-            public Resolver<T> GetResolver<T>(Type type)
+            public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, IContainer container = null)
             {
-                return Parent.GetResolver<T>(type);
+                return Parent.TryGetResolver(type, out resolver, container);
             }
 
-            public bool TryGetResolver<T>(Type type, out Resolver<T> resolver)
+            public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
             {
-                return Parent.TryGetResolver(type, out resolver);
+                return Parent.TryGetResolver(type, tag, out resolver, container);
             }
 
-            public Resolver<T> GetResolver<T>(Type type, object tag)
+            public Resolver<T> GetResolver<T>(Type type, IContainer container = null)
             {
-                return Parent.GetResolver<T>(type, tag);
+                return Parent.GetResolver<T>(type, container);
             }
 
-            public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver)
+            public Resolver<T> GetResolver<T>(Type type, object tag, IContainer container = null)
             {
-                return Parent.TryGetResolver(type, tag, out resolver);
-            }
-
-            public bool TryGetResolver<T>(IContainer container, Type type, object tag, out Resolver<T> resolver)
-            {
-                return Parent.TryGetResolver(container, type, tag, out resolver);
+                return Parent.GetResolver<T>(type, tag, container);
             }
 
             public void Dispose() { }

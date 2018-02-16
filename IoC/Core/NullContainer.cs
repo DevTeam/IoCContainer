@@ -21,38 +21,26 @@
             return false;
         }
 
-        public Resolver<T> GetResolver<T>(Type type)
+        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
+        {
+            resolver = default(Resolver<T>);
+            return false;
+        }
+
+        public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, IContainer container = null)
+        {
+            resolver = default(Resolver<T>);
+            return false;
+        }
+
+        public Resolver<T> GetResolver<T>(Type type, object tag, IContainer container = null)
         {
             throw new NotImplementedException();
         }
 
-        public bool TryGetResolver<T>(Type type, out Resolver<T> resolver)
-        {
-            resolver = default(Resolver<T>);
-            return false;
-        }
-
-        public Resolver<T> GetResolver<T>(Type type, object tag)
+        public Resolver<T> GetResolver<T>(Type type, IContainer container = null)
         {
             throw new NotImplementedException();
-        }
-
-        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver)
-        {
-            resolver = default(Resolver<T>);
-            return false;
-        }
-
-        public bool TryGetResolver<T>(Key key, out Resolver<T> resolver, IContainer container = null)
-        {
-            resolver = default(Resolver<T>);
-            return false;
-        }
-
-        public bool TryGetResolver<T>(IContainer container, Type type, object tag, out Resolver<T> resolver)
-        {
-            resolver = default(Resolver<T>);
-            return false;
         }
 
         public void Dispose()
