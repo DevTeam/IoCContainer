@@ -1,7 +1,6 @@
 ﻿namespace IoC.Core
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using Collections;
 
@@ -30,13 +29,13 @@
             Keys = keys ?? throw new ArgumentNullException(nameof(keys));
         }
 
-        public bool TryCreateResolver<T>([NotNull] Key key, [NotNull] IContainer container, out Resolver<T> resolver)
+        public bool TryCreateResolver<T>(Key key, [NotNull] IContainer container, out Resolver<T> resolver)
         {
             var typeInfo = key.Type.Info();
             var resolverKey = typeInfo.IsConstructedGenericType ? new ResolverKey(key, typeInfo.GenericTypeArguments) : new ResolverKey(key, new Type[0]);
             lock (_lockObject)
             {
-                var resolverObject = _resolvers.Find(resolverKey);
+                var resolverObject = _resolvers.Get(resolverKey);
                 if (resolverObject == null)
                 {
                     if (!_resolverExpressionBuilder.TryBuild<T>(key, container, Dependency, GetLifetime(typeInfo), out var resolverExpression))
@@ -75,7 +74,7 @@
             ILifetime lifetime;
             lock (_lockObject)
             {
-                lifetime = _lifetimes.Find(lifetimeKey);
+                lifetime = _lifetimes.Get(lifetimeKey);
                 if (lifetime == null)
                 {
                     lifetime = _lifetime?.Clone();
@@ -121,6 +120,11 @@
             _resource.Dispose();
         }
 
+        public override string ToString()
+        {
+            return $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {_lifetime?.ToString() ?? Lifetime.Transient.ToString()}";
+        }
+
         private struct ResolverKey
         {
             private readonly Key _key;
@@ -135,14 +139,14 @@
             public override bool Equals(object obj)
             {
                 if (ReferenceEquals(null, obj)) return false;
-                return obj is ResolverKey && Equals((ResolverKey) obj);
+                return obj is ResolverKey key && Equals(key);
             }
 
             public override int GetHashCode()
             {
                 unchecked
                 {
-                    return ((_key != null ? _key.GetHashCode() : 0) * 397) ^ (_genericTypes != null ? _genericTypes.GetHash() : 0);
+                    return (_key.GetHashCode() * 397) ^ (_genericTypes != null ? _genericTypes.GetHash() : 0);
                 }
             }
 

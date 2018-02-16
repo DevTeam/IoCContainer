@@ -34,11 +34,11 @@ namespace IoC.Core.Collections
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        public static IEnumerable<KeyValue<TKey, TValue>> InOrder<TKey, TValue>(this HashTree<TKey, TValue> hashTree)
+        public static IEnumerable<KeyValue<TKey, TValue>> Enumerate<TKey, TValue>(this HashTree<TKey, TValue> hashTree)
         {
             if (!hashTree.IsEmpty)
             {
-                foreach (var left in InOrder(hashTree.Left))
+                foreach (var left in Enumerate(hashTree.Left))
                 {
                     yield return new KeyValue<TKey, TValue>(left.Key, left.Value);
                 }
@@ -51,7 +51,7 @@ namespace IoC.Core.Collections
                     yield return hashTree.Duplicates.Items[i];
                 }
 
-                foreach (var right in InOrder(hashTree.Right))
+                foreach (var right in Enumerate(hashTree.Right))
                 {
                     yield return new KeyValue<TKey, TValue>(right.Key, right.Value);
                 }

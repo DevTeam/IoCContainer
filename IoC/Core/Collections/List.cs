@@ -8,15 +8,15 @@ namespace IoC.Core.Collections
     {
         public static readonly List<T> Empty = new List<T>();
         public readonly T[] Items;
-        // ReSharper disable once MemberCanBePrivate.Global
         public readonly int Count;
 
         public List(List<T> previousList, T value)
         {
             Items = new T[previousList.Items.Length + 1];
             Array.Copy(previousList.Items, Items, previousList.Items.Length);
-            Items[Items.Length - 1] = value;
-            Count = Items.Length;
+            var count = Items.Length;
+            Items[count - 1] = value;
+            Count = count;
         }
 
         private List()

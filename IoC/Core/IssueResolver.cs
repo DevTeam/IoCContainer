@@ -31,7 +31,6 @@
 
         public void CyclicDependenceDetected(Key key, int reentrancy)
         {
-            if (key == null) throw new ArgumentNullException(nameof(key));
             if (reentrancy <= 0) throw new ArgumentOutOfRangeException(nameof(reentrancy));
             if (reentrancy >= 256)
             {

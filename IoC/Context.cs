@@ -3,12 +3,12 @@
     [PublicAPI]
     public class Context
     {
-        [NotNull] public readonly Key Key;
+        public readonly Key Key;
         [NotNull] public readonly IContainer Container;
         [NotNull][ItemCanBeNull] public readonly object[] Args;
 
         public Context(
-            [NotNull] Key key,
+            Key key,
             [NotNull] IContainer container,
             [NotNull][ItemCanBeNull] params object[] args)
         {

@@ -56,7 +56,7 @@
                             _resolvers = (
                                     from keyGroup in _container
                                     let key = keyGroup.FirstOrDefault(key => ReferenceEquals(key.Type, ResolvingKey.Type))
-                                    where key != null
+                                    where !Equals(key, default(Key))
                                     where _container.TryGetResolver(_container, key.Type, key.Tag, out resolver)
                                     select resolver)
                                 .ToList()

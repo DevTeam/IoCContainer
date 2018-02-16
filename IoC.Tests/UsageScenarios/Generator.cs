@@ -1,4 +1,5 @@
-﻿namespace IoC.Tests.UsageScenarios
+﻿// ReSharper disable UnusedVariable
+namespace IoC.Tests.UsageScenarios
 {
     using System;
     using System.Collections.Generic;

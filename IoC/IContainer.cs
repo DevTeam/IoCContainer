@@ -8,9 +8,9 @@
     {
         [CanBeNull] IContainer Parent { get; }
 
-        bool TryRegister([NotNull][ItemNotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IDisposable registrationToken);
+        bool TryRegister([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IDisposable registrationToken);
 
-        bool TryGetDependency([NotNull] Key key, out IDependency dependency, [CanBeNull] out ILifetime lifetime);
+        bool TryGetDependency(Key key, out IDependency dependency, [CanBeNull] out ILifetime lifetime);
 
         bool TryGetResolver<T>([CanBeNull] IContainer container, [NotNull] Type type, [CanBeNull] object tag, out Resolver<T> resolver);
 

@@ -49,9 +49,10 @@ namespace IoC.Core.Collections
 #endif
         private void AddExistingValues(HashTable<TKey, TValue> previous)
         {
-            foreach (var bucket in previous.Buckets)
+            for (var index = 0; index < previous.Buckets.Length; index++)
             {
-                foreach (var keyValue in bucket.InOrder())
+                var bucket = previous.Buckets[index];
+                foreach (var keyValue in bucket.Enumerate())
                 {
                     var hashCode = keyValue.Key.GetHashCode();
                     var bucketIndex = hashCode & (Divisor - 1);

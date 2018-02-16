@@ -43,7 +43,7 @@
             }
         }
 
-        private static object CreateFunc([NotNull] Key key, [NotNull] IContainer container, Type factoryType)
+        private static object CreateFunc(Key key, [NotNull] IContainer container, Type factoryType)
         {
             Type[] genericTypeArguments;
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression

@@ -3,10 +3,10 @@
     [PublicAPI]
     public enum ContainerReference
     {
-        Current,
+        Current = 1,
 
-        Parent,
+        Parent = 2,
 
-        Child
+        Child = 3
     }
 }

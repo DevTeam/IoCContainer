@@ -338,6 +338,7 @@
         public struct Resolving
         {
             [NotNull] public readonly IContainer Container;
+            // ReSharper disable once MemberHidesStaticFromOuterClass
             [CanBeNull] public readonly object Tag;
 
             internal Resolving([NotNull] IContainer container, [CanBeNull]object tag)

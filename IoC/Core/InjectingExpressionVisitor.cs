@@ -32,9 +32,9 @@
             ContextConstructor = Type<Context>.Info.DeclaredConstructors.Single();
         }
 
-        public InjectingExpressionVisitor([NotNull] Key key, [NotNull] IContainer container, [CanBeNull] Expression thisExpression)
+        public InjectingExpressionVisitor(Key key, [NotNull] IContainer container, [CanBeNull] Expression thisExpression)
         {
-            _keys.Push(key ?? throw new ArgumentNullException(nameof(key)));
+            _keys.Push(key);
             _container = container ?? throw new ArgumentNullException(nameof(container));
             _thisExpression = thisExpression;
         }
@@ -179,7 +179,7 @@
 
         [NotNull]
         private Expression CreateDependencyExpression(
-            [NotNull] Key key,
+            Key key,
             [CanBeNull] Expression containerExpression)
         {
             Expression dependencyExpression;
@@ -213,11 +213,10 @@
 
         [NotNull]
         private Expression CreateDependencyExpression(
-            [NotNull] Key key,
+            Key key,
             [NotNull] Expression dependencyExpression,
             [CanBeNull] ILifetime lifetime)
         {
-            if (key == null) throw new ArgumentNullException(nameof(key));
             if (dependencyExpression == null) throw new ArgumentNullException(nameof(dependencyExpression));
 
             _keys.Push(key);

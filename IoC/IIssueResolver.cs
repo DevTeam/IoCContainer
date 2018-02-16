@@ -5,15 +5,15 @@
     [PublicAPI]
     public interface IIssueResolver
     {
-        [NotNull] IDisposable CannotRegister([NotNull] IContainer container, [NotNull][ItemNotNull] Key[] keys);
+        [NotNull] IDisposable CannotRegister([NotNull] IContainer container, [NotNull] Key[] keys);
 
-        [NotNull] Tuple<IDependency, ILifetime> CannotResolveDependency([NotNull] IContainer container, [NotNull] Key key);
+        [NotNull] Tuple<IDependency, ILifetime> CannotResolveDependency([NotNull] IContainer container, Key key);
 
-        [NotNull] Resolver<T> CannotGetResolver<T>([NotNull] IContainer container, [NotNull] Key key);
+        [NotNull] Resolver<T> CannotGetResolver<T>([NotNull] IContainer container, Key key);
 
         [NotNull][ItemNotNull] Type[] CannotGetGenericTypeArguments([NotNull] Type type);
 
-        void CyclicDependenceDetected([NotNull] Key key, int reentrancy);
+        void CyclicDependenceDetected(Key key, int reentrancy);
 
         [NotNull] Type CannotParseType([NotNull] string statementText, int statementLineNumber, int statementPosition, [NotNull] string typeName);
 

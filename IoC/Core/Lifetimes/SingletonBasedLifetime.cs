@@ -1,7 +1,6 @@
 ﻿namespace IoC.Core.Lifetimes
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq;
     using Collections;
     using Core;
@@ -22,7 +21,7 @@
             var key = CreateKey(container, args);
             lock (_lifetimes)
             {
-                lifetime = _lifetimes.Find(key);
+                lifetime = _lifetimes.Get(key);
                 if (lifetime == null)
                 {
                     lifetime = _singletonLifetimeFactory();

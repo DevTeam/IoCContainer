@@ -70,6 +70,16 @@ namespace IoC.Core.Collections
             HashCode = Key.GetHashCode();
         }
 
+        public override string ToString()
+        {
+            if (IsEmpty)
+            {
+                return "empty";
+            }
+
+            return $"{Key} = {Value}";
+        }
+
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif

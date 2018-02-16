@@ -13,22 +13,27 @@
     using Core.Collections;
     using Features;
 
+    using FullKey = System.Tuple<System.Type, object>;
+    using ShortKey = System.Type;
+
     [PublicAPI]
     public sealed class Container: IContainer, IResourceStore, IObserver<ContainerEvent>
     {
         private const string RootName = "container://";
         private static long _containerId;
-        [NotNull] private static readonly Lazy<Container> RootContainer = new Lazy<Container>(CreateRootContainer, true);
-        [NotNull] private static readonly Lazy<Container> PureRootContainer = new Lazy<Container>(CreatePureRootContainer, true);
+
         [NotNull] private readonly object _lockObject = new object();
-        [NotNull] private readonly Dictionary<Key, RegistrationEntry> _registrationEntries = new Dictionary<Key, RegistrationEntry>();
         [NotNull] private readonly IContainer _parent;
         [NotNull] private readonly string _name;
         [NotNull] private readonly Subject<ContainerEvent> _eventSubject = new Subject<ContainerEvent>();
         [NotNull] private readonly System.Collections.Generic.List<IDisposable> _resources = new System.Collections.Generic.List<IDisposable>();
-        [NotNull] private volatile HashTable<Key, object> _resolversByKey = HashTable<Key, object>.Empty;
-        [NotNull] private volatile HashTable<Type, object> _resolversByType = HashTable<Type, object>.Empty;
-        private IEnumerable<Key>[] _allKeys;
+
+        [NotNull] private volatile HashTable<FullKey, RegistrationEntry> _registrationEntries = HashTable<FullKey, RegistrationEntry>.Empty;
+        [NotNull] private volatile HashTable<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = HashTable<ShortKey, RegistrationEntry>.Empty;
+        [NotNull] private volatile HashTable<FullKey, object> _resolvers = HashTable<FullKey, object>.Empty;
+        [NotNull] private volatile HashTable<ShortKey, object> _resolversByType = HashTable<ShortKey, object>.Empty;
+
+        private volatile IEnumerable<Key>[] _allKeys;
         private volatile bool _hasResolver;
 
         private static Container CreateRootContainer()
@@ -51,14 +56,14 @@
         public static Container Create([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return new Container($"{RootName}{CreateContainerName(name)}", RootContainer.Value, true);
+            return new Container($"{RootName}{CreateContainerName(name)}", CreateRootContainer(), true);
         }
 
         [NotNull]
         public static Container CreatePure([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return new Container($"{RootName}{CreateContainerName(name)}", PureRootContainer.Value, true);
+            return new Container($"{RootName}{CreateContainerName(name)}", CreatePureRootContainer(), true);
         }
 
         private Container([NotNull] string name = "", [NotNull][ItemNotNull] params IConfiguration[] configurations)
@@ -78,16 +83,21 @@
             _name = name ?? throw new ArgumentNullException(nameof(name));
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
 
+            if (!root && _parent is IResourceStore resourceStore)
+            {
+                resourceStore.AddResource(this);
+            }
+
+            if (configurations.Length > 0)
+            {
+                _resources.Add(this.Apply(configurations));
+            }
+
             // Subscribe to events from the parent container
             ((IResourceStore)this).AddResource(_parent.Subscribe(_eventSubject));
 
             // Subscribe to reset resolvers
             ((IResourceStore)this).AddResource(_eventSubject.Subscribe(this));
-
-            if (!root && _parent is IResourceStore resourceStore)
-            {
-                resourceStore.AddResource(this);
-            }
         }
 
         public IContainer Parent => _parent;
@@ -102,10 +112,23 @@
             var registeredKeys = new System.Collections.Generic.List<Key>();
             void UnregisterKeys()
             {
+                var registrationAnyEntries = _registrationEntriesForTagAny;
+                var registrationEntries = _registrationEntries;
+
                 foreach (var key in registeredKeys)
                 {
-                    TryUnregister(key);
+                    if (key.Tag == Key.AnyTag)
+                    {
+                        TryUnregister(key, key.Type, ref registrationAnyEntries);
+                    }
+                    else
+                    {
+                        TryUnregister(key, Tuple.Create(key.Type, key.Tag), ref registrationEntries);
+                    }
                 }
+
+                _registrationEntriesForTagAny = registrationAnyEntries;
+                _registrationEntries = registrationEntries;
             }
 
             var registrationEntry = new RegistrationEntry(
@@ -117,9 +140,20 @@
 
             try
             {
+                var registrationAnyEntries = _registrationEntriesForTagAny;
+                var registrationEntries = _registrationEntries;
+
                 foreach (var key in keys)
                 {
-                    isRegistered &= TryRegister(key, registrationEntry);
+                    if (key.Tag == Key.AnyTag)
+                    {
+                        isRegistered &= TryRegister(key, key.Type, registrationEntry, ref registrationAnyEntries);
+                    }
+                    else
+                    {
+                        isRegistered &= TryRegister(key, Tuple.Create(key.Type, key.Tag), registrationEntry, ref registrationEntries);
+                    }
+
                     if (isRegistered)
                     {
                         registeredKeys.Add(key);
@@ -128,6 +162,12 @@
                     {
                         break;
                     }
+                }
+
+                if (isRegistered)
+                {
+                    _registrationEntriesForTagAny = registrationAnyEntries;
+                    _registrationEntries = registrationEntries;
                 }
             }
             catch (Exception)
@@ -158,7 +198,7 @@
         {
             if (!TryGetResolver<T>(type, out var resolver))
             {
-                return IssueResolver.CannotGetResolver<T>(this, new Key(type, null));
+                return IssueResolver.CannotGetResolver<T>(this, new Key(type));
             }
 
             return resolver;
@@ -170,33 +210,13 @@
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(Type type, out Resolver<T> resolver)
         {
-            var hashCode = type.GetHashCode();
-            var typeTree = _resolversByType.Buckets[hashCode & (_resolversByType.Divisor - 1)];
-            while (typeTree.Height != 0 && typeTree.HashCode != hashCode)
+            resolver = (Resolver<T>) _resolversByType.Get(type);
+            if (resolver != null)
             {
-                typeTree = hashCode < typeTree.HashCode ? typeTree.Left : typeTree.Right;
-            }
-
-            if (typeTree.Height != 0 && ReferenceEquals(typeTree.Key, type))
-            {
-                resolver = (Resolver<T>)typeTree.Value;
                 return true;
             }
 
-            if (typeTree.Duplicates.Items.Length > 0)
-            {
-                for (var index = 0; index < typeTree.Duplicates.Items.Length; index++)
-                {
-                    var keyValue = typeTree.Duplicates.Items[index];
-                    if (ReferenceEquals(keyValue.Key, type))
-                    {
-                        resolver = (Resolver<T>) keyValue.Value;
-                        return true;
-                    }
-                }
-            }
-
-            return TryCreateResolver(type, out resolver, null, this);
+            return TryCreateResolver(type, null, out resolver, this);
         }
 
 #if !NET40
@@ -218,34 +238,22 @@
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver)
         {
-            var key = new Key(type, tag);
-            var hashCode = key.HashCode;
-            var keyTree = _resolversByKey.Buckets[hashCode & (_resolversByKey.Divisor - 1)];
-            while (keyTree.Height != 0 && keyTree.HashCode != hashCode)
+            if (tag == null)
             {
-                keyTree = hashCode < keyTree.HashCode ? keyTree.Left : keyTree.Right;
-            }
-
-            if (keyTree.Height != 0 && Key.Equals(keyTree.Key, key))
-            {
-                resolver = (Resolver<T>)keyTree.Value;
-                return true;
-            }
-
-            if (keyTree.Duplicates.Items.Length > 0)
-            {
-                for (var index = 0; index < keyTree.Duplicates.Items.Length; index++)
+                resolver = (Resolver<T>) _resolversByType.Get(type);
+                if (resolver != null)
                 {
-                    var keyValue = keyTree.Duplicates.Items[index];
-                    if (Key.Equals(keyValue.Key, key))
-                    {
-                        resolver = (Resolver<T>) keyValue.Value;
-                        return true;
-                    }
+                    return true;
                 }
             }
 
-            return TryCreateResolver(type, out resolver, tag, null);
+            resolver = (Resolver<T>)_resolvers.Get(Tuple.Create(type, tag));
+            if (resolver != null)
+            {
+                return true;
+            }
+
+            return TryCreateResolver(type, tag, out resolver, null);
         }
 
 #if !NET40
@@ -259,10 +267,10 @@
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        private bool TryCreateResolver<T>(Type type, out Resolver<T> resolver, object tag, IContainer container)
+        private bool TryCreateResolver<T>(Type type, [CanBeNull] object tag, out Resolver<T> resolver, IContainer container)
         {
             var key = new Key(type, tag);
-            if (TryGetRegistrationEntry(key, out var registrationEntry))
+            if (TryGetRegistrationEntry(type, tag, out var registrationEntry))
             {
                 if (!registrationEntry.TryCreateResolver(key, container ?? this, out resolver))
                 {
@@ -272,7 +280,7 @@
                 lock (_lockObject)
                 {
                     _hasResolver = true;
-                    _resolversByKey = _resolversByKey.Add(key, resolver);
+                    _resolvers = _resolvers.Add(Tuple.Create(type, tag), resolver);
                     if (tag == null)
                     {
                         _resolversByType = _resolversByType.Add(type, resolver);
@@ -287,7 +295,7 @@
                 lock (_lockObject)
                 {
                     _hasResolver = true;
-                    _resolversByKey = _resolversByKey.Add(key, resolver);
+                    _resolvers = _resolvers.Add(Tuple.Create(type, tag), resolver);
                     if (tag == null)
                     {
                         _resolversByType = _resolversByType.Add(key.Type, resolver);
@@ -302,8 +310,7 @@
 
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
         {
-            if (key == null) throw new ArgumentNullException(nameof(key));
-            if (TryGetRegistrationEntry(key, out var registrationEntry))
+            if (TryGetRegistrationEntry(key.Type, key.Tag, out var registrationEntry))
             {
                 dependency = registrationEntry.Dependency;
                 lifetime = registrationEntry.GetLifetime(key.Type);
@@ -316,24 +323,37 @@
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
-        private bool TryGetRegistrationEntry(Key key, out RegistrationEntry registrationEntry)
+        private bool TryGetRegistrationEntry(Type type, object tag, out RegistrationEntry registrationEntry)
         {
             lock (_lockObject)
             {
-                if (_registrationEntries.TryGetValue(key, out registrationEntry))
+                registrationEntry = _registrationEntries.Get(Tuple.Create(type, tag));
+                if (registrationEntry != null)
                 {
                     return true;
                 }
 
-                var typeInfo = key.Type.Info();
+                var typeInfo = type.Info();
                 if (typeInfo.IsConstructedGenericType)
                 {
-                    var genericTypeDefinition = typeInfo.GetGenericTypeDefinition();
-                    var genericTypeDefinitionKey = new Key(genericTypeDefinition, key.Tag);
-                    if (_registrationEntries.TryGetValue(genericTypeDefinitionKey, out registrationEntry))
+                    var genericType = typeInfo.GetGenericTypeDefinition();
+                    registrationEntry = _registrationEntries.Get(Tuple.Create(genericType, tag));
+                    if (registrationEntry != null)
                     {
                         return true;
                     }
+
+                    registrationEntry = _registrationEntriesForTagAny.Get(genericType);
+                    if (registrationEntry != null)
+                    {
+                        return true;
+                    }
+                }
+
+                registrationEntry = _registrationEntriesForTagAny.Get(type);
+                if (registrationEntry != null)
+                {
+                    return true;
                 }
 
                 return false;
@@ -350,11 +370,10 @@
             IDisposable resource;
             lock (_lockObject)
             {
-                _registrationEntries.Clear();
-
-                _resolversByKey = HashTable<Key, object>.Empty;
-                _resolversByType = HashTable<Type, object>.Empty;
-
+                _registrationEntries = HashTable<FullKey, RegistrationEntry>.Empty;
+                _registrationEntriesForTagAny = HashTable<ShortKey, RegistrationEntry>.Empty;
+                _resolvers = HashTable<FullKey, object>.Empty;
+                _resolversByType = HashTable<ShortKey, object>.Empty;
                 resource = Disposable.Create(_resources);
                 _resources.Clear();
             }
@@ -391,7 +410,7 @@
             {
                 if (_allKeys == null)
                 {
-                    _allKeys = _registrationEntries.Values.Distinct().Select(i => (IEnumerable<Key>) i.Keys).ToArray();
+                    _allKeys = _registrationEntries.Enumerate().Select(i => i.Value).Distinct().Select(i => (IEnumerable<Key>) i.Keys).ToArray();
                 }
 
                 return _allKeys.Concat(_parent).GetEnumerator();
@@ -403,15 +422,15 @@
             return _eventSubject.Subscribe(observer);
         }
 
-        private bool TryRegister([NotNull] Key key, [NotNull] RegistrationEntry registrationEntry)
+        private bool TryRegister<TKey>(Key originalKey, TKey key, [NotNull] RegistrationEntry registrationEntry, [NotNull] ref HashTable<TKey, RegistrationEntry> entries)
         {
             bool added;
             lock (_lockObject)
             {
-                added = !_registrationEntries.ContainsKey(key);
+                added = entries.Get(key) == null;
                 if (added)
                 {
-                    _registrationEntries.Add(key, registrationEntry);
+                    entries = entries.Add(key, registrationEntry);
                     ResetResolvers();
                     _allKeys = null;
                 }
@@ -419,19 +438,19 @@
 
             if (added)
             {
-                _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Registration, key));
+                _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Registration, originalKey));
                 return true;
             }
 
             return false;
         }
 
-        private bool TryUnregister([NotNull] Key key)
+        private bool TryUnregister<TKey>(Key originalKey, TKey key, [NotNull] ref HashTable<TKey, RegistrationEntry> entries)
         {
             bool removed;
             lock (_lockObject)
             {
-                removed = _registrationEntries.Remove(key);
+                entries = entries.Remove(key, out removed);
                 if (removed)
                 {
                     ResetResolvers();
@@ -441,7 +460,7 @@
 
             if (removed)
             {
-                _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Unregistration, key));
+                _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Unregistration, originalKey));
             }
 
             return false;
@@ -455,13 +474,13 @@
             }
 
             _hasResolver = false;
-            foreach (var registration in _registrationEntries.Values)
+            foreach (var registration in _registrationEntries.Enumerate().Select(i => i.Value))
             {
                 registration.Reset();
             }
 
-            _resolversByKey = HashTable<Key, object>.Empty;
-            _resolversByType = HashTable<Type, object>.Empty;
+            _resolvers = HashTable<FullKey, object>.Empty;
+            _resolversByType = HashTable<ShortKey, object>.Empty;
         }
 
         void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
