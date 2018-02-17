@@ -10,17 +10,16 @@
     {
         public static  readonly ExpressionBuilder Shared = new ExpressionBuilder();
         private static readonly ITypeInfo ResolverGenericTypeInfo = typeof(Resolver<>).Info();
-        private static readonly MethodInfo LifetimeGenericGetOrCreateMethodInfo = Type<ILifetime>.Info.DeclaredMethods.Single(i => i.Name == nameof(ILifetime.GetOrCreate));
+        private static readonly MethodInfo LifetimeGenericGetOrCreateMethodInfo = TypeExtensions.Info<ILifetime>().DeclaredMethods.Single(i => i.Name == nameof(ILifetime.GetOrCreate));
 
-        public Expression PrepareExpression<T>(T expression, Key key, IDictionary<Type, Type> typesMap)
-            where T: Expression
+        public Expression PrepareExpression(Expression expression, Type type, IDictionary<Type, Type> typesMap)
         {
-            var typeMapingExpressionVisitor = new TypeMapingExpressionVisitor(key.Type, typesMap);
+            var typeMapingExpressionVisitor = new TypeMapingExpressionVisitor(type, typesMap);
             typeMapingExpressionVisitor.Visit(expression);
-            var typeReplacingExpressionVisitor = new TypeReplacingExpressionVisitor(typesMap);
             if (typesMap.Count > 0)
             {
-                return (T)typeReplacingExpressionVisitor.Visit(expression);
+                var typeReplacingExpressionVisitor = new TypeReplacingExpressionVisitor(typesMap);
+                expression = typeReplacingExpressionVisitor.Visit(expression);
             }
 
             return expression;
@@ -54,7 +53,7 @@
 
             var getOrCreateMethodInfo = LifetimeGenericGetOrCreateMethodInfo.MakeGenericMethod(type);
             var resolverType = ResolverGenericTypeInfo.MakeGenericType(type);
-            expression = injectingExpressionVisitor.Visit(expression);
+            expression = injectingExpressionVisitor.Visit(expression) ?? throw new BuildExpressionException(new InvalidOperationException("Null expression"));
             var resolverExpression = Expression.Lambda(resolverType, expression, true, ResolverExpressionBuilder.Parameters);
             var resolver = resolverExpression.Compile();
             var lifetimeCall = Expression.Call(Expression.Constant(lifetime), getOrCreateMethodInfo, ResolverExpressionBuilder.ContainerParameter, ResolverExpressionBuilder.ArgsParameter, Expression.Constant(resolver));

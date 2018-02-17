@@ -87,13 +87,21 @@ using (var container = Container.Create().Using<Glue>())
   var box1 = container.Get<IBox<ICat>>();
   Console.WriteLine("#1 is alive: " + box1.Content.IsAlive);
 
-  // Func way
+  // Func
   var box2 = container.Get<Func<IBox<ICat>>>();
   Console.WriteLine("#2 is alive: " + box2().Content.IsAlive);
 
-  // Async way
+  // Async
   var box3 = await container.Get<Task<IBox<ICat>>>();
   Console.WriteLine("#3 is alive: " + box3.Content.IsAlive);
+
+  // Tuple<,>
+  var box4 = container.Get<Tuple<IBox<ICat>, ICat>>();
+  Console.WriteLine("#4 is alive: " + box4.Item1.Content.IsAlive + ", " + box4.Item2.IsAlive);
+
+  // Lazy
+  var box5 = container.Get<Lazy<IBox<ICat>>>();
+  Console.WriteLine("#5 is alive: " + box5.Value.Content.IsAlive);
 }
 ```
 

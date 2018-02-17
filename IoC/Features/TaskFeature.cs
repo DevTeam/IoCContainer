@@ -16,32 +16,22 @@
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
+
             yield return container
-                .Bind(typeof(Task<>))
+                .Bind<TaskScheduler>()
                 .AnyTag()
-                .To(typeof(InstanceTask<>));
+                .To(ctx => TaskScheduler.Current);
+
+            yield return container
+                .Bind<Task<TT>>()
+                .AnyTag()
+                .To(ctx => StartTask(new Task<TT>(ctx.Container.Inject<Func<TT>>()), ctx.Container.Inject<TaskScheduler>()));
         }
 
-        private sealed class InstanceTask<T> : Task<T>
+        private Task<T> StartTask<T>(Task<T> task, TaskScheduler taskScheduler)
         {
-            public InstanceTask(Context context)
-                :base(CreateFunction(context))
-            {
-                if (context.Container.TryGetResolver<TaskScheduler>(typeof(TaskScheduler), out var taskSchedulerResolver))
-                {
-                    Start(taskSchedulerResolver(context.Container));
-                }
-            }
-
-            private static Func<T> CreateFunction(Context context)
-            {
-                if (!context.Container.TryGetResolver<T>(typeof(T), context.Key.Tag, out var resolver, context.Container))
-                {
-                    resolver = context.Container.Get<IIssueResolver>().CannotGetResolver<T>(context.Container, new Key(typeof(T), context.Key.Tag));
-                }
-
-                return () => resolver(context.Container);
-            }
+            task.Start(taskScheduler);
+            return task;
         }
     }
 }

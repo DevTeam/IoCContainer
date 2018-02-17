@@ -18,9 +18,9 @@
             try
             {
                 var typesMap = new Dictionary<Type, Type>();
-                var dependencyExpression = ExpressionBuilder.Shared.PrepareExpression(dependency.Expression, key, typesMap);
+                var dependencyExpression = ExpressionBuilder.Shared.PrepareExpression(dependency.Expression, key.Type, typesMap);
                 var expressionVisitor = new InjectingExpressionVisitor(key, container, null);
-                var injectedExpression = expressionVisitor.Visit(dependencyExpression) ?? throw new BuildExpressionException("Null expression", new InvalidOperationException());
+                var injectedExpression = expressionVisitor.Visit(dependencyExpression) ?? throw new BuildExpressionException(new InvalidOperationException("Null expression"));
                 switch (dependency)
                 {
                     case Autowring autowring:
@@ -67,7 +67,7 @@
             var expressionVisitor = new InjectingExpressionVisitor(key, container, instanceExpression);
             foreach (var statement in autowring.Statements)
             {
-                var statementExpression = ExpressionBuilder.Shared.PrepareExpression(statement, key, typesMap);
+                var statementExpression = ExpressionBuilder.Shared.PrepareExpression(statement, key.Type, typesMap);
                 yield return expressionVisitor.Visit(statementExpression);
             }
 

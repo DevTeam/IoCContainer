@@ -1,6 +1,7 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
     using System;
+    // ReSharper disable once RedundantUsingDirective
     using System.Threading.Tasks;
     using Moq;
     using Shouldly;
@@ -120,8 +121,9 @@
             }
         }
 
+#if !NET40
         [Fact]
-        public void ContainerShouldResolveTask()
+        public async Task ContainerShouldResolveTask()
         {
             // Given
             using (var container = Container.Create())
@@ -133,13 +135,12 @@
                 using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => func()))
                 {
                     // Then
-                    var task = container.Get<Task<IMyService>>();
-                    task.Start();
-                    var actualInstance = task.Result;
+                    var actualInstance = await container.Get<Task<IMyService>>();
                     actualInstance.ShouldBe(expectedInstance);
                 }
             }
         }
+#endif
 
         [Fact]
         public void ContainerShouldResolveWhenFuncWithArg()

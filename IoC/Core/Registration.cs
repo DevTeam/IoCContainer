@@ -7,7 +7,7 @@
     internal struct Registration<T>: IRegistration<T>
     {
         // ReSharper disable once StaticMemberInGenericType
-        private static readonly ITypeInfo GenericTypeArgumentInfo = Type<GenericTypeArgument>.Info;
+        private static readonly ITypeInfo GenericTypeArgumentInfo = TypeExtensions.Info<GenericTypeArgument>();
 
         public Registration([NotNull] IContainer container, [NotNull][ItemNotNull] params Type[] types)
         {

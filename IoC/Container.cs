@@ -46,6 +46,7 @@
                 FuncFeature.Shared,
                 TaskFeature.Shared,
                 TupleFeature.Shared,
+                LazyFeature.Shared,
                 ConfigurationFeature.Shared);
             return container;
         }

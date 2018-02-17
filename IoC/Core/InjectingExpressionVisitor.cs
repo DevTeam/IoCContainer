@@ -9,7 +9,7 @@
     internal class InjectingExpressionVisitor: ExpressionVisitor
     {
         private static readonly Key ContextKey = new Key(typeof(Context));
-        [NotNull] private static readonly ITypeInfo ContextTypeInfo = Type<Context>.Info;
+        [NotNull] private static readonly ITypeInfo ContextTypeInfo = TypeExtensions.Info<Context>();
         [NotNull] private static readonly ITypeInfo GenericContextTypeInfo = typeof(Context<>).Info();
         [NotNull] private static readonly ITypeInfo InstanceContextTypeInfo = typeof(Context<>).Info();
         [NotNull] private static readonly MethodInfo InjectMethodInfo;
@@ -29,8 +29,7 @@
             InjectWithTagMethodInfo = ((MethodCallExpression)injectWithTagExpression.Body).Method.GetGenericMethodDefinition();
             Expression<Action<object, object>> assigmentCallExpression = (item1, item2) => default(IContainer).Inject<object>(null, null);
             AssigmentCallExpressionMethodInfo = ((MethodCallExpression)assigmentCallExpression.Body).Method.GetGenericMethodDefinition();
-
-            ContextConstructor = Type<Context>.Info.DeclaredConstructors.Single();
+            ContextConstructor = TypeExtensions.Info<Context>().DeclaredConstructors.Single();
         }
 
         public InjectingExpressionVisitor(Key key, [NotNull] IContainer container, [CanBeNull] Expression thisExpression)
@@ -69,7 +68,10 @@
                 {
                     var dstExpression = Visit(methodCall.Arguments[1]);
                     var srcExpression = Visit(methodCall.Arguments[2]);
-                    return Expression.Assign(dstExpression, srcExpression);
+                    if (dstExpression != null && srcExpression != null)
+                    {
+                        return Expression.Assign(dstExpression, srcExpression);
+                    }
                 }
             }
 
@@ -146,7 +148,7 @@
                     break;
 
                 default:
-                    var expression = Visit(tagExpression) ?? throw new BuildExpressionException("Null expression", new InvalidOperationException());
+                    var expression = Visit(tagExpression) ?? throw new BuildExpressionException(new InvalidOperationException("Null expression"));
                     var tagFunc = Expression.Lambda<Func<object>>(expression, true).Compile();
                     tag = tagFunc();
                     break;
@@ -231,10 +233,10 @@
                 }
 
                 var typesMap = new Dictionary<Type, Type>();
-                dependencyExpression = ExpressionBuilder.Shared.PrepareExpression(dependencyExpression, key, typesMap);
+                dependencyExpression = ExpressionBuilder.Shared.PrepareExpression(dependencyExpression, key.Type, typesMap);
                 dependencyExpression = ExpressionBuilder.Shared.Convert(dependencyExpression, key.Type);
                 dependencyExpression = ExpressionBuilder.Shared.AddLifetime(dependencyExpression, lifetime, key.Type, this);
-                return Visit(dependencyExpression) ?? throw new BuildExpressionException("Null expression", new InvalidOperationException());
+                return Visit(dependencyExpression) ?? throw new BuildExpressionException(new InvalidOperationException("Null expression"));
             }
             finally
             {
@@ -243,9 +245,14 @@
             }
         }
 
-        private bool TryReplaceContextFields([NotNull] Type type, string name, out Expression expression)
+        private bool TryReplaceContextFields([CanBeNull] Type type, string name, out Expression expression)
         {
-            if (type == null) throw new ArgumentNullException(nameof(type));
+            if (type == null)
+            {
+                expression = default(Expression);
+                return false;
+            }
+
             var typeInfo = type.Info();
             if (ContextTypeInfo.IsAssignableFrom(typeInfo))
             {

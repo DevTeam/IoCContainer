@@ -7,6 +7,7 @@
     // ReSharper disable once RedundantUsingDirective
     using System.Runtime.CompilerServices;
     using Core;
+    using TypeExtensions = TypeExtensions;
 
     internal sealed class SingletonLifetime : ILifetime, IDisposable, IExpressionBuilder
     {
@@ -60,7 +61,7 @@
             return Lifetime.Singleton.ToString();
         }
 
-        private static readonly MethodInfo CreateInstanceMethodInfo = Type<SingletonLifetime>.Info.DeclaredMethods.Single(i => i.Name == nameof(CreateInstance));
+        private static readonly MethodInfo CreateInstanceMethodInfo = TypeExtensions.Info<SingletonLifetime>().DeclaredMethods.Single(i => i.Name == nameof(CreateInstance));
         private static readonly Expression NullConst = Expression.Constant(null);
         private static readonly ITypeInfo ResolverTypeInfo = typeof(Resolver<>).Info();
 

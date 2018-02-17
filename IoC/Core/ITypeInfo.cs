@@ -15,6 +15,12 @@
 
         bool IsInterface { get; }
 
+        bool IsGenericParameter { get; }
+
+        bool IsArray { get; }
+
+        Type ElementType { get; }
+
         bool IsConstructedGenericType { get; }
 
         bool IsGenericTypeDefinition { get; }

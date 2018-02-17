@@ -87,13 +87,21 @@ using (var container = Container.Create().Using<Glue>())
   var box1 = container.Get<IBox<ICat>>();
   Console.WriteLine("#1 is alive: " + box1.Content.IsAlive);
 
-  // Func way
+  // Func
   var box2 = container.Get<Func<IBox<ICat>>>();
   Console.WriteLine("#2 is alive: " + box2().Content.IsAlive);
 
-  // Async way
+  // Async
   var box3 = await container.Get<Task<IBox<ICat>>>();
   Console.WriteLine("#3 is alive: " + box3.Content.IsAlive);
+
+  // Tuple<,>
+  var box4 = container.Get<Tuple<IBox<ICat>, ICat>>();
+  Console.WriteLine("#4 is alive: " + box4.Item1.Content.IsAlive + ", " + box4.Item2.IsAlive);
+
+  // Lazy
+  var box5 = container.Get<Lazy<IBox<ICat>>>();
+  Console.WriteLine("#5 is alive: " + box5.Value.Content.IsAlive);
 }
 ```
 
@@ -130,6 +138,7 @@ The results of the [comparison tests](https://github.com/DevTeam/IoCContainer/bl
 * [Generic Auto-wiring](#generic-auto-wiring)
 * [Generics](#generics)
 * [Get Func](#get-func)
+* [Get Lazy](#get-lazy)
 * [Get Tuple](#get-tuple)
 * [Tags](#tags)
 * [Auto-wiring](#auto-wiring)
@@ -180,7 +189,6 @@ using (container.Bind<Service, IService, IAnotherService>().To<Service>())
 // Create a container
 using (var container = Container.Create())
 // Configure the container
-using (container.Bind<TaskScheduler>().To(ctx => TaskScheduler.Default))
 using (container.Bind<IDependency>().To<Dependency>())
 using (container.Bind<IService>().To<Service>())
 {
@@ -299,6 +307,25 @@ using (container.Bind<IService>().To<Service>())
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GetFunc.cs)
+
+### Get Lazy
+
+``` CSharp
+// Create a container
+using (var container = Container.Create())
+// Configure the container
+using (container.Bind<IDependency>().To<Dependency>())
+using (container.Bind<IService>().To<Service>())
+{
+    // Resolve Lazy
+    var lazy = container.Get<Lazy<IService>>();
+    // Get the instance via Lazy
+    var instance = lazy.Value;
+
+    instance.ShouldBeOfType<Service>();
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GetLazy.cs)
 
 ### Get Tuple
 

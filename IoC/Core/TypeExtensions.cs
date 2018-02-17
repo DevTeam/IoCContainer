@@ -3,29 +3,45 @@
     using System;
     using System.Collections.Generic;
     using System.Reflection;
+    using Collections;
 
     internal static class TypeExtensions
     {
-        private static readonly Dictionary<Type, ITypeInfo> TypeInfos = new Dictionary<Type, ITypeInfo>();
+        private static readonly object LockObject = new object();
+        private static HashTable<Type, ITypeInfo> _typeInfos = HashTable<Type, ITypeInfo>.Empty;
 
         public static ITypeInfo Info(this Type type)
         {
-            lock (TypeInfos)
+            lock (LockObject)
             {
-                if (!TypeInfos.TryGetValue(type, out var typeInfo))
+                var typeInfo = _typeInfos.Get(type);
+                if (typeInfo == null)
                 {
                     typeInfo = new InternalTypeInfo(type);
-                    TypeInfos.Add(type, typeInfo);
+                    if (!typeInfo.IsConstructedGenericType)
+                    {
+                        _typeInfos = _typeInfos.Add(type, typeInfo);
+                    }
                 }
 
                 return typeInfo;
             }
         }
 
+        public static ITypeInfo Info<T>()
+        {
+            return TypeInfoHolder<T>.Shared;
+        }
+
         public static Assembly LoadAssembly(string assemblyName)
         {
             if (string.IsNullOrWhiteSpace(assemblyName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(assemblyName));
             return Assembly.Load(new AssemblyName(assemblyName));
+        }
+
+        private static class TypeInfoHolder<T>
+        {
+            [NotNull] public static readonly ITypeInfo Shared = typeof(T).Info();
         }
 
 #if !NET40
@@ -46,6 +62,12 @@
             public bool IsValueType => _typeInfo.Value.IsValueType;
 
             public bool IsInterface => _typeInfo.Value.IsInterface;
+
+            public bool IsGenericParameter => _typeInfo.Value.IsGenericParameter;
+
+            public bool IsArray => _typeInfo.Value.IsArray;
+
+            public Type ElementType => _typeInfo.Value.GetElementType();
 
             public bool IsConstructedGenericType => _type.IsConstructedGenericType;
 
@@ -85,6 +107,7 @@
 #else
         private sealed class InternalTypeInfo : ITypeInfo
         {
+            private static readonly BindingFlags DefaultBindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.Static;
             private readonly Type _type;
 
             public InternalTypeInfo([NotNull] Type type)
@@ -98,7 +121,13 @@
 
             public bool IsValueType => _type.IsValueType;
 
+            public bool IsArray => _type.IsArray;
+
+            public Type ElementType => _type.GetElementType();
+
             public bool IsInterface => _type.IsInterface;
+
+            public bool IsGenericParameter => _type.IsGenericParameter;
 
             public bool IsConstructedGenericType => _type.IsGenericType;
 
@@ -110,9 +139,9 @@
 
             public IEnumerable<ConstructorInfo> DeclaredConstructors => _type.GetConstructors();
 
-            public IEnumerable<MethodInfo> DeclaredMethods => _type.GetMethods();
+            public IEnumerable<MethodInfo> DeclaredMethods => _type.GetMethods(DefaultBindingFlags);
 
-            public IEnumerable<MemberInfo> DeclaredMembers => _type.GetMembers();
+            public IEnumerable<MemberInfo> DeclaredMembers => _type.GetMembers(DefaultBindingFlags);
 
             public Type BaseType => _type.BaseType;
 

@@ -18,80 +18,68 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container
-                .Bind(typeof(IEnumerable<>))
+                .Bind<IEnumerable<TT>>()
                 .As(Lifetime.ContainerSingleton)
-                .To(typeof(InstanceEnumerable<>));
+                .To(ctx => new Enumeration<TT>(ctx.Container, ctx.Args));
         }
 
-        private sealed class InstanceEnumerable<T> : IEnumerable<T>, IDisposable, IObserver<ContainerEvent>
+        private class Enumeration<T>: IObserver<ContainerEvent>, IDisposable, IEnumerable<T>
         {
-            private readonly object[] _args;
-            private static readonly Key ResolvingKey = new Key(typeof(T));
             private readonly IContainer _container;
-            private readonly object _lockObject = new object();
-            private readonly IDisposable _eventsSubscription;
-            private volatile IEnumerable<T> _resolvers;
+            [NotNull] [ItemCanBeNull] private readonly object[] _args;
+            private readonly IDisposable _subscription;
+            private volatile Lazy<Resolver<T>[]> _currentResolvers;
 
-            public InstanceEnumerable(Context context)
+            public Enumeration([NotNull] IContainer container, [NotNull][ItemCanBeNull] params object[] args)
             {
-                _container = context.Container;
-                _args = context.Args;
-                _eventsSubscription = _container.Subscribe(this);
+                _container = container;
+                _args = args;
+                _subscription = container.Subscribe(this);
+                Reset();
+            }
+
+            public void OnNext(ContainerEvent value)
+            {
+                Reset();
+            }
+
+            public void OnError(Exception error)
+            {
+            }
+
+            public void OnCompleted()
+            {
+            }
+
+            public void Dispose()
+            {
+                _subscription.Dispose();
+            }
+
+            private void Reset()
+            {
+                lock (_subscription)
+                {
+                    _currentResolvers = new Lazy<Resolver<T>[]>(() => GetResolvers(_container).ToArray());
+                }
+            }
+
+            private static IEnumerable<Resolver<T>> GetResolvers(IContainer container)
+            {
+                return from keyGroup in container
+                    let key = keyGroup.FirstOrDefault(key => ReferenceEquals(key.Type, typeof(T)))
+                    where !Equals(key, default(Key))
+                    select container.GetResolver<T>(key.Type, key.Tag, container);
             }
 
             public IEnumerator<T> GetEnumerator()
             {
-                if (_resolvers != null)
-                {
-                    return _resolvers.GetEnumerator();
-                }
-
-                if (_resolvers == null)
-                {
-                    lock (_lockObject)
-                    {
-                        if (_resolvers == null)
-                        {
-                            Resolver<T> resolver = null;
-                            _resolvers = (
-                                    from keyGroup in _container
-                                    let key = keyGroup.FirstOrDefault(key => ReferenceEquals(key.Type, ResolvingKey.Type))
-                                    where !Equals(key, default(Key))
-                                    where _container.TryGetResolver(key.Type, key.Tag, out resolver, _container)
-                                    select resolver)
-                                .ToList()
-                                .Select(r => r(_container, _args));
-                        }
-                    }
-                }
-
-                return _resolvers.GetEnumerator();
+                return _currentResolvers.Value.Select(resolver => resolver(_container, _args)).GetEnumerator();
             }
 
             IEnumerator IEnumerable.GetEnumerator()
             {
                 return GetEnumerator();
-            }
-
-            public void Dispose()
-            {
-                _eventsSubscription.Dispose();
-            }
-
-            void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
-            {
-                lock (_lockObject)
-                {
-                    _resolvers = null;
-                }
-            }
-
-            void IObserver<ContainerEvent>.OnError(Exception error)
-            {
-            }
-
-            void IObserver<ContainerEvent>.OnCompleted()
-            {
             }
         }
     }

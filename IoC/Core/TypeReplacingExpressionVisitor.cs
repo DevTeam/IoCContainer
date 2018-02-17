@@ -30,7 +30,13 @@
             switch (node.NodeType)
             {
                 case ExpressionType.Convert:
-                    return Expression.Convert(Visit(node.Operand), newType);
+                    var newOperand = Visit(node.Operand);
+                    if (newOperand == null)
+                    {
+                        return base.VisitUnary(node);
+                    }
+
+                    return Expression.Convert(newOperand, newType);
 
                 default:
                     return base.VisitUnary(node);
@@ -40,7 +46,12 @@
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             var newDeclaringType = ReplaceType(node.Method.DeclaringType).Info();
-            var newMethod = newDeclaringType.DeclaredMethods.Single(i => i.Name == node.Method.Name && Match(node.Method.GetParameters(), i.GetParameters()));
+            var newMethod = newDeclaringType.DeclaredMethods.SingleOrDefault(i => i.Name == node.Method.Name && Match(node.Method.GetParameters(), i.GetParameters()));
+            if (newMethod == null)
+            {
+                throw new BuildExpressionException(new InvalidOperationException($"Cannot find method {node.Method} in the {node.Method.DeclaringType}."));
+            }
+
             if (newMethod.IsGenericMethod)
             {
                 newMethod = newMethod.MakeGenericMethod(ReplaceTypes(node.Method.GetGenericArguments()));
@@ -52,9 +63,20 @@
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            var newDeclaringType = ReplaceType(node.Member.DeclaringType).Info();
-            var newMember = newDeclaringType.DeclaredMembers.Single(i => i.Name == node.Member.Name);
-            return Expression.MakeMemberAccess(Visit(node.Expression), newMember);
+            var newDeclaringTypeInfo = ReplaceType(node.Member.DeclaringType).Info();
+            if (newDeclaringTypeInfo.IsConstructedGenericType)
+            {
+                newDeclaringTypeInfo = ReplaceType(newDeclaringTypeInfo.Type).Info();
+            }
+
+            var newMember = newDeclaringTypeInfo.DeclaredMembers.Single(i => i.Name == node.Member.Name);
+            var newExpression = Visit(node.Expression);
+            if (newExpression == null)
+            {
+                return base.VisitMember(node);
+            }
+
+            return Expression.MakeMemberAccess(newExpression, newMember);
         }
 
         protected override Expression VisitParameter(ParameterExpression node)
@@ -91,6 +113,11 @@
         {
             var parameters = node.Parameters.Select(VisitParameter).Cast<ParameterExpression>();
             var body = Visit(node.Body);
+            if (body == null)
+            {
+                return base.VisitLambda(node);
+            }
+
             return Expression.Lambda(ReplaceType(node.Type), body, parameters);
         }
 
@@ -99,6 +126,34 @@
             return Expression.NewArrayInit(ReplaceType(node.Type.GetElementType()), ReplaceAll(node.Expressions));
         }
 
+        protected override Expression VisitListInit(ListInitExpression node)
+        {
+            var newExpression = (NewExpression)Visit(node.NewExpression);
+            return Expression.ListInit(newExpression, node.Initializers.Select(VisitInitializer));
+        }
+
+        private ElementInit VisitInitializer(ElementInit node)
+        {
+            var newDeclaringType = ReplaceType(node.AddMethod.DeclaringType).Info();
+            var newMethod = newDeclaringType.DeclaredMethods.SingleOrDefault(i => i.Name == node.AddMethod.Name && Match(node.AddMethod.GetParameters(), i.GetParameters()));
+            if (newMethod == null)
+            {
+                throw new BuildExpressionException(new InvalidOperationException($"Cannot find method {node.AddMethod} in the {node.AddMethod.DeclaringType}."));
+            }
+
+            if (newMethod.IsGenericMethod)
+            {
+                newMethod = newMethod.MakeGenericMethod(ReplaceTypes(node.AddMethod.GetGenericArguments()));
+            }
+
+            var newArgs = ReplaceAll(node.Arguments).ToList();
+            return Expression.ElementInit(newMethod, newArgs);
+        }
+
+        public override Expression Visit(Expression node)
+        {
+            return base.Visit(node);
+        }
 
         private bool Match(ParameterInfo[] baseParams, ParameterInfo[] newParams)
         {
@@ -114,7 +169,13 @@
                     return false;
                 }
 
-                if (ReplaceType(baseParams[i].ParameterType).Info().Id != newParams[i].ParameterType.Info().Id)
+                var paramTypeInfo = newParams[i].ParameterType.Info();
+                if (paramTypeInfo.IsGenericParameter)
+                {
+                    return true;
+                }
+
+                if (ReplaceType(baseParams[i].ParameterType).Info().Id != paramTypeInfo.Id)
                 {
                     return false;
                 }
@@ -138,6 +199,18 @@
                     return newType;
                 }
 
+                if (baseTypeInfo.IsArray)
+                {
+                    var elementType = baseTypeInfo.ElementType;
+                    var newElementType = ReplaceType(baseTypeInfo.ElementType);
+                    if (elementType != newElementType)
+                    {
+                        return newElementType.MakeArrayType();
+                    }
+
+                    return type;
+                }
+
                 return type;
             }
 
@@ -152,7 +225,7 @@
                 }
                 else
                 {
-                    newGenericTypes[i] = genericType;
+                    newGenericTypes[i] = ReplaceType(genericType);
                 }
             }
 

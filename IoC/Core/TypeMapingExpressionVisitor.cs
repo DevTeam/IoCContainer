@@ -7,6 +7,7 @@
 
     internal class TypeMapingExpressionVisitor : ExpressionVisitor
     {
+        private static readonly ITypeInfo GenericTypeArgumentTypeInfo = typeof(GenericTypeArgument).Info();
         private readonly IDictionary<Type, Type> _typesMap;
         private readonly ITypeInfo _typeInfo;
         private readonly bool _isConstructedGenericType;
@@ -27,6 +28,16 @@
             }
 
             return base.Visit(node);
+        }
+
+        protected override Expression VisitConstant(ConstantExpression node)
+        {
+            if (node.Value is Type type)
+            {
+                UpdateMap(type);
+            }
+
+            return base.VisitConstant(node);
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
@@ -53,25 +64,29 @@
 
         private void UpdateMap(Type targetType)
         {
-            if (!_isConstructedGenericType)
-            {
-                return;
-            }
-
             UpdateMap(_typeInfo, targetType.Info());
         }
 
         private void UpdateMap(ITypeInfo typeInfo, ITypeInfo targetTypeInfo)
         {
             var isConstructedGenericType = typeInfo.IsConstructedGenericType;
-            ITypeInfo genTypeInfo = null;
+            ITypeInfo genTypeInfo;
             if (isConstructedGenericType)
             {
                 genTypeInfo = typeInfo.GetGenericTypeDefinition().Info();
             }
-
-            if (!isConstructedGenericType)
+            else
             {
+                if (targetTypeInfo.IsConstructedGenericType)
+                {
+                    return;
+                }
+
+                if (IsGenericTypeArgument(targetTypeInfo))
+                {
+                    _typesMap[targetTypeInfo.Type] = typeInfo.Type;
+                }
+
                 return;
             }
 
@@ -109,20 +124,35 @@
                 }
             }
 
-            if (realTargetTypeInfo != null)
+            if (realTargetTypeInfo == null)
             {
-                var targetGenTypes = realTargetTypeInfo.GenericTypeArguments;
-                var genTypes = typeInfo.GenericTypeArguments;
-                if (targetGenTypes.Length != genTypes.Length)
-                {
-                    return;
-                }
-
-                for (var i = 0; i < targetGenTypes.Length; i++)
-                {
-                    _typesMap[targetGenTypes[i]] = genTypes[i];
-                }
+                realTargetTypeInfo = targetTypeInfo;
             }
+
+            var targetGenTypes = realTargetTypeInfo.GenericTypeArguments;
+            var genTypes = typeInfo.GenericTypeArguments;
+            if (targetGenTypes.Length != genTypes.Length)
+            {
+                return;
+            }
+
+            for (var i = 0; i < targetGenTypes.Length; i++)
+            {
+                var targetType = targetGenTypes[i];
+                var type = genTypes[i];
+                if (!IsGenericTypeArgument(targetType.Info()))
+                {
+                    continue;
+                }
+                
+                _typesMap[targetType] = type;
+                UpdateMap(type.Info(), targetType.Info());
+            }
+        }
+
+        private static bool IsGenericTypeArgument(ITypeInfo targetTypeInfo)
+        {
+            return GenericTypeArgumentTypeInfo.IsAssignableFrom(targetTypeInfo);
         }
     }
 }
