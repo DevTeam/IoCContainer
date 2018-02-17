@@ -19,10 +19,36 @@
             _isConstructedGenericType = _typeInfo.IsConstructedGenericType;
         }
 
-        protected override Expression VisitNew(NewExpression node)
+        public override Expression Visit(Expression node)
         {
-            UpdateMap(node.Type);
-            return base.VisitNew(node);
+            if (node != null)
+            {
+                UpdateMap(node.Type);
+            }
+
+            return base.Visit(node);
+        }
+
+        protected override Expression VisitMethodCall(MethodCallExpression node)
+        {
+            foreach (var nodeArgument in node.Arguments)
+            {
+                Visit(nodeArgument);
+            }
+
+            return base.VisitMethodCall(node);
+        }
+
+        protected override Expression VisitLambda<T>(Expression<T> node)
+        {
+            UpdateMap(node.ReturnType);
+            return base.VisitLambda(node);
+        }
+
+        protected override Expression VisitUnary(UnaryExpression node)
+        {
+            Visit(node.Operand);
+            return base.VisitUnary(node);
         }
 
         private void UpdateMap(Type targetType)
@@ -34,7 +60,6 @@
 
             UpdateMap(_typeInfo, targetType.Info());
         }
-
 
         private void UpdateMap(ITypeInfo typeInfo, ITypeInfo targetTypeInfo)
         {
@@ -58,7 +83,11 @@
             ITypeInfo realTargetTypeInfo = null;
             if (genTypeInfo.IsInterface)
             {
-                realTargetTypeInfo = targetTypeInfo.ImplementedInterfaces.FirstOrDefault(t => genTypeInfo.Type == t.Info().GetGenericTypeDefinition())?.Info();
+                realTargetTypeInfo = targetTypeInfo.ImplementedInterfaces.FirstOrDefault(t =>
+                {
+                    var curTypeInfo = t.Info();
+                    return curTypeInfo.IsConstructedGenericType && genTypeInfo.Type == curTypeInfo.GetGenericTypeDefinition();
+                })?.Info();
             }
             else
             {

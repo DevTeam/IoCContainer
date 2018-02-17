@@ -76,7 +76,8 @@
             // ctx.It
             if (methodCall.Object is MemberExpression memberExpression && memberExpression.Member is FieldInfo fieldInfo)
             {
-                if (fieldInfo.DeclaringType.GetGenericTypeDefinition() == typeof(Context<>) && fieldInfo.Name == nameof(Context<object>.It))
+                var typeInfo = fieldInfo.DeclaringType.Info();
+                if (typeInfo.IsConstructedGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Context<>) && fieldInfo.Name == nameof(Context<object>.It))
                 {
                     return Expression.Call(_thisExpression, methodCall.Method, InjectAll(methodCall.Arguments));
                 }

@@ -35,22 +35,26 @@
 
         private volatile IEnumerable<Key>[] _allKeys;
         private volatile bool _hasResolver;
+        private bool _isFreezed;
 
         private static Container CreateRootContainer()
         {
-            return new Container(
-                RootName,
+            var container = new Container(RootName);
+            container.ApplyConfigurations(
                 CoreFeature.Shared,
                 EnumerableFeature.Shared,
                 FuncFeature.Shared,
                 TaskFeature.Shared,
                 TupleFeature.Shared,
                 ConfigurationFeature.Shared);
+            return container;
         }
 
         private static Container CreatePureRootContainer()
         {
-            return new Container(RootName, CoreFeature.Shared);
+            var container = new Container(RootName);
+            container.ApplyConfigurations(CoreFeature.Shared);
+            return container;
         }
 
         [NotNull]
@@ -67,20 +71,14 @@
             return new Container($"{RootName}{CreateContainerName(name)}", CreatePureRootContainer(), true);
         }
 
-        private Container([NotNull] string name = "", [NotNull][ItemNotNull] params IConfiguration[] configurations)
+        private Container([NotNull] string name = "")
         {
-            if (configurations == null) throw new ArgumentNullException(nameof(configurations));
             _name = name ?? throw new ArgumentNullException(nameof(name));
             _parent = new NullContainer();
-            if (configurations.Length > 0)
-            {
-                _resources.Add(this.Apply(configurations));
-            }
         }
 
-        internal Container([NotNull] string name, [NotNull] IContainer parent, bool root, [NotNull][ItemNotNull] params IConfiguration[] configurations)
+        internal Container([NotNull] string name, [NotNull] IContainer parent, bool root)
         {
-            if (configurations == null) throw new ArgumentNullException(nameof(configurations));
             _name = name ?? throw new ArgumentNullException(nameof(name));
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
 
@@ -89,16 +87,29 @@
                 resourceStore.AddResource(this);
             }
 
-            if (configurations.Length > 0)
-            {
-                _resources.Add(this.Apply(configurations));
-            }
-
             // Subscribe to events from the parent container
             ((IResourceStore)this).AddResource(_parent.Subscribe(_eventSubject));
 
             // Subscribe to reset resolvers
             ((IResourceStore)this).AddResource(_eventSubject.Subscribe(this));
+        }
+
+        private void ApplyConfigurations(params IConfiguration[] configurations)
+        {
+            if (configurations.Length == 0)
+            {
+                return;
+            }
+
+            try
+            {
+                _isFreezed = true;
+                _resources.Add(this.Apply(configurations));
+            }
+            finally
+            {
+                _isFreezed = false;
+            }
         }
 
         public IContainer Parent => _parent;
@@ -458,7 +469,7 @@
 
         private void ResetResolvers()
         {
-            if (!_hasResolver)
+            if (_isFreezed || !_hasResolver)
             {
                 return;
             }

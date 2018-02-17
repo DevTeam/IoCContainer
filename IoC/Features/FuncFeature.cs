@@ -2,24 +2,11 @@
 {
     using System;
     using System.Collections.Generic;
-    using Core;
 
     [PublicAPI]
     public sealed  class FuncFeature : IConfiguration
     {
         public static readonly IConfiguration Shared = new FuncFeature();
-        private static readonly Dictionary<Type, Type> Factories = new Dictionary<Type, Type>()
-        {
-            { typeof(Func<>), typeof(FuncFactory<>) },
-            { typeof(Func<,>), typeof(FuncFactory<,>) },
-            { typeof(Func<,,>), typeof(FuncFactory<,,>) },
-            { typeof(Func<,,,>), typeof(FuncFactory<,,,>) },
-            { typeof(Func<,,,,>), typeof(FuncFactory<,,,,>) },
-            { typeof(Func<,,,,,>), typeof(FuncFactory<,,,,,>) },
-            { typeof(Func<,,,,,,>), typeof(FuncFactory<,,,,,,>) },
-            { typeof(Func<,,,,,,,>), typeof(FuncFactory<,,,,,,,>) },
-            { typeof(Func<,,,,,,,,>), typeof(FuncFactory<,,,,,,,,>) }
-        };
 
         private FuncFeature()
         {
@@ -28,150 +15,32 @@
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            foreach (var factory in Factories)
-            {
-                var curFactory = factory;
-                yield return container
-                    .Bind(curFactory.Value)
-                    .AnyTag()
-                    .To(curFactory.Value);
+            yield return container.Bind<Func<TT>>().AnyTag().To(
+                ctx => (() => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container)));
 
-                yield return container
-                    .Bind(curFactory.Key)
-                    .AnyTag()
-                    .To(ctx => CreateFunc(ctx.Key, ctx.Container, curFactory.Value));
-            }
-        }
+            yield return container.Bind<Func<TT1, TT>>().AnyTag().To(
+                ctx => (arg1 => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1)));
 
-        private static object CreateFunc(Key key, [NotNull] IContainer container, Type factoryType)
-        {
-            Type[] genericTypeArguments;
-            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            var typeInfo = key.Type.Info();
-            if (typeInfo.IsConstructedGenericType)
-            {
-                genericTypeArguments = typeInfo.GenericTypeArguments;
-            }
-            else
-            {
-                genericTypeArguments = container.Get<IIssueResolver>().CannotGetGenericTypeArguments(key.Type);
-            }
+            yield return container.Bind<Func<TT1, TT2, TT>>().AnyTag().To(
+                ctx => ((arg1, arg2) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2)));
 
-            var instanceType = factoryType.MakeGenericType(genericTypeArguments);
-            if (!container.TryGetResolver<IFuncFactory>(instanceType, key.Tag, out var resolver, container))
-            {
-                var objectResolver = container.Get<IIssueResolver>().CannotGetResolver<object>(container, new Key(instanceType, key.Tag));
-                return ((IFuncFactory)objectResolver(container)).Create();
-            }
+            yield return container.Bind<Func<TT1, TT2, TT3, TT>>().AnyTag().To(
+                ctx => ((arg1, arg2, arg3) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3)));
 
-            return resolver(container).Create();
-        }
+            yield return container.Bind<Func<TT1, TT2, TT3, TT4, TT>>().AnyTag().To(
+                ctx => ((arg1, arg2, arg3, arg4) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4)));
 
-        private interface IFuncFactory
-        {
-            object Create();
-        }
+            yield return container.Bind<Func<TT1, TT2, TT3, TT4, TT5, TT>>().AnyTag().To(
+                ctx => ((arg1, arg2, arg3, arg4, arg5) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5)));
 
-        private class FuncFactory<T> : IFuncFactory
-        {
-            protected readonly Resolver<T> Resolver;
-            protected readonly IContainer Container;
+            yield return container.Bind<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>>().AnyTag().To(
+                ctx => ((arg1, arg2, arg3, arg4, arg5, arg6) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6)));
 
-            // ReSharper disable once MemberCanBeProtected.Local
-            public FuncFactory(Context context)
-            {
-                Container = context.Container;
-                if (!context.Container.TryGetResolver(typeof(T), context.Key.Tag, out Resolver, Container))
-                {
-                    var key = new Key(typeof(T), context.Key.Tag);
-                    Resolver = context.Container.Get<IIssueResolver>().CannotGetResolver<T>(Container, key);
-                }
-            }
+            yield return container.Bind<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>>().AnyTag().To(
+                ctx => ((arg1, arg2, arg3, arg4, arg5, arg6, arg7) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7)));
 
-            public virtual object Create()
-            {
-                return new Func<T>(() => Resolver(Container));
-            }
-        }
-
-        private sealed class FuncFactory<T1, T> : FuncFactory<T>
-        {
-            public FuncFactory(Context context) : base(context) { }
-
-            public override object Create()
-            {
-                return new Func<T1, T>(arg1 => Resolver(Container, arg1));
-            }
-        }
-
-        private sealed class FuncFactory<T1, T2, T> : FuncFactory<T>
-        {
-            public FuncFactory(Context context) : base(context) { }
-
-            public override object Create()
-            {
-                return new Func<T1, T2, T>((arg1, arg2) => Resolver(Container, arg1, arg2));
-            }
-        }
-
-        private sealed class FuncFactory<T1, T2, T3, T> : FuncFactory<T>
-        {
-            public FuncFactory(Context context) : base(context) { }
-
-            public override object Create()
-            {
-                return new Func<T1, T2, T3, T>((arg1, arg2, arg3) => Resolver(Container, arg1, arg2, arg3));
-            }
-        }
-
-        private sealed class FuncFactory<T1, T2, T3, T4, T> : FuncFactory<T>
-        {
-            public FuncFactory(Context context) : base(context) { }
-
-            public override object Create()
-            {
-                return new Func<T1, T2, T3, T4, T>((arg1, arg2, arg3, arg4) => Resolver(Container, arg1, arg2, arg3, arg4));
-            }
-        }
-
-        private sealed class FuncFactory<T1, T2, T3, T4, T5, T> : FuncFactory<T>
-        {
-            public FuncFactory(Context context) : base(context) { }
-
-            public override object Create()
-            {
-                return new Func<T1, T2, T3, T4, T5, T>((arg1, arg2, arg3, arg4, arg5) => Resolver(Container, arg1, arg2, arg3, arg4, arg5));
-            }
-        }
-
-        private sealed class FuncFactory<T1, T2, T3, T4, T5, T6, T> : FuncFactory<T>
-        {
-            public FuncFactory(Context context) : base(context) { }
-
-            public override object Create()
-            {
-                return new Func<T1, T2, T3, T4, T5, T6, T>((arg1, arg2, arg3, arg4, arg5, arg6) => Resolver(Container, arg1, arg2, arg3, arg4, arg5, arg6));
-            }
-        }
-
-        private sealed class FuncFactory<T1, T2, T3, T4, T5, T6, T7, T> : FuncFactory<T>
-        {
-            public FuncFactory(Context context) : base(context) { }
-
-            public override object Create()
-            {
-                return new Func<T1, T2, T3, T4, T5, T6, T7, T>((arg1, arg2, arg3, arg4, arg5, arg6, arg7) => Resolver(Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7));
-            }
-        }
-
-        private sealed class FuncFactory<T1, T2, T3, T4, T5, T6, T7, T8, T> : FuncFactory<T>
-        {
-            public FuncFactory(Context context) : base(context) { }
-
-            public override object Create()
-            {
-                return new Func<T1, T2, T3, T4, T5, T6, T7, T8, T>((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => Resolver(Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8));
-            }
+            yield return container.Bind<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>>().AnyTag().To(
+                ctx => ((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)));
         }
     }
 }

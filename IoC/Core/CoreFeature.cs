@@ -20,6 +20,11 @@
                 .To(ctx => IssueResolver.Shared);
 
             yield return container
+                .Bind<Resolver<TT>>()
+                .AnyTag()
+                .To(ctx => ctx.Container.GetResolver<TT>(typeof(TT), ctx.Key.Tag, ctx.Container));
+
+            yield return container
                 .Bind<ILifetime>()
                 .Tag(Lifetime.Singleton)
                 .To(ctx => new SingletonLifetime());

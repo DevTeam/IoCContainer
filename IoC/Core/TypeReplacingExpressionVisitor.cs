@@ -9,6 +9,7 @@
     internal class TypeReplacingExpressionVisitor: ExpressionVisitor
     {
         [NotNull] private readonly IDictionary<Type, Type> _typesMap;
+        [NotNull] private readonly Dictionary<string, ParameterExpression> _parameters = new Dictionary<string, ParameterExpression>();
 
         public TypeReplacingExpressionVisitor([NotNull] IDictionary<Type, Type> typesMap)
         {
@@ -18,7 +19,7 @@
         protected override Expression VisitNew(NewExpression node)
         {
             var newTypeInfo = ReplaceType(node.Type).Info();
-            var newConstructor = newTypeInfo.DeclaredConstructors.Single(i => Match(node.Constructor.GetParameters(), i.GetParameters()));
+            var newConstructor = newTypeInfo.DeclaredConstructors.Single(i => !i.IsPrivate && Match(node.Constructor.GetParameters(), i.GetParameters()));
             var newArgs = ReplaceAll(node.Arguments).ToList();
             return Expression.New(newConstructor, newArgs);
         }
@@ -29,7 +30,7 @@
             switch (node.NodeType)
             {
                 case ExpressionType.Convert:
-                    return Expression.Convert(node.Operand, newType);
+                    return Expression.Convert(Visit(node.Operand), newType);
 
                 default:
                     return base.VisitUnary(node);
@@ -39,7 +40,7 @@
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             var newDeclaringType = ReplaceType(node.Method.DeclaringType).Info();
-            var newMethod = newDeclaringType.DeclaredMethods.Single(i => Match(node.Method.GetParameters(), i.GetParameters()));
+            var newMethod = newDeclaringType.DeclaredMethods.Single(i => i.Name == node.Method.Name && Match(node.Method.GetParameters(), i.GetParameters()));
             if (newMethod.IsGenericMethod)
             {
                 newMethod = newMethod.MakeGenericMethod(ReplaceTypes(node.Method.GetGenericArguments()));
@@ -58,13 +59,46 @@
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            return Expression.Parameter(ReplaceType(node.Type), node.Name);
+            if (_parameters.TryGetValue(node.Name, out var newNode))
+            {
+                return newNode;
+            }
+
+            if (node.IsByRef)
+            {
+                newNode = Expression.Parameter(ReplaceType(node.Type).MakeByRefType(), node.Name);
+            }
+            else
+            {
+                newNode = Expression.Parameter(ReplaceType(node.Type), node.Name);
+            }
+
+            _parameters[newNode.Name] = newNode;
+            return newNode;
         }
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
+            if (node.Type == typeof(Type))
+            {
+                return Expression.Constant(ReplaceType((Type)node.Value), node.Type);
+            }
+
             return Expression.Constant(node.Value, ReplaceType(node.Type));
         }
+
+        protected override Expression VisitLambda<T>(Expression<T> node)
+        {
+            var parameters = node.Parameters.Select(VisitParameter).Cast<ParameterExpression>();
+            var body = Visit(node.Body);
+            return Expression.Lambda(ReplaceType(node.Type), body, parameters);
+        }
+
+        protected override Expression VisitNewArray(NewArrayExpression node)
+        {
+            return Expression.NewArrayInit(ReplaceType(node.Type.GetElementType()), ReplaceAll(node.Expressions));
+        }
+
 
         private bool Match(ParameterInfo[] baseParams, ParameterInfo[] newParams)
         {

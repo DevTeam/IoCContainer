@@ -193,7 +193,7 @@
 #endif
         public static T Get<T>(this Resolving resolving, [NotNull][ItemCanBeNull] params object[] args)
         {
-            return resolving.Container.GetResolver<T>(typeof(T), resolving.Tag)(resolving.Container, args);
+            return resolving.Container.GetResolver<T>(typeof(T), resolving.Tag, resolving.Container)(resolving.Container, args);
         }
 
 #if !NET40
@@ -201,7 +201,7 @@
 #endif
         public static object Get(this Resolving resolving, [NotNull] Type type, [NotNull][ItemCanBeNull] params object[] args)
         {
-            return resolving.Container.GetResolver<object>(type, resolving.Tag)(resolving.Container, args);
+            return resolving.Container.GetResolver<object>(type, resolving.Tag, resolving.Container)(resolving.Container, args);
         }
 
         [NotNull]

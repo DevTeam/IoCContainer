@@ -35,7 +35,7 @@ namespace IoC.Core.Collections
             for (var index = 0; index < items.Length; index++)
             {
                 var keyValue = items[index];
-                if (keyValue.KeyHashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
+                if (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key))
                 {
                     return keyValue.Value;
                 }
@@ -59,10 +59,9 @@ namespace IoC.Core.Collections
         {
             removed = false;
             var result = HashTable<TKey, TValue>.Empty;
-            var hashCode = key.GetHashCode();
             foreach (var keyValue in hashTable.Enumerate())
             {
-                if (keyValue.KeyHashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
+                if (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key))
                 {
                     removed = true;
                     continue;

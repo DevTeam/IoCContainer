@@ -10,15 +10,11 @@ namespace IoC.Core.Collections
         private static readonly EqualityComparer<TValue> ValueEqualityComparer = EqualityComparer<TValue>.Default;
         public readonly TKey Key;
         public readonly TValue Value;
-        public readonly int KeyHashCode;
-        private readonly int _hashCode;
 
         public KeyValue(TKey key, TValue value)
         {
             Key = key;
             Value = value;
-            KeyHashCode = Key.GetHashCode();
-            _hashCode = GetHashCodeInternal();
         }
 
         public override string ToString()
@@ -35,20 +31,9 @@ namespace IoC.Core.Collections
 
         public override int GetHashCode()
         {
-            return _hashCode;
-        }
-
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
-        private int GetHashCodeInternal()
-        {
             unchecked
             {
-                var hashCode = KeyHashCode;
-                hashCode = (hashCode * 397) ^ KeyEqualityComparer.GetHashCode(Key);
-                hashCode = (hashCode * 397) ^ ValueEqualityComparer.GetHashCode(Value);
-                return hashCode;
+                return (KeyEqualityComparer.GetHashCode(Key) * 397) ^ ValueEqualityComparer.GetHashCode(Value);
             }
         }
 
@@ -57,7 +42,7 @@ namespace IoC.Core.Collections
 #endif
         private bool Equals(KeyValue<TKey, TValue> other)
         {
-            return KeyHashCode == other.KeyHashCode && KeyEqualityComparer.Equals(Key, other.Key) && ValueEqualityComparer.Equals(Value, other.Value);
+            return KeyEqualityComparer.Equals(Key, other.Key) && ValueEqualityComparer.Equals(Value, other.Value);
         }
     }
 }

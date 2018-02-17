@@ -56,5 +56,48 @@
                 }
             }
         }
+
+        [Fact]
+        public void ContainerShouldGetResolver()
+        {
+            // Given
+            using (var container = Container.CreatePure())
+            {
+                var expectedRef = Mock.Of<IMyService1>();
+                Func<IMyService1> func = () => expectedRef;
+
+                // When
+                using (container.Bind<IMyService1>().To(ctx => func()))
+                {
+                    // Then
+                    var resolver = container.Get<Resolver<IMyService1>>();
+                    resolver.ShouldBeOfType<Resolver<IMyService1>>();
+                    var actualInstance = resolver(container);
+                    actualInstance.ShouldBe(expectedRef);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldInjectResolver()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedRef = Mock.Of<IMyService1>();
+                Func<IMyService1> func = () => expectedRef;
+
+                // When
+                using (container.Bind<IMyService1>().To(ctx => func()))
+                using (container.Bind<Func<IMyService1>>().To(ctx => (() => ctx.Container.Inject<Resolver<IMyService1>>()(ctx.Container))))
+                {
+                    // Then
+                    var funcInstance = container.Get<Func<IMyService1>>();
+                    funcInstance.ShouldBeOfType<Func<IMyService1>>();
+                    var actualInstance = funcInstance();
+                    actualInstance.ShouldBe(expectedRef);
+                }
+            }
+        }
     }
 }
