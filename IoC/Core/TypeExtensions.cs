@@ -8,20 +8,20 @@
     internal static class TypeExtensions
     {
         private static readonly object LockObject = new object();
-        private static HashTable<Type, ITypeInfo> _typeInfos = HashTable<Type, ITypeInfo>.Empty;
+        private static Map<Type, ITypeInfo> _typeInfos = Map<Type, ITypeInfo>.Empty;
 
         public static ITypeInfo Info(this Type type)
         {
+            var hashCode = type.GetHashCode();
             lock (LockObject)
             {
-                var typeInfo = _typeInfos.Get(type);
-                if (typeInfo == null)
+                if (!_typeInfos.TryGet(hashCode, type, out var typeInfo))
                 {
                     typeInfo = new InternalTypeInfo(type);
-                    _typeInfos = _typeInfos.Add(type, typeInfo);
+                    _typeInfos = _typeInfos.Set(hashCode, type, typeInfo);
                 }
 
-                return typeInfo;
+                return new InternalTypeInfo(type);
             }
         }
 

@@ -44,6 +44,7 @@
   - [GetResolver\`\`1()](#M-IoC-Container-GetResolver``1-System-Type,System-Object,IoC-IContainer- 'IoC.Container.GetResolver``1(System.Type,System.Object,IoC.IContainer)')
   - [GetResolver\`\`1()](#M-IoC-Container-GetResolver``1-System-Type,IoC-IContainer- 'IoC.Container.GetResolver``1(System.Type,IoC.IContainer)')
   - [Subscribe()](#M-IoC-Container-Subscribe-System-IObserver{IoC-ContainerEvent}- 'IoC.Container.Subscribe(System.IObserver{IoC.ContainerEvent})')
+  - [ToString()](#M-IoC-Container-ToString 'IoC.Container.ToString')
   - [TryGetDependency()](#M-IoC-Container-TryGetDependency-IoC-Key,IoC-IDependency@,IoC-ILifetime@- 'IoC.Container.TryGetDependency(IoC.Key,IoC.IDependency@,IoC.ILifetime@)')
   - [TryGetResolver\`\`1()](#M-IoC-Container-TryGetResolver``1-System-Type,System-Object,IoC-Resolver{``0}@,IoC-IContainer- 'IoC.Container.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,IoC.IContainer)')
   - [TryGetResolver\`\`1()](#M-IoC-Container-TryGetResolver``1-System-Type,IoC-Resolver{``0}@,IoC-IContainer- 'IoC.Container.TryGetResolver``1(System.Type,IoC.Resolver{``0}@,IoC.IContainer)')
@@ -170,7 +171,6 @@
   - [ContainerSingleton](#F-IoC-Lifetime-ContainerSingleton 'IoC.Lifetime.ContainerSingleton')
   - [ScopeSingleton](#F-IoC-Lifetime-ScopeSingleton 'IoC.Lifetime.ScopeSingleton')
   - [Singleton](#F-IoC-Lifetime-Singleton 'IoC.Lifetime.Singleton')
-  - [ThreadSingleton](#F-IoC-Lifetime-ThreadSingleton 'IoC.Lifetime.ThreadSingleton')
   - [Transient](#F-IoC-Lifetime-Transient 'IoC.Lifetime.Transient')
 - [LinqTunnelAttribute](#T-IoC-LinqTunnelAttribute 'IoC.LinqTunnelAttribute')
 - [LocalizationRequiredAttribute](#T-IoC-LocalizationRequiredAttribute 'IoC.LocalizationRequiredAttribute')
@@ -720,6 +720,17 @@ This method has no parameters.
 
 <a name='M-IoC-Container-Subscribe-System-IObserver{IoC-ContainerEvent}-'></a>
 ### Subscribe() `method` [#](#M-IoC-Container-Subscribe-System-IObserver{IoC-ContainerEvent}- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Container-ToString'></a>
+### ToString() `method` [#](#M-IoC-Container-ToString 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -2547,13 +2558,6 @@ Singleton per scope
 ##### Summary
 
 Single instance per registration
-
-<a name='F-IoC-Lifetime-ThreadSingleton'></a>
-### ThreadSingleton `constants` [#](#F-IoC-Lifetime-ThreadSingleton 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Thread per thread
 
 <a name='F-IoC-Lifetime-Transient'></a>
 ### Transient `constants` [#](#F-IoC-Lifetime-Transient 'Go To Here') [=](#contents 'Back To Contents')

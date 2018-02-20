@@ -12,8 +12,7 @@
         [NotNull] private readonly IDisposable _resource;
         [NotNull] public readonly System.Collections.Generic.List<Key> Keys;
         private readonly object _lockObject = new object();
-        private HashTable<ResolverKey, object> _resolvers = HashTable<ResolverKey, object>.Empty;
-        private HashTable<LifetimeKey, ILifetime> _lifetimes = HashTable<LifetimeKey, ILifetime>.Empty;
+        private Map<LifetimeKey, ILifetime> _lifetimes = Map<LifetimeKey, ILifetime>.Empty;
 
         public RegistrationEntry(
             [NotNull] IResolverExpressionBuilder resolverExpressionBuilder,
@@ -32,27 +31,13 @@
         public bool TryCreateResolver<T>(Type type, [CanBeNull] object tag, [NotNull] IContainer container, out Resolver<T> resolver)
         {
             var typeInfo = type.Info();
-            var resolverKey = typeInfo.IsConstructedGenericType ? new ResolverKey(type, typeInfo.GenericTypeArguments) : new ResolverKey(type, new Type[0]);
-            lock (_lockObject)
+            if (!_resolverExpressionBuilder.TryBuild<T>(new Key(type, tag), container, Dependency, GetLifetime(typeInfo), out var resolverExpression))
             {
-                var resolverObject = _resolvers.Get(resolverKey);
-                if (resolverObject == null)
-                {
-                    if (!_resolverExpressionBuilder.TryBuild<T>(new Key(type, tag), container, Dependency, GetLifetime(typeInfo), out var resolverExpression))
-                    {
-                        resolver = default(Resolver<T>);
-                        return false;
-                    }
-
-                    resolver = resolverExpression.Compile();
-                    _resolvers = _resolvers.Add(resolverKey, resolver);
-                }
-                else
-                {
-                    resolver = (Resolver<T>)resolverObject;
-                }
+                resolver = default(Resolver<T>);
+                return false;
             }
 
+            resolver = resolverExpression.Compile();
             return true;
         }
 
@@ -71,14 +56,14 @@
             }
 
             var lifetimeKey = new LifetimeKey(typeInfo.GenericTypeArguments);
+            var hashCode = lifetimeKey.GetHashCode();
             ILifetime lifetime;
             lock (_lockObject)
             {
-                lifetime = _lifetimes.Get(lifetimeKey);
-                if (lifetime == null)
+                if (!_lifetimes.TryGet(hashCode, lifetimeKey, out lifetime))
                 {
                     lifetime = _lifetime?.Clone();
-                    _lifetimes = _lifetimes.Add(lifetimeKey, lifetime);
+                    _lifetimes = _lifetimes.Set(hashCode, lifetimeKey, lifetime);
                 }
             }
 
@@ -90,14 +75,8 @@
             IDisposable[] lifetimesToDispose;
             lock (_lockObject)
             {
-                _resolvers = HashTable<ResolverKey, object>.Empty;
-                if (_lifetimes.Count == 0)
-                {
-                    return;
-                }
-
-                lifetimesToDispose = _lifetimes.Enumerate().Select(i => i.Value).OfType<IDisposable>().ToArray();
-                _lifetimes = HashTable<LifetimeKey, ILifetime>.Empty;
+                lifetimesToDispose = _lifetimes.Select(i => i.Value).OfType<IDisposable>().ToArray();
+                _lifetimes = Map<LifetimeKey, ILifetime>.Empty;
             }
 
             foreach (var lifetime in lifetimesToDispose)
@@ -121,37 +100,6 @@
         public override string ToString()
         {
             return $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {_lifetime?.ToString() ?? Lifetime.Transient.ToString()}";
-        }
-
-        private struct ResolverKey
-        {
-            private readonly Type _type;
-            private readonly Type[] _genericTypes;
-
-            public ResolverKey(Type type, Type [] genericTypes)
-            {
-                _type = type;
-                _genericTypes = genericTypes;
-            }
-
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                return obj is ResolverKey key && Equals(key);
-            }
-
-            public override int GetHashCode()
-            {
-                unchecked
-                {
-                    return (_type.GetHashCode() * 397) ^ (_genericTypes != null ? _genericTypes.GetHash() : 0);
-                }
-            }
-
-            private bool Equals(ResolverKey other)
-            {
-                return _type == other._type && ArrayExtensions.SequenceEqual(_genericTypes, other._genericTypes);
-            }
         }
 
         private struct LifetimeKey

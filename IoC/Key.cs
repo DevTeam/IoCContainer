@@ -1,11 +1,13 @@
 ﻿namespace IoC
 {
     using System;
+    using System.Diagnostics;
 
     /// <summary>
     /// Represents the key of binding.
     /// </summary>
     [PublicAPI]
+    [DebuggerDisplay("Type = {" + nameof(Type) + "}, Tag = {" + nameof(Tag) + "}")]
     public struct Key
     {
         /// <summary>

@@ -10,6 +10,7 @@
     using Xunit;
 
     [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
+    [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
     public class TypeMapingAndReplacingExpressionVisitorsTests
     {
         [Fact]
@@ -22,8 +23,8 @@
             Expression<Func<Tuple<TT>>> expression = () => new Tuple<TT>((TT)(object)"abc");
 
             // When
-            var expressionExpression = typeMapingVisitor.Visit(expression.Body);
-            expressionExpression = replacingVisitor.Visit(expression.Body);
+            typeMapingVisitor.Visit(expression.Body);
+            var expressionExpression = replacingVisitor.Visit(expression.Body);
             var func = Expression.Lambda<Func<Tuple<string>>>(expressionExpression).Compile();
 
             // Then
@@ -44,8 +45,8 @@
             Expression<Func<TT>> expression = () => (TT)(object)myClass.GetString("abc");
 
             // When
-            var expressionExpression = typeMapingVisitor.Visit(expression.Body);
-            expressionExpression = replacingVisitor.Visit(expression.Body);
+            typeMapingVisitor.Visit(expression.Body);
+            var expressionExpression = replacingVisitor.Visit(expression.Body);
             var func = Expression.Lambda<Func<string>>(expressionExpression).Compile();
 
             // Then
@@ -65,8 +66,8 @@
             Expression<Func<TT>> expression = () => (TT)(object)MyClass.StaticGetString("abc");
 
             // When
-            var expressionExpression = typeMapingVisitor.Visit(expression.Body);
-            expressionExpression = replacingVisitor.Visit(expression.Body);
+            typeMapingVisitor.Visit(expression.Body);
+            var expressionExpression = replacingVisitor.Visit(expression.Body);
             var func = Expression.Lambda<Func<string>>(expressionExpression).Compile();
 
             // Then
@@ -87,8 +88,8 @@
             Expression<Func<TT>> expression = () => myClass.Get((TT)(object)"abc");
 
             // When
-            var expressionExpression = typeMapingVisitor.Visit(expression.Body);
-            expressionExpression = replacingVisitor.Visit(expression.Body);
+            typeMapingVisitor.Visit(expression.Body);
+            var expressionExpression = replacingVisitor.Visit(expression.Body);
             var func = Expression.Lambda<Func<string>>(expressionExpression).Compile();
 
             // Then
@@ -108,8 +109,8 @@
             Expression<Func<TT>> expression = () => MyClass.StaticGet((TT)(object)"abc");
 
             // When
-            var expressionExpression = typeMapingVisitor.Visit(expression.Body);
-            expressionExpression = replacingVisitor.Visit(expression.Body);
+            typeMapingVisitor.Visit(expression.Body);
+            var expressionExpression = replacingVisitor.Visit(expression.Body);
             var func = Expression.Lambda<Func<string>>(expressionExpression).Compile();
 
             // Then
@@ -129,8 +130,8 @@
             Expression<Func<Type>> expression = () => typeof(TT);
 
             // When
-            var expressionExpression = typeMapingVisitor.Visit(expression.Body);
-            expressionExpression = replacingVisitor.Visit(expression.Body);
+            typeMapingVisitor.Visit(expression.Body);
+            var expressionExpression = replacingVisitor.Visit(expression.Body);
             var func = Expression.Lambda<Func<Type>>(expressionExpression).Compile();
 
             // Then
@@ -150,8 +151,8 @@
             Expression<Func<TT>> expression = () => new MyClass2<TT>((TT)(object)"abc").Field;
 
             // When
-            var expressionExpression = typeMapingVisitor.Visit(expression.Body);
-            expressionExpression = replacingVisitor.Visit(expression.Body);
+            typeMapingVisitor.Visit(expression.Body);
+            var expressionExpression = replacingVisitor.Visit(expression.Body);
             var func = Expression.Lambda<Func<string>>(expressionExpression).Compile();
 
             // Then
@@ -171,8 +172,8 @@
             Expression<Func<TT>> expression = () => new MyClass2<TT>((TT)(object)"abc").Prop;
 
             // When
-            var expressionExpression = typeMapingVisitor.Visit(expression.Body);
-            expressionExpression = replacingVisitor.Visit(expression.Body);
+            typeMapingVisitor.Visit(expression.Body);
+            var expressionExpression = replacingVisitor.Visit(expression.Body);
             var func = Expression.Lambda<Func<string>>(expressionExpression).Compile();
 
             // Then
@@ -192,8 +193,8 @@
             Expression<Func<TT[]>> expression = () => new[]{(TT)(object)"abc"};
 
             // When
-            var expressionExpression = typeMapingVisitor.Visit(expression.Body);
-            expressionExpression = replacingVisitor.Visit(expression.Body);
+            typeMapingVisitor.Visit(expression.Body);
+            var expressionExpression = replacingVisitor.Visit(expression.Body);
             var func = Expression.Lambda<Func<string[]>>(expressionExpression).Compile();
 
             // Then
@@ -213,8 +214,8 @@
             Expression<Func<IList<TT>>> expression = () => new List<TT> { (TT)(object)"abc" };
 
             // When
-            var expressionExpression = typeMapingVisitor.Visit(expression.Body);
-            expressionExpression = replacingVisitor.Visit(expression.Body);
+            typeMapingVisitor.Visit(expression.Body);
+            var expressionExpression = replacingVisitor.Visit(expression.Body);
             var func = Expression.Lambda<Func<IList<string>>>(expressionExpression).Compile();
 
             // Then
@@ -229,15 +230,15 @@
         public void ShouldReplaceWhenVisitLambda()
         {
             // Given
-            var myClass = new MyClass();
             var typesMap = new Dictionary<Type, Type>();
             var typeMapingVisitor = new TypeMapingExpressionVisitor(typeof(string), typesMap);
             var replacingVisitor = new TypeReplacingExpressionVisitor(typesMap);
+            // ReSharper disable once RedundantDelegateCreation
             Expression<Func<Func<TT>>> expression = () => new Func<TT>(() => (TT)(object)"abc");
 
             // When
-            var expressionExpression = typeMapingVisitor.Visit(expression.Body);
-            expressionExpression = replacingVisitor.Visit(expression.Body);
+            typeMapingVisitor.Visit(expression.Body);
+            var expressionExpression = replacingVisitor.Visit(expression.Body);
             var func = Expression.Lambda<Func<Func<string>>>(expressionExpression).Compile();
 
             // Then

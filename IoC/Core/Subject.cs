@@ -9,36 +9,55 @@
 
         public IDisposable Subscribe(IObserver<T> observer)
         {
-            _observers.Add(observer);
-            return Disposable.Create(() => _observers.Remove(observer));
+            lock (_observers)
+            {
+                _observers.Add(observer);
+            }
+
+            return Disposable.Create(() =>
+            {
+                lock (_observers)
+                {
+                    _observers.Remove(observer);
+                }
+            });
         }
 
         public void OnNext(T value)
         {
-            if (_observers.Count == 0)
+            lock (_observers)
             {
-                return;
-            }
+                if (_observers.Count == 0)
+                {
+                    return;
+                }
 
-            foreach (var observer in _observers)
-            {
-                observer.OnNext(value);
+                foreach (var observer in _observers)
+                {
+                    observer.OnNext(value);
+                }
             }
         }
 
         public void OnError(Exception error)
         {
-            foreach (var observer in _observers)
+            lock (_observers)
             {
-                observer.OnError(error);
+                foreach (var observer in _observers)
+                {
+                    observer.OnError(error);
+                }
             }
         }
 
         public void OnCompleted()
         {
-            foreach (var observer in _observers)
+            lock (_observers)
             {
-                observer.OnCompleted();
+                foreach (var observer in _observers)
+                {
+                    observer.OnCompleted();
+                }
             }
         }
     }

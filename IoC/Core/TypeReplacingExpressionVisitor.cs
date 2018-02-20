@@ -150,11 +150,6 @@
             return Expression.ElementInit(newMethod, newArgs);
         }
 
-        public override Expression Visit(Expression node)
-        {
-            return base.Visit(node);
-        }
-
         private bool Match(ParameterInfo[] baseParams, ParameterInfo[] newParams)
         {
             if (baseParams.Length != newParams.Length)

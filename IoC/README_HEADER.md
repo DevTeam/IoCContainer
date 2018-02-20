@@ -20,13 +20,11 @@ Supported platforms:
   - .NET Core 1.0+
   - .NET Standard 1.0+
 
-[Class References](https://github.com/DevTeam/IoCContainer/tree/master/IoC/IoC.md) for details.
-
-## [Schrödinger's cat](https://github.com/DevTeam/IoCContainer/tree/master/Samples/ShroedingersCat) shows how it works
+## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works
 
 ### The reality is that
 
-![Cat](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/Docs/Images/cat.jpg)
+![Cat](Docs/Images/cat.jpg)
 
 ### Let's create an abstraction
 
@@ -124,8 +122,15 @@ new ShroedingersCat()
 
 Thus this IoC container makes the minimal impact in terms of perfomrance and of memory trafic on a creation of instances of classes and might be used everywhere and everytime in accordance with the [SOLID principles](https://en.wikipedia.org/wiki/SOLID_\(object-oriented_design\)).
 
+## Class References
+
+- [.NET 4.0](IoC/IoC_net40.md)
+- [.NET 4.5](IoC/IoC_net45.md)
+- [.NET Standard 1.0](IoC/IoC_netstandard1.0.md)
+- [.NET Core 2.0](IoC/IoC_netcoreapp2.0.md)
+
 ## Why this one?
 
-The results of the [comparison tests](https://github.com/DevTeam/IoCContainer/blob/master/IoC.Tests/ComparisonTests.cs) for some popular IoC containers like Castle Windsor, Autofac, Unity, Ninject ...
+The results of the [comparison tests](IoC.Tests/ComparisonTests.cs) for some popular IoC containers like Castle Windsor, Autofac, Unity, Ninject ...
 
 ![Cat](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,status:SUCCESS/artifacts/content/REPORT.jpg)

@@ -7,7 +7,6 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    // ReSharper disable once RedundantUsingDirective
     using System.Runtime.CompilerServices;
     // ReSharper disable once RedundantUsingDirective
     using System.Threading.Tasks;
@@ -28,6 +27,7 @@
         /// <param name="parent">The parent container.</param>
         /// <param name="name">The name of child container.</param>
         /// <returns>The child container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IContainer CreateChild([NotNull] this IContainer parent, [NotNull] string name = "")
         {
@@ -42,6 +42,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="types"></param>
         /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<object> Bind([NotNull] this IContainer container, [NotNull][ItemNotNull] params Type[] types)
         {
@@ -57,6 +58,7 @@
         /// <typeparam name="T">The contract type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<T> Bind<T>([NotNull] this IContainer container)
         {
@@ -71,6 +73,7 @@
         /// <typeparam name="T1">The contract type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<T> Bind<T, T1>([NotNull] this IContainer container)
             where T : T1
@@ -87,6 +90,7 @@
         /// <typeparam name="T2">The contract type #2.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2>([NotNull] this IContainer container)
             where T : T1, T2
@@ -104,6 +108,7 @@
         /// <typeparam name="T3">The contract type #3.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3>([NotNull] this IContainer container)
             where T : T1, T2, T3
@@ -122,6 +127,7 @@
         /// <typeparam name="T4">The contract type #4.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4>([NotNull] this IContainer container)
             where T : T1, T2, T3, T4
@@ -141,6 +147,7 @@
         /// <typeparam name="T5">The contract type #5.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container)
             where T : T1, T2, T3, T4, T5
@@ -161,6 +168,7 @@
         /// <typeparam name="T6">The contract type #6.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container)
             where T : T1, T2, T3, T4, T5, T6
@@ -182,6 +190,7 @@
         /// <typeparam name="T7">The contract type #7.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container)
             where T : T1, T2, T3, T4, T5, T6, T7
@@ -197,6 +206,7 @@
         /// <param name="binding"></param>
         /// <param name="lifetime"></param>
         /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<T> As<T>([NotNull] this IBinding<T> binding, Lifetime lifetime)
         {
@@ -211,6 +221,7 @@
         /// <param name="binding"></param>
         /// <param name="lifetime"></param>
         /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<T> Lifetime<T>([NotNull] this IBinding<T> binding, [NotNull] ILifetime lifetime)
         {
@@ -226,6 +237,7 @@
         /// <param name="binding"></param>
         /// <param name="tagValue"></param>
         /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<T> Tag<T>([NotNull] this IBinding<T> binding, [CanBeNull] object tagValue = null)
         {
@@ -239,6 +251,7 @@
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="binding">The binding token.</param>
         /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<T> AnyTag<T>([NotNull] this IBinding<T> binding)
         {
@@ -253,6 +266,7 @@
         /// <param name="type">The instance type.</param>
         /// <param name="constructorFilter">The constructor's filter.</param>
         /// <returns>The registration token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable To([NotNull] this IBinding<object> binding, [NotNull] Type type, [CanBeNull] Predicate<ConstructorInfo> constructorFilter = null)
         {
@@ -267,6 +281,7 @@
         /// <param name="binding">The binding token.</param>
         /// <param name="constructorFilter">The constructor's filter.</param>
         /// <returns>The registration token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] Predicate<ConstructorInfo> constructorFilter = null)
         {
@@ -282,6 +297,7 @@
         /// <param name="factory">The expression to create an instance.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
         /// <returns>The registration token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable To<T>(
             [NotNull] this IBinding<T> binding,
@@ -297,6 +313,7 @@
         /// Puts the registration token to the target contaier to manage it.
         /// </summary>
         /// <param name="registrationToken"></param>
+        [MethodImpl((MethodImplOptions)256)]
         public static void ToSelf([NotNull] this IDisposable registrationToken)
         {
             if (registrationToken == null) throw new ArgumentNullException(nameof(registrationToken));
@@ -317,9 +334,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
+        [MethodImpl((MethodImplOptions)256)]
         public static T Get<T>([NotNull] this IContainer container, [NotNull][ItemCanBeNull] params object[] args)
         {
             return container.GetResolver<T>(typeof(T))(container, args);
@@ -332,9 +347,7 @@
         /// <param name="type">The instance type.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
+        [MethodImpl((MethodImplOptions)256)]
         public static object Get([NotNull] this IContainer container, [NotNull] Type type, [NotNull][ItemCanBeNull] params object[] args)
         {
             return container.GetResolver<object>(type)(container, args);
@@ -346,9 +359,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="tag">The tag value.</param>
         /// <returns>The instance.</returns>
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
+        [MethodImpl((MethodImplOptions)256)]
         public static Resolving Tag([NotNull] this IContainer container, [CanBeNull] object tag)
         {
             return new Resolving(container, tag);
@@ -361,9 +372,7 @@
         /// <param name="resolving"></param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
+        [MethodImpl((MethodImplOptions)256)]
         public static T Get<T>(this Resolving resolving, [NotNull][ItemCanBeNull] params object[] args)
         {
             return resolving.Container.GetResolver<T>(typeof(T), resolving.Tag, resolving.Container)(resolving.Container, args);
@@ -376,9 +385,7 @@
         /// <param name="type">The instance type.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
+        [MethodImpl((MethodImplOptions)256)]
         public static object Get(this Resolving resolving, [NotNull] Type type, [NotNull][ItemCanBeNull] params object[] args)
         {
             return resolving.Container.GetResolver<object>(type, resolving.Tag, resolving.Container)(resolving.Container, args);

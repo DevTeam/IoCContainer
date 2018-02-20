@@ -8,7 +8,7 @@
     internal abstract class SingletonBasedLifetime<TKey>: ILifetime, IDisposable
     {
         private readonly Func<ILifetime> _singletonLifetimeFactory;
-        private HashTable<TKey, ILifetime> _lifetimes = HashTable<TKey, ILifetime>.Empty;
+        private Map<TKey, ILifetime> _lifetimes = Map<TKey, ILifetime>.Empty;
 
         protected SingletonBasedLifetime(Func<ILifetime> singletonLifetimeFactory)
         {
@@ -19,13 +19,13 @@
         {
             ILifetime lifetime;
             var key = CreateKey(container, args);
+            var hashCode = key.GetHashCode();
             lock (_lifetimes)
             {
-                lifetime = _lifetimes.Get(key);
-                if (lifetime == null)
+                if (!_lifetimes.TryGet(hashCode, key, out lifetime))
                 {
                     lifetime = _singletonLifetimeFactory();
-                    _lifetimes = _lifetimes.Add(key, lifetime);
+                    _lifetimes = _lifetimes.Set(hashCode, key, lifetime);
                 }
             }
 
@@ -37,8 +37,8 @@
             System.Collections.Generic.List<ILifetime> items;
             lock (_lifetimes)
             { 
-                items = _lifetimes.Enumerate().Select(i => i.Value).ToList();
-                _lifetimes = HashTable<TKey, ILifetime>.Empty;
+                items = _lifetimes.Select(i => i.Value).ToList();
+                _lifetimes = Map<TKey, ILifetime>.Empty;
             }
 
             Disposable.Create(items.OfType<IDisposable>()).Dispose();

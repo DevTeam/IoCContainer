@@ -10,14 +10,12 @@
         private static readonly ITypeInfo GenericTypeArgumentTypeInfo = typeof(GenericTypeArgument).Info();
         private readonly IDictionary<Type, Type> _typesMap;
         private readonly ITypeInfo _typeInfo;
-        private readonly bool _isConstructedGenericType;
 
         public TypeMapingExpressionVisitor([NotNull] Type type, [NotNull] IDictionary<Type, Type> typesMap)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
             _typesMap = typesMap ?? throw new ArgumentNullException(nameof(typesMap));
             _typeInfo = type.Info();
-            _isConstructedGenericType = _typeInfo.IsConstructedGenericType;
         }
 
         public override Expression Visit(Expression node)

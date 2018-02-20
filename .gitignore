@@ -11,3 +11,4 @@ packages
 _ReSharper.Caches/
 IoC/README_TEMPLATE.md
 IoC.xml
+IoC/IoC_*.xml

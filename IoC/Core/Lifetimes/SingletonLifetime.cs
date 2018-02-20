@@ -4,7 +4,6 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    // ReSharper disable once RedundantUsingDirective
     using System.Runtime.CompilerServices;
     using Core;
     using Extensibility;
@@ -15,9 +14,7 @@
         [NotNull] private object _lockObject = new object();
         private volatile object _instance;
 
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
+        [MethodImpl((MethodImplOptions)256)]
         public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
         {
             if (_instance != null)
@@ -28,9 +25,7 @@
             return CreateInstance(container, args, resolver);
         }
 
-#if !NET40
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
-#endif
+        [MethodImpl((MethodImplOptions)256)]
         public T CreateInstance<T>(IContainer container, object[] args, Resolver<T> resolver)
         {
             lock (_lockObject)
