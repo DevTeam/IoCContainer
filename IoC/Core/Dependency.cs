@@ -3,7 +3,7 @@
     using System;
     using System.Linq.Expressions;
 
-    public class Dependency: IDependency
+    internal class Dependency: IDependency
     {
         public Dependency([NotNull] Expression expression)
         {

@@ -20,6 +20,8 @@ Supported platforms:
   - .NET Core 1.0+
   - .NET Standard 1.0+
 
+[Class References](https://github.com/DevTeam/IoCContainer/tree/master/IoC/IoC.md) for details.
+
 ## [Schrödinger's cat](https://github.com/DevTeam/IoCContainer/tree/master/Samples/ShroedingersCat) shows how it works
 
 ### The reality is that

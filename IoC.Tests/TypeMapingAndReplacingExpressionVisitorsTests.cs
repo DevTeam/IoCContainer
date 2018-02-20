@@ -224,6 +224,29 @@
             func()[0].ShouldBe("abc");
         }
 
+
+        [Fact]
+        public void ShouldReplaceWhenVisitLambda()
+        {
+            // Given
+            var myClass = new MyClass();
+            var typesMap = new Dictionary<Type, Type>();
+            var typeMapingVisitor = new TypeMapingExpressionVisitor(typeof(string), typesMap);
+            var replacingVisitor = new TypeReplacingExpressionVisitor(typesMap);
+            Expression<Func<Func<TT>>> expression = () => new Func<TT>(() => (TT)(object)"abc");
+
+            // When
+            var expressionExpression = typeMapingVisitor.Visit(expression.Body);
+            expressionExpression = replacingVisitor.Visit(expression.Body);
+            var func = Expression.Lambda<Func<Func<string>>>(expressionExpression).Compile();
+
+            // Then
+            typesMap.Count.ShouldBe(1);
+            typesMap.First().Key.ShouldBe(typeof(TT));
+            typesMap.First().Value.ShouldBe(typeof(string));
+            func()().ShouldBe("abc");
+        }
+
         public class MyClass
         {
             public string GetString(string value)

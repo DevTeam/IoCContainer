@@ -1,5 +1,6 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
+    using Features;
     using Moq;
     using Shouldly;
     using Xunit;
@@ -10,7 +11,7 @@
         public void ContainerShouldResolveFromInstanceWhenPureContainer()
         {
             // Given
-            using (var container = Container.CreatePure())
+            using (var container = Container.Create(CoreFeature.Shared))
             {
                 var expectedInstance = Mock.Of<IMyService>();
 
@@ -28,7 +29,7 @@
         public void ContainerShouldResolveAutowiringWhenPureContainer()
         {
             // Given
-            using (var container = Container.CreatePure())
+            using (var container = Container.Create(CoreFeature.Shared))
             {
                 // When
                 using (container.Bind<MySimpleClass>().To())
@@ -44,7 +45,7 @@
         public void ContainerShouldResolveAutowiringSingletonWhenPureContainer()
         {
             // Given
-            using (var container = Container.CreatePure())
+            using (var container = Container.Create(CoreFeature.Shared))
             {
                 // When
                 using (container.Bind<MySimpleClass>().As(Lifetime.Singleton).To())

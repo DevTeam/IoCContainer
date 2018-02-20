@@ -3,7 +3,7 @@
     using Shouldly;
     using Xunit;
 
-    public class FlexibleAutowiring
+    public class ManualAutowiring
     {
         [Fact]
         public void Run()
@@ -11,7 +11,7 @@
             // $visible=true
             // $group=01
             // $priority=04
-            // $description=Flexible Auto-wiring
+            // $description=Manual Auto-wiring
             // {
             // Create a container
             using (var container = Container.Create())

@@ -7,6 +7,7 @@
     // ReSharper disable once RedundantUsingDirective
     using System.Runtime.CompilerServices;
     using Core;
+    using Extensibility;
     using TypeExtensions = TypeExtensions;
 
     internal sealed class SingletonLifetime : ILifetime, IDisposable, IExpressionBuilder
@@ -65,14 +66,14 @@
         private static readonly Expression NullConst = Expression.Constant(null);
         private static readonly ITypeInfo ResolverTypeInfo = typeof(Resolver<>).Info();
 
-        public Expression Build(Expression baseExpression)
+        public Expression Build(Expression expression)
         {
-            if (baseExpression == null) throw new NotSupportedException($"The argument {nameof(baseExpression)} should not be null for lifetime.");
+            if (expression == null) throw new NotSupportedException($"The argument {nameof(expression)} should not be null for lifetime.");
             var instanceField = Expression.Field(Expression.Constant(this), nameof(_instance));
-            var typedInstance = Expression.Convert(instanceField, baseExpression.Type);
-            var methodInfo = CreateInstanceMethodInfo.MakeGenericMethod(baseExpression.Type);
-            var resolverType = ResolverTypeInfo.MakeGenericType(baseExpression.Type);
-            var resolverExpression = Expression.Lambda(resolverType, baseExpression, true, ResolverExpressionBuilder.Parameters);
+            var typedInstance = ExpressionBuilder.Shared.Convert(instanceField, expression.Type);
+            var methodInfo = CreateInstanceMethodInfo.MakeGenericMethod(expression.Type);
+            var resolverType = ResolverTypeInfo.MakeGenericType(expression.Type);
+            var resolverExpression = Expression.Lambda(resolverType, expression, true, ResolverExpressionBuilder.Parameters);
             var resolver = resolverExpression.Compile();
 
             var lifetimeBody = Expression.Condition(

@@ -3,15 +3,20 @@
     using System;
     using System.Collections.Generic;
 
+    /// <summary>
+    /// Allows to resolve Tuples.
+    /// </summary>
     [PublicAPI]
     public sealed  class TupleFeature : IConfiguration
     {
+        /// The shared instance.
         public static readonly IConfiguration Shared = new TupleFeature();
 
         private TupleFeature()
         {
         }
 
+        /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));

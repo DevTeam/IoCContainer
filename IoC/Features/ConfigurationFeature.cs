@@ -5,15 +5,22 @@
     using System.IO;
     using Core.Configuration;
 
+    /// <summary>
+    /// Allows to configure via a text metadata.
+    /// </summary>
     [PublicAPI]
     public sealed class ConfigurationFeature : IConfiguration
     {
+        /// <summary>
+        /// The shared instance.
+        /// </summary>
         public static readonly IConfiguration Shared = new ConfigurationFeature();
 
         private ConfigurationFeature()
         {
         }
 
+        /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));

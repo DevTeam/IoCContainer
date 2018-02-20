@@ -18,10 +18,7 @@
                 if (typeInfo == null)
                 {
                     typeInfo = new InternalTypeInfo(type);
-                    if (!typeInfo.IsConstructedGenericType)
-                    {
-                        _typeInfos = _typeInfos.Add(type, typeInfo);
-                    }
+                    _typeInfos = _typeInfos.Add(type, typeInfo);
                 }
 
                 return typeInfo;
@@ -137,7 +134,7 @@
 
             public Type[] GenericTypeParameters => _type.GetGenericArguments();
 
-            public IEnumerable<ConstructorInfo> DeclaredConstructors => _type.GetConstructors();
+            public IEnumerable<ConstructorInfo> DeclaredConstructors => _type.GetConstructors(DefaultBindingFlags);
 
             public IEnumerable<MethodInfo> DeclaredMethods => _type.GetMethods(DefaultBindingFlags);
 

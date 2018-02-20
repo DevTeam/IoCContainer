@@ -14,7 +14,7 @@
             var unresolvedKeys = new List<Key>();
             foreach (var key in container.SelectMany(i => i))
             {
-                var curKey = new Key(ExpressionBuilder.Shared.CreateDefinedGenericType(key.Type), key.Tag);
+                var curKey = new Key(ExpressionBuilder.Shared.ConvertToDefinedGenericType(key.Type), key.Tag);
                 var tryGetResolverInternal = TryGetResolverInternalMethodInfo.MakeGenericMethod(curKey.Type);
                 var resolved = (bool)tryGetResolverInternal.Invoke(null, new object[] { container, curKey });
                 if (resolved)

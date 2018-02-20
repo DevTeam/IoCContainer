@@ -3,6 +3,7 @@ namespace IoC.Tests.UsageScenarios
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using Extensibility;
     using Moq;
     using Shouldly;
     using Xunit;

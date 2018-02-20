@@ -2,25 +2,36 @@
 {
     using System;
 
+    /// <summary>
+    /// Represents the scope which could be used with <c>Lifetime.ScopeSingleton</c>
+    /// </summary>
     [PublicAPI]
     public class Scope: IDisposable
     {
-        [NotNull] private static Scope _currentScope = new Scope(DefaultScopeKey.Shared);
-        [NotNull] public readonly object ScopeKey;
+        [NotNull] internal readonly object ScopeKey;
+
         [CanBeNull] private readonly Scope _prevScope;
 
-        [NotNull] public static Scope Current => _currentScope;
+        /// <summary>
+        /// The current scope.
+        /// </summary>
+        [NotNull] public static Scope Current { get; private set; } = new Scope(DefaultScopeKey.Shared);
 
+        /// <summary>
+        /// Creates the instance of a new scope.
+        /// </summary>
+        /// <param name="scopeKey">The key of scope.</param>
         public Scope([NotNull] object scopeKey)
         {
             ScopeKey = scopeKey ?? throw new ArgumentNullException(nameof(scopeKey));
-            _prevScope = _currentScope;
-            _currentScope = this;
+            _prevScope = Current;
+            Current = this;
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
-            _currentScope = _prevScope ?? throw new NotSupportedException();
+            Current = _prevScope ?? throw new NotSupportedException();
         }
 
         private class DefaultScopeKey

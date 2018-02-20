@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    using Extensibility;
 
     internal sealed class IssueResolver : IIssueResolver
     {
@@ -14,13 +15,13 @@
         public Tuple<IDependency, ILifetime> CannotResolveDependency(IContainer container, Key key)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            throw new InvalidOperationException($"Cannot find the dependency for the key \"{key}\" from  the container \"{container}\".");
+            throw new InvalidOperationException($"Cannot find the dependency for the key \"{key}\" from  the container \"{container}\". Details:\n{GetContainerDetails(container)}");
         }
 
         public Resolver<T> CannotGetResolver<T>(IContainer container, Key key)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            throw new InvalidOperationException($"Cannot get resolver for the key \"{key}\" from the container \"{container}\".");
+            throw new InvalidOperationException($"Cannot get resolver for the key \"{key}\" from the container \"{container}\". Details:\n{GetContainerDetails(container)}");
         }
 
         public Type[] CannotGetGenericTypeArguments(Type type)
@@ -42,7 +43,7 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (keys == null) throw new ArgumentNullException(nameof(keys));
-            throw new InvalidOperationException($"Keys {string.Join(", ", keys.Select(i => i.ToString()))} cannot be registered in the container \"{container}\".");
+            throw new InvalidOperationException($"Keys {string.Join(", ", keys.Select(i => i.ToString()))} cannot be registered in the container \"{container}\". Details:\n{GetContainerDetails(container)}");
         }
 
         public Type CannotParseType(string statementText, int statementLineNumber, int statementPosition, string typeName)
@@ -58,6 +59,12 @@
         public object CannotParseTag(string statementText, int statementLineNumber, int statementPosition, string tag)
         {
             throw new InvalidOperationException($"Cannot parse the tag \"{tag}\" in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
+        }
+
+        private static string GetContainerDetails(IContainer container)
+        {
+            var keys = string.Join(Environment.NewLine, container.SelectMany(i => i).Select(i => i.ToString()));
+            return keys;
         }
     }
 }

@@ -5,15 +5,20 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    /// <summary>
+    /// Allows to resolve enumeration of all instances related to corresponding bindings.
+    /// </summary>
     [PublicAPI]
     public sealed class EnumerableFeature : IConfiguration
     {
+        /// The shared instance.
         public static readonly IConfiguration Shared = new EnumerableFeature();
 
         private EnumerableFeature()
         {
         }
 
+        /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));

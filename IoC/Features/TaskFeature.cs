@@ -4,15 +4,20 @@
     using System.Collections.Generic;
     using System.Threading.Tasks;
 
+    /// <summary>
+    /// Allows to resolve Tasks.
+    /// </summary>
     [PublicAPI]
     public sealed  class TaskFeature : IConfiguration
     {
+        /// The shared instance.
         public static readonly IConfiguration Shared = new TaskFeature();
 
         private TaskFeature()
         {
         }
 
+        /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));

@@ -11,11 +11,15 @@
     using System.Threading;
     using Core;
     using Core.Collections;
+    using Extensibility;
     using Features;
 
     using FullKey = Core.Collections.KeyValue<System.Type, object>;
     using ShortKey = System.Type;
 
+    /// <summary>
+    /// The IoC container implementation.
+    /// </summary>
     [PublicAPI]
     public sealed class Container: IContainer, IResourceStore, IObserver<ContainerEvent>
     {
@@ -37,39 +41,49 @@
         private volatile bool _hasResolver;
         private bool _isFreezed;
 
-        private static Container CreateRootContainer()
-        {
-            var container = new Container(RootName);
-            container.ApplyConfigurations(
-                CoreFeature.Shared,
-                EnumerableFeature.Shared,
-                FuncFeature.Shared,
-                TaskFeature.Shared,
-                TupleFeature.Shared,
-                LazyFeature.Shared,
-                ConfigurationFeature.Shared);
-            return container;
-        }
-
-        private static Container CreatePureRootContainer()
-        {
-            var container = new Container(RootName);
-            container.ApplyConfigurations(CoreFeature.Shared);
-            return container;
-        }
-
+        /// <summary>
+        /// Creates a root container with default features.
+        /// </summary>
+        /// <param name="name">The optional name of the container.</param>
+        /// <returns>The roor container.</returns>
         [NotNull]
         public static Container Create([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return new Container($"{RootName}{CreateContainerName(name)}", CreateRootContainer(), true);
+            return new Container($"{RootName}{CreateContainerName(name)}", CreateRootContainer(Feature.Defaults), true);
         }
 
+        /// <summary>
+        /// Creates a root container with specified features.
+        /// </summary>
+        /// <param name="configurations">The set of features.</param>
+        /// <returns>The roor container.</returns>
         [NotNull]
-        public static Container CreatePure([NotNull] string name = "")
+        public static Container Create([NotNull][ItemNotNull] params IConfiguration[] configurations)
+        {
+            if (configurations == null) throw new ArgumentNullException(nameof(configurations));
+            return Create("", configurations);
+        }
+
+        /// <summary>
+        /// Creates a root container with specified name and features.
+        /// </summary>
+        /// <param name="name">The optional name of the container.</param>
+        /// <param name="configurations">The set of features.</param>
+        /// <returns>The roor container.</returns>
+        [NotNull]
+        public static Container Create([NotNull] string name, [NotNull][ItemNotNull] params IConfiguration[] configurations)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return new Container($"{RootName}{CreateContainerName(name)}", CreatePureRootContainer(), true);
+            if (configurations == null) throw new ArgumentNullException(nameof(configurations));
+            return new Container($"{RootName}{CreateContainerName(name)}", CreateRootContainer(configurations), true);
+        }
+
+        private static Container CreateRootContainer([NotNull][ItemNotNull] IEnumerable<IConfiguration> configurations)
+        {
+            var container = new Container(RootName);
+            container.ApplyConfigurations(configurations);
+            return container;
         }
 
         private Container([NotNull] string name = "")
@@ -95,13 +109,8 @@
             ((IResourceStore)this).AddResource(_eventSubject.Subscribe(this));
         }
 
-        private void ApplyConfigurations(params IConfiguration[] configurations)
+        private void ApplyConfigurations(IEnumerable<IConfiguration> configurations)
         {
-            if (configurations.Length == 0)
-            {
-                return;
-            }
-
             try
             {
                 _isFreezed = true;
@@ -113,10 +122,12 @@
             }
         }
 
+        /// <inheritdoc />
         public IContainer Parent => _parent;
 
         private IIssueResolver IssueResolver => GetResolver<IIssueResolver>(typeof(IIssueResolver))(this);
 
+        /// <inheritdoc />
         public bool TryRegister(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
@@ -140,8 +151,11 @@
                     }
                 }
 
-                _registrationEntriesForTagAny = registrationAnyEntries;
-                _registrationEntries = registrationEntries;
+                lock (_lockObject)
+                {
+                    _registrationEntriesForTagAny = registrationAnyEntries;
+                    _registrationEntries = registrationEntries;
+                }
             }
 
             var registrationEntry = new RegistrationEntry(
@@ -179,8 +193,11 @@
 
                 if (isRegistered)
                 {
-                    _registrationEntriesForTagAny = registrationAnyEntries;
-                    _registrationEntries = registrationEntries;
+                    lock (_lockObject)
+                    {
+                        _registrationEntriesForTagAny = registrationAnyEntries;
+                        _registrationEntries = registrationEntries;
+                    }
                 }
             }
             catch (Exception)
@@ -204,6 +221,7 @@
             return isRegistered;
         }
 
+        /// <inheritdoc />
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
@@ -228,6 +246,7 @@
             return TryCreateResolver(type, tag, out resolver, container ?? this);
         }
 
+        /// <inheritdoc />
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
@@ -243,6 +262,7 @@
             return TryCreateResolver(type, null, out resolver, container ?? this);
         }
 
+        /// <inheritdoc />
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
@@ -256,6 +276,7 @@
             return resolver;
         }
 
+        /// <inheritdoc />
 #if !NET40
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
 #endif
@@ -310,6 +331,7 @@
             }
         }
 
+        /// <inheritdoc />
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
         {
             if (TryGetRegistrationEntry(key.Type, key.Tag, out var registrationEntry))
@@ -362,6 +384,7 @@
             }
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             if (_parent is IResourceStore resourceStore)
@@ -406,6 +429,7 @@
             return GetEnumerator();
         }
 
+        /// <inheritdoc />
         public IEnumerator<IEnumerable<Key>> GetEnumerator()
         {
             lock (_lockObject)
@@ -419,6 +443,7 @@
             }
         }
 
+        /// <inheritdoc />
         public IDisposable Subscribe(IObserver<ContainerEvent> observer)
         {
             return _eventSubject.Subscribe(observer);

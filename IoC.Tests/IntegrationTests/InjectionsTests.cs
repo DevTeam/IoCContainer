@@ -1,6 +1,7 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
     using System;
+    using Features;
     using Moq;
     using Shouldly;
     using Xunit;
@@ -61,7 +62,7 @@
         public void ContainerShouldGetResolver()
         {
             // Given
-            using (var container = Container.CreatePure())
+            using (var container = Container.Create(CoreFeature.Shared))
             {
                 var expectedRef = Mock.Of<IMyService1>();
                 Func<IMyService1> func = () => expectedRef;

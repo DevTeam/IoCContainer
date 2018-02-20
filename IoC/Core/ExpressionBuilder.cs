@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Extensibility;
 
     internal class ExpressionBuilder
     {
@@ -61,7 +62,7 @@
         }
 
         [NotNull]
-        public Type CreateDefinedGenericType([NotNull] Type type)
+        public Type ConvertToDefinedGenericType([NotNull] Type type)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
             var typeInfo = type.Info();

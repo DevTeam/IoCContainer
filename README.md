@@ -20,6 +20,8 @@ Supported platforms:
   - .NET Core 1.0+
   - .NET Standard 1.0+
 
+[Class References](https://github.com/DevTeam/IoCContainer/tree/master/IoC/IoC.md) for details.
+
 ## [Schrödinger's cat](https://github.com/DevTeam/IoCContainer/tree/master/Samples/ShroedingersCat) shows how it works
 
 ### The reality is that
@@ -146,7 +148,7 @@ The results of the [comparison tests](https://github.com/DevTeam/IoCContainer/bl
 * [Property Injection](#property-injection)
 * [Singleton lifetime](#singleton-lifetime)
 * [Constructor Auto-wiring](#constructor-auto-wiring)
-* [Flexible Auto-wiring](#flexible-auto-wiring)
+* [Manual Auto-wiring](#manual-auto-wiring)
 * [Resolve all appropriate instances as IEnumerable](#resolve-all-appropriate-instances-as-ienumerable)
 * [Func With Arguments](#func-with-arguments)
 * [Resolve Using Arguments](#resolve-using-arguments)
@@ -488,7 +490,7 @@ using (container.Bind<IService>().To<Service>(
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConstructorAutowiring.cs)
 
-### Flexible Auto-wiring
+### Manual Auto-wiring
 
 ``` CSharp
 // Create a container
@@ -510,7 +512,7 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(
     instance.Name.ShouldBe("some name");
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FlexibleAutowiring.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ManualAutowiring.cs)
 
 ### Resolve all appropriate instances as IEnumerable
 
@@ -691,7 +693,7 @@ public void Run()
     // Create a root container
     using (var container = Container.Create())
     // Configure the root container to use a custom container as a child container
-    using (container.Bind<IContainer>().Tag(WellknownContainer.Child).To<MyContainer>())
+    using (container.Bind<IContainer>().Tag(WellknownContainers.Child).To<MyContainer>())
     // Create the custom child container
     using (var childContainer = container.CreateChild("abc"))
     // Configure our container

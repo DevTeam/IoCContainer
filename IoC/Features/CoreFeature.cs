@@ -1,17 +1,25 @@
-﻿namespace IoC.Core
+﻿namespace IoC.Features
 {
     using System;
     using System.Collections.Generic;
-    using Lifetimes;
+    using Core;
+    using Core.Lifetimes;
+    using Extensibility;
 
-    internal sealed class CoreFeature : IConfiguration
+    /// <summary>
+    /// Adds the set of core features like lifetimes and default containers.
+    /// </summary>
+    [PublicAPI]
+    public sealed class CoreFeature : IConfiguration
     {
+        /// The shared instance.
         public static readonly IConfiguration Shared = new CoreFeature();
 
         private CoreFeature()
         {
         }
 
+        /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -54,17 +62,17 @@
             yield return container
                 .Bind<IContainer>()
                 .Tag()
-                .Tag(WellknownContainer.Current)
+                .Tag(WellknownContainers.Current)
                 .To(ctx => ctx.Container);
 
             yield return container
                 .Bind<IContainer>()
-                .Tag(WellknownContainer.Child)
+                .Tag(WellknownContainers.Child)
                 .To(ctx => new Container(ctx.Args.Length == 1 ? Container.CreateContainerName(ctx.Args[0] as string) : Container.CreateContainerName(string.Empty), ctx.Container, false));
 
             yield return container
                 .Bind<IContainer>()
-                .Tag(WellknownContainer.Parent)
+                .Tag(WellknownContainers.Parent)
                 .To(ctx => ctx.Container.Parent);
 
             yield return container

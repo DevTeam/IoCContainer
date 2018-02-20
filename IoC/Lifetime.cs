@@ -1,22 +1,35 @@
 ﻿namespace IoC
 {
+    /// <summary>
+    /// The enumeration of well-known lifetimes.
+    /// </summary>
     [PublicAPI]
     public enum Lifetime
     {
-        // Default lifetime. New instance each time (default).
+        /// <summary>
+        /// Default lifetime. New instance each time (default).
+        /// </summary>
         Transient = 1,
 
-        // Single instance per registration
+        /// <summary>
+        /// Single instance per registration
+        /// </summary>
         Singleton = 2,
 
-        // Singleton per container
+        /// <summary>
+        /// Singleton per container
+        /// </summary>
         ContainerSingleton = 3,
 
-        // Singleton per scope
+        /// <summary>
+        /// Singleton per scope
+        /// </summary>
         ScopeSingleton = 4,
 
 #if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_5 && !NETSTANDARD1_6
-        // Thread per thread
+        /// <summary>
+        /// Thread per thread
+        /// </summary>
         ThreadSingleton = 5,
 #endif
     }

@@ -36,7 +36,7 @@
                         return base.VisitUnary(node);
                     }
 
-                    return Expression.Convert(newOperand, newType);
+                    return ExpressionBuilder.Shared.Convert(newOperand, newType);
 
                 default:
                     return base.VisitUnary(node);

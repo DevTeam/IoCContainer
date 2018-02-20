@@ -2,6 +2,7 @@
 {
     using System;
     using System.Text.RegularExpressions;
+    using Extensibility;
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal sealed class StringToLifetimeConverter: IConverter<string, Statement, Lifetime>

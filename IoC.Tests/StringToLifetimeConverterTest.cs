@@ -4,6 +4,7 @@ namespace IoC.Tests
     using System.Collections;
     using System.Collections.Generic;
     using Core.Configuration;
+    using Extensibility;
     using Moq;
     using Shouldly;
     using Xunit;

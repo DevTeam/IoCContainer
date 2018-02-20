@@ -10,3 +10,4 @@ packages
 *.user
 _ReSharper.Caches/
 IoC/README_TEMPLATE.md
+IoC.xml
