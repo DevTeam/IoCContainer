@@ -8,7 +8,7 @@
     internal static class TypeExtensions
     {
         private static readonly object LockObject = new object();
-        private static Map<Type, ITypeInfo> _typeInfos = Map<Type, ITypeInfo>.Empty;
+        private static Table<Type, ITypeInfo> _typeInfos = Table<Type, ITypeInfo>.Empty;
 
         public static ITypeInfo Info(this Type type)
         {

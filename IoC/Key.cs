@@ -39,7 +39,7 @@
         /// <inheritdoc />
         public override string ToString()
         {
-            return $"{Type.FullName} {Tag ?? "empty"}";
+            return $"Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {GetHashCode()}";
         }
 
         private struct AnyTagObject

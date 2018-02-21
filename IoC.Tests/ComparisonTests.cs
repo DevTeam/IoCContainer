@@ -72,7 +72,7 @@ namespace IoC.Tests
         public void ConfigureContainerTest()
         {
             var performanceCounter = new TotalTimePerformanceCounter();
-            for (var i = 0; i < 1000; i++)
+            for (var i = 0; i < 100; i++)
             {
                 ThisSingleton(2, performanceCounter);
             }
@@ -84,7 +84,7 @@ namespace IoC.Tests
         {
             if (!int.TryParse(Environment.GetEnvironmentVariable("SERIES"), out var series))
             {
-                series = 1000000;
+                series = 1000;
             }
 
             var results = new List<TestResult>();

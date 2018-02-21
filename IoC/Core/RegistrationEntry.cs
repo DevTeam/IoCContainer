@@ -1,6 +1,7 @@
 ﻿namespace IoC.Core
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using Collections;
 
@@ -10,16 +11,16 @@
         [NotNull] internal readonly IDependency Dependency;
         [CanBeNull] private readonly ILifetime _lifetime;
         [NotNull] private readonly IDisposable _resource;
-        [NotNull] public readonly System.Collections.Generic.List<Key> Keys;
+        [NotNull] public readonly List<Key> Keys;
         private readonly object _lockObject = new object();
-        private Map<LifetimeKey, ILifetime> _lifetimes = Map<LifetimeKey, ILifetime>.Empty;
+        private Table<LifetimeKey, ILifetime> _lifetimes = Table<LifetimeKey, ILifetime>.Empty;
 
         public RegistrationEntry(
             [NotNull] IResolverExpressionBuilder resolverExpressionBuilder,
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource,
-            [NotNull] System.Collections.Generic.List<Key> keys)
+            [NotNull] List<Key> keys)
         {
             _resolverExpressionBuilder = resolverExpressionBuilder ?? throw new ArgumentNullException(nameof(resolverExpressionBuilder));
             Dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
@@ -76,7 +77,7 @@
             lock (_lockObject)
             {
                 lifetimesToDispose = _lifetimes.Select(i => i.Value).OfType<IDisposable>().ToArray();
-                _lifetimes = Map<LifetimeKey, ILifetime>.Empty;
+                _lifetimes = Table<LifetimeKey, ILifetime>.Empty;
             }
 
             foreach (var lifetime in lifetimesToDispose)

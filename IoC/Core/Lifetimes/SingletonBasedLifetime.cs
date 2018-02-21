@@ -8,7 +8,7 @@
     internal abstract class SingletonBasedLifetime<TKey>: ILifetime, IDisposable
     {
         private readonly Func<ILifetime> _singletonLifetimeFactory;
-        private Map<TKey, ILifetime> _lifetimes = Map<TKey, ILifetime>.Empty;
+        private Table<TKey, ILifetime> _lifetimes = Table<TKey, ILifetime>.Empty;
 
         protected SingletonBasedLifetime(Func<ILifetime> singletonLifetimeFactory)
         {
@@ -38,7 +38,7 @@
             lock (_lifetimes)
             { 
                 items = _lifetimes.Select(i => i.Value).ToList();
-                _lifetimes = Map<TKey, ILifetime>.Empty;
+                _lifetimes = Table<TKey, ILifetime>.Empty;
             }
 
             Disposable.Create(items.OfType<IDisposable>()).Dispose();

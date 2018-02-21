@@ -34,10 +34,10 @@
         [NotNull] private readonly Subject<ContainerEvent> _eventSubject = new Subject<ContainerEvent>();
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
 
-        [NotNull] private volatile Map<FullKey, RegistrationEntry> _registrationEntries = Map<FullKey, RegistrationEntry>.Empty;
-        [NotNull] private volatile Map<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = Map<ShortKey, RegistrationEntry>.Empty;
-        [NotNull] private volatile Map<FullKey, object> _resolvers = Map<FullKey, object>.Empty;
-        [NotNull] private volatile Map<ShortKey, object> _resolversByType = Map<ShortKey, object>.Empty;
+        [NotNull] private volatile Table<FullKey, RegistrationEntry> _registrationEntries = Table<FullKey, RegistrationEntry>.Empty;
+        [NotNull] private volatile Table<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = Table<ShortKey, RegistrationEntry>.Empty;
+        [NotNull] private volatile Table<FullKey, object> _resolvers = Table<FullKey, object>.Empty;
+        [NotNull] private volatile Table<ShortKey, object> _resolversByType = Table<ShortKey, object>.Empty;
 
         private volatile IEnumerable<Key>[] _allKeys;
         private volatile bool _hasResolver;
@@ -381,10 +381,10 @@
             IDisposable resource;
             lock (_lockObject)
             {
-                _registrationEntries = Map<FullKey, RegistrationEntry>.Empty;
-                _registrationEntriesForTagAny = Map<ShortKey, RegistrationEntry>.Empty;
-                _resolvers = Map<FullKey, object>.Empty;
-                _resolversByType = Map<ShortKey, object>.Empty;
+                _registrationEntries = Table<FullKey, RegistrationEntry>.Empty;
+                _registrationEntriesForTagAny = Table<ShortKey, RegistrationEntry>.Empty;
+                _resolvers = Table<FullKey, object>.Empty;
+                _resolversByType = Table<ShortKey, object>.Empty;
                 resource = Disposable.Create(_resources);
                 _resources.Clear();
             }
@@ -440,7 +440,7 @@
             return _eventSubject.Subscribe(observer);
         }
 
-        private bool TryRegister<TKey>(Key originalKey, TKey key, [NotNull] RegistrationEntry registrationEntry, [NotNull] ref Map<TKey, RegistrationEntry> entries)
+        private bool TryRegister<TKey>(Key originalKey, TKey key, [NotNull] RegistrationEntry registrationEntry, [NotNull] ref Table<TKey, RegistrationEntry> entries)
         {
             var hashCode = key.GetHashCode();
             var isRegistered = !entries.TryGet(hashCode, key, out var _);
@@ -460,7 +460,7 @@
             return true;
         }
 
-        private bool TryUnregister<TKey>(Key originalKey, TKey key, [NotNull] ref Map<TKey, RegistrationEntry> entries)
+        private bool TryUnregister<TKey>(Key originalKey, TKey key, [NotNull] ref Table<TKey, RegistrationEntry> entries)
         {
             var hashCode = key.GetHashCode();
             var isUnregistered = entries.TryGet(hashCode, key, out var _);
@@ -493,8 +493,8 @@
                 registration.Reset();
             }
 
-            _resolvers = Map<FullKey, object>.Empty;
-            _resolversByType = Map<ShortKey, object>.Empty;
+            _resolvers = Table<FullKey, object>.Empty;
+            _resolversByType = Table<ShortKey, object>.Empty;
         }
 
         void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
