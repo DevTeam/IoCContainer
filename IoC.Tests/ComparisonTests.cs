@@ -171,12 +171,15 @@ namespace IoC.Tests
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().As(Lifetime.Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
-            using (performanceCounter.Run())
             {
-                for (var i = 0; i < series; i++)
+                container.Validate();
+                using (performanceCounter.Run())
                 {
-                    container.TryGetResolver<IService1>(typeof(IService1), out var resolver);
-                    resolver(container).DoSomething();
+                    for (var i = 0; i < series; i++)
+                    {
+                        container.TryGetResolver<IService1>(typeof(IService1), out var resolver);
+                        resolver(container).DoSomething();
+                    }
                 }
             }
         }
@@ -187,12 +190,15 @@ namespace IoC.Tests
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
-            using (performanceCounter.Run())
             {
-                for (var i = 0; i < series; i++)
+                container.Validate();
+                using (performanceCounter.Run())
                 {
-                    container.TryGetResolver<IService1>(typeof(IService1), out var resolver);
-                    resolver(container).DoSomething();
+                    for (var i = 0; i < series; i++)
+                    {
+                        container.TryGetResolver<IService1>(typeof(IService1), out var resolver);
+                        resolver(container).DoSomething();
+                    }
                 }
             }
         }
@@ -204,9 +210,10 @@ namespace IoC.Tests
             using (container.Bind<IService2>().As(Lifetime.Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
             {
-                container.TryGetResolver<IService1>(typeof(IService1), null, out var resolver);
+                container.Validate();
                 using (performanceCounter.Run())
                 {
+                    container.TryGetResolver<IService1>(typeof(IService1), null, out var resolver);
                     for (var i = 0; i < series; i++)
                     {
                         resolver(container).DoSomething();
@@ -222,9 +229,10 @@ namespace IoC.Tests
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
             {
-                container.TryGetResolver<IService1>(typeof(IService1), null, out var resolver);
+                container.Validate();
                 using (performanceCounter.Run())
                 {
+                    container.TryGetResolver<IService1>(typeof(IService1), null, out var resolver);
                     for (var i = 0; i < series; i++)
                     {
                         resolver(container).DoSomething();
@@ -406,22 +414,21 @@ namespace IoC.Tests
 
         private static void CtorSingleton(int series, IPerformanceCounter performanceCounter)
         {
-            lock (LockObject)
-            {
-                _service2 = null;
-            }
-
             using (performanceCounter.Run())
             {
                 for (var i = 0; i < series; i++)
                 {
-                    var service1 = CreateSingleton();
-                    service1.DoSomething();
+                    CreateSingletonService().DoSomething();
+                }
+
+                lock (LockObject)
+                {
+                    _service2 = null;
                 }
             }
         }
 
-        private static IService1 CreateSingleton()
+        private static IService1 CreateSingletonService()
         {
             if (_service2 == null)
             {
@@ -434,8 +441,7 @@ namespace IoC.Tests
                 }
             }
 
-            IService1 service1 = new Service1(_service2, new Service3(), new Service3(), new Service3());
-            return service1;
+            return new Service1(_service2, new Service3(), new Service3(), new Service3());
         }
 
         private static void CtorTransient(int series, IPerformanceCounter performanceCounter)
@@ -444,13 +450,12 @@ namespace IoC.Tests
             {
                 for (var i = 0; i < series; i++)
                 {
-                    var service1 = CreateTransient();
-                    service1.DoSomething();
+                    CreateTransientService().DoSomething();
                 }
             }
         }
 
-        private static Service1 CreateTransient()
+        private static IService1 CreateTransientService()
         {
             return new Service1(new Service2(new Service3()), new Service3(), new Service3(), new Service3());
         }
@@ -475,7 +480,7 @@ namespace IoC.Tests
             var body = new StringBuilder();
             body.AppendLine($"<h2>{name}</h2>");
             body.AppendLine($"{GetFramework()}");
-            body.AppendLine("<style type='text/css'>TABLE {width: 300px; border-collapse: collapse;} TD, TH {padding: 3px; border: 1px solid black;} TH { background: #A0A0A0; } </style> ");
+            body.AppendLine("<style type='text/css'>TABLE {width: 600px; border-collapse: collapse;} TD, TH {padding: 3px; border: 1px solid black;} TH { background: #A0A0A0; } </style> ");
             body.AppendLine("<table border='1px' border-style:solid>");
             body.AppendLine("<tr>");
             body.AppendLine("<th>#</th>");
@@ -485,7 +490,7 @@ namespace IoC.Tests
             foreach (var line in results.OrderBy(i => i).Select((item, index) => $"<td>{index + 1:00}</td>{item}"))
             {
                 body.AppendLine("<tr>");
-                body.AppendLine(line);
+                body.AppendLine(line.Replace("\n", "<br/>"));
                 body.AppendLine("</tr>");
             }
             body.AppendLine("</table>");

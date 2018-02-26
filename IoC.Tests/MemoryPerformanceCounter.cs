@@ -40,7 +40,7 @@
 
             public override string ToString()
             {
-                return $"Memory(allocated/collected bytes): {_traffic.AllocatedMemory.SizeInBytes}/{_traffic.CollectedMemory.SizeInBytes}, Objects(allocated/collected): {_traffic.AllocatedMemory.ObjectsCount}/{_traffic.CollectedMemory.ObjectsCount}, NewObjects(bytes/count): {_newObjectsSizeInBytes}/{_newObjectsCount}";
+                return $"Memory(allocated/collected bytes): {_traffic.AllocatedMemory.SizeInBytes}/{_traffic.CollectedMemory.SizeInBytes}\nObjects(allocated/collected): {_traffic.AllocatedMemory.ObjectsCount}/{_traffic.CollectedMemory.ObjectsCount}\nNewObjects(bytes/count): {_newObjectsSizeInBytes}/{_newObjectsCount}";
             }
         }
     }

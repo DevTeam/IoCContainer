@@ -75,6 +75,14 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
+        public bool TryGetFast(int hashCode, TKey key, out TValue value)
+        {
+            var bucketIndex = CreateBucketIndex(hashCode);
+            var tree = _buckets[bucketIndex];
+            return tree.TryGetFast(hashCode, key, out value);
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
         public Table<TKey, TValue> Remove(int hashCode, TKey key)
         {
             var bucketIndex = CreateBucketIndex(hashCode);

@@ -9,7 +9,7 @@
     using Extensibility;
     using TypeExtensions = TypeExtensions;
 
-    internal sealed class SingletonLifetime : ILifetime, IDisposable, IExpressionBuilder
+    internal sealed class SingletonLifetime : ILifetime, IDisposable, IExpressionBuilder<object>
     {
         [NotNull] private object _lockObject = new object();
         private volatile object _instance;
@@ -61,20 +61,21 @@
         private static readonly Expression NullConst = Expression.Constant(null);
         private static readonly ITypeInfo ResolverTypeInfo = typeof(Resolver<>).Info();
 
-        public Expression Build(Expression expression)
+        public Expression Build(Expression expression, Key key, IContainer container, object context)
         {
-            if (expression == null) throw new NotSupportedException($"The argument {nameof(expression)} should not be null for lifetime.");
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            if (container == null) throw new ArgumentNullException(nameof(container));
             var instanceField = Expression.Field(Expression.Constant(this), nameof(_instance));
-            var typedInstance = ExpressionBuilder.Shared.Convert(instanceField, expression.Type);
+            var typedInstance = instanceField.Convert(expression.Type);
             var methodInfo = CreateInstanceMethodInfo.MakeGenericMethod(expression.Type);
             var resolverType = ResolverTypeInfo.MakeGenericType(expression.Type);
-            var resolverExpression = Expression.Lambda(resolverType, expression, true, ResolverExpressionBuilder.Parameters);
+            var resolverExpression = Expression.Lambda(resolverType, expression, true, ExpressionExtensions.Parameters);
             var resolver = resolverExpression.Compile();
 
             var lifetimeBody = Expression.Condition(
                 Expression.NotEqual(instanceField, NullConst),
                 typedInstance,
-                Expression.Call(Expression.Constant(this), methodInfo, ResolverExpressionBuilder.ContainerParameter, ResolverExpressionBuilder.ArgsParameter, Expression.Constant(resolver)));
+                Expression.Call(Expression.Constant(this), methodInfo, ExpressionExtensions.ContainerParameter, ExpressionExtensions.ArgsParameter, Expression.Constant(resolver)));
 
             return lifetimeBody;
         }

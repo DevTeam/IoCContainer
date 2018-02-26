@@ -72,9 +72,13 @@
   - [Bind\`\`8(container)](#M-IoC-ContainerExtensions-Bind``8-IoC-IContainer- 'IoC.ContainerExtensions.Bind``8(IoC.IContainer)')
   - [CreateChild(parent,name)](#M-IoC-ContainerExtensions-CreateChild-IoC-IContainer,System-String- 'IoC.ContainerExtensions.CreateChild(IoC.IContainer,System.String)')
   - [Get(container,type,args)](#M-IoC-ContainerExtensions-Get-IoC-IContainer,System-Type,System-Object[]- 'IoC.ContainerExtensions.Get(IoC.IContainer,System.Type,System.Object[])')
+  - [Get(container,type)](#M-IoC-ContainerExtensions-Get-IoC-IContainer,System-Type- 'IoC.ContainerExtensions.Get(IoC.IContainer,System.Type)')
   - [Get(resolving,type,args)](#M-IoC-ContainerExtensions-Get-IoC-ContainerExtensions-Resolving,System-Type,System-Object[]- 'IoC.ContainerExtensions.Get(IoC.ContainerExtensions.Resolving,System.Type,System.Object[])')
+  - [Get(resolving,type)](#M-IoC-ContainerExtensions-Get-IoC-ContainerExtensions-Resolving,System-Type- 'IoC.ContainerExtensions.Get(IoC.ContainerExtensions.Resolving,System.Type)')
   - [Get\`\`1(container,args)](#M-IoC-ContainerExtensions-Get``1-IoC-IContainer,System-Object[]- 'IoC.ContainerExtensions.Get``1(IoC.IContainer,System.Object[])')
+  - [Get\`\`1(container)](#M-IoC-ContainerExtensions-Get``1-IoC-IContainer- 'IoC.ContainerExtensions.Get``1(IoC.IContainer)')
   - [Get\`\`1(resolving,args)](#M-IoC-ContainerExtensions-Get``1-IoC-ContainerExtensions-Resolving,System-Object[]- 'IoC.ContainerExtensions.Get``1(IoC.ContainerExtensions.Resolving,System.Object[])')
+  - [Get\`\`1(resolving)](#M-IoC-ContainerExtensions-Get``1-IoC-ContainerExtensions-Resolving- 'IoC.ContainerExtensions.Get``1(IoC.ContainerExtensions.Resolving)')
   - [Lifetime\`\`1(binding,lifetime)](#M-IoC-ContainerExtensions-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime- 'IoC.ContainerExtensions.Lifetime``1(IoC.IBinding{``0},IoC.ILifetime)')
   - [Tag(container,tag)](#M-IoC-ContainerExtensions-Tag-IoC-IContainer,System-Object- 'IoC.ContainerExtensions.Tag(IoC.IContainer,System.Object)')
   - [Tag\`\`1(binding,tagValue)](#M-IoC-ContainerExtensions-Tag``1-IoC-IBinding{``0},System-Object- 'IoC.ContainerExtensions.Tag``1(IoC.IBinding{``0},System.Object)')
@@ -127,8 +131,8 @@
   - [TryRegister(keys,dependency,lifetime,registrationToken)](#M-IoC-IContainer-TryRegister-System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime,System-IDisposable@- 'IoC.IContainer.TryRegister(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,System.IDisposable@)')
 - [IDependency](#T-IoC-IDependency 'IoC.IDependency')
   - [Expression](#P-IoC-IDependency-Expression 'IoC.IDependency.Expression')
-- [IExpressionBuilder](#T-IoC-Extensibility-IExpressionBuilder 'IoC.Extensibility.IExpressionBuilder')
-  - [Build(expression)](#M-IoC-Extensibility-IExpressionBuilder-Build-System-Linq-Expressions-Expression- 'IoC.Extensibility.IExpressionBuilder.Build(System.Linq.Expressions.Expression)')
+- [IExpressionBuilder\`1](#T-IoC-Extensibility-IExpressionBuilder`1 'IoC.Extensibility.IExpressionBuilder`1')
+  - [Build(expression,key,container,context)](#M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Key,IoC-IContainer,`0- 'IoC.Extensibility.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.Key,IoC.IContainer,`0)')
 - [IIssueResolver](#T-IoC-Extensibility-IIssueResolver 'IoC.Extensibility.IIssueResolver')
   - [CannotGetGenericTypeArguments(type)](#M-IoC-Extensibility-IIssueResolver-CannotGetGenericTypeArguments-System-Type- 'IoC.Extensibility.IIssueResolver.CannotGetGenericTypeArguments(System.Type)')
   - [CannotGetResolver\`\`1(container,key)](#M-IoC-Extensibility-IIssueResolver-CannotGetResolver``1-IoC-IContainer,IoC-Key- 'IoC.Extensibility.IIssueResolver.CannotGetResolver``1(IoC.IContainer,IoC.Key)')
@@ -1231,6 +1235,24 @@ The instance.
 | type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
 | args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
 
+<a name='M-IoC-ContainerExtensions-Get-IoC-IContainer,System-Type-'></a>
+### Get(container,type) `method` [#](#M-IoC-ContainerExtensions-Get-IoC-IContainer,System-Type- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
+
 <a name='M-IoC-ContainerExtensions-Get-IoC-ContainerExtensions-Resolving,System-Type,System-Object[]-'></a>
 ### Get(resolving,type,args) `method` [#](#M-IoC-ContainerExtensions-Get-IoC-ContainerExtensions-Resolving,System-Type,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -1249,6 +1271,24 @@ The instance.
 | resolving | [IoC.ContainerExtensions.Resolving](#T-IoC-ContainerExtensions-Resolving 'IoC.ContainerExtensions.Resolving') |  |
 | type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
 | args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+<a name='M-IoC-ContainerExtensions-Get-IoC-ContainerExtensions-Resolving,System-Type-'></a>
+### Get(resolving,type) `method` [#](#M-IoC-ContainerExtensions-Get-IoC-ContainerExtensions-Resolving,System-Type- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| resolving | [IoC.ContainerExtensions.Resolving](#T-IoC-ContainerExtensions-Resolving 'IoC.ContainerExtensions.Resolving') |  |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
 
 <a name='M-IoC-ContainerExtensions-Get``1-IoC-IContainer,System-Object[]-'></a>
 ### Get\`\`1(container,args) `method` [#](#M-IoC-ContainerExtensions-Get``1-IoC-IContainer,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
@@ -1274,6 +1314,29 @@ The instance.
 | ---- | ----------- |
 | T | The instance type. |
 
+<a name='M-IoC-ContainerExtensions-Get``1-IoC-IContainer-'></a>
+### Get\`\`1(container) `method` [#](#M-IoC-ContainerExtensions-Get``1-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
 <a name='M-IoC-ContainerExtensions-Get``1-IoC-ContainerExtensions-Resolving,System-Object[]-'></a>
 ### Get\`\`1(resolving,args) `method` [#](#M-IoC-ContainerExtensions-Get``1-IoC-ContainerExtensions-Resolving,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -1291,6 +1354,29 @@ The instance.
 | ---- | ---- | ----------- |
 | resolving | [IoC.ContainerExtensions.Resolving](#T-IoC-ContainerExtensions-Resolving 'IoC.ContainerExtensions.Resolving') |  |
 | args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-ContainerExtensions-Get``1-IoC-ContainerExtensions-Resolving-'></a>
+### Get\`\`1(resolving) `method` [#](#M-IoC-ContainerExtensions-Get``1-IoC-ContainerExtensions-Resolving- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| resolving | [IoC.ContainerExtensions.Resolving](#T-IoC-ContainerExtensions-Resolving 'IoC.ContainerExtensions.Resolving') |  |
 
 ##### Generic Types
 
@@ -2001,8 +2087,8 @@ Represents a IoC dependency.
 
 The expression for dependency which is used to create a build graph.
 
-<a name='T-IoC-Extensibility-IExpressionBuilder'></a>
-## IExpressionBuilder [#](#T-IoC-Extensibility-IExpressionBuilder 'Go To Here') [=](#contents 'Back To Contents')
+<a name='T-IoC-Extensibility-IExpressionBuilder`1'></a>
+## IExpressionBuilder\`1 [#](#T-IoC-Extensibility-IExpressionBuilder`1 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Namespace
 
@@ -2012,8 +2098,8 @@ IoC.Extensibility
 
 Allows to build expresion for lifetimes.
 
-<a name='M-IoC-Extensibility-IExpressionBuilder-Build-System-Linq-Expressions-Expression-'></a>
-### Build(expression) `method` [#](#M-IoC-Extensibility-IExpressionBuilder-Build-System-Linq-Expressions-Expression- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Key,IoC-IContainer,`0-'></a>
+### Build(expression,key,container,context) `method` [#](#M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Key,IoC-IContainer,`0- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -2028,6 +2114,9 @@ The new expression.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | expression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression to get an instance. |
+| key | [IoC.Key](#T-IoC-Key 'IoC.Key') | The key. |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
+| context | [\`0](#T-`0 '`0') | The expression build context. |
 
 <a name='T-IoC-Extensibility-IIssueResolver'></a>
 ## IIssueResolver [#](#T-IoC-Extensibility-IIssueResolver 'Go To Here') [=](#contents 'Back To Contents')

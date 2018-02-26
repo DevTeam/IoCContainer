@@ -7,7 +7,7 @@
     using System.Reflection;
     using Extensibility;
 
-    internal class InjectingExpressionVisitor: ExpressionVisitor
+    internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
     {
         private static readonly Key ContextKey = new Key(typeof(Context));
         [NotNull] private static readonly ITypeInfo ContextTypeInfo = TypeExtensions.Info<Context>();
@@ -22,7 +22,7 @@
         [CanBeNull] private readonly Expression _thisExpression;
         private int _reentrancy;
 
-        static InjectingExpressionVisitor()
+        static DependencyInjectionExpressionVisitor()
         {
             Expression<Func<object>> injectExpression = () => default(IContainer).Inject<object>();
             InjectMethodInfo = ((MethodCallExpression)injectExpression.Body).Method.GetGenericMethodDefinition();
@@ -33,7 +33,7 @@
             ContextConstructor = TypeExtensions.Info<Context>().DeclaredConstructors.Single();
         }
 
-        public InjectingExpressionVisitor(Key key, [NotNull] IContainer container, [CanBeNull] Expression thisExpression)
+        public DependencyInjectionExpressionVisitor(Key key, [NotNull] IContainer container, [CanBeNull] Expression thisExpression)
         {
             _keys.Push(key);
             _container = container ?? throw new ArgumentNullException(nameof(container));
@@ -120,8 +120,8 @@
                     ctor,
                     _thisExpression,
                     Expression.Constant(_keys.Peek()),
-                    ResolverExpressionBuilder.ContainerParameter,
-                    ResolverExpressionBuilder.ArgsParameter);
+                    ExpressionExtensions.ContainerParameter,
+                    ExpressionExtensions.ArgsParameter);
             }
 
             return base.VisitParameter(node);
@@ -133,8 +133,8 @@
             return Expression.New(
                 ContextConstructor,
                 Expression.Constant(_keys.Peek()),
-                ResolverExpressionBuilder.ContainerParameter,
-                ResolverExpressionBuilder.ArgsParameter);
+                ExpressionExtensions.ContainerParameter,
+                ExpressionExtensions.ArgsParameter);
         }
 
         [CanBeNull]
@@ -174,7 +174,7 @@
                     return _container;
                 }
 
-                var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, ResolverExpressionBuilder.ContainerParameter);
+                var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, ExpressionExtensions.ContainerParameter);
                 var selectContainer = containerSelectorExpression.Compile();
                 return selectContainer(_container);
             }
@@ -189,13 +189,14 @@
         {
             Expression dependencyExpression;
             ILifetime lifetime = null;
+            var selectedContainer = _container;
             if (Equals(key, ContextKey))
             {
                 dependencyExpression = CreateNewContextExpression();
             }
             else
             {
-                var selectedContainer = SelectedContainer(containerExpression);
+                selectedContainer = SelectedContainer(containerExpression);
                 if (!selectedContainer.TryGetDependency(key, out var dependency, out lifetime))
                 {
                     try
@@ -213,12 +214,13 @@
                 dependencyExpression = dependency.Expression;
             }
 
-            return CreateDependencyExpression(key, dependencyExpression, lifetime);
+            return CreateDependencyExpression(key, selectedContainer, dependencyExpression, lifetime);
         }
 
         [NotNull]
         private Expression CreateDependencyExpression(
             Key key,
+            IContainer container,
             [NotNull] Expression dependencyExpression,
             [CanBeNull] ILifetime lifetime)
         {
@@ -233,10 +235,10 @@
                     _container.Get<IIssueResolver>().CyclicDependenceDetected(key, _reentrancy);
                 }
 
-                var typesMap = new Dictionary<Type, Type>();
-                dependencyExpression = ExpressionBuilder.Shared.PrepareExpression(dependencyExpression, key.Type, typesMap);
-                dependencyExpression = ExpressionBuilder.Shared.Convert(dependencyExpression, key.Type);
-                dependencyExpression = ExpressionBuilder.Shared.AddLifetime(dependencyExpression, lifetime, key.Type, this);
+                dependencyExpression = TypeReplacerExpressionBuilder.Shared.Build(dependencyExpression, key, container);
+                dependencyExpression = Visit(dependencyExpression);
+                dependencyExpression = dependencyExpression.Convert(key.Type);
+                dependencyExpression = LifetimeExpressionBuilder.Shared.Build(dependencyExpression, key, container, lifetime);
                 return Visit(dependencyExpression) ?? throw new BuildExpressionException(new InvalidOperationException("Null expression"));
             }
             finally
@@ -267,14 +269,14 @@
                 // ctx.Container
                 if (name == nameof(Context.Container))
                 {
-                    expression = ResolverExpressionBuilder.ContainerParameter;
+                    expression = ExpressionExtensions.ContainerParameter;
                     return true;
                 }
 
                 // ctx.Args
                 if (name == nameof(Context.Args))
                 {
-                    expression = ResolverExpressionBuilder.ArgsParameter;
+                    expression = ExpressionExtensions.ArgsParameter;
                     return true;
                 }
             }

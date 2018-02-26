@@ -148,6 +148,48 @@ namespace IoC.Core.Collections
             return false;
         }
 
+        [MethodImpl((MethodImplOptions)256)]
+        public bool TryGetFast(int hashCode, TKey key, out TValue value)
+        {
+            var tree = this;
+            while (tree._height != 0 && tree._entry.HashCode != hashCode)
+            {
+                if (hashCode < tree._entry.HashCode)
+                {
+                    tree = tree._left;
+                }
+                else
+                {
+                    tree = tree._right;
+                }
+            }
+
+            var treeEntry = tree._entry;
+            if (tree._height != 0 && ReferenceEquals(key, treeEntry.Key))
+            {
+                value = treeEntry.Value;
+                return true;
+            }
+
+            var entryDuplicates = treeEntry.Duplicates;
+            if (tree._height != 0 && entryDuplicates != null)
+            {
+                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                {
+                    if (!Equals(entryDuplicates[i].Key, key))
+                    {
+                        continue;
+                    }
+
+                    value = entryDuplicates[i].Value;
+                    return true;
+                }
+            }
+
+            value = default(TValue);
+            return false;
+        }
+
         public Tree<TKey, TValue> Remove(int hashCode, TKey key, bool ignoreKey = false)
         {
             if (_height == 0)

@@ -6,12 +6,12 @@
     using System.Linq.Expressions;
     using System.Reflection;
 
-    internal class TypeReplacingExpressionVisitor: ExpressionVisitor
+    internal class TypeReplacerExpressionVisitor: ExpressionVisitor
     {
         [NotNull] private readonly IDictionary<Type, Type> _typesMap;
         [NotNull] private readonly Dictionary<string, ParameterExpression> _parameters = new Dictionary<string, ParameterExpression>();
 
-        public TypeReplacingExpressionVisitor([NotNull] IDictionary<Type, Type> typesMap)
+        public TypeReplacerExpressionVisitor([NotNull] IDictionary<Type, Type> typesMap)
         {
             _typesMap = typesMap ?? throw new ArgumentNullException(nameof(typesMap));
         }
@@ -36,7 +36,7 @@
                         return base.VisitUnary(node);
                     }
 
-                    return ExpressionBuilder.Shared.Convert(newOperand, newType);
+                    return newOperand.Convert(newType);
 
                 default:
                     return base.VisitUnary(node);
@@ -129,6 +129,11 @@
         protected override Expression VisitListInit(ListInitExpression node)
         {
             var newExpression = (NewExpression)Visit(node.NewExpression);
+            if (newExpression == null)
+            {
+                return node;
+            }
+
             return Expression.ListInit(newExpression, node.Initializers.Select(VisitInitializer));
         }
 

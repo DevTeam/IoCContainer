@@ -18,7 +18,7 @@
         public FullAutowring([NotNull] Type type, [CanBeNull] Predicate<ConstructorInfo> constructorFilter = null)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            type = ExpressionBuilder.Shared.ConvertToDefinedGenericType(type);
+            type = type.ConvertToDefinedGenericType();
             var typeInfo = type.Info();
             var constructorInfo = typeInfo.DeclaredConstructors.First(i => constructorFilter == null || constructorFilter(i));
             var parameters = constructorInfo.GetParameters();

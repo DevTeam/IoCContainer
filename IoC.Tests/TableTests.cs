@@ -42,7 +42,7 @@
             table = table.Remove("c".GetHashCode(), "c");
 
             // Then
-            table.TryGet("c".GetHashCode(), "c", out var val).ShouldBeFalse();
+            table.TryGet("c".GetHashCode(), "c", out var _).ShouldBeFalse();
         }
     }
 }

@@ -11,7 +11,7 @@
 
     [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
-    public class TypeMapingAndReplacingExpressionVisitorsTests
+    public class TypeMapingAndReplacerExpressionVisitorsTests
     {
         [Fact]
         public void ShouldReplaceWhenNewExpressionAndConvertExpression()
@@ -19,7 +19,7 @@
             // Given
             var typesMap = new Dictionary<Type, Type>();
             var typeMapingVisitor = new TypeMapingExpressionVisitor(typeof(Tuple<string>), typesMap);
-            var replacingVisitor = new TypeReplacingExpressionVisitor(typesMap);
+            var replacingVisitor = new TypeReplacerExpressionVisitor(typesMap);
             Expression<Func<Tuple<TT>>> expression = () => new Tuple<TT>((TT)(object)"abc");
 
             // When
@@ -41,7 +41,7 @@
             var myClass = new MyClass();
             var typesMap = new Dictionary<Type, Type>();
             var typeMapingVisitor = new TypeMapingExpressionVisitor(typeof(string), typesMap);
-            var replacingVisitor = new TypeReplacingExpressionVisitor(typesMap);
+            var replacingVisitor = new TypeReplacerExpressionVisitor(typesMap);
             Expression<Func<TT>> expression = () => (TT)(object)myClass.GetString("abc");
 
             // When
@@ -62,7 +62,7 @@
             // Given
             var typesMap = new Dictionary<Type, Type>();
             var typeMapingVisitor = new TypeMapingExpressionVisitor(typeof(string), typesMap);
-            var replacingVisitor = new TypeReplacingExpressionVisitor(typesMap);
+            var replacingVisitor = new TypeReplacerExpressionVisitor(typesMap);
             Expression<Func<TT>> expression = () => (TT)(object)MyClass.StaticGetString("abc");
 
             // When
@@ -84,7 +84,7 @@
             var myClass = new MyClass();
             var typesMap = new Dictionary<Type, Type>();
             var typeMapingVisitor = new TypeMapingExpressionVisitor(typeof(string), typesMap);
-            var replacingVisitor = new TypeReplacingExpressionVisitor(typesMap);
+            var replacingVisitor = new TypeReplacerExpressionVisitor(typesMap);
             Expression<Func<TT>> expression = () => myClass.Get((TT)(object)"abc");
 
             // When
@@ -105,7 +105,7 @@
             // Given
             var typesMap = new Dictionary<Type, Type>();
             var typeMapingVisitor = new TypeMapingExpressionVisitor(typeof(string), typesMap);
-            var replacingVisitor = new TypeReplacingExpressionVisitor(typesMap);
+            var replacingVisitor = new TypeReplacerExpressionVisitor(typesMap);
             Expression<Func<TT>> expression = () => MyClass.StaticGet((TT)(object)"abc");
 
             // When
@@ -126,7 +126,7 @@
             // Given
             var typesMap = new Dictionary<Type, Type>();
             var typeMapingVisitor = new TypeMapingExpressionVisitor(typeof(string), typesMap);
-            var replacingVisitor = new TypeReplacingExpressionVisitor(typesMap);
+            var replacingVisitor = new TypeReplacerExpressionVisitor(typesMap);
             Expression<Func<Type>> expression = () => typeof(TT);
 
             // When
@@ -147,7 +147,7 @@
             // Given
             var typesMap = new Dictionary<Type, Type>();
             var typeMapingVisitor = new TypeMapingExpressionVisitor(typeof(string), typesMap);
-            var replacingVisitor = new TypeReplacingExpressionVisitor(typesMap);
+            var replacingVisitor = new TypeReplacerExpressionVisitor(typesMap);
             Expression<Func<TT>> expression = () => new MyClass2<TT>((TT)(object)"abc").Field;
 
             // When
@@ -168,7 +168,7 @@
             // Given
             var typesMap = new Dictionary<Type, Type>();
             var typeMapingVisitor = new TypeMapingExpressionVisitor(typeof(string), typesMap);
-            var replacingVisitor = new TypeReplacingExpressionVisitor(typesMap);
+            var replacingVisitor = new TypeReplacerExpressionVisitor(typesMap);
             Expression<Func<TT>> expression = () => new MyClass2<TT>((TT)(object)"abc").Prop;
 
             // When
@@ -189,7 +189,7 @@
             // Given
             var typesMap = new Dictionary<Type, Type>();
             var typeMapingVisitor = new TypeMapingExpressionVisitor(typeof(string), typesMap);
-            var replacingVisitor = new TypeReplacingExpressionVisitor(typesMap);
+            var replacingVisitor = new TypeReplacerExpressionVisitor(typesMap);
             Expression<Func<TT[]>> expression = () => new[]{(TT)(object)"abc"};
 
             // When
@@ -210,7 +210,7 @@
             // Given
             var typesMap = new Dictionary<Type, Type>();
             var typeMapingVisitor = new TypeMapingExpressionVisitor(typeof(string), typesMap);
-            var replacingVisitor = new TypeReplacingExpressionVisitor(typesMap);
+            var replacingVisitor = new TypeReplacerExpressionVisitor(typesMap);
             Expression<Func<IList<TT>>> expression = () => new List<TT> { (TT)(object)"abc" };
 
             // When
@@ -232,7 +232,7 @@
             // Given
             var typesMap = new Dictionary<Type, Type>();
             var typeMapingVisitor = new TypeMapingExpressionVisitor(typeof(string), typesMap);
-            var replacingVisitor = new TypeReplacingExpressionVisitor(typesMap);
+            var replacingVisitor = new TypeReplacerExpressionVisitor(typesMap);
             // ReSharper disable once RedundantDelegateCreation
             Expression<Func<Func<TT>>> expression = () => new Func<TT>(() => (TT)(object)"abc");
 

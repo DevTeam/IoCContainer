@@ -27,6 +27,7 @@
         private const string RootName = "root:/";
         private static long _containerId;
 
+        internal static readonly object[] EmptyArgs = new object[0];
         [NotNull] private static readonly Lazy<Container> DefultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.Defaults), true);
         [NotNull] private readonly object _lockObject = new object();
         [NotNull] private readonly IContainer _parent;
@@ -34,8 +35,8 @@
         [NotNull] private readonly Subject<ContainerEvent> _eventSubject = new Subject<ContainerEvent>();
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
 
-        [NotNull] private volatile Table<FullKey, RegistrationEntry> _registrationEntries = Table<FullKey, RegistrationEntry>.Empty;
-        [NotNull] private volatile Table<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = Table<ShortKey, RegistrationEntry>.Empty;
+        [NotNull] private Table<FullKey, RegistrationEntry> _registrationEntries = Table<FullKey, RegistrationEntry>.Empty;
+        [NotNull] private Table<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = Table<ShortKey, RegistrationEntry>.Empty;
         [NotNull] private volatile Table<FullKey, object> _resolvers = Table<FullKey, object>.Empty;
         [NotNull] private volatile Table<ShortKey, object> _resolversByType = Table<ShortKey, object>.Empty;
 
@@ -220,7 +221,7 @@
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
         {
-            if (_resolversByType.TryGet(type.GetHashCode(), type, out var resolverValue))
+            if (_resolversByType.TryGetFast(type.GetHashCode(), type, out var resolverValue))
             {
                 resolver = (Resolver<T>)resolverValue;
                 return true;
@@ -242,7 +243,7 @@
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, IContainer container = null)
         {
-            if (_resolversByType.TryGet(type.GetHashCode(), type, out var resolverValue))
+            if (_resolversByType.TryGetFast(type.GetHashCode(), type, out var resolverValue))
             {
                 resolver = (Resolver<T>)resolverValue;
                 return true;
@@ -255,25 +256,20 @@
         [MethodImpl((MethodImplOptions)256)]
         public Resolver<T> GetResolver<T>(Type type, object tag, IContainer container = null)
         {
-            if (!TryGetResolver<T>(type, tag, out var resolver, container))
-            {
-                return IssueResolver.CannotGetResolver<T>(this, new Key(type, tag));
-            }
-
-            return resolver;
+            return TryGetResolver<T>(type, tag, out var resolver, container)
+                ? resolver
+                : IssueResolver.CannotGetResolver<T>(this, new Key(type, tag));
         }
 
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]
         public Resolver<T> GetResolver<T>(Type type, IContainer container = null)
         {
-            if (!TryGetResolver<T>(type, out var resolver, container))
-            {
-                return IssueResolver.CannotGetResolver<T>(this, new Key(type));
-            }
-
-            return resolver;
+            return TryGetResolver<T>(type, out var resolver, container) 
+                ? resolver
+                : IssueResolver.CannotGetResolver<T>(this, new Key(type));
         }
+
 
         [MethodImpl((MethodImplOptions)256)]
         private bool TryCreateResolver<T>(Type type, [CanBeNull] object tag, out Resolver<T> resolver, IContainer container)
@@ -349,19 +345,19 @@
                 if (typeInfo.IsConstructedGenericType)
                 {
                     var genericType = typeInfo.GetGenericTypeDefinition();
-                    key = new FullKey(genericType, tag);
-                    if (_registrationEntries.TryGet(key.GetHashCode(), key, out registrationEntry))
+                    var genericKey = new FullKey(genericType, tag);
+                    if (_registrationEntries.TryGet(genericKey.GetHashCode(), genericKey, out registrationEntry))
                     {
                         return true;
                     }
 
-                    if (_registrationEntriesForTagAny.TryGet(genericType.GetHashCode(), genericType, out registrationEntry))
+                    if (_registrationEntriesForTagAny.TryGetFast(genericType.GetHashCode(), genericType, out registrationEntry))
                     {
                         return true;
                     }
                 }
 
-                if (_registrationEntriesForTagAny.TryGet(type.GetHashCode(), type, out registrationEntry))
+                if (_registrationEntriesForTagAny.TryGetFast(type.GetHashCode(), type, out registrationEntry))
                 {
                     return true;
                 }

@@ -9,18 +9,14 @@
     internal class ResolverExpressionBuilder: IResolverExpressionBuilder
     {
         public static readonly IResolverExpressionBuilder Shared = new ResolverExpressionBuilder();
-        public static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer), nameof(Context.Container));
-        public static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]), nameof(Context.Args));
-        public static readonly ParameterExpression[] Parameters = { ContainerParameter, ArgsParameter };
 
         public bool TryBuild<T>(Key key, IContainer container, IDependency dependency, ILifetime lifetime, out Expression<Resolver<T>> resolverExpression)
         {
             try
             {
                 var typesMap = new Dictionary<Type, Type>();
-                var dependencyExpression = ExpressionBuilder.Shared.PrepareExpression(dependency.Expression, key.Type, typesMap);
-                var expressionVisitor = new InjectingExpressionVisitor(key, container, null);
-                var injectedExpression = expressionVisitor.Visit(dependencyExpression) ?? throw new BuildExpressionException(new InvalidOperationException("Null expression"));
+                var expression = TypeReplacerExpressionBuilder.Shared.Build(dependency.Expression, key, container, typesMap);
+                expression = DependencyInjectionExpressionBuilder.Shared.Build(expression, key, container);
                 switch (dependency)
                 {
                     case Autowring autowring:
@@ -30,14 +26,14 @@
                         }
 
                         var vars = new Collection<ParameterExpression>();
-                        var statements = CreateAutowringStatements(key, container, autowring, injectedExpression, vars, typesMap).ToList();
-                        injectedExpression = Expression.Block(vars, statements);
+                        var statements = CreateAutowringStatements(key, container, autowring, expression, vars, typesMap).ToList();
+                        expression = Expression.Block(vars, statements);
                         break;
                 }
 
-                injectedExpression = ExpressionBuilder.Shared.Convert(injectedExpression, key.Type);
-                injectedExpression = ExpressionBuilder.Shared.AddLifetime(injectedExpression, lifetime, key.Type, expressionVisitor);
-                resolverExpression = Expression.Lambda<Resolver<T>>(injectedExpression, true, Parameters);
+                expression = expression.Convert(key.Type);
+                expression = LifetimeExpressionBuilder.Shared.Build(expression, key, container, lifetime);
+                resolverExpression = Expression.Lambda<Resolver<T>>(expression, true, ExpressionExtensions.Parameters);
                 return true;
             }
             catch (BuildExpressionException)
@@ -64,11 +60,11 @@
             vars.Add(instanceExpression);
             yield return instanceExpression;
             yield return Expression.Assign(instanceExpression, newExpression);
-            var expressionVisitor = new InjectingExpressionVisitor(key, container, instanceExpression);
             foreach (var statement in autowring.Statements)
             {
-                var statementExpression = ExpressionBuilder.Shared.PrepareExpression(statement, key.Type, typesMap);
-                yield return expressionVisitor.Visit(statementExpression);
+                var statementExpression = TypeReplacerExpressionBuilder.Shared.Build(statement, key, container, typesMap);
+                statementExpression = DependencyInjectionExpressionBuilder.Shared.Build(statementExpression, key, container, instanceExpression);
+                yield return statementExpression;
             }
 
             yield return instanceExpression;
