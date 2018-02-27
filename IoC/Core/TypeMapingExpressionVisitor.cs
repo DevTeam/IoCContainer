@@ -7,7 +7,6 @@
 
     internal class TypeMapingExpressionVisitor : ExpressionVisitor
     {
-        private static readonly ITypeInfo GenericTypeArgumentTypeInfo = typeof(GenericTypeArgument).Info();
         private readonly IDictionary<Type, Type> _typesMap;
         private readonly ITypeInfo _typeInfo;
 
@@ -80,7 +79,7 @@
                     return;
                 }
 
-                if (IsGenericTypeArgument(targetTypeInfo))
+                if (targetTypeInfo.IsGenericTypeArgument())
                 {
                     _typesMap[targetTypeInfo.Type] = typeInfo.Type;
                 }
@@ -138,19 +137,15 @@
             {
                 var targetType = targetGenTypes[i];
                 var type = genTypes[i];
-                if (!IsGenericTypeArgument(targetType.Info()))
+                targetTypeInfo = targetType.Info();
+                if (!targetTypeInfo.IsGenericTypeArgument())
                 {
                     continue;
                 }
                 
                 _typesMap[targetType] = type;
-                UpdateMap(type.Info(), targetType.Info());
+                UpdateMap(type.Info(), targetTypeInfo);
             }
-        }
-
-        private static bool IsGenericTypeArgument(ITypeInfo targetTypeInfo)
-        {
-            return GenericTypeArgumentTypeInfo.IsAssignableFrom(targetTypeInfo);
         }
     }
 }

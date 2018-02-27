@@ -7,8 +7,6 @@
     internal struct Binding<T>: IBinding<T>
     {
         // ReSharper disable once StaticMemberInGenericType
-        private static readonly ITypeInfo GenericTypeArgumentInfo = TypeExtensions.Info<GenericTypeArgument>();
-
         public Binding([NotNull] IContainer container, [NotNull][ItemNotNull] params Type[] types)
         {
             Container = container ?? throw new ArgumentNullException(nameof(container));
@@ -27,7 +25,7 @@
                 return type;
             }
 
-            if (typeInfo.GenericTypeArguments.Any(t => GenericTypeArgumentInfo.IsAssignableFrom(t.Info())))
+            if (typeInfo.GenericTypeArguments.Any(t => t.Info().IsGenericTypeArgument()))
             {
                 return typeInfo.GetGenericTypeDefinition();
             }

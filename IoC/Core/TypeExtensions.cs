@@ -2,6 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    // ReSharper disable once RedundantUsingDirective
+    using System.Linq;
     using System.Reflection;
     using Collections;
 
@@ -34,6 +36,12 @@
         {
             if (string.IsNullOrWhiteSpace(assemblyName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(assemblyName));
             return Assembly.Load(new AssemblyName(assemblyName));
+        }
+
+        public static bool IsGenericTypeArgument([NotNull] this ITypeInfo typeInfo)
+        {
+            if (typeInfo == null) throw new ArgumentNullException(nameof(typeInfo));
+            return typeInfo.GetCustomAttributes<GenericTypeArgumentAttribute>().Any();
         }
 
         private static class TypeInfoHolder<T>
@@ -73,6 +81,12 @@
             public Type[] GenericTypeArguments => _typeInfo.Value.GenericTypeArguments;
 
             public Type[] GenericTypeParameters => _typeInfo.Value.GenericTypeParameters;
+
+            public IEnumerable<T> GetCustomAttributes<T>(bool inherit)
+                where T: Attribute
+            {
+                return _typeInfo.Value.GetCustomAttributes<T>(inherit);
+            }
 
             public IEnumerable<ConstructorInfo> DeclaredConstructors => _typeInfo.Value.DeclaredConstructors;
 
@@ -129,6 +143,12 @@
             public bool IsConstructedGenericType => _type.IsGenericType;
 
             public bool IsGenericTypeDefinition => _type.IsGenericTypeDefinition;
+
+            public IEnumerable<T> GetCustomAttributes<T>(bool inherit)
+                where T : Attribute
+            {
+                return _type.GetCustomAttributes(typeof(T), inherit).Cast<T>();
+            }
 
             public Type[] GenericTypeArguments => _type.GetGenericArguments();
 

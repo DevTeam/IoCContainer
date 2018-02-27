@@ -25,6 +25,9 @@
 
         bool IsGenericTypeDefinition { get; }
 
+        [NotNull] [ItemNotNull]
+        IEnumerable<T> GetCustomAttributes<T>(bool inherit = true) where T : Attribute;
+
         [NotNull][ItemNotNull]
         Type[] GenericTypeArguments { get; }
 

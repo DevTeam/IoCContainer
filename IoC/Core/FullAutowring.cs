@@ -20,7 +20,11 @@
             if (type == null) throw new ArgumentNullException(nameof(type));
             type = type.ConvertToDefinedGenericType();
             var typeInfo = type.Info();
-            var constructorInfo = typeInfo.DeclaredConstructors.First(i => constructorFilter == null || constructorFilter(i));
+            var constructorInfo = typeInfo.DeclaredConstructors
+                .Where(ctor => !ctor.IsStatic && !ctor.IsPrivate)
+                .OrderBy(ctor => ctor.GetParameters().Length)
+                .First(ctor => constructorFilter == null || constructorFilter(ctor));
+
             var parameters = constructorInfo.GetParameters();
             var parameterExpressions = new Expression[parameters.Length];
             for (var position = 0; position < parameters.Length; position++)

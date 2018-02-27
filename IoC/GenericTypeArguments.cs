@@ -7,44 +7,56 @@ namespace IoC
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
-    [PublicAPI]
-    public abstract class GenericTypeArgument { }
+    [PublicAPI, GenericTypeArgument]
+    public class TT { }
 
-    /// <inheritdoc />
-    [PublicAPI]
-    public abstract class TT: GenericTypeArgument { }
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT1 { }
 
-    /// <inheritdoc />
-    [PublicAPI]
-    public abstract class TT1 : GenericTypeArgument { }
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT2 { }
 
-    /// <inheritdoc />
-    [PublicAPI]
-    public abstract class TT2 : GenericTypeArgument { }
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT3 { }
 
-    /// <inheritdoc />
-    [PublicAPI]
-    public abstract class TT3 : GenericTypeArgument { }
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT4 { }
 
-    /// <inheritdoc />
-    [PublicAPI]
-    public abstract class TT4 : GenericTypeArgument { }
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT5 { }
 
-    /// <inheritdoc />
-    [PublicAPI]
-    public abstract class TT5 : GenericTypeArgument { }
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT6 { }
 
-    /// <inheritdoc />
-    [PublicAPI]
-    public abstract class TT6 : GenericTypeArgument { }
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT7 { }
 
-    /// <inheritdoc />
-    [PublicAPI]
-    public abstract class TT7 : GenericTypeArgument { }
-
-    /// <inheritdoc />
-    [PublicAPI]
-    public abstract class TT8 : GenericTypeArgument { }
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT8 { }
 
     internal static class GenericTypeArguments
     {
