@@ -78,6 +78,10 @@
             yield return container
                 .Bind<IResourceStore>()
                 .To(ctx => (IResourceStore)ctx.Container);
+
+            yield return container
+                .Bind<IValidator>()
+                .To(ctx => Validator.Shared);
         }
     }
 }

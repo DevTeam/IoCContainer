@@ -5,7 +5,7 @@
     /// <summary>
     /// Provides defaults for features.
     /// </summary>
-    public static class Feature
+    internal static class Feature
     {
         /// <summary>
         /// The enumeration of default features.

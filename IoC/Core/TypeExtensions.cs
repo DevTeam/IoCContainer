@@ -44,6 +44,25 @@
             return typeInfo.GetCustomAttributes<GenericTypeArgumentAttribute>().Any();
         }
 
+        [NotNull]
+        public static Type ToDefinedGenericType([NotNull] this ITypeInfo typeInfo)
+        {
+            if (!typeInfo.IsGenericTypeDefinition)
+            {
+                return typeInfo.Type;
+            }
+
+            var genericTypeParameters = typeInfo.GenericTypeParameters;
+            var typesMap = genericTypeParameters.Distinct().Zip(GenericTypeArguments.Types, Tuple.Create).ToDictionary(i => i.Item1, i => i.Item2);
+            var genericTypeArguments = new Type[genericTypeParameters.Length];
+            for (var position = 0; position < genericTypeParameters.Length; position++)
+            {
+                genericTypeArguments[position] = typesMap[genericTypeParameters[position]];
+            }
+
+            return typeInfo.MakeGenericType(genericTypeArguments);
+        }
+
         private static class TypeInfoHolder<T>
         {
             [NotNull] public static readonly ITypeInfo Shared = typeof(T).Info();

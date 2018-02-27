@@ -1,20 +1,29 @@
 ﻿namespace IoC.Core
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
+    using Extensibility;
 
-    internal static class ValidateUtils
+    internal class Validator : IValidator
     {
-        private static readonly MethodInfo TryGetResolverInternalMethodInfo = typeof(ValidateUtils).Info().DeclaredMethods.Single(i => i.Name == nameof(TryGetResolverInternal));
+        public static readonly IValidator Shared = new Validator();
+        private static readonly MethodInfo TryGetResolverInternalMethodInfo = typeof(Validator).Info().DeclaredMethods.Single(i => i.Name == nameof(TryGetResolverInternal));
 
-        public static ValidationResult Validate([NotNull] this IContainer container)
+        private Validator()
         {
+        }
+
+        public ValidationResult Validate(IContainer container)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
             var resolvedKeys = new List<Key>();
             var unresolvedKeys = new List<Key>();
             foreach (var key in container.SelectMany(i => i))
             {
-                var curKey = new Key(key.Type.ConvertToDefinedGenericType(), key.Tag);
+                var curTypeInfo = key.Type.Info();
+                var curKey = new Key(curTypeInfo.ToDefinedGenericType(), key.Tag);
                 var tryGetResolverInternal = TryGetResolverInternalMethodInfo.MakeGenericMethod(curKey.Type);
                 var resolved = (bool)tryGetResolverInternal.Invoke(null, new object[] { container, curKey });
                 if (resolved)
@@ -31,7 +40,7 @@
         }
 
         // ReSharper disable once MemberCanBePrivate.Global
-        public static bool TryGetResolverInternal<T>(IContainer container, Key key)
+        private static bool TryGetResolverInternal<T>(IContainer container, Key key)
         {
             return container.TryGetResolver<T>(key.Type, key.Tag, out var _, container);
         }

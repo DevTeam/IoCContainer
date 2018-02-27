@@ -18,7 +18,7 @@
         public FullAutowring([NotNull] Type type, [CanBeNull] Predicate<ConstructorInfo> constructorFilter = null)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            type = type.ConvertToDefinedGenericType();
+            type = type.Info().ToDefinedGenericType();
             var typeInfo = type.Info();
             var constructorInfo = typeInfo.DeclaredConstructors
                 .Where(ctor => !ctor.IsStatic && !ctor.IsPrivate)

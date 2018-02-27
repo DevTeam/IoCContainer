@@ -595,8 +595,7 @@
         /// <returns>The validation result.</returns>
         public static ValidationResult Validate([NotNull] this IContainer container)
         {
-            // ReSharper disable once InvokeAsExtensionMethod
-            return ValidateUtils.Validate(container);
+            return container.Get<IValidator>().Validate(container);
         }
 
         [NotNull]
