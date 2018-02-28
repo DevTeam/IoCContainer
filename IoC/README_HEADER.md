@@ -39,14 +39,18 @@ interface ICat { bool IsAlive { get; } }
 ```csharp
 class CardboardBox<T> : IBox<T>
 {
-  public CardboardBox(T content) { Content = content; }
+    public CardboardBox(T content) { Content = content; }
 
-  public T Content { get; }
+    public T Content { get; }
+
+    public override string ToString() { return Content.ToString(); }
 }
 
 class ShroedingersCat : ICat
 {
-  public bool IsAlive => new Random().Next(2) == 1;
+    public bool IsAlive => new Random().Next(2) == 1;
+
+    public override string ToString() { return $"Is alive: {IsAlive}"; }
 }
 ```
 
@@ -84,32 +88,36 @@ class Glue : IConfiguration
 ```csharp
 using (var container = Container.Create().Using<Glue>())
 {
-  var box1 = container.Get<IBox<ICat>>();
-  Console.WriteLine("#1 is alive: " + box1.Content.IsAlive);
+    var box = container.Get<IBox<ICat>>();
+    Console.WriteLine(box);
 
-  // Func
-  var box2 = container.Get<Func<IBox<ICat>>>();
-  Console.WriteLine("#2 is alive: " + box2().Content.IsAlive);
+    // Func
+    var func = container.Get<Func<IBox<ICat>>>();
+    Console.WriteLine(func());
 
-  // Task
-  var box3 = await container.Get<Task<IBox<ICat>>>();
-  Console.WriteLine("#3 is alive: " + box3.Content.IsAlive);
+    // Async
+    box = await container.Get<Task<IBox<ICat>>>();
+    Console.WriteLine(box);
 
-  // Tuple
-  var box4 = container.Get<Tuple<IBox<ICat>, ICat>>();
-  Console.WriteLine("#4 is alive: " + box4.Item1.Content.IsAlive + ", " + box4.Item2.IsAlive);
+    // Tuple<,>
+    var tuple = container.Get<Tuple<IBox<ICat>, ICat>>();
+    Console.WriteLine(tuple.Item1 + ", " + tuple.Item2);
 
-  // Lazy
-  var box5 = container.Get<Lazy<IBox<ICat>>>();
-  Console.WriteLine("#5 is alive: " + box5.Value.Content.IsAlive);
+    // ValueTuple(,,)
+    var valueTuple = container.Get<(IBox<ICat> box, ICat cat, IBox<ICat> anotherBox)>();
+    Console.WriteLine(valueTuple.box + ", " + valueTuple.cat + ", " + valueTuple.anotherBox);
 
-  // Enumerable
-  var boxes6 = container.Get<IEnumerable<IBox<ICat>>>();
-  Console.WriteLine("#6 is alive: " + boxes6.Single().Content.IsAlive);
+    // Lazy
+    var lazy = container.Get<Lazy<IBox<ICat>>>();
+    Console.WriteLine(lazy.Value);
 
-  // List
-  var boxes7 = container.Get<IList<IBox<ICat>>>();
-  Console.WriteLine("#7 is alive: " + boxes7[0].Content.IsAlive);
+    // Enumerable
+    var enumerable = container.Get<IEnumerable<IBox<ICat>>>();
+    Console.WriteLine(enumerable.Single());
+
+    // List
+    var list = container.Get<IList<IBox<ICat>>>();
+    Console.WriteLine(list[0]);
 }
 ```
 
