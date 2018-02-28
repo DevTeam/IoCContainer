@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Threading.Tasks;
     using IoC;
 
@@ -33,6 +34,14 @@
                 // Lazy
                 var box5 = container.Get<Lazy<IBox<ICat>>>();
                 Console.WriteLine("#5 is alive: " + box5.Value.Content.IsAlive);
+
+                // Enumerable
+                var boxes6 = container.Get<IEnumerable<IBox<ICat>>>();
+                Console.WriteLine("#6 is alive: " + boxes6.Single().Content.IsAlive);
+
+                // List
+                var boxes7 = container.Get<IList<IBox<ICat>>>();
+                Console.WriteLine("#7 is alive: " + boxes7[0].Content.IsAlive);
             }
         }
 

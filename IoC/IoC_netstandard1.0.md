@@ -31,6 +31,9 @@
   - [None](#F-IoC-CollectionAccessType-None 'IoC.CollectionAccessType.None')
   - [Read](#F-IoC-CollectionAccessType-Read 'IoC.CollectionAccessType.Read')
   - [UpdatedContent](#F-IoC-CollectionAccessType-UpdatedContent 'IoC.CollectionAccessType.UpdatedContent')
+- [CollectionFeature](#T-IoC-Features-CollectionFeature 'IoC.Features.CollectionFeature')
+  - [Shared](#F-IoC-Features-CollectionFeature-Shared 'IoC.Features.CollectionFeature.Shared')
+  - [Apply()](#M-IoC-Features-CollectionFeature-Apply-IoC-IContainer- 'IoC.Features.CollectionFeature.Apply(IoC.IContainer)')
 - [ConfigurationFeature](#T-IoC-Features-ConfigurationFeature 'IoC.Features.ConfigurationFeature')
   - [Shared](#F-IoC-Features-ConfigurationFeature-Shared 'IoC.Features.ConfigurationFeature.Shared')
   - [Apply()](#M-IoC-Features-ConfigurationFeature-Apply-IoC-IContainer- 'IoC.Features.ConfigurationFeature.Apply(IoC.IContainer)')
@@ -102,9 +105,6 @@
 - [CoreFeature](#T-IoC-Features-CoreFeature 'IoC.Features.CoreFeature')
   - [Shared](#F-IoC-Features-CoreFeature-Shared 'IoC.Features.CoreFeature.Shared')
   - [Apply()](#M-IoC-Features-CoreFeature-Apply-IoC-IContainer- 'IoC.Features.CoreFeature.Apply(IoC.IContainer)')
-- [EnumerableFeature](#T-IoC-Features-EnumerableFeature 'IoC.Features.EnumerableFeature')
-  - [Shared](#F-IoC-Features-EnumerableFeature-Shared 'IoC.Features.EnumerableFeature.Shared')
-  - [Apply()](#M-IoC-Features-EnumerableFeature-Apply-IoC-IContainer- 'IoC.Features.EnumerableFeature.Apply(IoC.IContainer)')
 - [EventType](#T-IoC-ContainerEvent-EventType 'IoC.ContainerEvent.EventType')
   - [Registration](#F-IoC-ContainerEvent-EventType-Registration 'IoC.ContainerEvent.EventType.Registration')
   - [Unregistration](#F-IoC-ContainerEvent-EventType-Unregistration 'IoC.ContainerEvent.EventType.Unregistration')
@@ -580,6 +580,31 @@ Method only reads content of the collection but does not modify it.
 ##### Summary
 
 Method can add new elements to the collection.
+
+<a name='T-IoC-Features-CollectionFeature'></a>
+## CollectionFeature [#](#T-IoC-Features-CollectionFeature 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC.Features
+
+##### Summary
+
+Allows to resolve enumeration of all instances related to corresponding bindings.
+
+<a name='F-IoC-Features-CollectionFeature-Shared'></a>
+### Shared `constants` [#](#F-IoC-Features-CollectionFeature-Shared 'Go To Here') [=](#contents 'Back To Contents')
+
+<a name='M-IoC-Features-CollectionFeature-Apply-IoC-IContainer-'></a>
+### Apply() `method` [#](#M-IoC-Features-CollectionFeature-Apply-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
 
 <a name='T-IoC-Features-ConfigurationFeature'></a>
 ## ConfigurationFeature [#](#T-IoC-Features-ConfigurationFeature 'Go To Here') [=](#contents 'Back To Contents')
@@ -1728,31 +1753,6 @@ Adds the set of core features like lifetimes and default containers.
 
 <a name='M-IoC-Features-CoreFeature-Apply-IoC-IContainer-'></a>
 ### Apply() `method` [#](#M-IoC-Features-CoreFeature-Apply-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='T-IoC-Features-EnumerableFeature'></a>
-## EnumerableFeature [#](#T-IoC-Features-EnumerableFeature 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Namespace
-
-IoC.Features
-
-##### Summary
-
-Allows to resolve enumeration of all instances related to corresponding bindings.
-
-<a name='F-IoC-Features-EnumerableFeature-Shared'></a>
-### Shared `constants` [#](#F-IoC-Features-EnumerableFeature-Shared 'Go To Here') [=](#contents 'Back To Contents')
-
-<a name='M-IoC-Features-EnumerableFeature-Apply-IoC-IContainer-'></a>
-### Apply() `method` [#](#M-IoC-Features-EnumerableFeature-Apply-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 

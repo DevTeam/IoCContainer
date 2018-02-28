@@ -91,17 +91,25 @@ using (var container = Container.Create().Using<Glue>())
   var box2 = container.Get<Func<IBox<ICat>>>();
   Console.WriteLine("#2 is alive: " + box2().Content.IsAlive);
 
-  // Async
+  // Task
   var box3 = await container.Get<Task<IBox<ICat>>>();
   Console.WriteLine("#3 is alive: " + box3.Content.IsAlive);
 
-  // Tuple<,>
+  // Tuple
   var box4 = container.Get<Tuple<IBox<ICat>, ICat>>();
   Console.WriteLine("#4 is alive: " + box4.Item1.Content.IsAlive + ", " + box4.Item2.IsAlive);
 
   // Lazy
   var box5 = container.Get<Lazy<IBox<ICat>>>();
   Console.WriteLine("#5 is alive: " + box5.Value.Content.IsAlive);
+
+  // Enumerable
+  var boxes6 = container.Get<IEnumerable<IBox<ICat>>>();
+  Console.WriteLine("#6 is alive: " + boxes6.Single().Content.IsAlive);
+
+  // List
+  var boxes7 = container.Get<IList<IBox<ICat>>>();
+  Console.WriteLine("#7 is alive: " + boxes7[0].Content.IsAlive);
 }
 ```
 
@@ -154,9 +162,12 @@ The results of the [comparison tests](IoC.Tests/ComparisonTests.cs) for some pop
 * [Singleton lifetime](#singleton-lifetime)
 * [Constructor Auto-wiring](#constructor-auto-wiring)
 * [Manual Auto-wiring](#manual-auto-wiring)
+* [Resolve all appropriate instances as ICollection](#resolve-all-appropriate-instances-as-icollection)
 * [Resolve all appropriate instances as IEnumerable](#resolve-all-appropriate-instances-as-ienumerable)
 * [Func With Arguments](#func-with-arguments)
+* [Resolve all appropriate instances as IObservable source](#resolve-all-appropriate-instances-as-iobservable-source)
 * [Resolve Using Arguments](#resolve-using-arguments)
+* [Resolve all appropriate instances as ISet](#resolve-all-appropriate-instances-as-iset)
 * [Auto dispose singleton during container's dispose](#auto-dispose-singleton-during-containers-dispose)
 * [Configuration class](#configuration-class)
 * [Configuration via a text metadata](#configuration-via-a-text-metadata)
@@ -519,6 +530,29 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ManualAutowiring.cs)
 
+### Resolve all appropriate instances as ICollection
+
+``` CSharp
+// Create a container
+using (var container = Container.Create())
+// Configure the container
+using (container.Bind<IDependency>().To<Dependency>())
+using (container.Bind<IService>().Tag(1).To<Service>())
+using (container.Bind<IService>().Tag(2).Tag("abc").To<Service>())
+using (container.Bind<IService>().Tag(3).To<Service>())
+{
+    // Resolve all appropriate instances
+    var instances = container.Get<ICollection<IService>>();
+
+    instances.Count.ShouldBe(3);
+    foreach (var instance in instances)
+    {
+        instance.ShouldBeOfType<Service>();
+    }
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Collection.cs)
+
 ### Resolve all appropriate instances as IEnumerable
 
 ``` CSharp
@@ -567,6 +601,30 @@ using (container.Bind<INamedService>().To(
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FuncWithArguments.cs)
 
+### Resolve all appropriate instances as IObservable source
+
+``` CSharp
+// Create a container
+using (var container = Container.Create())
+// Configure the container
+using (container.Bind<IDependency>().To<Dependency>())
+using (container.Bind<IService>().Tag(1).To<Service>())
+using (container.Bind<IService>().Tag(2).Tag("abc").To<Service>())
+using (container.Bind<IService>().Tag(3).To<Service>())
+{
+    // Resolve source for all appropriate instances
+    var instancesSource = container.Get<IObservable<IService>>();
+
+    var observer = new Mock<IObserver<IService>>();
+    using (instancesSource.Subscribe(observer.Object))
+    {
+        observer.Verify(o => o.OnNext(It.IsAny<IService>()), Times.Exactly(3));
+        observer.Verify(o => o.OnCompleted(), Times.Once);
+    }
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Observable.cs)
+
 ### Resolve Using Arguments
 
 ``` CSharp
@@ -591,6 +649,29 @@ using (container.Bind<INamedService>().To<NamedService>(
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveWithArgs.cs)
+
+### Resolve all appropriate instances as ISet
+
+``` CSharp
+// Create a container
+using (var container = Container.Create())
+// Configure the container
+using (container.Bind<IDependency>().To<Dependency>())
+using (container.Bind<IService>().Tag(1).To<Service>())
+using (container.Bind<IService>().Tag(2).Tag("abc").To<Service>())
+using (container.Bind<IService>().Tag(3).To<Service>())
+{
+    // Resolve all appropriate instances
+    var instances = container.Get<ISet<IService>>();
+
+    instances.Count.ShouldBe(3);
+    foreach (var instance in instances)
+    {
+        instance.ShouldBeOfType<Service>();
+    }
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Set.cs)
 
 ### Auto dispose singleton during container's dispose
 

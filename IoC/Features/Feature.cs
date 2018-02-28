@@ -13,7 +13,7 @@
         public static readonly IEnumerable<IConfiguration> Defaults = new[]
         {
             CoreFeature.Shared,
-            EnumerableFeature.Shared,
+            CollectionFeature.Shared,
             FuncFeature.Shared,
             TaskFeature.Shared,
             TupleFeature.Shared,

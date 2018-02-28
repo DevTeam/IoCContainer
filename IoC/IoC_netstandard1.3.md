@@ -31,6 +31,9 @@
   - [None](#F-IoC-CollectionAccessType-None 'IoC.CollectionAccessType.None')
   - [Read](#F-IoC-CollectionAccessType-Read 'IoC.CollectionAccessType.Read')
   - [UpdatedContent](#F-IoC-CollectionAccessType-UpdatedContent 'IoC.CollectionAccessType.UpdatedContent')
+- [CollectionFeature](#T-IoC-Features-CollectionFeature 'IoC.Features.CollectionFeature')
+  - [Shared](#F-IoC-Features-CollectionFeature-Shared 'IoC.Features.CollectionFeature.Shared')
+  - [Apply()](#M-IoC-Features-CollectionFeature-Apply-IoC-IContainer- 'IoC.Features.CollectionFeature.Apply(IoC.IContainer)')
 - [ConfigurationFeature](#T-IoC-Features-ConfigurationFeature 'IoC.Features.ConfigurationFeature')
   - [Shared](#F-IoC-Features-ConfigurationFeature-Shared 'IoC.Features.ConfigurationFeature.Shared')
   - [Apply()](#M-IoC-Features-ConfigurationFeature-Apply-IoC-IContainer- 'IoC.Features.ConfigurationFeature.Apply(IoC.IContainer)')
@@ -102,9 +105,6 @@
 - [CoreFeature](#T-IoC-Features-CoreFeature 'IoC.Features.CoreFeature')
   - [Shared](#F-IoC-Features-CoreFeature-Shared 'IoC.Features.CoreFeature.Shared')
   - [Apply()](#M-IoC-Features-CoreFeature-Apply-IoC-IContainer- 'IoC.Features.CoreFeature.Apply(IoC.IContainer)')
-- [EnumerableFeature](#T-IoC-Features-EnumerableFeature 'IoC.Features.EnumerableFeature')
-  - [Shared](#F-IoC-Features-EnumerableFeature-Shared 'IoC.Features.EnumerableFeature.Shared')
-  - [Apply()](#M-IoC-Features-EnumerableFeature-Apply-IoC-IContainer- 'IoC.Features.EnumerableFeature.Apply(IoC.IContainer)')
 - [EventType](#T-IoC-ContainerEvent-EventType 'IoC.ContainerEvent.EventType')
   - [Registration](#F-IoC-ContainerEvent-EventType-Registration 'IoC.ContainerEvent.EventType.Registration')
   - [Unregistration](#F-IoC-ContainerEvent-EventType-Unregistration 'IoC.ContainerEvent.EventType.Unregistration')
@@ -113,7 +113,7 @@
 - [FuncFeature](#T-IoC-Features-FuncFeature 'IoC.Features.FuncFeature')
   - [Shared](#F-IoC-Features-FuncFeature-Shared 'IoC.Features.FuncFeature.Shared')
   - [Apply()](#M-IoC-Features-FuncFeature-Apply-IoC-IContainer- 'IoC.Features.FuncFeature.Apply(IoC.IContainer)')
-- [GenericTypeArgument](#T-IoC-GenericTypeArgument 'IoC.GenericTypeArgument')
+- [GenericTypeArgumentAttribute](#T-IoC-GenericTypeArgumentAttribute 'IoC.GenericTypeArgumentAttribute')
 - [IBinding\`1](#T-IoC-IBinding`1 'IoC.IBinding`1')
   - [Container](#P-IoC-IBinding`1-Container 'IoC.IBinding`1.Container')
   - [Lifetime](#P-IoC-IBinding`1-Lifetime 'IoC.IBinding`1.Lifetime')
@@ -162,6 +162,8 @@
 - [InvokerParameterNameAttribute](#T-IoC-InvokerParameterNameAttribute 'IoC.InvokerParameterNameAttribute')
 - [ItemCanBeNullAttribute](#T-IoC-ItemCanBeNullAttribute 'IoC.ItemCanBeNullAttribute')
 - [ItemNotNullAttribute](#T-IoC-ItemNotNullAttribute 'IoC.ItemNotNullAttribute')
+- [IValidator](#T-IoC-Extensibility-IValidator 'IoC.Extensibility.IValidator')
+  - [Validate(container)](#M-IoC-Extensibility-IValidator-Validate-IoC-IContainer- 'IoC.Extensibility.IValidator.Validate(IoC.IContainer)')
 - [Key](#T-IoC-Key 'IoC.Key')
   - [#ctor(type,tag)](#M-IoC-Key-#ctor-System-Type,System-Object- 'IoC.Key.#ctor(System.Type,System.Object)')
   - [AnyTag](#F-IoC-Key-AnyTag 'IoC.Key.AnyTag')
@@ -578,6 +580,31 @@ Method only reads content of the collection but does not modify it.
 ##### Summary
 
 Method can add new elements to the collection.
+
+<a name='T-IoC-Features-CollectionFeature'></a>
+## CollectionFeature [#](#T-IoC-Features-CollectionFeature 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC.Features
+
+##### Summary
+
+Allows to resolve enumeration of all instances related to corresponding bindings.
+
+<a name='F-IoC-Features-CollectionFeature-Shared'></a>
+### Shared `constants` [#](#F-IoC-Features-CollectionFeature-Shared 'Go To Here') [=](#contents 'Back To Contents')
+
+<a name='M-IoC-Features-CollectionFeature-Apply-IoC-IContainer-'></a>
+### Apply() `method` [#](#M-IoC-Features-CollectionFeature-Apply-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
 
 <a name='T-IoC-Features-ConfigurationFeature'></a>
 ## ConfigurationFeature [#](#T-IoC-Features-ConfigurationFeature 'Go To Here') [=](#contents 'Back To Contents')
@@ -1735,31 +1762,6 @@ Adds the set of core features like lifetimes and default containers.
 
 This method has no parameters.
 
-<a name='T-IoC-Features-EnumerableFeature'></a>
-## EnumerableFeature [#](#T-IoC-Features-EnumerableFeature 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Namespace
-
-IoC.Features
-
-##### Summary
-
-Allows to resolve enumeration of all instances related to corresponding bindings.
-
-<a name='F-IoC-Features-EnumerableFeature-Shared'></a>
-### Shared `constants` [#](#F-IoC-Features-EnumerableFeature-Shared 'Go To Here') [=](#contents 'Back To Contents')
-
-<a name='M-IoC-Features-EnumerableFeature-Apply-IoC-IContainer-'></a>
-### Apply() `method` [#](#M-IoC-Features-EnumerableFeature-Apply-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
 <a name='T-IoC-ContainerEvent-EventType'></a>
 ## EventType [#](#T-IoC-ContainerEvent-EventType 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -1828,8 +1830,8 @@ Allows to resolve Funcs.
 
 This method has no parameters.
 
-<a name='T-IoC-GenericTypeArgument'></a>
-## GenericTypeArgument [#](#T-IoC-GenericTypeArgument 'Go To Here') [=](#contents 'Back To Contents')
+<a name='T-IoC-GenericTypeArgumentAttribute'></a>
+## GenericTypeArgumentAttribute [#](#T-IoC-GenericTypeArgumentAttribute 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Namespace
 
@@ -2534,6 +2536,34 @@ IoC
 
 Can be appplied to symbols of types derived from IEnumerable as well as to symbols of Task and Lazy classes to indicate that the value of a collection item, of the Task.Result property or of the Lazy.Value property can never be null.
 
+<a name='T-IoC-Extensibility-IValidator'></a>
+## IValidator [#](#T-IoC-Extensibility-IValidator 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC.Extensibility
+
+##### Summary
+
+Represents a container validator.
+
+<a name='M-IoC-Extensibility-IValidator-Validate-IoC-IContainer-'></a>
+### Validate(container) `method` [#](#M-IoC-Extensibility-IValidator-Validate-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Calidates a container.
+
+##### Returns
+
+The validation results.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
 <a name='T-IoC-Key'></a>
 ## Key [#](#T-IoC-Key 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -3138,7 +3168,7 @@ IoC
 
 ##### Summary
 
-*Inherit from parent.*
+Represents the generic type parameter marker.
 
 <a name='T-IoC-TT1'></a>
 ## TT1 [#](#T-IoC-TT1 'Go To Here') [=](#contents 'Back To Contents')
@@ -3149,7 +3179,7 @@ IoC
 
 ##### Summary
 
-*Inherit from parent.*
+Represents the generic type parameter marker.
 
 <a name='T-IoC-TT2'></a>
 ## TT2 [#](#T-IoC-TT2 'Go To Here') [=](#contents 'Back To Contents')
@@ -3160,7 +3190,7 @@ IoC
 
 ##### Summary
 
-*Inherit from parent.*
+Represents the generic type parameter marker.
 
 <a name='T-IoC-TT3'></a>
 ## TT3 [#](#T-IoC-TT3 'Go To Here') [=](#contents 'Back To Contents')
@@ -3171,7 +3201,7 @@ IoC
 
 ##### Summary
 
-*Inherit from parent.*
+Represents the generic type parameter marker.
 
 <a name='T-IoC-TT4'></a>
 ## TT4 [#](#T-IoC-TT4 'Go To Here') [=](#contents 'Back To Contents')
@@ -3182,7 +3212,7 @@ IoC
 
 ##### Summary
 
-*Inherit from parent.*
+Represents the generic type parameter marker.
 
 <a name='T-IoC-TT5'></a>
 ## TT5 [#](#T-IoC-TT5 'Go To Here') [=](#contents 'Back To Contents')
@@ -3193,7 +3223,7 @@ IoC
 
 ##### Summary
 
-*Inherit from parent.*
+Represents the generic type parameter marker.
 
 <a name='T-IoC-TT6'></a>
 ## TT6 [#](#T-IoC-TT6 'Go To Here') [=](#contents 'Back To Contents')
@@ -3204,7 +3234,7 @@ IoC
 
 ##### Summary
 
-*Inherit from parent.*
+Represents the generic type parameter marker.
 
 <a name='T-IoC-TT7'></a>
 ## TT7 [#](#T-IoC-TT7 'Go To Here') [=](#contents 'Back To Contents')
@@ -3215,7 +3245,7 @@ IoC
 
 ##### Summary
 
-*Inherit from parent.*
+Represents the generic type parameter marker.
 
 <a name='T-IoC-TT8'></a>
 ## TT8 [#](#T-IoC-TT8 'Go To Here') [=](#contents 'Back To Contents')
@@ -3226,7 +3256,7 @@ IoC
 
 ##### Summary
 
-*Inherit from parent.*
+Represents the generic type parameter marker.
 
 <a name='T-IoC-Features-TupleFeature'></a>
 ## TupleFeature [#](#T-IoC-Features-TupleFeature 'Go To Here') [=](#contents 'Back To Contents')
