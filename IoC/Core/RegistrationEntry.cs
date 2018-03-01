@@ -13,7 +13,7 @@
         [NotNull] private readonly IDisposable _resource;
         [NotNull] public readonly List<Key> Keys;
         private readonly object _lockObject = new object();
-        private Table<LifetimeKey, ILifetime> _lifetimes = Table<LifetimeKey, ILifetime>.Empty;
+        private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
 
         public RegistrationEntry(
             [NotNull] IResolverExpressionBuilder resolverExpressionBuilder,
@@ -29,10 +29,10 @@
             Keys = keys ?? throw new ArgumentNullException(nameof(keys));
         }
 
-        public bool TryCreateResolver<T>(Type type, [CanBeNull] object tag, [NotNull] IContainer container, out Resolver<T> resolver)
+        public bool TryCreateResolver<T>(Key key, [NotNull] IContainer container, out Resolver<T> resolver)
         {
-            var typeInfo = type.Info();
-            if (!_resolverExpressionBuilder.TryBuild<T>(new Key(type, tag), container, Dependency, GetLifetime(typeInfo), out var resolverExpression))
+            var typeInfo = key.Type.Info();
+            if (!_resolverExpressionBuilder.TryBuild<T>(key, container, Dependency, GetLifetime(typeInfo), out var resolverExpression))
             {
                 resolver = default(Resolver<T>);
                 return false;
@@ -57,14 +57,13 @@
             }
 
             var lifetimeKey = new LifetimeKey(typeInfo.GenericTypeArguments);
-            var hashCode = lifetimeKey.GetHashCode();
             ILifetime lifetime;
             lock (_lockObject)
             {
-                if (!_lifetimes.TryGet(hashCode, lifetimeKey, out lifetime))
+                if (!_lifetimes.TryGetValue(lifetimeKey, out lifetime))
                 {
                     lifetime = _lifetime?.Clone();
-                    _lifetimes = _lifetimes.Set(hashCode, lifetimeKey, lifetime);
+                    _lifetimes.Add(lifetimeKey, lifetime);
                 }
             }
 
@@ -77,7 +76,7 @@
             lock (_lockObject)
             {
                 lifetimesToDispose = _lifetimes.Select(i => i.Value).OfType<IDisposable>().ToArray();
-                _lifetimes = Table<LifetimeKey, ILifetime>.Empty;
+                _lifetimes.Clear();
             }
 
             foreach (var lifetime in lifetimesToDispose)

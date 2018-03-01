@@ -72,7 +72,7 @@ namespace IoC.Tests
         public void ConfigureContainerTest()
         {
             var performanceCounter = new TotalTimePerformanceCounter();
-            for (var i = 0; i < 100; i++)
+            for (var i = 0; i < 1000; i++)
             {
                 ThisSingleton(2, performanceCounter);
             }
@@ -172,7 +172,6 @@ namespace IoC.Tests
             using (container.Bind<IService2>().As(Lifetime.Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
             {
-                container.Validate();
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -191,7 +190,6 @@ namespace IoC.Tests
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
             {
-                container.Validate();
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)

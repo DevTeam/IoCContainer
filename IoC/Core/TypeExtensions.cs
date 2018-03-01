@@ -5,22 +5,20 @@
     // ReSharper disable once RedundantUsingDirective
     using System.Linq;
     using System.Reflection;
-    using Collections;
 
     internal static class TypeExtensions
     {
         private static readonly object LockObject = new object();
-        private static Table<Type, ITypeInfo> _typeInfos = Table<Type, ITypeInfo>.Empty;
+        private static readonly Dictionary<Type, ITypeInfo> TypeInfos = new Dictionary<Type, ITypeInfo>();
 
         public static ITypeInfo Info(this Type type)
         {
-            var hashCode = type.GetHashCode();
             lock (LockObject)
             {
-                if (!_typeInfos.TryGet(hashCode, type, out var typeInfo))
+                if (!TypeInfos.TryGetValue(type, out var typeInfo))
                 {
                     typeInfo = new InternalTypeInfo(type);
-                    _typeInfos = _typeInfos.Set(hashCode, type, typeInfo);
+                    TypeInfos.Add(type, typeInfo);
                 }
 
                 return new InternalTypeInfo(type);
@@ -36,12 +34,6 @@
         {
             if (string.IsNullOrWhiteSpace(assemblyName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(assemblyName));
             return Assembly.Load(new AssemblyName(assemblyName));
-        }
-
-        public static bool IsGenericTypeArgument([NotNull] this ITypeInfo typeInfo)
-        {
-            if (typeInfo == null) throw new ArgumentNullException(nameof(typeInfo));
-            return typeInfo.GetCustomAttributes<GenericTypeArgumentAttribute>().Any();
         }
 
         [NotNull]
@@ -73,10 +65,13 @@
         {
             private readonly Type _type;
             private readonly Lazy<TypeInfo> _typeInfo;
+            private readonly Lazy<bool> _isGenericTypeArgument;
+
             public InternalTypeInfo([NotNull] Type type)
-            {
+            {   
                 _type = type ?? throw new ArgumentNullException(nameof(type));
                 _typeInfo = new Lazy<TypeInfo>(type.GetTypeInfo);
+                _isGenericTypeArgument = new Lazy<bool>(() => GetCustomAttributes<GenericTypeArgumentAttribute>(true).Any());
             }
 
             public Type Type => _type;
@@ -100,6 +95,8 @@
             public Type[] GenericTypeArguments => _typeInfo.Value.GenericTypeArguments;
 
             public Type[] GenericTypeParameters => _typeInfo.Value.GenericTypeParameters;
+
+            public bool IsGenericTypeArgument => _isGenericTypeArgument.Value;
 
             public IEnumerable<T> GetCustomAttributes<T>(bool inherit)
                 where T: Attribute
@@ -139,10 +136,12 @@
         {
             private static readonly BindingFlags DefaultBindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.Static;
             private readonly Type _type;
+            private readonly Lazy<bool> _isGenericTypeArgument;
 
             public InternalTypeInfo([NotNull] Type type)
             {
                 _type = type ?? throw new ArgumentNullException(nameof(type));
+                _isGenericTypeArgument = new Lazy<bool>(() => GetCustomAttributes<GenericTypeArgumentAttribute>(true).Any());
             }
 
             public Type Type => _type;
@@ -162,6 +161,8 @@
             public bool IsConstructedGenericType => _type.IsGenericType;
 
             public bool IsGenericTypeDefinition => _type.IsGenericTypeDefinition;
+
+            public bool IsGenericTypeArgument => _isGenericTypeArgument.Value;
 
             public IEnumerable<T> GetCustomAttributes<T>(bool inherit)
                 where T : Attribute

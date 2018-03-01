@@ -166,6 +166,7 @@ The results of the [comparison tests](IoC.Tests/ComparisonTests.cs) for some pop
 * [Get ValueTuple](#get-valuetuple)
 * [Tags](#tags)
 * [Auto-wiring](#auto-wiring)
+* [Child Container](#child-container)
 * [Method Injection](#method-injection)
 * [Property Injection](#property-injection)
 * [Singleton lifetime](#singleton-lifetime)
@@ -430,6 +431,19 @@ using (container.Bind<IService>().To<Service>())
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Autowiring.cs)
+
+### Child Container
+
+``` CSharp
+// Create a parent container
+using (var parentContainer = Container.Create())
+// Create a child container
+using (var childContainer = parentContainer.CreateChild())
+{
+    childContainer.Parent.ShouldBe(parentContainer);
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ChildContainer.cs)
 
 ### Method Injection
 

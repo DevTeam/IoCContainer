@@ -617,6 +617,7 @@
         }
 
         [NotNull]
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         private static IDisposable CreateRegistration<T>([NotNull] this IBinding<T> binding, [NotNull] IDependency dependency)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
@@ -625,11 +626,11 @@
             var keys = (
                 from contract in binding.Types
                 from tag in binding.Tags.DefaultIfEmpty(null)
-                select new Key(contract, tag)).Distinct().ToArray();
+                select new Key(contract, tag)).Distinct();
 
             if (!binding.Container.TryRegister(keys, dependency, binding.Lifetime, out var registrationToken))
             {
-                return binding.Container.GetIssueResolver().CannotRegister(binding.Container, keys);
+                return binding.Container.GetIssueResolver().CannotRegister(binding.Container, keys.ToArray());
             }
 
             return registrationToken;

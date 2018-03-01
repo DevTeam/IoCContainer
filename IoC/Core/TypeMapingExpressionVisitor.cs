@@ -79,7 +79,7 @@
                     return;
                 }
 
-                if (targetTypeInfo.IsGenericTypeArgument())
+                if (targetTypeInfo.IsGenericTypeArgument)
                 {
                     _typesMap[targetTypeInfo.Type] = typeInfo.Type;
                 }
@@ -138,7 +138,7 @@
                 var targetType = targetGenTypes[i];
                 var type = genTypes[i];
                 targetTypeInfo = targetType.Info();
-                if (!targetTypeInfo.IsGenericTypeArgument())
+                if (!targetTypeInfo.IsGenericTypeArgument)
                 {
                     continue;
                 }

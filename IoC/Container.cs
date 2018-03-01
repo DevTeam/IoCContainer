@@ -221,7 +221,7 @@
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
         {
-            if (_resolversByType.TryGetFast(type.GetHashCode(), type, out var resolverValue))
+            if (tag == null && _resolversByType.TryGetFast(type.GetHashCode(), type, out var resolverValue))
             {
                 resolver = (Resolver<T>)resolverValue;
                 return true;
@@ -235,7 +235,7 @@
                 return true;
             }
 
-            return TryCreateResolver(type, tag, out resolver, container ?? this);
+            return TryCreateResolver(key, out resolver, container ?? this);
         }
 
         /// <inheritdoc />
@@ -249,7 +249,7 @@
                 return true;
             }
 
-            return TryCreateResolver(type, null, out resolver, container ?? this);
+            return TryCreateResolver(KeyHolder<T>.Shared, out resolver, container ?? this);
         }
 
         /// <inheritdoc />
@@ -272,47 +272,42 @@
 
 
         [MethodImpl((MethodImplOptions)256)]
-        private bool TryCreateResolver<T>(Type type, [CanBeNull] object tag, out Resolver<T> resolver, IContainer container)
+        private bool TryCreateResolver<T>(FullKey key, out Resolver<T> resolver, IContainer container)
         {
-            if (TryGetRegistrationEntry(type, tag, out var registrationEntry))
+            if (TryGetRegistrationEntry(key, out var registrationEntry))
             {
-                if (!registrationEntry.TryCreateResolver(type, tag, container, out resolver))
+                if (!registrationEntry.TryCreateResolver(key, container, out resolver))
                 {
                     return false;
                 }
 
-                if (container == this)
-                {
-                    AddResolver(type, tag, resolver);
-                }
-
+                AddResolver(key, resolver);
                 return true;
             }
 
-            if (!_parent.TryGetResolver(type, tag, out resolver, container))
+            if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, container))
             {
                 return false;
             }
 
             if (container == this)
             {
-                AddResolver(type, tag, resolver);
+                AddResolver(key, resolver);
             }
 
             return true;
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        private void AddResolver<T>(Type type, object tag, Resolver<T> resolver)
+        private void AddResolver<T>(FullKey key, Resolver<T> resolver)
         {
             lock (_lockObject)
             {
                 _hasResolver = true;
-                var key = new FullKey(type, tag);
                 _resolvers = _resolvers.Set(key.GetHashCode(), key, resolver);
-                if (tag == null)
+                if (key.Tag == null)
                 {
-                    _resolversByType = _resolversByType.Set(type.GetHashCode(), type, resolver);
+                    _resolversByType = _resolversByType.Set(key.Type.GetHashCode(), key.Type, resolver);
                 }
             }
         }
@@ -320,7 +315,7 @@
         /// <inheritdoc />
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
         {
-            if (TryGetRegistrationEntry(key.Type, key.Tag, out var registrationEntry))
+            if (TryGetRegistrationEntry(key, out var registrationEntry))
             {
                 dependency = registrationEntry.Dependency;
                 lifetime = registrationEntry.GetLifetime(key.Type);
@@ -331,21 +326,21 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        private bool TryGetRegistrationEntry(Type type, object tag, out RegistrationEntry registrationEntry)
+        private bool TryGetRegistrationEntry(FullKey key, out RegistrationEntry registrationEntry)
         {
             lock (_lockObject)
             {
-                var key = new FullKey(type, tag);
                 if (_registrationEntries.TryGet(key.GetHashCode(), key, out registrationEntry))
                 {
                     return true;
                 }
 
+                var type = key.Type;
                 var typeInfo = type.Info();
                 if (typeInfo.IsConstructedGenericType)
                 {
                     var genericType = typeInfo.GetGenericTypeDefinition();
-                    var genericKey = new FullKey(genericType, tag);
+                    var genericKey = new FullKey(genericType, key.Tag);
                     if (_registrationEntries.TryGet(genericKey.GetHashCode(), genericKey, out registrationEntry))
                     {
                         return true;
@@ -532,6 +527,11 @@
             {
                 _isFreezed = false;
             }
+        }
+
+        private class KeyHolder<T>
+        {
+            public static readonly Key Shared = new Key(typeof(T));
         }
     }
 }

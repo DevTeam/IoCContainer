@@ -25,7 +25,7 @@
                 return type;
             }
 
-            if (typeInfo.GenericTypeArguments.Any(t => t.Info().IsGenericTypeArgument()))
+            if (typeInfo.GenericTypeArguments.Any(t => t.Info().IsGenericTypeArgument))
             {
                 return typeInfo.GetGenericTypeDefinition();
             }
