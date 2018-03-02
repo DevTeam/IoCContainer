@@ -5,37 +5,44 @@
     // ReSharper disable once RedundantUsingDirective
     using System.Linq;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
+    using Collections;
 
     internal static class TypeExtensions
     {
         private static readonly object LockObject = new object();
-        private static readonly Dictionary<Type, ITypeInfo> TypeInfos = new Dictionary<Type, ITypeInfo>();
+        private static Table<Type, ITypeInfo> _typeInfos = Table<Type, ITypeInfo>.Empty;
 
+        [MethodImpl((MethodImplOptions)256)]
         public static ITypeInfo Info(this Type type)
         {
             lock (LockObject)
             {
-                if (!TypeInfos.TryGetValue(type, out var typeInfo))
+                var hashCode = type.GetHashCode();
+                if (!_typeInfos.TryGet(hashCode, type, out var typeInfo))
                 {
                     typeInfo = new InternalTypeInfo(type);
-                    TypeInfos.Add(type, typeInfo);
+                    _typeInfos = _typeInfos.Set(hashCode, type, typeInfo);
                 }
 
-                return new InternalTypeInfo(type);
+                return typeInfo;
             }
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         public static ITypeInfo Info<T>()
         {
             return TypeInfoHolder<T>.Shared;
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         public static Assembly LoadAssembly(string assemblyName)
         {
             if (string.IsNullOrWhiteSpace(assemblyName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(assemblyName));
             return Assembly.Load(new AssemblyName(assemblyName));
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static Type ToDefinedGenericType([NotNull] this ITypeInfo typeInfo)
         {
@@ -54,6 +61,26 @@
 
             return typeInfo.MakeGenericType(genericTypeArguments);
         }
+
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static Type ToGenericType([NotNull] this Type type)
+        {
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            var typeInfo = type.Info();
+            if (!typeInfo.IsConstructedGenericType)
+            {
+                return type;
+            }
+
+            if (typeInfo.GenericTypeArguments.Any(t => t.Info().IsGenericTypeArgument))
+            {
+                return typeInfo.GetGenericTypeDefinition();
+            }
+
+            return type;
+        }
+
 
         private static class TypeInfoHolder<T>
         {

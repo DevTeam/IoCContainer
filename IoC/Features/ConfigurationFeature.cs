@@ -24,47 +24,15 @@
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container
-                .Bind<IConverter<IEnumerable<Statement>, BindingContext, BindingContext>>()
-                .As(Lifetime.ContainerSingleton)
-                .To<StatementsToBindingContextConverter>();
-
-            yield return container
-                .Bind<IConverter<Statement, BindingContext, BindingContext>>()
-                .Tag("Bind")
-                .As(Lifetime.ContainerSingleton)
-                .To<StatementToBindingConverter>();
-
-            yield return container
-                .Bind<IConverter<Statement, BindingContext, BindingContext>>()
-                .Tag("using")
-                .As(Lifetime.ContainerSingleton)
-                .To<StatementToNamespacesConverter>();
-
-            yield return container
-                .Bind<IConverter<Statement, BindingContext, BindingContext>>()
-                .Tag("ref")
-                .As(Lifetime.ContainerSingleton)
-                .To<StatementToReferencesConverter>();
-
-            yield return container
-                .Bind<IConverter<string, BindingContext, Type>>()
-                .As(Lifetime.ContainerSingleton)
-                .To<StringToTypeConverter>();
-
-            yield return container
-                .Bind<IConverter<string, Statement, Lifetime>>()
-                .As(Lifetime.ContainerSingleton)
-                .To<StringToLifetimeConverter>();
-
-            yield return container
-                .Bind<IConverter<string, Statement, IEnumerable<object>>>()
-                .As(Lifetime.ContainerSingleton)
-                .To<StringToTagsConverter>();
-
-            yield return container
-                .Bind<IConfiguration>()
-                .To(ctx => CreateTextConfiguration(ctx));
+            var containerSingletonResolver = container.GetResolver<ILifetime>(typeof(ILifetime), Lifetime.ContainerSingleton);
+            yield return container.Register<StatementsToBindingContextConverter, IConverter<IEnumerable<Statement>, BindingContext, BindingContext>>(containerSingletonResolver(container));
+            yield return container.Register<StatementToBindingConverter, IConverter<Statement, BindingContext, BindingContext>>(containerSingletonResolver(container), new object[] { "Bind" });
+            yield return container.Register<StatementToNamespacesConverter, IConverter<Statement, BindingContext, BindingContext>>(containerSingletonResolver(container), new object[] {"using"});
+            yield return container.Register<StatementToReferencesConverter, IConverter<Statement, BindingContext, BindingContext>>(containerSingletonResolver(container), new object[] { "ref" });
+            yield return container.Register<StringToTypeConverter, IConverter<string, BindingContext, Type>>(containerSingletonResolver(container));
+            yield return container.Register<StringToLifetimeConverter, IConverter<string, Statement, Lifetime>>(containerSingletonResolver(container));
+            yield return container.Register<StringToTagsConverter, IConverter<string, Statement, IEnumerable<object>>>(containerSingletonResolver(container));
+            yield return container.Register<IConfiguration>(ctx => CreateTextConfiguration(ctx));
         }
 
         private static TextConfiguration CreateTextConfiguration(Context ctx)

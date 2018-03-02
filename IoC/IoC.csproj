@@ -1,10 +1,9 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk" ToolsVersion="15.0">
   <PropertyGroup>
-    <TargetFrameworks Condition="'$(Configuration)'=='Debug'">net40;net47;netstandard1.0;netcoreapp2.0</TargetFrameworks>
-    <TargetFrameworks Condition="'$(Configuration)'=='Release'">netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;net40;net45;net46;net47;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
+    <TargetFrameworks>net40;net47;netstandard1.0;netcoreapp2.0</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
-    <TreatWarningsAsErrors>True</TreatWarningsAsErrors>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackageId>IoC.Container</PackageId>
     <Authors>NikolayP</Authors>
     <Description>Simple, powerful and fast IoC container</Description>
@@ -16,11 +15,17 @@
     <PackageTags>IoC inversionofcontrol Container DI dependencyinjection</PackageTags>
     <Product>IoC Container</Product>
     <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
-    <DebugType Condition="'$(Configuration)'=='Release'">none</DebugType>
-    <DebugSymbols Condition="'$(Configuration)'=='Release'">false</DebugSymbols>
-    <OldToolsVersion>2.0</OldToolsVersion>
     <DocumentationFile>IoC_$(TargetFramework).xml</DocumentationFile>
+    <WarningsAsErrors />
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;net40;net45;net46;net47;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Vsxmd" Version="1.2.0">
         <PrivateAssets>all</PrivateAssets>

@@ -4,7 +4,7 @@
     using System.Linq;
     using System.Runtime.CompilerServices;
 
-    internal static class ArrayExtensions
+    internal static class Extensions
     {
         [MethodImpl((MethodImplOptions)256)]
         public static bool SequenceEqual<T>([NotNull] T[] array1, [NotNull] T[] array2)

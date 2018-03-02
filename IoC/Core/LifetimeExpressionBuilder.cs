@@ -9,7 +9,6 @@
     internal class LifetimeExpressionBuilder : IExpressionBuilder<ILifetime>
     {
         public static readonly IExpressionBuilder<ILifetime> Shared = new LifetimeExpressionBuilder();
-        private static readonly ITypeInfo ResolverGenericTypeInfo = typeof(Resolver<>).Info();
         private static readonly MethodInfo LifetimeGenericGetOrCreateMethodInfo = TypeExtensions.Info<ILifetime>().DeclaredMethods.Single(i => i.Name == nameof(ILifetime.GetOrCreate));
 
         private LifetimeExpressionBuilder()
@@ -30,8 +29,7 @@
             }
 
             var getOrCreateMethodInfo = LifetimeGenericGetOrCreateMethodInfo.MakeGenericMethod(key.Type);
-            var resolverType = ResolverGenericTypeInfo.MakeGenericType(key.Type);
-            var resolverExpression = Expression.Lambda(resolverType, expression, true, ExpressionExtensions.Parameters);
+            var resolverExpression = Expression.Lambda(key.Type.ToResolverType(), expression, false, ExpressionExtensions.Parameters);
             var resolver = resolverExpression.Compile();
             var lifetimeCall = Expression.Call(Expression.Constant(lifetime), getOrCreateMethodInfo, ExpressionExtensions.ContainerParameter, ExpressionExtensions.ArgsParameter, Expression.Constant(resolver));
             return lifetimeCall;

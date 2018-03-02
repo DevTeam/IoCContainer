@@ -19,11 +19,7 @@
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-
-            yield return container
-                .Bind<Lazy<TT>>()
-                .AnyTag()
-                .To(ctx => new Lazy<TT>(() => ctx.Container.Inject<TT>(), true));
+            yield return container.Register(ctx => new Lazy<TT>(() => ctx.Container.Inject<TT>(), true), null, Feature.AnyTag);
         }
     }
 }

@@ -10,27 +10,9 @@
         public Binding([NotNull] IContainer container, [NotNull][ItemNotNull] params Type[] types)
         {
             Container = container ?? throw new ArgumentNullException(nameof(container));
-            Types = (types ?? throw new ArgumentNullException(nameof(types))).Select(ConvertType).ToArray();
+            Types = types ?? throw new ArgumentNullException(nameof(types));
             Lifetime = null;
             Tags = Enumerable.Empty<object>();
-        }
-
-        [NotNull]
-        private static Type ConvertType([NotNull] Type type)
-        {
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            var typeInfo = type.Info();
-            if (!typeInfo.IsConstructedGenericType)
-            {
-                return type;
-            }
-
-            if (typeInfo.GenericTypeArguments.Any(t => t.Info().IsGenericTypeArgument))
-            {
-                return typeInfo.GetGenericTypeDefinition();
-            }
-
-            return type;
         }
 
         public Binding([NotNull] IBinding<T> binding, Lifetime lifetime)
@@ -39,7 +21,7 @@
             Container = binding.Container;
             Types = binding.Types;
             Tags = binding.Tags;
-            Lifetime = lifetime != IoC.Lifetime.Transient ? binding.Container.Tag(lifetime).Get<ILifetime>() : null;
+            Lifetime = lifetime != IoC.Lifetime.Transient ? binding.Container.GetResolver<ILifetime>(typeof(ILifetime), lifetime)(binding.Container) : null;
         }
 
         public Binding([NotNull] IBinding<T> binding, [NotNull] ILifetime lifetime)
@@ -57,7 +39,7 @@
             Container = binding.Container;
             Types = binding.Types;
             Lifetime = binding.Lifetime;
-            Tags = binding.Tags.Concat(Enumerable.Repeat(tagValue, 1)).Distinct().ToArray();
+            Tags = binding.Tags.Concat(Enumerable.Repeat(tagValue, 1));
         }
 
         public IContainer Container { get; }

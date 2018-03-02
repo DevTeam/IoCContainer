@@ -42,6 +42,7 @@
   - [Create(name)](#M-IoC-Container-Create-System-String- 'IoC.Container.Create(System.String)')
   - [Create(configurations)](#M-IoC-Container-Create-IoC-IConfiguration[]- 'IoC.Container.Create(IoC.IConfiguration[])')
   - [Create(name,configurations)](#M-IoC-Container-Create-System-String,IoC-IConfiguration[]- 'IoC.Container.Create(System.String,IoC.IConfiguration[])')
+  - [CreateBasic(name)](#M-IoC-Container-CreateBasic-System-String- 'IoC.Container.CreateBasic(System.String)')
   - [Dispose()](#M-IoC-Container-Dispose 'IoC.Container.Dispose')
   - [GetEnumerator()](#M-IoC-Container-GetEnumerator 'IoC.Container.GetEnumerator')
   - [GetResolver\`\`1()](#M-IoC-Container-GetResolver``1-System-Type,System-Object,IoC-IContainer- 'IoC.Container.GetResolver``1(System.Type,System.Object,IoC.IContainer)')
@@ -83,6 +84,24 @@
   - [Get\`\`1(resolving,args)](#M-IoC-ContainerExtensions-Get``1-IoC-ContainerExtensions-Resolving,System-Object[]- 'IoC.ContainerExtensions.Get``1(IoC.ContainerExtensions.Resolving,System.Object[])')
   - [Get\`\`1(resolving)](#M-IoC-ContainerExtensions-Get``1-IoC-ContainerExtensions-Resolving- 'IoC.ContainerExtensions.Get``1(IoC.ContainerExtensions.Resolving)')
   - [Lifetime\`\`1(binding,lifetime)](#M-IoC-ContainerExtensions-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime- 'IoC.ContainerExtensions.Lifetime``1(IoC.IBinding{``0},IoC.ILifetime)')
+  - [Register\`\`1(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``1(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`1(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``1-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``1(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`2(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``2-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``2(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`2(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``2-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``2(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`3(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``3-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``3(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`3(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``3-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``3(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`4(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``4-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``4(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`4(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``4-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``4(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`5(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``5-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``5(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`5(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``5-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``5(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`6(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``6-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``6(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`6(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``6-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``6(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`7(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``7-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``7(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`7(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``7-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``7(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`8(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``8-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``8(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`8(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``8-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``8(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`9(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``9-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``9(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`9(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``9-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``9(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
   - [Tag(container,tag)](#M-IoC-ContainerExtensions-Tag-IoC-IContainer,System-Object- 'IoC.ContainerExtensions.Tag(IoC.IContainer,System.Object)')
   - [Tag\`\`1(binding,tagValue)](#M-IoC-ContainerExtensions-Tag``1-IoC-IBinding{``0},System-Object- 'IoC.ContainerExtensions.Tag``1(IoC.IBinding{``0},System.Object)')
   - [To(binding,type,constructorFilter)](#M-IoC-ContainerExtensions-To-IoC-IBinding{System-Object},System-Type,System-Predicate{System-Reflection-ConstructorInfo}- 'IoC.ContainerExtensions.To(IoC.IBinding{System.Object},System.Type,System.Predicate{System.Reflection.ConstructorInfo})')
@@ -95,6 +114,11 @@
   - [Using(container,configurations)](#M-IoC-ContainerExtensions-Using-IoC-IContainer,IoC-IConfiguration[]- 'IoC.ContainerExtensions.Using(IoC.IContainer,IoC.IConfiguration[])')
   - [Using\`\`1(container)](#M-IoC-ContainerExtensions-Using``1-IoC-IContainer- 'IoC.ContainerExtensions.Using``1(IoC.IContainer)')
   - [Validate(container)](#M-IoC-ContainerExtensions-Validate-IoC-IContainer- 'IoC.ContainerExtensions.Validate(IoC.IContainer)')
+- [ContainerSingletonLifetime](#T-IoC-Lifetimes-ContainerSingletonLifetime 'IoC.Lifetimes.ContainerSingletonLifetime')
+  - [#ctor()](#M-IoC-Lifetimes-ContainerSingletonLifetime-#ctor-System-Func{IoC-ILifetime}- 'IoC.Lifetimes.ContainerSingletonLifetime.#ctor(System.Func{IoC.ILifetime})')
+  - [Clone()](#M-IoC-Lifetimes-ContainerSingletonLifetime-Clone 'IoC.Lifetimes.ContainerSingletonLifetime.Clone')
+  - [CreateKey()](#M-IoC-Lifetimes-ContainerSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ContainerSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])')
+  - [ToString()](#M-IoC-Lifetimes-ContainerSingletonLifetime-ToString 'IoC.Lifetimes.ContainerSingletonLifetime.ToString')
 - [Context](#T-IoC-Context 'IoC.Context')
   - [Args](#F-IoC-Context-Args 'IoC.Context.Args')
   - [Container](#F-IoC-Context-Container 'IoC.Context.Container')
@@ -109,7 +133,8 @@
   - [Registration](#F-IoC-ContainerEvent-EventType-Registration 'IoC.ContainerEvent.EventType.Registration')
   - [Unregistration](#F-IoC-ContainerEvent-EventType-Unregistration 'IoC.ContainerEvent.EventType.Unregistration')
 - [Feature](#T-IoC-Features-Feature 'IoC.Features.Feature')
-  - [Defaults](#F-IoC-Features-Feature-Defaults 'IoC.Features.Feature.Defaults')
+  - [BasicSet](#F-IoC-Features-Feature-BasicSet 'IoC.Features.Feature.BasicSet')
+  - [DefaultSet](#F-IoC-Features-Feature-DefaultSet 'IoC.Features.Feature.DefaultSet')
 - [FuncFeature](#T-IoC-Features-FuncFeature 'IoC.Features.FuncFeature')
   - [Shared](#F-IoC-Features-FuncFeature-Shared 'IoC.Features.FuncFeature.Shared')
   - [Apply()](#M-IoC-Features-FuncFeature-Apply-IoC-IContainer- 'IoC.Features.FuncFeature.Apply(IoC.IContainer)')
@@ -205,6 +230,23 @@
   - [#ctor(scopeKey)](#M-IoC-Scope-#ctor-System-Object- 'IoC.Scope.#ctor(System.Object)')
   - [Current](#P-IoC-Scope-Current 'IoC.Scope.Current')
   - [Dispose()](#M-IoC-Scope-Dispose 'IoC.Scope.Dispose')
+- [ScopeSingletonLifetime](#T-IoC-Lifetimes-ScopeSingletonLifetime 'IoC.Lifetimes.ScopeSingletonLifetime')
+  - [#ctor()](#M-IoC-Lifetimes-ScopeSingletonLifetime-#ctor-System-Func{IoC-ILifetime}- 'IoC.Lifetimes.ScopeSingletonLifetime.#ctor(System.Func{IoC.ILifetime})')
+  - [Clone()](#M-IoC-Lifetimes-ScopeSingletonLifetime-Clone 'IoC.Lifetimes.ScopeSingletonLifetime.Clone')
+  - [CreateKey()](#M-IoC-Lifetimes-ScopeSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])')
+  - [ToString()](#M-IoC-Lifetimes-ScopeSingletonLifetime-ToString 'IoC.Lifetimes.ScopeSingletonLifetime.ToString')
+- [SingletonBasedLifetime\`1](#T-IoC-Lifetimes-SingletonBasedLifetime`1 'IoC.Lifetimes.SingletonBasedLifetime`1')
+  - [#ctor()](#M-IoC-Lifetimes-SingletonBasedLifetime`1-#ctor-System-Func{IoC-ILifetime}- 'IoC.Lifetimes.SingletonBasedLifetime`1.#ctor(System.Func{IoC.ILifetime})')
+  - [Clone()](#M-IoC-Lifetimes-SingletonBasedLifetime`1-Clone 'IoC.Lifetimes.SingletonBasedLifetime`1.Clone')
+  - [CreateKey(container,args)](#M-IoC-Lifetimes-SingletonBasedLifetime`1-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.SingletonBasedLifetime`1.CreateKey(IoC.IContainer,System.Object[])')
+  - [Dispose()](#M-IoC-Lifetimes-SingletonBasedLifetime`1-Dispose 'IoC.Lifetimes.SingletonBasedLifetime`1.Dispose')
+  - [GetOrCreate\`\`1()](#M-IoC-Lifetimes-SingletonBasedLifetime`1-GetOrCreate``1-IoC-IContainer,System-Object[],IoC-Resolver{``0}- 'IoC.Lifetimes.SingletonBasedLifetime`1.GetOrCreate``1(IoC.IContainer,System.Object[],IoC.Resolver{``0})')
+- [SingletonLifetime](#T-IoC-Lifetimes-SingletonLifetime 'IoC.Lifetimes.SingletonLifetime')
+  - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Key,IoC-IContainer,System-Object- 'IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.Key,IoC.IContainer,System.Object)')
+  - [Clone()](#M-IoC-Lifetimes-SingletonLifetime-Clone 'IoC.Lifetimes.SingletonLifetime.Clone')
+  - [Dispose()](#M-IoC-Lifetimes-SingletonLifetime-Dispose 'IoC.Lifetimes.SingletonLifetime.Dispose')
+  - [GetOrCreate\`\`1()](#M-IoC-Lifetimes-SingletonLifetime-GetOrCreate``1-IoC-IContainer,System-Object[],IoC-Resolver{``0}- 'IoC.Lifetimes.SingletonLifetime.GetOrCreate``1(IoC.IContainer,System.Object[],IoC.Resolver{``0})')
+  - [ToString()](#M-IoC-Lifetimes-SingletonLifetime-ToString 'IoC.Lifetimes.SingletonLifetime.ToString')
 - [SourceTemplateAttribute](#T-IoC-SourceTemplateAttribute 'IoC.SourceTemplateAttribute')
 - [StringFormatMethodAttribute](#T-IoC-StringFormatMethodAttribute 'IoC.StringFormatMethodAttribute')
   - [#ctor(formatParameterName)](#M-IoC-StringFormatMethodAttribute-#ctor-System-String- 'IoC.StringFormatMethodAttribute.#ctor(System.String)')
@@ -212,6 +254,11 @@
   - [Shared](#F-IoC-Features-TaskFeature-Shared 'IoC.Features.TaskFeature.Shared')
   - [Apply()](#M-IoC-Features-TaskFeature-Apply-IoC-IContainer- 'IoC.Features.TaskFeature.Apply(IoC.IContainer)')
 - [TerminatesProgramAttribute](#T-IoC-TerminatesProgramAttribute 'IoC.TerminatesProgramAttribute')
+- [ThreadSingletonLifetime](#T-IoC-Lifetimes-ThreadSingletonLifetime 'IoC.Lifetimes.ThreadSingletonLifetime')
+  - [#ctor()](#M-IoC-Lifetimes-ThreadSingletonLifetime-#ctor-System-Func{IoC-ILifetime}- 'IoC.Lifetimes.ThreadSingletonLifetime.#ctor(System.Func{IoC.ILifetime})')
+  - [Clone()](#M-IoC-Lifetimes-ThreadSingletonLifetime-Clone 'IoC.Lifetimes.ThreadSingletonLifetime.Clone')
+  - [CreateKey()](#M-IoC-Lifetimes-ThreadSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ThreadSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])')
+  - [ToString()](#M-IoC-Lifetimes-ThreadSingletonLifetime-ToString 'IoC.Lifetimes.ThreadSingletonLifetime.ToString')
 - [TT](#T-IoC-TT 'IoC.TT')
 - [TT1](#T-IoC-TT1 'IoC.TT1')
 - [TT2](#T-IoC-TT2 'IoC.TT2')
@@ -705,6 +752,23 @@ The roor container.
 | ---- | ---- | ----------- |
 | name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The optional name of the container. |
 | configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The set of features. |
+
+<a name='M-IoC-Container-CreateBasic-System-String-'></a>
+### CreateBasic(name) `method` [#](#M-IoC-Container-CreateBasic-System-String- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Creates a root container with basic features.
+
+##### Returns
+
+The roor container.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The optional name of the container. |
 
 <a name='M-IoC-Container-Dispose'></a>
 ### Dispose() `method` [#](#M-IoC-Container-Dispose 'Go To Here') [=](#contents 'Back To Contents')
@@ -1436,6 +1500,546 @@ The binding token.
 | ---- | ----------- |
 | T | The instance type. |
 
+<a name='M-IoC-ContainerExtensions-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`1(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+
+<a name='M-IoC-ContainerExtensions-Register``1-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`1(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``1-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+
+<a name='M-IoC-ContainerExtensions-Register``2-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`2(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``2-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``2-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`2(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``2-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``3-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`3(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``3-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``3-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`3(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``3-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``4-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`4(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``4-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``4-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`4(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``4-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``5-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`5(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``5-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``5-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`5(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``5-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``6-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`6(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``6-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``6-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`6(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``6-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``7-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`7(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``7-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+| T6 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``7-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`7(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``7-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+| T6 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``8-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`8(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``8-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+| T6 | The additional contract type. |
+| T7 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``8-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`8(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``8-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+| T6 | The additional contract type. |
+| T7 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``9-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`9(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``9-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+| T6 | The additional contract type. |
+| T7 | The additional contract type. |
+| T8 | The additional contract type. |
+
+<a name='M-IoC-ContainerExtensions-Register``9-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`9(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``9-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+| T6 | The additional contract type. |
+| T7 | The additional contract type. |
+| T8 | The additional contract type. |
+
 <a name='M-IoC-ContainerExtensions-Tag-IoC-IContainer,System-Object-'></a>
 ### Tag(container,tag) `method` [#](#M-IoC-ContainerExtensions-Tag-IoC-IContainer,System-Object- 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -1671,6 +2275,61 @@ The validation result.
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
 
+<a name='T-IoC-Lifetimes-ContainerSingletonLifetime'></a>
+## ContainerSingletonLifetime [#](#T-IoC-Lifetimes-ContainerSingletonLifetime 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC.Lifetimes
+
+##### Summary
+
+Represents singleton per container lifetime.
+
+<a name='M-IoC-Lifetimes-ContainerSingletonLifetime-#ctor-System-Func{IoC-ILifetime}-'></a>
+### #ctor() `constructor` [#](#M-IoC-Lifetimes-ContainerSingletonLifetime-#ctor-System-Func{IoC-ILifetime}- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This constructor has no parameters.
+
+<a name='M-IoC-Lifetimes-ContainerSingletonLifetime-Clone'></a>
+### Clone() `method` [#](#M-IoC-Lifetimes-ContainerSingletonLifetime-Clone 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ContainerSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]-'></a>
+### CreateKey() `method` [#](#M-IoC-Lifetimes-ContainerSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ContainerSingletonLifetime-ToString'></a>
+### ToString() `method` [#](#M-IoC-Lifetimes-ContainerSingletonLifetime-ToString 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
 <a name='T-IoC-Context'></a>
 ## Context [#](#T-IoC-Context 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -1799,8 +2458,15 @@ IoC.Features
 
 Provides defaults for features.
 
-<a name='F-IoC-Features-Feature-Defaults'></a>
-### Defaults `constants` [#](#F-IoC-Features-Feature-Defaults 'Go To Here') [=](#contents 'Back To Contents')
+<a name='F-IoC-Features-Feature-BasicSet'></a>
+### BasicSet `constants` [#](#F-IoC-Features-Feature-BasicSet 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+The enumeration of default features.
+
+<a name='F-IoC-Features-Feature-DefaultSet'></a>
+### DefaultSet `constants` [#](#F-IoC-Features-Feature-DefaultSet 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -3072,6 +3738,206 @@ The current scope.
 
 This method has no parameters.
 
+<a name='T-IoC-Lifetimes-ScopeSingletonLifetime'></a>
+## ScopeSingletonLifetime [#](#T-IoC-Lifetimes-ScopeSingletonLifetime 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC.Lifetimes
+
+##### Summary
+
+Represents singleton per scope lifetime.
+
+<a name='M-IoC-Lifetimes-ScopeSingletonLifetime-#ctor-System-Func{IoC-ILifetime}-'></a>
+### #ctor() `constructor` [#](#M-IoC-Lifetimes-ScopeSingletonLifetime-#ctor-System-Func{IoC-ILifetime}- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This constructor has no parameters.
+
+<a name='M-IoC-Lifetimes-ScopeSingletonLifetime-Clone'></a>
+### Clone() `method` [#](#M-IoC-Lifetimes-ScopeSingletonLifetime-Clone 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ScopeSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]-'></a>
+### CreateKey() `method` [#](#M-IoC-Lifetimes-ScopeSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ScopeSingletonLifetime-ToString'></a>
+### ToString() `method` [#](#M-IoC-Lifetimes-ScopeSingletonLifetime-ToString 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='T-IoC-Lifetimes-SingletonBasedLifetime`1'></a>
+## SingletonBasedLifetime\`1 [#](#T-IoC-Lifetimes-SingletonBasedLifetime`1 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC.Lifetimes
+
+##### Summary
+
+Represents the abstaction for singleton based lifetimes.
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| TKey |  |
+
+<a name='M-IoC-Lifetimes-SingletonBasedLifetime`1-#ctor-System-Func{IoC-ILifetime}-'></a>
+### #ctor() `constructor` [#](#M-IoC-Lifetimes-SingletonBasedLifetime`1-#ctor-System-Func{IoC-ILifetime}- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This constructor has no parameters.
+
+<a name='M-IoC-Lifetimes-SingletonBasedLifetime`1-Clone'></a>
+### Clone() `method` [#](#M-IoC-Lifetimes-SingletonBasedLifetime`1-Clone 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-SingletonBasedLifetime`1-CreateKey-IoC-IContainer,System-Object[]-'></a>
+### CreateKey(container,args) `method` [#](#M-IoC-Lifetimes-SingletonBasedLifetime`1-CreateKey-IoC-IContainer,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Creates key for singleton.
+
+##### Returns
+
+The created key.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The arfuments. |
+
+<a name='M-IoC-Lifetimes-SingletonBasedLifetime`1-Dispose'></a>
+### Dispose() `method` [#](#M-IoC-Lifetimes-SingletonBasedLifetime`1-Dispose 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-SingletonBasedLifetime`1-GetOrCreate``1-IoC-IContainer,System-Object[],IoC-Resolver{``0}-'></a>
+### GetOrCreate\`\`1() `method` [#](#M-IoC-Lifetimes-SingletonBasedLifetime`1-GetOrCreate``1-IoC-IContainer,System-Object[],IoC-Resolver{``0}- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='T-IoC-Lifetimes-SingletonLifetime'></a>
+## SingletonLifetime [#](#T-IoC-Lifetimes-SingletonLifetime 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC.Lifetimes
+
+##### Summary
+
+Represents singleton lifetime.
+
+<a name='M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Key,IoC-IContainer,System-Object-'></a>
+### Build() `method` [#](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Key,IoC-IContainer,System-Object- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-SingletonLifetime-Clone'></a>
+### Clone() `method` [#](#M-IoC-Lifetimes-SingletonLifetime-Clone 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-SingletonLifetime-Dispose'></a>
+### Dispose() `method` [#](#M-IoC-Lifetimes-SingletonLifetime-Dispose 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-SingletonLifetime-GetOrCreate``1-IoC-IContainer,System-Object[],IoC-Resolver{``0}-'></a>
+### GetOrCreate\`\`1() `method` [#](#M-IoC-Lifetimes-SingletonLifetime-GetOrCreate``1-IoC-IContainer,System-Object[],IoC-Resolver{``0}- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-SingletonLifetime-ToString'></a>
+### ToString() `method` [#](#M-IoC-Lifetimes-SingletonLifetime-ToString 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
 <a name='T-IoC-SourceTemplateAttribute'></a>
 ## SourceTemplateAttribute [#](#T-IoC-SourceTemplateAttribute 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -3166,6 +4032,61 @@ IoC
 ##### Summary
 
 Indicates that the marked method unconditionally terminates control flow execution. For example, it could unconditionally throw exception.
+
+<a name='T-IoC-Lifetimes-ThreadSingletonLifetime'></a>
+## ThreadSingletonLifetime [#](#T-IoC-Lifetimes-ThreadSingletonLifetime 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC.Lifetimes
+
+##### Summary
+
+Represents singleton per thread lifetime.
+
+<a name='M-IoC-Lifetimes-ThreadSingletonLifetime-#ctor-System-Func{IoC-ILifetime}-'></a>
+### #ctor() `constructor` [#](#M-IoC-Lifetimes-ThreadSingletonLifetime-#ctor-System-Func{IoC-ILifetime}- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This constructor has no parameters.
+
+<a name='M-IoC-Lifetimes-ThreadSingletonLifetime-Clone'></a>
+### Clone() `method` [#](#M-IoC-Lifetimes-ThreadSingletonLifetime-Clone 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ThreadSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]-'></a>
+### CreateKey() `method` [#](#M-IoC-Lifetimes-ThreadSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ThreadSingletonLifetime-ToString'></a>
+### ToString() `method` [#](#M-IoC-Lifetimes-ThreadSingletonLifetime-ToString 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
 
 <a name='T-IoC-TT'></a>
 ## TT [#](#T-IoC-TT 'Go To Here') [=](#contents 'Back To Contents')

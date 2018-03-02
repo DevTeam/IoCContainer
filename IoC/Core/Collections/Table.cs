@@ -7,56 +7,56 @@
     using System.Linq;
     using System.Runtime.CompilerServices;
 
-    internal class Table<TKey, TValue> : IEnumerable<Tree<TKey, TValue>.KeyValue>
+    internal sealed class Table<TKey, TValue> : IEnumerable<Tree<TKey, TValue>.KeyValue>
     {
         public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>();
-        private readonly int _count;
-        private readonly int _divisor;
-        private readonly Tree<TKey, TValue>[] _buckets;
+        public readonly int Count;
+        public readonly int Divisor;
+        public readonly Tree<TKey, TValue>[] Buckets;
 
         private Table(Table<TKey, TValue> origin, int hashCode, TKey key, TValue value)
         {
             int bucketIndex;
-            _count = origin._count + 1;
-            if (origin._count >= origin._divisor)
+            Count = origin.Count + 1;
+            if (origin.Count >= origin.Divisor)
             {
-                _divisor = origin._divisor << 1;
-                _buckets = new Tree<TKey, TValue>[_divisor];
-                InitializeBuckets(0, _divisor);
-                var originBuckets = origin._buckets;
+                Divisor = origin.Divisor << 1;
+                Buckets = new Tree<TKey, TValue>[Divisor];
+                InitializeBuckets(0, Divisor);
+                var originBuckets = origin.Buckets;
                 foreach (var originBucket in originBuckets)
                 {
                     foreach (var keyValue in originBucket)
                     {
-                        bucketIndex = CreateBucketIndex(keyValue.HashCode);
-                        _buckets[bucketIndex] = _buckets[bucketIndex].Set(keyValue.HashCode, keyValue.Key, keyValue.Value);
+                        bucketIndex = keyValue.HashCode & (Divisor - 1);
+                        Buckets[bucketIndex] = Buckets[bucketIndex].Set(keyValue.HashCode, keyValue.Key, keyValue.Value);
                     }
                 }
             }
             else
             {
-                _divisor = origin._divisor;
-                _buckets = new Tree<TKey, TValue>[_divisor];
-                Array.Copy(origin._buckets, _buckets, origin._divisor);
+                Divisor = origin.Divisor;
+                Buckets = new Tree<TKey, TValue>[Divisor];
+                Array.Copy(origin.Buckets, Buckets, origin.Divisor);
             }
 
-            bucketIndex = CreateBucketIndex(hashCode);
-            _buckets[bucketIndex] = _buckets[bucketIndex].Set(hashCode, key, value);
+            bucketIndex = hashCode & (Divisor - 1);
+            Buckets[bucketIndex] = Buckets[bucketIndex].Set(hashCode, key, value);
         }
 
         private Table(Table<TKey, TValue> origin)
         {
-            _divisor = origin._divisor;
-            _count = origin._count;
-            var length = origin._buckets.Length;
-            _buckets = new Tree<TKey, TValue>[length];
-            Array.Copy(origin._buckets, _buckets, length);
+            Divisor = origin.Divisor;
+            Count = origin.Count;
+            var length = origin.Buckets.Length;
+            Buckets = new Tree<TKey, TValue>[length];
+            Array.Copy(origin.Buckets, Buckets, length);
         }
 
         private Table()
         {
-            _buckets = new Tree<TKey, TValue>[2];
-            _divisor = 2;
+            Buckets = new Tree<TKey, TValue>[2];
+            Divisor = 2;
             InitializeBuckets(0, 2);
         }
 
@@ -69,25 +69,15 @@
         [MethodImpl((MethodImplOptions)256)]
         public bool TryGet(int hashCode, TKey key, out TValue value)
         {
-            var bucketIndex = CreateBucketIndex(hashCode);
-            var tree = _buckets[bucketIndex];
-            return tree.TryGet(hashCode, key, out value);
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        public bool TryGetFast(int hashCode, TKey key, out TValue value)
-        {
-            var bucketIndex = CreateBucketIndex(hashCode);
-            var tree = _buckets[bucketIndex];
-            return tree.TryGetFast(hashCode, key, out value);
+            return Buckets[hashCode & (Divisor - 1)].TryGet(hashCode, key, out value);
         }
 
         [MethodImpl((MethodImplOptions)256)]
         public Table<TKey, TValue> Remove(int hashCode, TKey key)
         {
-            var bucketIndex = CreateBucketIndex(hashCode);
+            var bucketIndex = hashCode & (Divisor - 1);
             var newTable = new Table<TKey, TValue>(this);
-            newTable._buckets[bucketIndex] = newTable._buckets[bucketIndex].Remove(hashCode, key);
+            newTable.Buckets[bucketIndex] = newTable.Buckets[bucketIndex].Remove(hashCode, key);
             return newTable;
         }
 
@@ -98,26 +88,20 @@
 
         public IEnumerator<Tree<TKey, TValue>.KeyValue> GetEnumerator()
         {
-            return _buckets.SelectMany(i => i).GetEnumerator();
+            return Buckets.SelectMany(i => i).GetEnumerator();
         }
 
         [SuppressMessage("ReSharper", "UnusedParameter.Local")]
         private void InitializeBuckets(int startIndex, int count)
         {
 #if NETCOREAPP2_0
-            Array.Fill(_buckets, Tree<TKey, TValue>.Empty);
+            Array.Fill(Buckets, Tree<TKey, TValue>.Empty);
 #else
             for (var i = startIndex; i < count; i++)
             {
-                _buckets[i] = Tree<TKey, TValue>.Empty;
+                Buckets[i] = Tree<TKey, TValue>.Empty;
             }
 #endif
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        private int CreateBucketIndex(int hashCode)
-        {
-            return hashCode & (_divisor - 1);
         }
     }
 }

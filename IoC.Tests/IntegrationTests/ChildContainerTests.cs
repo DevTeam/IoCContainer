@@ -8,6 +8,23 @@
     public class ChildContainerTests
     {
         [Fact]
+        public void ShouldResolveChildContainer()
+        {
+            // Given
+            using (var parentContainer = Container.Create("parent"))
+            {
+                // When
+                var childContainer1 = parentContainer.CreateChild("child_1");
+                var childContainer2 = parentContainer.CreateChild("child_2");
+
+                // Then
+                childContainer1.Parent.ShouldBe(parentContainer);
+                childContainer2.Parent.ShouldBe(parentContainer);
+                childContainer1.ShouldNotBeSameAs(childContainer2);
+            }
+        }
+
+        [Fact]
         public void ShouldRegisterCustomChildContainer()
         {
             // Given

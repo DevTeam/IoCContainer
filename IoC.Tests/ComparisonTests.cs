@@ -72,9 +72,9 @@ namespace IoC.Tests
         public void ConfigureContainerTest()
         {
             var performanceCounter = new TotalTimePerformanceCounter();
-            for (var i = 0; i < 1000; i++)
+            for (var i = 0; i < 10000; i++)
             {
-                ThisSingleton(2, performanceCounter);
+                ThisSingleton(0, performanceCounter);
             }
         }
 
@@ -208,7 +208,6 @@ namespace IoC.Tests
             using (container.Bind<IService2>().As(Lifetime.Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
             {
-                container.Validate();
                 using (performanceCounter.Run())
                 {
                     container.TryGetResolver<IService1>(typeof(IService1), null, out var resolver);
@@ -227,7 +226,6 @@ namespace IoC.Tests
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
             {
-                container.Validate();
                 using (performanceCounter.Run())
                 {
                     container.TryGetResolver<IService1>(typeof(IService1), null, out var resolver);

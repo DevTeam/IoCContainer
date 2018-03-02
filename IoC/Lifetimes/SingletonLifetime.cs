@@ -1,4 +1,4 @@
-﻿namespace IoC.Core.Lifetimes
+﻿namespace IoC.Lifetimes
 {
     using System;
     using System.Linq;
@@ -7,13 +7,18 @@
     using System.Runtime.CompilerServices;
     using Core;
     using Extensibility;
-    using TypeExtensions = TypeExtensions;
+    using TypeExtensions = Core.TypeExtensions;
 
-    internal sealed class SingletonLifetime : ILifetime, IDisposable, IExpressionBuilder<object>
+    /// <summary>
+    /// Represents singleton lifetime.
+    /// </summary>
+    [PublicAPI]
+    public sealed class SingletonLifetime : ILifetime, IDisposable, IExpressionBuilder<object>
     {
         [NotNull] private object _lockObject = new object();
         private volatile object _instance;
 
+        /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]
         public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
         {
@@ -26,7 +31,7 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        public T CreateInstance<T>(IContainer container, object[] args, Resolver<T> resolver)
+        internal T CreateInstance<T>(IContainer container, object[] args, Resolver<T> resolver)
         {
             lock (_lockObject)
             {
@@ -39,6 +44,7 @@
             return (T)_instance;
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             if (_instance is IDisposable disposable)
@@ -47,11 +53,13 @@
             }
         }
 
+        /// <inheritdoc />
         public ILifetime Clone()
         {
             return new SingletonLifetime();
         }
 
+        /// <inheritdoc />
         public override string ToString()
         {
             return Lifetime.Singleton.ToString();
@@ -61,6 +69,7 @@
         private static readonly Expression NullConst = Expression.Constant(null);
         private static readonly ITypeInfo ResolverTypeInfo = typeof(Resolver<>).Info();
 
+        /// <inheritdoc />
         public Expression Build(Expression expression, Key key, IContainer container, object context)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
@@ -69,7 +78,7 @@
             var typedInstance = instanceField.Convert(expression.Type);
             var methodInfo = CreateInstanceMethodInfo.MakeGenericMethod(expression.Type);
             var resolverType = ResolverTypeInfo.MakeGenericType(expression.Type);
-            var resolverExpression = Expression.Lambda(resolverType, expression, true, ExpressionExtensions.Parameters);
+            var resolverExpression = Expression.Lambda(resolverType, expression, false, ExpressionExtensions.Parameters);
             var resolver = ExpressionCompiler.Shared.Compile(resolverExpression);
 
             var lifetimeBody = Expression.Condition(

@@ -10,7 +10,7 @@
     {
         public static readonly IResolverExpressionBuilder Shared = new ResolverExpressionBuilder();
 
-        public bool TryBuild<T>(Key key, IContainer container, IDependency dependency, ILifetime lifetime, out Expression<Resolver<T>> resolverExpression)
+        public bool TryBuild(Key key, IContainer container, IDependency dependency, ILifetime lifetime, out LambdaExpression resolverExpression)
         {
             try
             {
@@ -33,12 +33,12 @@
 
                 expression = expression.Convert(key.Type);
                 expression = LifetimeExpressionBuilder.Shared.Build(expression, key, container, lifetime);
-                resolverExpression = Expression.Lambda<Resolver<T>>(expression, true, ExpressionExtensions.Parameters);
+                resolverExpression = Expression.Lambda(key.Type.ToResolverType(), expression, false, ExpressionExtensions.Parameters);
                 return true;
             }
             catch (BuildExpressionException)
             {
-                resolverExpression = default(Expression<Resolver<T>>);
+                resolverExpression = default(LambdaExpression);
                 return false;
             }
         }

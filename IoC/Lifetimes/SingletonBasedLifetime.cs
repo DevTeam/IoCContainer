@@ -1,20 +1,27 @@
-﻿namespace IoC.Core.Lifetimes
+﻿namespace IoC.Lifetimes
 {
     using System;
     using System.Linq;
-    using Collections;
     using Core;
+    using Core.Collections;
 
-    internal abstract class SingletonBasedLifetime<TKey>: ILifetime, IDisposable
+    /// <summary>
+    /// Represents the abstaction for singleton based lifetimes.
+    /// </summary>
+    /// <typeparam name="TKey"></typeparam>
+    [PublicAPI]
+    public abstract class SingletonBasedLifetime<TKey>: ILifetime, IDisposable
     {
         private readonly Func<ILifetime> _singletonLifetimeFactory;
         private Table<TKey, ILifetime> _lifetimes = Table<TKey, ILifetime>.Empty;
 
+        /// <inheritdoc />
         protected SingletonBasedLifetime(Func<ILifetime> singletonLifetimeFactory)
         {
             _singletonLifetimeFactory = singletonLifetimeFactory;
         }
 
+        /// <inheritdoc />
         public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
         {
             ILifetime lifetime;
@@ -32,6 +39,7 @@
             return lifetime.GetOrCreate(container, args, resolver);
         }
 
+        /// <inheritdoc />
         public void Dispose()
         {
             System.Collections.Generic.List<ILifetime> items;
@@ -44,8 +52,15 @@
             Disposable.Create(items.OfType<IDisposable>()).Dispose();
         }
 
+        /// <inheritdoc />
         public abstract ILifetime Clone();
-        
+
+        /// <summary>
+        /// Creates key for singleton.
+        /// </summary>
+        /// <param name="container">The target container.</param>
+        /// <param name="args">The arfuments.</param>
+        /// <returns>The created key.</returns>
         protected abstract TKey CreateKey(IContainer container, object[] args);
     }
 }

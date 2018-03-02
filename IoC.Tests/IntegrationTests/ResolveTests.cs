@@ -28,6 +28,28 @@
         }
 
         [Fact]
+        public void ContainerShouldResolveWhenInherited()
+        {
+            // Given
+            using (var container = Container.CreateBasic())
+            {
+                // When
+                using (container.Bind<MyService, IMyService>().To(ctx => new MyService("abc", null)))
+                {
+                    // Then
+                    var instance1 = container.GetResolver<MyService>(typeof(MyService))(container);
+                    var instance2 = container.GetResolver<object>(typeof(MyService))(container);
+                    var instance3 = container.GetResolver<IMyService>(typeof(IMyService))(container);
+
+                    instance3.ShouldBeOfType<MyService>();
+                    instance1.ShouldBeOfType<MyService>();
+                    instance2.ShouldBeOfType<MyService>();
+                    container.Validate().IsValid.ShouldBeTrue();
+                }
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveFunc()
         {
             // Given

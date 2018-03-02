@@ -8,59 +8,59 @@ namespace IoC.Core.Collections
     internal sealed class Tree<TKey, TValue>: IEnumerable<Tree<TKey, TValue>.KeyValue>
     {
         public static readonly Tree<TKey, TValue> Empty = new Tree<TKey, TValue>();
-        private readonly int _height;
-        private readonly Tree<TKey, TValue> _left;
-        private readonly Tree<TKey, TValue> _right;
-        private readonly Entry _entry;
+        public readonly int Height;
+        public readonly Tree<TKey, TValue> Left;
+        public readonly Tree<TKey, TValue> Right;
+        public readonly Entry Current;
 
         private Tree()
         {
-            _entry = Entry.Empty;
+            Current = Entry.Empty;
         }
 
         private Tree(Entry entry)
         {
-            _entry = entry;
-            _left = Empty;
-            _right = Empty;
-            _height = 1;
+            Current = entry;
+            Left = Empty;
+            Right = Empty;
+            Height = 1;
         }
 
         private Tree(Entry entry, Tree<TKey, TValue> left, Tree<TKey, TValue> right)
         {
-            _entry = entry;
-            _left = left;
-            _right = right;
-            _height = (left._height > right._height ? left._height : right._height) + 1;
+            Current = entry;
+            Left = left;
+            Right = right;
+            Height = (left.Height > right.Height ? left.Height : right.Height) + 1;
         }
 
         private Tree(Entry entry, Tree<TKey, TValue> left, Tree<TKey, TValue> right, int height)
         {
-            _entry = entry;
-            _left = left;
-            _right = right;
-            _height = height;
+            Current = entry;
+            Left = left;
+            Right = right;
+            Height = height;
         }
 
         public Tree<TKey, TValue> Set(int hashCode, TKey key, TValue value)
         {
-            if (_height == 0)
+            if (Height == 0)
             {
                 return new Tree<TKey, TValue>(new Entry(hashCode, key, value));
             }
 
-            if (hashCode == _entry.HashCode)
+            if (hashCode == Current.HashCode)
             {
-                var entryDuplicates = _entry.Duplicates;
-                var entryKey = _entry.Key;
+                var entryDuplicates = Current.Duplicates;
+                var entryKey = Current.Key;
                 if (ReferenceEquals(entryKey, key) || entryKey.Equals(key))
                 {
-                    return new Tree<TKey, TValue>(new Entry(hashCode, key, value, entryDuplicates), _left, _right);
+                    return new Tree<TKey, TValue>(new Entry(hashCode, key, value, entryDuplicates), Left, Right);
                 }
 
                 if (entryDuplicates == null)
                 {
-                    return new Tree<TKey, TValue>(new Entry(_entry.HashCode, entryKey, _entry.Value, new[] {new KeyValue(hashCode, key, value)}), _left, _right);
+                    return new Tree<TKey, TValue>(new Entry(Current.HashCode, entryKey, Current.Value, new[] {new KeyValue(hashCode, key, value)}), Left, Right);
                 }
 
                 var duplicateIndex = entryDuplicates.Length - 1;
@@ -75,104 +75,62 @@ namespace IoC.Core.Collections
                     var newDuplicates = new KeyValue[entryDuplicates.Length + 1];
                     Array.Copy(entryDuplicates, 0, newDuplicates, 0, entryDuplicates.Length);
                     newDuplicates[entryDuplicates.Length] = new KeyValue(hashCode, key, value);
-                    return new Tree<TKey, TValue>(new Entry(_entry.HashCode, entryKey, _entry.Value, newDuplicates), _left, _right);
+                    return new Tree<TKey, TValue>(new Entry(Current.HashCode, entryKey, Current.Value, newDuplicates), Left, Right);
                 }
 
                 // Update the duplicate
                 var duplicates = new KeyValue[entryDuplicates.Length];
                 Array.Copy(entryDuplicates, 0, duplicates, 0, entryDuplicates.Length);
                 duplicates[duplicateIndex] = new KeyValue(hashCode, key, value);
-                return new Tree<TKey, TValue>(new Entry(_entry.HashCode, entryKey, _entry.Value, duplicates), _left, _right);
+                return new Tree<TKey, TValue>(new Entry(Current.HashCode, entryKey, Current.Value, duplicates), Left, Right);
             }
 
             // To left
-            if (hashCode < _entry.HashCode)
+            if (hashCode < Current.HashCode)
             {
-                if (_height == 1)
+                if (Height == 1)
                 {
-                    return new Tree<TKey, TValue>(_entry, new Tree<TKey, TValue>(new Entry(hashCode, key, value)), _right, 2);
+                    return new Tree<TKey, TValue>(Current, new Tree<TKey, TValue>(new Entry(hashCode, key, value)), Right, 2);
                 }
 
-                return new Tree<TKey, TValue>(_entry, _left.Set(hashCode, key, value), _right).RebalanceTree();
+                return new Tree<TKey, TValue>(Current, Left.Set(hashCode, key, value), Right).RebalanceTree();
             }
 
             // To right
-            if (_height == 1)
+            if (Height == 1)
             {
-                return new Tree<TKey, TValue>(_entry, _left, new Tree<TKey, TValue>(new Entry(hashCode, key, value)), 2);
+                return new Tree<TKey, TValue>(Current, Left, new Tree<TKey, TValue>(new Entry(hashCode, key, value)), 2);
             }
             
             // Too big depth
-            return new Tree<TKey, TValue>(_entry, _left, _right.Set(hashCode, key, value)).RebalanceTree();
+            return new Tree<TKey, TValue>(Current, Left, Right.Set(hashCode, key, value)).RebalanceTree();
         }
 
         [MethodImpl((MethodImplOptions)256)]
         public bool TryGet(int hashCode, TKey key, out TValue value)
         {
             var tree = this;
-            while (tree._height != 0 && tree._entry.HashCode != hashCode)
+            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
             {
-                if (hashCode < tree._entry.HashCode)
+                if (hashCode < tree.Current.HashCode)
                 {
-                    tree = tree._left;
+                    tree = tree.Left;
                 }
                 else
                 {
-                    tree = tree._right;
+                    tree = tree.Right;
                 }
             }
 
-            var treeEntry = tree._entry;
-            if (tree._height != 0 && (ReferenceEquals(key, treeEntry.Key) || key.Equals(treeEntry.Key)))
+            var treeEntry = tree.Current;
+            if (tree.Height != 0 && (ReferenceEquals(key, treeEntry.Key) || key.Equals(treeEntry.Key)))
             {
                 value = treeEntry.Value;
                 return true;
             }
 
             var entryDuplicates = treeEntry.Duplicates;
-            if (tree._height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
-                {
-                    if (!Equals(entryDuplicates[i].Key, key))
-                    {
-                        continue;
-                    }
-
-                    value = entryDuplicates[i].Value;
-                    return true;
-                }
-            }
-
-            value = default(TValue);
-            return false;
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        public bool TryGetFast(int hashCode, TKey key, out TValue value)
-        {
-            var tree = this;
-            while (tree._height != 0 && tree._entry.HashCode != hashCode)
-            {
-                if (hashCode < tree._entry.HashCode)
-                {
-                    tree = tree._left;
-                }
-                else
-                {
-                    tree = tree._right;
-                }
-            }
-
-            var treeEntry = tree._entry;
-            if (tree._height != 0 && ReferenceEquals(key, treeEntry.Key))
-            {
-                value = treeEntry.Value;
-                return true;
-            }
-
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree._height != 0 && entryDuplicates != null)
+            if (tree.Height != 0 && entryDuplicates != null)
             {
                 for (var i = entryDuplicates.Length - 1; i >= 0; --i)
                 {
@@ -192,23 +150,23 @@ namespace IoC.Core.Collections
 
         public Tree<TKey, TValue> Remove(int hashCode, TKey key, bool ignoreKey = false)
         {
-            if (_height == 0)
+            if (Height == 0)
             {
                 return this;
             }
 
             Tree<TKey, TValue> result;
-            if (hashCode == _entry.HashCode)
+            if (hashCode == Current.HashCode)
             {
-                if (!ignoreKey && !Equals(_entry.Key, key))
+                if (!ignoreKey && !Equals(Current.Key, key))
                 {
-                    if (_entry.Duplicates == null)
+                    if (Current.Duplicates == null)
                     {
                         return this;
                     }
 
-                    var index = _entry.Duplicates.Length - 1;
-                    while (index >= 0 && !Equals(_entry.Duplicates[index].Key, key))
+                    var index = Current.Duplicates.Length - 1;
+                    while (index >= 0 && !Equals(Current.Duplicates[index].Key, key))
                     {
                         --index;
                     }
@@ -218,74 +176,74 @@ namespace IoC.Core.Collections
                         return this;
                     }
 
-                    if (_entry.Duplicates.Length == 1)
+                    if (Current.Duplicates.Length == 1)
                     {
-                        return new Tree<TKey, TValue>(new Entry(_entry.HashCode, _entry.Key, _entry.Value), _left, _right);
+                        return new Tree<TKey, TValue>(new Entry(Current.HashCode, Current.Key, Current.Value), Left, Right);
                     }
 
-                    var duplicates = new KeyValue[_entry.Duplicates.Length - 1];
+                    var duplicates = new KeyValue[Current.Duplicates.Length - 1];
                     var newIndex = 0;
-                    for (var i = 0; i < _entry.Duplicates.Length; ++i)
+                    for (var i = 0; i < Current.Duplicates.Length; ++i)
                     {
                         if (i == index)
                         {
                             continue;
                         }
 
-                        duplicates[newIndex++] = _entry.Duplicates[i];
+                        duplicates[newIndex++] = Current.Duplicates[i];
                     }
 
-                    return new Tree<TKey, TValue>(new Entry(_entry.HashCode, _entry.Key, _entry.Value, duplicates), _left, _right);
+                    return new Tree<TKey, TValue>(new Entry(Current.HashCode, Current.Key, Current.Value, duplicates), Left, Right);
 
                 }
 
-                if (!ignoreKey && _entry.Duplicates != null)
+                if (!ignoreKey && Current.Duplicates != null)
                 {
-                    if (_entry.Duplicates.Length == 1)
+                    if (Current.Duplicates.Length == 1)
                     {
-                        return new Tree<TKey, TValue>(new Entry(_entry.HashCode, _entry.Duplicates[0].Key, _entry.Duplicates[0].Value), _left, _right);
+                        return new Tree<TKey, TValue>(new Entry(Current.HashCode, Current.Duplicates[0].Key, Current.Duplicates[0].Value), Left, Right);
                     }
 
-                    var duplicates = new KeyValue[_entry.Duplicates.Length - 1];
-                    Array.Copy(_entry.Duplicates, 1, duplicates, 0, duplicates.Length);
-                    return new Tree<TKey, TValue>(new Entry(_entry.HashCode, _entry.Duplicates[0].Key, _entry.Duplicates[0].Value, duplicates), _left, _right);
+                    var duplicates = new KeyValue[Current.Duplicates.Length - 1];
+                    Array.Copy(Current.Duplicates, 1, duplicates, 0, duplicates.Length);
+                    return new Tree<TKey, TValue>(new Entry(Current.HashCode, Current.Duplicates[0].Key, Current.Duplicates[0].Value, duplicates), Left, Right);
                 }
 
-                if (_height == 1)
+                if (Height == 1)
                 {
                     return Empty;
                 }
 
-                if (_right._height == 0)
+                if (Right.Height == 0)
                 {
-                    result = _left;
+                    result = Left;
                 }
-                else if (_left._height == 0)
+                else if (Left.Height == 0)
                 {
-                    result = _right;
+                    result = Right;
                 }
                 else
                 {
-                    var inheritor = _right;
-                    while (inheritor._left._height != 0)
+                    var inheritor = Right;
+                    while (inheritor.Left.Height != 0)
                     {
-                        inheritor = inheritor._left;
+                        inheritor = inheritor.Left;
                     }
 
-                    result = new Tree<TKey, TValue>(inheritor._entry, _left, _right.Remove(inheritor._entry.HashCode, default(TKey), true));
+                    result = new Tree<TKey, TValue>(inheritor.Current, Left, Right.Remove(inheritor.Current.HashCode, default(TKey), true));
                 }
             }
             else
-            if (hashCode < _entry.HashCode)
+            if (hashCode < Current.HashCode)
             {
-                result = new Tree<TKey, TValue>(_entry, _left.Remove(hashCode, key, ignoreKey), _right);
+                result = new Tree<TKey, TValue>(Current, Left.Remove(hashCode, key, ignoreKey), Right);
             }
             else
             {
-                result = new Tree<TKey, TValue>(_entry, _left, _right.Remove(hashCode, key, ignoreKey));
+                result = new Tree<TKey, TValue>(Current, Left, Right.Remove(hashCode, key, ignoreKey));
             }
 
-            if (result._height == 1)
+            if (result.Height == 1)
             {
                 return result;
             }
@@ -306,27 +264,27 @@ namespace IoC.Core.Collections
         [MethodImpl((MethodImplOptions)256)]
         private IEnumerable<KeyValue> Enumerate()
         {
-            if (_height == 0)
+            if (Height == 0)
             {
                 yield break;
             }
 
             var parentCount = -1;
             var node = this;
-            var parents = new Tree<TKey, TValue>[_height];
-            while (node._height != 0 || parentCount != -1)
+            var parents = new Tree<TKey, TValue>[Height];
+            while (node.Height != 0 || parentCount != -1)
             {
-                if (node._height != 0)
+                if (node.Height != 0)
                 {
                     parents[++parentCount] = node;
-                    node = node._left;
+                    node = node.Left;
                 }
                 else
                 {
                     node = parents[parentCount--];
-                    yield return new KeyValue(node._entry.HashCode, node._entry.Key, node._entry.Value);
+                    yield return new KeyValue(node.Current.HashCode, node.Current.Key, node.Current.Value);
 
-                    var entryDuplicates = node._entry.Duplicates;
+                    var entryDuplicates = node.Current.Duplicates;
                     if (entryDuplicates != null)
                     {
                         for (var i = 0; i < entryDuplicates.Length; i++)
@@ -335,27 +293,27 @@ namespace IoC.Core.Collections
                         }
                     }
 
-                    node = node._right;
+                    node = node.Right;
                 }
             }
         }
 
         private Tree<TKey, TValue> RebalanceTree()
         {
-            var delta = _left._height - _right._height;
+            var delta = Left.Height - Right.Height;
             if (delta >= 2)
             {
-                var ll = _left._left;
-                var lr = _left._right;
-                if (lr._height - ll._height == 1)
+                var ll = Left.Left;
+                var lr = Left.Right;
+                if (lr.Height - ll.Height == 1)
                 {
                     return new Tree<TKey, TValue>(
-                        lr._entry,
-                        new Tree<TKey, TValue>(_left._entry, ll, lr._left),
-                        new Tree<TKey, TValue>(_entry, lr._right, _right));
+                        lr.Current,
+                        new Tree<TKey, TValue>(Left.Current, ll, lr.Left),
+                        new Tree<TKey, TValue>(Current, lr.Right, Right));
                 }
 
-                return new Tree<TKey, TValue>(_left._entry, ll, new Tree<TKey, TValue>(_entry, lr, _right));
+                return new Tree<TKey, TValue>(Left.Current, ll, new Tree<TKey, TValue>(Current, lr, Right));
             }
 
             if (delta > -2)
@@ -363,17 +321,17 @@ namespace IoC.Core.Collections
                 return this;
             }
 
-            var rl = _right._left;
-            var rr = _right._right;
-            if (rl._height - rr._height == 1)
+            var rl = Right.Left;
+            var rr = Right.Right;
+            if (rl.Height - rr.Height == 1)
             {
                 return new Tree<TKey, TValue>(
-                    rl._entry,
-                    new Tree<TKey, TValue>(_entry, _left, rl._left),
-                    new Tree<TKey, TValue>(_right._entry, rl._right, rr));
+                    rl.Current,
+                    new Tree<TKey, TValue>(Current, Left, rl.Left),
+                    new Tree<TKey, TValue>(Right.Current, rl.Right, rr));
             }
 
-            return new Tree<TKey, TValue>( _right._entry, new Tree<TKey, TValue>(_entry, _left, rl), rr);
+            return new Tree<TKey, TValue>( Right.Current, new Tree<TKey, TValue>(Current, Left, rl), rr);
         }
 
         public sealed class KeyValue
@@ -398,7 +356,7 @@ namespace IoC.Core.Collections
             }
         }
 
-        private sealed class Entry
+        internal sealed class Entry
         {
             // ReSharper disable once MemberHidesStaticFromOuterClass
             [NotNull] public static readonly Entry Empty = new Entry();

@@ -16,6 +16,7 @@
 
     using FullKey = Key;
     using ShortKey = System.Type;
+    using ResolverDelegate = System.Delegate;
 
     /// <summary>
     /// The IoC container implementation.
@@ -28,18 +29,17 @@
         private static long _containerId;
 
         internal static readonly object[] EmptyArgs = new object[0];
-        [NotNull] private static readonly Lazy<Container> DefultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.Defaults), true);
+        [NotNull] private static readonly Lazy<Container> BasicRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.BasicSet), true);
+        [NotNull] private static readonly Lazy<Container> DefultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.DefaultSet), true);
         [NotNull] private readonly object _lockObject = new object();
         [NotNull] private readonly IContainer _parent;
         [NotNull] private readonly string _name;
         [NotNull] private readonly Subject<ContainerEvent> _eventSubject = new Subject<ContainerEvent>();
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
-
-        [NotNull] private Table<FullKey, RegistrationEntry> _registrationEntries = Table<FullKey, RegistrationEntry>.Empty;
-        [NotNull] private Table<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = Table<ShortKey, RegistrationEntry>.Empty;
-        [NotNull] private volatile Table<FullKey, object> _resolvers = Table<FullKey, object>.Empty;
-        [NotNull] private volatile Table<ShortKey, object> _resolversByType = Table<ShortKey, object>.Empty;
-
+        [NotNull] private readonly Dictionary<FullKey, RegistrationEntry> _registrationEntries = new Dictionary<FullKey, RegistrationEntry>();
+        [NotNull] private readonly Dictionary<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = new Dictionary<ShortKey, RegistrationEntry>();
+        [NotNull] private volatile Table<FullKey, ResolverDelegate> _resolvers = Table<FullKey, ResolverDelegate>.Empty;
+        [NotNull] private volatile Table<ShortKey, ResolverDelegate> _resolversByType = Table<ShortKey, ResolverDelegate>.Empty;
         private volatile IEnumerable<Key>[] _allKeys;
         private volatile bool _hasResolver;
         private bool _isFreezed;
@@ -54,6 +54,18 @@
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             return new Container(CreateContainerName(name), DefultRootContainer.Value, true);
+        }
+
+        /// <summary>
+        /// Creates a root container with basic features.
+        /// </summary>
+        /// <param name="name">The optional name of the container.</param>
+        /// <returns>The roor container.</returns>
+        [NotNull]
+        public static Container CreateBasic([NotNull] string name = "")
+        {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            return new Container(CreateContainerName(name), BasicRootContainer.Value, true);
         }
 
         /// <summary>
@@ -134,23 +146,17 @@
             {
                 lock (_lockObject)
                 {
-                    var registrationAnyEntries = _registrationEntriesForTagAny;
-                    var registrationEntries = _registrationEntries;
-
                     foreach (var key in registeredKeys)
                     {
                         if (key.Tag == Key.AnyTag)
                         {
-                            TryUnregister(key, key.Type, ref registrationAnyEntries);
+                            TryUnregister(key, key.Type, _registrationEntriesForTagAny);
                         }
                         else
                         {
-                            TryUnregister(key, key, ref registrationEntries);
+                            TryUnregister(key, key, _registrationEntries);
                         }
                     }
-
-                    _registrationEntriesForTagAny = registrationAnyEntries;
-                    _registrationEntries = registrationEntries;
                 }
             }
 
@@ -165,34 +171,26 @@
             {
                 lock (_lockObject)
                 {
-                    var registrationAnyEntries = _registrationEntriesForTagAny;
-                    var registrationEntries = _registrationEntries;
-
-                    foreach (var key in keys)
+                    foreach (var curKey in keys)
                     {
+                        var type = curKey.Type.ToGenericType();
+                        var key = type != curKey.Type ? new Key(type, curKey.Tag) : curKey;
+
                         if (key.Tag == Key.AnyTag)
                         {
-                            isRegistered &= TryRegister(key, key.Type, registrationEntry, ref registrationAnyEntries);
+                            isRegistered &= TryRegister(key, key.Type, registrationEntry, _registrationEntriesForTagAny);
                         }
                         else
                         {
-                            isRegistered &= TryRegister(key, key, registrationEntry, ref registrationEntries);
+                            isRegistered &= TryRegister(key, key, registrationEntry, _registrationEntries);
                         }
 
-                        if (isRegistered)
-                        {
-                            registeredKeys.Add(key);
-                        }
-                        else
+                        if (!isRegistered)
                         {
                             break;
                         }
-                    }
 
-                    if (isRegistered)
-                    {
-                        _registrationEntriesForTagAny = registrationAnyEntries;
-                        _registrationEntries = registrationEntries;
+                        registeredKeys.Add(key);
                     }
                 }
             }
@@ -221,21 +219,44 @@
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
         {
-            if (tag == null && _resolversByType.TryGetFast(type.GetHashCode(), type, out var resolverValue))
+            if (tag == null && TryGetResolver(type, out resolver, container))
             {
-                resolver = (Resolver<T>)resolverValue;
                 return true;
             }
-
 
             var key = new FullKey(type, tag);
-            if (_resolvers.TryGet(key.GetHashCode(), key, out resolverValue))
+            var hashCode = key.GetHashCode();
+            var tree = _resolvers.Buckets[hashCode & (_resolvers.Divisor - 1)];
+            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
             {
-                resolver = (Resolver<T>)resolverValue;
+                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
+            }
+
+            var treeEntry = tree.Current;
+            if (tree.Height != 0 && key.Equals(treeEntry.Key))
+            {
+                resolver = (Resolver<T>)treeEntry.Value;
                 return true;
             }
 
-            return TryCreateResolver(key, out resolver, container ?? this);
+            var entryDuplicates = treeEntry.Duplicates;
+            if (tree.Height != 0 && entryDuplicates != null)
+            {
+                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                {
+                    if (!Equals(entryDuplicates[i].Key, key))
+                    {
+                        continue;
+                    }
+
+                    resolver = (Resolver<T>)entryDuplicates[i].Value;
+                    return true;
+                }
+            }
+
+            var resolved = TryCreateResolver<T>(key, out var curResolver, container ?? this);
+            resolver = (Resolver<T>)curResolver;
+            return resolved;
         }
 
         /// <inheritdoc />
@@ -243,13 +264,38 @@
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, IContainer container = null)
         {
-            if (_resolversByType.TryGetFast(type.GetHashCode(), type, out var resolverValue))
+            var hashCode = type.GetHashCode();
+            var tree = _resolversByType.Buckets[hashCode & (_resolversByType.Divisor - 1)];
+            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
             {
-                resolver = (Resolver<T>)resolverValue;
+                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
+            }
+
+            var treeEntry = tree.Current;
+            if (tree.Height != 0 && ReferenceEquals(type, treeEntry.Key))
+            {
+                resolver = (Resolver<T>)treeEntry.Value;
                 return true;
             }
 
-            return TryCreateResolver(KeyHolder<T>.Shared, out resolver, container ?? this);
+            var entryDuplicates = treeEntry.Duplicates;
+            if (tree.Height != 0 && entryDuplicates != null)
+            {
+                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                {
+                    if (!ReferenceEquals(entryDuplicates[i].Key, type))
+                    {
+                        continue;
+                    }
+
+                    resolver = (Resolver<T>)entryDuplicates[i].Value;
+                    return true;
+                }
+            }
+
+            var resolved = TryCreateResolver<T>(new Key(type), out var curResolver, container ?? this);
+            resolver = (Resolver<T>)curResolver;
+            return resolved;
         }
 
         /// <inheritdoc />
@@ -272,7 +318,7 @@
 
 
         [MethodImpl((MethodImplOptions)256)]
-        private bool TryCreateResolver<T>(FullKey key, out Resolver<T> resolver, IContainer container)
+        private bool TryCreateResolver<T>(FullKey key, out ResolverDelegate resolver, IContainer container)
         {
             if (TryGetRegistrationEntry(key, out var registrationEntry))
             {
@@ -281,29 +327,35 @@
                     return false;
                 }
 
-                AddResolver(key, resolver);
+                AddResolver(key, resolver, true);
                 return true;
             }
 
-            if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, container))
+            if (!_parent.TryGetResolver<T>(key.Type, key.Tag, out var parentResolver, container))
             {
+                resolver = default(ResolverDelegate);
                 return false;
             }
 
+            resolver = parentResolver;
             if (container == this)
             {
-                AddResolver(key, resolver);
+                AddResolver(key, resolver, false);
             }
 
             return true;
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        private void AddResolver<T>(FullKey key, Resolver<T> resolver)
+        private void AddResolver(FullKey key, ResolverDelegate resolver, bool currentContainer)
         {
             lock (_lockObject)
             {
-                _hasResolver = true;
+                if (currentContainer)
+                {
+                    _hasResolver = true;
+                }
+
                 _resolvers = _resolvers.Set(key.GetHashCode(), key, resolver);
                 if (key.Tag == null)
                 {
@@ -330,7 +382,7 @@
         {
             lock (_lockObject)
             {
-                if (_registrationEntries.TryGet(key.GetHashCode(), key, out registrationEntry))
+                if (_registrationEntries.TryGetValue(key, out registrationEntry))
                 {
                     return true;
                 }
@@ -341,18 +393,18 @@
                 {
                     var genericType = typeInfo.GetGenericTypeDefinition();
                     var genericKey = new FullKey(genericType, key.Tag);
-                    if (_registrationEntries.TryGet(genericKey.GetHashCode(), genericKey, out registrationEntry))
+                    if (_registrationEntries.TryGetValue(genericKey, out registrationEntry))
                     {
                         return true;
                     }
 
-                    if (_registrationEntriesForTagAny.TryGetFast(genericType.GetHashCode(), genericType, out registrationEntry))
+                    if (_registrationEntriesForTagAny.TryGetValue(genericType, out registrationEntry))
                     {
                         return true;
                     }
                 }
 
-                if (_registrationEntriesForTagAny.TryGetFast(type.GetHashCode(), type, out registrationEntry))
+                if (_registrationEntriesForTagAny.TryGetValue(type, out registrationEntry))
                 {
                     return true;
                 }
@@ -372,10 +424,10 @@
             IDisposable resource;
             lock (_lockObject)
             {
-                _registrationEntries = Table<FullKey, RegistrationEntry>.Empty;
-                _registrationEntriesForTagAny = Table<ShortKey, RegistrationEntry>.Empty;
-                _resolvers = Table<FullKey, object>.Empty;
-                _resolversByType = Table<ShortKey, object>.Empty;
+                _registrationEntries.Clear();
+                _registrationEntriesForTagAny.Clear();
+                _resolvers = Table<FullKey, ResolverDelegate>.Empty;
+                _resolversByType = Table<ShortKey, ResolverDelegate>.Empty;
                 resource = Disposable.Create(_resources);
                 _resources.Clear();
             }
@@ -431,15 +483,18 @@
             return _eventSubject.Subscribe(observer);
         }
 
-        private bool TryRegister<TKey>(Key originalKey, TKey key, [NotNull] RegistrationEntry registrationEntry, [NotNull] ref Table<TKey, RegistrationEntry> entries)
+        private bool TryRegister<TKey>(Key originalKey, TKey key, [NotNull] RegistrationEntry registrationEntry, [NotNull] Dictionary<TKey, RegistrationEntry> entries)
         {
-            var hashCode = key.GetHashCode();
-            var isRegistered = !entries.TryGet(hashCode, key, out var _);
-            if (isRegistered)
+            var isRegistered = false;
+            try
             {
-                entries = entries.Set(hashCode, key, registrationEntry);
+                entries.Add(key, registrationEntry);
                 ResetResolvers();
                 _allKeys = null;
+                isRegistered = true;
+            }
+            catch (ArgumentException)
+            {
             }
 
             if (!isRegistered)
@@ -451,13 +506,11 @@
             return true;
         }
 
-        private bool TryUnregister<TKey>(Key originalKey, TKey key, [NotNull] ref Table<TKey, RegistrationEntry> entries)
+        private bool TryUnregister<TKey>(Key originalKey, TKey key, [NotNull] Dictionary<TKey, RegistrationEntry> entries)
         {
-            var hashCode = key.GetHashCode();
-            var isUnregistered = entries.TryGet(hashCode, key, out var _);
+            var isUnregistered = entries.Remove(key);
             if (isUnregistered)
             {
-                entries = entries.Remove(hashCode, key);
                 ResetResolvers();
                 _allKeys = null;
             }
@@ -484,8 +537,8 @@
                 registration.Reset();
             }
 
-            _resolvers = Table<FullKey, object>.Empty;
-            _resolversByType = Table<ShortKey, object>.Empty;
+            _resolvers = Table<FullKey, ResolverDelegate>.Empty;
+            _resolversByType = Table<ShortKey, ResolverDelegate>.Empty;
         }
 
         void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
@@ -527,11 +580,6 @@
             {
                 _isFreezed = false;
             }
-        }
-
-        private class KeyHolder<T>
-        {
-            public static readonly Key Shared = new Key(typeof(T));
         }
     }
 }

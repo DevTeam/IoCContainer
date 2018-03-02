@@ -29,16 +29,16 @@
             Keys = keys ?? throw new ArgumentNullException(nameof(keys));
         }
 
-        public bool TryCreateResolver<T>(Key key, [NotNull] IContainer container, out Resolver<T> resolver)
+        public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver)
         {
             var typeInfo = key.Type.Info();
-            if (!_resolverExpressionBuilder.TryBuild<T>(key, container, Dependency, GetLifetime(typeInfo), out var resolverExpression))
+            if (!_resolverExpressionBuilder.TryBuild(key, container, Dependency, GetLifetime(typeInfo), out var resolverExpression))
             {
-                resolver = default(Resolver<T>);
+                resolver = default(Delegate);
                 return false;
             }
 
-            resolver = (Resolver<T>)ExpressionCompiler.Shared.Compile(resolverExpression);
+            resolver = ExpressionCompiler.Shared.Compile(resolverExpression);
             return true;
         }
 
@@ -124,7 +124,7 @@
 
             private bool Equals(LifetimeKey other)
             {
-                return ArrayExtensions.SequenceEqual(_genericTypes, other._genericTypes);
+                return Extensions.SequenceEqual(_genericTypes, other._genericTypes);
             }
         }
     }

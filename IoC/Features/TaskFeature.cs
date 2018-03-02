@@ -21,19 +21,11 @@
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-
-            yield return container
-                .Bind<TaskScheduler>()
-                .AnyTag()
-                .To(ctx => TaskScheduler.Current);
-
-            yield return container
-                .Bind<Task<TT>>()
-                .AnyTag()
-                .To(ctx => StartTask(new Task<TT>(ctx.Container.Inject<Func<TT>>()), ctx.Container.Inject<TaskScheduler>()));
+            yield return container.Register(ctx => TaskScheduler.Current);
+            yield return container.Register(ctx => StartTask(new Task<TT>(ctx.Container.Inject<Func<TT>>()), ctx.Container.Inject<TaskScheduler>()), null, Feature.AnyTag);
         }
 
-        private Task<T> StartTask<T>(Task<T> task, TaskScheduler taskScheduler)
+        private static Task<T> StartTask<T>(Task<T> task, TaskScheduler taskScheduler)
         {
             task.Start(taskScheduler);
             return task;

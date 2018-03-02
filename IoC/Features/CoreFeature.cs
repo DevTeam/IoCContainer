@@ -3,8 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Core;
-    using Core.Lifetimes;
-    using Extensibility;
+    using Lifetimes;
 
     /// <summary>
     /// Adds the set of core features like lifetimes and default containers.
@@ -23,65 +22,25 @@
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container
-                .Bind<IIssueResolver>()
-                .To(ctx => IssueResolver.Shared);
+            yield return container.Register(ctx => IssueResolver.Shared);
+            yield return container.Register(ctx => ctx.Container.GetResolver<TT>(typeof(TT), ctx.Key.Tag, ctx.Container), null, Feature.AnyTag);
 
-            yield return container
-                .Bind<Resolver<TT>>()
-                .AnyTag()
-                .To(ctx => ctx.Container.GetResolver<TT>(typeof(TT), ctx.Key.Tag, ctx.Container));
-
-            yield return container
-                .Bind<ILifetime>()
-                .Tag(Lifetime.Singleton)
-                .To(ctx => new SingletonLifetime());
-
-            yield return container
-                .Bind<Func<ILifetime>>()
-                .Tag(Lifetime.Singleton)
-                .To(ctx => (() => new SingletonLifetime()));
-
-            yield return container
-                .Bind<ILifetime>()
-                .Tag(Lifetime.ContainerSingleton)
-                .To(ctx => new ContainerSingletonLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)));
-
-            yield return container
-                .Bind<ILifetime>()
-                .Tag(Lifetime.ScopeSingleton)
-                .To(ctx => new ScopeSingletonLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)));
-
+            // Lifetimes
+            yield return container.Register<ILifetime>(ctx => new SingletonLifetime(), null, new object[] { Lifetime.Singleton });
+            yield return container.Register<Func<ILifetime>>(ctx => (() => new SingletonLifetime()), null, new object[] { Lifetime.Singleton });
+            yield return container.Register<ILifetime>(ctx => new ContainerSingletonLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)), null, new object[] { Lifetime.ContainerSingleton });
+            yield return container.Register<ILifetime>(ctx => new ScopeSingletonLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)), null, new object[] { Lifetime.ScopeSingleton });
 #if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_5 && !NETSTANDARD1_6
-            yield return container
-                .Bind<ILifetime>()
-                .Tag(Lifetime.ThreadSingleton)
-                .To(ctx => new ThreadSingletonLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)));
+            yield return container.Register<ILifetime>(ctx => new ThreadSingletonLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)), null, new object[] { Lifetime.ThreadSingleton });
 #endif
 
-            yield return container
-                .Bind<IContainer>()
-                .Tag()
-                .Tag(WellknownContainers.Current)
-                .To(ctx => ctx.Container);
+            // Containers
+            yield return container.Register(ctx => ctx.Container, null, new object[] { null, WellknownContainers.Current } );
+            yield return container.Register<IContainer>(ctx => new Container(ctx.Args.Length == 1 ? Container.CreateContainerName(ctx.Args[0] as string) : Container.CreateContainerName(string.Empty), ctx.Container, false), null, new object[] { WellknownContainers.Child });
+            yield return container.Register(ctx => ctx.Container.Parent, null, new object[] { WellknownContainers.Parent });
 
-            yield return container
-                .Bind<IContainer>()
-                .Tag(WellknownContainers.Child)
-                .To(ctx => new Container(ctx.Args.Length == 1 ? Container.CreateContainerName(ctx.Args[0] as string) : Container.CreateContainerName(string.Empty), ctx.Container, false));
-
-            yield return container
-                .Bind<IContainer>()
-                .Tag(WellknownContainers.Parent)
-                .To(ctx => ctx.Container.Parent);
-
-            yield return container
-                .Bind<IResourceStore>()
-                .To(ctx => (IResourceStore)ctx.Container);
-
-            yield return container
-                .Bind<IValidator>()
-                .To(ctx => Validator.Shared);
+            yield return container.Register(ctx => (IResourceStore)ctx.Container);
+            yield return container.Register(ctx => Validator.Shared);
         }
     }
 }
