@@ -21,6 +21,8 @@
 
         bool IsArray { get; }
 
+        bool IsPublic { get; }
+
         Type ElementType { get; }
 
         bool IsConstructedGenericType { get; }

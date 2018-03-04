@@ -25,7 +25,7 @@
                 var instance2 = container.Tag(10).Get<IService>();
 
                 // Resolve the instance using the empty tag
-                var instance3 = container.Get<IService>();
+                var instance3 = container.Resolve<IService>();
             }
             // }
         }

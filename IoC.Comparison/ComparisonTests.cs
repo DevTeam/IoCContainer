@@ -13,6 +13,7 @@ namespace IoC.Comparison
     using Castle.MicroKernel.Registration;
     using Castle.Windsor;
     using DryIoc;
+    using Features;
     using JetBrains.dotMemoryUnit;
     using JetBrains.dotMemoryUnit.Kernel;
     using LightInject;
@@ -169,6 +170,9 @@ namespace IoC.Comparison
         private static void ThisSingleton(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = IoC.Container.Create())
+#if NET47
+            using (container.Apply(ExpressionCompilerFeature.Shared))
+#endif
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().As(Lifetime.Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
@@ -177,8 +181,7 @@ namespace IoC.Comparison
                 {
                     for (var i = 0; i < series; i++)
                     {
-                        container.TryGetResolver<IService1>(typeof(IService1), out var resolver);
-                        resolver(container).DoSomething();
+                        container.Resolve<IService1>().DoSomething();
                     }
                 }
             }
@@ -187,6 +190,9 @@ namespace IoC.Comparison
         private static void ThisTransient(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = IoC.Container.Create())
+#if NET47
+            using(container.Apply(ExpressionCompilerFeature.Shared))
+#endif
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
@@ -195,8 +201,7 @@ namespace IoC.Comparison
                 {
                     for (var i = 0; i < series; i++)
                     {
-                        container.TryGetResolver<IService1>(typeof(IService1), out var resolver);
-                        resolver(container).DoSomething();
+                        container.Resolve<IService1>().DoSomething();
                     }
                 }
             }
@@ -205,6 +210,9 @@ namespace IoC.Comparison
         private static void ThisByFuncSingleton(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = IoC.Container.Create())
+#if NET47
+            using (container.Apply(ExpressionCompilerFeature.Shared))
+#endif
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().As(Lifetime.Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
@@ -223,6 +231,9 @@ namespace IoC.Comparison
         private static void ThisByFuncTransient(int series, IPerformanceCounter performanceCounter)
         {
             using (var container = IoC.Container.Create())
+#if NET47
+            using (container.Apply(ExpressionCompilerFeature.Shared))
+#endif
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())

@@ -88,48 +88,48 @@ class Glue : IConfiguration
 ```csharp
 using (var container = Container.Create().Using<Glue>())
 {
-    var box = container.Get<IBox<ICat>>();
+    var box = container.Resolve<IBox<ICat>>();
     Console.WriteLine(box);
 
     // Func
-    var func = container.Get<Func<IBox<ICat>>>();
+    var func = container.Resolve<Func<IBox<ICat>>>();
     Console.WriteLine(func());
 
     // Async
-    box = await container.Get<Task<IBox<ICat>>>();
+    box = await container.Resolve<Task<IBox<ICat>>>();
     Console.WriteLine(box);
 
     // Tuple<,>
-    var tuple = container.Get<Tuple<IBox<ICat>, ICat>>();
+    var tuple = container.Resolve<Tuple<IBox<ICat>, ICat>>();
     Console.WriteLine(tuple.Item1 + ", " + tuple.Item2);
 
     // ValueTuple(,,)
-    var valueTuple = container.Get<(IBox<ICat> box, ICat cat, IBox<ICat> anotherBox)>();
+    var valueTuple = container.Resolve<(IBox<ICat> box, ICat cat, IBox<ICat> anotherBox)>();
     Console.WriteLine(valueTuple.box + ", " + valueTuple.cat + ", " + valueTuple.anotherBox);
 
     // Lazy
-    var lazy = container.Get<Lazy<IBox<ICat>>>();
+    var lazy = container.Resolve<Lazy<IBox<ICat>>>();
     Console.WriteLine(lazy.Value);
 
     // Enumerable
-    var enumerable = container.Get<IEnumerable<IBox<ICat>>>();
+    var enumerable = container.Resolve<IEnumerable<IBox<ICat>>>();
     Console.WriteLine(enumerable.Single());
 
     // List
-    var list = container.Get<IList<IBox<ICat>>>();
+    var list = container.Resolve<IList<IBox<ICat>>>();
     Console.WriteLine(list[0]);
 }
 ```
 
 ### Under the hood
 
-Actually these getters are represented just as set of operators `new` that allow to create required instances.
+Actually these resolvers are represented just as set of operators `new` that allow to create (or get) required instances.
 
 ```csharp
 var box = new CardboardBox<ShroedingersCat>(new ShroedingersCat());
 ```
 
-There is only one difference - this getter are wrapped to compiled lambda function and the each call of these lambdas spends some minimal time in the operator `call`, but in actual scenarios it is not required to make these lambdas each time to create an instance.
+There is only one difference - these resolvers are wrapped to compiled lambda functions and the each call of these lambdas spends some minimal time in the operator `call`, but in actual scenarios it is not required to make these lambdas each time to create an instance.
 When some dependencies are injected to an instance they are injected without any lambdas at all but just as a minimal set of instruction to create these dependencies:
 
 ```csharp
@@ -147,7 +147,7 @@ Thus this IoC container makes the minimal impact in terms of perfomrance and of 
 
 ## Why this one?
 
-The results of the [comparison tests](IoC.Tests/ComparisonTests.cs) for some popular IoC containers like Castle Windsor, Autofac, Unity, Ninject ...
+The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for some popular IoC containers like Castle Windsor, Autofac, Unity, Ninject ...
 
 ![Cat](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,status:SUCCESS/artifacts/content/REPORT.jpg)
 
@@ -202,8 +202,8 @@ using (container.Bind<IDependency>().To<Dependency>())
 using (container.Bind<Service, IService, IAnotherService>().To<Service>())
 {
     // Resolve instances
-    var instance1 = container.Get<IService>();
-    var instance2 = container.Get<IAnotherService>();
+    var instance1 = container.Resolve<IService>();
+    var instance2 = container.Resolve<IAnotherService>();
 
     instance1.ShouldBeOfType<Service>();
     instance2.ShouldBeOfType<Service>();
@@ -221,7 +221,7 @@ using (container.Bind<IDependency>().To<Dependency>())
 using (container.Bind<IService>().To<Service>())
 {
     // Resolve an instance asynchronously
-    var instance = await container.Get<Task<IService>>();
+    var instance = await container.Resolve<Task<IService>>();
 
     instance.ShouldBeOfType<Service>();
 }
@@ -237,7 +237,7 @@ using (var container = Container.Create())
 using (container.Bind<IService>().To(ctx => new Service(new Dependency())))
 {
     // Resolve an instance
-    var instance = container.Get<IService>();
+    var instance = container.Resolve<IService>();
 
     instance.ShouldBeOfType<Service>();
 }
@@ -257,7 +257,7 @@ using (container.Bind<IService>().To<Service>(
     ctx => new Service(ctx.Container.Inject<IDependency>("MyDep"))))
 {
     // Resolve an instance
-    var instance = container.Get<IService>();
+    var instance = container.Resolve<IService>();
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/DependencyTag.cs)
@@ -272,7 +272,7 @@ using (var container = Container.Create())
 using (container.Bind<IService>().To(ctx => func()))
 {
     // Resolve an instance
-    var instance = container.Get<IService>();
+    var instance = container.Resolve<IService>();
 
     instance.ShouldBeOfType<Service>();
 }
@@ -292,7 +292,7 @@ using (container.Bind<IService<TT>>().To<Service<TT>>(
     ctx => new Service<TT>(ctx.Container.Inject<IDependency>())))
 {
     // Resolve a generic instance
-    var instance = container.Get<IService<int>>();
+    var instance = container.Resolve<IService<int>>();
 
     instance.ShouldBeOfType<Service<int>>();
 }
@@ -310,7 +310,7 @@ using (container.Bind<IDependency>().To<Dependency>())
 using (container.Bind(typeof(IService<>)).To(typeof(Service<>)))
 {
     // Resolve a generic instance
-    var instance = container.Get<IService<int>>();
+    var instance = container.Resolve<IService<int>>();
 
     instance.ShouldBeOfType<Service<int>>();
 }
@@ -327,7 +327,7 @@ using (container.Bind<IDependency>().To<Dependency>())
 using (container.Bind<IService>().To<Service>())
 {
     // Resolve Func
-    var func = container.Get<Func<IService>>();
+    var func = container.Resolve<Func<IService>>();
     // Get the instance via Func
     var instance = func();
 
@@ -346,7 +346,7 @@ using (container.Bind<IDependency>().To<Dependency>())
 using (container.Bind<IService>().To<Service>())
 {
     // Resolve Lazy
-    var lazy = container.Get<Lazy<IService>>();
+    var lazy = container.Resolve<Lazy<IService>>();
     // Get the instance via Lazy
     var instance = lazy.Value;
 
@@ -367,7 +367,7 @@ using (container.Bind<INamedService>().To<NamedService>(
     ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name")))
 {
     // Resolve Tuple
-    var tuple = container.Get<Tuple<IService, INamedService>>();
+    var tuple = container.Resolve<Tuple<IService, INamedService>>();
 
     tuple.Item1.ShouldBeOfType<Service>();
     tuple.Item2.ShouldBeOfType<NamedService>();
@@ -387,7 +387,7 @@ using (container.Bind<INamedService>().To<NamedService>(
     ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name")))
 {
     // Resolve ValueTuple
-    var valueTuple = container.Get<(IService service, INamedService namedService)>();
+    var valueTuple = container.Resolve<(IService service, INamedService namedService)>();
 
     valueTuple.service.ShouldBeOfType<Service>();
     valueTuple.namedService.ShouldBeOfType<NamedService>();
@@ -409,7 +409,7 @@ using (container.Bind<IService>().Tag(10).Tag().Tag("abc").To<Service>())
     var instance2 = container.Tag(10).Get<IService>();
 
     // Resolve the instance using the empty tag
-    var instance3 = container.Get<IService>();
+    var instance3 = container.Resolve<IService>();
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Tags.cs)
@@ -425,7 +425,7 @@ using (container.Bind<IDependency>().To<Dependency>())
 using (container.Bind<IService>().To<Service>())
 {
     // Resolve an instance
-    var instance = container.Get<IService>();
+    var instance = container.Resolve<IService>();
 
     instance.ShouldBeOfType<Service>();
 }
@@ -462,13 +462,13 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(
     ctx => ctx.It.Initialize((string)ctx.Args[0], ctx.Container.Inject<IDependency>())))
 {
     // Resolve the instance "alpha"
-    var instance = container.Get<INamedService>("alpha");
+    var instance = container.Resolve<INamedService>("alpha");
 
     instance.ShouldBeOfType<InitializingNamedService>();
     instance.Name.ShouldBe("alpha");
 
     // Resolve the instance "beta"
-    var func = container.Get<Func<string, INamedService>>();
+    var func = container.Resolve<Func<string, INamedService>>();
     var otherInstance = func("beta");
     otherInstance.Name.ShouldBe("beta");
 }
@@ -490,13 +490,13 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(
     ctx => ctx.Container.Inject(ctx.It.Name, (string)ctx.Args[0])))
 {
     // Resolve the instance "alpha"
-    var instance = container.Get<INamedService>("alpha");
+    var instance = container.Resolve<INamedService>("alpha");
 
     instance.ShouldBeOfType<InitializingNamedService>();
     instance.Name.ShouldBe("alpha");
 
     // Resolve the instance "beta"
-    var func = container.Get<Func<string, INamedService>>();
+    var func = container.Resolve<Func<string, INamedService>>();
     var otherInstance = func("beta");
     otherInstance.Name.ShouldBe("beta");
 }
@@ -513,8 +513,8 @@ using (container.Bind<IDependency>().To<Dependency>())
 using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
 {
     // Resolve one instance twice
-    var instance1 = container.Get<IService>();
-    var instance2 = container.Get<IService>();
+    var instance1 = container.Resolve<IService>();
+    var instance2 = container.Resolve<IService>();
 
     instance1.ShouldBe(instance2);
 }
@@ -541,7 +541,7 @@ using (container.Bind<IService>().To<Service>(
     ctx => new Service(ctx.Container.Inject<IDependency>(), "some state")))
 {
     // Resolve an instance
-    var instance = container.Get<IService>();
+    var instance = container.Resolve<IService>();
 
     instance.ShouldBeOfType<Service>();
     instance.State.ShouldBe("some state");
@@ -565,7 +565,7 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(
     ctx => ctx.It.Initialize("some name", ctx.Container.Inject<IDependency>())))
 {
     // Resolve an instance
-    var instance = container.Get<INamedService>();
+    var instance = container.Resolve<INamedService>();
 
     instance.ShouldBeOfType<InitializingNamedService>();
     instance.Name.ShouldBe("some name");
@@ -585,7 +585,7 @@ using (container.Bind<IService>().Tag(2).Tag("abc").To<Service>())
 using (container.Bind<IService>().Tag(3).To<Service>())
 {
     // Resolve all appropriate instances
-    var instances = container.Get<ICollection<IService>>();
+    var instances = container.Resolve<ICollection<IService>>();
 
     instances.Count.ShouldBe(3);
     foreach (var instance in instances)
@@ -608,7 +608,7 @@ using (container.Bind<IService>().Tag(2).Tag("abc").To<Service>())
 using (container.Bind<IService>().Tag(3).To<Service>())
 {
     // Resolve all appropriate instances
-    var instances = container.Get<IEnumerable<IService>>().ToList();
+    var instances = container.Resolve<IEnumerable<IService>>().ToList();
 
     instances.Count.ShouldBe(3);
     instances.ForEach(instance => instance.ShouldBeOfType<Service>());
@@ -631,13 +631,13 @@ using (container.Bind<INamedService>().To(
     ctx => func(ctx.Container.Inject<IDependency>(), (string)ctx.Args[0])))
 {
     // Resolve the instance "alpha" passing the array of arguments
-    var instance = container.Get<INamedService>("alpha");
+    var instance = container.Resolve<INamedService>("alpha");
 
     instance.ShouldBeOfType<NamedService>();
     instance.Name.ShouldBe("alpha");
 
     // Resolve the instance "beta"
-    var getterFunc = container.Get<Func<string, INamedService>>();
+    var getterFunc = container.Resolve<Func<string, INamedService>>();
     var otherInstance = getterFunc("beta");
     otherInstance.Name.ShouldBe("beta");
 }
@@ -656,7 +656,7 @@ using (container.Bind<IService>().Tag(2).Tag("abc").To<Service>())
 using (container.Bind<IService>().Tag(3).To<Service>())
 {
     // Resolve source for all appropriate instances
-    var instancesSource = container.Get<IObservable<IService>>();
+    var instancesSource = container.Resolve<IObservable<IService>>();
 
     var observer = new Mock<IObserver<IService>>();
     using (instancesSource.Subscribe(observer.Object))
@@ -680,13 +680,13 @@ using (container.Bind<INamedService>().To<NamedService>(
     ctx => new NamedService(ctx.Container.Inject<IDependency>(), (string)ctx.Args[0])))
 {
     // Resolve the instance "alpha"
-    var instance = container.Get<INamedService>("alpha");
+    var instance = container.Resolve<INamedService>("alpha");
 
     instance.ShouldBeOfType<NamedService>();
     instance.Name.ShouldBe("alpha");
 
     // Resolve the instance "beta"
-    var func = container.Get<Func<string, INamedService>>();
+    var func = container.Resolve<Func<string, INamedService>>();
     var otherInstance = func("beta");
     otherInstance.Name.ShouldBe("beta");
 }
@@ -705,7 +705,7 @@ using (container.Bind<IService>().Tag(2).Tag("abc").To<Service>())
 using (container.Bind<IService>().Tag(3).To<Service>())
 {
     // Resolve all appropriate instances
-    var instances = container.Get<ISet<IService>>();
+    var instances = container.Resolve<ISet<IService>>();
 
     instances.Count.ShouldBe(3);
     foreach (var instance in instances)
@@ -728,8 +728,8 @@ using (var container = Container.Create())
     container.Bind<IService>().As(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object).ToSelf();
 
     // Resolve instances
-    var instance1 = container.Get<IService>();
-    var instance2 = container.Get<IService>();
+    var instance1 = container.Resolve<IService>();
+    var instance2 = container.Resolve<IService>();
 
     instance1.ShouldBe(instance2);
 }
@@ -747,7 +747,7 @@ public void Run()
     using (var container = Container.Create().Using<Glue>())
     {
         // Resolve an instance
-        var instance = container.Get<IService>();
+        var instance = container.Resolve<IService>();
 
         instance.ShouldBeOfType<Service>();
     }
@@ -776,7 +776,7 @@ using (var container = Container.Create().Using(
     "Bind<IService>().To<Service>();"))
 {
     // Resolve an instance
-    var instance = container.Get<IService>();
+    var instance = container.Resolve<IService>();
 
     instance.ShouldBeOfType<Service>();
 }
@@ -795,8 +795,8 @@ using (container.Bind<IDependency>().To<Dependency>())
     using (container.Bind<IService>().To<Service>())
     {
         // Resolve instances
-        var instance1 = container.Get<IService>();
-        var instance2 = container.Get<IService>();
+        var instance1 = container.Resolve<IService>();
+        var instance2 = container.Resolve<IService>();
 
         instance1.ShouldNotBe(instance2);
     }
@@ -805,8 +805,8 @@ using (container.Bind<IDependency>().To<Dependency>())
     using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
     {
         // Resolve the instance twice
-        var instance1 = container.Get<IService>();
-        var instance2 = container.Get<IService>();
+        var instance1 = container.Resolve<IService>();
+        var instance2 = container.Resolve<IService>();
 
         instance1.ShouldBe(instance2);
     }
@@ -830,7 +830,7 @@ public void Run()
     using (childContainer.Bind<IService>().To<Service>())
     {
         // Resolve an instance
-        var instance = childContainer.Get<IService>();
+        var instance = childContainer.Resolve<IService>();
 
         childContainer.ShouldBeOfType<MyContainer>();
         instance.ShouldBeOfType<Service>();
@@ -867,16 +867,6 @@ public class MyContainer: IContainer
         return Parent.TryGetResolver(type, tag, out resolver, container);
     }
 
-    public Resolver<T> GetResolver<T>(Type type, IContainer container = null)
-    {
-        return Parent.GetResolver<T>(type, container);
-    }
-
-    public Resolver<T> GetResolver<T>(Type type, object tag, IContainer container = null)
-    {
-        return Parent.GetResolver<T>(type, tag, container);
-    }
-
     public void Dispose() { }
 
     IEnumerator IEnumerable.GetEnumerator()
@@ -909,7 +899,7 @@ public void Run()
     using (container.Bind<IService>().Lifetime(new MyTransientLifetime()).To<Service>())
     {
         // Resolve an instance
-        var instance = container.Get<IService>();
+        var instance = container.Resolve<IService>();
 
         instance.ShouldBeOfType<Service>();
     }
@@ -954,8 +944,8 @@ public void Run()
     using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
     {
         // Resolve one instance twice using the custom Singletine lifetime
-        var instance1 = container.Get<IService>();
-        var instance2 = container.Get<IService>();
+        var instance1 = container.Resolve<IService>();
+        var instance2 = container.Resolve<IService>();
 
         instance1.ShouldBe(instance2);
     }
@@ -1005,22 +995,22 @@ using (container.Bind<IDependency>().As(Lifetime.ScopeSingleton).To<Dependency>(
     using (container.Bind<IService>().As(Lifetime.ScopeSingleton).To<Service>())
     {
         // Default scope
-        var instance1 = container.Get<IService>();
-        var instance2 = container.Get<IService>();
+        var instance1 = container.Resolve<IService>();
+        var instance2 = container.Resolve<IService>();
         instance1.ShouldBe(instance2);
 
         // Scope "1"
         using (new Scope("1"))
         {
-            var instance3 = container.Get<IService>();
-            var instance4 = container.Get<IService>();
+            var instance3 = container.Resolve<IService>();
+            var instance4 = container.Resolve<IService>();
 
             instance3.ShouldBe(instance4);
             instance3.ShouldNotBe(instance1);
         }
 
         // Default scope again
-        var instance5 = container.Get<IService>();
+        var instance5 = container.Resolve<IService>();
         instance5.ShouldBe(instance1);
     }
 
@@ -1028,14 +1018,14 @@ using (container.Bind<IDependency>().As(Lifetime.ScopeSingleton).To<Dependency>(
     using (container.Bind<IService>().As(Lifetime.Transient).To<Service>())
     {
         // Default scope
-        var instance1 = container.Get<IService>();
-        var instance2 = container.Get<IService>();
+        var instance1 = container.Resolve<IService>();
+        var instance2 = container.Resolve<IService>();
         instance1.Dependency.ShouldBe(instance2.Dependency);
 
         // Scope "1"
         using (new Scope("1"))
         {
-            var instance3 = container.Get<IService>();
+            var instance3 = container.Resolve<IService>();
             instance3.Dependency.ShouldNotBe(instance1.Dependency);
         }
     }
@@ -1064,7 +1054,7 @@ public void Run()
             // Inject the logger from the parent container to our new logger
             ctx => new TimeLogger(ctx.Container.Parent.Inject<ILogger>())))
         {
-            var logger = childContainer.Get<ILogger>();
+            var logger = childContainer.Resolve<ILogger>();
 
             // Log message
             logger.Log("Hello");
@@ -1144,7 +1134,7 @@ public void Run()
         var random = container.Tag(GeneratorType.Random).Get<int>();
 
         // Generate a set of numbers
-        var setOfValues = container.Get<(int, int)>();
+        var setOfValues = container.Resolve<(int, int)>();
 
         setOfValues.Item1.ShouldBe(sequential2 + 1);
     }
@@ -1194,7 +1184,7 @@ public void Run()
         try
         {
             // Resolve the first link
-            container.Get<ILink>();
+            container.Resolve<ILink>();
         }
         catch (InvalidOperationException actualException)
         {
@@ -1236,7 +1226,7 @@ public void Run()
     using (container.Bind(typeof(IInstantMessenger<>)).To(typeof(InstantMessenger<>)))
     using (container.Bind<IMessage>().To<Message>(ctx => new Message(ctx.Container.Inject<int>("IdGenerator"), (string)ctx.Args[0], (string)ctx.Args[1])))
     {
-        var instantMessenger = container.Get<IInstantMessenger<IMessage>>();
+        var instantMessenger = container.Resolve<IInstantMessenger<IMessage>>();
         using (instantMessenger.Subscribe(observer.Object))
         {
             for (var i = 0; i < 10; i++)

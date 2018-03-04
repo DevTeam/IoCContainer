@@ -88,48 +88,48 @@ class Glue : IConfiguration
 ```csharp
 using (var container = Container.Create().Using<Glue>())
 {
-    var box = container.Get<IBox<ICat>>();
+    var box = container.Resolve<IBox<ICat>>();
     Console.WriteLine(box);
 
     // Func
-    var func = container.Get<Func<IBox<ICat>>>();
+    var func = container.Resolve<Func<IBox<ICat>>>();
     Console.WriteLine(func());
 
     // Async
-    box = await container.Get<Task<IBox<ICat>>>();
+    box = await container.Resolve<Task<IBox<ICat>>>();
     Console.WriteLine(box);
 
     // Tuple<,>
-    var tuple = container.Get<Tuple<IBox<ICat>, ICat>>();
+    var tuple = container.Resolve<Tuple<IBox<ICat>, ICat>>();
     Console.WriteLine(tuple.Item1 + ", " + tuple.Item2);
 
     // ValueTuple(,,)
-    var valueTuple = container.Get<(IBox<ICat> box, ICat cat, IBox<ICat> anotherBox)>();
+    var valueTuple = container.Resolve<(IBox<ICat> box, ICat cat, IBox<ICat> anotherBox)>();
     Console.WriteLine(valueTuple.box + ", " + valueTuple.cat + ", " + valueTuple.anotherBox);
 
     // Lazy
-    var lazy = container.Get<Lazy<IBox<ICat>>>();
+    var lazy = container.Resolve<Lazy<IBox<ICat>>>();
     Console.WriteLine(lazy.Value);
 
     // Enumerable
-    var enumerable = container.Get<IEnumerable<IBox<ICat>>>();
+    var enumerable = container.Resolve<IEnumerable<IBox<ICat>>>();
     Console.WriteLine(enumerable.Single());
 
     // List
-    var list = container.Get<IList<IBox<ICat>>>();
+    var list = container.Resolve<IList<IBox<ICat>>>();
     Console.WriteLine(list[0]);
 }
 ```
 
 ### Under the hood
 
-Actually these getters are represented just as set of operators `new` that allow to create required instances.
+Actually these resolvers are represented just as set of operators `new` that allow to create (or get) required instances.
 
 ```csharp
 var box = new CardboardBox<ShroedingersCat>(new ShroedingersCat());
 ```
 
-There is only one difference - this getter are wrapped to compiled lambda function and the each call of these lambdas spends some minimal time in the operator `call`, but in actual scenarios it is not required to make these lambdas each time to create an instance.
+There is only one difference - these resolvers are wrapped to compiled lambda functions and the each call of these lambdas spends some minimal time in the operator `call`, but in actual scenarios it is not required to make these lambdas each time to create an instance.
 When some dependencies are injected to an instance they are injected without any lambdas at all but just as a minimal set of instruction to create these dependencies:
 
 ```csharp

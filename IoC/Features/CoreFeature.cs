@@ -23,7 +23,7 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => IssueResolver.Shared);
-            yield return container.Register(ctx => ctx.Container.GetResolver<TT>(typeof(TT), ctx.Key.Tag, ctx.Container), null, Feature.AnyTag);
+            yield return container.Register(ctx => ctx.Container.GetResolver<TT>(typeof(TT), ctx.Key.Tag), null, Feature.AnyTag);
 
             // Lifetimes
             yield return container.Register<ILifetime>(ctx => new SingletonLifetime(), null, new object[] { Lifetime.Singleton });

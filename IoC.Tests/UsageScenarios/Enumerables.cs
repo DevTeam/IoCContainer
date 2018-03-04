@@ -24,7 +24,7 @@
             using (container.Bind<IService>().Tag(3).To<Service>())
             {
                 // Resolve all appropriate instances
-                var instances = container.Get<IEnumerable<IService>>().ToList();
+                var instances = container.Resolve<IEnumerable<IService>>().ToList();
 
                 instances.Count.ShouldBe(3);
                 instances.ForEach(instance => instance.ShouldBeOfType<Service>());

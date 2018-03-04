@@ -24,7 +24,7 @@
                     ctx => ctx.It.Init(ctx.Container.Inject<IMyService1>(), ctx.Container.Inject<IMyService1>(), (string) ctx.Args[1])))
                 {
                     // Then
-                    var actualInstance = container.Get<IMyService>("abc", "xyz");
+                    var actualInstance = container.Resolve<IMyService>("abc", "xyz");
 
                     actualInstance.ShouldBeOfType<MyService>();
                     ((MyService) actualInstance).Name.ShouldBe("xyz");
@@ -49,7 +49,7 @@
                     ctx => ctx.Container.Inject(ctx.It.Name, (string) ctx.Args[1])))
                 {
                     // Then
-                    var actualInstance = container.Get<IMyService>("abc", "xyz");
+                    var actualInstance = container.Resolve<IMyService>("abc", "xyz");
 
                     actualInstance.ShouldBeOfType<MyService>();
                     ((MyService) actualInstance).Name.ShouldBe("xyz");
@@ -71,7 +71,7 @@
                 using (container.Bind<IMyService1>().To(ctx => func()))
                 {
                     // Then
-                    var resolver = container.Get<Resolver<IMyService1>>();
+                    var resolver = container.Resolve<Resolver<IMyService1>>();
                     resolver.ShouldBeOfType<Resolver<IMyService1>>();
                     var actualInstance = resolver(container);
                     actualInstance.ShouldBe(expectedRef);
@@ -93,7 +93,7 @@
                 using (container.Bind<Func<IMyService1>>().To(ctx => (() => ctx.Container.Inject<Resolver<IMyService1>>()(ctx.Container))))
                 {
                     // Then
-                    var funcInstance = container.Get<Func<IMyService1>>();
+                    var funcInstance = container.Resolve<Func<IMyService1>>();
                     funcInstance.ShouldBeOfType<Func<IMyService1>>();
                     var actualInstance = funcInstance();
                     actualInstance.ShouldBe(expectedRef);

@@ -23,8 +23,8 @@
                 container.Bind<IService>().As(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object).ToSelf();
 
                 // Resolve instances
-                var instance1 = container.Get<IService>();
-                var instance2 = container.Get<IService>();
+                var instance1 = container.Resolve<IService>();
+                var instance2 = container.Resolve<IService>();
 
                 instance1.ShouldBe(instance2);
             }

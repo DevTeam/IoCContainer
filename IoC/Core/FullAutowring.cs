@@ -77,7 +77,7 @@
         {
             var typeInfo = type.Info().ToDefinedGenericType().Info();
             return typeInfo.DeclaredConstructors
-                .Where(ctor => !ctor.IsStatic && !ctor.IsPrivate)
+                .Where(ctor => !ctor.IsStatic && ctor.IsPublic)
                 .OrderBy(ctor => ctor.GetParameters().Length);
         }
     }

@@ -21,7 +21,7 @@
             using (container.Bind(typeof(IService<>)).To(typeof(Service<>)))
             {
                 // Resolve a generic instance
-                var instance = container.Get<IService<int>>();
+                var instance = container.Resolve<IService<int>>();
 
                 instance.ShouldBeOfType<Service<int>>();
             }

@@ -35,7 +35,7 @@ namespace IoC.Tests.UsageScenarios
                 try
                 {
                     // Resolve the first link
-                    container.Get<ILink>();
+                    container.Resolve<ILink>();
                 }
                 catch (InvalidOperationException actualException)
                 {

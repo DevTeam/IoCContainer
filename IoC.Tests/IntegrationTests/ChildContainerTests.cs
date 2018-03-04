@@ -36,7 +36,7 @@
                 IContainer actualChildContainer;
                 using (container.Bind<IContainer>().To(ctx => containerGetter()))
                 {
-                    actualChildContainer = container.Get<IContainer>();
+                    actualChildContainer = container.Resolve<IContainer>();
                 }
 
                 // Then
@@ -56,7 +56,7 @@
                 using (childContainer.Bind<IDisposable>().As(Lifetime.ContainerSingleton).To(ctx => expectedInstance.Object))
                 {
                     // When
-                    actualInstance = childContainer.Get<IDisposable>();
+                    actualInstance = childContainer.Resolve<IDisposable>();
                 }
 
                 // Then
@@ -80,7 +80,7 @@
                     using (var childContainer = container.CreateChild())
                     {
                         // Then
-                        var actualInstance = childContainer.Get<IMyService>();
+                        var actualInstance = childContainer.Resolve<IMyService>();
                         actualInstance.ShouldBe(expectedInstance);
                     }
                 }

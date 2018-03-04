@@ -23,7 +23,7 @@
             using (container.Bind<IService>().Tag(3).To<Service>())
             {
                 // Resolve all appropriate instances
-                var instances = container.Get<ISet<IService>>();
+                var instances = container.Resolve<ISet<IService>>();
 
                 instances.Count.ShouldBe(3);
                 foreach (var instance in instances)

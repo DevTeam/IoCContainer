@@ -32,7 +32,7 @@
             using (container.Bind(typeof(IInstantMessenger<>)).To(typeof(InstantMessenger<>)))
             using (container.Bind<IMessage>().To<Message>(ctx => new Message(ctx.Container.Inject<int>("IdGenerator"), (string)ctx.Args[0], (string)ctx.Args[1])))
             {
-                var instantMessenger = container.Get<IInstantMessenger<IMessage>>();
+                var instantMessenger = container.Resolve<IInstantMessenger<IMessage>>();
                 using (instantMessenger.Subscribe(observer.Object))
                 {
                     for (var i = 0; i < 10; i++)

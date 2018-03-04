@@ -24,7 +24,7 @@
                 ctx => new Service(ctx.Container.Inject<IDependency>(), "some state")))
             {
                 // Resolve an instance
-                var instance = container.Get<IService>();
+                var instance = container.Resolve<IService>();
 
                 instance.ShouldBeOfType<Service>();
                 instance.State.ShouldBe("some state");

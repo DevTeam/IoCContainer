@@ -201,7 +201,7 @@
                 {
                     try
                     {
-                        var dependenctyInfo = _container.Get<IIssueResolver>().CannotResolveDependency(selectedContainer, key);
+                        var dependenctyInfo = _container.Resolve<IIssueResolver>().CannotResolveDependency(selectedContainer, key);
                         dependency = dependenctyInfo.Item1;
                         lifetime = dependenctyInfo.Item2;
                     }
@@ -232,7 +232,7 @@
                 _reentrancy++;
                 if (_reentrancy >= 64)
                 {
-                    _container.Get<IIssueResolver>().CyclicDependenceDetected(key, _reentrancy);
+                    _container.Resolve<IIssueResolver>().CyclicDependenceDetected(key, _reentrancy);
                 }
 
                 dependencyExpression = TypeReplacerExpressionBuilder.Shared.Build(dependencyExpression, key, container);

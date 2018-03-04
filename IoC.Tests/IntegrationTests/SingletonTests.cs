@@ -18,12 +18,12 @@
                 using (container.Bind<IMyService>().As(Lifetime.Singleton).To(ctx => func()))
                 {
                     // Then
-                    var instance1 = container.Get<IMyService>();
-                    var instance2 = container.Get<IMyService>();
+                    var instance1 = container.Resolve<IMyService>();
+                    var instance2 = container.Resolve<IMyService>();
                     using (var childContainer = container.CreateChild())
                     {
                         // Then
-                        var instance3 = childContainer.Get<IMyService>();
+                        var instance3 = childContainer.Resolve<IMyService>();
                         instance1.ShouldNotBeNull();
                         instance1.ShouldBe(instance2);
                         instance1.ShouldBe(instance3);
@@ -43,13 +43,13 @@
                 using (container.Bind<IMyService, IMyService1>().As(Lifetime.Singleton).To(ctx => func()))
                 {
                     // Then
-                    var instance1 = container.Get<IMyService>();
-                    var instance2 = container.Get<IMyService1>();
+                    var instance1 = container.Resolve<IMyService>();
+                    var instance2 = container.Resolve<IMyService1>();
                     using (var childContainer = container.CreateChild())
                     {
                         // Then
-                        var instance3 = childContainer.Get<IMyService>();
-                        var instance4 = childContainer.Get<IMyService1>();
+                        var instance3 = childContainer.Resolve<IMyService>();
+                        var instance4 = childContainer.Resolve<IMyService1>();
                         instance1.ShouldBe(instance2);
                         instance1.ShouldBe(instance3);
                         instance1.ShouldBe(instance4);
@@ -69,12 +69,12 @@
                 using (container.Bind<IMyService>().As(Lifetime.Singleton).To(ctx => func()))
                 {
                     // Then
-                    var instance1 = container.Get<IMyService>();
-                    var instance2 = container.Get<IMyService>();
+                    var instance1 = container.Resolve<IMyService>();
+                    var instance2 = container.Resolve<IMyService>();
                     using (var childContainer = container.CreateChild())
                     {
                         // Then
-                        var instance3 = childContainer.Get<IMyService>();
+                        var instance3 = childContainer.Resolve<IMyService>();
                         instance1.ShouldBe(instance2);
                         instance1.ShouldBe(instance3);
                     }
@@ -92,10 +92,10 @@
                 using (container.Bind<IMyGenericService<TT1, TT2>>().As(Lifetime.Singleton).To(ctx => new MyGenericService<TT1, TT2>()))
                 {
                     // Then
-                    var instance1 = container.Get<IMyGenericService<int, double>>();
-                    var instance2 = container.Get<IMyGenericService<string, object>>();
-                    var instance3 = container.Get<IMyGenericService<int, double>>();
-                    var instance4 = container.Get<IMyGenericService<string, object>>();
+                    var instance1 = container.Resolve<IMyGenericService<int, double>>();
+                    var instance2 = container.Resolve<IMyGenericService<string, object>>();
+                    var instance3 = container.Resolve<IMyGenericService<int, double>>();
+                    var instance4 = container.Resolve<IMyGenericService<string, object>>();
                     instance1.ShouldBe(instance3);
                     instance2.ShouldBe(instance4);
                 }

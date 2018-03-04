@@ -115,6 +115,8 @@
 
             public bool IsArray => _typeInfo.Value.IsArray;
 
+            public bool IsPublic => _typeInfo.Value.IsPublic;
+
             public Type ElementType => _typeInfo.Value.GetElementType();
 
             public bool IsConstructedGenericType => _type.IsConstructedGenericType;
@@ -182,6 +184,8 @@
             public bool IsValueType => _type.IsValueType;
 
             public bool IsArray => _type.IsArray;
+
+            public bool IsPublic => _type.IsPublic;
 
             public Type ElementType => _type.GetElementType();
 

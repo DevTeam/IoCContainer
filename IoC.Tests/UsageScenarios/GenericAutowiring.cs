@@ -23,7 +23,7 @@
                 ctx => new Service<TT>(ctx.Container.Inject<IDependency>())))
             {
                 // Resolve a generic instance
-                var instance = container.Get<IService<int>>();
+                var instance = container.Resolve<IService<int>>();
 
                 instance.ShouldBeOfType<Service<int>>();
             }

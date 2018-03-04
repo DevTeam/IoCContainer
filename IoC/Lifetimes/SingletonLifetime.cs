@@ -79,7 +79,7 @@
             var methodInfo = CreateInstanceMethodInfo.MakeGenericMethod(expression.Type);
             var resolverType = ResolverTypeInfo.MakeGenericType(expression.Type);
             var resolverExpression = Expression.Lambda(resolverType, expression, false, ExpressionExtensions.Parameters);
-            var resolver = ExpressionCompiler.Shared.Compile(resolverExpression);
+            var resolver = container.GetExpressionCompiler().Compile(resolverExpression);
 
             var lifetimeBody = Expression.Condition(
                 Expression.NotEqual(instanceField, NullConst),

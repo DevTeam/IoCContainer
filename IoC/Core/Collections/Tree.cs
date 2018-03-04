@@ -112,14 +112,7 @@ namespace IoC.Core.Collections
             var tree = this;
             while (tree.Height != 0 && tree.Current.HashCode != hashCode)
             {
-                if (hashCode < tree.Current.HashCode)
-                {
-                    tree = tree.Left;
-                }
-                else
-                {
-                    tree = tree.Right;
-                }
+                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
             }
 
             var treeEntry = tree.Current;
@@ -287,9 +280,9 @@ namespace IoC.Core.Collections
                     var entryDuplicates = node.Current.Duplicates;
                     if (entryDuplicates != null)
                     {
-                        for (var i = 0; i < entryDuplicates.Length; i++)
+                        foreach (var duplicate in entryDuplicates)
                         {
-                            yield return entryDuplicates[i];
+                            yield return duplicate;
                         }
                     }
 

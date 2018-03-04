@@ -45,8 +45,6 @@
   - [CreateBasic(name)](#M-IoC-Container-CreateBasic-System-String- 'IoC.Container.CreateBasic(System.String)')
   - [Dispose()](#M-IoC-Container-Dispose 'IoC.Container.Dispose')
   - [GetEnumerator()](#M-IoC-Container-GetEnumerator 'IoC.Container.GetEnumerator')
-  - [GetResolver\`\`1()](#M-IoC-Container-GetResolver``1-System-Type,System-Object,IoC-IContainer- 'IoC.Container.GetResolver``1(System.Type,System.Object,IoC.IContainer)')
-  - [GetResolver\`\`1()](#M-IoC-Container-GetResolver``1-System-Type,IoC-IContainer- 'IoC.Container.GetResolver``1(System.Type,IoC.IContainer)')
   - [Subscribe()](#M-IoC-Container-Subscribe-System-IObserver{IoC-ContainerEvent}- 'IoC.Container.Subscribe(System.IObserver{IoC.ContainerEvent})')
   - [ToString()](#M-IoC-Container-ToString 'IoC.Container.ToString')
   - [TryGetDependency()](#M-IoC-Container-TryGetDependency-IoC-Key,IoC-IDependency@,IoC-ILifetime@- 'IoC.Container.TryGetDependency(IoC.Key,IoC.IDependency@,IoC.ILifetime@)')
@@ -57,63 +55,6 @@
   - [Container](#F-IoC-ContainerEvent-Container 'IoC.ContainerEvent.Container')
   - [EventTypeType](#F-IoC-ContainerEvent-EventTypeType 'IoC.ContainerEvent.EventTypeType')
   - [Key](#F-IoC-ContainerEvent-Key 'IoC.ContainerEvent.Key')
-- [ContainerExtensions](#T-IoC-ContainerExtensions 'IoC.ContainerExtensions')
-  - [AnyTag\`\`1(binding)](#M-IoC-ContainerExtensions-AnyTag``1-IoC-IBinding{``0}- 'IoC.ContainerExtensions.AnyTag``1(IoC.IBinding{``0})')
-  - [Apply(container,configurationText)](#M-IoC-ContainerExtensions-Apply-IoC-IContainer,System-String[]- 'IoC.ContainerExtensions.Apply(IoC.IContainer,System.String[])')
-  - [Apply(container,configurationStreams)](#M-IoC-ContainerExtensions-Apply-IoC-IContainer,System-IO-Stream[]- 'IoC.ContainerExtensions.Apply(IoC.IContainer,System.IO.Stream[])')
-  - [Apply(container,configurationReaders)](#M-IoC-ContainerExtensions-Apply-IoC-IContainer,System-IO-TextReader[]- 'IoC.ContainerExtensions.Apply(IoC.IContainer,System.IO.TextReader[])')
-  - [Apply(container,configurations)](#M-IoC-ContainerExtensions-Apply-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IConfiguration}- 'IoC.ContainerExtensions.Apply(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IConfiguration})')
-  - [Apply(container,configurations)](#M-IoC-ContainerExtensions-Apply-IoC-IContainer,IoC-IConfiguration[]- 'IoC.ContainerExtensions.Apply(IoC.IContainer,IoC.IConfiguration[])')
-  - [As\`\`1(binding,lifetime)](#M-IoC-ContainerExtensions-As``1-IoC-IBinding{``0},IoC-Lifetime- 'IoC.ContainerExtensions.As``1(IoC.IBinding{``0},IoC.Lifetime)')
-  - [Bind(container,types)](#M-IoC-ContainerExtensions-Bind-IoC-IContainer,System-Type[]- 'IoC.ContainerExtensions.Bind(IoC.IContainer,System.Type[])')
-  - [Bind\`\`1(container)](#M-IoC-ContainerExtensions-Bind``1-IoC-IContainer- 'IoC.ContainerExtensions.Bind``1(IoC.IContainer)')
-  - [Bind\`\`2(container)](#M-IoC-ContainerExtensions-Bind``2-IoC-IContainer- 'IoC.ContainerExtensions.Bind``2(IoC.IContainer)')
-  - [Bind\`\`3(container)](#M-IoC-ContainerExtensions-Bind``3-IoC-IContainer- 'IoC.ContainerExtensions.Bind``3(IoC.IContainer)')
-  - [Bind\`\`4(container)](#M-IoC-ContainerExtensions-Bind``4-IoC-IContainer- 'IoC.ContainerExtensions.Bind``4(IoC.IContainer)')
-  - [Bind\`\`5(container)](#M-IoC-ContainerExtensions-Bind``5-IoC-IContainer- 'IoC.ContainerExtensions.Bind``5(IoC.IContainer)')
-  - [Bind\`\`6(container)](#M-IoC-ContainerExtensions-Bind``6-IoC-IContainer- 'IoC.ContainerExtensions.Bind``6(IoC.IContainer)')
-  - [Bind\`\`7(container)](#M-IoC-ContainerExtensions-Bind``7-IoC-IContainer- 'IoC.ContainerExtensions.Bind``7(IoC.IContainer)')
-  - [Bind\`\`8(container)](#M-IoC-ContainerExtensions-Bind``8-IoC-IContainer- 'IoC.ContainerExtensions.Bind``8(IoC.IContainer)')
-  - [CreateChild(parent,name)](#M-IoC-ContainerExtensions-CreateChild-IoC-IContainer,System-String- 'IoC.ContainerExtensions.CreateChild(IoC.IContainer,System.String)')
-  - [Get(container,type,args)](#M-IoC-ContainerExtensions-Get-IoC-IContainer,System-Type,System-Object[]- 'IoC.ContainerExtensions.Get(IoC.IContainer,System.Type,System.Object[])')
-  - [Get(container,type)](#M-IoC-ContainerExtensions-Get-IoC-IContainer,System-Type- 'IoC.ContainerExtensions.Get(IoC.IContainer,System.Type)')
-  - [Get(resolving,type,args)](#M-IoC-ContainerExtensions-Get-IoC-ContainerExtensions-Resolving,System-Type,System-Object[]- 'IoC.ContainerExtensions.Get(IoC.ContainerExtensions.Resolving,System.Type,System.Object[])')
-  - [Get(resolving,type)](#M-IoC-ContainerExtensions-Get-IoC-ContainerExtensions-Resolving,System-Type- 'IoC.ContainerExtensions.Get(IoC.ContainerExtensions.Resolving,System.Type)')
-  - [Get\`\`1(container,args)](#M-IoC-ContainerExtensions-Get``1-IoC-IContainer,System-Object[]- 'IoC.ContainerExtensions.Get``1(IoC.IContainer,System.Object[])')
-  - [Get\`\`1(container)](#M-IoC-ContainerExtensions-Get``1-IoC-IContainer- 'IoC.ContainerExtensions.Get``1(IoC.IContainer)')
-  - [Get\`\`1(resolving,args)](#M-IoC-ContainerExtensions-Get``1-IoC-ContainerExtensions-Resolving,System-Object[]- 'IoC.ContainerExtensions.Get``1(IoC.ContainerExtensions.Resolving,System.Object[])')
-  - [Get\`\`1(resolving)](#M-IoC-ContainerExtensions-Get``1-IoC-ContainerExtensions-Resolving- 'IoC.ContainerExtensions.Get``1(IoC.ContainerExtensions.Resolving)')
-  - [Lifetime\`\`1(binding,lifetime)](#M-IoC-ContainerExtensions-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime- 'IoC.ContainerExtensions.Lifetime``1(IoC.IBinding{``0},IoC.ILifetime)')
-  - [Register\`\`1(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``1(IoC.IContainer,IoC.ILifetime,System.Object[])')
-  - [Register\`\`1(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``1-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``1(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
-  - [Register\`\`2(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``2-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``2(IoC.IContainer,IoC.ILifetime,System.Object[])')
-  - [Register\`\`2(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``2-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``2(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
-  - [Register\`\`3(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``3-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``3(IoC.IContainer,IoC.ILifetime,System.Object[])')
-  - [Register\`\`3(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``3-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``3(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
-  - [Register\`\`4(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``4-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``4(IoC.IContainer,IoC.ILifetime,System.Object[])')
-  - [Register\`\`4(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``4-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``4(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
-  - [Register\`\`5(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``5-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``5(IoC.IContainer,IoC.ILifetime,System.Object[])')
-  - [Register\`\`5(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``5-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``5(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
-  - [Register\`\`6(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``6-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``6(IoC.IContainer,IoC.ILifetime,System.Object[])')
-  - [Register\`\`6(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``6-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``6(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
-  - [Register\`\`7(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``7-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``7(IoC.IContainer,IoC.ILifetime,System.Object[])')
-  - [Register\`\`7(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``7-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``7(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
-  - [Register\`\`8(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``8-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``8(IoC.IContainer,IoC.ILifetime,System.Object[])')
-  - [Register\`\`8(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``8-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``8(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
-  - [Register\`\`9(container,lifetime,tags)](#M-IoC-ContainerExtensions-Register``9-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.ContainerExtensions.Register``9(IoC.IContainer,IoC.ILifetime,System.Object[])')
-  - [Register\`\`9(container,factory,lifetime,tags,statements)](#M-IoC-ContainerExtensions-Register``9-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.Register``9(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
-  - [Tag(container,tag)](#M-IoC-ContainerExtensions-Tag-IoC-IContainer,System-Object- 'IoC.ContainerExtensions.Tag(IoC.IContainer,System.Object)')
-  - [Tag\`\`1(binding,tagValue)](#M-IoC-ContainerExtensions-Tag``1-IoC-IBinding{``0},System-Object- 'IoC.ContainerExtensions.Tag``1(IoC.IBinding{``0},System.Object)')
-  - [To(binding,type,constructorFilter)](#M-IoC-ContainerExtensions-To-IoC-IBinding{System-Object},System-Type,System-Predicate{System-Reflection-ConstructorInfo}- 'IoC.ContainerExtensions.To(IoC.IBinding{System.Object},System.Type,System.Predicate{System.Reflection.ConstructorInfo})')
-  - [To\`\`1(binding,constructorFilter)](#M-IoC-ContainerExtensions-To``1-IoC-IBinding{``0},System-Predicate{System-Reflection-ConstructorInfo}- 'IoC.ContainerExtensions.To``1(IoC.IBinding{``0},System.Predicate{System.Reflection.ConstructorInfo})')
-  - [To\`\`1(binding,factory,statements)](#M-IoC-ContainerExtensions-To``1-IoC-IBinding{``0},System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.ContainerExtensions.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
-  - [ToSelf(registrationToken)](#M-IoC-ContainerExtensions-ToSelf-System-IDisposable- 'IoC.ContainerExtensions.ToSelf(System.IDisposable)')
-  - [Using(container,configurationText)](#M-IoC-ContainerExtensions-Using-IoC-IContainer,System-String[]- 'IoC.ContainerExtensions.Using(IoC.IContainer,System.String[])')
-  - [Using(container,configurationStreams)](#M-IoC-ContainerExtensions-Using-IoC-IContainer,System-IO-Stream[]- 'IoC.ContainerExtensions.Using(IoC.IContainer,System.IO.Stream[])')
-  - [Using(container,configurationReaders)](#M-IoC-ContainerExtensions-Using-IoC-IContainer,System-IO-TextReader[]- 'IoC.ContainerExtensions.Using(IoC.IContainer,System.IO.TextReader[])')
-  - [Using(container,configurations)](#M-IoC-ContainerExtensions-Using-IoC-IContainer,IoC-IConfiguration[]- 'IoC.ContainerExtensions.Using(IoC.IContainer,IoC.IConfiguration[])')
-  - [Using\`\`1(container)](#M-IoC-ContainerExtensions-Using``1-IoC-IContainer- 'IoC.ContainerExtensions.Using``1(IoC.IContainer)')
-  - [Validate(container)](#M-IoC-ContainerExtensions-Validate-IoC-IContainer- 'IoC.ContainerExtensions.Validate(IoC.IContainer)')
 - [ContainerSingletonLifetime](#T-IoC-Lifetimes-ContainerSingletonLifetime 'IoC.Lifetimes.ContainerSingletonLifetime')
   - [#ctor()](#M-IoC-Lifetimes-ContainerSingletonLifetime-#ctor-System-Func{IoC-ILifetime}- 'IoC.Lifetimes.ContainerSingletonLifetime.#ctor(System.Func{IoC.ILifetime})')
   - [Clone()](#M-IoC-Lifetimes-ContainerSingletonLifetime-Clone 'IoC.Lifetimes.ContainerSingletonLifetime.Clone')
@@ -135,6 +76,72 @@
 - [Feature](#T-IoC-Features-Feature 'IoC.Features.Feature')
   - [BasicSet](#F-IoC-Features-Feature-BasicSet 'IoC.Features.Feature.BasicSet')
   - [DefaultSet](#F-IoC-Features-Feature-DefaultSet 'IoC.Features.Feature.DefaultSet')
+- [Fluent](#T-IoC-Fluent 'IoC.Fluent')
+  - [CreateChild(parent,name)](#M-IoC-Fluent-CreateChild-IoC-IContainer,System-String- 'IoC.Fluent.CreateChild(IoC.IContainer,System.String)')
+  - [Validate(container)](#M-IoC-Fluent-Validate-IoC-IContainer- 'IoC.Fluent.Validate(IoC.IContainer)')
+- [FluentBind](#T-IoC-FluentBind 'IoC.FluentBind')
+  - [AnyTag\`\`1(binding)](#M-IoC-FluentBind-AnyTag``1-IoC-IBinding{``0}- 'IoC.FluentBind.AnyTag``1(IoC.IBinding{``0})')
+  - [As\`\`1(binding,lifetime)](#M-IoC-FluentBind-As``1-IoC-IBinding{``0},IoC-Lifetime- 'IoC.FluentBind.As``1(IoC.IBinding{``0},IoC.Lifetime)')
+  - [Bind(container,types)](#M-IoC-FluentBind-Bind-IoC-IContainer,System-Type[]- 'IoC.FluentBind.Bind(IoC.IContainer,System.Type[])')
+  - [Bind\`\`1(container)](#M-IoC-FluentBind-Bind``1-IoC-IContainer- 'IoC.FluentBind.Bind``1(IoC.IContainer)')
+  - [Bind\`\`2(container)](#M-IoC-FluentBind-Bind``2-IoC-IContainer- 'IoC.FluentBind.Bind``2(IoC.IContainer)')
+  - [Bind\`\`3(container)](#M-IoC-FluentBind-Bind``3-IoC-IContainer- 'IoC.FluentBind.Bind``3(IoC.IContainer)')
+  - [Bind\`\`4(container)](#M-IoC-FluentBind-Bind``4-IoC-IContainer- 'IoC.FluentBind.Bind``4(IoC.IContainer)')
+  - [Bind\`\`5(container)](#M-IoC-FluentBind-Bind``5-IoC-IContainer- 'IoC.FluentBind.Bind``5(IoC.IContainer)')
+  - [Bind\`\`6(container)](#M-IoC-FluentBind-Bind``6-IoC-IContainer- 'IoC.FluentBind.Bind``6(IoC.IContainer)')
+  - [Bind\`\`7(container)](#M-IoC-FluentBind-Bind``7-IoC-IContainer- 'IoC.FluentBind.Bind``7(IoC.IContainer)')
+  - [Bind\`\`8(container)](#M-IoC-FluentBind-Bind``8-IoC-IContainer- 'IoC.FluentBind.Bind``8(IoC.IContainer)')
+  - [Lifetime\`\`1(binding,lifetime)](#M-IoC-FluentBind-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime- 'IoC.FluentBind.Lifetime``1(IoC.IBinding{``0},IoC.ILifetime)')
+  - [Tag\`\`1(binding,tagValue)](#M-IoC-FluentBind-Tag``1-IoC-IBinding{``0},System-Object- 'IoC.FluentBind.Tag``1(IoC.IBinding{``0},System.Object)')
+  - [To(binding,type,constructorFilter)](#M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Predicate{System-Reflection-ConstructorInfo}- 'IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,System.Predicate{System.Reflection.ConstructorInfo})')
+  - [To\`\`1(binding,constructorFilter)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Predicate{System-Reflection-ConstructorInfo}- 'IoC.FluentBind.To``1(IoC.IBinding{``0},System.Predicate{System.Reflection.ConstructorInfo})')
+  - [To\`\`1(binding,factory,statements)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [ToSelf(registrationToken)](#M-IoC-FluentBind-ToSelf-System-IDisposable- 'IoC.FluentBind.ToSelf(System.IDisposable)')
+- [FluentConfiguration](#T-IoC-FluentConfiguration 'IoC.FluentConfiguration')
+  - [Apply(container,configurationText)](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-String[]- 'IoC.FluentConfiguration.Apply(IoC.IContainer,System.String[])')
+  - [Apply(container,configurationStreams)](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-IO-Stream[]- 'IoC.FluentConfiguration.Apply(IoC.IContainer,System.IO.Stream[])')
+  - [Apply(container,configurationReaders)](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-IO-TextReader[]- 'IoC.FluentConfiguration.Apply(IoC.IContainer,System.IO.TextReader[])')
+  - [Apply(container,configurations)](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IConfiguration}- 'IoC.FluentConfiguration.Apply(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IConfiguration})')
+  - [Apply(container,configurations)](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,IoC-IConfiguration[]- 'IoC.FluentConfiguration.Apply(IoC.IContainer,IoC.IConfiguration[])')
+  - [Using(container,configurationText)](#M-IoC-FluentConfiguration-Using-IoC-IContainer,System-String[]- 'IoC.FluentConfiguration.Using(IoC.IContainer,System.String[])')
+  - [Using(container,configurationStreams)](#M-IoC-FluentConfiguration-Using-IoC-IContainer,System-IO-Stream[]- 'IoC.FluentConfiguration.Using(IoC.IContainer,System.IO.Stream[])')
+  - [Using(container,configurationReaders)](#M-IoC-FluentConfiguration-Using-IoC-IContainer,System-IO-TextReader[]- 'IoC.FluentConfiguration.Using(IoC.IContainer,System.IO.TextReader[])')
+  - [Using(container,configurations)](#M-IoC-FluentConfiguration-Using-IoC-IContainer,IoC-IConfiguration[]- 'IoC.FluentConfiguration.Using(IoC.IContainer,IoC.IConfiguration[])')
+  - [Using\`\`1(container)](#M-IoC-FluentConfiguration-Using``1-IoC-IContainer- 'IoC.FluentConfiguration.Using``1(IoC.IContainer)')
+- [FluentGet](#T-IoC-FluentGet 'IoC.FluentGet')
+  - [Get(resolving,type,args)](#M-IoC-FluentGet-Get-IoC-FluentGet-Resolving,System-Type,System-Object[]- 'IoC.FluentGet.Get(IoC.FluentGet.Resolving,System.Type,System.Object[])')
+  - [Get(resolving,type)](#M-IoC-FluentGet-Get-IoC-FluentGet-Resolving,System-Type- 'IoC.FluentGet.Get(IoC.FluentGet.Resolving,System.Type)')
+  - [Get\`\`1(resolving,args)](#M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving,System-Object[]- 'IoC.FluentGet.Get``1(IoC.FluentGet.Resolving,System.Object[])')
+  - [Get\`\`1(resolving)](#M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving- 'IoC.FluentGet.Get``1(IoC.FluentGet.Resolving)')
+  - [Tag(container,tag)](#M-IoC-FluentGet-Tag-IoC-IContainer,System-Object- 'IoC.FluentGet.Tag(IoC.IContainer,System.Object)')
+- [FluentRegister](#T-IoC-FluentRegister 'IoC.FluentRegister')
+  - [Register\`\`1(container,lifetime,tags)](#M-IoC-FluentRegister-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.FluentRegister.Register``1(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`1(container,factory,lifetime,tags,statements)](#M-IoC-FluentRegister-Register``1-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentRegister.Register``1(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`2(container,lifetime,tags)](#M-IoC-FluentRegister-Register``2-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.FluentRegister.Register``2(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`2(container,factory,lifetime,tags,statements)](#M-IoC-FluentRegister-Register``2-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentRegister.Register``2(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`3(container,lifetime,tags)](#M-IoC-FluentRegister-Register``3-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.FluentRegister.Register``3(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`3(container,factory,lifetime,tags,statements)](#M-IoC-FluentRegister-Register``3-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentRegister.Register``3(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`4(container,lifetime,tags)](#M-IoC-FluentRegister-Register``4-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.FluentRegister.Register``4(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`4(container,factory,lifetime,tags,statements)](#M-IoC-FluentRegister-Register``4-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentRegister.Register``4(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`5(container,lifetime,tags)](#M-IoC-FluentRegister-Register``5-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.FluentRegister.Register``5(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`5(container,factory,lifetime,tags,statements)](#M-IoC-FluentRegister-Register``5-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentRegister.Register``5(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`6(container,lifetime,tags)](#M-IoC-FluentRegister-Register``6-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.FluentRegister.Register``6(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`6(container,factory,lifetime,tags,statements)](#M-IoC-FluentRegister-Register``6-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentRegister.Register``6(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`7(container,lifetime,tags)](#M-IoC-FluentRegister-Register``7-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.FluentRegister.Register``7(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`7(container,factory,lifetime,tags,statements)](#M-IoC-FluentRegister-Register``7-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentRegister.Register``7(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`8(container,lifetime,tags)](#M-IoC-FluentRegister-Register``8-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.FluentRegister.Register``8(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`8(container,factory,lifetime,tags,statements)](#M-IoC-FluentRegister-Register``8-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentRegister.Register``8(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`9(container,lifetime,tags)](#M-IoC-FluentRegister-Register``9-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.FluentRegister.Register``9(IoC.IContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`9(container,factory,lifetime,tags,statements)](#M-IoC-FluentRegister-Register``9-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentRegister.Register``9(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+- [FluentResolve](#T-IoC-FluentResolve 'IoC.FluentResolve')
+  - [GetResolver\`\`1(type,tag,container)](#M-IoC-FluentResolve-GetResolver``1-IoC-IContainer,System-Type,System-Object- 'IoC.FluentResolve.GetResolver``1(IoC.IContainer,System.Type,System.Object)')
+  - [GetResolver\`\`1(type,container)](#M-IoC-FluentResolve-GetResolver``1-IoC-IContainer,System-Type- 'IoC.FluentResolve.GetResolver``1(IoC.IContainer,System.Type)')
+  - [Resolve(container,type,args)](#M-IoC-FluentResolve-Resolve-IoC-IContainer,System-Type,System-Object[]- 'IoC.FluentResolve.Resolve(IoC.IContainer,System.Type,System.Object[])')
+  - [Resolve(container,type)](#M-IoC-FluentResolve-Resolve-IoC-IContainer,System-Type- 'IoC.FluentResolve.Resolve(IoC.IContainer,System.Type)')
+  - [Resolve\`\`1(container)](#M-IoC-FluentResolve-Resolve``1-IoC-Container- 'IoC.FluentResolve.Resolve``1(IoC.Container)')
+  - [Resolve\`\`1(container,args)](#M-IoC-FluentResolve-Resolve``1-IoC-Container,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.Container,System.Object[])')
+  - [Resolve\`\`1(container,args)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Object[])')
+  - [Resolve\`\`1(container)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer- 'IoC.FluentResolve.Resolve``1(IoC.IContainer)')
 - [FuncFeature](#T-IoC-Features-FuncFeature 'IoC.Features.FuncFeature')
   - [Shared](#F-IoC-Features-FuncFeature-Shared 'IoC.Features.FuncFeature.Shared')
   - [Apply()](#M-IoC-Features-FuncFeature-Apply-IoC-IContainer- 'IoC.Features.FuncFeature.Apply(IoC.IContainer)')
@@ -148,8 +155,6 @@
   - [Apply(container)](#M-IoC-IConfiguration-Apply-IoC-IContainer- 'IoC.IConfiguration.Apply(IoC.IContainer)')
 - [IContainer](#T-IoC-IContainer 'IoC.IContainer')
   - [Parent](#P-IoC-IContainer-Parent 'IoC.IContainer.Parent')
-  - [GetResolver\`\`1(type,tag,container)](#M-IoC-IContainer-GetResolver``1-System-Type,System-Object,IoC-IContainer- 'IoC.IContainer.GetResolver``1(System.Type,System.Object,IoC.IContainer)')
-  - [GetResolver\`\`1(type,container)](#M-IoC-IContainer-GetResolver``1-System-Type,IoC-IContainer- 'IoC.IContainer.GetResolver``1(System.Type,IoC.IContainer)')
   - [TryGetDependency(key,dependency,lifetime)](#M-IoC-IContainer-TryGetDependency-IoC-Key,IoC-IDependency@,IoC-ILifetime@- 'IoC.IContainer.TryGetDependency(IoC.Key,IoC.IDependency@,IoC.ILifetime@)')
   - [TryGetResolver\`\`1(type,tag,resolver,container)](#M-IoC-IContainer-TryGetResolver``1-System-Type,System-Object,IoC-Resolver{``0}@,IoC-IContainer- 'IoC.IContainer.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,IoC.IContainer)')
   - [TryGetResolver\`\`1(type,resolver,container)](#M-IoC-IContainer-TryGetResolver``1-System-Type,IoC-Resolver{``0}@,IoC-IContainer- 'IoC.IContainer.TryGetResolver``1(System.Type,IoC.Resolver{``0}@,IoC.IContainer)')
@@ -222,9 +227,9 @@
 - [RazorSectionAttribute](#T-IoC-RazorSectionAttribute 'IoC.RazorSectionAttribute')
 - [RegexPatternAttribute](#T-IoC-RegexPatternAttribute 'IoC.RegexPatternAttribute')
 - [Resolver\`1](#T-IoC-Resolver`1 'IoC.Resolver`1')
-- [Resolving](#T-IoC-ContainerExtensions-Resolving 'IoC.ContainerExtensions.Resolving')
-  - [Container](#F-IoC-ContainerExtensions-Resolving-Container 'IoC.ContainerExtensions.Resolving.Container')
-  - [Tag](#F-IoC-ContainerExtensions-Resolving-Tag 'IoC.ContainerExtensions.Resolving.Tag')
+- [Resolving](#T-IoC-FluentGet-Resolving 'IoC.FluentGet.Resolving')
+  - [Container](#F-IoC-FluentGet-Resolving-Container 'IoC.FluentGet.Resolving.Container')
+  - [Tag](#F-IoC-FluentGet-Resolving-Tag 'IoC.FluentGet.Resolving.Tag')
 - [Scope](#T-IoC-Scope 'IoC.Scope')
   - [#ctor(scopeKey)](#M-IoC-Scope-#ctor-System-Object- 'IoC.Scope.#ctor(System.Object)')
   - [Current](#P-IoC-Scope-Current 'IoC.Scope.Current')
@@ -786,28 +791,6 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-IoC-Container-GetResolver``1-System-Type,System-Object,IoC-IContainer-'></a>
-### GetResolver\`\`1() `method` [#](#M-IoC-Container-GetResolver``1-System-Type,System-Object,IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='M-IoC-Container-GetResolver``1-System-Type,IoC-IContainer-'></a>
-### GetResolver\`\`1() `method` [#](#M-IoC-Container-GetResolver``1-System-Type,IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
 <a name='M-IoC-Container-Subscribe-System-IObserver{IoC-ContainerEvent}-'></a>
 ### Subscribe() `method` [#](#M-IoC-Container-Subscribe-System-IObserver{IoC-ContainerEvent}- 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -905,1369 +888,6 @@ The type of event.
 ##### Summary
 
 The chenged binding key.
-
-<a name='T-IoC-ContainerExtensions'></a>
-## ContainerExtensions [#](#T-IoC-ContainerExtensions 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Namespace
-
-IoC
-
-##### Summary
-
-Extension method for IoC container.
-
-<a name='M-IoC-ContainerExtensions-AnyTag``1-IoC-IBinding{``0}-'></a>
-### AnyTag\`\`1(binding) `method` [#](#M-IoC-ContainerExtensions-AnyTag``1-IoC-IBinding{``0}- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Marks the binding to be used for any tags.
-
-##### Returns
-
-The binding token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') | The binding token. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-
-<a name='M-IoC-ContainerExtensions-Apply-IoC-IContainer,System-String[]-'></a>
-### Apply(container,configurationText) `method` [#](#M-IoC-ContainerExtensions-Apply-IoC-IContainer,System-String[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Applies text configurations for the target container.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| configurationText | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') | The text configurations. |
-
-<a name='M-IoC-ContainerExtensions-Apply-IoC-IContainer,System-IO-Stream[]-'></a>
-### Apply(container,configurationStreams) `method` [#](#M-IoC-ContainerExtensions-Apply-IoC-IContainer,System-IO-Stream[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Applies text configurations from streams for the target container.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| configurationStreams | [System.IO.Stream[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.Stream[] 'System.IO.Stream[]') | The set of streams with text configurations. |
-
-<a name='M-IoC-ContainerExtensions-Apply-IoC-IContainer,System-IO-TextReader[]-'></a>
-### Apply(container,configurationReaders) `method` [#](#M-IoC-ContainerExtensions-Apply-IoC-IContainer,System-IO-TextReader[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Applies text configurations from text readers for the target container.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| configurationReaders | [System.IO.TextReader[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.TextReader[] 'System.IO.TextReader[]') | The set of text readers with text configurations. |
-
-<a name='M-IoC-ContainerExtensions-Apply-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IConfiguration}-'></a>
-### Apply(container,configurations) `method` [#](#M-IoC-ContainerExtensions-Apply-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IConfiguration}- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Applies configurations for the target container.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| configurations | [System.Collections.Generic.IEnumerable{IoC.IConfiguration}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IConfiguration}') | The configurations. |
-
-<a name='M-IoC-ContainerExtensions-Apply-IoC-IContainer,IoC-IConfiguration[]-'></a>
-### Apply(container,configurations) `method` [#](#M-IoC-ContainerExtensions-Apply-IoC-IContainer,IoC-IConfiguration[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Applies configurations for the target container.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The configurations. |
-
-<a name='M-IoC-ContainerExtensions-As``1-IoC-IBinding{``0},IoC-Lifetime-'></a>
-### As\`\`1(binding,lifetime) `method` [#](#M-IoC-ContainerExtensions-As``1-IoC-IBinding{``0},IoC-Lifetime- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Assigns well-known lifetime to the binding.
-
-##### Returns
-
-The binding token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') |  |
-| lifetime | [IoC.Lifetime](#T-IoC-Lifetime 'IoC.Lifetime') |  |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-
-<a name='M-IoC-ContainerExtensions-Bind-IoC-IContainer,System-Type[]-'></a>
-### Bind(container,types) `method` [#](#M-IoC-ContainerExtensions-Bind-IoC-IContainer,System-Type[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Binds the type(s).
-
-##### Returns
-
-The binding token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') |  |
-
-<a name='M-IoC-ContainerExtensions-Bind``1-IoC-IContainer-'></a>
-### Bind\`\`1(container) `method` [#](#M-IoC-ContainerExtensions-Bind``1-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Binds the type.
-
-##### Returns
-
-The binding token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The contract type. |
-
-<a name='M-IoC-ContainerExtensions-Bind``2-IoC-IContainer-'></a>
-### Bind\`\`2(container) `method` [#](#M-IoC-ContainerExtensions-Bind``2-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Binds multiple types.
-
-##### Returns
-
-The binding token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-| T1 | The contract type. |
-
-<a name='M-IoC-ContainerExtensions-Bind``3-IoC-IContainer-'></a>
-### Bind\`\`3(container) `method` [#](#M-IoC-ContainerExtensions-Bind``3-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Binds multiple types.
-
-##### Returns
-
-The binding token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-| T1 | The contract type #1. |
-| T2 | The contract type #2. |
-
-<a name='M-IoC-ContainerExtensions-Bind``4-IoC-IContainer-'></a>
-### Bind\`\`4(container) `method` [#](#M-IoC-ContainerExtensions-Bind``4-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Binds multiple types.
-
-##### Returns
-
-The binding token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-| T1 | The contract type #1. |
-| T2 | The contract type #2. |
-| T3 | The contract type #3. |
-
-<a name='M-IoC-ContainerExtensions-Bind``5-IoC-IContainer-'></a>
-### Bind\`\`5(container) `method` [#](#M-IoC-ContainerExtensions-Bind``5-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Binds multiple types.
-
-##### Returns
-
-The binding token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-| T1 | The contract type #1. |
-| T2 | The contract type #2. |
-| T3 | The contract type #3. |
-| T4 | The contract type #4. |
-
-<a name='M-IoC-ContainerExtensions-Bind``6-IoC-IContainer-'></a>
-### Bind\`\`6(container) `method` [#](#M-IoC-ContainerExtensions-Bind``6-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Binds multiple types.
-
-##### Returns
-
-The binding token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-| T1 | The contract type #1. |
-| T2 | The contract type #2. |
-| T3 | The contract type #3. |
-| T4 | The contract type #4. |
-| T5 | The contract type #5. |
-
-<a name='M-IoC-ContainerExtensions-Bind``7-IoC-IContainer-'></a>
-### Bind\`\`7(container) `method` [#](#M-IoC-ContainerExtensions-Bind``7-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Binds multiple types.
-
-##### Returns
-
-The binding token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-| T1 | The contract type #1. |
-| T2 | The contract type #2. |
-| T3 | The contract type #3. |
-| T4 | The contract type #4. |
-| T5 | The contract type #5. |
-| T6 | The contract type #6. |
-
-<a name='M-IoC-ContainerExtensions-Bind``8-IoC-IContainer-'></a>
-### Bind\`\`8(container) `method` [#](#M-IoC-ContainerExtensions-Bind``8-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Binds multiple types.
-
-##### Returns
-
-The binding token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-| T1 | The contract type #1. |
-| T2 | The contract type #2. |
-| T3 | The contract type #3. |
-| T4 | The contract type #4. |
-| T5 | The contract type #5. |
-| T6 | The contract type #6. |
-| T7 | The contract type #7. |
-
-<a name='M-IoC-ContainerExtensions-CreateChild-IoC-IContainer,System-String-'></a>
-### CreateChild(parent,name) `method` [#](#M-IoC-ContainerExtensions-CreateChild-IoC-IContainer,System-String- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Creates child container.
-
-##### Returns
-
-The child container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| parent | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The parent container. |
-| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The name of child container. |
-
-<a name='M-IoC-ContainerExtensions-Get-IoC-IContainer,System-Type,System-Object[]-'></a>
-### Get(container,type,args) `method` [#](#M-IoC-ContainerExtensions-Get-IoC-IContainer,System-Type,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets an instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
-| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
-
-<a name='M-IoC-ContainerExtensions-Get-IoC-IContainer,System-Type-'></a>
-### Get(container,type) `method` [#](#M-IoC-ContainerExtensions-Get-IoC-IContainer,System-Type- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets an instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
-
-<a name='M-IoC-ContainerExtensions-Get-IoC-ContainerExtensions-Resolving,System-Type,System-Object[]-'></a>
-### Get(resolving,type,args) `method` [#](#M-IoC-ContainerExtensions-Get-IoC-ContainerExtensions-Resolving,System-Type,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets an instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| resolving | [IoC.ContainerExtensions.Resolving](#T-IoC-ContainerExtensions-Resolving 'IoC.ContainerExtensions.Resolving') |  |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
-| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
-
-<a name='M-IoC-ContainerExtensions-Get-IoC-ContainerExtensions-Resolving,System-Type-'></a>
-### Get(resolving,type) `method` [#](#M-IoC-ContainerExtensions-Get-IoC-ContainerExtensions-Resolving,System-Type- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets an instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| resolving | [IoC.ContainerExtensions.Resolving](#T-IoC-ContainerExtensions-Resolving 'IoC.ContainerExtensions.Resolving') |  |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
-
-<a name='M-IoC-ContainerExtensions-Get``1-IoC-IContainer,System-Object[]-'></a>
-### Get\`\`1(container,args) `method` [#](#M-IoC-ContainerExtensions-Get``1-IoC-IContainer,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets an instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-
-<a name='M-IoC-ContainerExtensions-Get``1-IoC-IContainer-'></a>
-### Get\`\`1(container) `method` [#](#M-IoC-ContainerExtensions-Get``1-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets an instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-
-<a name='M-IoC-ContainerExtensions-Get``1-IoC-ContainerExtensions-Resolving,System-Object[]-'></a>
-### Get\`\`1(resolving,args) `method` [#](#M-IoC-ContainerExtensions-Get``1-IoC-ContainerExtensions-Resolving,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets an instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| resolving | [IoC.ContainerExtensions.Resolving](#T-IoC-ContainerExtensions-Resolving 'IoC.ContainerExtensions.Resolving') |  |
-| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-
-<a name='M-IoC-ContainerExtensions-Get``1-IoC-ContainerExtensions-Resolving-'></a>
-### Get\`\`1(resolving) `method` [#](#M-IoC-ContainerExtensions-Get``1-IoC-ContainerExtensions-Resolving- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets an instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| resolving | [IoC.ContainerExtensions.Resolving](#T-IoC-ContainerExtensions-Resolving 'IoC.ContainerExtensions.Resolving') |  |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-
-<a name='M-IoC-ContainerExtensions-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime-'></a>
-### Lifetime\`\`1(binding,lifetime) `method` [#](#M-IoC-ContainerExtensions-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Assigns the lifetime to the binding.
-
-##### Returns
-
-The binding token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') |  |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') |  |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-
-<a name='M-IoC-ContainerExtensions-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
-### Register\`\`1(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The autowring type. |
-
-<a name='M-IoC-ContainerExtensions-Register``1-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
-### Register\`\`1(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``1-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The base type. |
-
-<a name='M-IoC-ContainerExtensions-Register``2-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
-### Register\`\`2(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``2-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The autowring type. |
-| T1 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``2-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
-### Register\`\`2(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``2-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The base type. |
-| T1 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``3-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
-### Register\`\`3(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``3-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The autowring type. |
-| T1 | The additional contract type. |
-| T2 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``3-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
-### Register\`\`3(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``3-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The base type. |
-| T1 | The additional contract type. |
-| T2 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``4-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
-### Register\`\`4(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``4-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The autowring type. |
-| T1 | The additional contract type. |
-| T2 | The additional contract type. |
-| T3 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``4-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
-### Register\`\`4(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``4-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The base type. |
-| T1 | The additional contract type. |
-| T2 | The additional contract type. |
-| T3 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``5-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
-### Register\`\`5(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``5-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The autowring type. |
-| T1 | The additional contract type. |
-| T2 | The additional contract type. |
-| T3 | The additional contract type. |
-| T4 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``5-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
-### Register\`\`5(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``5-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The base type. |
-| T1 | The additional contract type. |
-| T2 | The additional contract type. |
-| T3 | The additional contract type. |
-| T4 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``6-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
-### Register\`\`6(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``6-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The autowring type. |
-| T1 | The additional contract type. |
-| T2 | The additional contract type. |
-| T3 | The additional contract type. |
-| T4 | The additional contract type. |
-| T5 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``6-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
-### Register\`\`6(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``6-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The base type. |
-| T1 | The additional contract type. |
-| T2 | The additional contract type. |
-| T3 | The additional contract type. |
-| T4 | The additional contract type. |
-| T5 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``7-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
-### Register\`\`7(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``7-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The autowring type. |
-| T1 | The additional contract type. |
-| T2 | The additional contract type. |
-| T3 | The additional contract type. |
-| T4 | The additional contract type. |
-| T5 | The additional contract type. |
-| T6 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``7-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
-### Register\`\`7(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``7-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The base type. |
-| T1 | The additional contract type. |
-| T2 | The additional contract type. |
-| T3 | The additional contract type. |
-| T4 | The additional contract type. |
-| T5 | The additional contract type. |
-| T6 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``8-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
-### Register\`\`8(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``8-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The autowring type. |
-| T1 | The additional contract type. |
-| T2 | The additional contract type. |
-| T3 | The additional contract type. |
-| T4 | The additional contract type. |
-| T5 | The additional contract type. |
-| T6 | The additional contract type. |
-| T7 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``8-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
-### Register\`\`8(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``8-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The base type. |
-| T1 | The additional contract type. |
-| T2 | The additional contract type. |
-| T3 | The additional contract type. |
-| T4 | The additional contract type. |
-| T5 | The additional contract type. |
-| T6 | The additional contract type. |
-| T7 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``9-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
-### Register\`\`9(container,lifetime,tags) `method` [#](#M-IoC-ContainerExtensions-Register``9-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The autowring type. |
-| T1 | The additional contract type. |
-| T2 | The additional contract type. |
-| T3 | The additional contract type. |
-| T4 | The additional contract type. |
-| T5 | The additional contract type. |
-| T6 | The additional contract type. |
-| T7 | The additional contract type. |
-| T8 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Register``9-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
-### Register\`\`9(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-ContainerExtensions-Register``9-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Registers a binding.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
-| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The base type. |
-| T1 | The additional contract type. |
-| T2 | The additional contract type. |
-| T3 | The additional contract type. |
-| T4 | The additional contract type. |
-| T5 | The additional contract type. |
-| T6 | The additional contract type. |
-| T7 | The additional contract type. |
-| T8 | The additional contract type. |
-
-<a name='M-IoC-ContainerExtensions-Tag-IoC-IContainer,System-Object-'></a>
-### Tag(container,tag) `method` [#](#M-IoC-ContainerExtensions-Tag-IoC-IContainer,System-Object- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Specifies the tag of the instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
-
-<a name='M-IoC-ContainerExtensions-Tag``1-IoC-IBinding{``0},System-Object-'></a>
-### Tag\`\`1(binding,tagValue) `method` [#](#M-IoC-ContainerExtensions-Tag``1-IoC-IBinding{``0},System-Object- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Marks the binding by the tag. Is it possible to use multiple times.
-
-##### Returns
-
-The binding token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') |  |
-| tagValue | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') |  |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-
-<a name='M-IoC-ContainerExtensions-To-IoC-IBinding{System-Object},System-Type,System-Predicate{System-Reflection-ConstructorInfo}-'></a>
-### To(binding,type,constructorFilter) `method` [#](#M-IoC-ContainerExtensions-To-IoC-IBinding{System-Object},System-Type,System-Predicate{System-Reflection-ConstructorInfo}- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Creates full auto-wiring.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| binding | [IoC.IBinding{System.Object}](#T-IoC-IBinding{System-Object} 'IoC.IBinding{System.Object}') | The binding token. |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
-| constructorFilter | [System.Predicate{System.Reflection.ConstructorInfo}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Predicate 'System.Predicate{System.Reflection.ConstructorInfo}') | The constructor's filter. |
-
-<a name='M-IoC-ContainerExtensions-To``1-IoC-IBinding{``0},System-Predicate{System-Reflection-ConstructorInfo}-'></a>
-### To\`\`1(binding,constructorFilter) `method` [#](#M-IoC-ContainerExtensions-To``1-IoC-IBinding{``0},System-Predicate{System-Reflection-ConstructorInfo}- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Creates full auto-wiring.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') | The binding token. |
-| constructorFilter | [System.Predicate{System.Reflection.ConstructorInfo}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Predicate 'System.Predicate{System.Reflection.ConstructorInfo}') | The constructor's filter. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-
-<a name='M-IoC-ContainerExtensions-To``1-IoC-IBinding{``0},System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
-### To\`\`1(binding,factory,statements) `method` [#](#M-IoC-ContainerExtensions-To``1-IoC-IBinding{``0},System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Creates manual auto-wiring.
-
-##### Returns
-
-The registration token.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') | The binding token. |
-| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
-| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-
-<a name='M-IoC-ContainerExtensions-ToSelf-System-IDisposable-'></a>
-### ToSelf(registrationToken) `method` [#](#M-IoC-ContainerExtensions-ToSelf-System-IDisposable- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Puts the registration token to the target contaier to manage it.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| registrationToken | [System.IDisposable](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IDisposable 'System.IDisposable') |  |
-
-<a name='M-IoC-ContainerExtensions-Using-IoC-IContainer,System-String[]-'></a>
-### Using(container,configurationText) `method` [#](#M-IoC-ContainerExtensions-Using-IoC-IContainer,System-String[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Applies text configurations for the target container.
-
-##### Returns
-
-The target container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| configurationText | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') | The text configurations. |
-
-<a name='M-IoC-ContainerExtensions-Using-IoC-IContainer,System-IO-Stream[]-'></a>
-### Using(container,configurationStreams) `method` [#](#M-IoC-ContainerExtensions-Using-IoC-IContainer,System-IO-Stream[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Applies text configurations from streams for the target container.
-
-##### Returns
-
-The target container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| configurationStreams | [System.IO.Stream[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.Stream[] 'System.IO.Stream[]') | The set of streams with text configurations. |
-
-<a name='M-IoC-ContainerExtensions-Using-IoC-IContainer,System-IO-TextReader[]-'></a>
-### Using(container,configurationReaders) `method` [#](#M-IoC-ContainerExtensions-Using-IoC-IContainer,System-IO-TextReader[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Applies text configurations from text readers for the target container.
-
-##### Returns
-
-The target container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| configurationReaders | [System.IO.TextReader[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.TextReader[] 'System.IO.TextReader[]') | The set of text readers with text configurations. |
-
-<a name='M-IoC-ContainerExtensions-Using-IoC-IContainer,IoC-IConfiguration[]-'></a>
-### Using(container,configurations) `method` [#](#M-IoC-ContainerExtensions-Using-IoC-IContainer,IoC-IConfiguration[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Applies configurations for the target container.
-
-##### Returns
-
-The target container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The configurations. |
-
-<a name='M-IoC-ContainerExtensions-Using``1-IoC-IContainer-'></a>
-### Using\`\`1(container) `method` [#](#M-IoC-ContainerExtensions-Using``1-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Applies configuration for the target container.
-
-##### Returns
-
-The target container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The type of configuration. |
-
-<a name='M-IoC-ContainerExtensions-Validate-IoC-IContainer-'></a>
-### Validate(container) `method` [#](#M-IoC-ContainerExtensions-Validate-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Validates the target container.
-
-##### Returns
-
-The validation result.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
 
 <a name='T-IoC-Lifetimes-ContainerSingletonLifetime'></a>
 ## ContainerSingletonLifetime [#](#T-IoC-Lifetimes-ContainerSingletonLifetime 'Go To Here') [=](#contents 'Back To Contents')
@@ -2466,6 +1086,1520 @@ The enumeration of default features.
 
 The enumeration of default features.
 
+<a name='T-IoC-Fluent'></a>
+## Fluent [#](#T-IoC-Fluent 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Extension method for IoC container.
+
+<a name='M-IoC-Fluent-CreateChild-IoC-IContainer,System-String-'></a>
+### CreateChild(parent,name) `method` [#](#M-IoC-Fluent-CreateChild-IoC-IContainer,System-String- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Creates child container.
+
+##### Returns
+
+The child container.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| parent | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The parent container. |
+| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The name of child container. |
+
+<a name='M-IoC-Fluent-Validate-IoC-IContainer-'></a>
+### Validate(container) `method` [#](#M-IoC-Fluent-Validate-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Validates the target container.
+
+##### Returns
+
+The validation result.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+<a name='T-IoC-FluentBind'></a>
+## FluentBind [#](#T-IoC-FluentBind 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents extensions to add bindings to a container.
+
+<a name='M-IoC-FluentBind-AnyTag``1-IoC-IBinding{``0}-'></a>
+### AnyTag\`\`1(binding) `method` [#](#M-IoC-FluentBind-AnyTag``1-IoC-IBinding{``0}- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Marks the binding to be used for any tags.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') | The binding token. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentBind-As``1-IoC-IBinding{``0},IoC-Lifetime-'></a>
+### As\`\`1(binding,lifetime) `method` [#](#M-IoC-FluentBind-As``1-IoC-IBinding{``0},IoC-Lifetime- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Assigns well-known lifetime to the binding.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') |  |
+| lifetime | [IoC.Lifetime](#T-IoC-Lifetime 'IoC.Lifetime') |  |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentBind-Bind-IoC-IContainer,System-Type[]-'></a>
+### Bind(container,types) `method` [#](#M-IoC-FluentBind-Bind-IoC-IContainer,System-Type[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Binds the type(s).
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') |  |
+
+<a name='M-IoC-FluentBind-Bind``1-IoC-IContainer-'></a>
+### Bind\`\`1(container) `method` [#](#M-IoC-FluentBind-Bind``1-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Binds the type.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The contract type. |
+
+<a name='M-IoC-FluentBind-Bind``2-IoC-IContainer-'></a>
+### Bind\`\`2(container) `method` [#](#M-IoC-FluentBind-Bind``2-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type. |
+
+<a name='M-IoC-FluentBind-Bind``3-IoC-IContainer-'></a>
+### Bind\`\`3(container) `method` [#](#M-IoC-FluentBind-Bind``3-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+
+<a name='M-IoC-FluentBind-Bind``4-IoC-IContainer-'></a>
+### Bind\`\`4(container) `method` [#](#M-IoC-FluentBind-Bind``4-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+
+<a name='M-IoC-FluentBind-Bind``5-IoC-IContainer-'></a>
+### Bind\`\`5(container) `method` [#](#M-IoC-FluentBind-Bind``5-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+
+<a name='M-IoC-FluentBind-Bind``6-IoC-IContainer-'></a>
+### Bind\`\`6(container) `method` [#](#M-IoC-FluentBind-Bind``6-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+
+<a name='M-IoC-FluentBind-Bind``7-IoC-IContainer-'></a>
+### Bind\`\`7(container) `method` [#](#M-IoC-FluentBind-Bind``7-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+
+<a name='M-IoC-FluentBind-Bind``8-IoC-IContainer-'></a>
+### Bind\`\`8(container) `method` [#](#M-IoC-FluentBind-Bind``8-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+
+<a name='M-IoC-FluentBind-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime-'></a>
+### Lifetime\`\`1(binding,lifetime) `method` [#](#M-IoC-FluentBind-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Assigns the lifetime to the binding.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') |  |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') |  |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentBind-Tag``1-IoC-IBinding{``0},System-Object-'></a>
+### Tag\`\`1(binding,tagValue) `method` [#](#M-IoC-FluentBind-Tag``1-IoC-IBinding{``0},System-Object- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Marks the binding by the tag. Is it possible to use multiple times.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') |  |
+| tagValue | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') |  |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Predicate{System-Reflection-ConstructorInfo}-'></a>
+### To(binding,type,constructorFilter) `method` [#](#M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Predicate{System-Reflection-ConstructorInfo}- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Creates full auto-wiring.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding{System.Object}](#T-IoC-IBinding{System-Object} 'IoC.IBinding{System.Object}') | The binding token. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
+| constructorFilter | [System.Predicate{System.Reflection.ConstructorInfo}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Predicate 'System.Predicate{System.Reflection.ConstructorInfo}') | The constructor's filter. |
+
+<a name='M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Predicate{System-Reflection-ConstructorInfo}-'></a>
+### To\`\`1(binding,constructorFilter) `method` [#](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Predicate{System-Reflection-ConstructorInfo}- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Creates full auto-wiring.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') | The binding token. |
+| constructorFilter | [System.Predicate{System.Reflection.ConstructorInfo}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Predicate 'System.Predicate{System.Reflection.ConstructorInfo}') | The constructor's filter. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### To\`\`1(binding,factory,statements) `method` [#](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Creates manual auto-wiring.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') | The binding token. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentBind-ToSelf-System-IDisposable-'></a>
+### ToSelf(registrationToken) `method` [#](#M-IoC-FluentBind-ToSelf-System-IDisposable- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Puts the registration token to the target contaier to manage it.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| registrationToken | [System.IDisposable](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IDisposable 'System.IDisposable') |  |
+
+<a name='T-IoC-FluentConfiguration'></a>
+## FluentConfiguration [#](#T-IoC-FluentConfiguration 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents extensons to configure a container.
+
+<a name='M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-String[]-'></a>
+### Apply(container,configurationText) `method` [#](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-String[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Applies text configurations for the target container.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| configurationText | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') | The text configurations. |
+
+<a name='M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-IO-Stream[]-'></a>
+### Apply(container,configurationStreams) `method` [#](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-IO-Stream[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Applies text configurations from streams for the target container.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| configurationStreams | [System.IO.Stream[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.Stream[] 'System.IO.Stream[]') | The set of streams with text configurations. |
+
+<a name='M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-IO-TextReader[]-'></a>
+### Apply(container,configurationReaders) `method` [#](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-IO-TextReader[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Applies text configurations from text readers for the target container.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| configurationReaders | [System.IO.TextReader[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.TextReader[] 'System.IO.TextReader[]') | The set of text readers with text configurations. |
+
+<a name='M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IConfiguration}-'></a>
+### Apply(container,configurations) `method` [#](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IConfiguration}- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Applies configurations for the target container.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| configurations | [System.Collections.Generic.IEnumerable{IoC.IConfiguration}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IConfiguration}') | The configurations. |
+
+<a name='M-IoC-FluentConfiguration-Apply-IoC-IContainer,IoC-IConfiguration[]-'></a>
+### Apply(container,configurations) `method` [#](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,IoC-IConfiguration[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Applies configurations for the target container.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The configurations. |
+
+<a name='M-IoC-FluentConfiguration-Using-IoC-IContainer,System-String[]-'></a>
+### Using(container,configurationText) `method` [#](#M-IoC-FluentConfiguration-Using-IoC-IContainer,System-String[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Applies text configurations for the target container.
+
+##### Returns
+
+The target container.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| configurationText | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') | The text configurations. |
+
+<a name='M-IoC-FluentConfiguration-Using-IoC-IContainer,System-IO-Stream[]-'></a>
+### Using(container,configurationStreams) `method` [#](#M-IoC-FluentConfiguration-Using-IoC-IContainer,System-IO-Stream[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Applies text configurations from streams for the target container.
+
+##### Returns
+
+The target container.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| configurationStreams | [System.IO.Stream[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.Stream[] 'System.IO.Stream[]') | The set of streams with text configurations. |
+
+<a name='M-IoC-FluentConfiguration-Using-IoC-IContainer,System-IO-TextReader[]-'></a>
+### Using(container,configurationReaders) `method` [#](#M-IoC-FluentConfiguration-Using-IoC-IContainer,System-IO-TextReader[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Applies text configurations from text readers for the target container.
+
+##### Returns
+
+The target container.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| configurationReaders | [System.IO.TextReader[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.TextReader[] 'System.IO.TextReader[]') | The set of text readers with text configurations. |
+
+<a name='M-IoC-FluentConfiguration-Using-IoC-IContainer,IoC-IConfiguration[]-'></a>
+### Using(container,configurations) `method` [#](#M-IoC-FluentConfiguration-Using-IoC-IContainer,IoC-IConfiguration[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Applies configurations for the target container.
+
+##### Returns
+
+The target container.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The configurations. |
+
+<a name='M-IoC-FluentConfiguration-Using``1-IoC-IContainer-'></a>
+### Using\`\`1(container) `method` [#](#M-IoC-FluentConfiguration-Using``1-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Applies configuration for the target container.
+
+##### Returns
+
+The target container.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The type of configuration. |
+
+<a name='T-IoC-FluentGet'></a>
+## FluentGet [#](#T-IoC-FluentGet 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents extensions to get an instance from a continer.
+
+<a name='M-IoC-FluentGet-Get-IoC-FluentGet-Resolving,System-Type,System-Object[]-'></a>
+### Get(resolving,type,args) `method` [#](#M-IoC-FluentGet-Get-IoC-FluentGet-Resolving,System-Type,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| resolving | [IoC.FluentGet.Resolving](#T-IoC-FluentGet-Resolving 'IoC.FluentGet.Resolving') |  |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+<a name='M-IoC-FluentGet-Get-IoC-FluentGet-Resolving,System-Type-'></a>
+### Get(resolving,type) `method` [#](#M-IoC-FluentGet-Get-IoC-FluentGet-Resolving,System-Type- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| resolving | [IoC.FluentGet.Resolving](#T-IoC-FluentGet-Resolving 'IoC.FluentGet.Resolving') |  |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
+
+<a name='M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving,System-Object[]-'></a>
+### Get\`\`1(resolving,args) `method` [#](#M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| resolving | [IoC.FluentGet.Resolving](#T-IoC-FluentGet-Resolving 'IoC.FluentGet.Resolving') |  |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving-'></a>
+### Get\`\`1(resolving) `method` [#](#M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| resolving | [IoC.FluentGet.Resolving](#T-IoC-FluentGet-Resolving 'IoC.FluentGet.Resolving') |  |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentGet-Tag-IoC-IContainer,System-Object-'></a>
+### Tag(container,tag) `method` [#](#M-IoC-FluentGet-Tag-IoC-IContainer,System-Object- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Specifies the tag of the instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
+
+<a name='T-IoC-FluentRegister'></a>
+## FluentRegister [#](#T-IoC-FluentRegister 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents extensions for registration in a container.
+
+<a name='M-IoC-FluentRegister-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`1(container,lifetime,tags) `method` [#](#M-IoC-FluentRegister-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+
+<a name='M-IoC-FluentRegister-Register``1-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`1(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-FluentRegister-Register``1-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+
+<a name='M-IoC-FluentRegister-Register``2-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`2(container,lifetime,tags) `method` [#](#M-IoC-FluentRegister-Register``2-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``2-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`2(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-FluentRegister-Register``2-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``3-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`3(container,lifetime,tags) `method` [#](#M-IoC-FluentRegister-Register``3-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``3-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`3(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-FluentRegister-Register``3-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``4-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`4(container,lifetime,tags) `method` [#](#M-IoC-FluentRegister-Register``4-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``4-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`4(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-FluentRegister-Register``4-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``5-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`5(container,lifetime,tags) `method` [#](#M-IoC-FluentRegister-Register``5-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``5-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`5(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-FluentRegister-Register``5-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``6-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`6(container,lifetime,tags) `method` [#](#M-IoC-FluentRegister-Register``6-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``6-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`6(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-FluentRegister-Register``6-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``7-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`7(container,lifetime,tags) `method` [#](#M-IoC-FluentRegister-Register``7-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+| T6 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``7-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`7(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-FluentRegister-Register``7-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+| T6 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``8-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`8(container,lifetime,tags) `method` [#](#M-IoC-FluentRegister-Register``8-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+| T6 | The additional contract type. |
+| T7 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``8-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`8(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-FluentRegister-Register``8-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+| T6 | The additional contract type. |
+| T7 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``9-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+### Register\`\`9(container,lifetime,tags) `method` [#](#M-IoC-FluentRegister-Register``9-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The autowring type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+| T6 | The additional contract type. |
+| T7 | The additional contract type. |
+| T8 | The additional contract type. |
+
+<a name='M-IoC-FluentRegister-Register``9-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+### Register\`\`9(container,factory,lifetime,tags,statements) `method` [#](#M-IoC-FluentRegister-Register``9-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+The registration token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
+| statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The base type. |
+| T1 | The additional contract type. |
+| T2 | The additional contract type. |
+| T3 | The additional contract type. |
+| T4 | The additional contract type. |
+| T5 | The additional contract type. |
+| T6 | The additional contract type. |
+| T7 | The additional contract type. |
+| T8 | The additional contract type. |
+
+<a name='T-IoC-FluentResolve'></a>
+## FluentResolve [#](#T-IoC-FluentResolve 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents extensions to resolve from a container.
+
+<a name='M-IoC-FluentResolve-GetResolver``1-IoC-IContainer,System-Type,System-Object-'></a>
+### GetResolver\`\`1(type,tag,container) `method` [#](#M-IoC-FluentResolve-GetResolver``1-IoC-IContainer,System-Type,System-Object- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets the resolver.
+
+##### Returns
+
+The resolver.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| type | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target type. |
+| tag | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The tag of binding. |
+| container | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') |  |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The resolver type. |
+
+<a name='M-IoC-FluentResolve-GetResolver``1-IoC-IContainer,System-Type-'></a>
+### GetResolver\`\`1(type,container) `method` [#](#M-IoC-FluentResolve-GetResolver``1-IoC-IContainer,System-Type- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets the resolver.
+
+##### Returns
+
+The resolver.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| type | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target type. |
+| container | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') |  |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The resolver type. |
+
+<a name='M-IoC-FluentResolve-Resolve-IoC-IContainer,System-Type,System-Object[]-'></a>
+### Resolve(container,type,args) `method` [#](#M-IoC-FluentResolve-Resolve-IoC-IContainer,System-Type,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+<a name='M-IoC-FluentResolve-Resolve-IoC-IContainer,System-Type-'></a>
+### Resolve(container,type) `method` [#](#M-IoC-FluentResolve-Resolve-IoC-IContainer,System-Type- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
+
+<a name='M-IoC-FluentResolve-Resolve``1-IoC-Container-'></a>
+### Resolve\`\`1(container) `method` [#](#M-IoC-FluentResolve-Resolve``1-IoC-Container- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.Container](#T-IoC-Container 'IoC.Container') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentResolve-Resolve``1-IoC-Container,System-Object[]-'></a>
+### Resolve\`\`1(container,args) `method` [#](#M-IoC-FluentResolve-Resolve``1-IoC-Container,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.Container](#T-IoC-Container 'IoC.Container') | The target container. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Object[]-'></a>
+### Resolve\`\`1(container,args) `method` [#](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentResolve-Resolve``1-IoC-IContainer-'></a>
+### Resolve\`\`1(container) `method` [#](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Gets an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
 <a name='T-IoC-Features-FuncFeature'></a>
 ## FuncFeature [#](#T-IoC-Features-FuncFeature 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -2592,55 +2726,6 @@ The IoC container.
 ##### Summary
 
 The parent container.
-
-<a name='M-IoC-IContainer-GetResolver``1-System-Type,System-Object,IoC-IContainer-'></a>
-### GetResolver\`\`1(type,tag,container) `method` [#](#M-IoC-IContainer-GetResolver``1-System-Type,System-Object,IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets the resolver.
-
-##### Returns
-
-The resolver.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The target type. |
-| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag of binding. |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') |  |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The resolver type. |
-
-<a name='M-IoC-IContainer-GetResolver``1-System-Type,IoC-IContainer-'></a>
-### GetResolver\`\`1(type,container) `method` [#](#M-IoC-IContainer-GetResolver``1-System-Type,IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets the resolver.
-
-##### Returns
-
-The resolver.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The target type. |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') |  |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The resolver type. |
 
 <a name='M-IoC-IContainer-TryGetDependency-IoC-Key,IoC-IDependency@,IoC-ILifetime@-'></a>
 ### TryGetDependency(key,dependency,lifetime) `method` [#](#M-IoC-IContainer-TryGetDependency-IoC-Key,IoC-IDependency@,IoC-ILifetime@- 'Go To Here') [=](#contents 'Back To Contents')
@@ -3658,26 +3743,26 @@ Represents the resolver delegate.
 | ---- | ----------- |
 | T | The type of resolving instance. |
 
-<a name='T-IoC-ContainerExtensions-Resolving'></a>
-## Resolving [#](#T-IoC-ContainerExtensions-Resolving 'Go To Here') [=](#contents 'Back To Contents')
+<a name='T-IoC-FluentGet-Resolving'></a>
+## Resolving [#](#T-IoC-FluentGet-Resolving 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Namespace
 
-IoC.ContainerExtensions
+IoC.FluentGet
 
 ##### Summary
 
 Represents the resolving token.
 
-<a name='F-IoC-ContainerExtensions-Resolving-Container'></a>
-### Container `constants` [#](#F-IoC-ContainerExtensions-Resolving-Container 'Go To Here') [=](#contents 'Back To Contents')
+<a name='F-IoC-FluentGet-Resolving-Container'></a>
+### Container `constants` [#](#F-IoC-FluentGet-Resolving-Container 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
 The target container.
 
-<a name='F-IoC-ContainerExtensions-Resolving-Tag'></a>
-### Tag `constants` [#](#F-IoC-ContainerExtensions-Resolving-Tag 'Go To Here') [=](#contents 'Back To Contents')
+<a name='F-IoC-FluentGet-Resolving-Tag'></a>
+### Tag `constants` [#](#F-IoC-FluentGet-Resolving-Tag 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 

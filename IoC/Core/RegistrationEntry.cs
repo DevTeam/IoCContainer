@@ -38,7 +38,7 @@
                 return false;
             }
 
-            resolver = ExpressionCompiler.Shared.Compile(resolverExpression);
+            resolver = container.GetExpressionCompiler().Compile(resolverExpression);
             return true;
         }
 

@@ -16,35 +16,35 @@
         {
             using (var container = Container.Create().Using<Glue>())
             {
-                var box = container.Get<IBox<ICat>>();
+                var box = container.Resolve<IBox<ICat>>();
                 Console.WriteLine(box);
 
                 // Func
-                var func = container.Get<Func<IBox<ICat>>>();
+                var func = container.Resolve<Func<IBox<ICat>>>();
                 Console.WriteLine(func());
 
                 // Async
-                box = await container.Get<Task<IBox<ICat>>>();
+                box = await container.Resolve<Task<IBox<ICat>>>();
                 Console.WriteLine(box);
 
                 // Tuple<,>
-                var tuple = container.Get<Tuple<IBox<ICat>, ICat>>();
+                var tuple = container.Resolve<Tuple<IBox<ICat>, ICat>>();
                 Console.WriteLine(tuple.Item1 + ", " + tuple.Item2);
 
                 // ValueTuple(,,)
-                var valueTuple = container.Get<(IBox<ICat> box, ICat cat, IBox<ICat> anotherBox)>();
+                var valueTuple = container.Resolve<(IBox<ICat> box, ICat cat, IBox<ICat> anotherBox)>();
                 Console.WriteLine(valueTuple.box + ", " + valueTuple.cat + ", " + valueTuple.anotherBox);
 
                 // Lazy
-                var lazy = container.Get<Lazy<IBox<ICat>>>();
+                var lazy = container.Resolve<Lazy<IBox<ICat>>>();
                 Console.WriteLine(lazy.Value);
 
                 // Enumerable
-                var enumerable = container.Get<IEnumerable<IBox<ICat>>>();
+                var enumerable = container.Resolve<IEnumerable<IBox<ICat>>>();
                 Console.WriteLine(enumerable.Single());
 
                 // List
-                var list = container.Get<IList<IBox<ICat>>>();
+                var list = container.Resolve<IList<IBox<ICat>>>();
                 Console.WriteLine(list[0]);
             }
         }

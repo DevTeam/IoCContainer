@@ -19,7 +19,7 @@
                 using (var childContainer = container.Tag(WellknownContainers.Child).Get<IContainer>())
                 {
                     // Then
-                    var actualInstance = childContainer.Get<IMyService>();
+                    var actualInstance = childContainer.Resolve<IMyService>();
                     actualInstance.ShouldBe(expectedInstance);
                 }
             }
@@ -35,7 +35,7 @@
             using (var container = Container.Create())
             {
                 // When
-                using (var curContainer = wellknownContainer.HasValue ? container.Tag(wellknownContainer.Value).Get<IContainer>() : container.Get<IContainer>())
+                using (var curContainer = wellknownContainer.HasValue ? container.Tag(wellknownContainer.Value).Get<IContainer>() : container.Resolve<IContainer>())
                 {
                     // Then
                     curContainer.ShouldBe(container);

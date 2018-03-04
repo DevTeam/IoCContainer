@@ -23,7 +23,7 @@
                 using (container.Bind<IMyService, IMyService1>().As(Lifetime.Transient).Tag("xyz").To(ctx => func()))
                 {
                     // Then
-                    var actualInstances = container.Get<IEnumerable<IMyService1>>().ToList();
+                    var actualInstances = container.Resolve<IEnumerable<IMyService1>>().ToList();
                     actualInstances.Count.ShouldBe(3);
                 }
             }
@@ -41,13 +41,13 @@
                 using (container.Bind<IMyService1>().Tag("abc").To(ctx => func1()))
                 using (container.Bind<IMyService, IMyService1>().As(Lifetime.Transient).Tag("xyz").To(ctx => func()))
                 {
-                    var actualInstances = container.Get<IEnumerable<IMyService1>>().ToList();
+                    var actualInstances = container.Resolve<IEnumerable<IMyService1>>().ToList();
                     actualInstances.Count.ShouldBe(3);
                     // When
                     using (container.Bind<IMyService1>().Tag(123).To(ctx => func1()))
                     {
                         // Then
-                        var actualInstances2 = container.Get<IEnumerable<IMyService1>>().ToList();
+                        var actualInstances2 = container.Resolve<IEnumerable<IMyService1>>().ToList();
                         actualInstances2.Count.ShouldBe(4);
                     }
                 }

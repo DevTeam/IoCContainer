@@ -115,7 +115,7 @@
                 return from keyGroup in container
                     let item = keyGroup.Select(key => new {type = CreateType(key.Type.Info(), typeInfo), tag = key.Tag}).FirstOrDefault(i => i.type != null)
                     where item != null
-                    select container.GetResolver<T>(item.type, item.tag, container);
+                    select container.GetResolver<T>(item.type, item.tag);
             }
 
             private static Type CreateType(ITypeInfo registeredType, ITypeInfo targetType)

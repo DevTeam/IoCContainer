@@ -26,7 +26,7 @@
                 ctx => ctx.It.Initialize("some name", ctx.Container.Inject<IDependency>())))
             {
                 // Resolve an instance
-                var instance = container.Get<INamedService>();
+                var instance = container.Resolve<INamedService>();
 
                 instance.ShouldBeOfType<InitializingNamedService>();
                 instance.Name.ShouldBe("some name");

@@ -62,7 +62,7 @@
                     throw new ArgumentException("Invalid type of argument.");
             }
 
-            return new TextConfiguration(reader, ctx.Container.Get<IConverter<IEnumerable<Statement>, BindingContext, BindingContext>>());
+            return new TextConfiguration(reader, ctx.Container.Resolve<IConverter<IEnumerable<Statement>, BindingContext, BindingContext>>());
         }
     }
 }

@@ -33,16 +33,6 @@
             return false;
         }
 
-        public Resolver<T> GetResolver<T>(Type type, object tag, IContainer container = null)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Resolver<T> GetResolver<T>(Type type, IContainer container = null)
-        {
-            throw new NotImplementedException();
-        }
-
         public void Dispose()
         {
         }

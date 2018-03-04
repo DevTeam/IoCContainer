@@ -22,8 +22,8 @@
             using (container.Bind<Service, IService, IAnotherService>().To<Service>())
             {
                 // Resolve instances
-                var instance1 = container.Get<IService>();
-                var instance2 = container.Get<IAnotherService>();
+                var instance1 = container.Resolve<IService>();
+                var instance2 = container.Resolve<IAnotherService>();
 
                 instance1.ShouldBeOfType<Service>();
                 instance2.ShouldBeOfType<Service>();

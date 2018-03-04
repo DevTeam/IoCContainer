@@ -23,7 +23,7 @@
             using (container.Bind<IService>().Tag(3).To<Service>())
             {
                 // Resolve source for all appropriate instances
-                var instancesSource = container.Get<IObservable<IService>>();
+                var instancesSource = container.Resolve<IObservable<IService>>();
 
                 var observer = new Mock<IObserver<IService>>();
                 using (instancesSource.Subscribe(observer.Object))

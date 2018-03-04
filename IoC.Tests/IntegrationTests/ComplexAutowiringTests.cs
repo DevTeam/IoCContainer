@@ -23,7 +23,7 @@
                 using (container.Bind<MyClass>().As(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(ctx.Container.Inject<MyClass3>().ToString()))))
                 {
                     // Then
-                    var actualInstance = container.Get<MyClass>();
+                    var actualInstance = container.Resolve<MyClass>();
                 }
             }
         }
@@ -39,7 +39,7 @@
                 using (container.Bind<MyClass>().As(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(new []{ ctx.Container.Inject<MyClass3>(), ctx.Container.Inject<MyClass3>() }))))
                 {
                     // Then
-                    var actualInstance = container.Get<MyClass>();
+                    var actualInstance = container.Resolve<MyClass>();
                 }
             }
         }
@@ -55,7 +55,7 @@
                 using (container.Bind<MyClass>().As(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(new Func<MyClass3>[] { () => ctx.Container.Inject<MyClass3>(), () => ctx.Container.Inject<MyClass3>() }))))
                 {
                     // Then
-                    var actualInstance = container.Get<MyClass>();
+                    var actualInstance = container.Resolve<MyClass>();
                 }
             }
         }
@@ -71,7 +71,7 @@
                 using (container.Bind<MyClass>().As(Lifetime.Transient).To(ctx => new MyClass(new MyClass2(new[] { ctx.Container.Inject<Task<MyClass3>>(), ctx.Container.Inject<Task<MyClass3>>() }))))
                 {
                     // Then
-                    var actualInstance = container.Get<MyClass>();
+                    var actualInstance = container.Resolve<MyClass>();
                 }
             }
         }
@@ -96,7 +96,7 @@
                     ctx => new MyService((string)ctx.Args[0], ctx.Container.Parent.Inject<IMyService1>())))
                 {
                     // Then
-                    var actualInstance = childContainer.Get<IMyService>("abc");
+                    var actualInstance = childContainer.Resolve<IMyService>("abc");
                     actualInstance.ShouldBeOfType<MyService>();
                     ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
                 }
@@ -124,7 +124,7 @@
                     ctx => new MyService((string)ctx.Args[0], ctx.Container.Parent.Parent.Inject<IMyService1>())))
                 {
                     // Then
-                    var actualInstance = childContainer2.Get<IMyService>("abc");
+                    var actualInstance = childContainer2.Resolve<IMyService>("abc");
                     actualInstance.ShouldBeOfType<MyService>();
                     ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
                 }
@@ -144,7 +144,7 @@
                     ctx => ctx.It.Initialize("aaa")))
                 {
                     // Then
-                    var actualInstance = container.Get<MyClass>();
+                    var actualInstance = container.Resolve<MyClass>();
                 }
             }
         }
@@ -163,7 +163,7 @@
                     ctx => ctx.It.Initialize2(ref val)))
                 {
                     // Then
-                    var actualInstance = container.Get<MyClass>();
+                    var actualInstance = container.Resolve<MyClass>();
                     val.ShouldBe(default(string));
                 }
             }

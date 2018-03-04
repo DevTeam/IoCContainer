@@ -25,7 +25,7 @@
                 {
                     using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => firstRef))
                     {
-                        var actualInstance = container.Get<IMyService>("xyz");
+                        var actualInstance = container.Resolve<IMyService>("xyz");
                         ((MyService) actualInstance).Name.ShouldBe("xyz");
                         ((MyService) actualInstance).SomeRef.ShouldBe(firstRef);
                     }
@@ -33,7 +33,7 @@
                     using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => expectedRef))
                     {
                         // Then
-                        var actualInstance = container.Get<IMyService>("abc");
+                        var actualInstance = container.Resolve<IMyService>("abc");
                         ((MyService)actualInstance).Name.ShouldBe("abc");
                         ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
                     }

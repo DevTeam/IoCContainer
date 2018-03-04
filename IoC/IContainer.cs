@@ -54,24 +54,5 @@
         /// <param name="container">The resolving container.</param>
         /// <returns>True if successful.</returns>
         bool TryGetResolver<T>([NotNull] Type type, out Resolver<T> resolver, [CanBeNull] IContainer container = null);
-
-        /// <summary>
-        /// Gets the resolver.
-        /// </summary>
-        /// <typeparam name="T">The resolver type.</typeparam>
-        /// <param name="type">The target type.</param>
-        /// <param name="tag">The tag of binding.</param>
-        /// <param name="container"></param>
-        /// <returns>The resolver.</returns>
-        [NotNull] Resolver<T> GetResolver<T>([NotNull] Type type, [CanBeNull] object tag, [CanBeNull] IContainer container = null);
-
-        /// <summary>
-        /// Gets the resolver.
-        /// </summary>
-        /// <typeparam name="T">The resolver type.</typeparam>
-        /// <param name="type">The target type.</param>
-        /// <param name="container"></param>
-        /// <returns>The resolver.</returns>
-        [NotNull] Resolver<T> GetResolver<T>([NotNull] Type type, [CanBeNull] IContainer container = null);
     }
 }

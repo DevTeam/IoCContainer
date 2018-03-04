@@ -25,7 +25,7 @@
                 ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name")))
             {
                 // Resolve Tuple
-                var tuple = container.Get<Tuple<IService, INamedService>>();
+                var tuple = container.Resolve<Tuple<IService, INamedService>>();
 
                 tuple.Item1.ShouldBeOfType<Service>();
                 tuple.Item2.ShouldBeOfType<NamedService>();

@@ -26,13 +26,13 @@
                 ctx => func(ctx.Container.Inject<IDependency>(), (string)ctx.Args[0])))
             {
                 // Resolve the instance "alpha" passing the array of arguments
-                var instance = container.Get<INamedService>("alpha");
+                var instance = container.Resolve<INamedService>("alpha");
 
                 instance.ShouldBeOfType<NamedService>();
                 instance.Name.ShouldBe("alpha");
 
                 // Resolve the instance "beta"
-                var getterFunc = container.Get<Func<string, INamedService>>();
+                var getterFunc = container.Resolve<Func<string, INamedService>>();
                 var otherInstance = getterFunc("beta");
                 otherInstance.Name.ShouldBe("beta");
             }

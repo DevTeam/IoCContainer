@@ -23,7 +23,7 @@
             using (container.Bind<IService>().To<Service>())
             {
                 // Resolve Func
-                var func = container.Get<Func<IService>>();
+                var func = container.Resolve<Func<IService>>();
                 // Get the instance via Func
                 var instance = func();
 

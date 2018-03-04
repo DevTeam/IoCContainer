@@ -19,7 +19,7 @@
                 using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
-                    var actualInstance = container.Get<IMyService>();
+                    var actualInstance = container.Resolve<IMyService>();
                     actualInstance.ShouldBe(expectedInstance);
                 }
             }
@@ -35,7 +35,7 @@
                 using (container.Bind<MySimpleClass>().To())
                 {
                     // Then
-                    var actualInstance = container.Get<MySimpleClass>();
+                    var actualInstance = container.Resolve<MySimpleClass>();
                     actualInstance.ShouldBeOfType<MySimpleClass>();
                 }
             }
@@ -51,8 +51,8 @@
                 using (container.Bind<MySimpleClass>().As(Lifetime.Singleton).To())
                 {
                     // Then
-                    var actualInstance1 = container.Get<MySimpleClass>();
-                    var actualInstance2 = container.Get<MySimpleClass>();
+                    var actualInstance1 = container.Resolve<MySimpleClass>();
+                    var actualInstance2 = container.Resolve<MySimpleClass>();
 
                     actualInstance1.ShouldBeOfType<MySimpleClass>();
                     actualInstance1.ShouldBe(actualInstance2);

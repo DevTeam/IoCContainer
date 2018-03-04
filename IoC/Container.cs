@@ -38,8 +38,8 @@
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
         [NotNull] private readonly Dictionary<FullKey, RegistrationEntry> _registrationEntries = new Dictionary<FullKey, RegistrationEntry>();
         [NotNull] private readonly Dictionary<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = new Dictionary<ShortKey, RegistrationEntry>();
-        [NotNull] private volatile Table<FullKey, ResolverDelegate> _resolvers = Table<FullKey, ResolverDelegate>.Empty;
-        [NotNull] private volatile Table<ShortKey, ResolverDelegate> _resolversByType = Table<ShortKey, ResolverDelegate>.Empty;
+        [NotNull] internal volatile Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
+        [NotNull] internal volatile Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
         private volatile IEnumerable<Key>[] _allKeys;
         private volatile bool _hasResolver;
         private bool _isFreezed;
@@ -127,7 +127,7 @@
         /// <inheritdoc />
         public IContainer Parent => _parent;
 
-        private IIssueResolver IssueResolver => GetResolver<IIssueResolver>(typeof(IIssueResolver))(this);
+        private IIssueResolver IssueResolver => this.Resolve<IIssueResolver>(typeof(IIssueResolver));
 
         /// <inheritdoc />
         public override string ToString()
@@ -219,44 +219,24 @@
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
         {
-            if (tag == null && TryGetResolver(type, out resolver, container))
+            if (tag == null)
             {
-                return true;
-            }
-
-            var key = new FullKey(type, tag);
-            var hashCode = key.GetHashCode();
-            var tree = _resolvers.Buckets[hashCode & (_resolvers.Divisor - 1)];
-            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
-            {
-                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
-            }
-
-            var treeEntry = tree.Current;
-            if (tree.Height != 0 && key.Equals(treeEntry.Key))
-            {
-                resolver = (Resolver<T>)treeEntry.Value;
-                return true;
-            }
-
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree.Height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                resolver = Extensions.TryGetResolver<T>(ResolversByType, type.GetHashCode(), type, container ?? this);
+                if (resolver != default(Resolver<T>))
                 {
-                    if (!Equals(entryDuplicates[i].Key, key))
-                    {
-                        continue;
-                    }
-
-                    resolver = (Resolver<T>)entryDuplicates[i].Value;
+                    return true;
+                }
+            }
+            else
+            {
+                resolver = Extensions.TryGetResolver<T>(ResolversByType, Resolvers, type, tag, container ?? this);
+                if (resolver != default(Resolver<T>))
+                {
                     return true;
                 }
             }
 
-            var resolved = TryCreateResolver<T>(key, out var curResolver, container ?? this);
-            resolver = (Resolver<T>)curResolver;
-            return resolved;
+            return TryCreateResolver(new Key(type, tag), out resolver, container ?? this);
         }
 
         /// <inheritdoc />
@@ -264,90 +244,46 @@
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, IContainer container = null)
         {
-            var hashCode = type.GetHashCode();
-            var tree = _resolversByType.Buckets[hashCode & (_resolversByType.Divisor - 1)];
-            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
+            resolver = Extensions.TryGetResolver<T>(ResolversByType, type.GetHashCode(), type, container ?? this);
+            if (resolver != default(Resolver<T>))
             {
-                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
-            }
-
-            var treeEntry = tree.Current;
-            if (tree.Height != 0 && ReferenceEquals(type, treeEntry.Key))
-            {
-                resolver = (Resolver<T>)treeEntry.Value;
                 return true;
             }
 
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree.Height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
-                {
-                    if (!ReferenceEquals(entryDuplicates[i].Key, type))
-                    {
-                        continue;
-                    }
-
-                    resolver = (Resolver<T>)entryDuplicates[i].Value;
-                    return true;
-                }
-            }
-
-            var resolved = TryCreateResolver<T>(new Key(type), out var curResolver, container ?? this);
-            resolver = (Resolver<T>)curResolver;
-            return resolved;
+            return TryCreateResolver(new Key(type), out resolver, container ?? this);
         }
 
-        /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]
-        public Resolver<T> GetResolver<T>(Type type, object tag, IContainer container = null)
-        {
-            return TryGetResolver<T>(type, tag, out var resolver, container)
-                ? resolver
-                : IssueResolver.CannotGetResolver<T>(this, new Key(type, tag));
-        }
-
-        /// <inheritdoc />
-        [MethodImpl((MethodImplOptions)256)]
-        public Resolver<T> GetResolver<T>(Type type, IContainer container = null)
-        {
-            return TryGetResolver<T>(type, out var resolver, container) 
-                ? resolver
-                : IssueResolver.CannotGetResolver<T>(this, new Key(type));
-        }
-
-
-        [MethodImpl((MethodImplOptions)256)]
-        private bool TryCreateResolver<T>(FullKey key, out ResolverDelegate resolver, IContainer container)
+        private bool TryCreateResolver<T>(FullKey key, out Resolver<T> resolver, IContainer container)
         {
             if (TryGetRegistrationEntry(key, out var registrationEntry))
             {
-                if (!registrationEntry.TryCreateResolver(key, container, out resolver))
+                if (!registrationEntry.TryCreateResolver(key, container, out var resolverDelegate))
                 {
+                    resolver = default(Resolver<T>);
                     return false;
                 }
 
-                AddResolver(key, resolver, true);
+                resolver = AddResolver<T>(key, resolverDelegate, true);
                 return true;
             }
 
-            if (!_parent.TryGetResolver<T>(key.Type, key.Tag, out var parentResolver, container))
+            if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, container))
             {
-                resolver = default(ResolverDelegate);
+                resolver = default(Resolver<T>);
                 return false;
             }
 
-            resolver = parentResolver;
             if (container == this)
             {
-                AddResolver(key, resolver, false);
+                resolver = AddResolver<T>(key, resolver, false);
             }
 
             return true;
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        private void AddResolver(FullKey key, ResolverDelegate resolver, bool currentContainer)
+        private Resolver<T> AddResolver<T>(FullKey key, ResolverDelegate resolverDelegate, bool currentContainer)
         {
             lock (_lockObject)
             {
@@ -356,11 +292,19 @@
                     _hasResolver = true;
                 }
 
-                _resolvers = _resolvers.Set(key.GetHashCode(), key, resolver);
+                var resolver = (Resolver<T>)resolverDelegate;
+                if (typeof(T) == key.Type)
+                {
+                    resolverDelegate = resolver;
+                }
+
+                Resolvers = Resolvers.Set(key.GetHashCode(), key, resolverDelegate);
                 if (key.Tag == null)
                 {
-                    _resolversByType = _resolversByType.Set(key.Type.GetHashCode(), key.Type, resolver);
+                    ResolversByType = ResolversByType.Set(key.Type.GetHashCode(), key.Type, resolverDelegate);
                 }
+
+                return resolver;
             }
         }
 
@@ -426,8 +370,8 @@
             {
                 _registrationEntries.Clear();
                 _registrationEntriesForTagAny.Clear();
-                _resolvers = Table<FullKey, ResolverDelegate>.Empty;
-                _resolversByType = Table<ShortKey, ResolverDelegate>.Empty;
+                Resolvers = Table<FullKey, ResolverDelegate>.Empty;
+                ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
                 resource = Disposable.Create(_resources);
                 _resources.Clear();
             }
@@ -468,12 +412,7 @@
         {
             lock (_lockObject)
             {
-                if (_allKeys == null)
-                {
-                    _allKeys = _registrationEntries.Select(i => i.Value).Distinct().Select(i => (IEnumerable<Key>)i.Keys).ToArray();
-                }
-
-                return _allKeys;
+                return _allKeys ?? (_allKeys = _registrationEntries.Select(i => i.Value).Distinct().Select(i => (IEnumerable<Key>) i.Keys).ToArray());
             }
         }
 
@@ -537,8 +476,8 @@
                 registration.Reset();
             }
 
-            _resolvers = Table<FullKey, ResolverDelegate>.Empty;
-            _resolversByType = Table<ShortKey, ResolverDelegate>.Empty;
+            Resolvers = Table<FullKey, ResolverDelegate>.Empty;
+            ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
         }
 
         void IObserver<ContainerEvent>.OnNext(ContainerEvent value)

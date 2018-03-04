@@ -25,7 +25,7 @@ namespace IoC.Tests.UsageScenarios
             using (container.Bind<IService>().To<Service>())
             {
                 // Resolve an instance asynchronously
-                var instance = await container.Get<Task<IService>>();
+                var instance = await container.Resolve<Task<IService>>();
 
                 instance.ShouldBeOfType<Service>();
             }

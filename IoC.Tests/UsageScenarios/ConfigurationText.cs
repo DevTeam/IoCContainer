@@ -21,7 +21,7 @@
                 "Bind<IService>().To<Service>();"))
             {
                 // Resolve an instance
-                var instance = container.Get<IService>();
+                var instance = container.Resolve<IService>();
 
                 instance.ShouldBeOfType<Service>();
             }

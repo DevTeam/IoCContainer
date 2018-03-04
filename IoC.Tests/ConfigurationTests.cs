@@ -22,7 +22,7 @@ namespace IoC.Tests
                     // Then
                     var actualInstance1 = container.Tag(33).Get<IMyService33<int>>();
                     var actualInstance2 = container.Tag("abc").Get<IMyService33<int>>();
-                    var actualInstance3 = container.Get<IMyService33<int>>();
+                    var actualInstance3 = container.Resolve<IMyService33<int>>();
                     actualInstance1.ShouldBeOfType<MyService33<int>>();
                     actualInstance1.ShouldBe(actualInstance2);
                     actualInstance1.ShouldBe(actualInstance3);

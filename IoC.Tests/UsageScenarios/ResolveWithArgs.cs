@@ -23,13 +23,13 @@
                 ctx => new NamedService(ctx.Container.Inject<IDependency>(), (string)ctx.Args[0])))
             {
                 // Resolve the instance "alpha"
-                var instance = container.Get<INamedService>("alpha");
+                var instance = container.Resolve<INamedService>("alpha");
 
                 instance.ShouldBeOfType<NamedService>();
                 instance.Name.ShouldBe("alpha");
 
                 // Resolve the instance "beta"
-                var func = container.Get<Func<string, INamedService>>();
+                var func = container.Resolve<Func<string, INamedService>>();
                 var otherInstance = func("beta");
                 otherInstance.Name.ShouldBe("beta");
             }

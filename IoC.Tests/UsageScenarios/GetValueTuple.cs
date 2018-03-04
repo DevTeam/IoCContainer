@@ -25,7 +25,7 @@ namespace IoC.Tests.UsageScenarios
                 ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name")))
             {
                 // Resolve ValueTuple
-                var valueTuple = container.Get<(IService service, INamedService namedService)>();
+                var valueTuple = container.Resolve<(IService service, INamedService namedService)>();
 
                 valueTuple.service.ShouldBeOfType<Service>();
                 valueTuple.namedService.ShouldBeOfType<NamedService>();

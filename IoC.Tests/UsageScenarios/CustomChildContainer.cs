@@ -28,7 +28,7 @@
             using (childContainer.Bind<IService>().To<Service>())
             {
                 // Resolve an instance
-                var instance = childContainer.Get<IService>();
+                var instance = childContainer.Resolve<IService>();
 
                 childContainer.ShouldBeOfType<MyContainer>();
                 instance.ShouldBeOfType<Service>();
@@ -63,16 +63,6 @@
             public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
             {
                 return Parent.TryGetResolver(type, tag, out resolver, container);
-            }
-
-            public Resolver<T> GetResolver<T>(Type type, IContainer container = null)
-            {
-                return Parent.GetResolver<T>(type, container);
-            }
-
-            public Resolver<T> GetResolver<T>(Type type, object tag, IContainer container = null)
-            {
-                return Parent.GetResolver<T>(type, tag, container);
             }
 
             public void Dispose() { }

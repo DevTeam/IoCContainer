@@ -40,7 +40,7 @@
                     ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>())))
                 {
                     // Then
-                    var actualInstance = container.Get<IMyService>("abc");
+                    var actualInstance = container.Resolve<IMyService>("abc");
 
                     actualInstance.ShouldBeOfType<MyService>();
                     ((MyService) actualInstance).Name.ShouldBe("abc");
@@ -64,7 +64,7 @@
                     ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>())))
                 {
                     // Then
-                    var actualInstance = container.Get<Func<string, IMyService>>()("abc");
+                    var actualInstance = container.Resolve<Func<string, IMyService>>()("abc");
 
                     actualInstance.ShouldBeOfType<MyService>();
                     ((MyService) actualInstance).Name.ShouldBe("abc");
@@ -114,7 +114,7 @@
                     ctx => new MyGenericService<TT>((TT) ctx.Args[0], ctx.Container.Inject<IMyService>())))
                 {
                     // Then
-                    var actualInstance = container.Get<IMyGenericService<int>>(99, "abc");
+                    var actualInstance = container.Resolve<IMyGenericService<int>>(99, "abc");
 
                     actualInstance.ShouldBeOfType<MyGenericService<int>>();
                     actualInstance.Value.ShouldBe(99);
@@ -139,7 +139,7 @@
                     ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>(33))))
                 {
                     // Then
-                    var actualInstance = container.Get<IMyService>("abc");
+                    var actualInstance = container.Resolve<IMyService>("abc");
 
                     actualInstance.ShouldBeOfType<MyService>();
                     ((MyService) actualInstance).Name.ShouldBe("abc");
@@ -160,7 +160,7 @@
                 using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Parent.Inject<IMyWrapper>())))
                 {
                     // Then
-                    var actualInstance = childContainer.Get<IMyWrapper>();
+                    var actualInstance = childContainer.Resolve<IMyWrapper>();
                     actualInstance.ShouldBeOfType<Wrapper>();
                     actualInstance.Wrapped.ShouldBeOfType<Wrappered>();
                 }
@@ -177,7 +177,7 @@
                 using (container.Bind(typeof(IMyGenericService<,>)).As(Lifetime.Transient).To(typeof(MyGenericService<,>)))
                 {
                     // Then
-                    var actualInstance = container.Get<IMyGenericService<int, string>>();
+                    var actualInstance = container.Resolve<IMyGenericService<int, string>>();
                     actualInstance.ShouldBeOfType<MyGenericService<int, string>>();
                 }
             }

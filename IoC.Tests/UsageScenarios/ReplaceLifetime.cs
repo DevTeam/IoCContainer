@@ -33,8 +33,8 @@
             using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
             {
                 // Resolve one instance twice using the custom Singletine lifetime
-                var instance1 = container.Get<IService>();
-                var instance2 = container.Get<IService>();
+                var instance1 = container.Resolve<IService>();
+                var instance2 = container.Resolve<IService>();
 
                 instance1.ShouldBe(instance2);
             }

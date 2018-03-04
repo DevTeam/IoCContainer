@@ -22,13 +22,13 @@
                 using (container.Bind<IMyService1>().As(Lifetime.ScopeSingleton).To(ctx => func()))
                 {
                     // Default resolving scope
-                    var instance1 = (MyService) container.Get<IMyService>("abc");
+                    var instance1 = (MyService) container.Resolve<IMyService>("abc");
 
                     // Resolving scope 2
                     MyService instance2;
                     using (new Scope(2))
                     {
-                        instance2 = (MyService) container.Get<IMyService>("xyz");
+                        instance2 = (MyService) container.Resolve<IMyService>("xyz");
                     }
 
                     // Then

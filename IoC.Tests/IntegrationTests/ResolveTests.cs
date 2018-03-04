@@ -20,8 +20,8 @@
                 using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => func()))
                 {
                     // Then
-                    var instance1 = container.Get<IMyService>();
-                    var instance2 = container.Get<IMyService>();
+                    var instance1 = container.Resolve<IMyService>();
+                    var instance2 = container.Resolve<IMyService>();
                     instance1.ShouldNotBe(instance2);
                 }
             }
@@ -61,7 +61,7 @@
                 using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
-                    var actualInstance = container.Get<Func<IMyService>>();
+                    var actualInstance = container.Resolve<Func<IMyService>>();
                     actualInstance().ShouldBe(expectedInstance);
                 }
             }
@@ -79,7 +79,7 @@
                 using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
-                    var actualInstance = container.Get<IMyService>();
+                    var actualInstance = container.Resolve<IMyService>();
                     actualInstance.ShouldBe(expectedInstance);
                 }
             }
@@ -97,8 +97,8 @@
                 using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
-                    var actualInstance = container.Get<IMyService>();
-                    var actualInstance1 = container.Get<IMyService>();
+                    var actualInstance = container.Resolve<IMyService>();
+                    var actualInstance1 = container.Resolve<IMyService>();
                     actualInstance.ShouldBe(expectedInstance);
                     actualInstance1.ShouldBe(expectedInstance);
                 }
@@ -117,7 +117,7 @@
                 using (container.Bind(typeof(IMyGenericService<,>)).As(Lifetime.Transient).To(ctx => expectedInstance))
                 {
                     // Then
-                    var actualInstance = container.Get<IMyGenericService<int, string>>();
+                    var actualInstance = container.Resolve<IMyGenericService<int, string>>();
                     actualInstance.ShouldBe(expectedInstance);
                 }
             }
@@ -136,7 +136,7 @@
                 using (container.Bind<IMyService>().To(ctx => func()))
                 {
                     // Then
-                    var getter = container.Get<Func<IMyService>>();
+                    var getter = container.Resolve<Func<IMyService>>();
                     var actualInstance = getter();
                     actualInstance.ShouldBe(expectedInstance);
                 }
@@ -157,7 +157,7 @@
                 using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => func()))
                 {
                     // Then
-                    var actualInstance = await container.Get<Task<IMyService>>();
+                    var actualInstance = await container.Resolve<Task<IMyService>>();
                     actualInstance.ShouldBe(expectedInstance);
                 }
             }
@@ -177,7 +177,7 @@
                 using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => new MyService((string)ctx.Args[0], ctx.Container.Inject<IMyService1>())))
                 {
                     // Then
-                    var func = container.Get<Func<string, IMyService>>();
+                    var func = container.Resolve<Func<string, IMyService>>();
                     var actualInstance = func("abc");
                     actualInstance.ShouldBeOfType<MyService>();
                     ((MyService)actualInstance).Name.ShouldBe("abc");

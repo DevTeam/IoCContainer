@@ -32,7 +32,7 @@
                     // Inject the logger from the parent container to our new logger
                     ctx => new TimeLogger(ctx.Container.Parent.Inject<ILogger>())))
                 {
-                    var logger = childContainer.Get<ILogger>();
+                    var logger = childContainer.Resolve<ILogger>();
 
                     // Log message
                     logger.Log("Hello");

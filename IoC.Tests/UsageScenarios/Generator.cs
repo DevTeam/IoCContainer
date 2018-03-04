@@ -41,7 +41,7 @@ namespace IoC.Tests.UsageScenarios
                 var random = container.Tag(GeneratorType.Random).Get<int>();
 
                 // Generate a set of numbers
-                var setOfValues = container.Get<(int, int)>();
+                var setOfValues = container.Resolve<(int, int)>();
 
                 setOfValues.Item1.ShouldBe(sequential2 + 1);
             }

@@ -23,7 +23,7 @@
             using (container.Bind<IService>().To<Service>())
             {
                 // Resolve Lazy
-                var lazy = container.Get<Lazy<IService>>();
+                var lazy = container.Resolve<Lazy<IService>>();
                 // Get the instance via Lazy
                 var instance = lazy.Value;
 
