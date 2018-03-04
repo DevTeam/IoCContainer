@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="DryIoc.dll" Version="2.12.7" />
     <PackageReference Include="JetBrains.dotMemoryUnit" Version="3.0.20171219.105559" />
     <PackageReference Include="Shouldly" Version="3.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.4.0" />

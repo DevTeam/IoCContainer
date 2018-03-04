@@ -12,6 +12,7 @@ namespace IoC.Comparison
     using Autofac;
     using Castle.MicroKernel.Registration;
     using Castle.Windsor;
+    using DryIoc;
     using JetBrains.dotMemoryUnit;
     using JetBrains.dotMemoryUnit.Kernel;
     using LightInject;
@@ -37,6 +38,7 @@ namespace IoC.Comparison
             new TestInfo($"{ThisIocName} actual DI", ThisByFuncSingleton),
             new TestInfo(ThisIocName, ThisSingleton),
             new TestInfo("LightInject", LightInjectSingleton),
+            new TestInfo("DryIoc", DryIocSingleton),
             new TestInfo("Castle Windsor", CastleWindsorSingleton){ PerformanceRate = 10 },
             new TestInfo("Unity", UnitySingleton){ PerformanceRate = 800 },
             new TestInfo("Ninject", NinjectSingleton) { PerformanceRate = 1000 },
@@ -49,6 +51,7 @@ namespace IoC.Comparison
             new TestInfo($"{ThisIocName} actual DI", ThisByFuncTransient),
             new TestInfo(ThisIocName, ThisTransient),
             new TestInfo("LightInject", LightInjectTransient),
+            new TestInfo("DryIoc", DryIocTransient),
             new TestInfo("Castle Windsor", CastleWindsorTransient) { PerformanceRate = 10 },
             new TestInfo("Unity", UnityTransient) { PerformanceRate = 800 },
             new TestInfo("Ninject", NinjectTransient) { PerformanceRate = 1000 },
@@ -165,7 +168,7 @@ namespace IoC.Comparison
 
         private static void ThisSingleton(int series, IPerformanceCounter performanceCounter)
         {
-            using (var container = Container.Create())
+            using (var container = IoC.Container.Create())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().As(Lifetime.Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
@@ -183,7 +186,7 @@ namespace IoC.Comparison
 
         private static void ThisTransient(int series, IPerformanceCounter performanceCounter)
         {
-            using (var container = Container.Create())
+            using (var container = IoC.Container.Create())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
@@ -201,7 +204,7 @@ namespace IoC.Comparison
 
         private static void ThisByFuncSingleton(int series, IPerformanceCounter performanceCounter)
         {
-            using (var container = Container.Create())
+            using (var container = IoC.Container.Create())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().As(Lifetime.Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
@@ -219,7 +222,7 @@ namespace IoC.Comparison
 
         private static void ThisByFuncTransient(int series, IPerformanceCounter performanceCounter)
         {
-            using (var container = Container.Create())
+            using (var container = IoC.Container.Create())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
@@ -398,6 +401,40 @@ namespace IoC.Comparison
                     for (var i = 0; i < series; i++)
                     {
                         container.GetInstance<IService1>().DoSomething();
+                    }
+                }
+            }
+        }
+
+        private static void DryIocSingleton(int series, IPerformanceCounter performanceCounter)
+        {
+            using (var container = new Container())
+            {
+                container.Register<IService1, Service1>();
+                container.Register<IService2, Service2>(Reuse.Singleton);
+                container.Register<IService3, Service3>();
+                using (performanceCounter.Run())
+                {
+                    for (var i = 0; i < series; i++)
+                    {
+                        container.Resolve<IService1>().DoSomething();
+                    }
+                }
+            }
+        }
+
+        private static void DryIocTransient(int series, IPerformanceCounter performanceCounter)
+        {
+            using (var container = new Container())
+            {
+                container.Register<IService1, Service1>();
+                container.Register<IService2, Service2>();
+                container.Register<IService3, Service3>();
+                using (performanceCounter.Run())
+                {
+                    for (var i = 0; i < series; i++)
+                    {
+                        container.Resolve<IService1>().DoSomething();
                     }
                 }
             }
