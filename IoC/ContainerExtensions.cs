@@ -19,6 +19,7 @@
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     [PublicAPI]
+    [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
     public static class ContainerExtensions
     {
         private static readonly IEnumerable<object> DefaultTags = new object[] { null };

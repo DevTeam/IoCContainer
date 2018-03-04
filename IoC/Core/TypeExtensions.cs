@@ -105,6 +105,8 @@
 
             public Guid Id => _typeInfo.Value.GUID;
 
+            public Assembly Assembly => _typeInfo.Value.Assembly;
+
             public bool IsValueType => _typeInfo.Value.IsValueType;
 
             public bool IsInterface => _typeInfo.Value.IsInterface;
@@ -174,6 +176,8 @@
             public Type Type => _type;
 
             public Guid Id => _type.GUID;
+
+            public Assembly Assembly => _type.Assembly;
 
             public bool IsValueType => _type.IsValueType;
 

@@ -11,6 +11,8 @@
 
         Guid Id { get; }
 
+        Assembly Assembly { get; }
+
         bool IsValueType { get; }
 
         bool IsInterface { get; }

@@ -1,4 +1,4 @@
-﻿namespace IoC.Tests
+﻿namespace IoC.Comparison
 {
     public interface ITestResult
     {

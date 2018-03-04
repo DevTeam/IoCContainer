@@ -1,7 +1,7 @@
 ﻿// ReSharper disable HeuristicUnreachableCode
 // ReSharper disable RedundantUsingDirective
 #pragma warning disable 162
-namespace IoC.Tests
+namespace IoC.Comparison
 {
     using System;
     using System.Collections.Generic;
@@ -19,7 +19,9 @@ namespace IoC.Tests
     using Unity;
     using Unity.Lifetime;
     using Xunit;
+#if !NET40
     using Xunit.Abstractions;
+#endif
 
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
     [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
@@ -34,9 +36,7 @@ namespace IoC.Tests
             new TestInfo( "operators 'new'", CtorSingleton),
             new TestInfo($"{ThisIocName} actual DI", ThisByFuncSingleton),
             new TestInfo(ThisIocName, ThisSingleton),
-#if NETCOREAPP2_0
             new TestInfo("LightInject", LightInjectSingleton),
-#endif
             new TestInfo("Castle Windsor", CastleWindsorSingleton){ PerformanceRate = 10 },
             new TestInfo("Unity", UnitySingleton){ PerformanceRate = 800 },
             new TestInfo("Ninject", NinjectSingleton) { PerformanceRate = 1000 },
@@ -48,9 +48,7 @@ namespace IoC.Tests
             new TestInfo("operators 'new'", CtorTransient),
             new TestInfo($"{ThisIocName} actual DI", ThisByFuncTransient),
             new TestInfo(ThisIocName, ThisTransient),
-#if NETCOREAPP2_0
             new TestInfo("LightInject", LightInjectTransient),
-#endif
             new TestInfo("Castle Windsor", CastleWindsorTransient) { PerformanceRate = 10 },
             new TestInfo("Unity", UnityTransient) { PerformanceRate = 800 },
             new TestInfo("Ninject", NinjectTransient) { PerformanceRate = 1000 },

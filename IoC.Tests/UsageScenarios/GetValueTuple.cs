@@ -1,4 +1,4 @@
-﻿#if !NET40
+﻿#if !NET40 && !NETCOREAPP1_0
 namespace IoC.Tests.UsageScenarios
 {
     using System.Diagnostics.CodeAnalysis;

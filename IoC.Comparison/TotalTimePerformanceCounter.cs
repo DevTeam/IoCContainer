@@ -1,8 +1,7 @@
-﻿namespace IoC.Tests
+﻿namespace IoC.Comparison
 {
     using System;
     using System.Diagnostics;
-    using Core;
 
     public class TotalTimePerformanceCounter: IPerformanceCounter
     {
