@@ -35,6 +35,7 @@
             return container.Resolve<IValidator>().Validate(container);
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         internal static IIssueResolver GetIssueResolver([NotNull] this IContainer container)
         {

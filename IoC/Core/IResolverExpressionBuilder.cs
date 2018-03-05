@@ -1,9 +1,10 @@
 ﻿namespace IoC.Core
 {
     using System.Linq.Expressions;
+    using Extensibility;
 
     internal interface IResolverExpressionBuilder
     {
-        bool TryBuild(Key key, [NotNull] IContainer container, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out LambdaExpression resolverExpression);
+        bool TryBuild([NotNull] BuildContext buildContext, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out LambdaExpression resolverExpression);
     }
 }

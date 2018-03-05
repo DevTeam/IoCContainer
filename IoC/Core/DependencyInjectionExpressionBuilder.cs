@@ -1,5 +1,6 @@
 ﻿namespace IoC.Core
 {
+    using System;
     using System.Linq.Expressions;
     using Extensibility;
 
@@ -11,9 +12,11 @@
         {
         }
 
-        public Expression Build(Expression expression, Key key, IContainer container, Expression thisExpression)
+        public Expression Build(Expression expression, BuildContext buildContext, Expression thisExpression)
         {
-            var visitor = new DependencyInjectionExpressionVisitor(key, container, thisExpression);
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            var visitor = new DependencyInjectionExpressionVisitor(buildContext, thisExpression);
             var newExpression = visitor.Visit(expression);
             return newExpression ?? expression;
         }

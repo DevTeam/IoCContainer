@@ -1,12 +1,12 @@
-﻿namespace IoC.Tests.UsageScenarios
+﻿#if !NET40 && !NETCOREAPP1_0
+namespace IoC.Tests.UsageScenarios
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
     using Shouldly;
     using Xunit;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public class GetFunc
+    public class ResolveValueTuple
     {
         [Fact]
         public void Run()
@@ -14,22 +14,24 @@
             // $visible=true
             // $group=01
             // $priority=02
-            // $description=Get Func
+            // $description=Resolve ValueTuple
             // {
             // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
+            using (container.Bind<INamedService>().To<NamedService>(
+                ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name")))
             {
-                // Resolve Func
-                var func = container.Resolve<Func<IService>>();
-                // Get the instance via Func
-                var instance = func();
+                // Resolve ValueTuple
+                var valueTuple = container.Resolve<(IService service, INamedService namedService)>();
 
-                instance.ShouldBeOfType<Service>();
+                valueTuple.service.ShouldBeOfType<Service>();
+                valueTuple.namedService.ShouldBeOfType<NamedService>();
             }
             // }
         }
     }
 }
+#endif

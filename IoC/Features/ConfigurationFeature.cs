@@ -12,9 +12,9 @@
     public sealed class ConfigurationFeature : IConfiguration
     {
         /// <summary>
-        /// The shared instance.
+        /// The default instance.
         /// </summary>
-        public static readonly IConfiguration Shared = new ConfigurationFeature();
+        public static readonly IConfiguration Default = new ConfigurationFeature();
 
         private ConfigurationFeature()
         {
@@ -35,7 +35,7 @@
             yield return container.Register<IConfiguration>(ctx => CreateTextConfiguration(ctx));
         }
 
-        private static TextConfiguration CreateTextConfiguration(Context ctx)
+        internal static TextConfiguration CreateTextConfiguration(Context ctx)
         {
             if (ctx.Args.Length != 1)
             {

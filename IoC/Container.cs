@@ -31,6 +31,7 @@
         internal static readonly object[] EmptyArgs = new object[0];
         [NotNull] private static readonly Lazy<Container> BasicRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.BasicSet), true);
         [NotNull] private static readonly Lazy<Container> DefultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.DefaultSet), true);
+        [NotNull] private static readonly Lazy<Container> HighPerformanceRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.HighPerformanceSet), true);
         [NotNull] private readonly object _lockObject = new object();
         [NotNull] private readonly IContainer _parent;
         [NotNull] private readonly string _name;
@@ -54,6 +55,20 @@
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             return new Container(CreateContainerName(name), DefultRootContainer.Value, true);
+        }
+
+        /// <summary>
+        /// Creates a high-performance root container.
+        /// It requires access permissions to types/constructors/initialization methods.
+        /// Also you could add the attribute <code>[assembly: InternalsVisibleTo(IoC.Features.HighPerformanceFeature.DynamicAssemblyName)]</code> for your assembly to allow use internal classes/methods/properties in a dependency injection.
+        /// </summary>
+        /// <param name="name">The optional name of the container.</param>
+        /// <returns>The roor container.</returns>
+        [NotNull]
+        public static Container CreateHighPerformance([NotNull] string name = "")
+        {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            return new Container(CreateContainerName(name), HighPerformanceRootContainer.Value, true);
         }
 
         /// <summary>
@@ -127,7 +142,7 @@
         /// <inheritdoc />
         public IContainer Parent => _parent;
 
-        private IIssueResolver IssueResolver => this.Resolve<IIssueResolver>(typeof(IIssueResolver));
+        private IIssueResolver IssueResolver => this.Resolve<IIssueResolver>();
 
         /// <inheritdoc />
         public override string ToString()

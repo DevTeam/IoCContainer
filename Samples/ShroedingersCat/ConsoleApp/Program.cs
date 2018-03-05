@@ -27,6 +27,10 @@
                 box = await container.Resolve<Task<IBox<ICat>>>();
                 Console.WriteLine(box);
 
+                // Async value
+                box = await container.Resolve<ValueTask<IBox<ICat>>>();
+                Console.WriteLine(box);
+
                 // Tuple<,>
                 var tuple = container.Resolve<Tuple<IBox<ICat>, ICat>>();
                 Console.WriteLine(tuple.Item1 + ", " + tuple.Item2);

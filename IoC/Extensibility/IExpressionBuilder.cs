@@ -12,10 +12,9 @@
         /// Builds the expression.
         /// </summary>
         /// <param name="expression">The base expression to get an instance.</param>
-        /// <param name="key">The key.</param>
-        /// <param name="container">The resolving container.</param>
+        /// <param name="buildContext">The build context.</param>
         /// <param name="context">The expression build context.</param>
         /// <returns>The new expression.</returns>
-        [NotNull] Expression Build([NotNull] Expression expression, Key key, [NotNull] IContainer container, [CanBeNull] TContext context = default(TContext));
+        [NotNull] Expression Build([NotNull] Expression expression, [NotNull] BuildContext buildContext, [CanBeNull] TContext context = default(TContext));
     }
 }

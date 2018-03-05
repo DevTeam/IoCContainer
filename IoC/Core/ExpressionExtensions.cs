@@ -1,16 +1,11 @@
 ﻿namespace IoC.Core
 {
     using System;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
 
     internal static class ExpressionExtensions
     {
-        public static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer), nameof(Context.Container));
-        public static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]), nameof(Context.Args));
-        public static readonly ParameterExpression[] Parameters = { ContainerParameter, ArgsParameter };
-        public static readonly Type[] ParameterTypes = Parameters.Select(i => i.Type).ToArray();
         private static readonly ITypeInfo ResolverGenericTypeInfo = typeof(Resolver<>).Info();
         [ThreadStatic] private static int _getExpressionCompilerReentrancy;
 
@@ -27,7 +22,7 @@
                     }
                 }
 
-                return ExpressionCompilerSkippingSecurityCheck.Shared;
+                return ExpressionCompilerDefault.Shared;
             }
             finally
             {

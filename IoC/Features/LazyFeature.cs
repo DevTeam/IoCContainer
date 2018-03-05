@@ -8,8 +8,8 @@
     /// </summary>
     public class LazyFeature : IConfiguration
     {
-        /// The shared instance.
-        public static readonly IConfiguration Shared = new LazyFeature();
+        /// The default instance.
+        public static readonly IConfiguration Default = new LazyFeature();
 
         private LazyFeature()
         {

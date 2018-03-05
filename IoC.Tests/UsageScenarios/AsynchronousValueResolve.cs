@@ -1,36 +1,36 @@
-﻿namespace IoC.Tests.UsageScenarios
+﻿#if !NET40
+namespace IoC.Tests.UsageScenarios
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
+    using System.Threading.Tasks;
     using Shouldly;
     using Xunit;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public class GetTuple
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+    public class AsynchronousResolve
     {
         [Fact]
-        public void Run()
+        public async void Run()
         {
             // $visible=true
             // $group=01
             // $priority=02
-            // $description=Get Tuple
+            // $description=Asynchronous resolve
             // {
             // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
-            using (container.Bind<INamedService>().To<NamedService>(
-                ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name")))
             {
-                // Resolve Tuple
-                var tuple = container.Resolve<Tuple<IService, INamedService>>();
+                // Resolve an instance asynchronously
+                var instance = await container.Resolve<Task<IService>>();
 
-                tuple.Item1.ShouldBeOfType<Service>();
-                tuple.Item2.ShouldBeOfType<NamedService>();
+                instance.ShouldBeOfType<Service>();
             }
             // }
         }
     }
 }
+#endif

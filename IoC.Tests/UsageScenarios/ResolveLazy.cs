@@ -1,22 +1,20 @@
-﻿#if !NET40
-namespace IoC.Tests.UsageScenarios
+﻿namespace IoC.Tests.UsageScenarios
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
-    using System.Threading.Tasks;
     using Shouldly;
     using Xunit;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    public class AsyncGet
+    public class ResolveLazy
     {
         [Fact]
-        public async void Run()
+        public void Run()
         {
             // $visible=true
             // $group=01
             // $priority=02
-            // $description=Asynchronous get
+            // $description=Resolve Lazy
             // {
             // Create a container
             using (var container = Container.Create())
@@ -24,8 +22,10 @@ namespace IoC.Tests.UsageScenarios
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
             {
-                // Resolve an instance asynchronously
-                var instance = await container.Resolve<Task<IService>>();
+                // Resolve Lazy
+                var lazy = container.Resolve<Lazy<IService>>();
+                // Get the instance via Lazy
+                var instance = lazy.Value;
 
                 instance.ShouldBeOfType<Service>();
             }
@@ -33,4 +33,3 @@ namespace IoC.Tests.UsageScenarios
         }
     }
 }
-#endif

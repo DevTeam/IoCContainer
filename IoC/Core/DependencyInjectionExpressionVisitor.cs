@@ -19,6 +19,7 @@
         [NotNull] private static readonly ConstructorInfo ContextConstructor;
         [NotNull] private readonly Stack<Key> _keys = new Stack<Key>();
         [NotNull] private readonly IContainer _container;
+        [NotNull] private readonly BuildContext _buildContext;
         [CanBeNull] private readonly Expression _thisExpression;
         private int _reentrancy;
 
@@ -33,10 +34,12 @@
             ContextConstructor = TypeExtensions.Info<Context>().DeclaredConstructors.Single();
         }
 
-        public DependencyInjectionExpressionVisitor(Key key, [NotNull] IContainer container, [CanBeNull] Expression thisExpression)
+        public DependencyInjectionExpressionVisitor([NotNull] BuildContext buildContext, [CanBeNull] Expression thisExpression)
         {
-            _keys.Push(key);
-            _container = container ?? throw new ArgumentNullException(nameof(container));
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            _keys.Push(buildContext.Key);
+            _container = buildContext.Container;
+            _buildContext = buildContext;
             _thisExpression = thisExpression;
         }
 
@@ -120,8 +123,8 @@
                     ctor,
                     _thisExpression,
                     Expression.Constant(_keys.Peek()),
-                    ExpressionExtensions.ContainerParameter,
-                    ExpressionExtensions.ArgsParameter);
+                    BuildContext.ContainerParameter,
+                    BuildContext.ArgsParameter);
             }
 
             return base.VisitParameter(node);
@@ -133,8 +136,8 @@
             return Expression.New(
                 ContextConstructor,
                 Expression.Constant(_keys.Peek()),
-                ExpressionExtensions.ContainerParameter,
-                ExpressionExtensions.ArgsParameter);
+                BuildContext.ContainerParameter,
+                BuildContext.ArgsParameter);
         }
 
         [CanBeNull]
@@ -174,7 +177,7 @@
                     return _container;
                 }
 
-                var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, ExpressionExtensions.ContainerParameter);
+                var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, BuildContext.ContainerParameter);
                 var selectContainer = containerSelectorExpression.Compile();
                 return selectContainer(_container);
             }
@@ -235,10 +238,12 @@
                     _container.Resolve<IIssueResolver>().CyclicDependenceDetected(key, _reentrancy);
                 }
 
-                dependencyExpression = TypeReplacerExpressionBuilder.Shared.Build(dependencyExpression, key, container);
+                var buildContext = new BuildContext(key, container, _buildContext);
+                dependencyExpression = TypeReplacerExpressionBuilder.Shared.Build(dependencyExpression, buildContext);
                 dependencyExpression = Visit(dependencyExpression);
                 dependencyExpression = dependencyExpression.Convert(key.Type);
-                dependencyExpression = LifetimeExpressionBuilder.Shared.Build(dependencyExpression, key, container, lifetime);
+                dependencyExpression = LifetimeExpressionBuilder.Shared.Build(dependencyExpression, buildContext, lifetime);
+                dependencyExpression = buildContext.CloseBlock(dependencyExpression);
                 return Visit(dependencyExpression) ?? throw new BuildExpressionException(new InvalidOperationException("Null expression"));
             }
             finally
@@ -269,14 +274,14 @@
                 // ctx.Container
                 if (name == nameof(Context.Container))
                 {
-                    expression = ExpressionExtensions.ContainerParameter;
+                    expression = BuildContext.ContainerParameter;
                     return true;
                 }
 
                 // ctx.Args
                 if (name == nameof(Context.Args))
                 {
-                    expression = ExpressionExtensions.ArgsParameter;
+                    expression = BuildContext.ArgsParameter;
                     return true;
                 }
             }

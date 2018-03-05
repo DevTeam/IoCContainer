@@ -95,7 +95,7 @@
                 newNode = Expression.Parameter(ReplaceType(node.Type), node.Name);
             }
 
-            _parameters[newNode.Name] = newNode;
+            _parameters[node.Name] = newNode;
             return newNode;
         }
 
@@ -135,6 +135,16 @@
             }
 
             return Expression.ListInit(newExpression, node.Initializers.Select(VisitInitializer));
+        }
+
+        protected override Expression VisitBinary(BinaryExpression node)
+        {
+            switch (node.NodeType)
+            {
+                case ExpressionType.Assign:
+                    return Expression.Assign(Visit(node.Left) ?? throw new InvalidOperationException(), Visit(node.Right) ?? throw new InvalidOperationException());
+            }
+            return base.VisitBinary(node);
         }
 
         private ElementInit VisitInitializer(ElementInit node)

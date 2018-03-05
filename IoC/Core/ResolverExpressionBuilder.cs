@@ -2,21 +2,21 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
-    using System.Linq;
     using System.Linq.Expressions;
+    using Extensibility;
 
     internal class ResolverExpressionBuilder: IResolverExpressionBuilder
     {
         public static readonly IResolverExpressionBuilder Shared = new ResolverExpressionBuilder();
 
-        public bool TryBuild(Key key, IContainer container, IDependency dependency, ILifetime lifetime, out LambdaExpression resolverExpression)
+        public bool TryBuild(BuildContext buildContext, IDependency dependency, ILifetime lifetime, out LambdaExpression resolverExpression)
         {
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             try
             {
                 var typesMap = new Dictionary<Type, Type>();
-                var expression = TypeReplacerExpressionBuilder.Shared.Build(dependency.Expression, key, container, typesMap);
-                expression = DependencyInjectionExpressionBuilder.Shared.Build(expression, key, container);
+                var expression = TypeReplacerExpressionBuilder.Shared.Build(dependency.Expression, buildContext, typesMap);
+                expression = DependencyInjectionExpressionBuilder.Shared.Build(expression, buildContext);
                 switch (dependency)
                 {
                     case Autowring autowring:
@@ -25,15 +25,16 @@
                             break;
                         }
 
-                        var vars = new Collection<ParameterExpression>();
-                        var statements = CreateAutowringStatements(key, container, autowring, expression, vars, typesMap).ToList();
-                        expression = Expression.Block(vars, statements);
+                        expression = Expression.Block(CreateAutowringStatements(buildContext, autowring, expression, typesMap));
                         break;
                 }
 
-                expression = expression.Convert(key.Type);
-                expression = LifetimeExpressionBuilder.Shared.Build(expression, key, container, lifetime);
-                resolverExpression = Expression.Lambda(key.Type.ToResolverType(), expression, false, ExpressionExtensions.Parameters);
+                expression = expression.Convert(buildContext.Key.Type);
+                expression = buildContext.CloseBlock(expression);
+                expression = LifetimeExpressionBuilder.Shared.Build(expression, buildContext, lifetime);
+                expression = buildContext.CloseBlock(expression);
+
+                resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, BuildContext.ResolverParameters);
                 return true;
             }
             catch (BuildExpressionException)
@@ -44,26 +45,24 @@
         }
 
         private IEnumerable<Expression> CreateAutowringStatements(
-            Key key,
-            IContainer container,
-            Autowring autowring,
-            Expression newExpression,
-            ICollection<ParameterExpression> vars,
+            [NotNull] BuildContext buildContext,
+            [NotNull] Autowring autowring,
+            [NotNull] Expression newExpression,
             IDictionary<Type, Type> typesMap)
         {
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            if (autowring == null) throw new ArgumentNullException(nameof(autowring));
+            if (newExpression == null) throw new ArgumentNullException(nameof(newExpression));
             if (autowring.Statements.Length == 0)
             {
                 throw new ArgumentException($"{nameof(autowring.Statements)} should not be empty.");
             }
 
-            var instanceExpression = Expression.Variable(newExpression.Type);
-            vars.Add(instanceExpression);
-            yield return instanceExpression;
-            yield return Expression.Assign(instanceExpression, newExpression);
+            var instanceExpression = buildContext.DefineValue(newExpression);
             foreach (var statement in autowring.Statements)
             {
-                var statementExpression = TypeReplacerExpressionBuilder.Shared.Build(statement, key, container, typesMap);
-                statementExpression = DependencyInjectionExpressionBuilder.Shared.Build(statementExpression, key, container, instanceExpression);
+                var statementExpression = TypeReplacerExpressionBuilder.Shared.Build(statement, buildContext, typesMap);
+                statementExpression = DependencyInjectionExpressionBuilder.Shared.Build(statementExpression, buildContext, instanceExpression);
                 yield return statementExpression;
             }
 

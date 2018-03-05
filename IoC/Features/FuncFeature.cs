@@ -9,11 +9,16 @@
     [PublicAPI]
     public sealed  class FuncFeature : IConfiguration
     {
-        /// The shared instance.
-        public static readonly IConfiguration Shared = new FuncFeature();
+        /// The default instance.
+        public static readonly IConfiguration Default = new FuncFeature();
+        /// The high-performance instance.
+        public static readonly IConfiguration HighPerformance = new FuncFeature(true);
 
-        private FuncFeature()
+        private readonly bool _highPerformance;
+
+        private FuncFeature(bool highPerformance = false)
         {
+            _highPerformance = highPerformance;
         }
 
         /// <inheritdoc />
@@ -25,10 +30,13 @@
             yield return container.Register<Func<TT1, TT2, TT>>(ctx => ((arg1, arg2) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2)), null, Feature.AnyTag);
             yield return container.Register<Func<TT1, TT2, TT3, TT>>(ctx => ((arg1, arg2, arg3) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3)), null, Feature.AnyTag);
             yield return container.Register<Func<TT1, TT2, TT3, TT4, TT>>(ctx => ((arg1, arg2, arg3, arg4) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4)), null, Feature.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT>>(ctx => ((arg1, arg2, arg3, arg4, arg5) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5)), null, Feature.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>>(ctx => ((arg1, arg2, arg3, arg4, arg5, arg6) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6)), null, Feature.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>>(ctx => ((arg1, arg2, arg3, arg4, arg5, arg6, arg7) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7)), null, Feature.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>>(ctx => ((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)), null, Feature.AnyTag);
+            if (!_highPerformance)
+            {
+                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT>>(ctx => ((arg1, arg2, arg3, arg4, arg5) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5)), null, Feature.AnyTag);
+                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>>(ctx => ((arg1, arg2, arg3, arg4, arg5, arg6) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6)), null, Feature.AnyTag);
+                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>>(ctx => ((arg1, arg2, arg3, arg4, arg5, arg6, arg7) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7)), null, Feature.AnyTag);
+                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>>(ctx => ((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)), null, Feature.AnyTag);
+            }
         }
     }
 }

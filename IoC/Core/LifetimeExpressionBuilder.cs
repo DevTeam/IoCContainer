@@ -15,7 +15,7 @@
         {
         }
 
-        public Expression Build(Expression expression, Key key, IContainer container, ILifetime lifetime)
+        public Expression Build(Expression expression, BuildContext buildContext, ILifetime lifetime)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (lifetime == null)
@@ -23,16 +23,18 @@
                 return expression;
             }
 
-            if (lifetime is IExpressionBuilder<object> builder)
+            var getOrCreateMethodInfo = LifetimeGenericGetOrCreateMethodInfo.MakeGenericMethod(buildContext.Key.Type);
+            var resolverType = expression.Type.ToResolverType();
+            var resolverExpression = Expression.Lambda(resolverType, expression, false, BuildContext.ResolverParameters);
+            var resolver = buildContext.Container.GetExpressionCompiler().Compile(resolverExpression);
+            var resolverVar = buildContext.DefineValue(resolver, resolverType);
+            if (lifetime is IExpressionBuilder<ParameterExpression> builder)
             {
-                return builder.Build(expression, key, container);
+                return builder.Build(expression, buildContext, resolverVar);
             }
 
-            var getOrCreateMethodInfo = LifetimeGenericGetOrCreateMethodInfo.MakeGenericMethod(key.Type);
-            var resolverExpression = Expression.Lambda(key.Type.ToResolverType(), expression, false, ExpressionExtensions.Parameters);
-            var resolver = resolverExpression.Compile();
-            var lifetimeCall = Expression.Call(Expression.Constant(lifetime), getOrCreateMethodInfo, ExpressionExtensions.ContainerParameter, ExpressionExtensions.ArgsParameter, Expression.Constant(resolver));
-            return lifetimeCall;
+            var lifetimeVar = buildContext.DefineValue(lifetime);
+            return Expression.Call(lifetimeVar, getOrCreateMethodInfo, BuildContext.ContainerParameter, BuildContext.ArgsParameter, resolverVar);
         }
     }
 }

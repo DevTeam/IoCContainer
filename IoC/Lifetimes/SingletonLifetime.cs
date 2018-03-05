@@ -13,18 +13,18 @@
     /// Represents singleton lifetime.
     /// </summary>
     [PublicAPI]
-    public sealed class SingletonLifetime : ILifetime, IDisposable, IExpressionBuilder<object>
+    public sealed class SingletonLifetime : ILifetime, IDisposable, IExpressionBuilder<ParameterExpression>
     {
         [NotNull] private object _lockObject = new object();
-        private volatile object _instance;
+        internal volatile object Instance;
 
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]
         public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
         {
-            if (_instance != null)
+            if (Instance != null)
             {
-                return (T) _instance;
+                return (T) Instance;
             }
 
             return CreateInstance(container, args, resolver);
@@ -35,19 +35,19 @@
         {
             lock (_lockObject)
             {
-                if (_instance == null)
+                if (Instance == null)
                 {
-                    _instance = resolver(container, args);
+                    Instance = resolver(container, args);
                 }
             }
 
-            return (T)_instance;
+            return (T)Instance;
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            if (_instance is IDisposable disposable)
+            if (Instance is IDisposable disposable)
             {
                 disposable.Dispose();
             }
@@ -70,23 +70,19 @@
         private static readonly ITypeInfo ResolverTypeInfo = typeof(Resolver<>).Info();
 
         /// <inheritdoc />
-        public Expression Build(Expression expression, Key key, IContainer container, object context)
+        public Expression Build(Expression expression, BuildContext buildContext, ParameterExpression resolver)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            var instanceField = Expression.Field(Expression.Constant(this), nameof(_instance));
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            if (resolver == null) throw new ArgumentNullException(nameof(resolver));
+            var thisVar = buildContext.DefineValue(this);
+            var instanceField = Expression.Field(thisVar, nameof(Instance));
             var typedInstance = instanceField.Convert(expression.Type);
             var methodInfo = CreateInstanceMethodInfo.MakeGenericMethod(expression.Type);
-            var resolverType = ResolverTypeInfo.MakeGenericType(expression.Type);
-            var resolverExpression = Expression.Lambda(resolverType, expression, false, ExpressionExtensions.Parameters);
-            var resolver = container.GetExpressionCompiler().Compile(resolverExpression);
-
-            var lifetimeBody = Expression.Condition(
+            return Expression.Condition(
                 Expression.NotEqual(instanceField, NullConst),
                 typedInstance,
-                Expression.Call(Expression.Constant(this), methodInfo, ExpressionExtensions.ContainerParameter, ExpressionExtensions.ArgsParameter, Expression.Constant(resolver)));
-
-            return lifetimeBody;
+                buildContext.PartiallyCloseBlock(Expression.Call(thisVar, methodInfo, BuildContext.ContainerParameter, BuildContext.ArgsParameter, resolver), resolver));
         }
     }
 }

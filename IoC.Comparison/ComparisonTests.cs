@@ -25,6 +25,8 @@ namespace IoC.Comparison
     using Xunit.Abstractions;
 #endif
 
+    using ThisContainer = IoC.Container;
+
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
     [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
     [SuppressMessage("ReSharper", "EmptyConstructor")]
@@ -35,7 +37,7 @@ namespace IoC.Comparison
 
         private static readonly List<TestInfo> IocsGraphOf3ObjectsWithSingleton = new List<TestInfo>
         {
-            new TestInfo( "operators 'new'", CtorSingleton),
+            new TestInfo("operators 'new'", CtorSingleton),
             new TestInfo($"{ThisIocName} actual DI", ThisByFuncSingleton),
             new TestInfo(ThisIocName, ThisSingleton),
             new TestInfo("LightInject", LightInjectSingleton),
@@ -169,10 +171,7 @@ namespace IoC.Comparison
 
         private static void ThisSingleton(int series, IPerformanceCounter performanceCounter)
         {
-            using (var container = IoC.Container.Create())
-#if NET47
-            using (container.Apply(ExpressionCompilerFeature.Shared))
-#endif
+            using (var container = ThisContainer.CreateHighPerformance())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().As(Lifetime.Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
@@ -189,10 +188,7 @@ namespace IoC.Comparison
 
         private static void ThisTransient(int series, IPerformanceCounter performanceCounter)
         {
-            using (var container = IoC.Container.Create())
-#if NET47
-            using(container.Apply(ExpressionCompilerFeature.Shared))
-#endif
+            using (var container = ThisContainer.CreateHighPerformance())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
@@ -209,10 +205,7 @@ namespace IoC.Comparison
 
         private static void ThisByFuncSingleton(int series, IPerformanceCounter performanceCounter)
         {
-            using (var container = IoC.Container.Create())
-#if NET47
-            using (container.Apply(ExpressionCompilerFeature.Shared))
-#endif
+            using (var container = ThisContainer.CreateHighPerformance())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().As(Lifetime.Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
@@ -230,10 +223,7 @@ namespace IoC.Comparison
 
         private static void ThisByFuncTransient(int series, IPerformanceCounter performanceCounter)
         {
-            using (var container = IoC.Container.Create())
-#if NET47
-            using (container.Apply(ExpressionCompilerFeature.Shared))
-#endif
+            using (var container = ThisContainer.CreateHighPerformance())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())

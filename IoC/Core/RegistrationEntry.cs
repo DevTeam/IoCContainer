@@ -4,13 +4,14 @@
     using System.Collections.Generic;
     using System.Linq;
     using Collections;
+    using Extensibility;
 
     internal sealed class RegistrationEntry : IDisposable
     {
         [NotNull] private readonly IResolverExpressionBuilder _resolverExpressionBuilder;
         [NotNull] internal readonly IDependency Dependency;
         [CanBeNull] private readonly ILifetime _lifetime;
-        [NotNull] private readonly IDisposable _resource;
+        [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
         [NotNull] public readonly List<Key> Keys;
         private readonly object _lockObject = new object();
         private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
@@ -25,14 +26,15 @@
             _resolverExpressionBuilder = resolverExpressionBuilder ?? throw new ArgumentNullException(nameof(resolverExpressionBuilder));
             Dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
             _lifetime = lifetime;
-            _resource = resource ?? throw new ArgumentNullException(nameof(resource));
+            _resources.Add(resource ?? throw new ArgumentNullException(nameof(resource)));
             Keys = keys ?? throw new ArgumentNullException(nameof(keys));
         }
 
         public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver)
         {
             var typeInfo = key.Type.Info();
-            if (!_resolverExpressionBuilder.TryBuild(key, container, Dependency, GetLifetime(typeInfo), out var resolverExpression))
+            var buildContext = new BuildContext(key, container);
+            if (!_resolverExpressionBuilder.TryBuild(buildContext, Dependency, GetLifetime(typeInfo), out var resolverExpression))
             {
                 resolver = default(Delegate);
                 return false;
@@ -94,7 +96,12 @@
                 disposableLifetime.Dispose();
             }
 
-            _resource.Dispose();
+            foreach (var resource in _resources)
+            {
+                resource.Dispose();
+            }
+
+            _resources.Clear();
         }
 
         public override string ToString()

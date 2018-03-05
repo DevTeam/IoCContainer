@@ -11,8 +11,8 @@
     [PublicAPI]
     public sealed class CoreFeature : IConfiguration
     {
-        /// The shared instance.
-        public static readonly IConfiguration Shared = new CoreFeature();
+        /// The default instance.
+        public static readonly IConfiguration Default = new CoreFeature();
 
         private CoreFeature()
         {

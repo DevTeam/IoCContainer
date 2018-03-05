@@ -15,11 +15,16 @@
     [PublicAPI]
     public sealed class CollectionFeature : IConfiguration
     {
-        /// The shared instance.
-        public static readonly IConfiguration Shared = new CollectionFeature();
+        /// The default instance.
+        public static readonly IConfiguration Default = new CollectionFeature();
+        /// The high-performance instance.
+        public static readonly IConfiguration HighPerformance = new CollectionFeature(true);
 
-        private CollectionFeature()
+        private readonly bool _highPerformance;
+
+        private CollectionFeature(bool highPerformance = false)
         {
+            _highPerformance = highPerformance;
         }
 
         /// <inheritdoc />
@@ -27,7 +32,15 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var containerSingletonResolver = container.GetResolver<ILifetime>(typeof(ILifetime), Lifetime.ContainerSingleton);
-            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx.Container, ctx.Args), containerSingletonResolver(container));
+            if (_highPerformance)
+            {
+                yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx.Container, ctx.Args).ToArray(), containerSingletonResolver(container));
+            }
+            else
+            {
+                yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx.Container, ctx.Args), containerSingletonResolver(container));
+            }
+
             yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToList());
             yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => new HashSet<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
             yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Inject<IEnumerable<TT>>()), containerSingletonResolver(container));
@@ -37,7 +50,7 @@
 #endif
         }
 
-        private class Observable<T>: IObservable<T>
+        internal class Observable<T>: IObservable<T>
         {
             private readonly IEnumerable<T> _source;
 
@@ -58,7 +71,7 @@
             }
         }
 
-        private class Enumeration<T>: IObserver<ContainerEvent>, IDisposable, IEnumerable<T>
+        internal class Enumeration<T>: IObserver<ContainerEvent>, IDisposable, IEnumerable<T>
         {
             private readonly IContainer _container;
             [NotNull] [ItemCanBeNull] private readonly object[] _args;
@@ -132,12 +145,7 @@
                     }
                 }
 
-                if (targetType.IsAssignableFrom(registeredType))
-                {
-                    return registeredType.Type;
-                }
-
-                return null;
+                return targetType.IsAssignableFrom(registeredType) ? registeredType.Type : null;
             }
         }
     }

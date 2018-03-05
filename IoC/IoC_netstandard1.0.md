@@ -23,6 +23,17 @@
   - [IS_TRUE](#F-IoC-AssertionConditionType-IS_TRUE 'IoC.AssertionConditionType.IS_TRUE')
 - [AssertionMethodAttribute](#T-IoC-AssertionMethodAttribute 'IoC.AssertionMethodAttribute')
 - [BaseTypeRequiredAttribute](#T-IoC-BaseTypeRequiredAttribute 'IoC.BaseTypeRequiredAttribute')
+- [BuildContext](#T-IoC-Extensibility-BuildContext 'IoC.Extensibility.BuildContext')
+  - [ArgsParameter](#F-IoC-Extensibility-BuildContext-ArgsParameter 'IoC.Extensibility.BuildContext.ArgsParameter')
+  - [Container](#F-IoC-Extensibility-BuildContext-Container 'IoC.Extensibility.BuildContext.Container')
+  - [ContainerParameter](#F-IoC-Extensibility-BuildContext-ContainerParameter 'IoC.Extensibility.BuildContext.ContainerParameter')
+  - [Key](#F-IoC-Extensibility-BuildContext-Key 'IoC.Extensibility.BuildContext.Key')
+  - [ResolverParameters](#F-IoC-Extensibility-BuildContext-ResolverParameters 'IoC.Extensibility.BuildContext.ResolverParameters')
+  - [ResolverParameterTypes](#F-IoC-Extensibility-BuildContext-ResolverParameterTypes 'IoC.Extensibility.BuildContext.ResolverParameterTypes')
+  - [CloseBlock(expression)](#M-IoC-Extensibility-BuildContext-CloseBlock-System-Linq-Expressions-Expression- 'IoC.Extensibility.BuildContext.CloseBlock(System.Linq.Expressions.Expression)')
+  - [DefineValue(value,type)](#M-IoC-Extensibility-BuildContext-DefineValue-System-Object,System-Type- 'IoC.Extensibility.BuildContext.DefineValue(System.Object,System.Type)')
+  - [DefineValue(expression)](#M-IoC-Extensibility-BuildContext-DefineValue-System-Linq-Expressions-Expression- 'IoC.Extensibility.BuildContext.DefineValue(System.Linq.Expressions.Expression)')
+  - [DefineValue\`\`1(value)](#M-IoC-Extensibility-BuildContext-DefineValue``1-``0- 'IoC.Extensibility.BuildContext.DefineValue``1(``0)')
 - [CanBeNullAttribute](#T-IoC-CanBeNullAttribute 'IoC.CanBeNullAttribute')
 - [CannotApplyEqualityOperatorAttribute](#T-IoC-CannotApplyEqualityOperatorAttribute 'IoC.CannotApplyEqualityOperatorAttribute')
 - [CollectionAccessAttribute](#T-IoC-CollectionAccessAttribute 'IoC.CollectionAccessAttribute')
@@ -32,10 +43,11 @@
   - [Read](#F-IoC-CollectionAccessType-Read 'IoC.CollectionAccessType.Read')
   - [UpdatedContent](#F-IoC-CollectionAccessType-UpdatedContent 'IoC.CollectionAccessType.UpdatedContent')
 - [CollectionFeature](#T-IoC-Features-CollectionFeature 'IoC.Features.CollectionFeature')
-  - [Shared](#F-IoC-Features-CollectionFeature-Shared 'IoC.Features.CollectionFeature.Shared')
+  - [Default](#F-IoC-Features-CollectionFeature-Default 'IoC.Features.CollectionFeature.Default')
+  - [HighPerformance](#F-IoC-Features-CollectionFeature-HighPerformance 'IoC.Features.CollectionFeature.HighPerformance')
   - [Apply()](#M-IoC-Features-CollectionFeature-Apply-IoC-IContainer- 'IoC.Features.CollectionFeature.Apply(IoC.IContainer)')
 - [ConfigurationFeature](#T-IoC-Features-ConfigurationFeature 'IoC.Features.ConfigurationFeature')
-  - [Shared](#F-IoC-Features-ConfigurationFeature-Shared 'IoC.Features.ConfigurationFeature.Shared')
+  - [Default](#F-IoC-Features-ConfigurationFeature-Default 'IoC.Features.ConfigurationFeature.Default')
   - [Apply()](#M-IoC-Features-ConfigurationFeature-Apply-IoC-IContainer- 'IoC.Features.ConfigurationFeature.Apply(IoC.IContainer)')
 - [Container](#T-IoC-Container 'IoC.Container')
   - [Parent](#P-IoC-Container-Parent 'IoC.Container.Parent')
@@ -43,6 +55,7 @@
   - [Create(configurations)](#M-IoC-Container-Create-IoC-IConfiguration[]- 'IoC.Container.Create(IoC.IConfiguration[])')
   - [Create(name,configurations)](#M-IoC-Container-Create-System-String,IoC-IConfiguration[]- 'IoC.Container.Create(System.String,IoC.IConfiguration[])')
   - [CreateBasic(name)](#M-IoC-Container-CreateBasic-System-String- 'IoC.Container.CreateBasic(System.String)')
+  - [CreateHighPerformance(name)](#M-IoC-Container-CreateHighPerformance-System-String- 'IoC.Container.CreateHighPerformance(System.String)')
   - [Dispose()](#M-IoC-Container-Dispose 'IoC.Container.Dispose')
   - [GetEnumerator()](#M-IoC-Container-GetEnumerator 'IoC.Container.GetEnumerator')
   - [Subscribe()](#M-IoC-Container-Subscribe-System-IObserver{IoC-ContainerEvent}- 'IoC.Container.Subscribe(System.IObserver{IoC.ContainerEvent})')
@@ -68,7 +81,7 @@
   - [It](#F-IoC-Context`1-It 'IoC.Context`1.It')
 - [ContractAnnotationAttribute](#T-IoC-ContractAnnotationAttribute 'IoC.ContractAnnotationAttribute')
 - [CoreFeature](#T-IoC-Features-CoreFeature 'IoC.Features.CoreFeature')
-  - [Shared](#F-IoC-Features-CoreFeature-Shared 'IoC.Features.CoreFeature.Shared')
+  - [Default](#F-IoC-Features-CoreFeature-Default 'IoC.Features.CoreFeature.Default')
   - [Apply()](#M-IoC-Features-CoreFeature-Apply-IoC-IContainer- 'IoC.Features.CoreFeature.Apply(IoC.IContainer)')
 - [EventType](#T-IoC-ContainerEvent-EventType 'IoC.ContainerEvent.EventType')
   - [Registration](#F-IoC-ContainerEvent-EventType-Registration 'IoC.ContainerEvent.EventType.Registration')
@@ -76,6 +89,7 @@
 - [Feature](#T-IoC-Features-Feature 'IoC.Features.Feature')
   - [BasicSet](#F-IoC-Features-Feature-BasicSet 'IoC.Features.Feature.BasicSet')
   - [DefaultSet](#F-IoC-Features-Feature-DefaultSet 'IoC.Features.Feature.DefaultSet')
+  - [HighPerformanceSet](#F-IoC-Features-Feature-HighPerformanceSet 'IoC.Features.Feature.HighPerformanceSet')
 - [Fluent](#T-IoC-Fluent 'IoC.Fluent')
   - [CreateChild(parent,name)](#M-IoC-Fluent-CreateChild-IoC-IContainer,System-String- 'IoC.Fluent.CreateChild(IoC.IContainer,System.String)')
   - [Validate(container)](#M-IoC-Fluent-Validate-IoC-IContainer- 'IoC.Fluent.Validate(IoC.IContainer)')
@@ -109,11 +123,14 @@
   - [Using(container,configurations)](#M-IoC-FluentConfiguration-Using-IoC-IContainer,IoC-IConfiguration[]- 'IoC.FluentConfiguration.Using(IoC.IContainer,IoC.IConfiguration[])')
   - [Using\`\`1(container)](#M-IoC-FluentConfiguration-Using``1-IoC-IContainer- 'IoC.FluentConfiguration.Using``1(IoC.IContainer)')
 - [FluentGet](#T-IoC-FluentGet 'IoC.FluentGet')
-  - [Get(resolving,type,args)](#M-IoC-FluentGet-Get-IoC-FluentGet-Resolving,System-Type,System-Object[]- 'IoC.FluentGet.Get(IoC.FluentGet.Resolving,System.Type,System.Object[])')
-  - [Get(resolving,type)](#M-IoC-FluentGet-Get-IoC-FluentGet-Resolving,System-Type- 'IoC.FluentGet.Get(IoC.FluentGet.Resolving,System.Type)')
   - [Get\`\`1(resolving,args)](#M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving,System-Object[]- 'IoC.FluentGet.Get``1(IoC.FluentGet.Resolving,System.Object[])')
-  - [Get\`\`1(resolving)](#M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving- 'IoC.FluentGet.Get``1(IoC.FluentGet.Resolving)')
+  - [Get\`\`1(resolving,type,args)](#M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving,System-Type,System-Object[]- 'IoC.FluentGet.Get``1(IoC.FluentGet.Resolving,System.Type,System.Object[])')
   - [Tag(container,tag)](#M-IoC-FluentGet-Tag-IoC-IContainer,System-Object- 'IoC.FluentGet.Tag(IoC.IContainer,System.Object)')
+- [FluentNativeResolve](#T-IoC-FluentNativeResolve 'IoC.FluentNativeResolve')
+  - [Resolve\`\`1(container)](#M-IoC-FluentNativeResolve-Resolve``1-IoC-Container- 'IoC.FluentNativeResolve.Resolve``1(IoC.Container)')
+  - [Resolve\`\`1(container,args)](#M-IoC-FluentNativeResolve-Resolve``1-IoC-Container,System-Object[]- 'IoC.FluentNativeResolve.Resolve``1(IoC.Container,System.Object[])')
+  - [Resolve\`\`1(container,type)](#M-IoC-FluentNativeResolve-Resolve``1-IoC-Container,System-Type- 'IoC.FluentNativeResolve.Resolve``1(IoC.Container,System.Type)')
+  - [Resolve\`\`1(container,type,args)](#M-IoC-FluentNativeResolve-Resolve``1-IoC-Container,System-Type,System-Object[]- 'IoC.FluentNativeResolve.Resolve``1(IoC.Container,System.Type,System.Object[])')
 - [FluentRegister](#T-IoC-FluentRegister 'IoC.FluentRegister')
   - [Register\`\`1(container,lifetime,tags)](#M-IoC-FluentRegister-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.FluentRegister.Register``1(IoC.IContainer,IoC.ILifetime,System.Object[])')
   - [Register\`\`1(container,factory,lifetime,tags,statements)](#M-IoC-FluentRegister-Register``1-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentRegister.Register``1(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
@@ -136,14 +153,11 @@
 - [FluentResolve](#T-IoC-FluentResolve 'IoC.FluentResolve')
   - [GetResolver\`\`1(type,tag,container)](#M-IoC-FluentResolve-GetResolver``1-IoC-IContainer,System-Type,System-Object- 'IoC.FluentResolve.GetResolver``1(IoC.IContainer,System.Type,System.Object)')
   - [GetResolver\`\`1(type,container)](#M-IoC-FluentResolve-GetResolver``1-IoC-IContainer,System-Type- 'IoC.FluentResolve.GetResolver``1(IoC.IContainer,System.Type)')
-  - [Resolve(container,type,args)](#M-IoC-FluentResolve-Resolve-IoC-IContainer,System-Type,System-Object[]- 'IoC.FluentResolve.Resolve(IoC.IContainer,System.Type,System.Object[])')
-  - [Resolve(container,type)](#M-IoC-FluentResolve-Resolve-IoC-IContainer,System-Type- 'IoC.FluentResolve.Resolve(IoC.IContainer,System.Type)')
-  - [Resolve\`\`1(container)](#M-IoC-FluentResolve-Resolve``1-IoC-Container- 'IoC.FluentResolve.Resolve``1(IoC.Container)')
-  - [Resolve\`\`1(container,args)](#M-IoC-FluentResolve-Resolve``1-IoC-Container,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.Container,System.Object[])')
   - [Resolve\`\`1(container,args)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Object[])')
-  - [Resolve\`\`1(container)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer- 'IoC.FluentResolve.Resolve``1(IoC.IContainer)')
+  - [Resolve\`\`1(container,type,args)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Type,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type,System.Object[])')
 - [FuncFeature](#T-IoC-Features-FuncFeature 'IoC.Features.FuncFeature')
-  - [Shared](#F-IoC-Features-FuncFeature-Shared 'IoC.Features.FuncFeature.Shared')
+  - [Default](#F-IoC-Features-FuncFeature-Default 'IoC.Features.FuncFeature.Default')
+  - [HighPerformance](#F-IoC-Features-FuncFeature-HighPerformance 'IoC.Features.FuncFeature.HighPerformance')
   - [Apply()](#M-IoC-Features-FuncFeature-Apply-IoC-IContainer- 'IoC.Features.FuncFeature.Apply(IoC.IContainer)')
 - [GenericTypeArgumentAttribute](#T-IoC-GenericTypeArgumentAttribute 'IoC.GenericTypeArgumentAttribute')
 - [IBinding\`1](#T-IoC-IBinding`1 'IoC.IBinding`1')
@@ -162,7 +176,7 @@
 - [IDependency](#T-IoC-IDependency 'IoC.IDependency')
   - [Expression](#P-IoC-IDependency-Expression 'IoC.IDependency.Expression')
 - [IExpressionBuilder\`1](#T-IoC-Extensibility-IExpressionBuilder`1 'IoC.Extensibility.IExpressionBuilder`1')
-  - [Build(expression,key,container,context)](#M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Key,IoC-IContainer,`0- 'IoC.Extensibility.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.Key,IoC.IContainer,`0)')
+  - [Build(expression,buildContext,context)](#M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-BuildContext,`0- 'IoC.Extensibility.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.BuildContext,`0)')
 - [IIssueResolver](#T-IoC-Extensibility-IIssueResolver 'IoC.Extensibility.IIssueResolver')
   - [CannotGetGenericTypeArguments(type)](#M-IoC-Extensibility-IIssueResolver-CannotGetGenericTypeArguments-System-Type- 'IoC.Extensibility.IIssueResolver.CannotGetGenericTypeArguments(System.Type)')
   - [CannotGetResolver\`\`1(container,key)](#M-IoC-Extensibility-IIssueResolver-CannotGetResolver``1-IoC-IContainer,IoC-Key- 'IoC.Extensibility.IIssueResolver.CannotGetResolver``1(IoC.IContainer,IoC.Key)')
@@ -201,7 +215,7 @@
   - [Type](#F-IoC-Key-Type 'IoC.Key.Type')
   - [ToString()](#M-IoC-Key-ToString 'IoC.Key.ToString')
 - [LazyFeature](#T-IoC-Features-LazyFeature 'IoC.Features.LazyFeature')
-  - [Shared](#F-IoC-Features-LazyFeature-Shared 'IoC.Features.LazyFeature.Shared')
+  - [Default](#F-IoC-Features-LazyFeature-Default 'IoC.Features.LazyFeature.Default')
   - [Apply()](#M-IoC-Features-LazyFeature-Apply-IoC-IContainer- 'IoC.Features.LazyFeature.Apply(IoC.IContainer)')
 - [Lifetime](#T-IoC-Lifetime 'IoC.Lifetime')
   - [ContainerSingleton](#F-IoC-Lifetime-ContainerSingleton 'IoC.Lifetime.ContainerSingleton')
@@ -246,7 +260,7 @@
   - [Dispose()](#M-IoC-Lifetimes-SingletonBasedLifetime`1-Dispose 'IoC.Lifetimes.SingletonBasedLifetime`1.Dispose')
   - [GetOrCreate\`\`1()](#M-IoC-Lifetimes-SingletonBasedLifetime`1-GetOrCreate``1-IoC-IContainer,System-Object[],IoC-Resolver{``0}- 'IoC.Lifetimes.SingletonBasedLifetime`1.GetOrCreate``1(IoC.IContainer,System.Object[],IoC.Resolver{``0})')
 - [SingletonLifetime](#T-IoC-Lifetimes-SingletonLifetime 'IoC.Lifetimes.SingletonLifetime')
-  - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Key,IoC-IContainer,System-Object- 'IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.Key,IoC.IContainer,System.Object)')
+  - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-BuildContext,System-Linq-Expressions-ParameterExpression- 'IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.Extensibility.BuildContext,System.Linq.Expressions.ParameterExpression)')
   - [Clone()](#M-IoC-Lifetimes-SingletonLifetime-Clone 'IoC.Lifetimes.SingletonLifetime.Clone')
   - [Dispose()](#M-IoC-Lifetimes-SingletonLifetime-Dispose 'IoC.Lifetimes.SingletonLifetime.Dispose')
   - [GetOrCreate\`\`1()](#M-IoC-Lifetimes-SingletonLifetime-GetOrCreate``1-IoC-IContainer,System-Object[],IoC-Resolver{``0}- 'IoC.Lifetimes.SingletonLifetime.GetOrCreate``1(IoC.IContainer,System.Object[],IoC.Resolver{``0})')
@@ -255,7 +269,7 @@
 - [StringFormatMethodAttribute](#T-IoC-StringFormatMethodAttribute 'IoC.StringFormatMethodAttribute')
   - [#ctor(formatParameterName)](#M-IoC-StringFormatMethodAttribute-#ctor-System-String- 'IoC.StringFormatMethodAttribute.#ctor(System.String)')
 - [TaskFeature](#T-IoC-Features-TaskFeature 'IoC.Features.TaskFeature')
-  - [Shared](#F-IoC-Features-TaskFeature-Shared 'IoC.Features.TaskFeature.Shared')
+  - [Default](#F-IoC-Features-TaskFeature-Default 'IoC.Features.TaskFeature.Default')
   - [Apply()](#M-IoC-Features-TaskFeature-Apply-IoC-IContainer- 'IoC.Features.TaskFeature.Apply(IoC.IContainer)')
 - [TerminatesProgramAttribute](#T-IoC-TerminatesProgramAttribute 'IoC.TerminatesProgramAttribute')
 - [TT](#T-IoC-TT 'IoC.TT')
@@ -268,7 +282,8 @@
 - [TT7](#T-IoC-TT7 'IoC.TT7')
 - [TT8](#T-IoC-TT8 'IoC.TT8')
 - [TupleFeature](#T-IoC-Features-TupleFeature 'IoC.Features.TupleFeature')
-  - [Shared](#F-IoC-Features-TupleFeature-Shared 'IoC.Features.TupleFeature.Shared')
+  - [Default](#F-IoC-Features-TupleFeature-Default 'IoC.Features.TupleFeature.Default')
+  - [HighPerformance](#F-IoC-Features-TupleFeature-HighPerformance 'IoC.Features.TupleFeature.HighPerformance')
   - [Apply()](#M-IoC-Features-TupleFeature-Apply-IoC-IContainer- 'IoC.Features.TupleFeature.Apply(IoC.IContainer)')
 - [UsedImplicitlyAttribute](#T-IoC-UsedImplicitlyAttribute 'IoC.UsedImplicitlyAttribute')
 - [ValidationResult](#T-IoC-ValidationResult 'IoC.ValidationResult')
@@ -532,6 +547,134 @@ When applied to a target attribute, specifies a requirement for any type marked 
             class MyComponent : IComponent { }
 ```
 
+<a name='T-IoC-Extensibility-BuildContext'></a>
+## BuildContext [#](#T-IoC-Extensibility-BuildContext 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC.Extensibility
+
+##### Summary
+
+Represents build context.
+
+<a name='F-IoC-Extensibility-BuildContext-ArgsParameter'></a>
+### ArgsParameter `constants` [#](#F-IoC-Extensibility-BuildContext-ArgsParameter 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+The args parameters.
+
+<a name='F-IoC-Extensibility-BuildContext-Container'></a>
+### Container `constants` [#](#F-IoC-Extensibility-BuildContext-Container 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+The target container.
+
+<a name='F-IoC-Extensibility-BuildContext-ContainerParameter'></a>
+### ContainerParameter `constants` [#](#F-IoC-Extensibility-BuildContext-ContainerParameter 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+The container parameter.
+
+<a name='F-IoC-Extensibility-BuildContext-Key'></a>
+### Key `constants` [#](#F-IoC-Extensibility-BuildContext-Key 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+The target key.
+
+<a name='F-IoC-Extensibility-BuildContext-ResolverParameters'></a>
+### ResolverParameters `constants` [#](#F-IoC-Extensibility-BuildContext-ResolverParameters 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+All resolver's parameters.
+
+<a name='F-IoC-Extensibility-BuildContext-ResolverParameterTypes'></a>
+### ResolverParameterTypes `constants` [#](#F-IoC-Extensibility-BuildContext-ResolverParameterTypes 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Types of all resolver's parameters.
+
+<a name='M-IoC-Extensibility-BuildContext-CloseBlock-System-Linq-Expressions-Expression-'></a>
+### CloseBlock(expression) `method` [#](#M-IoC-Extensibility-BuildContext-CloseBlock-System-Linq-Expressions-Expression- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Closes a block of statements.
+
+##### Returns
+
+The result expression.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| expression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The target expression. |
+
+<a name='M-IoC-Extensibility-BuildContext-DefineValue-System-Object,System-Type-'></a>
+### DefineValue(value,type) `method` [#](#M-IoC-Extensibility-BuildContext-DefineValue-System-Object,System-Type- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Defines value.
+
+##### Returns
+
+The parameter expression.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| value | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The value. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The value type. |
+
+<a name='M-IoC-Extensibility-BuildContext-DefineValue-System-Linq-Expressions-Expression-'></a>
+### DefineValue(expression) `method` [#](#M-IoC-Extensibility-BuildContext-DefineValue-System-Linq-Expressions-Expression- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Defines value.
+
+##### Returns
+
+The parameter expression.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| expression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The value expression. |
+
+<a name='M-IoC-Extensibility-BuildContext-DefineValue``1-``0-'></a>
+### DefineValue\`\`1(value) `method` [#](#M-IoC-Extensibility-BuildContext-DefineValue``1-``0- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Defines value.
+
+##### Returns
+
+The parameter expression.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| value | [\`\`0](#T-``0 '``0') | The value. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The value type. |
+
 <a name='T-IoC-CanBeNullAttribute'></a>
 ## CanBeNullAttribute [#](#T-IoC-CanBeNullAttribute 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -639,8 +782,11 @@ IoC.Features
 
 Allows to resolve enumeration of all instances related to corresponding bindings.
 
-<a name='F-IoC-Features-CollectionFeature-Shared'></a>
-### Shared `constants` [#](#F-IoC-Features-CollectionFeature-Shared 'Go To Here') [=](#contents 'Back To Contents')
+<a name='F-IoC-Features-CollectionFeature-Default'></a>
+### Default `constants` [#](#F-IoC-Features-CollectionFeature-Default 'Go To Here') [=](#contents 'Back To Contents')
+
+<a name='F-IoC-Features-CollectionFeature-HighPerformance'></a>
+### HighPerformance `constants` [#](#F-IoC-Features-CollectionFeature-HighPerformance 'Go To Here') [=](#contents 'Back To Contents')
 
 <a name='M-IoC-Features-CollectionFeature-Apply-IoC-IContainer-'></a>
 ### Apply() `method` [#](#M-IoC-Features-CollectionFeature-Apply-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
@@ -664,12 +810,12 @@ IoC.Features
 
 Allows to configure via a text metadata.
 
-<a name='F-IoC-Features-ConfigurationFeature-Shared'></a>
-### Shared `constants` [#](#F-IoC-Features-ConfigurationFeature-Shared 'Go To Here') [=](#contents 'Back To Contents')
+<a name='F-IoC-Features-ConfigurationFeature-Default'></a>
+### Default `constants` [#](#F-IoC-Features-ConfigurationFeature-Default 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
-The shared instance.
+The default instance.
 
 <a name='M-IoC-Features-ConfigurationFeature-Apply-IoC-IContainer-'></a>
 ### Apply() `method` [#](#M-IoC-Features-ConfigurationFeature-Apply-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
@@ -758,6 +904,29 @@ The roor container.
 ##### Summary
 
 Creates a root container with basic features.
+
+##### Returns
+
+The roor container.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The optional name of the container. |
+
+<a name='M-IoC-Container-CreateHighPerformance-System-String-'></a>
+### CreateHighPerformance(name) `method` [#](#M-IoC-Container-CreateHighPerformance-System-String- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Creates a high-performance root container. It requires access permissions to types/constructors/initialization methods. Also you could add the attribute
+
+```
+[assembly: InternalsVisibleTo(IoC.Features.HighPerformanceFeature.DynamicAssemblyName)]
+```
+
+for your assembly to allow use internal classes/methods/properties in a dependency injection.
 
 ##### Returns
 
@@ -1022,8 +1191,8 @@ IoC.Features
 
 Adds the set of core features like lifetimes and default containers.
 
-<a name='F-IoC-Features-CoreFeature-Shared'></a>
-### Shared `constants` [#](#F-IoC-Features-CoreFeature-Shared 'Go To Here') [=](#contents 'Back To Contents')
+<a name='F-IoC-Features-CoreFeature-Default'></a>
+### Default `constants` [#](#F-IoC-Features-CoreFeature-Default 'Go To Here') [=](#contents 'Back To Contents')
 
 <a name='M-IoC-Features-CoreFeature-Apply-IoC-IContainer-'></a>
 ### Apply() `method` [#](#M-IoC-Features-CoreFeature-Apply-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
@@ -1081,6 +1250,13 @@ The enumeration of default features.
 
 <a name='F-IoC-Features-Feature-DefaultSet'></a>
 ### DefaultSet `constants` [#](#F-IoC-Features-Feature-DefaultSet 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+The enumeration of default features.
+
+<a name='F-IoC-Features-Feature-HighPerformanceSet'></a>
+### HighPerformanceSet `constants` [#](#F-IoC-Features-Feature-HighPerformanceSet 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -1756,43 +1932,6 @@ IoC
 
 Represents extensions to get an instance from a continer.
 
-<a name='M-IoC-FluentGet-Get-IoC-FluentGet-Resolving,System-Type,System-Object[]-'></a>
-### Get(resolving,type,args) `method` [#](#M-IoC-FluentGet-Get-IoC-FluentGet-Resolving,System-Type,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets an instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| resolving | [IoC.FluentGet.Resolving](#T-IoC-FluentGet-Resolving 'IoC.FluentGet.Resolving') |  |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
-| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
-
-<a name='M-IoC-FluentGet-Get-IoC-FluentGet-Resolving,System-Type-'></a>
-### Get(resolving,type) `method` [#](#M-IoC-FluentGet-Get-IoC-FluentGet-Resolving,System-Type- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets an instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| resolving | [IoC.FluentGet.Resolving](#T-IoC-FluentGet-Resolving 'IoC.FluentGet.Resolving') |  |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
-
 <a name='M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving,System-Object[]-'></a>
 ### Get\`\`1(resolving,args) `method` [#](#M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -1817,8 +1956,8 @@ The instance.
 | ---- | ----------- |
 | T | The instance type. |
 
-<a name='M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving-'></a>
-### Get\`\`1(resolving) `method` [#](#M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving,System-Type,System-Object[]-'></a>
+### Get\`\`1(resolving,type,args) `method` [#](#M-IoC-FluentGet-Get``1-IoC-FluentGet-Resolving,System-Type,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -1833,6 +1972,8 @@ The instance.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | resolving | [IoC.FluentGet.Resolving](#T-IoC-FluentGet-Resolving 'IoC.FluentGet.Resolving') |  |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The resolving instance type. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
 
 ##### Generic Types
 
@@ -1857,6 +1998,113 @@ The instance.
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
 | tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
+
+<a name='T-IoC-FluentNativeResolve'></a>
+## FluentNativeResolve [#](#T-IoC-FluentNativeResolve 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents extensions to resolve from a native container.
+
+<a name='M-IoC-FluentNativeResolve-Resolve``1-IoC-Container-'></a>
+### Resolve\`\`1(container) `method` [#](#M-IoC-FluentNativeResolve-Resolve``1-IoC-Container- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Resolves an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.Container](#T-IoC-Container 'IoC.Container') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentNativeResolve-Resolve``1-IoC-Container,System-Object[]-'></a>
+### Resolve\`\`1(container,args) `method` [#](#M-IoC-FluentNativeResolve-Resolve``1-IoC-Container,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Resolves an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.Container](#T-IoC-Container 'IoC.Container') | The target container. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentNativeResolve-Resolve``1-IoC-Container,System-Type-'></a>
+### Resolve\`\`1(container,type) `method` [#](#M-IoC-FluentNativeResolve-Resolve``1-IoC-Container,System-Type- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Resolves an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.Container](#T-IoC-Container 'IoC.Container') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The resolving instance type. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentNativeResolve-Resolve``1-IoC-Container,System-Type,System-Object[]-'></a>
+### Resolve\`\`1(container,type,args) `method` [#](#M-IoC-FluentNativeResolve-Resolve``1-IoC-Container,System-Type,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Resolves an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.Container](#T-IoC-Container 'IoC.Container') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The resolving instance type. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
 
 <a name='T-IoC-FluentRegister'></a>
 ## FluentRegister [#](#T-IoC-FluentRegister 'Go To Here') [=](#contents 'Back To Contents')
@@ -2469,96 +2717,12 @@ The resolver.
 | ---- | ----------- |
 | T | The resolver type. |
 
-<a name='M-IoC-FluentResolve-Resolve-IoC-IContainer,System-Type,System-Object[]-'></a>
-### Resolve(container,type,args) `method` [#](#M-IoC-FluentResolve-Resolve-IoC-IContainer,System-Type,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets an instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
-| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
-
-<a name='M-IoC-FluentResolve-Resolve-IoC-IContainer,System-Type-'></a>
-### Resolve(container,type) `method` [#](#M-IoC-FluentResolve-Resolve-IoC-IContainer,System-Type- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets an instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
-
-<a name='M-IoC-FluentResolve-Resolve``1-IoC-Container-'></a>
-### Resolve\`\`1(container) `method` [#](#M-IoC-FluentResolve-Resolve``1-IoC-Container- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets an instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.Container](#T-IoC-Container 'IoC.Container') | The target container. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-
-<a name='M-IoC-FluentResolve-Resolve``1-IoC-Container,System-Object[]-'></a>
-### Resolve\`\`1(container,args) `method` [#](#M-IoC-FluentResolve-Resolve``1-IoC-Container,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Gets an instance.
-
-##### Returns
-
-The instance.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.Container](#T-IoC-Container 'IoC.Container') | The target container. |
-| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The instance type. |
-
 <a name='M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Object[]-'></a>
 ### Resolve\`\`1(container,args) `method` [#](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
-Gets an instance.
+Resolves an instance.
 
 ##### Returns
 
@@ -2577,12 +2741,12 @@ The instance.
 | ---- | ----------- |
 | T | The instance type. |
 
-<a name='M-IoC-FluentResolve-Resolve``1-IoC-IContainer-'></a>
-### Resolve\`\`1(container) `method` [#](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Type,System-Object[]-'></a>
+### Resolve\`\`1(container,type,args) `method` [#](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Type,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
-Gets an instance.
+Resolves an instance.
 
 ##### Returns
 
@@ -2593,6 +2757,8 @@ The instance.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The resolving instance type. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
 
 ##### Generic Types
 
@@ -2611,8 +2777,11 @@ IoC.Features
 
 Allows to resolve Funcs.
 
-<a name='F-IoC-Features-FuncFeature-Shared'></a>
-### Shared `constants` [#](#F-IoC-Features-FuncFeature-Shared 'Go To Here') [=](#contents 'Back To Contents')
+<a name='F-IoC-Features-FuncFeature-Default'></a>
+### Default `constants` [#](#F-IoC-Features-FuncFeature-Default 'Go To Here') [=](#contents 'Back To Contents')
+
+<a name='F-IoC-Features-FuncFeature-HighPerformance'></a>
+### HighPerformance `constants` [#](#F-IoC-Features-FuncFeature-HighPerformance 'Go To Here') [=](#contents 'Back To Contents')
 
 <a name='M-IoC-Features-FuncFeature-Apply-IoC-IContainer-'></a>
 ### Apply() `method` [#](#M-IoC-Features-FuncFeature-Apply-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
@@ -2846,8 +3015,8 @@ IoC.Extensibility
 
 Allows to build expresion for lifetimes.
 
-<a name='M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Key,IoC-IContainer,`0-'></a>
-### Build(expression,key,container,context) `method` [#](#M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Key,IoC-IContainer,`0- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-BuildContext,`0-'></a>
+### Build(expression,buildContext,context) `method` [#](#M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-BuildContext,`0- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -2862,8 +3031,7 @@ The new expression.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | expression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression to get an instance. |
-| key | [IoC.Key](#T-IoC-Key 'IoC.Key') | The key. |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
+| buildContext | [IoC.Extensibility.BuildContext](#T-IoC-Extensibility-BuildContext 'IoC.Extensibility.BuildContext') | The build context. |
 | context | [\`0](#T-`0 '`0') | The expression build context. |
 
 <a name='T-IoC-Extensibility-IIssueResolver'></a>
@@ -3378,8 +3546,8 @@ IoC.Features
 
 Allows to resolve Lazy.
 
-<a name='F-IoC-Features-LazyFeature-Shared'></a>
-### Shared `constants` [#](#F-IoC-Features-LazyFeature-Shared 'Go To Here') [=](#contents 'Back To Contents')
+<a name='F-IoC-Features-LazyFeature-Default'></a>
+### Default `constants` [#](#F-IoC-Features-LazyFeature-Default 'Go To Here') [=](#contents 'Back To Contents')
 
 <a name='M-IoC-Features-LazyFeature-Apply-IoC-IContainer-'></a>
 ### Apply() `method` [#](#M-IoC-Features-LazyFeature-Apply-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
@@ -3955,8 +4123,8 @@ IoC.Lifetimes
 
 Represents singleton lifetime.
 
-<a name='M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Key,IoC-IContainer,System-Object-'></a>
-### Build() `method` [#](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Key,IoC-IContainer,System-Object- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-BuildContext,System-Linq-Expressions-ParameterExpression-'></a>
+### Build() `method` [#](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-BuildContext,System-Linq-Expressions-ParameterExpression- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -4080,8 +4248,8 @@ IoC.Features
 
 Allows to resolve Tasks.
 
-<a name='F-IoC-Features-TaskFeature-Shared'></a>
-### Shared `constants` [#](#F-IoC-Features-TaskFeature-Shared 'Go To Here') [=](#contents 'Back To Contents')
+<a name='F-IoC-Features-TaskFeature-Default'></a>
+### Default `constants` [#](#F-IoC-Features-TaskFeature-Default 'Go To Here') [=](#contents 'Back To Contents')
 
 <a name='M-IoC-Features-TaskFeature-Apply-IoC-IContainer-'></a>
 ### Apply() `method` [#](#M-IoC-Features-TaskFeature-Apply-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
@@ -4215,8 +4383,11 @@ IoC.Features
 
 Allows to resolve Tuples.
 
-<a name='F-IoC-Features-TupleFeature-Shared'></a>
-### Shared `constants` [#](#F-IoC-Features-TupleFeature-Shared 'Go To Here') [=](#contents 'Back To Contents')
+<a name='F-IoC-Features-TupleFeature-Default'></a>
+### Default `constants` [#](#F-IoC-Features-TupleFeature-Default 'Go To Here') [=](#contents 'Back To Contents')
+
+<a name='F-IoC-Features-TupleFeature-HighPerformance'></a>
+### HighPerformance `constants` [#](#F-IoC-Features-TupleFeature-HighPerformance 'Go To Here') [=](#contents 'Back To Contents')
 
 <a name='M-IoC-Features-TupleFeature-Apply-IoC-IContainer-'></a>
 ### Apply() `method` [#](#M-IoC-Features-TupleFeature-Apply-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')

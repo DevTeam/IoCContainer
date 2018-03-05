@@ -99,6 +99,10 @@ using (var container = Container.Create().Using<Glue>())
     box = await container.Resolve<Task<IBox<ICat>>>();
     Console.WriteLine(box);
 
+    // Async value
+    box = await container.Resolve<ValueTask<IBox<ICat>>>();
+    Console.WriteLine(box);
+
     // Tuple<,>
     var tuple = container.Resolve<Tuple<IBox<ICat>, ICat>>();
     Console.WriteLine(tuple.Item1 + ", " + tuple.Item2);
@@ -154,16 +158,17 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
 ## Usage Scenarios
 
 * [Several Contracts](#several-contracts)
-* [Asynchronous get](#asynchronous-get)
+* [Asynchronous resolve](#asynchronous-resolve)
+* [Asynchronous resolve](#asynchronous-resolve)
 * [Constant](#constant)
 * [Dependency Tag](#dependency-tag)
 * [Func](#func)
 * [Generic Auto-wiring](#generic-auto-wiring)
 * [Generics](#generics)
-* [Get Func](#get-func)
-* [Get Lazy](#get-lazy)
-* [Get Tuple](#get-tuple)
-* [Get ValueTuple](#get-valuetuple)
+* [Resolve Func](#resolve-func)
+* [Resolve Lazy](#resolve-lazy)
+* [Resolve Tuple](#resolve-tuple)
+* [Resolve ValueTuple](#resolve-valuetuple)
 * [Tags](#tags)
 * [Auto-wiring](#auto-wiring)
 * [Child Container](#child-container)
@@ -211,7 +216,24 @@ using (container.Bind<Service, IService, IAnotherService>().To<Service>())
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SeveralContracts.cs)
 
-### Asynchronous get
+### Asynchronous resolve
+
+``` CSharp
+// Create a container
+using (var container = Container.Create())
+// Configure the container
+using (container.Bind<IDependency>().To<Dependency>())
+using (container.Bind<IService>().To<Service>())
+{
+    // Resolve an instance asynchronously via ValueTask
+    var instance = await container.Resolve<ValueTask<IService>>();
+
+    instance.ShouldBeOfType<Service>();
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousResolve.cs)
+
+### Asynchronous resolve
 
 ``` CSharp
 // Create a container
@@ -226,7 +248,7 @@ using (container.Bind<IService>().To<Service>())
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsyncGet.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousValueResolve.cs)
 
 ### Constant
 
@@ -317,7 +339,7 @@ using (container.Bind(typeof(IService<>)).To(typeof(Service<>)))
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Generics.cs)
 
-### Get Func
+### Resolve Func
 
 ``` CSharp
 // Create a container
@@ -334,9 +356,9 @@ using (container.Bind<IService>().To<Service>())
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GetFunc.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveFunc.cs)
 
-### Get Lazy
+### Resolve Lazy
 
 ``` CSharp
 // Create a container
@@ -353,9 +375,9 @@ using (container.Bind<IService>().To<Service>())
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GetLazy.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveLazy.cs)
 
-### Get Tuple
+### Resolve Tuple
 
 ``` CSharp
 // Create a container
@@ -373,9 +395,9 @@ using (container.Bind<INamedService>().To<NamedService>(
     tuple.Item2.ShouldBeOfType<NamedService>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GetTuple.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveTuple.cs)
 
-### Get ValueTuple
+### Resolve ValueTuple
 
 ``` CSharp
 // Create a container
@@ -393,7 +415,7 @@ using (container.Bind<INamedService>().To<NamedService>(
     valueTuple.namedService.ShouldBeOfType<NamedService>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GetValueTuple.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveValueTuple.cs)
 
 ### Tags
 

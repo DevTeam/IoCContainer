@@ -13,10 +13,12 @@
         {
         }
 
-        public Expression Build(Expression expression, Key key, IContainer container, IDictionary<Type, Type> typesMap)
+        public Expression Build(Expression expression, BuildContext buildContext, IDictionary<Type, Type> typesMap)
         {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             typesMap = typesMap ?? new Dictionary<Type, Type>();
-            var typeMapingExpressionVisitor = new TypeMapingExpressionVisitor(key.Type, typesMap);
+            var typeMapingExpressionVisitor = new TypeMapingExpressionVisitor(buildContext.Key.Type, typesMap);
             typeMapingExpressionVisitor.Visit(expression);
             if (typesMap.Count > 0)
             {
