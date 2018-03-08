@@ -21,8 +21,8 @@
             using (container.Bind<IService>().Tag(10).Tag().Tag("abc").To<Service>())
             {
                 // Resolve instances using tags
-                var instance1 = container.Tag("abc").Get<IService>();
-                var instance2 = container.Tag(10).Get<IService>();
+                var instance1 = container.Resolve<IService>("abc".AsTag());
+                var instance2 = container.Resolve<IService>(10.AsTag());
 
                 // Resolve the instance using the empty tag
                 var instance3 = container.Resolve<IService>();

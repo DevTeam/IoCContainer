@@ -21,7 +21,7 @@
             Container = binding.Container;
             Types = binding.Types;
             Tags = binding.Tags;
-            Lifetime = lifetime != IoC.Lifetime.Transient ? binding.Container.GetResolver<ILifetime>(typeof(ILifetime), lifetime)(binding.Container) : null;
+            Lifetime = lifetime != IoC.Lifetime.Transient ? binding.Container.Resolve<ILifetime>(lifetime.AsTag(), binding.Container) : null;
         }
 
         public Binding([NotNull] IBinding<T> binding, [NotNull] ILifetime lifetime)

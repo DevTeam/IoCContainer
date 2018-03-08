@@ -32,13 +32,13 @@ namespace IoC.Tests.UsageScenarios
                     ctx.Container.Inject<int>(GeneratorType.Random))))
             {
                 // Generate sequential numbers
-                var sequential1 = container.Tag(GeneratorType.Sequential).Get<int>();
-                var sequential2 = container.Tag(GeneratorType.Sequential).Get<int>();
+                var sequential1 = container.Resolve<int>(GeneratorType.Sequential.AsTag());
+                var sequential2 = container.Resolve<int>(GeneratorType.Sequential.AsTag());
 
                 sequential2.ShouldBe(sequential1 + 1);
 
                 // Generate a random number
-                var random = container.Tag(GeneratorType.Random).Get<int>();
+                var random = container.Resolve<int>(GeneratorType.Random.AsTag());
 
                 // Generate a set of numbers
                 var setOfValues = container.Resolve<(int, int)>();

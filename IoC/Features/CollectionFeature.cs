@@ -31,7 +31,7 @@
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            var containerSingletonResolver = container.GetResolver<ILifetime>(typeof(ILifetime), Lifetime.ContainerSingleton);
+            var containerSingletonResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
             if (_highPerformance)
             {
                 yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx.Container, ctx.Args).ToArray(), containerSingletonResolver(container));
@@ -128,7 +128,7 @@
                 return from keyGroup in container
                     let item = keyGroup.Select(key => new {type = CreateType(key.Type.Info(), typeInfo), tag = key.Tag}).FirstOrDefault(i => i.type != null)
                     where item != null
-                    select container.GetResolver<T>(item.type, item.tag);
+                    select container.GetResolver<T>(item.type, item.tag.AsTag());
             }
 
             private static Type CreateType(ITypeInfo registeredType, ITypeInfo targetType)

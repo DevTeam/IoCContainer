@@ -1,4 +1,4 @@
-﻿#if !NET40
+﻿#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NET40 && !NET45 && !NET46 && !NET47
 namespace IoC.Tests.UsageScenarios
 {
     using System.Diagnostics.CodeAnalysis;
@@ -8,7 +8,7 @@ namespace IoC.Tests.UsageScenarios
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    public class AsynchronousResolve
+    public class AsynchronousValueResolve
     {
         [Fact]
         public async void Run()
@@ -16,7 +16,7 @@ namespace IoC.Tests.UsageScenarios
             // $visible=true
             // $group=01
             // $priority=02
-            // $description=Asynchronous resolve
+            // $description=Asynchronous lightweight resolve
             // {
             // Create a container
             using (var container = Container.Create())
@@ -24,8 +24,8 @@ namespace IoC.Tests.UsageScenarios
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
             {
-                // Resolve an instance asynchronously
-                var instance = await container.Resolve<Task<IService>>();
+                // Resolve an instance asynchronously via ValueTask
+                var instance = await container.Resolve<ValueTask<IService>>();
 
                 instance.ShouldBeOfType<Service>();
             }

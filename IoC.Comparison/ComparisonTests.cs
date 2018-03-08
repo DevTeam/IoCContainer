@@ -13,7 +13,6 @@ namespace IoC.Comparison
     using Castle.MicroKernel.Registration;
     using Castle.Windsor;
     using DryIoc;
-    using Features;
     using JetBrains.dotMemoryUnit;
     using JetBrains.dotMemoryUnit.Kernel;
     using LightInject;
@@ -25,7 +24,7 @@ namespace IoC.Comparison
     using Xunit.Abstractions;
 #endif
 
-    using ThisContainer = IoC.Container;
+    using ThisContainer = Container;
 
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
     [SuppressMessage("ReSharper", "PossibleNullReferenceException")]

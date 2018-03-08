@@ -53,6 +53,48 @@
         /// </summary>
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="container">The target container.</param>
+        /// <param name="tag">The tag.</param>
+        /// <returns>The instance.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        public static T Resolve<T>([NotNull] this Container container, Tag tag)
+        {
+            var type = typeof(T);
+            var key = new Key(type, tag.Value);
+            var hashCode = key.GetHashCode();
+            var tree = container.Resolvers.Buckets[hashCode & (container.ResolversByType.Divisor - 1)];
+            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
+            {
+                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
+            }
+
+            var treeEntry = tree.Current;
+            if (tree.Height != 0 && Equals(key, treeEntry.Key))
+            {
+                return ((Resolver<T>)treeEntry.Value)(container, Container.EmptyArgs);
+            }
+
+            var entryDuplicates = treeEntry.Duplicates;
+            if (tree.Height != 0 && entryDuplicates != null)
+            {
+                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                {
+                    if (!Equals(entryDuplicates[i].Key, key))
+                    {
+                        continue;
+                    }
+
+                    return ((Resolver<T>)entryDuplicates[i].Value)(container, Container.EmptyArgs);
+                }
+            }
+
+            return container.GetResolver<T>(tag)(container, Container.EmptyArgs);
+        }
+
+        /// <summary>
+        /// Resolves an instance.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <param name="container">The target container.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions) 256)]
@@ -87,6 +129,49 @@
             }
 
             return container.GetResolver<T>(typeof(T))(container, args);
+        }
+
+        /// <summary>
+        /// Resolves an instance.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <param name="tag">The tag.</param>
+        /// <param name="args">The optional arguments.</param>
+        /// <returns>The instance.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
+        {
+            var type = typeof(T);
+            var key = new Key(type, tag.Value);
+            var hashCode = key.GetHashCode();
+            var tree = container.Resolvers.Buckets[hashCode & (container.ResolversByType.Divisor - 1)];
+            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
+            {
+                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
+            }
+
+            var treeEntry = tree.Current;
+            if (tree.Height != 0 && Equals(key, treeEntry.Key))
+            {
+                return ((Resolver<T>)treeEntry.Value)(container, args);
+            }
+
+            var entryDuplicates = treeEntry.Duplicates;
+            if (tree.Height != 0 && entryDuplicates != null)
+            {
+                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                {
+                    if (!Equals(entryDuplicates[i].Key, key))
+                    {
+                        continue;
+                    }
+
+                    return ((Resolver<T>)entryDuplicates[i].Value)(container, args);
+                }
+            }
+
+            return container.GetResolver<T>(tag)(container, args);
         }
 
         /// <summary>
@@ -135,6 +220,48 @@
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <param name="type">The resolving instance type.</param>
+        /// <param name="tag">The tag.</param>
+        /// <returns>The instance.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
+        {
+            var key = new Key(type, tag.Value);
+            var hashCode = key.GetHashCode();
+            var tree = container.Resolvers.Buckets[hashCode & (container.ResolversByType.Divisor - 1)];
+            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
+            {
+                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
+            }
+
+            var treeEntry = tree.Current;
+            if (tree.Height != 0 && Equals(key, treeEntry.Key))
+            {
+                return ((Resolver<T>)treeEntry.Value)(container, Container.EmptyArgs);
+            }
+
+            var entryDuplicates = treeEntry.Duplicates;
+            if (tree.Height != 0 && entryDuplicates != null)
+            {
+                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                {
+                    if (!Equals(entryDuplicates[i].Key, key))
+                    {
+                        continue;
+                    }
+
+                    return ((Resolver<T>)entryDuplicates[i].Value)(container, Container.EmptyArgs);
+                }
+            }
+
+            return container.GetResolver<T>(tag)(container, Container.EmptyArgs);
+        }
+
+        /// <summary>
+        /// Resolves an instance.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <param name="type">The resolving instance type.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)256)]
@@ -168,6 +295,49 @@
             }
 
             return container.GetResolver<T>(typeof(T))(container, args);
+        }
+
+        /// <summary>
+        /// Resolves an instance.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <param name="type">The resolving instance type.</param>
+        /// <param name="tag">The tag.</param>
+        /// <param name="args">The optional arguments.</param>
+        /// <returns>The instance.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
+        {
+            var key = new Key(type, tag.Value);
+            var hashCode = key.GetHashCode();
+            var tree = container.Resolvers.Buckets[hashCode & (container.ResolversByType.Divisor - 1)];
+            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
+            {
+                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
+            }
+
+            var treeEntry = tree.Current;
+            if (tree.Height != 0 && Equals(key, treeEntry.Key))
+            {
+                return ((Resolver<T>)treeEntry.Value)(container, args);
+            }
+
+            var entryDuplicates = treeEntry.Duplicates;
+            if (tree.Height != 0 && entryDuplicates != null)
+            {
+                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                {
+                    if (!Equals(entryDuplicates[i].Key, key))
+                    {
+                        continue;
+                    }
+
+                    return ((Resolver<T>)entryDuplicates[i].Value)(container, args);
+                }
+            }
+
+            return container.GetResolver<T>(tag)(container, args);
         }
 
         private static class HashCode<T>

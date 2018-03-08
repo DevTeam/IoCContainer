@@ -19,7 +19,7 @@
                 using (container.Bind<IMyService>().As(Lifetime.Transient).Tag("abc").Tag(10).To(ctx => func()))
                 {
                     // Then
-                    var actualInstance = container.Tag(10).Get<IMyService>();
+                    var actualInstance = container.Resolve<IMyService>(10.AsTag());
                     actualInstance.ShouldBe(expectedInstance);
                 }
             }
@@ -88,7 +88,7 @@
                     ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>())))
                 {
                     // Then
-                    var actualInstance = container.Tag(33).Get<Func<string, IMyService>>()("abc");
+                    var actualInstance = container.Resolve<Func<string, IMyService>>(33.AsTag())("abc");
 
                     actualInstance.ShouldBeOfType<MyService>();
                     ((MyService) actualInstance).Name.ShouldBe("abc");

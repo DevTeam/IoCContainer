@@ -159,7 +159,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
 
 * [Several Contracts](#several-contracts)
 * [Asynchronous resolve](#asynchronous-resolve)
-* [Asynchronous resolve](#asynchronous-resolve)
+* [Asynchronous lightweight resolve](#asynchronous-lightweight-resolve)
 * [Constant](#constant)
 * [Dependency Tag](#dependency-tag)
 * [Func](#func)
@@ -225,15 +225,15 @@ using (var container = Container.Create())
 using (container.Bind<IDependency>().To<Dependency>())
 using (container.Bind<IService>().To<Service>())
 {
-    // Resolve an instance asynchronously via ValueTask
-    var instance = await container.Resolve<ValueTask<IService>>();
+    // Resolve an instance asynchronously
+    var instance = await container.Resolve<Task<IService>>();
 
     instance.ShouldBeOfType<Service>();
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousResolve.cs)
 
-### Asynchronous resolve
+### Asynchronous lightweight resolve
 
 ``` CSharp
 // Create a container
@@ -242,8 +242,8 @@ using (var container = Container.Create())
 using (container.Bind<IDependency>().To<Dependency>())
 using (container.Bind<IService>().To<Service>())
 {
-    // Resolve an instance asynchronously
-    var instance = await container.Resolve<Task<IService>>();
+    // Resolve an instance asynchronously via ValueTask
+    var instance = await container.Resolve<ValueTask<IService>>();
 
     instance.ShouldBeOfType<Service>();
 }
@@ -427,8 +427,8 @@ using (container.Bind<IDependency>().To<Dependency>())
 using (container.Bind<IService>().Tag(10).Tag().Tag("abc").To<Service>())
 {
     // Resolve instances using tags
-    var instance1 = container.Tag("abc").Get<IService>();
-    var instance2 = container.Tag(10).Get<IService>();
+    var instance1 = container.Resolve<IService>("abc".AsTag());
+    var instance2 = container.Resolve<IService>(10.AsTag());
 
     // Resolve the instance using the empty tag
     var instance3 = container.Resolve<IService>();
@@ -1147,13 +1147,13 @@ public void Run()
             ctx.Container.Inject<int>(GeneratorType.Random))))
     {
         // Generate sequential numbers
-        var sequential1 = container.Tag(GeneratorType.Sequential).Get<int>();
-        var sequential2 = container.Tag(GeneratorType.Sequential).Get<int>();
+        var sequential1 = container.Resolve<int>(GeneratorType.Sequential.AsTag());
+        var sequential2 = container.Resolve<int>(GeneratorType.Sequential.AsTag());
 
         sequential2.ShouldBe(sequential1 + 1);
 
         // Generate a random number
-        var random = container.Tag(GeneratorType.Random).Get<int>();
+        var random = container.Resolve<int>(GeneratorType.Random.AsTag());
 
         // Generate a set of numbers
         var setOfValues = container.Resolve<(int, int)>();
