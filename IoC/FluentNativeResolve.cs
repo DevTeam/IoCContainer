@@ -45,7 +45,7 @@
                 }
             }
 
-            return container.GetResolver<T>(typeof(T))(container, Container.EmptyArgs);
+            return container.GetResolver<T>(type)(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -128,7 +128,7 @@
                 }
             }
 
-            return container.GetResolver<T>(typeof(T))(container, args);
+            return container.GetResolver<T>(type)(container, args);
         }
 
         /// <summary>
@@ -211,7 +211,7 @@
                 }
             }
 
-            return container.GetResolver<T>(typeof(T))(container, Container.EmptyArgs);
+            return container.GetResolver<T>(type)(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -253,7 +253,7 @@
                 }
             }
 
-            return container.GetResolver<T>(tag)(container, Container.EmptyArgs);
+            return container.GetResolver<T>(type, tag)(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -294,7 +294,7 @@
                 }
             }
 
-            return container.GetResolver<T>(typeof(T))(container, args);
+            return container.GetResolver<T>(type)(container, args);
         }
 
         /// <summary>
@@ -337,7 +337,7 @@
                 }
             }
 
-            return container.GetResolver<T>(tag)(container, args);
+            return container.GetResolver<T>(type, tag)(container, args);
         }
 
         private static class HashCode<T>

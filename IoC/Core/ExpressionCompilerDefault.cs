@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq.Expressions;
+    using Extensibility;
 
     internal class ExpressionCompilerDefault : IExpressionCompiler
     {
@@ -10,6 +11,8 @@
         private ExpressionCompilerDefault()
         {
         }
+
+        public bool IsSupportingCompextTypeConstant => true;
 
         public Delegate Compile(LambdaExpression resolverExpression)
         {

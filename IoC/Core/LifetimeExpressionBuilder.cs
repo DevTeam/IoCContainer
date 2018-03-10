@@ -26,9 +26,9 @@
             var getOrCreateMethodInfo = LifetimeGenericGetOrCreateMethodInfo.MakeGenericMethod(buildContext.Key.Type);
             var resolverType = expression.Type.ToResolverType();
             var resolverExpression = Expression.Lambda(resolverType, expression, false, BuildContext.ResolverParameters);
-            var resolver = buildContext.Container.GetExpressionCompiler().Compile(resolverExpression);
+            var resolver = buildContext.Compiler.Compile(resolverExpression);
             var resolverVar = buildContext.DefineValue(resolver, resolverType);
-            if (lifetime is IExpressionBuilder<ParameterExpression> builder)
+            if (lifetime is IExpressionBuilder<Expression> builder)
             {
                 return builder.Build(expression, buildContext, resolverVar);
             }

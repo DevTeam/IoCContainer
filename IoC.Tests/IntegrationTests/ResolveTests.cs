@@ -80,7 +80,149 @@
                 {
                     // Then
                     var actualInstance = container.Resolve<IMyService>();
+                    var actualInstance2 = ((IContainer)container).Resolve<IMyService>();
                     actualInstance.ShouldBe(expectedInstance);
+                    actualInstance2.ShouldBe(expectedInstance);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWithArgs()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedInstance = Mock.Of<IMyService>();
+
+                // When
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
+                {
+                    // Then
+                    var actualInstance = container.Resolve<IMyService>("abc");
+                    var actualInstance2 = ((IContainer)container).Resolve<IMyService>("abc");
+                    actualInstance.ShouldBe(expectedInstance);
+                    actualInstance2.ShouldBe(expectedInstance);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWithTag()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedInstance = Mock.Of<IMyService>();
+
+                // When
+                using (container.Bind<IMyService>().Tag(10).To(ctx => expectedInstance))
+                {
+                    // Then
+                    var actualInstance = container.Resolve<IMyService>(10.AsTag());
+                    var actualInstance2 = ((IContainer)container).Resolve<IMyService>(10.AsTag());
+                    actualInstance.ShouldBe(expectedInstance);
+                    actualInstance2.ShouldBe(expectedInstance);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWithTagAndArgs()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedInstance = Mock.Of<IMyService>();
+
+                // When
+                using (container.Bind<IMyService>().Tag(10).To(ctx => expectedInstance))
+                {
+                    // Then
+                    var actualInstance = container.Resolve<IMyService>(10.AsTag(), "abc");
+                    var actualInstance2 = ((IContainer)container).Resolve<IMyService>(10.AsTag(), "abc");
+                    actualInstance.ShouldBe(expectedInstance);
+                    actualInstance2.ShouldBe(expectedInstance);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWithType()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedInstance = Mock.Of<IMyService>();
+
+                // When
+                using (container.Bind<IMyService>().To(ctx => expectedInstance))
+                {
+                    // Then
+                    var actualInstance = container.Resolve<object>(typeof(IMyService));
+                    var actualInstance2 = ((IContainer)container).Resolve<object>(typeof(IMyService));
+                    actualInstance.ShouldBe(expectedInstance);
+                    actualInstance2.ShouldBe(expectedInstance);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWithTypeAndArgs()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedInstance = Mock.Of<IMyService>();
+
+                // When
+                using (container.Bind<IMyService>().To(ctx => expectedInstance))
+                {
+                    // Then
+                    var actualInstance = container.Resolve<object>(typeof(IMyService), "abc");
+                    var actualInstance2 = ((IContainer)container).Resolve<object>(typeof(IMyService), "abc");
+                    actualInstance.ShouldBe(expectedInstance);
+                    actualInstance2.ShouldBe(expectedInstance);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWithTypeAndTag()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedInstance = Mock.Of<IMyService>();
+
+                // When
+                using (container.Bind<IMyService>().Tag(9).To(ctx => expectedInstance))
+                {
+                    // Then
+                    var actualInstance = container.Resolve<object>(typeof(IMyService), 9.AsTag());
+                    var actualInstance2 = ((IContainer)container).Resolve<object>(typeof(IMyService), 9.AsTag());
+                    actualInstance.ShouldBe(expectedInstance);
+                    actualInstance2.ShouldBe(expectedInstance);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWithTypeAndTagAndArgs()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedInstance = Mock.Of<IMyService>();
+
+                // When
+                using (container.Bind<IMyService>().Tag(9).To(ctx => expectedInstance))
+                {
+                    // Then
+                    var actualInstance = container.Resolve<object>(typeof(IMyService), 9.AsTag(), "abc");
+                    var actualInstance2 = ((IContainer)container).Resolve<object>(typeof(IMyService), 9.AsTag(), "abc");
+                    actualInstance.ShouldBe(expectedInstance);
+                    actualInstance2.ShouldBe(expectedInstance);
                 }
             }
         }

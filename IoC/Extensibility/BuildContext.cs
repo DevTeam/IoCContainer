@@ -14,27 +14,38 @@
     /// Represents build context.
     /// </summary>
     [SuppressMessage("ReSharper", "RedundantNameQualifier")]
-    public class BuildContext: IDisposable
+    [PublicAPI]
+    public class BuildContext
     {
         /// <summary>
         /// The container parameter.
         /// </summary>
+        [NotNull]
         public static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer), nameof(Context.Container));
 
         /// <summary>
         /// The args parameters.
         /// </summary>
+        [NotNull]
         public static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]), nameof(Context.Args));
 
         /// <summary>
         /// All resolver's parameters.
         /// </summary>
+        [NotNull]
         public static readonly ParameterExpression[] ResolverParameters = { ContainerParameter, ArgsParameter };
 
         /// <summary>
         /// Types of all resolver's parameters.
         /// </summary>
+        [NotNull]
         public static readonly Type[] ResolverParameterTypes = ResolverParameters.Select(i => i.Type).ToArray();
+
+        /// <summary>
+        /// The compiler.
+        /// </summary>
+        [NotNull]
+        public readonly IExpressionCompiler Compiler;
 
         /// <summary>
         /// The target key.
@@ -44,11 +55,13 @@
         /// <summary>
         /// The target container.
         /// </summary>
-        [NotNull] public readonly IContainer Container;
+        [NotNull]
+        public readonly IContainer Container;
 
         private static readonly MethodInfo GetContextDataMethodInfo = Core.TypeExtensions.Info<BuildContext>().DeclaredMethods.Single(i => i.Name == nameof(GetContextData));
         private static ResizableArray<BuildContext> _contexts = ResizableArray<BuildContext>.Empty;
 
+        private readonly ICollection<IDisposable> _resources;
         private readonly int _id;
         private readonly List<ParameterExpression> _parameters = new List<ParameterExpression>();
         private readonly List<Expression> _statements = new List<Expression>();
@@ -56,36 +69,49 @@
         private int _curId;
         private ParameterExpression _contextExpression;
 
-        internal BuildContext(Key key, [NotNull] IContainer container, BuildContext parentBuildContext = null)
+        internal BuildContext([NotNull] IExpressionCompiler compiler, Key key, [NotNull] IContainer container, [NotNull] ICollection<IDisposable> resources)
         {
+            Compiler = compiler ?? throw new ArgumentNullException(nameof(compiler));
+            Key = key;
+            Container = container ?? throw new ArgumentNullException(nameof(container));
+            _resources = resources ?? throw new ArgumentNullException(nameof(resources));
             _id = -1;
             var contexts = _contexts.Items;
             // Try finding an empty element
             for (var i = 0; i < contexts.Length; i++)
             {
-                if (contexts[i] != null)
+                if (contexts[i] == null)
                 {
-                    continue;
+                    _id = i;
+                    contexts[i] = this;
+                    return;
                 }
-
-                _id = i;
-                contexts[i] = this;
             }
 
             // An empty element was not found
-            if (_id == -1)
+            _id = contexts.Length;
+            _contexts = _contexts.Add(this);
+            resources.Add(Disposable.Create(() =>
             {
-                _contexts = _contexts.Add(this);
-                _id = _contexts.Items.Length - 1;
-            }
+                _contexts.Items[_id] = null;
+            }));
+        }
 
-            Key = key;
-            Container = container ?? throw new ArgumentNullException(nameof(container));
-            if (parentBuildContext != null)
-            {
-                _parameters.AddRange(parentBuildContext._parameters);
-                _statements.AddRange(parentBuildContext._statements);
-            }
+
+        /// <summary>
+        /// Creates a child context.
+        /// </summary>
+        /// <param name="key">The key</param>
+        /// <param name="container">The container.</param>
+        /// <returns>The new build context.</returns>
+        [NotNull]
+        public BuildContext CreateChild(Key key, [NotNull] IContainer container)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            var child = new BuildContext(Compiler, key, container, _resources);
+            child._parameters.AddRange(_parameters);
+            child._statements.AddRange(_statements);
+            return child;
         }
 
         /// <summary>
@@ -94,13 +120,25 @@
         /// <param name="value">The value.</param>
         /// <param name="type">The value type.</param>
         /// <returns>The parameter expression.</returns>
-        public ParameterExpression DefineValue([CanBeNull] object value, Type type)
+        [NotNull]
+        public Expression DefineValue([CanBeNull] object value, [NotNull] Type type)
         {
-            var valueId = SetValue(value);
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            if (Compiler.IsSupportingCompextTypeConstant)
+            {
+                return Expression.Constant(value, type);
+            }
+
+            var valueId = _values.Items.Length;
+            _values = _values.Add(value);
             var varExpression = Expression.Variable(type, "var" + valueId);
             _parameters.Add(varExpression);
-            _statements.Add(Expression.Assign(varExpression, GetValueExpression(GetContextExpression(), valueId, type)));
+            _statements.Add(
+                Expression.Assign(
+                    varExpression,
+                    Expression.ArrayAccess(GetContextExpression(), Expression.Constant(valueId)).Convert(type)));
             return varExpression;
+
         }
 
         /// <summary>
@@ -108,8 +146,10 @@
         /// </summary>
         /// <param name="expression">The value expression.</param>
         /// <returns>The parameter expression.</returns>
+        [NotNull]
         public ParameterExpression DefineValue([NotNull] Expression expression)
         {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
             var varExpression = Expression.Variable(expression.Type, "var" + GenerateId());
             _parameters.Add(varExpression);
             _statements.Add(Expression.Assign(varExpression, expression));
@@ -122,68 +162,56 @@
         /// <typeparam name="T">The value type.</typeparam>
         /// <param name="value">The value.</param>
         /// <returns>The parameter expression.</returns>
-        public ParameterExpression DefineValue<T>([CanBeNull] T value) => DefineValue(value, typeof(T));
+        [NotNull]
+        public Expression DefineValue<T>([CanBeNull] T value) => DefineValue(value, typeof(T));
 
         /// <summary>
         /// Closes a block of statements.
         /// </summary>
-        /// <param name="expression">The target expression.</param>
+        /// <param name="targetExpression">The target expression.</param>
         /// <returns>The result expression.</returns>
-        public Expression CloseBlock(Expression expression)
+        [NotNull]
+        public Expression CloseBlock([NotNull] Expression targetExpression)
         {
-            if (_parameters.Any() || _statements.Any())
+            if (targetExpression == null) throw new ArgumentNullException(nameof(targetExpression));
+            if (!_parameters.Any() && !_statements.Any())
             {
-                _statements.Add(expression);
-                return Expression.Block(_parameters, _statements);
+                return targetExpression;
             }
 
-            return expression;
+            _statements.Add(targetExpression);
+            return Expression.Block(_parameters, _statements);
         }
 
-        internal Expression PartiallyCloseBlock(Expression expression, params ParameterExpression[] parameterExpressions)
+        /// <summary>
+        /// Closes block for specified expressions.
+        /// </summary>
+        /// <param name="targetExpression">The target expression.</param>
+        /// <param name="expressions">Assigment expressions.</param>
+        /// <returns>The resulting block expression.</returns>
+        [NotNull]
+        public Expression PartiallyCloseBlock([NotNull] Expression targetExpression, [NotNull][ItemNotNull] params Expression[] expressions)
         {
+            if (targetExpression == null) throw new ArgumentNullException(nameof(targetExpression));
+            if (expressions == null) throw new ArgumentNullException(nameof(expressions));
             var statements = (
                 from binaryExpression in _statements.OfType<BinaryExpression>()
-                join parameterExpression in parameterExpressions on binaryExpression.Left equals parameterExpression
+                join parameterExpression in expressions on binaryExpression.Left equals parameterExpression
                 select (Expression)binaryExpression).ToList();
 
-            foreach (var statement in statements)
+            var parameterExpressions = expressions.OfType<ParameterExpression>();
+            if (!statements.Any() && !parameterExpressions.Any())
             {
-                _statements.Remove(statement);
+                return targetExpression;
             }
 
-            statements.Add(expression);
-            return Expression.Block(parameterExpressions, statements);
+            statements.Add(targetExpression);
+            return Expression.Block(expressions.OfType<ParameterExpression>(), statements);
         }
 
         [MethodImpl((MethodImplOptions)256)]
         // ReSharper disable once MemberCanBePrivate.Global
         internal static object[] GetContextData(int contextId) => _contexts.Items[contextId]._values.Items;
-
-        void IDisposable.Dispose()
-        {
-            _contexts.Items[_id] = null;
-            Reset();
-        }
-
-        private void Reset()
-        {
-            _parameters.Clear();
-            _statements.Clear();
-            _contextExpression = null;
-        }
-
-        private int SetValue([CanBeNull] object value)
-        {
-            _values = _values.Add(value);
-            return _values.Items.Length - 1;
-        }
-
-        [NotNull]
-        private static Expression GetValueExpression([NotNull] Expression contextExpression, int valueId, [NotNull] Type type)
-        {
-            return Expression.ArrayAccess(contextExpression, Expression.Constant(valueId)).Convert(type);
-        }
 
         [NotNull]
         private ParameterExpression GetContextExpression()

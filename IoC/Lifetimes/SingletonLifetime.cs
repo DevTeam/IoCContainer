@@ -13,7 +13,7 @@
     /// Represents singleton lifetime.
     /// </summary>
     [PublicAPI]
-    public sealed class SingletonLifetime : ILifetime, IDisposable, IExpressionBuilder<ParameterExpression>
+    public sealed class SingletonLifetime : ILifetime, IDisposable, IExpressionBuilder<Expression>
     {
         [NotNull] private object _lockObject = new object();
         internal volatile object Instance;
@@ -70,7 +70,7 @@
         private static readonly ITypeInfo ResolverTypeInfo = typeof(Resolver<>).Info();
 
         /// <inheritdoc />
-        public Expression Build(Expression expression, BuildContext buildContext, ParameterExpression resolver)
+        public Expression Build(Expression expression, BuildContext buildContext, Expression resolver)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));

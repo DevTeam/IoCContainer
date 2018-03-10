@@ -13,11 +13,11 @@ namespace IoC.Core.Collections
             Items = new T[0];
         }
 
-        private ResizableArray(ResizableArray<T> previousList, T value)
+        private ResizableArray(ResizableArray<T> previous, T value)
         {
-            var length = previousList.Items.Length;
+            var length = previous.Items.Length;
             Items = new T[length + 1];
-            Array.Copy(previousList.Items, Items, length);
+            Array.Copy(previous.Items, Items, length);
             Items[length] = value;
         }
 

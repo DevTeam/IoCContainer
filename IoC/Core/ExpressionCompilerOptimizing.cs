@@ -29,6 +29,8 @@ namespace IoC.Core
             }
         }
 
+        public bool IsSupportingCompextTypeConstant => false;
+
         public Delegate Compile(LambdaExpression resolverExpression)
         {
             if (resolverExpression == null) throw new ArgumentNullException(nameof(resolverExpression));

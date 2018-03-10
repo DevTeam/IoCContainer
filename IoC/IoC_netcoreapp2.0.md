@@ -25,15 +25,18 @@
 - [BaseTypeRequiredAttribute](#T-IoC-BaseTypeRequiredAttribute 'IoC.BaseTypeRequiredAttribute')
 - [BuildContext](#T-IoC-Extensibility-BuildContext 'IoC.Extensibility.BuildContext')
   - [ArgsParameter](#F-IoC-Extensibility-BuildContext-ArgsParameter 'IoC.Extensibility.BuildContext.ArgsParameter')
+  - [Compiler](#F-IoC-Extensibility-BuildContext-Compiler 'IoC.Extensibility.BuildContext.Compiler')
   - [Container](#F-IoC-Extensibility-BuildContext-Container 'IoC.Extensibility.BuildContext.Container')
   - [ContainerParameter](#F-IoC-Extensibility-BuildContext-ContainerParameter 'IoC.Extensibility.BuildContext.ContainerParameter')
   - [Key](#F-IoC-Extensibility-BuildContext-Key 'IoC.Extensibility.BuildContext.Key')
   - [ResolverParameters](#F-IoC-Extensibility-BuildContext-ResolverParameters 'IoC.Extensibility.BuildContext.ResolverParameters')
   - [ResolverParameterTypes](#F-IoC-Extensibility-BuildContext-ResolverParameterTypes 'IoC.Extensibility.BuildContext.ResolverParameterTypes')
-  - [CloseBlock(expression)](#M-IoC-Extensibility-BuildContext-CloseBlock-System-Linq-Expressions-Expression- 'IoC.Extensibility.BuildContext.CloseBlock(System.Linq.Expressions.Expression)')
+  - [CloseBlock(targetExpression)](#M-IoC-Extensibility-BuildContext-CloseBlock-System-Linq-Expressions-Expression- 'IoC.Extensibility.BuildContext.CloseBlock(System.Linq.Expressions.Expression)')
+  - [CreateChild(key,container)](#M-IoC-Extensibility-BuildContext-CreateChild-IoC-Key,IoC-IContainer- 'IoC.Extensibility.BuildContext.CreateChild(IoC.Key,IoC.IContainer)')
   - [DefineValue(value,type)](#M-IoC-Extensibility-BuildContext-DefineValue-System-Object,System-Type- 'IoC.Extensibility.BuildContext.DefineValue(System.Object,System.Type)')
   - [DefineValue(expression)](#M-IoC-Extensibility-BuildContext-DefineValue-System-Linq-Expressions-Expression- 'IoC.Extensibility.BuildContext.DefineValue(System.Linq.Expressions.Expression)')
   - [DefineValue\`\`1(value)](#M-IoC-Extensibility-BuildContext-DefineValue``1-``0- 'IoC.Extensibility.BuildContext.DefineValue``1(``0)')
+  - [PartiallyCloseBlock(targetExpression,expressions)](#M-IoC-Extensibility-BuildContext-PartiallyCloseBlock-System-Linq-Expressions-Expression,System-Linq-Expressions-Expression[]- 'IoC.Extensibility.BuildContext.PartiallyCloseBlock(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression[])')
 - [CanBeNullAttribute](#T-IoC-CanBeNullAttribute 'IoC.CanBeNullAttribute')
 - [CannotApplyEqualityOperatorAttribute](#T-IoC-CannotApplyEqualityOperatorAttribute 'IoC.CannotApplyEqualityOperatorAttribute')
 - [CollectionAccessAttribute](#T-IoC-CollectionAccessAttribute 'IoC.CollectionAccessAttribute')
@@ -183,6 +186,9 @@
   - [Expression](#P-IoC-IDependency-Expression 'IoC.IDependency.Expression')
 - [IExpressionBuilder\`1](#T-IoC-Extensibility-IExpressionBuilder`1 'IoC.Extensibility.IExpressionBuilder`1')
   - [Build(expression,buildContext,context)](#M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-BuildContext,`0- 'IoC.Extensibility.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.BuildContext,`0)')
+- [IExpressionCompiler](#T-IoC-Extensibility-IExpressionCompiler 'IoC.Extensibility.IExpressionCompiler')
+  - [IsSupportingCompextTypeConstant](#P-IoC-Extensibility-IExpressionCompiler-IsSupportingCompextTypeConstant 'IoC.Extensibility.IExpressionCompiler.IsSupportingCompextTypeConstant')
+  - [Compile(resolverExpression)](#M-IoC-Extensibility-IExpressionCompiler-Compile-System-Linq-Expressions-LambdaExpression- 'IoC.Extensibility.IExpressionCompiler.Compile(System.Linq.Expressions.LambdaExpression)')
 - [IIssueResolver](#T-IoC-Extensibility-IIssueResolver 'IoC.Extensibility.IIssueResolver')
   - [CannotGetGenericTypeArguments(type)](#M-IoC-Extensibility-IIssueResolver-CannotGetGenericTypeArguments-System-Type- 'IoC.Extensibility.IIssueResolver.CannotGetGenericTypeArguments(System.Type)')
   - [CannotGetResolver\`\`1(container,key)](#M-IoC-Extensibility-IIssueResolver-CannotGetResolver``1-IoC-IContainer,IoC-Key- 'IoC.Extensibility.IIssueResolver.CannotGetResolver``1(IoC.IContainer,IoC.Key)')
@@ -264,7 +270,7 @@
   - [Dispose()](#M-IoC-Lifetimes-SingletonBasedLifetime`1-Dispose 'IoC.Lifetimes.SingletonBasedLifetime`1.Dispose')
   - [GetOrCreate\`\`1()](#M-IoC-Lifetimes-SingletonBasedLifetime`1-GetOrCreate``1-IoC-IContainer,System-Object[],IoC-Resolver{``0}- 'IoC.Lifetimes.SingletonBasedLifetime`1.GetOrCreate``1(IoC.IContainer,System.Object[],IoC.Resolver{``0})')
 - [SingletonLifetime](#T-IoC-Lifetimes-SingletonLifetime 'IoC.Lifetimes.SingletonLifetime')
-  - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-BuildContext,System-Linq-Expressions-ParameterExpression- 'IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.Extensibility.BuildContext,System.Linq.Expressions.ParameterExpression)')
+  - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-BuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.Extensibility.BuildContext,System.Linq.Expressions.Expression)')
   - [Clone()](#M-IoC-Lifetimes-SingletonLifetime-Clone 'IoC.Lifetimes.SingletonLifetime.Clone')
   - [Dispose()](#M-IoC-Lifetimes-SingletonLifetime-Dispose 'IoC.Lifetimes.SingletonLifetime.Dispose')
   - [GetOrCreate\`\`1()](#M-IoC-Lifetimes-SingletonLifetime-GetOrCreate``1-IoC-IContainer,System-Object[],IoC-Resolver{``0}- 'IoC.Lifetimes.SingletonLifetime.GetOrCreate``1(IoC.IContainer,System.Object[],IoC.Resolver{``0})')
@@ -576,6 +582,13 @@ Represents build context.
 
 The args parameters.
 
+<a name='F-IoC-Extensibility-BuildContext-Compiler'></a>
+### Compiler `constants` [#](#F-IoC-Extensibility-BuildContext-Compiler 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+The compiler.
+
 <a name='F-IoC-Extensibility-BuildContext-Container'></a>
 ### Container `constants` [#](#F-IoC-Extensibility-BuildContext-Container 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -612,7 +625,7 @@ All resolver's parameters.
 Types of all resolver's parameters.
 
 <a name='M-IoC-Extensibility-BuildContext-CloseBlock-System-Linq-Expressions-Expression-'></a>
-### CloseBlock(expression) `method` [#](#M-IoC-Extensibility-BuildContext-CloseBlock-System-Linq-Expressions-Expression- 'Go To Here') [=](#contents 'Back To Contents')
+### CloseBlock(targetExpression) `method` [#](#M-IoC-Extensibility-BuildContext-CloseBlock-System-Linq-Expressions-Expression- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -626,7 +639,25 @@ The result expression.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| expression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The target expression. |
+| targetExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The target expression. |
+
+<a name='M-IoC-Extensibility-BuildContext-CreateChild-IoC-Key,IoC-IContainer-'></a>
+### CreateChild(key,container) `method` [#](#M-IoC-Extensibility-BuildContext-CreateChild-IoC-Key,IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Creates a child context.
+
+##### Returns
+
+The new build context.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| key | [IoC.Key](#T-IoC-Key 'IoC.Key') | The key |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The container. |
 
 <a name='M-IoC-Extensibility-BuildContext-DefineValue-System-Object,System-Type-'></a>
 ### DefineValue(value,type) `method` [#](#M-IoC-Extensibility-BuildContext-DefineValue-System-Object,System-Type- 'Go To Here') [=](#contents 'Back To Contents')
@@ -685,6 +716,24 @@ The parameter expression.
 | Name | Description |
 | ---- | ----------- |
 | T | The value type. |
+
+<a name='M-IoC-Extensibility-BuildContext-PartiallyCloseBlock-System-Linq-Expressions-Expression,System-Linq-Expressions-Expression[]-'></a>
+### PartiallyCloseBlock(targetExpression,expressions) `method` [#](#M-IoC-Extensibility-BuildContext-PartiallyCloseBlock-System-Linq-Expressions-Expression,System-Linq-Expressions-Expression[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Closes block for specified expressions.
+
+##### Returns
+
+The resulting block expression.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| targetExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The target expression. |
+| expressions | [System.Linq.Expressions.Expression[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression[] 'System.Linq.Expressions.Expression[]') | Assigment expressions. |
 
 <a name='T-IoC-CanBeNullAttribute'></a>
 ## CanBeNullAttribute [#](#T-IoC-CanBeNullAttribute 'Go To Here') [=](#contents 'Back To Contents')
@@ -3193,6 +3242,41 @@ The new expression.
 | buildContext | [IoC.Extensibility.BuildContext](#T-IoC-Extensibility-BuildContext 'IoC.Extensibility.BuildContext') | The build context. |
 | context | [\`0](#T-`0 '`0') | The expression build context. |
 
+<a name='T-IoC-Extensibility-IExpressionCompiler'></a>
+## IExpressionCompiler [#](#T-IoC-Extensibility-IExpressionCompiler 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC.Extensibility
+
+##### Summary
+
+Represents a expression compiler.
+
+<a name='P-IoC-Extensibility-IExpressionCompiler-IsSupportingCompextTypeConstant'></a>
+### IsSupportingCompextTypeConstant `property` [#](#P-IoC-Extensibility-IExpressionCompiler-IsSupportingCompextTypeConstant 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+True if supports a compext type constant.
+
+<a name='M-IoC-Extensibility-IExpressionCompiler-Compile-System-Linq-Expressions-LambdaExpression-'></a>
+### Compile(resolverExpression) `method` [#](#M-IoC-Extensibility-IExpressionCompiler-Compile-System-Linq-Expressions-LambdaExpression- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Compiles an expression to a delegate.
+
+##### Returns
+
+The resulting delegate.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| resolverExpression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The lambda expression. |
+
 <a name='T-IoC-Extensibility-IIssueResolver'></a>
 ## IIssueResolver [#](#T-IoC-Extensibility-IIssueResolver 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -4264,8 +4348,8 @@ IoC.Lifetimes
 
 Represents singleton lifetime.
 
-<a name='M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-BuildContext,System-Linq-Expressions-ParameterExpression-'></a>
-### Build() `method` [#](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-BuildContext,System-Linq-Expressions-ParameterExpression- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-BuildContext,System-Linq-Expressions-Expression-'></a>
+### Build() `method` [#](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-BuildContext,System-Linq-Expressions-Expression- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 

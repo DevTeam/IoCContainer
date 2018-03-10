@@ -238,12 +238,12 @@
                     _container.Resolve<IIssueResolver>().CyclicDependenceDetected(key, _reentrancy);
                 }
 
-                var buildContext = new BuildContext(key, container, _buildContext);
-                dependencyExpression = TypeReplacerExpressionBuilder.Shared.Build(dependencyExpression, buildContext);
+                var childBuildContext = _buildContext.CreateChild(key, container);
+                dependencyExpression = TypeReplacerExpressionBuilder.Shared.Build(dependencyExpression, childBuildContext);
                 dependencyExpression = Visit(dependencyExpression);
                 dependencyExpression = dependencyExpression.Convert(key.Type);
-                dependencyExpression = LifetimeExpressionBuilder.Shared.Build(dependencyExpression, buildContext, lifetime);
-                dependencyExpression = buildContext.CloseBlock(dependencyExpression);
+                dependencyExpression = LifetimeExpressionBuilder.Shared.Build(dependencyExpression, childBuildContext, lifetime);
+                dependencyExpression = childBuildContext.CloseBlock(dependencyExpression);
                 return Visit(dependencyExpression) ?? throw new BuildExpressionException(new InvalidOperationException("Null expression"));
             }
             finally

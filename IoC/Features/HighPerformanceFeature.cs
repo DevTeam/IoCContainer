@@ -4,6 +4,7 @@ namespace IoC.Features
     using System;
     using System.Collections.Generic;
     using Core;
+    using Extensibility;
 
     /// <summary>
     /// Allows to compile fast delegates.

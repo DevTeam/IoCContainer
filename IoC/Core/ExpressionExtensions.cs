@@ -3,6 +3,7 @@
     using System;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
+    using Extensibility;
 
     internal static class ExpressionExtensions
     {

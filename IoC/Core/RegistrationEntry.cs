@@ -33,14 +33,15 @@
         public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver)
         {
             var typeInfo = key.Type.Info();
-            var buildContext = new BuildContext(key, container);
+            var compiler = container.GetExpressionCompiler();
+            var buildContext = new BuildContext(compiler, key, container, _resources);
             if (!_resolverExpressionBuilder.TryBuild(buildContext, Dependency, GetLifetime(typeInfo), out var resolverExpression))
             {
                 resolver = default(Delegate);
                 return false;
             }
 
-            resolver = container.GetExpressionCompiler().Compile(resolverExpression);
+            resolver = compiler.Compile(resolverExpression);
             return true;
         }
 
