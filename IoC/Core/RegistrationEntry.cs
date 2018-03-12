@@ -28,6 +28,10 @@
             _lifetime = lifetime;
             _resources.Add(resource ?? throw new ArgumentNullException(nameof(resource)));
             Keys = keys ?? throw new ArgumentNullException(nameof(keys));
+            if (lifetime is IDisposable disposableLifetime)
+            {
+                _resources.Add(disposableLifetime);
+            }
         }
 
         public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver)
@@ -66,6 +70,11 @@
                 if (!_lifetimes.TryGetValue(lifetimeKey, out lifetime))
                 {
                     lifetime = _lifetime?.Clone();
+                    if (lifetime is IDisposable disposableLifetime)
+                    {
+                        _resources.Add(disposableLifetime);
+                    }
+
                     _lifetimes.Add(lifetimeKey, lifetime);
                 }
             }
@@ -73,30 +82,8 @@
             return lifetime;
         }
 
-        public void Reset()
-        {
-            IDisposable[] lifetimesToDispose;
-            lock (_lockObject)
-            {
-                lifetimesToDispose = _lifetimes.Select(i => i.Value).OfType<IDisposable>().ToArray();
-                _lifetimes.Clear();
-            }
-
-            foreach (var lifetime in lifetimesToDispose)
-            {
-                lifetime.Dispose();
-            }
-        }
-
         public void Dispose()
         {
-            Reset();
-
-            if (_lifetime is IDisposable disposableLifetime)
-            {
-                disposableLifetime.Dispose();
-            }
-
             foreach (var resource in _resources)
             {
                 resource.Dispose();
@@ -114,26 +101,13 @@
         {
             private readonly Type[] _genericTypes;
 
-            public LifetimeKey(Type[] genericTypes)
-            {
-                _genericTypes = genericTypes;
-            }
+            public LifetimeKey(Type[] genericTypes) => _genericTypes = genericTypes;
 
-            public override bool Equals(object obj)
-            {
-                if (ReferenceEquals(null, obj)) return false;
-                return obj is LifetimeKey key && Equals(key);
-            }
+            public override bool Equals(object obj) => obj is LifetimeKey key && Equals(key);
 
-            public override int GetHashCode()
-            {
-                return _genericTypes != null ? _genericTypes.GetHash() : 0;
-            }
+            public override int GetHashCode() => _genericTypes != null ? _genericTypes.GetHash() : 0;
 
-            private bool Equals(LifetimeKey other)
-            {
-                return Extensions.SequenceEqual(_genericTypes, other._genericTypes);
-            }
+            private bool Equals(LifetimeKey other) => Extensions.SequenceEqual(_genericTypes, other._genericTypes);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿// ReSharper disable All
 namespace IoC.Tests.IntegrationTests
 {
+    using System;
     using System.Diagnostics.CodeAnalysis;
 
     public interface IMyService : IMyService1
@@ -17,6 +18,10 @@ namespace IoC.Tests.IntegrationTests
     }
 
     public interface IMyService1
+    {
+    }
+
+    public interface IMyDisposableService: IDisposable
     {
     }
 

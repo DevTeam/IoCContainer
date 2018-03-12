@@ -73,6 +73,12 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
+        public TValue Get(int hashCode, TKey key)
+        {
+            return Buckets[hashCode & (Divisor - 1)].Get(hashCode, key);
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
         public Table<TKey, TValue> Remove(int hashCode, TKey key)
         {
             var bucketIndex = hashCode & (Divisor - 1);

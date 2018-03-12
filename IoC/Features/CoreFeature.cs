@@ -27,11 +27,10 @@
 
             // Lifetimes
             yield return container.Register<ILifetime>(ctx => new SingletonLifetime(), null, new object[] { Lifetime.Singleton });
-            yield return container.Register<Func<ILifetime>>(ctx => (() => new SingletonLifetime()), null, new object[] { Lifetime.Singleton });
-            yield return container.Register<ILifetime>(ctx => new ContainerSingletonLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)), null, new object[] { Lifetime.ContainerSingleton });
-            yield return container.Register<ILifetime>(ctx => new ScopeSingletonLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)), null, new object[] { Lifetime.ScopeSingleton });
+            yield return container.Register<ILifetime>(ctx => new ContainerSingletonLifetime(), null, new object[] { Lifetime.ContainerSingleton });
+            yield return container.Register<ILifetime>(ctx => new ScopeSingletonLifetime(), null, new object[] { Lifetime.ScopeSingleton });
 #if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_5 && !NETSTANDARD1_6
-            yield return container.Register<ILifetime>(ctx => new ThreadSingletonLifetime(ctx.Container.Inject<Func<ILifetime>>(Lifetime.Singleton)), null, new object[] { Lifetime.ThreadSingleton });
+            yield return container.Register<ILifetime>(ctx => new ThreadSingletonLifetime(), null, new object[] { Lifetime.ThreadSingleton });
 #endif
 
             // Containers

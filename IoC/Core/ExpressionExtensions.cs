@@ -1,14 +1,20 @@
 ﻿namespace IoC.Core
 {
     using System;
+    using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using System.Runtime.CompilerServices;
     using Extensibility;
+    using static TypeExtensions;
 
     internal static class ExpressionExtensions
     {
         private static readonly ITypeInfo ResolverGenericTypeInfo = typeof(Resolver<>).Info();
         [ThreadStatic] private static int _getExpressionCompilerReentrancy;
+        internal static readonly MethodInfo GetHashCodeMethodInfo = Info<object>().DeclaredMethods.Single(i => i.Name == nameof(GetHashCode));
+        internal static readonly Expression NullConst = Expression.Constant(null);
+        internal static readonly ITypeInfo ResolverTypeInfo = typeof(Resolver<>).Info();
 
         public static IExpressionCompiler GetExpressionCompiler(this IContainer container)
         {

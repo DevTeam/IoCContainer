@@ -1,22 +1,12 @@
 ﻿#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6
 namespace IoC.Lifetimes
 {
-    using System;
-
     /// <summary>
     /// Represents singleton per thread lifetime.
     /// </summary>
     [PublicAPI]
     public class ThreadSingletonLifetime : SingletonBasedLifetime<int>
     {
-        [NotNull] private readonly Func<ILifetime> _singletonLifetimeFactory;
-
-        /// <inheritdoc />
-        public ThreadSingletonLifetime([NotNull] Func<ILifetime> singletonLifetimeFactory) : base(singletonLifetimeFactory)
-        {
-            _singletonLifetimeFactory = singletonLifetimeFactory ?? throw new ArgumentNullException(nameof(singletonLifetimeFactory));
-        }
-
         /// <inheritdoc />
         protected override int CreateKey(IContainer container, object[] args)
         {
@@ -32,7 +22,12 @@ namespace IoC.Lifetimes
         /// <inheritdoc />
         public override ILifetime Clone()
         {
-            return new ThreadSingletonLifetime(_singletonLifetimeFactory);
+            return new ThreadSingletonLifetime();
+        }
+
+        /// <inheritdoc />
+        protected override void OnNewInstanceCreated<T>(T newInstance, int key, IContainer container, object[] args)
+        {
         }
     }
 }

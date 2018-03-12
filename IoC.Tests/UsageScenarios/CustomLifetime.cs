@@ -1,5 +1,7 @@
 ﻿namespace IoC.Tests.UsageScenarios
 {
+    using System.Linq.Expressions;
+    using Extensibility;
     using Shouldly;
     using Xunit;
 
@@ -28,9 +30,9 @@
 
         public class MyTransientLifetime : ILifetime
         {
-            public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
+            public Expression Build(Expression expression, BuildContext buildContext, Expression context = default(Expression))
             {
-                return resolver(container, args);
+                return expression;
             }
 
             public ILifetime Clone()

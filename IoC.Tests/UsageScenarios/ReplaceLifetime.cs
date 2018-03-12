@@ -1,5 +1,10 @@
-﻿namespace IoC.Tests.UsageScenarios
+﻿#if !NET40
+namespace IoC.Tests.UsageScenarios
 {
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using Extensibility;
     using Moq;
     using Shouldly;
     using Xunit;
@@ -49,6 +54,7 @@
 
         public class MySingletonLifetime : ILifetime
         {
+            private static readonly MethodInfo IncrementCounterMethodInfo = typeof(MySingletonLifetime).GetTypeInfo().DeclaredMethods.Single(i => i.Name == nameof(IncrementCounter));
             private readonly ILifetime _baseSingletonLifetime;
             private readonly ICounter _counter;
 
@@ -58,18 +64,32 @@
                 _counter = counter;
             }
 
-            public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
+            public Expression Build(Expression expression, BuildContext buildContext, Expression context = default(Expression))
             {
-                // Just counting the number of calls
-                _counter.Increment();
-                return _baseSingletonLifetime.GetOrCreate(container, args, resolver);
+                // Build expression using base lifetime
+                expression = _baseSingletonLifetime.Build(expression, buildContext, context);
+
+                // Define `this` variable
+                var thisVar = buildContext.DefineValue(this);
+
+                return Expression.Block(
+                    // Adds statement this.IncrementCounter()
+                    Expression.Call(thisVar, IncrementCounterMethodInfo),
+                    expression);
             }
 
             public ILifetime Clone()
             {
                 return new MySingletonLifetime(_baseSingletonLifetime.Clone(), _counter);
             }
+
+            internal void IncrementCounter()
+            {
+                // Just counting the number of calls
+                _counter.Increment();
+            }
         }
         // }
     }
 }
+#endif

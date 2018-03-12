@@ -6,20 +6,12 @@
     /// Represents singleton per scope lifetime.
     /// </summary>
     [PublicAPI]
-    public sealed class ScopeSingletonLifetime: SingletonBasedLifetime<object>
+    public sealed class ScopeSingletonLifetime: SingletonBasedLifetime<Scope>
     {
-        [NotNull] private readonly Func<ILifetime> _singletonLifetimeFactory;
-
         /// <inheritdoc />
-        public ScopeSingletonLifetime([NotNull] Func<ILifetime> singletonLifetimeFactory) : base(singletonLifetimeFactory)
+        protected override Scope CreateKey(IContainer container, object[] args)
         {
-            _singletonLifetimeFactory = singletonLifetimeFactory ?? throw new ArgumentNullException(nameof(singletonLifetimeFactory));
-        }
-
-        /// <inheritdoc />
-        protected override object CreateKey(IContainer container, object[] args)
-        {
-            return Scope.Current.ScopeKey;
+            return Scope.Current;
         }
 
         /// <inheritdoc />
@@ -31,7 +23,16 @@
         /// <inheritdoc />
         public override ILifetime Clone()
         {
-            return new ScopeSingletonLifetime(_singletonLifetimeFactory);
+            return new ScopeSingletonLifetime();
+        }
+
+        /// <inheritdoc />
+        protected override void OnNewInstanceCreated<T>(T newInstance, Scope scope, IContainer container, object[] args)
+        {
+            if (newInstance is IDisposable disposable)
+            {
+                scope.AddResource(disposable);
+            }
         }
     }
 }

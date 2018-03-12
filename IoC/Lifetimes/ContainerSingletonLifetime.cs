@@ -1,6 +1,7 @@
 ﻿namespace IoC.Lifetimes
 {
     using System;
+    using Core;
 
     /// <summary>
     /// Represents singleton per container lifetime.
@@ -8,15 +9,6 @@
     [PublicAPI]
     public sealed class ContainerSingletonLifetime: SingletonBasedLifetime<IContainer>
     {
-        [NotNull] private readonly Func<ILifetime> _singletonLifetimeFactory;
-
-        /// <inheritdoc />
-        public ContainerSingletonLifetime([NotNull] Func<ILifetime> singletonLifetimeFactory)
-            : base(singletonLifetimeFactory)
-        {
-            _singletonLifetimeFactory = singletonLifetimeFactory ?? throw new ArgumentNullException(nameof(singletonLifetimeFactory));
-        }
-
         /// <inheritdoc />
         protected override IContainer CreateKey(IContainer container, object[] args)
         {
@@ -32,7 +24,16 @@
         /// <inheritdoc />
         public override ILifetime Clone()
         {
-            return new ContainerSingletonLifetime(_singletonLifetimeFactory);
+            return new ContainerSingletonLifetime();
+        }
+
+        /// <inheritdoc />
+        protected override void OnNewInstanceCreated<T>(T newInstance, IContainer targetContainer, IContainer container, object[] args)
+        {
+            if (newInstance is IDisposable disposable && targetContainer is IResourceStore resourceStore)
+            {
+                resourceStore.AddResource(disposable);
+            }
         }
     }
 }

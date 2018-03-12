@@ -42,8 +42,6 @@
         [NotNull] internal volatile Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
         [NotNull] internal volatile Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
         private volatile IEnumerable<Key>[] _allKeys;
-        private volatile bool _hasResolver;
-        private bool _isFreezed;
 
         /// <summary>
         /// Creates a root container with default features.
@@ -126,11 +124,6 @@
         {
             _name = $"{parent}/{name ?? throw new ArgumentNullException(nameof(name))}";
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
-
-            if (!root && _parent is IResourceStore resourceStore)
-            {
-                resourceStore.AddResource(this);
-            }
 
             // Subscribe to events from the parent container
             ((IResourceStore)this).AddResource(_parent.Subscribe(_eventSubject));
@@ -302,11 +295,6 @@
         {
             lock (_lockObject)
             {
-                if (currentContainer)
-                {
-                    _hasResolver = true;
-                }
-
                 var resolver = (Resolver<T>)resolverDelegate;
                 if (typeof(T) == key.Type)
                 {
@@ -380,15 +368,22 @@
                 resourceStore.RemoveResource(this);
             }
 
+            List<RegistrationEntry> entriesToDispose;
             IDisposable resource;
             lock (_lockObject)
             {
+                entriesToDispose = _registrationEntries.Values.Concat(_registrationEntriesForTagAny.Values).ToList();
                 _registrationEntries.Clear();
                 _registrationEntriesForTagAny.Clear();
                 Resolvers = Table<FullKey, ResolverDelegate>.Empty;
                 ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
                 resource = Disposable.Create(_resources);
                 _resources.Clear();
+            }
+
+            foreach (var entry in entriesToDispose)
+            {
+                entry.Dispose();
             }
 
             resource.Dispose();
@@ -480,17 +475,6 @@
 
         private void ResetResolvers()
         {
-            if (_isFreezed || !_hasResolver)
-            {
-                return;
-            }
-
-            _hasResolver = false;
-            foreach (var registration in _registrationEntries.Select(i => i.Value))
-            {
-                registration.Reset();
-            }
-
             Resolvers = Table<FullKey, ResolverDelegate>.Empty;
             ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
         }
@@ -525,15 +509,7 @@
 
         private void ApplyConfigurations(IEnumerable<IConfiguration> configurations)
         {
-            try
-            {
-                _isFreezed = true;
-                _resources.Add(this.Apply(configurations));
-            }
-            finally
-            {
-                _isFreezed = false;
-            }
+            _resources.Add(this.Apply(configurations));
         }
     }
 }

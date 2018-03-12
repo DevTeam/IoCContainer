@@ -141,6 +141,38 @@ namespace IoC.Core.Collections
             return false;
         }
 
+        [MethodImpl((MethodImplOptions)256)]
+        public TValue Get(int hashCode, TKey key)
+        {
+            var tree = this;
+            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
+            {
+                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
+            }
+
+            var treeEntry = tree.Current;
+            if (tree.Height != 0 && (ReferenceEquals(key, treeEntry.Key) || key.Equals(treeEntry.Key)))
+            {
+                return treeEntry.Value;
+            }
+
+            var entryDuplicates = treeEntry.Duplicates;
+            if (tree.Height != 0 && entryDuplicates != null)
+            {
+                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                {
+                    if (!Equals(entryDuplicates[i].Key, key))
+                    {
+                        continue;
+                    }
+
+                    return entryDuplicates[i].Value;
+                }
+            }
+
+            return default(TValue);
+        }
+
         public Tree<TKey, TValue> Remove(int hashCode, TKey key, bool ignoreKey = false)
         {
             if (Height == 0)

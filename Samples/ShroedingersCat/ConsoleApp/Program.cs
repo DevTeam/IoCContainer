@@ -59,18 +59,18 @@
 
         class CardboardBox<T> : IBox<T>
         {
-            public CardboardBox(T content) { Content = content; }
+            public CardboardBox(T content) => Content = content;
 
             public T Content { get; }
 
-            public override string ToString() { return Content.ToString(); }
+            public override string ToString() => Content.ToString();
         }
 
         class ShroedingersCat : ICat
         {
             public bool IsAlive => new Random().Next(2) == 1;
 
-            public override string ToString() { return $"Is alive: {IsAlive}"; }
+            public override string ToString() => $"Is alive: {IsAlive}";
         }
 
         class Glue : IConfiguration

@@ -59,27 +59,38 @@
         }
 
         [Fact]
-        public void ContainerShouldDiposeWhenSingletonLifetime()
+        public void ContainerShouldDiposeWhenRegistrationTokenDisposed()
         {
             // Given
             using (var container = Container.Create())
             {
-                Func<IMyService> func = Mock.Of<IMyService>;
+                var mock = new Mock<IMyDisposableService>();
                 // When
-                using (container.Bind<IMyService>().As(Lifetime.Singleton).To(ctx => func()))
+                using (container.Bind<IMyDisposableService>().As(Lifetime.Singleton).To(ctx => mock.Object))
                 {
-                    // Then
-                    var instance1 = container.Resolve<IMyService>();
-                    var instance2 = container.Resolve<IMyService>();
-                    using (var childContainer = container.CreateChild())
-                    {
-                        // Then
-                        var instance3 = childContainer.Resolve<IMyService>();
-                        instance1.ShouldBe(instance2);
-                        instance1.ShouldBe(instance3);
-                    }
+                    var instance1 = container.Resolve<IMyDisposableService>();
                 }
+
+                // Then
+                mock.Verify(i => i.Dispose(), Times.Once);
             }
+        }
+
+        [Fact]
+        public void ContainerShouldDiposeWhenContainerDisposed()
+        {
+            // Given
+            var mock = new Mock<IMyDisposableService>();
+            using (var container = Container.Create())
+            {
+                container.Bind<IMyDisposableService>().As(Lifetime.Singleton).To(ctx => mock.Object);
+
+                // When
+                var instance1 = container.Resolve<IMyDisposableService>();
+            }
+
+            // Then
+            mock.Verify(i => i.Dispose(), Times.Once);
         }
 
         [Fact]

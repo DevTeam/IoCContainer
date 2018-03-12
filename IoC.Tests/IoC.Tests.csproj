@@ -27,6 +27,10 @@
     <PackageReference Include="xunit" Version="1.9.2" />	    
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.0'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />
+  </ItemGroup>
+
   <ItemGroup>
     <ProjectReference Include="..\IoC\IoC.csproj" />
   </ItemGroup>

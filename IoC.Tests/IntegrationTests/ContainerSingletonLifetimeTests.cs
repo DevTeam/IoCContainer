@@ -1,11 +1,13 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Moq;
     using Shouldly;
     using Xunit;
 
-    public class ContainerLifetimeTests
+    [SuppressMessage("ReSharper", "UnusedVariable")]
+    public class ContainerSingletonLifetimeTests
     {
         [Fact]
         public void ContainerShouldResolveWhenContainerLifetime()
@@ -68,6 +70,43 @@
                         instance3.ShouldBe(instance4);
                     }
                 }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldDiposeWhenRegistrationTokenDisposed()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var mock = new Mock<IMyDisposableService>();
+                // When
+                using (container.Bind<IMyDisposableService>().As(Lifetime.ContainerSingleton).To(ctx => mock.Object))
+                {
+                    var instance = container.Resolve<IMyDisposableService>();
+                }
+
+                // Then
+                mock.Verify(i => i.Dispose(), Times.Once);
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldDiposeWhenChildContainerDisposed()
+        {
+            // Given
+            var mock = new Mock<IMyDisposableService>();
+            using (var container = Container.Create())
+            using (container.Bind<IMyDisposableService>().As(Lifetime.ContainerSingleton).To(ctx => mock.Object))
+            {
+                // When
+                using (var childContainer = container.CreateChild())
+                {
+                    var instance = childContainer.Resolve<IMyDisposableService>();
+                }
+
+                // Then
+                mock.Verify(i => i.Dispose(), Times.Once);
             }
         }
     }
