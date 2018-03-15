@@ -1,0 +1,2198 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>IoC</name>
+    </assembly>
+    <members>
+        <member name="T:IoC.CanBeNullAttribute">
+            <summary>
+            Indicates that the value of the marked element could be <c>null</c> sometimes,
+            so the check for <c>null</c> is necessary before its usage.
+            </summary>
+            <example><code>
+            [CanBeNull] object Test() => null;
+            
+            void UseTest() {
+              var p = Test();
+              var s = p.ToString(); // Warning: Possible 'System.NullReferenceException'
+            }
+            </code></example>
+        </member>
+        <member name="T:IoC.NotNullAttribute">
+            <summary>
+            Indicates that the value of the marked element could never be <c>null</c>.
+            </summary>
+            <example><code>
+            [NotNull] object Foo() {
+              return null; // Warning: Possible 'null' assignment
+            }
+            </code></example>
+        </member>
+        <member name="T:IoC.ItemNotNullAttribute">
+            <summary>
+            Can be appplied to symbols of types derived from IEnumerable as well as to symbols of Task
+            and Lazy classes to indicate that the value of a collection item, of the Task.Result property
+            or of the Lazy.Value property can never be null.
+            </summary>
+        </member>
+        <member name="T:IoC.ItemCanBeNullAttribute">
+            <summary>
+            Can be appplied to symbols of types derived from IEnumerable as well as to symbols of Task
+            and Lazy classes to indicate that the value of a collection item, of the Task.Result property
+            or of the Lazy.Value property can be null.
+            </summary>
+        </member>
+        <member name="T:IoC.ImplicitNotNullAttribute">
+            <summary>
+            Implicitly apply [NotNull]/[ItemNotNull] annotation to all the of type members and parameters
+            in particular scope where this annotation is used (type declaration or whole assembly).
+            </summary>
+        </member>
+        <member name="T:IoC.StringFormatMethodAttribute">
+            <summary>
+            Indicates that the marked method builds string by format pattern and (optional) arguments.
+            Parameter, which contains format string, should be given in constructor. The format string
+            should be in <see cref="M:System.String.Format(System.IFormatProvider,System.String,System.Object[])"/>-like form.
+            </summary>
+            <example><code>
+            [StringFormatMethod("message")]
+            void ShowError(string message, params object[] args) { /* do something */ }
+            
+            void Foo() {
+              ShowError("Failed: {0}"); // Warning: Non-existing argument in format string
+            }
+            </code></example>
+        </member>
+        <member name="M:IoC.StringFormatMethodAttribute.#ctor(System.String)">
+            <param name="formatParameterName">
+            Specifies which parameter of an annotated method should be treated as format-string
+            </param>
+        </member>
+        <member name="T:IoC.ValueProviderAttribute">
+            <summary>
+            For a parameter that is expected to be one of the limited set of values.
+            Specify fields of which type should be used as values for this parameter.
+            </summary>
+        </member>
+        <member name="T:IoC.InvokerParameterNameAttribute">
+            <summary>
+            Indicates that the function argument should be string literal and match one
+            of the parameters of the caller function. For example, ReSharper annotates
+            the parameter of <see cref="T:System.ArgumentNullException"/>.
+            </summary>
+            <example><code>
+            void Foo(string param) {
+              if (param == null)
+                throw new ArgumentNullException("par"); // Warning: Cannot resolve symbol
+            }
+            </code></example>
+        </member>
+        <member name="T:IoC.NotifyPropertyChangedInvocatorAttribute">
+             <summary>
+             Indicates that the method is contained in a type that implements
+             <c>System.ComponentModel.INotifyPropertyChanged</c> interface and this method
+             is used to notify that some property value changed.
+             </summary>
+             <remarks>
+             The method should be non-static and conform to one of the supported signatures:
+             <list>
+             <item><c>NotifyChanged(string)</c></item>
+             <item><c>NotifyChanged(params string[])</c></item>
+             <item><c>NotifyChanged{T}(Expression{Func{T}})</c></item>
+             <item><c>NotifyChanged{T,U}(Expression{Func{T,U}})</c></item>
+             <item><c>SetProperty{T}(ref T, T, string)</c></item>
+             </list>
+             </remarks>
+             <example><code>
+             public class Foo : INotifyPropertyChanged {
+               public event PropertyChangedEventHandler PropertyChanged;
+             
+               [NotifyPropertyChangedInvocator]
+               protected virtual void NotifyChanged(string propertyName) { ... }
+            
+               string _name;
+             
+               public string Name {
+                 get { return _name; }
+                 set { _name = value; NotifyChanged("LastName"); /* Warning */ }
+               }
+             }
+             </code>
+             Examples of generated notifications:
+             <list>
+             <item><c>NotifyChanged("Property")</c></item>
+             <item><c>NotifyChanged(() =&gt; Property)</c></item>
+             <item><c>NotifyChanged((VM x) =&gt; x.Property)</c></item>
+             <item><c>SetProperty(ref myField, value, "Property")</c></item>
+             </list>
+             </example>
+        </member>
+        <member name="T:IoC.ContractAnnotationAttribute">
+            <summary>
+            Describes dependency between method input and output.
+            </summary>
+            <syntax>
+            <p>Function Definition Table syntax:</p>
+            <list>
+            <item>FDT      ::= FDTRow [;FDTRow]*</item>
+            <item>FDTRow   ::= Input =&gt; Output | Output &lt;= Input</item>
+            <item>Input    ::= ParameterName: Value [, Input]*</item>
+            <item>Output   ::= [ParameterName: Value]* {halt|stop|void|nothing|Value}</item>
+            <item>Value    ::= true | false | null | notnull | canbenull</item>
+            </list>
+            If method has single input parameter, it's name could be omitted.<br/>
+            Using <c>halt</c> (or <c>void</c>/<c>nothing</c>, which is the same)
+            for method output means that the methos doesn't return normally.<br/>
+            <c>canbenull</c> annotation is only applicable for output parameters.<br/>
+            You can use multiple <c>[ContractAnnotation]</c> for each FDT row,
+            or use single attribute with rows separated by semicolon.<br/>
+            </syntax>
+            <examples><list>
+            <item><code>
+            [ContractAnnotation("=> halt")]
+            public void TerminationMethod()
+            </code></item>
+            <item><code>
+            [ContractAnnotation("halt &lt;= condition: false")]
+            public void Assert(bool condition, string text) // regular assertion method
+            </code></item>
+            <item><code>
+            [ContractAnnotation("s:null => true")]
+            public bool IsNullOrEmpty(string s) // string.IsNullOrEmpty()
+            </code></item>
+            <item><code>
+            // A method that returns null if the parameter is null,
+            // and not null if the parameter is not null
+            [ContractAnnotation("null => null; notnull => notnull")]
+            public object Transform(object data) 
+            </code></item>
+            <item><code>
+            [ContractAnnotation("s:null=>false; =>true,result:notnull; =>false, result:null")]
+            public bool TryParse(string s, out Person result)
+            </code></item>
+            </list></examples>
+        </member>
+        <member name="T:IoC.LocalizationRequiredAttribute">
+            <summary>
+            Indicates that marked element should be localized or not.
+            </summary>
+            <example><code>
+            [LocalizationRequiredAttribute(true)]
+            class Foo {
+              string str = "my string"; // Warning: Localizable string
+            }
+            </code></example>
+        </member>
+        <member name="T:IoC.CannotApplyEqualityOperatorAttribute">
+            <summary>
+            Indicates that the value of the marked type (or its derivatives)
+            cannot be compared using '==' or '!=' operators and <c>Equals()</c>
+            should be used instead. However, using '==' or '!=' for comparison
+            with <c>null</c> is always permitted.
+            </summary>
+            <example><code>
+            [CannotApplyEqualityOperator]
+            class NoEquality { }
+            
+            class UsesNoEquality {
+              void Test() {
+                var ca1 = new NoEquality();
+                var ca2 = new NoEquality();
+                if (ca1 != null) { // OK
+                  bool condition = ca1 == ca2; // Warning
+                }
+              }
+            }
+            </code></example>
+        </member>
+        <member name="T:IoC.BaseTypeRequiredAttribute">
+            <summary>
+            When applied to a target attribute, specifies a requirement for any type marked
+            with the target attribute to implement or inherit specific type or types.
+            </summary>
+            <example><code>
+            [BaseTypeRequired(typeof(IComponent)] // Specify requirement
+            class ComponentAttribute : Attribute { }
+            
+            [Component] // ComponentAttribute requires implementing IComponent interface
+            class MyComponent : IComponent { }
+            </code></example>
+        </member>
+        <member name="T:IoC.UsedImplicitlyAttribute">
+            <summary>
+            Indicates that the marked symbol is used implicitly (e.g. via reflection, in external library),
+            so this symbol will not be marked as unused (as well as by other usage inspections).
+            </summary>
+        </member>
+        <member name="T:IoC.MeansImplicitUseAttribute">
+            <summary>
+            Should be used on attributes and causes ReSharper to not mark symbols marked with such attributes
+            as unused (as well as by other usage inspections)
+            </summary>
+        </member>
+        <member name="F:IoC.ImplicitUseKindFlags.Access">
+            <summary>Only entity marked with attribute considered used.</summary>
+        </member>
+        <member name="F:IoC.ImplicitUseKindFlags.Assign">
+            <summary>Indicates implicit assignment to a member.</summary>
+        </member>
+        <member name="F:IoC.ImplicitUseKindFlags.InstantiatedWithFixedConstructorSignature">
+            <summary>
+            Indicates implicit instantiation of a type with fixed constructor signature.
+            That means any unused constructor parameters won't be reported as such.
+            </summary>
+        </member>
+        <member name="F:IoC.ImplicitUseKindFlags.InstantiatedNoFixedConstructorSignature">
+            <summary>Indicates implicit instantiation of a type.</summary>
+        </member>
+        <member name="T:IoC.ImplicitUseTargetFlags">
+            <summary>
+            Specify what is considered used implicitly when marked
+            with <see cref="T:IoC.MeansImplicitUseAttribute"/> or <see cref="T:IoC.UsedImplicitlyAttribute"/>.
+            </summary>
+        </member>
+        <member name="F:IoC.ImplicitUseTargetFlags.Members">
+            <summary>Members of entity marked with attribute are considered used.</summary>
+        </member>
+        <member name="F:IoC.ImplicitUseTargetFlags.WithMembers">
+            <summary>Entity marked with attribute and all its members considered used.</summary>
+        </member>
+        <member name="T:IoC.PublicAPIAttribute">
+            <summary>
+            This attribute is intended to mark publicly available API
+            which should not be removed and so is treated as used.
+            </summary>
+        </member>
+        <member name="T:IoC.InstantHandleAttribute">
+            <summary>
+            Tells code analysis engine if the parameter is completely handled when the invoked method is on stack.
+            If the parameter is a delegate, indicates that delegate is executed while the method is executed.
+            If the parameter is an enumerable, indicates that it is enumerated while the method is executed.
+            </summary>
+        </member>
+        <member name="T:IoC.PureAttribute">
+            <summary>
+            Indicates that a method does not make any observable state changes.
+            The same as <c>System.Diagnostics.Contracts.PureAttribute</c>.
+            </summary>
+            <example><code>
+            [Pure] int Multiply(int x, int y) => x * y;
+            
+            void M() {
+              Multiply(123, 42); // Waring: Return value of pure method is not used
+            }
+            </code></example>
+        </member>
+        <member name="T:IoC.MustUseReturnValueAttribute">
+            <summary>
+            Indicates that the return value of method invocation must be used.
+            </summary>
+        </member>
+        <member name="T:IoC.ProvidesContextAttribute">
+            <summary>
+            Indicates the type member or parameter of some type, that should be used instead of all other ways
+            to get the value that type. This annotation is useful when you have some "context" value evaluated
+            and stored somewhere, meaning that all other ways to get this value must be consolidated with existing one.
+            </summary>
+            <example><code>
+            class Foo {
+              [ProvidesContext] IBarService _barService = ...;
+            
+              void ProcessNode(INode node) {
+                DoSomething(node, node.GetGlobalServices().Bar);
+                //              ^ Warning: use value of '_barService' field
+              }
+            }
+            </code></example>
+        </member>
+        <member name="T:IoC.PathReferenceAttribute">
+            <summary>
+            Indicates that a parameter is a path to a file or a folder within a web project.
+            Path can be relative or absolute, starting from web root (~).
+            </summary>
+        </member>
+        <member name="T:IoC.SourceTemplateAttribute">
+            <summary>
+            An extension method marked with this attribute is processed by ReSharper code completion
+            as a 'Source Template'. When extension method is completed over some expression, it's source code
+            is automatically expanded like a template at call site.
+            </summary>
+            <remarks>
+            Template method body can contain valid source code and/or special comments starting with '$'.
+            Text inside these comments is added as source code when the template is applied. Template parameters
+            can be used either as additional method parameters or as identifiers wrapped in two '$' signs.
+            Use the <see cref="T:IoC.MacroAttribute"/> attribute to specify macros for parameters.
+            </remarks>
+            <example>
+            In this example, the 'forEach' method is a source template available over all values
+            of enumerable types, producing ordinary C# 'foreach' statement and placing caret inside block:
+            <code>
+            [SourceTemplate]
+            public static void forEach&lt;T&gt;(this IEnumerable&lt;T&gt; xs) {
+              foreach (var x in xs) {
+                 //$ $END$
+              }
+            }
+            </code>
+            </example>
+        </member>
+        <member name="T:IoC.MacroAttribute">
+            <summary>
+            Allows specifying a macro for a parameter of a <see cref="T:IoC.SourceTemplateAttribute">source template</see>.
+            </summary>
+            <remarks>
+            You can apply the attribute on the whole method or on any of its additional parameters. The macro expression
+            is defined in the <see cref="P:IoC.MacroAttribute.Expression"/> property. When applied on a method, the target
+            template parameter is defined in the <see cref="P:IoC.MacroAttribute.Target"/> property. To apply the macro silently
+            for the parameter, set the <see cref="P:IoC.MacroAttribute.Editable"/> property value = -1.
+            </remarks>
+            <example>
+            Applying the attribute on a source template method:
+            <code>
+            [SourceTemplate, Macro(Target = "item", Expression = "suggestVariableName()")]
+            public static void forEach&lt;T&gt;(this IEnumerable&lt;T&gt; collection) {
+              foreach (var item in collection) {
+                //$ $END$
+              }
+            }
+            </code>
+            Applying the attribute on a template method parameter:
+            <code>
+            [SourceTemplate]
+            public static void something(this Entity x, [Macro(Expression = "guid()", Editable = -1)] string newguid) {
+              /*$ var $x$Id = "$newguid$" + x.ToString();
+              x.DoSomething($x$Id); */
+            }
+            </code>
+            </example>
+        </member>
+        <member name="P:IoC.MacroAttribute.Expression">
+            <summary>
+            Allows specifying a macro that will be executed for a <see cref="T:IoC.SourceTemplateAttribute">source template</see>
+            parameter when the template is expanded.
+            </summary>
+        </member>
+        <member name="P:IoC.MacroAttribute.Editable">
+            <summary>
+            Allows specifying which occurrence of the target parameter becomes editable when the template is deployed.
+            </summary>
+            <remarks>
+            If the target parameter is used several times in the template, only one occurrence becomes editable;
+            other occurrences are changed synchronously. To specify the zero-based index of the editable occurrence,
+            use values >= 0. To make the parameter non-editable when the template is expanded, use -1.
+            </remarks>>
+        </member>
+        <member name="P:IoC.MacroAttribute.Target">
+            <summary>
+            Identifies the target parameter of a <see cref="T:IoC.SourceTemplateAttribute">source template</see> if the
+            <see cref="T:IoC.MacroAttribute"/> is applied on a template method.
+            </summary>
+        </member>
+        <member name="T:IoC.AspMvcActionAttribute">
+            <summary>
+            ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter
+            is an MVC action. If applied to a method, the MVC action name is calculated
+            implicitly from the context. Use this attribute for custom wrappers similar to
+            <c>System.Web.Mvc.Html.ChildActionExtensions.RenderAction(HtmlHelper, String)</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.AspMvcAreaAttribute">
+            <summary>
+            ASP.NET MVC attribute. Indicates that a parameter is an MVC area.
+            Use this attribute for custom wrappers similar to
+            <c>System.Web.Mvc.Html.ChildActionExtensions.RenderAction(HtmlHelper, String)</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.AspMvcControllerAttribute">
+            <summary>
+            ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter is
+            an MVC controller. If applied to a method, the MVC controller name is calculated
+            implicitly from the context. Use this attribute for custom wrappers similar to
+            <c>System.Web.Mvc.Html.ChildActionExtensions.RenderAction(HtmlHelper, String, String)</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.AspMvcMasterAttribute">
+            <summary>
+            ASP.NET MVC attribute. Indicates that a parameter is an MVC Master. Use this attribute
+            for custom wrappers similar to <c>System.Web.Mvc.Controller.View(String, String)</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.AspMvcModelTypeAttribute">
+            <summary>
+            ASP.NET MVC attribute. Indicates that a parameter is an MVC model type. Use this attribute
+            for custom wrappers similar to <c>System.Web.Mvc.Controller.View(String, Object)</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.AspMvcPartialViewAttribute">
+            <summary>
+            ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter is an MVC
+            partial view. If applied to a method, the MVC partial view name is calculated implicitly
+            from the context. Use this attribute for custom wrappers similar to
+            <c>System.Web.Mvc.Html.RenderPartialExtensions.RenderPartial(HtmlHelper, String)</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.AspMvcSuppressViewErrorAttribute">
+            <summary>
+            ASP.NET MVC attribute. Allows disabling inspections for MVC views within a class or a method.
+            </summary>
+        </member>
+        <member name="T:IoC.AspMvcDisplayTemplateAttribute">
+            <summary>
+            ASP.NET MVC attribute. Indicates that a parameter is an MVC display template.
+            Use this attribute for custom wrappers similar to 
+            <c>System.Web.Mvc.Html.DisplayExtensions.DisplayForModel(HtmlHelper, String)</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.AspMvcEditorTemplateAttribute">
+            <summary>
+            ASP.NET MVC attribute. Indicates that a parameter is an MVC editor template.
+            Use this attribute for custom wrappers similar to
+            <c>System.Web.Mvc.Html.EditorExtensions.EditorForModel(HtmlHelper, String)</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.AspMvcTemplateAttribute">
+            <summary>
+            ASP.NET MVC attribute. Indicates that a parameter is an MVC template.
+            Use this attribute for custom wrappers similar to
+            <c>System.ComponentModel.DataAnnotations.UIHintAttribute(System.String)</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.AspMvcViewAttribute">
+            <summary>
+            ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter
+            is an MVC view component. If applied to a method, the MVC view name is calculated implicitly
+            from the context. Use this attribute for custom wrappers similar to
+            <c>System.Web.Mvc.Controller.View(Object)</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.AspMvcViewComponentAttribute">
+            <summary>
+            ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter
+            is an MVC view component name.
+            </summary>
+        </member>
+        <member name="T:IoC.AspMvcViewComponentViewAttribute">
+            <summary>
+            ASP.NET MVC attribute. If applied to a parameter, indicates that the parameter
+            is an MVC view component view. If applied to a method, the MVC view component view name is default.
+            </summary>
+        </member>
+        <member name="T:IoC.AspMvcActionSelectorAttribute">
+            <summary>
+            ASP.NET MVC attribute. When applied to a parameter of an attribute,
+            indicates that this parameter is an MVC action name.
+            </summary>
+            <example><code>
+            [ActionName("Foo")]
+            public ActionResult Login(string returnUrl) {
+              ViewBag.ReturnUrl = Url.Action("Foo"); // OK
+              return RedirectToAction("Bar"); // Error: Cannot resolve action
+            }
+            </code></example>
+        </member>
+        <member name="T:IoC.RazorSectionAttribute">
+            <summary>
+            Razor attribute. Indicates that a parameter or a method is a Razor section.
+            Use this attribute for custom wrappers similar to 
+            <c>System.Web.WebPages.WebPageBase.RenderSection(String)</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.CollectionAccessAttribute">
+            <summary>
+            Indicates how method, constructor invocation or property access
+            over collection type affects content of the collection.
+            </summary>
+        </member>
+        <member name="F:IoC.CollectionAccessType.None">
+            <summary>Method does not use or modify content of the collection.</summary>
+        </member>
+        <member name="F:IoC.CollectionAccessType.Read">
+            <summary>Method only reads content of the collection but does not modify it.</summary>
+        </member>
+        <member name="F:IoC.CollectionAccessType.ModifyExistingContent">
+            <summary>Method can change content of the collection but does not add new elements.</summary>
+        </member>
+        <member name="F:IoC.CollectionAccessType.UpdatedContent">
+            <summary>Method can add new elements to the collection.</summary>
+        </member>
+        <member name="T:IoC.AssertionMethodAttribute">
+            <summary>
+            Indicates that the marked method is assertion method, i.e. it halts control flow if
+            one of the conditions is satisfied. To set the condition, mark one of the parameters with 
+            <see cref="T:IoC.AssertionConditionAttribute"/> attribute.
+            </summary>
+        </member>
+        <member name="T:IoC.AssertionConditionAttribute">
+            <summary>
+            Indicates the condition parameter of the assertion method. The method itself should be
+            marked by <see cref="T:IoC.AssertionMethodAttribute"/> attribute. The mandatory argument of
+            the attribute is the assertion type.
+            </summary>
+        </member>
+        <member name="T:IoC.AssertionConditionType">
+            <summary>
+            Specifies assertion type. If the assertion method argument satisfies the condition,
+            then the execution continues. Otherwise, execution is assumed to be halted.
+            </summary>
+        </member>
+        <member name="F:IoC.AssertionConditionType.IS_TRUE">
+            <summary>Marked parameter should be evaluated to true.</summary>
+        </member>
+        <member name="F:IoC.AssertionConditionType.IS_FALSE">
+            <summary>Marked parameter should be evaluated to false.</summary>
+        </member>
+        <member name="F:IoC.AssertionConditionType.IS_NULL">
+            <summary>Marked parameter should be evaluated to null value.</summary>
+        </member>
+        <member name="F:IoC.AssertionConditionType.IS_NOT_NULL">
+            <summary>Marked parameter should be evaluated to not null value.</summary>
+        </member>
+        <member name="T:IoC.TerminatesProgramAttribute">
+            <summary>
+            Indicates that the marked method unconditionally terminates control flow execution.
+            For example, it could unconditionally throw exception.
+            </summary>
+        </member>
+        <member name="T:IoC.LinqTunnelAttribute">
+            <summary>
+            Indicates that method is pure LINQ method, with postponed enumeration (like Enumerables.Select,
+            .Where). This annotation allows inference of [InstantHandle] annotation for parameters
+            of delegate type by analyzing LINQ method chains.
+            </summary>
+        </member>
+        <member name="T:IoC.NoEnumerationAttribute">
+            <summary>
+            Indicates that IEnumerable, passed as parameter, is not enumerated.
+            </summary>
+        </member>
+        <member name="T:IoC.RegexPatternAttribute">
+            <summary>
+            Indicates that parameter is regular expression pattern.
+            </summary>
+        </member>
+        <member name="T:IoC.XamlItemsControlAttribute">
+            <summary>
+            XAML attribute. Indicates the type that has <c>ItemsSource</c> property and should be treated
+            as <c>ItemsControl</c>-derived type, to enable inner items <c>DataContext</c> type resolve.
+            </summary>
+        </member>
+        <member name="T:IoC.XamlItemBindingOfItemsControlAttribute">
+            <summary>
+            XAML attribute. Indicates the property of some <c>BindingBase</c>-derived type, that
+            is used to bind some item of <c>ItemsControl</c>-derived type. This annotation will
+            enable the <c>DataContext</c> type resolve for XAML bindings for such properties.
+            </summary>
+            <remarks>
+            Property should have the tree ancestor of the <c>ItemsControl</c> type or
+            marked with the <see cref="T:IoC.XamlItemsControlAttribute"/> attribute.
+            </remarks>
+        </member>
+        <member name="T:IoC.NoReorder">
+            <summary>
+            Prevents the Member Reordering feature from tossing members of the marked class.
+            </summary>
+            <remarks>
+            The attribute must be mentioned in your member reordering patterns
+            </remarks>
+        </member>
+        <member name="T:IoC.Container">
+            <summary>
+            The IoC container implementation.
+            </summary>
+        </member>
+        <member name="M:IoC.Container.Create(System.String)">
+            <summary>
+            Creates a root container with default features.
+            </summary>
+            <param name="name">The optional name of the container.</param>
+            <returns>The roor container.</returns>
+        </member>
+        <member name="M:IoC.Container.CreateHighPerformance(System.String)">
+            <summary>
+            Creates a high-performance root container.
+            It requires access permissions to types/constructors/initialization methods.
+            Also you could add the attribute <code>[assembly: InternalsVisibleTo(IoC.Features.HighPerformanceFeature.DynamicAssemblyName)]</code> for your assembly to allow use internal classes/methods/properties in a dependency injection.
+            </summary>
+            <param name="name">The optional name of the container.</param>
+            <returns>The roor container.</returns>
+        </member>
+        <member name="M:IoC.Container.CreateBasic(System.String)">
+            <summary>
+            Creates a root container with basic features.
+            </summary>
+            <param name="name">The optional name of the container.</param>
+            <returns>The roor container.</returns>
+        </member>
+        <member name="M:IoC.Container.Create(IoC.IConfiguration[])">
+            <summary>
+            Creates a root container with specified features.
+            </summary>
+            <param name="configurations">The set of features.</param>
+            <returns>The roor container.</returns>
+        </member>
+        <member name="M:IoC.Container.Create(System.String,IoC.IContainer)">
+            <summary>
+            Creates a root container with basic features.
+            </summary>
+            <param name="name">The optional name of the container.</param>
+            <param name="baseContainer"></param>
+            <returns>The roor container.</returns>
+        </member>
+        <member name="M:IoC.Container.Create(System.String,IoC.IConfiguration[])">
+            <summary>
+            Creates a root container with specified name and features.
+            </summary>
+            <param name="name">The optional name of the container.</param>
+            <param name="configurations">The set of features.</param>
+            <returns>The roor container.</returns>
+        </member>
+        <member name="P:IoC.Container.Parent">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Container.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Container.TryRegister(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,System.IDisposable@)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Container.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,IoC.IContainer)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Container.TryGetResolver``1(System.Type,IoC.Resolver{``0}@,IoC.IContainer)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Container.TryGetDependency(IoC.Key,IoC.IDependency@,IoC.ILifetime@)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Container.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Container.GetEnumerator">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Container.Subscribe(System.IObserver{IoC.ContainerEvent})">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.ContainerEvent">
+            <summary>
+            Provides information about changes in the container.
+            </summary>
+        </member>
+        <member name="F:IoC.ContainerEvent.Container">
+            <summary>
+            The target container.
+            </summary>
+        </member>
+        <member name="F:IoC.ContainerEvent.EventTypeType">
+            <summary>
+            The type of event.
+            </summary>
+        </member>
+        <member name="F:IoC.ContainerEvent.Key">
+            <summary>
+            The chenged binding key.
+            </summary>
+        </member>
+        <member name="T:IoC.ContainerEvent.EventType">
+            <summary>
+            The types of event.
+            </summary>
+        </member>
+        <member name="F:IoC.ContainerEvent.EventType.Registration">
+            <summary>
+            A new registration was created.
+            </summary>
+        </member>
+        <member name="F:IoC.ContainerEvent.EventType.Unregistration">
+            <summary>
+            The registration was removed.
+            </summary>
+        </member>
+        <member name="T:IoC.Context`1">
+            <summary>
+            Represent the resolving context with an instance.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="F:IoC.Context`1.It">
+            <summary>
+            The resolved instance.
+            </summary>
+        </member>
+        <member name="T:IoC.Context">
+            <summary>
+            Represents the resolving context.
+            </summary>
+        </member>
+        <member name="F:IoC.Context.Key">
+            <summary>
+            The resolving key.
+            </summary>
+        </member>
+        <member name="F:IoC.Context.Container">
+            <summary>
+            The resolving container.
+            </summary>
+        </member>
+        <member name="F:IoC.Context.Args">
+            <summary>
+            The optional resolving arguments.
+            </summary>
+        </member>
+        <member name="T:IoC.Extensibility.BuildContext">
+            <summary>
+            Represents build context.
+            </summary>
+        </member>
+        <member name="F:IoC.Extensibility.BuildContext.ContainerParameter">
+            <summary>
+            The container parameter.
+            </summary>
+        </member>
+        <member name="F:IoC.Extensibility.BuildContext.ArgsParameter">
+            <summary>
+            The args parameters.
+            </summary>
+        </member>
+        <member name="F:IoC.Extensibility.BuildContext.ResolverParameters">
+            <summary>
+            All resolver's parameters.
+            </summary>
+        </member>
+        <member name="F:IoC.Extensibility.BuildContext.ResolverParameterTypes">
+            <summary>
+            Types of all resolver's parameters.
+            </summary>
+        </member>
+        <member name="F:IoC.Extensibility.BuildContext.Compiler">
+            <summary>
+            The compiler.
+            </summary>
+        </member>
+        <member name="F:IoC.Extensibility.BuildContext.Key">
+            <summary>
+            The target key.
+            </summary>
+        </member>
+        <member name="F:IoC.Extensibility.BuildContext.Container">
+            <summary>
+            The target container.
+            </summary>
+        </member>
+        <member name="M:IoC.Extensibility.BuildContext.CreateChild(IoC.Key,IoC.IContainer)">
+            <summary>
+            Creates a child context.
+            </summary>
+            <param name="key">The key</param>
+            <param name="container">The container.</param>
+            <returns>The new build context.</returns>
+        </member>
+        <member name="M:IoC.Extensibility.BuildContext.DefineValue(System.Object,System.Type)">
+            <summary>
+            Defines value.
+            </summary>
+            <param name="value">The value.</param>
+            <param name="type">The value type.</param>
+            <returns>The parameter expression.</returns>
+        </member>
+        <member name="M:IoC.Extensibility.BuildContext.DefineValue(System.Linq.Expressions.Expression)">
+            <summary>
+            Defines value.
+            </summary>
+            <param name="expression">The value expression.</param>
+            <returns>The parameter expression.</returns>
+        </member>
+        <member name="M:IoC.Extensibility.BuildContext.DefineValue``1(``0)">
+            <summary>
+            Defines value.
+            </summary>
+            <typeparam name="T">The value type.</typeparam>
+            <param name="value">The value.</param>
+            <returns>The parameter expression.</returns>
+        </member>
+        <member name="M:IoC.Extensibility.BuildContext.CloseBlock(System.Linq.Expressions.Expression)">
+            <summary>
+            Closes a block of statements.
+            </summary>
+            <param name="targetExpression">The target expression.</param>
+            <returns>The result expression.</returns>
+        </member>
+        <member name="M:IoC.Extensibility.BuildContext.PartiallyCloseBlock(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression[])">
+            <summary>
+            Closes block for specified expressions.
+            </summary>
+            <param name="targetExpression">The target expression.</param>
+            <param name="expressions">Assigment expressions.</param>
+            <returns>The resulting block expression.</returns>
+        </member>
+        <member name="T:IoC.Extensibility.IExpressionBuilder`1">
+            <summary>
+            Allows to build expresion for lifetimes.
+            </summary>
+        </member>
+        <member name="M:IoC.Extensibility.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.BuildContext,`0)">
+            <summary>
+            Builds the expression.
+            </summary>
+            <param name="expression">The base expression to get an instance.</param>
+            <param name="buildContext">The build context.</param>
+            <param name="context">The expression build context.</param>
+            <returns>The new expression.</returns>
+        </member>
+        <member name="T:IoC.Extensibility.IExpressionCompiler">
+            <summary>
+            Represents a expression compiler.
+            </summary>
+        </member>
+        <member name="P:IoC.Extensibility.IExpressionCompiler.IsSupportingCompextTypeConstant">
+            <summary>
+            True if supports a compext type constant.
+            </summary>
+        </member>
+        <member name="M:IoC.Extensibility.IExpressionCompiler.Compile(System.Linq.Expressions.LambdaExpression)">
+            <summary>
+            Compiles an expression to a delegate.
+            </summary>
+            <param name="resolverExpression">The lambda expression.</param>
+            <returns>The resulting delegate.</returns>
+        </member>
+        <member name="T:IoC.Extensibility.IIssueResolver">
+            <summary>
+            Allows to specify behaviour for cases with issue.
+            </summary>
+        </member>
+        <member name="M:IoC.Extensibility.IIssueResolver.CannotRegister(IoC.IContainer,IoC.Key[])">
+            <summary>
+            Handles the scenario when binding cannot be registered.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="keys">The set of binding keys.</param>
+            <returns>The registration tiken.</returns>
+        </member>
+        <member name="M:IoC.Extensibility.IIssueResolver.CannotResolveDependency(IoC.IContainer,IoC.Key)">
+            <summary>
+            Handles the scenario when the dependency cannot be resolved.
+            </summary>
+            <param name="container">The resolving container.</param>
+            <param name="key">The resolving key.</param>
+            <returns>The pair of the dependency and of the lifetime.</returns>
+        </member>
+        <member name="M:IoC.Extensibility.IIssueResolver.CannotGetResolver``1(IoC.IContainer,IoC.Key)">
+            <summary>
+            Handles the scenario when cannot get a resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The resolving container.</param>
+            <param name="key">The resolving key.</param>
+            <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.Extensibility.IIssueResolver.CannotGetGenericTypeArguments(System.Type)">
+            <summary>
+            Handles the scenario when cannot extract generic type arguments.
+            </summary>
+            <param name="type">The instance type.</param>
+            <returns>The extracted generic type arguments.</returns>
+        </member>
+        <member name="M:IoC.Extensibility.IIssueResolver.CyclicDependenceDetected(IoC.Key,System.Int32)">
+            <summary>
+            Handles the scenario when a cyclic dependence was detected.
+            </summary>
+            <param name="key">The resolving key.</param>
+            <param name="reentrancy">The level of reentrancy.</param>
+        </member>
+        <member name="M:IoC.Extensibility.IIssueResolver.CannotParseType(System.String,System.Int32,System.Int32,System.String)">
+            <summary>
+            Handles the scenario when cannot parse a type from a text.
+            </summary>
+            <param name="statementText">The statement containing a type metadata.</param>
+            <param name="statementLineNumber">The line number in the source data.</param>
+            <param name="statementPosition">The position at the line of the source data.</param>
+            <param name="typeName">The text with a type metadata.</param>
+            <returns></returns>
+        </member>
+        <member name="M:IoC.Extensibility.IIssueResolver.CannotParseLifetime(System.String,System.Int32,System.Int32,System.String)">
+            <summary>
+            Handles the scenario when cannot parse a lifetime from a text.
+            </summary>
+            <param name="statementText">The statement containing a lifetime metadata.</param>
+            <param name="statementLineNumber">The line number in the source data.</param>
+            <param name="statementPosition">The position at the line of the source data.</param>
+            <param name="lifetimeName">The text with a lifetime metadata.</param>
+            <returns></returns>
+        </member>
+        <member name="M:IoC.Extensibility.IIssueResolver.CannotParseTag(System.String,System.Int32,System.Int32,System.String)">
+            <summary>
+            Handles the scenario when cannot parse a tag from a text.
+            </summary>
+            <param name="statementText">The statement containing a tag metadata.</param>
+            <param name="statementLineNumber">The line number in the source data.</param>
+            <param name="statementPosition">The position at the line of the source data.</param>
+            <param name="tag">The text with a tag metadata.</param>
+            <returns></returns>
+        </member>
+        <member name="T:IoC.Extensibility.IValidator">
+            <summary>
+            Represents a container validator.
+            </summary>
+        </member>
+        <member name="M:IoC.Extensibility.IValidator.Validate(IoC.IContainer)">
+            <summary>
+            Calidates a container.
+            </summary>
+            <param name="container">The target container.</param>
+            <returns>The validation results.</returns>
+        </member>
+        <member name="T:IoC.Features.CollectionFeature">
+            <summary>
+            Allows to resolve enumeration of all instances related to corresponding bindings.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.CollectionFeature.Default">
+            The default instance.
+        </member>
+        <member name="F:IoC.Features.CollectionFeature.HighPerformance">
+            The high-performance instance.
+        </member>
+        <member name="M:IoC.Features.CollectionFeature.Apply(IoC.IContainer)">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Features.ConfigurationFeature">
+            <summary>
+            Allows to configure via a text metadata.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.ConfigurationFeature.Default">
+            <summary>
+            The default instance.
+            </summary>
+        </member>
+        <member name="M:IoC.Features.ConfigurationFeature.Apply(IoC.IContainer)">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Features.CoreFeature">
+            <summary>
+            Adds the set of core features like lifetimes and default containers.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.CoreFeature.Default">
+            The default instance.
+        </member>
+        <member name="M:IoC.Features.CoreFeature.Apply(IoC.IContainer)">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Features.Feature">
+            <summary>
+            Provides defaults for features.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.Feature.BasicSet">
+            <summary>
+            The enumeration of default features.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.Feature.DefaultSet">
+            <summary>
+            The enumeration of default features.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.Feature.HighPerformanceSet">
+            <summary>
+            The enumeration of default features.
+            </summary>
+        </member>
+        <member name="T:IoC.Features.FuncFeature">
+            <summary>
+            Allows to resolve Funcs.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.FuncFeature.Default">
+            The default instance.
+        </member>
+        <member name="F:IoC.Features.FuncFeature.HighPerformance">
+            The high-performance instance.
+        </member>
+        <member name="M:IoC.Features.FuncFeature.Apply(IoC.IContainer)">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Features.LazyFeature">
+            <summary>
+            Allows to resolve Lazy.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.LazyFeature.Default">
+            The default instance.
+        </member>
+        <member name="M:IoC.Features.LazyFeature.Apply(IoC.IContainer)">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Features.TaskFeature">
+            <summary>
+            Allows to resolve Tasks.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.TaskFeature.Default">
+            The default instance.
+        </member>
+        <member name="M:IoC.Features.TaskFeature.Apply(IoC.IContainer)">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Features.TupleFeature">
+            <summary>
+            Allows to resolve Tuples.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.TupleFeature.Default">
+            The default instance.
+        </member>
+        <member name="F:IoC.Features.TupleFeature.HighPerformance">
+            The high-performance instance.
+        </member>
+        <member name="M:IoC.Features.TupleFeature.Apply(IoC.IContainer)">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Fluent">
+            <summary>
+            Extension method for IoC container.
+            </summary>
+        </member>
+        <member name="M:IoC.Fluent.CreateChild(IoC.IContainer,System.String)">
+            <summary>
+            Creates child container.
+            </summary>
+            <param name="parent">The parent container.</param>
+            <param name="name">The name of child container.</param>
+            <returns>The child container.</returns>
+        </member>
+        <member name="M:IoC.Fluent.Validate(IoC.IContainer)">
+            <summary>
+            Validates the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <returns>The validation result.</returns>
+        </member>
+        <member name="T:IoC.FluentBind">
+            <summary>
+            Represents extensions to add bindings to a container.
+            </summary>
+        </member>
+        <member name="M:IoC.FluentBind.Bind(IoC.IContainer,System.Type[])">
+            <summary>
+            Binds the type(s).
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="types"></param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``1(IoC.IContainer)">
+            <summary>
+            Binds the type.
+            </summary>
+            <typeparam name="T">The contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``2(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``3(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``4(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``5(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``6(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``7(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``8(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.As``1(IoC.IBinding{``0},IoC.Lifetime)">
+            <summary>
+            Assigns well-known lifetime to the binding.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="binding"></param>
+            <param name="lifetime"></param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Lifetime``1(IoC.IBinding{``0},IoC.ILifetime)">
+            <summary>
+            Assigns the lifetime to the binding.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="binding"></param>
+            <param name="lifetime"></param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Tag``1(IoC.IBinding{``0},System.Object)">
+            <summary>
+            Marks the binding by the tag. Is it possible to use multiple times.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="binding"></param>
+            <param name="tagValue"></param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.AnyTag``1(IoC.IBinding{``0})">
+            <summary>
+            Marks the binding to be used for any tags.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="binding">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,System.Predicate{System.Reflection.ConstructorInfo})">
+            <summary>
+            Creates full auto-wiring.
+            </summary>
+            <param name="binding">The binding token.</param>
+            <param name="type">The instance type.</param>
+            <param name="constructorFilter">The constructor's filter.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},System.Predicate{System.Reflection.ConstructorInfo})">
+            <summary>
+            Creates full auto-wiring.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="binding">The binding token.</param>
+            <param name="constructorFilter">The constructor's filter.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Creates manual auto-wiring.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="binding">The binding token.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.ToSelf(System.IDisposable)">
+            <summary>
+            Puts the registration token to the target contaier to manage it.
+            </summary>
+            <param name="registrationToken"></param>
+        </member>
+        <member name="T:IoC.FluentConfiguration">
+            <summary>
+            Represents extensons to configure a container.
+            </summary>
+        </member>
+        <member name="M:IoC.FluentConfiguration.Apply(IoC.IContainer,System.String[])">
+            <summary>
+            Applies text configurations for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurationText">The text configurations.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentConfiguration.Apply(IoC.IContainer,System.IO.Stream[])">
+            <summary>
+            Applies text configurations from streams for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurationStreams">The set of streams with text configurations.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentConfiguration.Apply(IoC.IContainer,System.IO.TextReader[])">
+            <summary>
+            Applies text configurations from text readers for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurationReaders">The set of text readers with text configurations.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentConfiguration.Using(IoC.IContainer,System.String[])">
+            <summary>
+            Applies text configurations for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurationText">The text configurations.</param>
+            <returns>The target container.</returns>
+        </member>
+        <member name="M:IoC.FluentConfiguration.Using(IoC.IContainer,System.IO.Stream[])">
+            <summary>
+            Applies text configurations from streams for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurationStreams">The set of streams with text configurations.</param>
+            <returns>The target container.</returns>
+        </member>
+        <member name="M:IoC.FluentConfiguration.Using(IoC.IContainer,System.IO.TextReader[])">
+            <summary>
+            Applies text configurations from text readers for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurationReaders">The set of text readers with text configurations.</param>
+            <returns>The target container.</returns>
+        </member>
+        <member name="M:IoC.FluentConfiguration.Apply(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IConfiguration})">
+            <summary>
+            Applies configurations for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurations">The configurations.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentConfiguration.Apply(IoC.IContainer,IoC.IConfiguration[])">
+            <summary>
+            Applies configurations for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurations">The configurations.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentConfiguration.Using(IoC.IContainer,IoC.IConfiguration[])">
+            <summary>
+            Applies configurations for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurations">The configurations.</param>
+            <returns>The target container.</returns>
+        </member>
+        <member name="M:IoC.FluentConfiguration.Using``1(IoC.IContainer)">
+            <summary>
+            Applies configuration for the target container.
+            </summary>
+            <typeparam name="T">The type of configuration.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The target container.</returns>
+        </member>
+        <member name="T:IoC.FluentGetResolver">
+            <summary>
+            Represents extensions to get a resolver from a container.
+            </summary>
+        </member>
+        <member name="M:IoC.FluentGetResolver.GetResolver``1(IoC.IContainer,System.Type,IoC.Tag)">
+            <summary>
+            Gets the resolver.
+            </summary>
+            <typeparam name="T">The resolver type.</typeparam>
+            <param name="type">The target type.</param>
+            <param name="tag">The tag of binding.</param>
+            <param name="container"></param>
+            <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentGetResolver.GetResolver``1(IoC.IContainer,IoC.Tag)">
+            <summary>
+            Gets the resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="tag">The tag of binding.</param>
+            <param name="container"></param>
+            <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentGetResolver.GetResolver``1(IoC.IContainer,System.Type)">
+            <summary>
+            Gets the resolver.
+            </summary>
+            <typeparam name="T">The resolver type.</typeparam>
+            <param name="type">The target type.</param>
+            <param name="container"></param>
+            <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentGetResolver.GetResolver``1(IoC.IContainer)">
+            <summary>
+            Gets the resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container"></param>
+            <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentGetResolver.AsTag(System.Object)">
+            <summary>
+            Creates tag.
+            </summary>
+            <param name="tagValue">The tage value.</param>
+            <returns>The tag.</returns>
+        </member>
+        <member name="T:IoC.FluentNativeResolve">
+            <summary>
+            Represents extensions to resolve from a native container.
+            </summary>
+        </member>
+        <member name="M:IoC.FluentNativeResolve.Resolve``1(IoC.Container)">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The instance.</returns>
+        </member>
+        <member name="M:IoC.FluentNativeResolve.Resolve``1(IoC.Container,IoC.Tag)">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="tag">The tag.</param>
+            <returns>The instance.</returns>
+        </member>
+        <member name="M:IoC.FluentNativeResolve.Resolve``1(IoC.Container,System.Object[])">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="args">The optional arguments.</param>
+            <returns>The instance.</returns>
+        </member>
+        <member name="M:IoC.FluentNativeResolve.Resolve``1(IoC.Container,IoC.Tag,System.Object[])">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="tag">The tag.</param>
+            <param name="args">The optional arguments.</param>
+            <returns>The instance.</returns>
+        </member>
+        <member name="M:IoC.FluentNativeResolve.Resolve``1(IoC.Container,System.Type)">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="type">The resolving instance type.</param>
+            <returns>The instance.</returns>
+        </member>
+        <member name="M:IoC.FluentNativeResolve.Resolve``1(IoC.Container,System.Type,IoC.Tag)">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="type">The resolving instance type.</param>
+            <param name="tag">The tag.</param>
+            <returns>The instance.</returns>
+        </member>
+        <member name="M:IoC.FluentNativeResolve.Resolve``1(IoC.Container,System.Type,System.Object[])">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="type">The resolving instance type.</param>
+            <param name="args">The optional arguments.</param>
+            <returns>The instance.</returns>
+        </member>
+        <member name="M:IoC.FluentNativeResolve.Resolve``1(IoC.Container,System.Type,IoC.Tag,System.Object[])">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="type">The resolving instance type.</param>
+            <param name="tag">The tag.</param>
+            <param name="args">The optional arguments.</param>
+            <returns>The instance.</returns>
+        </member>
+        <member name="T:IoC.FluentRegister">
+            <summary>
+            Represents extensions for registration in a container.
+            </summary>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``1(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowring type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``2(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``3(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``4(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``5(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``6(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``7(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <typeparam name="T6">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``8(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <typeparam name="T6">The additional contract type.</typeparam>
+            <typeparam name="T7">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``9(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <typeparam name="T6">The additional contract type.</typeparam>
+            <typeparam name="T7">The additional contract type.</typeparam>
+            <typeparam name="T8">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``1(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``2(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``3(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``4(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``5(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``6(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``7(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <typeparam name="T6">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``8(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <typeparam name="T6">The additional contract type.</typeparam>
+            <typeparam name="T7">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.FluentRegister.Register``9(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <typeparam name="T6">The additional contract type.</typeparam>
+            <typeparam name="T7">The additional contract type.</typeparam>
+            <typeparam name="T8">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="T:IoC.FluentResolve">
+            <summary>
+            Represents extensions to resolve from a container.
+            </summary>
+        </member>
+        <member name="M:IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Object[])">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="args">The optional arguments.</param>
+            <returns>The instance.</returns>
+        </member>
+        <member name="M:IoC.FluentResolve.Resolve``1(IoC.IContainer,IoC.Tag,System.Object[])">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="tag">The tag.</param>
+            <param name="args">The optional arguments.</param>
+            <returns>The instance.</returns>
+        </member>
+        <member name="M:IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type,System.Object[])">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="type">The resolving instance type.</param>
+            <param name="args">The optional arguments.</param>
+            <returns>The instance.</returns>
+        </member>
+        <member name="M:IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type,IoC.Tag,System.Object[])">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="type">The resolving instance type.</param>
+            <param name="tag">The tag.</param>
+            <param name="args">The optional arguments.</param>
+            <returns>The instance.</returns>
+        </member>
+        <member name="T:IoC.GenericTypeArgumentAttribute">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT2">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT3">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT4">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT5">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT6">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT7">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT8">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.IBinding`1">
+            <summary>
+            The container's binding.
+            </summary>
+            <typeparam name="T"></typeparam>
+        </member>
+        <member name="P:IoC.IBinding`1.Container">
+            <summary>
+            The target container.
+            </summary>
+        </member>
+        <member name="P:IoC.IBinding`1.Types">
+            <summary>
+            The type to bind.
+            </summary>
+        </member>
+        <member name="P:IoC.IBinding`1.Tags">
+            <summary>
+            The tags to mark the binding.
+            </summary>
+        </member>
+        <member name="P:IoC.IBinding`1.Lifetime">
+            <summary>
+            The specified lifetime instance or null.
+            </summary>
+        </member>
+        <member name="T:IoC.IConfiguration">
+            <summary>
+            The container's configuration.
+            </summary>
+        </member>
+        <member name="M:IoC.IConfiguration.Apply(IoC.IContainer)">
+            <summary>
+            Apply the configuration for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <returns>The enumeration of registration tokens.</returns>
+        </member>
+        <member name="T:IoC.IContainer">
+            <summary>
+            The IoC container.
+            </summary>
+        </member>
+        <member name="P:IoC.IContainer.Parent">
+            <summary>
+            The parent container.
+            </summary>
+        </member>
+        <member name="M:IoC.IContainer.TryRegister(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,System.IDisposable@)">
+            <summary>
+            Registers the binding to the target container.
+            </summary>
+            <param name="keys">The set of keys.</param>
+            <param name="dependency">The dependency.</param>
+            <param name="lifetime">The lifetime.</param>
+            <param name="registrationToken">The registration token.</param>
+            <returns>True if successful.</returns>
+        </member>
+        <member name="M:IoC.IContainer.TryGetDependency(IoC.Key,IoC.IDependency@,IoC.ILifetime@)">
+            <summary>
+            Registers the dependency and lifetime.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="dependency">The dependency.</param>
+            <param name="lifetime">The lifetime.</param>
+            <returns>True if successful.</returns>
+        </member>
+        <member name="M:IoC.IContainer.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,IoC.IContainer)">
+            <summary>
+            Gets the resolver.
+            </summary>
+            <typeparam name="T">The resolver type.</typeparam>
+            <param name="type">The target type.</param>
+            <param name="tag">The tag of binding.</param>
+            <param name="resolver">The resolver.</param>
+            <param name="container">The resolving container.</param>
+            <returns>True if successful.</returns>
+        </member>
+        <member name="M:IoC.IContainer.TryGetResolver``1(System.Type,IoC.Resolver{``0}@,IoC.IContainer)">
+            <summary>
+            Gets the resolver.
+            </summary>
+            <typeparam name="T">The resolver type.</typeparam>
+            <param name="type">The target type.</param>
+            <param name="resolver">The resolver.</param>
+            <param name="container">The resolving container.</param>
+            <returns>True if successful.</returns>
+        </member>
+        <member name="T:IoC.IDependency">
+            <summary>
+            Represents a IoC dependency.
+            </summary>
+        </member>
+        <member name="P:IoC.IDependency.Expression">
+            <summary>
+            The expression for dependency which is used to create a build graph.
+            </summary>
+        </member>
+        <member name="T:IoC.ILifetime">
+            <summary>
+            Represents a lifetime for an instance.
+            </summary>
+        </member>
+        <member name="M:IoC.ILifetime.Clone">
+            <summary>
+            Clone this lifetime to use with generic instances.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:IoC.Injections">
+            <summary>
+            Injection extensions.
+            </summary>
+        </member>
+        <member name="M:IoC.Injections.Inject``1(IoC.IContainer)">
+            <summary>
+            Injects the dependency. Just a marker.
+            </summary>
+            <typeparam name="T">The type of dependency.</typeparam>
+            <param name="container">The resolving container.</param>
+            <returns>The injected instance.</returns>
+        </member>
+        <member name="M:IoC.Injections.Inject``1(IoC.IContainer,System.Object)">
+            <summary>
+            Injects the dependency. Just a marker.
+            </summary>
+            <typeparam name="T">The type of dependency.</typeparam>
+            <param name="container">The resolving container.</param>
+            <param name="tag">The tag of dependency.</param>
+            <returns>The injected instance.</returns>
+        </member>
+        <member name="M:IoC.Injections.Inject``1(IoC.IContainer,``0,``0)">
+            <summary>
+            Injects the dependency. Just a marker.
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="container">The resolving container.</param>
+            <param name="destination">The destination member for injection.</param>
+            <param name="source">The source of injection.</param>
+        </member>
+        <member name="T:IoC.Key">
+            <summary>
+            Represents the key of binding.
+            </summary>
+        </member>
+        <member name="F:IoC.Key.AnyTag">
+            <summary>
+            The marker object for any tag.
+            </summary>
+        </member>
+        <member name="F:IoC.Key.Type">
+            <summary>
+            The type.
+            </summary>
+        </member>
+        <member name="F:IoC.Key.Tag">
+            <summary>
+            The tag.
+            </summary>
+        </member>
+        <member name="M:IoC.Key.#ctor(System.Type,System.Object)">
+            <summary>
+            Creates the instance of Key.
+            </summary>
+            <param name="type"></param>
+            <param name="tag"></param>
+        </member>
+        <member name="M:IoC.Key.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Lifetime">
+            <summary>
+            The enumeration of well-known lifetimes.
+            </summary>
+        </member>
+        <member name="F:IoC.Lifetime.Transient">
+            <summary>
+            Default lifetime. New instance each time (default).
+            </summary>
+        </member>
+        <member name="F:IoC.Lifetime.Singleton">
+            <summary>
+            Single instance per registration
+            </summary>
+        </member>
+        <member name="F:IoC.Lifetime.ContainerSingleton">
+            <summary>
+            Singleton per container
+            </summary>
+        </member>
+        <member name="F:IoC.Lifetime.ScopeSingleton">
+            <summary>
+            Singleton per scope
+            </summary>
+        </member>
+        <member name="T:IoC.Lifetimes.ContainerSingletonLifetime">
+            <summary>
+            Represents singleton per container lifetime.
+            </summary>
+        </member>
+        <member name="M:IoC.Lifetimes.ContainerSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.ContainerSingletonLifetime.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.ContainerSingletonLifetime.Clone">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.ContainerSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.IContainer,IoC.IContainer,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Lifetimes.ScopeSingletonLifetime">
+            <summary>
+            Represents singleton per scope lifetime.
+            </summary>
+        </member>
+        <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.ToString">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.Clone">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.Scope,IoC.IContainer,System.Object[])">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Lifetimes.SingletonBasedLifetime`1">
+            <summary>
+            Represents the abstaction for singleton based lifetimes.
+            </summary>
+            <typeparam name="TKey">The key type.</typeparam>
+        </member>
+        <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.BuildContext,System.Linq.Expressions.Expression)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.Clone">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.CreateKey(IoC.IContainer,System.Object[])">
+            <summary>
+            Creates key for singleton.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="args">The arfuments.</param>
+            <returns>The created key.</returns>
+        </member>
+        <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.OnNewInstanceCreated``1(``0,`0,IoC.IContainer,System.Object[])">
+            <summary>
+            Is invoked on the new instance creation.
+            </summary>
+            <param name="newInstance">The new instance.</param>
+            <param name="key">The instance key.</param>
+            <param name="container">The target container.</param>
+            <param name="args">Optional arguments.</param>
+        </member>
+        <member name="T:IoC.Lifetimes.SingletonLifetime">
+            <summary>
+            Represents singleton lifetime.
+            </summary>
+        </member>
+        <member name="M:IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.Extensibility.BuildContext,System.Linq.Expressions.Expression)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.SingletonLifetime.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.SingletonLifetime.Clone">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.SingletonLifetime.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Resolver`1">
+            <summary>
+            Represents the resolver delegate.
+            </summary>
+            <typeparam name="T">The type of resolving instance.</typeparam>
+            <param name="container">The resolving container.</param>
+            <param name="args">The optional resolving arguments.</param>
+            <returns></returns>
+        </member>
+        <member name="T:IoC.Scope">
+            <summary>
+            Represents the scope which could be used with <c>Lifetime.ScopeSingleton</c>
+            </summary>
+        </member>
+        <member name="P:IoC.Scope.Current">
+            <summary>
+            The current scope.
+            </summary>
+        </member>
+        <member name="M:IoC.Scope.#ctor(System.Object)">
+            <summary>
+            Creates the instance of a new scope.
+            </summary>
+            <param name="scopeKey">The key of scope.</param>
+        </member>
+        <member name="M:IoC.Scope.Begin">
+            <summary>
+            Begins scope.
+            </summary>
+            <returns>The scope token to end the scope.</returns>
+        </member>
+        <member name="M:IoC.Scope.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Scope.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Scope.GetHashCode">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Tag">
+            <summary>
+            Represents a tag holder.
+            </summary>
+        </member>
+        <member name="M:IoC.Tag.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.ValidationResult">
+            <summary>
+            Represents a container's validation result.
+            </summary>
+        </member>
+        <member name="F:IoC.ValidationResult.ResolvedKey">
+            <summary>
+            Keys that were resolved successfully.
+            </summary>
+        </member>
+        <member name="F:IoC.ValidationResult.UnresolvedKeys">
+            <summary>
+            Keys that were not resolved successfully.
+            </summary>
+        </member>
+        <member name="P:IoC.ValidationResult.IsValid">
+            <summary>
+            True if the container could be used successfully.
+            </summary>
+        </member>
+        <member name="T:IoC.WellknownContainers">
+            <summary>
+            Represents the enumeration of well-known containers.
+            </summary>
+        </member>
+        <member name="F:IoC.WellknownContainers.Current">
+            <summary>
+            Current container.
+            </summary>
+        </member>
+        <member name="F:IoC.WellknownContainers.Parent">
+            <summary>
+            Parent container.
+            </summary>
+        </member>
+        <member name="F:IoC.WellknownContainers.Child">
+            <summary>
+            Creates new child container.
+            </summary>
+        </member>
+    </members>
+</doc>

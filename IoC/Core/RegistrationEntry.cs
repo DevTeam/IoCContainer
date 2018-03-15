@@ -93,9 +93,7 @@
         }
 
         public override string ToString()
-        {
-            return $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {_lifetime?.ToString() ?? Lifetime.Transient.ToString()}";
-        }
+            => $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {_lifetime?.ToString() ?? Lifetime.Transient.ToString()}";
 
         private struct LifetimeKey
         {

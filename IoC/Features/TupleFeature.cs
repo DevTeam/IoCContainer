@@ -16,10 +16,7 @@
 
         private readonly bool _highPerformance;
 
-        private TupleFeature(bool highPerformance = false)
-        {
-            _highPerformance = highPerformance;
-        }
+        private TupleFeature(bool highPerformance = false) => _highPerformance = highPerformance;
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)

@@ -57,9 +57,7 @@
         /// </summary>
         /// <param name="tagValue">The tage value.</param>
         /// <returns>The tag.</returns>
-        public static Tag AsTag([CanBeNull] this object tagValue)
-        {
-            return new Tag(tagValue);
-        }
+        [MethodImpl((MethodImplOptions)256)]
+        public static Tag AsTag([CanBeNull] this object tagValue) => new Tag(tagValue);
     }
 }

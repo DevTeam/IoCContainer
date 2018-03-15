@@ -16,10 +16,7 @@
 
         private readonly bool _highPerformance;
 
-        private FuncFeature(bool highPerformance = false)
-        {
-            _highPerformance = highPerformance;
-        }
+        private FuncFeature(bool highPerformance = false) => _highPerformance = highPerformance;
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)

@@ -22,10 +22,7 @@
 
         private readonly bool _highPerformance;
 
-        private CollectionFeature(bool highPerformance = false)
-        {
-            _highPerformance = highPerformance;
-        }
+        private CollectionFeature(bool highPerformance = false) => _highPerformance = highPerformance;
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
@@ -54,10 +51,7 @@
         {
             private readonly IEnumerable<T> _source;
 
-            public Observable([NotNull] IEnumerable<T> source)
-            {
-                _source = source ?? throw new ArgumentNullException(nameof(source));
-            }
+            public Observable([NotNull] IEnumerable<T> source) => _source = source ?? throw new ArgumentNullException(nameof(source));
 
             public IDisposable Subscribe(IObserver<T> observer)
             {
@@ -86,10 +80,7 @@
                 Reset();
             }
 
-            public void OnNext(ContainerEvent value)
-            {
-                Reset();
-            }
+            public void OnNext(ContainerEvent value) => Reset();
 
             public void OnError(Exception error)
             {
@@ -99,20 +90,12 @@
             {
             }
 
-            public void Dispose()
-            {
-                _subscription.Dispose();
-            }
+            public void Dispose() => _subscription.Dispose();
 
-            public IEnumerator<T> GetEnumerator()
-            {
-                return _currentResolvers.Value.Select(resolver => resolver(_container, _args)).GetEnumerator();
-            }
+            public IEnumerator<T> GetEnumerator() 
+                => _currentResolvers.Value.Select(resolver => resolver(_container, _args)).GetEnumerator();
 
-            IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             private void Reset()
             {

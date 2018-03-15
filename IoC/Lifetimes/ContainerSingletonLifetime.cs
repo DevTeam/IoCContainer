@@ -10,22 +10,13 @@
     public sealed class ContainerSingletonLifetime: SingletonBasedLifetime<IContainer>
     {
         /// <inheritdoc />
-        protected override IContainer CreateKey(IContainer container, object[] args)
-        {
-            return container;
-        }
+        protected override IContainer CreateKey(IContainer container, object[] args) => container;
 
         /// <inheritdoc />
-        public override string ToString()
-        {
-            return Lifetime.ContainerSingleton.ToString();
-        }
+        public override string ToString() => Lifetime.ContainerSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Clone()
-        {
-            return new ContainerSingletonLifetime();
-        }
+        public override ILifetime Clone() => new ContainerSingletonLifetime();
 
         /// <inheritdoc />
         protected override void OnNewInstanceCreated<T>(T newInstance, IContainer targetContainer, IContainer container, object[] args)

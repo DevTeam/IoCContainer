@@ -28,7 +28,8 @@
 
                     // Resolving scope 2
                     MyService instance2;
-                    using (new Scope(2))
+                    using (var scope = new Scope(2))
+                    using (scope.Begin())
                     {
                         instance2 = (MyService) container.Resolve<IMyService>("xyz");
                     }
@@ -54,7 +55,8 @@
             using (container.Bind<IMyDisposableService>().As(Lifetime.ScopeSingleton).To(ctx => mock.Object))
             {
                 // When
-                using (new Scope(99))
+                using (var scope = new Scope(99))
+                using (scope.Begin())
                 {
                     var instance = container.Resolve<IMyDisposableService>();
                 }

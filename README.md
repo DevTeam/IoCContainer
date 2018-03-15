@@ -39,18 +39,18 @@ interface ICat { bool IsAlive { get; } }
 ```csharp
 class CardboardBox<T> : IBox<T>
 {
-    public CardboardBox(T content) { Content = content; }
+    public CardboardBox(T content) => Content = content;
 
     public T Content { get; }
 
-    public override string ToString() { return Content.ToString(); }
+    public override string ToString() => Content.ToString();
 }
 
 class ShroedingersCat : ICat
 {
     public bool IsAlive => new Random().Next(2) == 1;
 
-    public override string ToString() { return $"Is alive: {IsAlive}"; }
+    public override string ToString() => $"Is alive: {IsAlive}";
 }
 ```
 
@@ -144,10 +144,10 @@ Thus this IoC container makes the minimal impact in terms of perfomrance and of 
 
 ## Class References
 
-- [.NET 4.0](IoC/IoC_net40.md)
-- [.NET 4.5](IoC/IoC_net45.md)
-- [.NET Standard 1.0](IoC/IoC_netstandard1.0.md)
-- [.NET Core 2.0](IoC/IoC_netcoreapp2.0.md)
+- [.NET 4.0](Docs/IoC_net40.md)
+- [.NET 4.5](Docs/IoC_net45.md)
+- [.NET Standard 1.0](Docs/IoC_netstandard1.0.md)
+- [.NET Core 2.0](Docs/IoC_netcoreapp2.0.md)
 
 ## Why this one?
 
@@ -187,6 +187,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
 * [Configuration class](#configuration-class)
 * [Configuration via a text metadata](#configuration-via-a-text-metadata)
 * [Change configuration on-the-fly](#change-configuration-on-the-fly)
+* [ASP Net Core Support](#asp-net-core-support)
 * [Custom Child Container](#custom-child-container)
 * [Custom Lifetime](#custom-lifetime)
 * [Replace Lifetime](#replace-lifetime)
@@ -836,6 +837,49 @@ using (container.Bind<IDependency>().To<Dependency>())
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ChangeConfigurationOnTheFly.cs)
 
+### ASP Net Core Support
+
+``` CSharp
+public void Run()
+{
+    var mocks = new List<Mock<IMyController>>();
+    // Create a container
+    using (var container = Container.Create().Using(new AspNetCoreFeature()))
+    using (container.Bind<IMyController>().As(Lifetime.ScopeSingleton).To(ctx => CreateController(mocks)))
+    {
+        var factory = container.Resolve<IServiceScopeFactory>();
+        using (var scope = factory.CreateScope())
+        {
+            var controller1 = (IMyController)scope.ServiceProvider.GetService(typeof(IMyController));
+        }
+
+        using (var scope = factory.CreateScope())
+        {
+            var controller2 = (IMyController)scope.ServiceProvider.GetService(typeof(IMyController));
+        }
+
+        mocks.Count.ShouldBe(2);
+        foreach (var mock in mocks)
+        {
+            mock.Verify(i => i.Dispose(), Times.Once);
+        }
+    }
+}
+
+public IMyController CreateController(ICollection<Mock<IMyController>> mocks)
+{
+    var newMock = new Mock<IMyController>();
+    mocks.Add(newMock);
+    return newMock.Object;
+}
+
+public interface IMyController: IDisposable
+{
+}
+
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AspNetCore.cs)
+
 ### Custom Child Container
 
 ``` CSharp
@@ -929,9 +973,9 @@ public void Run()
 
 public class MyTransientLifetime : ILifetime
 {
-    public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
+    public Expression Build(Expression expression, BuildContext buildContext, Expression context = default(Expression))
     {
-        return resolver(container, args);
+        return expression;
     }
 
     public ILifetime Clone()
@@ -982,6 +1026,7 @@ public interface ICounter
 
 public class MySingletonLifetime : ILifetime
 {
+    private static readonly MethodInfo IncrementCounterMethodInfo = typeof(MySingletonLifetime).GetTypeInfo().DeclaredMethods.Single(i => i.Name == nameof(IncrementCounter));
     private readonly ILifetime _baseSingletonLifetime;
     private readonly ICounter _counter;
 
@@ -991,16 +1036,29 @@ public class MySingletonLifetime : ILifetime
         _counter = counter;
     }
 
-    public T GetOrCreate<T>(IContainer container, object[] args, Resolver<T> resolver)
+    public Expression Build(Expression expression, BuildContext buildContext, Expression context = default(Expression))
     {
-        // Just counting the number of calls
-        _counter.Increment();
-        return _baseSingletonLifetime.GetOrCreate(container, args, resolver);
+        // Build expression using base lifetime
+        expression = _baseSingletonLifetime.Build(expression, buildContext, context);
+
+        // Define `this` variable
+        var thisVar = buildContext.DefineValue(this);
+
+        return Expression.Block(
+            // Adds statement this.IncrementCounter()
+            Expression.Call(thisVar, IncrementCounterMethodInfo),
+            expression);
     }
 
     public ILifetime Clone()
     {
         return new MySingletonLifetime(_baseSingletonLifetime.Clone(), _counter);
+    }
+
+    internal void IncrementCounter()
+    {
+        // Just counting the number of calls
+        _counter.Increment();
     }
 }
 ```
@@ -1022,7 +1080,8 @@ using (container.Bind<IDependency>().As(Lifetime.ScopeSingleton).To<Dependency>(
         instance1.ShouldBe(instance2);
 
         // Scope "1"
-        using (new Scope("1"))
+        using (var scope = new Scope("1"))
+        using (scope.Begin())
         {
             var instance3 = container.Resolve<IService>();
             var instance4 = container.Resolve<IService>();
@@ -1045,7 +1104,8 @@ using (container.Bind<IDependency>().As(Lifetime.ScopeSingleton).To<Dependency>(
         instance1.Dependency.ShouldBe(instance2.Dependency);
 
         // Scope "1"
-        using (new Scope("1"))
+        using (var scope = new Scope("1"))
+        using (scope.Begin())
         {
             var instance3 = container.Resolve<IService>();
             instance3.Dependency.ShouldNotBe(instance1.Dependency);

@@ -13,9 +13,6 @@
             _registration = registration ?? throw new ArgumentNullException(nameof(registration));
         }
 
-        public void Dispose()
-        {
-            _registration.Dispose();
-        }
+        public void Dispose() => _registration.Dispose();
     }
 }

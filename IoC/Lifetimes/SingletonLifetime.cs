@@ -46,16 +46,10 @@
         }
 
         /// <inheritdoc />
-        public ILifetime Clone()
-        {
-            return new SingletonLifetime();
-        }
+        public ILifetime Clone() => new SingletonLifetime();
 
         /// <inheritdoc />
-        public override string ToString()
-        {
-            return Lifetime.Singleton.ToString();
-        }
+        public override string ToString() => Lifetime.Singleton.ToString();
 
         [MethodImpl((MethodImplOptions)256)]
         internal T CreateInstance<T>(IContainer container, object[] args, Resolver<T> resolver)

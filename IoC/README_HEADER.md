@@ -144,10 +144,10 @@ Thus this IoC container makes the minimal impact in terms of perfomrance and of 
 
 ## Class References
 
-- [.NET 4.0](IoC/IoC_net40.md)
-- [.NET 4.5](IoC/IoC_net45.md)
-- [.NET Standard 1.0](IoC/IoC_netstandard1.0.md)
-- [.NET Core 2.0](IoC/IoC_netcoreapp2.0.md)
+- [.NET 4.0](Docs/IoC_net40.md)
+- [.NET 4.5](Docs/IoC_net45.md)
+- [.NET Standard 1.0](Docs/IoC_netstandard1.0.md)
+- [.NET Core 2.0](Docs/IoC_netcoreapp2.0.md)
 
 ## Why this one?
 

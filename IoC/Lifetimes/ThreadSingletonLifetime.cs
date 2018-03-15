@@ -8,22 +8,13 @@ namespace IoC.Lifetimes
     public class ThreadSingletonLifetime : SingletonBasedLifetime<int>
     {
         /// <inheritdoc />
-        protected override int CreateKey(IContainer container, object[] args)
-        {
-            return System.Threading.Thread.CurrentThread.ManagedThreadId;
-        }
+        protected override int CreateKey(IContainer container, object[] args) => System.Threading.Thread.CurrentThread.ManagedThreadId;
 
         /// <inheritdoc />
-        public override string ToString()
-        {
-            return Lifetime.ScopeSingleton.ToString();
-        }
+        public override string ToString() => Lifetime.ScopeSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Clone()
-        {
-            return new ThreadSingletonLifetime();
-        }
+        public override ILifetime Clone() => new ThreadSingletonLifetime();
 
         /// <inheritdoc />
         protected override void OnNewInstanceCreated<T>(T newInstance, int key, IContainer container, object[] args)

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using Core;
 
     /// <summary>
     /// Represents the scope which could be used with <c>Lifetime.ScopeSingleton</c>
@@ -10,24 +11,33 @@
     [PublicAPI]
     public class Scope: IDisposable
     {
+        [NotNull] private static readonly Scope Default = new Scope(DefaultScopeKey.Shared);
+        [CanBeNull] [ThreadStatic] private static Scope _current;
         [NotNull] internal readonly object ScopeKey;
-        [CanBeNull] private readonly Scope _prevScope;
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
+        [CanBeNull] private Scope _prevScope;
 
         /// <summary>
         /// The current scope.
         /// </summary>
-        [NotNull] public static Scope Current { get; private set; } = new Scope(DefaultScopeKey.Shared);
+        [NotNull]
+        public static Scope Current => _current ?? Default;
 
         /// <summary>
         /// Creates the instance of a new scope.
         /// </summary>
         /// <param name="scopeKey">The key of scope.</param>
-        public Scope([NotNull] object scopeKey)
+        public Scope([NotNull] object scopeKey) => ScopeKey = scopeKey ?? throw new ArgumentNullException(nameof(scopeKey));
+
+        /// <summary>
+        /// Begins scope.
+        /// </summary>
+        /// <returns>The scope token to end the scope.</returns>
+        public IDisposable Begin()
         {
-            ScopeKey = scopeKey ?? throw new ArgumentNullException(nameof(scopeKey));
             _prevScope = Current;
-            Current = this;
+            _current = this;
+            return Disposable.Create(() => { _current = _prevScope ?? throw new NotSupportedException(); });
         }
 
         /// <inheritdoc />
@@ -37,8 +47,6 @@
             {
                 resource.Dispose();
             }
-
-            Current = _prevScope ?? throw new NotSupportedException();
         }
 
         /// <inheritdoc />
@@ -51,15 +59,9 @@
         }
 
         /// <inheritdoc />
-        public override int GetHashCode()
-        {
-            return ScopeKey.GetHashCode();
-        }
+        public override int GetHashCode() => ScopeKey.GetHashCode();
 
-        internal void AddResource(IDisposable resource)
-        {
-            _resources.Add(resource);
-        }
+        internal void AddResource(IDisposable resource) => _resources.Add(resource);
 
         private class DefaultScopeKey
         {
@@ -69,10 +71,7 @@
             {
             }
 
-            public override string ToString()
-            {
-                return "Default Resolving Scope Key";
-            }
+            public override string ToString() => "Default Resolving Scope Key";
         }
     }
 }

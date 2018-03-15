@@ -1,0 +1,86 @@
+﻿namespace IoC.Features
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Microsoft.Extensions.DependencyInjection;
+
+    /// <inheritdoc />
+    [PublicAPI]
+    public class AspNetCoreFeature: IConfiguration
+    {
+        [CanBeNull] private readonly IEnumerable<ServiceDescriptor> _services;
+
+        /// <summary>
+        /// Creates an instance.
+        /// </summary>
+        /// <param name="services"></param>
+        public AspNetCoreFeature([CanBeNull] IEnumerable<ServiceDescriptor> services = null) => _services = services;
+
+        /// <inheritdoc />
+        public IEnumerable<IDisposable> Apply(IContainer container)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            var singletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.Singleton.AsTag());
+            var scopeSingletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.ScopeSingleton.AsTag());
+            if (_services != null)
+            {
+                foreach (var serviceGroup in _services.GroupBy(i => i.ServiceType))
+                {
+                    var tag = 0;
+                    foreach (var service in serviceGroup.Reverse())
+                    {
+                        var binding = container.Bind(service.ServiceType);
+                        switch (service.Lifetime)
+                        {
+                            case ServiceLifetime.Transient:
+                                break;
+
+                            case ServiceLifetime.Singleton:
+                                binding = binding.Lifetime(singletonLifetimeResolver(container));
+                                break;
+
+                            case ServiceLifetime.Scoped:
+                                binding = binding.Lifetime(scopeSingletonLifetimeResolver(container));
+                                break;
+
+                            default:
+                                throw new NotSupportedException($"Unknown lifetime {service.Lifetime}.");
+                        }
+
+                        if (tag > 0)
+                        {
+                            binding = binding.Tag(tag);
+                        }
+
+                        tag++;
+
+                        if (service.ImplementationType != null)
+                        {
+                            yield return binding.To(service.ImplementationType);
+                            continue;
+                        }
+
+                        if (service.ImplementationFactory != null)
+                        {
+                            yield return binding.To(ctx => service.ImplementationFactory(ctx.Container.Inject<IServiceProvider>()));
+                            continue;
+                        }
+
+                        if (service.ImplementationInstance != null)
+                        {
+                            yield return binding.To(ctx => service.ImplementationInstance);
+                            continue;
+                        }
+
+                        throw new NotSupportedException($"The service descriptor {service} is not supported.");
+                    }
+                }
+            }
+
+            yield return container.Bind<IServiceProvider>().Lifetime(singletonLifetimeResolver(container)).To<ServiceProvider>();
+            yield return container.Bind<IServiceScopeFactory>().Lifetime(singletonLifetimeResolver(container)).To<ServiceScopeFactory>();
+            yield return container.Bind<IServiceScope>().To<ServiceScope>(ctx => new ServiceScope(ctx.Container.Inject<Scope>(), ctx.Container.Inject<IContainer>()));
+        }
+    }
+}

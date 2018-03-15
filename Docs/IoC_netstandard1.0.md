@@ -56,6 +56,7 @@
   - [Parent](#P-IoC-Container-Parent 'IoC.Container.Parent')
   - [Create(name)](#M-IoC-Container-Create-System-String- 'IoC.Container.Create(System.String)')
   - [Create(configurations)](#M-IoC-Container-Create-IoC-IConfiguration[]- 'IoC.Container.Create(IoC.IConfiguration[])')
+  - [Create(name,baseContainer)](#M-IoC-Container-Create-System-String,IoC-IContainer- 'IoC.Container.Create(System.String,IoC.IContainer)')
   - [Create(name,configurations)](#M-IoC-Container-Create-System-String,IoC-IConfiguration[]- 'IoC.Container.Create(System.String,IoC.IConfiguration[])')
   - [CreateBasic(name)](#M-IoC-Container-CreateBasic-System-String- 'IoC.Container.CreateBasic(System.String)')
   - [CreateHighPerformance(name)](#M-IoC-Container-CreateHighPerformance-System-String- 'IoC.Container.CreateHighPerformance(System.String)')
@@ -169,10 +170,6 @@
   - [HighPerformance](#F-IoC-Features-FuncFeature-HighPerformance 'IoC.Features.FuncFeature.HighPerformance')
   - [Apply()](#M-IoC-Features-FuncFeature-Apply-IoC-IContainer- 'IoC.Features.FuncFeature.Apply(IoC.IContainer)')
 - [GenericTypeArgumentAttribute](#T-IoC-GenericTypeArgumentAttribute 'IoC.GenericTypeArgumentAttribute')
-- [HighPerformanceFeature](#T-IoC-Features-HighPerformanceFeature 'IoC.Features.HighPerformanceFeature')
-  - [Default](#F-IoC-Features-HighPerformanceFeature-Default 'IoC.Features.HighPerformanceFeature.Default')
-  - [DynamicAssemblyName](#F-IoC-Features-HighPerformanceFeature-DynamicAssemblyName 'IoC.Features.HighPerformanceFeature.DynamicAssemblyName')
-  - [Apply()](#M-IoC-Features-HighPerformanceFeature-Apply-IoC-IContainer- 'IoC.Features.HighPerformanceFeature.Apply(IoC.IContainer)')
 - [IBinding\`1](#T-IoC-IBinding`1 'IoC.IBinding`1')
   - [Container](#P-IoC-IBinding`1-Container 'IoC.IBinding`1.Container')
   - [Lifetime](#P-IoC-IBinding`1-Lifetime 'IoC.IBinding`1.Lifetime')
@@ -236,7 +233,6 @@
   - [ContainerSingleton](#F-IoC-Lifetime-ContainerSingleton 'IoC.Lifetime.ContainerSingleton')
   - [ScopeSingleton](#F-IoC-Lifetime-ScopeSingleton 'IoC.Lifetime.ScopeSingleton')
   - [Singleton](#F-IoC-Lifetime-Singleton 'IoC.Lifetime.Singleton')
-  - [ThreadSingleton](#F-IoC-Lifetime-ThreadSingleton 'IoC.Lifetime.ThreadSingleton')
   - [Transient](#F-IoC-Lifetime-Transient 'IoC.Lifetime.Transient')
 - [LinqTunnelAttribute](#T-IoC-LinqTunnelAttribute 'IoC.LinqTunnelAttribute')
 - [LocalizationRequiredAttribute](#T-IoC-LocalizationRequiredAttribute 'IoC.LocalizationRequiredAttribute')
@@ -260,6 +256,7 @@
 - [Scope](#T-IoC-Scope 'IoC.Scope')
   - [#ctor(scopeKey)](#M-IoC-Scope-#ctor-System-Object- 'IoC.Scope.#ctor(System.Object)')
   - [Current](#P-IoC-Scope-Current 'IoC.Scope.Current')
+  - [Begin()](#M-IoC-Scope-Begin 'IoC.Scope.Begin')
   - [Dispose()](#M-IoC-Scope-Dispose 'IoC.Scope.Dispose')
   - [Equals()](#M-IoC-Scope-Equals-System-Object- 'IoC.Scope.Equals(System.Object)')
   - [GetHashCode()](#M-IoC-Scope-GetHashCode 'IoC.Scope.GetHashCode')
@@ -288,11 +285,6 @@
   - [Default](#F-IoC-Features-TaskFeature-Default 'IoC.Features.TaskFeature.Default')
   - [Apply()](#M-IoC-Features-TaskFeature-Apply-IoC-IContainer- 'IoC.Features.TaskFeature.Apply(IoC.IContainer)')
 - [TerminatesProgramAttribute](#T-IoC-TerminatesProgramAttribute 'IoC.TerminatesProgramAttribute')
-- [ThreadSingletonLifetime](#T-IoC-Lifetimes-ThreadSingletonLifetime 'IoC.Lifetimes.ThreadSingletonLifetime')
-  - [Clone()](#M-IoC-Lifetimes-ThreadSingletonLifetime-Clone 'IoC.Lifetimes.ThreadSingletonLifetime.Clone')
-  - [CreateKey()](#M-IoC-Lifetimes-ThreadSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ThreadSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])')
-  - [OnNewInstanceCreated\`\`1()](#M-IoC-Lifetimes-ThreadSingletonLifetime-OnNewInstanceCreated``1-``0,System-Int32,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ThreadSingletonLifetime.OnNewInstanceCreated``1(``0,System.Int32,IoC.IContainer,System.Object[])')
-  - [ToString()](#M-IoC-Lifetimes-ThreadSingletonLifetime-ToString 'IoC.Lifetimes.ThreadSingletonLifetime.ToString')
 - [TT](#T-IoC-TT 'IoC.TT')
 - [TT1](#T-IoC-TT1 'IoC.TT1')
 - [TT2](#T-IoC-TT2 'IoC.TT2')
@@ -943,6 +935,24 @@ The roor container.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The set of features. |
+
+<a name='M-IoC-Container-Create-System-String,IoC-IContainer-'></a>
+### Create(name,baseContainer) `method` [#](#M-IoC-Container-Create-System-String,IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Creates a root container with basic features.
+
+##### Returns
+
+The roor container.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The optional name of the container. |
+| baseContainer | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') |  |
 
 <a name='M-IoC-Container-Create-System-String,IoC-IConfiguration[]-'></a>
 ### Create(name,configurations) `method` [#](#M-IoC-Container-Create-System-String,IoC-IConfiguration[]- 'Go To Here') [=](#contents 'Back To Contents')
@@ -3017,44 +3027,6 @@ IoC
 
 Represents the generic type parameter marker.
 
-<a name='T-IoC-Features-HighPerformanceFeature'></a>
-## HighPerformanceFeature [#](#T-IoC-Features-HighPerformanceFeature 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Namespace
-
-IoC.Features
-
-##### Summary
-
-Allows to compile fast delegates. It requires access permissions to types/constructors/initialization methods. Also you could add the attribute
-
-```
-[assembly: InternalsVisibleTo(IoC.Features.HighPerformanceFeature.DynamicAssemblyName)]
-```
-
-for your assembly to allow use internal classes/methods/properties in a dependency injection.
-
-<a name='F-IoC-Features-HighPerformanceFeature-Default'></a>
-### Default `constants` [#](#F-IoC-Features-HighPerformanceFeature-Default 'Go To Here') [=](#contents 'Back To Contents')
-
-<a name='F-IoC-Features-HighPerformanceFeature-DynamicAssemblyName'></a>
-### DynamicAssemblyName `constants` [#](#F-IoC-Features-HighPerformanceFeature-DynamicAssemblyName 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-The full name of dynamic assembly. Could be use with `InternalsVisibleTo` attribute.
-
-<a name='M-IoC-Features-HighPerformanceFeature-Apply-IoC-IContainer-'></a>
-### Apply() `method` [#](#M-IoC-Features-HighPerformanceFeature-Apply-IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
 <a name='T-IoC-IBinding`1'></a>
 ## IBinding\`1 [#](#T-IoC-IBinding`1 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -3852,13 +3824,6 @@ Singleton per scope
 
 Single instance per registration
 
-<a name='F-IoC-Lifetime-ThreadSingleton'></a>
-### ThreadSingleton `constants` [#](#F-IoC-Lifetime-ThreadSingleton 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Thread per thread
-
 <a name='F-IoC-Lifetime-Transient'></a>
 ### Transient `constants` [#](#F-IoC-Lifetime-Transient 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -4209,6 +4174,21 @@ Creates the instance of a new scope.
 
 The current scope.
 
+<a name='M-IoC-Scope-Begin'></a>
+### Begin() `method` [#](#M-IoC-Scope-Begin 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Begins scope.
+
+##### Returns
+
+The scope token to end the scope.
+
+##### Parameters
+
+This method has no parameters.
+
 <a name='M-IoC-Scope-Dispose'></a>
 ### Dispose() `method` [#](#M-IoC-Scope-Dispose 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -4552,61 +4532,6 @@ IoC
 ##### Summary
 
 Indicates that the marked method unconditionally terminates control flow execution. For example, it could unconditionally throw exception.
-
-<a name='T-IoC-Lifetimes-ThreadSingletonLifetime'></a>
-## ThreadSingletonLifetime [#](#T-IoC-Lifetimes-ThreadSingletonLifetime 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Namespace
-
-IoC.Lifetimes
-
-##### Summary
-
-Represents singleton per thread lifetime.
-
-<a name='M-IoC-Lifetimes-ThreadSingletonLifetime-Clone'></a>
-### Clone() `method` [#](#M-IoC-Lifetimes-ThreadSingletonLifetime-Clone 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='M-IoC-Lifetimes-ThreadSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]-'></a>
-### CreateKey() `method` [#](#M-IoC-Lifetimes-ThreadSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='M-IoC-Lifetimes-ThreadSingletonLifetime-OnNewInstanceCreated``1-``0,System-Int32,IoC-IContainer,System-Object[]-'></a>
-### OnNewInstanceCreated\`\`1() `method` [#](#M-IoC-Lifetimes-ThreadSingletonLifetime-OnNewInstanceCreated``1-``0,System-Int32,IoC-IContainer,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='M-IoC-Lifetimes-ThreadSingletonLifetime-ToString'></a>
-### ToString() `method` [#](#M-IoC-Lifetimes-ThreadSingletonLifetime-ToString 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
 
 <a name='T-IoC-TT'></a>
 ## TT [#](#T-IoC-TT 'Go To Here') [=](#contents 'Back To Contents')

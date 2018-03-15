@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Threading;
     using Core;
     using Lifetimes;
 
@@ -32,6 +33,10 @@
 #if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_5 && !NETSTANDARD1_6
             yield return container.Register<ILifetime>(ctx => new ThreadSingletonLifetime(), null, new object[] { Lifetime.ThreadSingleton });
 #endif
+            // Scope
+            long scopeId = 0;
+            Func<long> createScopeId = () => Interlocked.Increment(ref scopeId);
+            yield return container.Register(ctx => new Scope(createScopeId()));
 
             // Containers
             yield return container.Register(ctx => ctx.Container, null, new object[] { null, WellknownContainers.Current } );

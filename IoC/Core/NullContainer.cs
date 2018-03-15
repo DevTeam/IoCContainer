@@ -10,9 +10,7 @@
         public IContainer Parent => throw new NotSupportedException();
 
         public bool TryRegister(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
-        {
-            throw new NotSupportedException();
-        }
+            => throw new NotSupportedException();
 
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
         {
@@ -37,24 +35,12 @@
         {
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public IEnumerator<IEnumerable<Key>> GetEnumerator()
-        {
-            return Enumerable.Empty<IEnumerable<Key>>().GetEnumerator();
-        }
+        public IEnumerator<IEnumerable<Key>> GetEnumerator() => Enumerable.Empty<IEnumerable<Key>>().GetEnumerator();
 
-        public IDisposable Subscribe(IObserver<ContainerEvent> observer)
-        {
-            return Disposable.Empty;
-        }
+        public IDisposable Subscribe(IObserver<ContainerEvent> observer) => Disposable.Empty;
 
-        public override string ToString()
-        {
-            return string.Empty;
-        }
+        public override string ToString() => string.Empty;
     }
 }

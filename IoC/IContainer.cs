@@ -9,7 +9,6 @@
     [PublicAPI]
     public interface IContainer: IEnumerable<IEnumerable<Key>>, IObservable<ContainerEvent>, IDisposable
     {
-
         /// <summary>
         /// The parent container.
         /// </summary>

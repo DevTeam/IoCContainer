@@ -15,7 +15,7 @@
     <PackageTags>IoC inversionofcontrol Container DI dependencyinjection</PackageTags>
     <Product>IoC Container</Product>
     <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
-    <DocumentationFile>IoC_$(TargetFramework).xml</DocumentationFile>
+    <DocumentationFile>..\Docs\IoC_$(TargetFramework).xml</DocumentationFile>
     <WarningsAsErrors />
   </PropertyGroup>
 

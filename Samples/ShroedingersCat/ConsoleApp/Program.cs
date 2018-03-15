@@ -1,15 +1,12 @@
-﻿namespace ConsoleApp
+﻿// ReSharper disable ClassNeverInstantiated.Global
+namespace ConsoleApp
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Threading.Tasks;
     using IoC;
 
-    // ReSharper disable once ClassNeverInstantiated.Global
-    [SuppressMessage("ReSharper", "ArrangeTypeMemberModifiers")]
-    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Local")]
     public class Program
     {
         public static async Task Main()
@@ -52,34 +49,34 @@
                 Console.WriteLine(list[0]);
             }
         }
+    }
 
-        interface IBox<out T> { T Content { get; } }
+    public interface IBox<out T> { T Content { get; } }
 
-        interface ICat { bool IsAlive { get; } }
+    public interface ICat { bool IsAlive { get; } }
 
-        class CardboardBox<T> : IBox<T>
+    class CardboardBox<T> : IBox<T>
+    {
+        public CardboardBox(T content) => Content = content;
+
+        public T Content { get; }
+
+        public override string ToString() => Content.ToString();
+    }
+
+    class ShroedingersCat : ICat
+    {
+        public bool IsAlive => new Random().Next(2) == 1;
+
+        public override string ToString() => $"Is alive: {IsAlive}";
+    }
+
+    public class Glue : IConfiguration
+    {
+        public IEnumerable<IDisposable> Apply(IContainer container)
         {
-            public CardboardBox(T content) => Content = content;
-
-            public T Content { get; }
-
-            public override string ToString() => Content.ToString();
-        }
-
-        class ShroedingersCat : ICat
-        {
-            public bool IsAlive => new Random().Next(2) == 1;
-
-            public override string ToString() => $"Is alive: {IsAlive}";
-        }
-
-        class Glue : IConfiguration
-        {
-            public IEnumerable<IDisposable> Apply(IContainer container)
-            {
-                yield return container.Bind<IBox<TT>>().To<CardboardBox<TT>>();
-                yield return container.Bind<ICat>().To<ShroedingersCat>();
-            }
+            yield return container.Bind<IBox<TT>>().To<CardboardBox<TT>>();
+            yield return container.Bind<ICat>().To<ShroedingersCat>();
         }
     }
 }

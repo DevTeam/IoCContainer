@@ -1,0 +1,43 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>IoC.Features</RootNamespace>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;net47</TargetFrameworks>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PackageId>IoC.AspNetCore</PackageId>
+    <Authors>NikolayP</Authors>
+    <Description>AspNetCore feature for IoC container</Description>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/DevTeam/IoCContainer/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/DevTeam/IoCContainer/</PackageProjectUrl>
+    <PackageIconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</PackageIconUrl>
+    <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>ASP net core IoC inversionofcontrol Container DI dependencyinjection</PackageTags>
+    <Product>IoC Container AspNetCore feature</Product>
+    <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
+    <DocumentationFile>..\Docs\IoC.AspNetCore_$(TargetFramework).xml</DocumentationFile>
+    <WarningsAsErrors />    
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;net45;net46;net47;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0</TargetFrameworks>
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IoC\IoC.csproj" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.0'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />    
+  </ItemGroup>  
+
+  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp2.0'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
+  </ItemGroup>  
+
+</Project>

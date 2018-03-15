@@ -30,10 +30,7 @@
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <returns>The validation result.</returns>
-        public static ValidationResult Validate([NotNull] this IContainer container)
-        {
-            return container.Resolve<IValidator>().Validate(container);
-        }
+        public static ValidationResult Validate([NotNull] this IContainer container) => container.Resolve<IValidator>().Validate(container);
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]

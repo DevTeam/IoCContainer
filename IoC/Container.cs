@@ -13,7 +13,7 @@
     using Core.Collections;
     using Extensibility;
     using Features;
-
+    using static Key;
     using FullKey = Key;
     using ShortKey = System.Type;
     using ResolverDelegate = System.Delegate;
@@ -41,7 +41,7 @@
         [NotNull] private readonly Dictionary<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = new Dictionary<ShortKey, RegistrationEntry>();
         [NotNull] internal volatile Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
         [NotNull] internal volatile Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
-        private volatile IEnumerable<Key>[] _allKeys;
+        private volatile IEnumerable<FullKey>[] _allKeys;
 
         /// <summary>
         /// Creates a root container with default features.
@@ -52,7 +52,7 @@
         public static Container Create([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return new Container(CreateContainerName(name), DefultRootContainer.Value, true);
+            return Create(name, DefultRootContainer.Value);
         }
 
         /// <summary>
@@ -66,7 +66,7 @@
         public static Container CreateHighPerformance([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return new Container(CreateContainerName(name), HighPerformanceRootContainer.Value, true);
+            return Create(name, HighPerformanceRootContainer.Value);
         }
 
         /// <summary>
@@ -78,7 +78,7 @@
         public static Container CreateBasic([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return new Container(CreateContainerName(name), BasicRootContainer.Value, true);
+            return Create(name, BasicRootContainer.Value);
         }
 
         /// <summary>
@@ -90,7 +90,21 @@
         public static Container Create([NotNull][ItemNotNull] params IConfiguration[] configurations)
         {
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
-            return Create("", configurations);
+            return Create(string.Empty, configurations);
+        }
+
+        /// <summary>
+        /// Creates a root container with basic features.
+        /// </summary>
+        /// <param name="name">The optional name of the container.</param>
+        /// <param name="baseContainer"></param>
+        /// <returns>The roor container.</returns>
+        [NotNull]
+        public static Container Create([NotNull] string name, [NotNull] IContainer baseContainer)
+        {
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            if (baseContainer == null) throw new ArgumentNullException(nameof(baseContainer));
+            return new Container(CreateContainerName(name), baseContainer, true);
         }
 
         /// <summary>
@@ -144,7 +158,7 @@
         }
 
         /// <inheritdoc />
-        public bool TryRegister(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
+        public bool TryRegister(IEnumerable<FullKey> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
@@ -156,7 +170,7 @@
                 {
                     foreach (var key in registeredKeys)
                     {
-                        if (key.Tag == Key.AnyTag)
+                        if (key.Tag == AnyTag)
                         {
                             TryUnregister(key, key.Type, _registrationEntriesForTagAny);
                         }
@@ -182,9 +196,9 @@
                     foreach (var curKey in keys)
                     {
                         var type = curKey.Type.ToGenericType();
-                        var key = type != curKey.Type ? new Key(type, curKey.Tag) : curKey;
+                        var key = type != curKey.Type ? new FullKey(type, curKey.Tag) : curKey;
 
-                        if (key.Tag == Key.AnyTag)
+                        if (key.Tag == AnyTag)
                         {
                             isRegistered &= TryRegister(key, key.Type, registrationEntry, _registrationEntriesForTagAny);
                         }
@@ -225,7 +239,7 @@
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
+        public bool TryGetResolver<T>(ShortKey type, object tag, out Resolver<T> resolver, IContainer container = null)
         {
             if (tag == null)
             {
@@ -250,7 +264,7 @@
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-        public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, IContainer container = null)
+        public bool TryGetResolver<T>(ShortKey type, out Resolver<T> resolver, IContainer container = null)
         {
             resolver = Extensions.TryGetResolver<T>(ResolversByType, type.GetHashCode(), type, container ?? this);
             if (resolver != default(Resolver<T>))
@@ -258,7 +272,7 @@
                 return true;
             }
 
-            return TryCreateResolver(new Key(type), out resolver, container ?? this);
+            return TryCreateResolver(new FullKey(type), out resolver, container ?? this);
         }
 
         [MethodImpl((MethodImplOptions)256)]
@@ -312,7 +326,7 @@
         }
 
         /// <inheritdoc />
-        public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
+        public bool TryGetDependency(FullKey key, out IDependency dependency, out ILifetime lifetime)
         {
             if (TryGetRegistrationEntry(key, out var registrationEntry))
             {
@@ -413,16 +427,16 @@
         }
 
         /// <inheritdoc />
-        public IEnumerator<IEnumerable<Key>> GetEnumerator()
+        public IEnumerator<IEnumerable<FullKey>> GetEnumerator()
         {
             return GetAllKeys().Concat(_parent).GetEnumerator();
         }
 
-        private IEnumerable<IEnumerable<Key>> GetAllKeys()
+        private IEnumerable<IEnumerable<FullKey>> GetAllKeys()
         {
             lock (_lockObject)
             {
-                return _allKeys ?? (_allKeys = _registrationEntries.Select(i => i.Value).Distinct().Select(i => (IEnumerable<Key>) i.Keys).ToArray());
+                return _allKeys ?? (_allKeys = _registrationEntries.Select(i => i.Value).Distinct().Select(i => (IEnumerable<FullKey>) i.Keys).ToArray());
             }
         }
 
@@ -432,7 +446,7 @@
             return _eventSubject.Subscribe(observer);
         }
 
-        private bool TryRegister<TKey>(Key originalKey, TKey key, [NotNull] RegistrationEntry registrationEntry, [NotNull] Dictionary<TKey, RegistrationEntry> entries)
+        private bool TryRegister<TKey>(FullKey originalKey, TKey key, [NotNull] RegistrationEntry registrationEntry, [NotNull] Dictionary<TKey, RegistrationEntry> entries)
         {
             var isRegistered = false;
             try
@@ -455,7 +469,7 @@
             return true;
         }
 
-        private bool TryUnregister<TKey>(Key originalKey, TKey key, [NotNull] Dictionary<TKey, RegistrationEntry> entries)
+        private bool TryUnregister<TKey>(FullKey originalKey, TKey key, [NotNull] Dictionary<TKey, RegistrationEntry> entries)
         {
             var isUnregistered = entries.Remove(key);
             if (isUnregistered)

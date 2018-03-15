@@ -30,10 +30,7 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        public static ITypeInfo Info<T>()
-        {
-            return TypeInfoHolder<T>.Shared;
-        }
+        public static ITypeInfo Info<T>() => TypeInfoHolder<T>.Shared;
 
         [MethodImpl((MethodImplOptions)256)]
         public static Assembly LoadAssembly(string assemblyName)
@@ -80,7 +77,6 @@
 
             return type;
         }
-
 
         private static class TypeInfoHolder<T>
         {
@@ -130,10 +126,8 @@
             public bool IsGenericTypeArgument => _isGenericTypeArgument.Value;
 
             public IEnumerable<T> GetCustomAttributes<T>(bool inherit)
-                where T: Attribute
-            {
-                return _typeInfo.Value.GetCustomAttributes<T>(inherit);
-            }
+                where T : Attribute
+                => _typeInfo.Value.GetCustomAttributes<T>(inherit);
 
             public IEnumerable<ConstructorInfo> DeclaredConstructors => _typeInfo.Value.DeclaredConstructors;
 
@@ -157,10 +151,7 @@
                 return _type.MakeGenericType(typeArguments);
             }
 
-            public Type GetGenericTypeDefinition()
-            {
-                return _type.GetGenericTypeDefinition();
-            }
+            public Type GetGenericTypeDefinition() => _type.GetGenericTypeDefinition();
         }
 #else
         private sealed class InternalTypeInfo : ITypeInfo
@@ -201,9 +192,7 @@
 
             public IEnumerable<T> GetCustomAttributes<T>(bool inherit)
                 where T : Attribute
-            {
-                return _type.GetCustomAttributes(typeof(T), inherit).Cast<T>();
-            }
+                => _type.GetCustomAttributes(typeof(T), inherit).Cast<T>();
 
             public Type[] GenericTypeArguments => _type.GetGenericArguments();
 
@@ -231,10 +220,7 @@
                 return _type.MakeGenericType(typeArguments);
             }
 
-            public Type GetGenericTypeDefinition()
-            {
-                return _type.GetGenericTypeDefinition();
-            }
+            public Type GetGenericTypeDefinition() => _type.GetGenericTypeDefinition();
         }
 #endif
     }

@@ -9,22 +9,13 @@
     public sealed class ScopeSingletonLifetime: SingletonBasedLifetime<Scope>
     {
         /// <inheritdoc />
-        protected override Scope CreateKey(IContainer container, object[] args)
-        {
-            return Scope.Current;
-        }
+        protected override Scope CreateKey(IContainer container, object[] args) => Scope.Current;
 
         /// <inheritdoc />
-        public override string ToString()
-        {
-            return Lifetime.ScopeSingleton.ToString();
-        }
+        public override string ToString() => Lifetime.ScopeSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Clone()
-        {
-            return new ScopeSingletonLifetime();
-        }
+        public override ILifetime Clone() => new ScopeSingletonLifetime();
 
         /// <inheritdoc />
         protected override void OnNewInstanceCreated<T>(T newInstance, Scope scope, IContainer container, object[] args)

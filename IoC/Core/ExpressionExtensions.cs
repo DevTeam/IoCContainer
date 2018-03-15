@@ -14,7 +14,6 @@
         [ThreadStatic] private static int _getExpressionCompilerReentrancy;
         internal static readonly MethodInfo GetHashCodeMethodInfo = Info<object>().DeclaredMethods.Single(i => i.Name == nameof(GetHashCode));
         internal static readonly Expression NullConst = Expression.Constant(null);
-        internal static readonly ITypeInfo ResolverTypeInfo = typeof(Resolver<>).Info();
 
         public static IExpressionCompiler GetExpressionCompiler(this IContainer container)
         {
@@ -51,9 +50,6 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        public static Type ToResolverType(this Type type)
-        {
-            return ResolverGenericTypeInfo.MakeGenericType(type);
-        }
+        public static Type ToResolverType(this Type type) => ResolverGenericTypeInfo.MakeGenericType(type);
     }
 }

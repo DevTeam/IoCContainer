@@ -61,10 +61,7 @@
         {
             private readonly List<IDisposable> _disposables;
 
-            public CompositeDisposable(IEnumerable<IDisposable> disposables)
-            {
-                _disposables = disposables.ToList();
-            }
+            public CompositeDisposable(IEnumerable<IDisposable> disposables) => _disposables = disposables.ToList();
 
             public void Dispose()
             {
