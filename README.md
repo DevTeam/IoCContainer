@@ -1,8 +1,13 @@
 # Simple, powerful and fast IoC container
 
-[![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-Key features:
+Package| Link
+---|:---:
+IoC.Container|[![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.Container?includePreReleases=true)](https://www.nuget.org/packages/IoC.Container)
+IoC.AspNetCore|[![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.AspNetCore?includePreReleases=true)](https://www.nuget.org/packages/IoC.AspNetCore)
+
+IoC.Container provides the following benefits:
   - One of the fastest, almost as fast as operators `new`
   - Produces minimal memory trafic
   - Powerful auto-wiring
@@ -14,6 +19,7 @@ Key features:
   - Reconfigurable on-the-fly
   - Supports concurrent and asynchronous resolving
   - Does not need additional dependencies
+  - Supports ASP.NET Core
 
 Supported platforms:
   - .NET 4.0+
@@ -56,7 +62,9 @@ class ShroedingersCat : ICat
 
 _**It is important to note that our abstraction and our implementation do not know anything about IoC containers**_
 
-### Add a [package reference](https://www.nuget.org/packages/IoC.Container)
+### Add the [package reference](https://www.nuget.org/packages/IoC.Container)
+
+IoC.Container ships entirely as NuGet packages. Using NuGet packages allows you to optimize your app to include only the necessary dependencies.
 
 - Package Manager
 
@@ -70,7 +78,7 @@ _**It is important to note that our abstraction and our implementation do not kn
   dotnet add package IoC.Container
   ```
 
-### Let's glue our abstraction and our implementation
+### Let's glue all together
 
 ```csharp
 class Glue : IConfiguration
@@ -141,6 +149,42 @@ new ShroedingersCat()
 ```
 
 Thus this IoC container makes the minimal impact in terms of perfomrance and of memory trafic on a creation of instances of classes and might be used everywhere and everytime in accordance with the [SOLID principles](https://en.wikipedia.org/wiki/SOLID_\(object-oriented_design\)).
+
+## [ASP.NET Core](https://github.com/aspnet/Home)
+
+### Add the [package reference](IoC.AspNetCore)
+
+- Package Manager
+
+  ```
+  Install-Package IoC.AspNetCore
+  ```
+  
+- .NET CLI
+  
+  ```
+  dotnet add package IoC.AspNetCore
+  ```
+
+### Change IoC container and configure it at [Startup](Samples/AspNetCore/WebApplication/Startup.cs)
+
+```csharp
+public IServiceProvider ConfigureServices(IServiceCollection services)
+{
+  services.AddMvc().AddControllersAsServices();
+
+  // Create container
+  var container = Container.Create().Using(new AspNetCoreFeature(services));
+
+  // Configure container
+  container.Using<Glue>();
+
+  // Resolve IServiceProvider
+  return container.Resolve<IServiceProvider>();
+}
+```
+
+For more information see [this sample](Samples/AspNetCore).
 
 ## Class References
 
@@ -973,7 +1017,7 @@ public void Run()
 
 public class MyTransientLifetime : ILifetime
 {
-    public Expression Build(Expression expression, BuildContext buildContext, Expression context = default(Expression))
+    public Expression Build(Expression expression, IBuildContext buildContext, Expression context = default(Expression))
     {
         return expression;
     }
@@ -1036,7 +1080,7 @@ public class MySingletonLifetime : ILifetime
         _counter = counter;
     }
 
-    public Expression Build(Expression expression, BuildContext buildContext, Expression context = default(Expression))
+    public Expression Build(Expression expression, IBuildContext buildContext, Expression context = default(Expression))
     {
         // Build expression using base lifetime
         expression = _baseSingletonLifetime.Build(expression, buildContext, context);
