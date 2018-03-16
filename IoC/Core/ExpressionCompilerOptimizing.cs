@@ -3,16 +3,19 @@ namespace IoC.Core
 {
     using System;
     using System.IO;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Reflection.Emit;
     using Extensibility;
     using Features;
+    using static Extensibility.WellknownExpressions;
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class ExpressionCompilerOptimizing : IExpressionCompiler
     {
-        private static readonly ModuleBuilder ModuleBuilder;
+        [NotNull] private static readonly Type[] ResolverParameterTypes = ResolverParameters.Select(i => i.Type).ToArray();
+        [NotNull] private static readonly ModuleBuilder ModuleBuilder;
         private static int _resolverTypeId;
 
         static ExpressionCompilerOptimizing()
@@ -55,7 +58,7 @@ namespace IoC.Core
 
                 var typeName = "DynamicResolver" + System.Threading.Interlocked.Increment(ref _resolverTypeId);
                 var typeBuilder = ModuleBuilder.DefineType(typeName, TypeAttributes.Public);
-                var methodBuilder = typeBuilder.DefineMethod("Resolve", MethodAttributes.Public | MethodAttributes.Static, resolverExpression.ReturnType, BuildContext.ResolverParameterTypes);
+                var methodBuilder = typeBuilder.DefineMethod("Resolve", MethodAttributes.Public | MethodAttributes.Static, resolverExpression.ReturnType, ResolverParameterTypes);
                 resolverExpression.CompileToMethod(methodBuilder);
                 var methodInfo = typeBuilder.CreateType().GetMethod("Resolve");
                 if (methodInfo == null)

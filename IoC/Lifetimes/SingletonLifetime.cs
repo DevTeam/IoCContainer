@@ -7,6 +7,7 @@
     using System.Runtime.CompilerServices;
     using Core;
     using Extensibility;
+    using static Extensibility.WellknownExpressions;
     using TypeExtensions = Core.TypeExtensions;
 
     /// <summary>
@@ -21,7 +22,7 @@
         private static readonly MethodInfo CreateInstanceMethodInfo = TypeExtensions.Info<SingletonLifetime>().DeclaredMethods.Single(i => i.Name == nameof(CreateInstance));
 
         /// <inheritdoc />
-        public Expression Build(Expression expression, BuildContext buildContext, Expression resolver)
+        public Expression Build(Expression expression, IBuildContext buildContext, Expression resolver)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
@@ -33,7 +34,7 @@
             return Expression.Condition(
                 Expression.NotEqual(instanceField, ExpressionExtensions.NullConst),
                 typedInstance,
-                buildContext.PartiallyCloseBlock(Expression.Call(thisVar, methodInfo, BuildContext.ContainerParameter, BuildContext.ArgsParameter, resolver), resolver));
+                buildContext.PartiallyCloseBlock(Expression.Call(thisVar, methodInfo, ContainerParameter, ArgsParameter, resolver), resolver));
         }
 
         /// <inheritdoc />

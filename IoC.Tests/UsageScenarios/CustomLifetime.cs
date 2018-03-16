@@ -30,7 +30,7 @@
 
         public class MyTransientLifetime : ILifetime
         {
-            public Expression Build(Expression expression, BuildContext buildContext, Expression context = default(Expression))
+            public Expression Build(Expression expression, IBuildContext buildContext, Expression context = default(Expression))
             {
                 return expression;
             }

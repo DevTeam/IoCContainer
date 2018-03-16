@@ -739,47 +739,32 @@
             The optional resolving arguments.
             </summary>
         </member>
-        <member name="T:IoC.Extensibility.BuildContext">
+        <member name="T:IoC.Core.BuildContext">
             <summary>
             Represents build context.
             </summary>
         </member>
-        <member name="F:IoC.Extensibility.BuildContext.ContainerParameter">
+        <member name="T:IoC.Extensibility.IBuildContext">
             <summary>
-            The container parameter.
+            Represents the abstraction for build context.
             </summary>
         </member>
-        <member name="F:IoC.Extensibility.BuildContext.ArgsParameter">
-            <summary>
-            The args parameters.
-            </summary>
-        </member>
-        <member name="F:IoC.Extensibility.BuildContext.ResolverParameters">
-            <summary>
-            All resolver's parameters.
-            </summary>
-        </member>
-        <member name="F:IoC.Extensibility.BuildContext.ResolverParameterTypes">
-            <summary>
-            Types of all resolver's parameters.
-            </summary>
-        </member>
-        <member name="F:IoC.Extensibility.BuildContext.Compiler">
+        <member name="P:IoC.Extensibility.IBuildContext.Compiler">
             <summary>
             The compiler.
             </summary>
         </member>
-        <member name="F:IoC.Extensibility.BuildContext.Key">
+        <member name="P:IoC.Extensibility.IBuildContext.Key">
             <summary>
             The target key.
             </summary>
         </member>
-        <member name="F:IoC.Extensibility.BuildContext.Container">
+        <member name="P:IoC.Extensibility.IBuildContext.Container">
             <summary>
             The target container.
             </summary>
         </member>
-        <member name="M:IoC.Extensibility.BuildContext.CreateChild(IoC.Key,IoC.IContainer)">
+        <member name="M:IoC.Extensibility.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)">
             <summary>
             Creates a child context.
             </summary>
@@ -787,7 +772,7 @@
             <param name="container">The container.</param>
             <returns>The new build context.</returns>
         </member>
-        <member name="M:IoC.Extensibility.BuildContext.DefineValue(System.Object,System.Type)">
+        <member name="M:IoC.Extensibility.IBuildContext.DefineValue(System.Object,System.Type)">
             <summary>
             Defines value.
             </summary>
@@ -795,14 +780,7 @@
             <param name="type">The value type.</param>
             <returns>The parameter expression.</returns>
         </member>
-        <member name="M:IoC.Extensibility.BuildContext.DefineValue(System.Linq.Expressions.Expression)">
-            <summary>
-            Defines value.
-            </summary>
-            <param name="expression">The value expression.</param>
-            <returns>The parameter expression.</returns>
-        </member>
-        <member name="M:IoC.Extensibility.BuildContext.DefineValue``1(``0)">
+        <member name="M:IoC.Extensibility.IBuildContext.DefineValue``1(``0)">
             <summary>
             Defines value.
             </summary>
@@ -810,14 +788,21 @@
             <param name="value">The value.</param>
             <returns>The parameter expression.</returns>
         </member>
-        <member name="M:IoC.Extensibility.BuildContext.CloseBlock(System.Linq.Expressions.Expression)">
+        <member name="M:IoC.Extensibility.IBuildContext.DefineVariable(System.Linq.Expressions.Expression)">
+            <summary>
+            Defines variable.
+            </summary>
+            <param name="expression">The value expression.</param>
+            <returns>The parameter expression.</returns>
+        </member>
+        <member name="M:IoC.Extensibility.IBuildContext.CloseBlock(System.Linq.Expressions.Expression)">
             <summary>
             Closes a block of statements.
             </summary>
             <param name="targetExpression">The target expression.</param>
             <returns>The result expression.</returns>
         </member>
-        <member name="M:IoC.Extensibility.BuildContext.PartiallyCloseBlock(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression[])">
+        <member name="M:IoC.Extensibility.IBuildContext.PartiallyCloseBlock(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression[])">
             <summary>
             Closes block for specified expressions.
             </summary>
@@ -830,7 +815,7 @@
             Allows to build expresion for lifetimes.
             </summary>
         </member>
-        <member name="M:IoC.Extensibility.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.BuildContext,`0)">
+        <member name="M:IoC.Extensibility.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,`0)">
             <summary>
             Builds the expression.
             </summary>
@@ -941,6 +926,26 @@
             </summary>
             <param name="container">The target container.</param>
             <returns>The validation results.</returns>
+        </member>
+        <member name="T:IoC.Extensibility.WellknownExpressions">
+            <summary>
+            The list of well-known expressions.
+            </summary>
+        </member>
+        <member name="F:IoC.Extensibility.WellknownExpressions.ContainerParameter">
+            <summary>
+            The container parameter.
+            </summary>
+        </member>
+        <member name="F:IoC.Extensibility.WellknownExpressions.ArgsParameter">
+            <summary>
+            The args parameters.
+            </summary>
+        </member>
+        <member name="F:IoC.Extensibility.WellknownExpressions.ResolverParameters">
+            <summary>
+            All resolver's parameters.
+            </summary>
         </member>
         <member name="T:IoC.Features.CollectionFeature">
             <summary>
@@ -2063,7 +2068,7 @@
             </summary>
             <typeparam name="TKey">The key type.</typeparam>
         </member>
-        <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.BuildContext,System.Linq.Expressions.Expression)">
+        <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,System.Linq.Expressions.Expression)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.Dispose">
@@ -2094,7 +2099,7 @@
             Represents singleton lifetime.
             </summary>
         </member>
-        <member name="M:IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.Extensibility.BuildContext,System.Linq.Expressions.Expression)">
+        <member name="M:IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,System.Linq.Expressions.Expression)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.SingletonLifetime.Dispose">

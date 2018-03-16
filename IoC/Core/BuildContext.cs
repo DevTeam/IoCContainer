@@ -1,4 +1,4 @@
-﻿namespace IoC.Extensibility
+﻿namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
@@ -7,57 +7,16 @@
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Runtime.CompilerServices;
-    using Core;
-    using Core.Collections;
+    using Collections;
+    using Extensibility;
 
     /// <summary>
     /// Represents build context.
     /// </summary>
     [SuppressMessage("ReSharper", "RedundantNameQualifier")]
     [PublicAPI]
-    public class BuildContext
+    internal class BuildContext : IBuildContext
     {
-        /// <summary>
-        /// The container parameter.
-        /// </summary>
-        [NotNull]
-        public static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer), nameof(Context.Container));
-
-        /// <summary>
-        /// The args parameters.
-        /// </summary>
-        [NotNull]
-        public static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]), nameof(Context.Args));
-
-        /// <summary>
-        /// All resolver's parameters.
-        /// </summary>
-        [NotNull]
-        public static readonly ParameterExpression[] ResolverParameters = { ContainerParameter, ArgsParameter };
-
-        /// <summary>
-        /// Types of all resolver's parameters.
-        /// </summary>
-        [NotNull]
-        public static readonly Type[] ResolverParameterTypes = ResolverParameters.Select(i => i.Type).ToArray();
-
-        /// <summary>
-        /// The compiler.
-        /// </summary>
-        [NotNull]
-        public readonly IExpressionCompiler Compiler;
-
-        /// <summary>
-        /// The target key.
-        /// </summary>
-        public readonly Key Key;
-
-        /// <summary>
-        /// The target container.
-        /// </summary>
-        [NotNull]
-        public readonly IContainer Container;
-
         private static readonly MethodInfo GetContextDataMethodInfo = Core.TypeExtensions.Info<BuildContext>().DeclaredMethods.Single(i => i.Name == nameof(GetContextData));
         private static ResizableArray<BuildContext> _contexts = ResizableArray<BuildContext>.Empty;
 
@@ -97,15 +56,14 @@
             }));
         }
 
+        [NotNull] public IExpressionCompiler Compiler { get; }
 
-        /// <summary>
-        /// Creates a child context.
-        /// </summary>
-        /// <param name="key">The key</param>
-        /// <param name="container">The container.</param>
-        /// <returns>The new build context.</returns>
+        public Key Key { get; }
+
+        [NotNull] public IContainer Container { get; }
+
         [NotNull]
-        public BuildContext CreateChild(Key key, [NotNull] IContainer container)
+        public IBuildContext CreateChild(Key key, [NotNull] IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var child = new BuildContext(Compiler, key, container, _resources);
@@ -114,12 +72,6 @@
             return child;
         }
 
-        /// <summary>
-        /// Defines value.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <param name="type">The value type.</param>
-        /// <returns>The parameter expression.</returns>
         [NotNull]
         public Expression DefineValue([CanBeNull] object value, [NotNull] Type type)
         {
@@ -131,23 +83,14 @@
 
             var valueId = _values.Items.Length;
             _values = _values.Add(value);
-            var varExpression = Expression.Variable(type, "var" + valueId);
-            _parameters.Add(varExpression);
-            _statements.Add(
-                Expression.Assign(
-                    varExpression,
-                    Expression.ArrayAccess(GetContextExpression(), Expression.Constant(valueId)).Convert(type)));
-            return varExpression;
-
+            return Expression.ArrayAccess(GetContextExpression(), Expression.Constant(valueId)).Convert(type);
         }
 
-        /// <summary>
-        /// Defines value.
-        /// </summary>
-        /// <param name="expression">The value expression.</param>
-        /// <returns>The parameter expression.</returns>
         [NotNull]
-        public ParameterExpression DefineValue([NotNull] Expression expression)
+        public Expression DefineValue<T>([CanBeNull] T value) => DefineValue(value, typeof(T));
+
+        [NotNull]
+        public ParameterExpression DefineVariable([NotNull] Expression expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             var varExpression = Expression.Variable(expression.Type, "var" + GenerateId());
@@ -156,20 +99,6 @@
             return varExpression;
         }
 
-        /// <summary>
-        /// Defines value.
-        /// </summary>
-        /// <typeparam name="T">The value type.</typeparam>
-        /// <param name="value">The value.</param>
-        /// <returns>The parameter expression.</returns>
-        [NotNull]
-        public Expression DefineValue<T>([CanBeNull] T value) => DefineValue(value, typeof(T));
-
-        /// <summary>
-        /// Closes a block of statements.
-        /// </summary>
-        /// <param name="targetExpression">The target expression.</param>
-        /// <returns>The result expression.</returns>
         [NotNull]
         public Expression CloseBlock([NotNull] Expression targetExpression)
         {
@@ -183,12 +112,6 @@
             return Expression.Block(_parameters, _statements);
         }
 
-        /// <summary>
-        /// Closes block for specified expressions.
-        /// </summary>
-        /// <param name="targetExpression">The target expression.</param>
-        /// <param name="expressions">Assigment expressions.</param>
-        /// <returns>The resulting block expression.</returns>
         [NotNull]
         public Expression PartiallyCloseBlock([NotNull] Expression targetExpression, [NotNull][ItemNotNull] params Expression[] expressions)
         {
@@ -210,7 +133,6 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        // ReSharper disable once MemberCanBePrivate.Global
         internal static object[] GetContextData(int contextId) => _contexts.Items[contextId]._values.Items;
 
         [NotNull]

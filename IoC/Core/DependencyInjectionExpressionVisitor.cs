@@ -6,6 +6,7 @@
     using System.Linq.Expressions;
     using System.Reflection;
     using Extensibility;
+    using static Extensibility.WellknownExpressions;
 
     internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
     {
@@ -19,7 +20,7 @@
         [NotNull] private static readonly ConstructorInfo ContextConstructor;
         [NotNull] private readonly Stack<Key> _keys = new Stack<Key>();
         [NotNull] private readonly IContainer _container;
-        [NotNull] private readonly BuildContext _buildContext;
+        [NotNull] private readonly IBuildContext _buildContext;
         [CanBeNull] private readonly Expression _thisExpression;
         private int _reentrancy;
 
@@ -34,7 +35,7 @@
             ContextConstructor = TypeExtensions.Info<Context>().DeclaredConstructors.Single();
         }
 
-        public DependencyInjectionExpressionVisitor([NotNull] BuildContext buildContext, [CanBeNull] Expression thisExpression)
+        public DependencyInjectionExpressionVisitor([NotNull] IBuildContext buildContext, [CanBeNull] Expression thisExpression)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             _keys.Push(buildContext.Key);
@@ -123,8 +124,8 @@
                     ctor,
                     _thisExpression,
                     Expression.Constant(_keys.Peek()),
-                    BuildContext.ContainerParameter,
-                    BuildContext.ArgsParameter);
+                    ContainerParameter,
+                    ArgsParameter);
             }
 
             return base.VisitParameter(node);
@@ -136,8 +137,8 @@
             return Expression.New(
                 ContextConstructor,
                 Expression.Constant(_keys.Peek()),
-                BuildContext.ContainerParameter,
-                BuildContext.ArgsParameter);
+                ContainerParameter,
+                ArgsParameter);
         }
 
         [CanBeNull]
@@ -177,7 +178,7 @@
                     return _container;
                 }
 
-                var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, BuildContext.ContainerParameter);
+                var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, ContainerParameter);
                 var selectContainer = containerSelectorExpression.Compile();
                 return selectContainer(_container);
             }
@@ -274,14 +275,14 @@
                 // ctx.Container
                 if (name == nameof(Context.Container))
                 {
-                    expression = BuildContext.ContainerParameter;
+                    expression = ContainerParameter;
                     return true;
                 }
 
                 // ctx.Args
                 if (name == nameof(Context.Args))
                 {
-                    expression = BuildContext.ArgsParameter;
+                    expression = ArgsParameter;
                     return true;
                 }
             }

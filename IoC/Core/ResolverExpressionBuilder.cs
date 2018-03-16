@@ -4,12 +4,13 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using Extensibility;
+    using static Extensibility.WellknownExpressions;
 
     internal class ResolverExpressionBuilder: IResolverExpressionBuilder
     {
         public static readonly IResolverExpressionBuilder Shared = new ResolverExpressionBuilder();
 
-        public bool TryBuild(BuildContext buildContext, IDependency dependency, ILifetime lifetime, out LambdaExpression resolverExpression)
+        public bool TryBuild(IBuildContext buildContext, IDependency dependency, ILifetime lifetime, out LambdaExpression resolverExpression)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             try
@@ -34,7 +35,7 @@
                 expression = LifetimeExpressionBuilder.Shared.Build(expression, buildContext, lifetime);
                 expression = buildContext.CloseBlock(expression);
 
-                resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, BuildContext.ResolverParameters);
+                resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, ResolverParameters);
                 return true;
             }
             catch (BuildExpressionException)
@@ -45,7 +46,7 @@
         }
 
         private IEnumerable<Expression> CreateAutowringStatements(
-            [NotNull] BuildContext buildContext,
+            [NotNull] IBuildContext buildContext,
             [NotNull] Autowring autowring,
             [NotNull] Expression newExpression,
             IDictionary<Type, Type> typesMap)
@@ -58,7 +59,7 @@
                 throw new ArgumentException($"{nameof(autowring.Statements)} should not be empty.");
             }
 
-            var instanceExpression = buildContext.DefineValue(newExpression);
+            var instanceExpression = buildContext.DefineVariable(newExpression);
             foreach (var statement in autowring.Statements)
             {
                 var statementExpression = TypeReplacerExpressionBuilder.Shared.Build(statement, buildContext, typesMap);

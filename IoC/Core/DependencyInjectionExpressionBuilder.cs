@@ -12,7 +12,7 @@
         {
         }
 
-        public Expression Build(Expression expression, BuildContext buildContext, Expression thisExpression)
+        public Expression Build(Expression expression, IBuildContext buildContext, Expression thisExpression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));

@@ -5,6 +5,6 @@
 
     internal interface IResolverExpressionBuilder
     {
-        bool TryBuild([NotNull] BuildContext buildContext, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out LambdaExpression resolverExpression);
+        bool TryBuild([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out LambdaExpression resolverExpression);
     }
 }

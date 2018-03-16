@@ -13,7 +13,7 @@
         {
         }
 
-        public Expression Build(Expression expression, BuildContext buildContext, IDictionary<Type, Type> typesMap)
+        public Expression Build(Expression expression, IBuildContext buildContext, IDictionary<Type, Type> typesMap)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));

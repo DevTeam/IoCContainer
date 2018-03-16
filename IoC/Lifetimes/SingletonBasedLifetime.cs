@@ -9,6 +9,7 @@
     using Core.Collections;
     using Extensibility;
     using static Core.TypeExtensions;
+    using static Extensibility.WellknownExpressions;
 
     /// <summary>
     /// Represents the abstaction for singleton based lifetimes.
@@ -23,7 +24,7 @@
         internal volatile Table<TKey, object> Instances = Table<TKey, object>.Empty;
 
         /// <inheritdoc />
-        public Expression Build(Expression expression, BuildContext buildContext, Expression resolver)
+        public Expression Build(Expression expression, IBuildContext buildContext, Expression resolver)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
@@ -33,14 +34,14 @@
             var keyVar = Expression.Variable(typeof(TKey), "key");
             var hashCodeVar = Expression.Variable(typeof(int), "hashCode");
             var valVar = Expression.Variable(returnType, "val");
-            var assignKeyStatement = Expression.Assign(keyVar, Expression.Call(thisVar, CreateKeyMethodInfo, BuildContext.ContainerParameter, BuildContext.ArgsParameter));
+            var assignKeyStatement = Expression.Assign(keyVar, Expression.Call(thisVar, CreateKeyMethodInfo, ContainerParameter, ArgsParameter));
             var assignHashCodeStatement = Expression.Assign(hashCodeVar, Expression.Call(keyVar, ExpressionExtensions.GetHashCodeMethodInfo));
             var assignValStatement = Expression.Assign(valVar, Expression.Call(Expression.Field(thisVar, nameof(Instances)), GetMethodInfo, hashCodeVar, keyVar).Convert(returnType));
             var methodInfo = CreateInstanceMethodInfo.MakeGenericMethod(returnType);
             var conditionStatement = Expression.Condition(
                 Expression.NotEqual(valVar, ExpressionExtensions.NullConst),
                 valVar,
-                Expression.Call(thisVar, methodInfo, keyVar, hashCodeVar, BuildContext.ContainerParameter, BuildContext.ArgsParameter, resolver).Convert(returnType));
+                Expression.Call(thisVar, methodInfo, keyVar, hashCodeVar, ContainerParameter, ArgsParameter, resolver).Convert(returnType));
 
             return Expression.Block(
                 new[] { keyVar, hashCodeVar, valVar },
