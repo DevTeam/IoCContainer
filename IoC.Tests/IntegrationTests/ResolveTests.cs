@@ -10,6 +10,23 @@
     public class ResolveTests
     {
         [Fact]
+        public void ContainerShouldResolveWhenRef()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<MySimpleClass>().To(ctx => new MySimpleClass()))
+                {
+                    // Then
+                    var instance1 = container.Resolve<MySimpleClass>();
+                    var instance2 = container.Resolve<MySimpleClass>();
+                    instance1.ShouldNotBe(instance2);
+                }
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveWhenTransientLifetime()
         {
             // Given
@@ -58,11 +75,29 @@
                 var expectedInstance = Mock.Of<IMyService>();
 
                 // When
-                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind<IMyService>().Tag(99).To(ctx => expectedInstance))
                 {
                     // Then
-                    var actualInstance = container.Resolve<Func<IMyService>>();
+                    var actualInstance = container.Resolve<Func<IMyService>>(99.AsTag());
                     actualInstance().ShouldBe(expectedInstance);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveLazy()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedInstance = Mock.Of<IMyService>();
+
+                // When
+                using (container.Bind<IMyService>().Tag(99).To(ctx => expectedInstance))
+                {
+                    // Then
+                    var actualInstance = container.Resolve<Lazy<IMyService>>(99.AsTag());
+                    actualInstance.Value.ShouldBe(expectedInstance);
                 }
             }
         }

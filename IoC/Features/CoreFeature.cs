@@ -43,7 +43,7 @@
             yield return container.Register<IContainer>(ctx => new Container(ctx.Args.Length == 1 ? Container.CreateContainerName(ctx.Args[0] as string) : Container.CreateContainerName(string.Empty), ctx.Container, false), null, new object[] { WellknownContainers.Child });
             yield return container.Register(ctx => ctx.Container.Parent, null, new object[] { WellknownContainers.Parent });
 
-            yield return container.Register(ctx => (IResourceStore)ctx.Container);
+            yield return container.Register(ctx => (IResourceStore)ctx.Container.Inject<IContainer>(WellknownContainers.Current));
             yield return container.Register(ctx => Validator.Shared);
         }
     }

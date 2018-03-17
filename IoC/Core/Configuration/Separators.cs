@@ -9,7 +9,5 @@
         public static readonly char Assembly = ',';
 
         public static readonly char Namespace = ',';
-
-        public static readonly char Binding = '.';
     }
 }

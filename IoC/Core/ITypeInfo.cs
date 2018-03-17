@@ -6,12 +6,11 @@
 
     internal interface ITypeInfo
     {
-        [NotNull]
-        Type Type { get; }
+        [NotNull] Type Type { get; }
 
         Guid Id { get; }
 
-        Assembly Assembly { get; }
+        [NotNull] Assembly Assembly { get; }
 
         bool IsValueType { get; }
 
@@ -51,6 +50,7 @@
 
         Type BaseType { get; }
 
+        [NotNull]
         IEnumerable<Type> ImplementedInterfaces { get; }
 
         bool IsAssignableFrom([NotNull] ITypeInfo typeInfo);
