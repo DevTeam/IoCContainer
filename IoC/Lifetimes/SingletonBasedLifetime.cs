@@ -20,15 +20,17 @@
     {
         private static readonly MethodInfo CreateKeyMethodInfo = Info<SingletonBasedLifetime<TKey>>().DeclaredMethods.Single(i => i.Name == nameof(CreateKey));
         private static readonly MethodInfo GetMethodInfo = Info<Table<TKey, object>>().DeclaredMethods.Single(i => i.Name == nameof(Table<TKey, object>.Get));
-        private static readonly MethodInfo CreateInstanceMethodInfo = Info<SingletonBasedLifetime<TKey>>().DeclaredMethods.Single(i => i.Name == nameof(CreateInstance));
+        private static readonly MethodInfo SetMethodInfo = Info<Table<TKey, object>>().DeclaredMethods.Single(i => i.Name == nameof(Table<TKey, object>.Set));
+        private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Info<SingletonBasedLifetime<TKey>>().DeclaredMethods.Single(i => i.Name == nameof(OnNewInstanceCreated));
+
+        [NotNull] internal object LockObject = new object();
         internal volatile Table<TKey, object> Instances = Table<TKey, object>.Empty;
 
         /// <inheritdoc />
-        public Expression Build(Expression expression, IBuildContext buildContext, Expression resolver)
+        public Expression Build(Expression expression, IBuildContext buildContext, object state)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            if (resolver == null) throw new ArgumentNullException(nameof(resolver));
             var returnType = buildContext.Key.Type;
             var thisVar = buildContext.DefineValue(this);
             var keyVar = Expression.Variable(typeof(TKey), "key");
@@ -36,12 +38,20 @@
             var valVar = Expression.Variable(returnType, "val");
             var assignKeyStatement = Expression.Assign(keyVar, Expression.Call(thisVar, CreateKeyMethodInfo, ContainerParameter, ArgsParameter));
             var assignHashCodeStatement = Expression.Assign(hashCodeVar, Expression.Call(keyVar, ExpressionExtensions.GetHashCodeMethodInfo));
-            var assignValStatement = Expression.Assign(valVar, Expression.Call(Expression.Field(thisVar, nameof(Instances)), GetMethodInfo, hashCodeVar, keyVar).Convert(returnType));
-            var methodInfo = CreateInstanceMethodInfo.MakeGenericMethod(returnType);
+            var instancesField = Expression.Field(thisVar, nameof(Instances));
+            var assignValStatement = Expression.Assign(valVar, Expression.Call(instancesField, GetMethodInfo, hashCodeVar, keyVar).Convert(returnType));
+            var lockObjectField = Expression.Field(thisVar, nameof(LockObject));
+            var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
             var conditionStatement = Expression.Condition(
                 Expression.NotEqual(valVar, ExpressionExtensions.NullConst),
                 valVar,
-                Expression.Call(thisVar, methodInfo, keyVar, hashCodeVar, ContainerParameter, ArgsParameter, resolver).Convert(returnType));
+                Expression.Block(
+                    Expression.Block(
+                        Expression.Assign(valVar, expression),
+                        Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, hashCodeVar, keyVar, valVar))
+                        ).LockExpression(lockObjectField),
+                    Expression.Call(thisVar, onNewInstanceCreatedMethodInfo, valVar, keyVar, ContainerParameter, ArgsParameter),
+                    valVar));
 
             return Expression.Block(
                 new[] { keyVar, hashCodeVar, valVar },
@@ -56,7 +66,7 @@
         public void Dispose()
         {
             System.Collections.Generic.List<IDisposable> items;
-            lock (Instances)
+            lock (LockObject)
             { 
                 items = Instances.Select(i => i.Value).OfType<IDisposable>().ToList();
                 Instances = Table<TKey, object>.Empty;
@@ -75,20 +85,6 @@
         /// <param name="args">The arfuments.</param>
         /// <returns>The created key.</returns>
         protected abstract TKey CreateKey(IContainer container, object[] args);
-
-        [MethodImpl((MethodImplOptions)256)]
-        internal T CreateInstance<T>(TKey key, int hashCode, IContainer container, object[] args, Resolver<T> resolver)
-        {
-            T instance;
-            lock (Instances)
-            {
-                instance = resolver(container, args);
-                Instances = Instances.Set(hashCode, key, instance);
-            }
-
-            OnNewInstanceCreated(instance, key, container, args);
-            return instance;
-        }
 
         /// <summary>
         /// Is invoked on the new instance creation.

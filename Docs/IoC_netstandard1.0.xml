@@ -2068,7 +2068,7 @@
             </summary>
             <typeparam name="TKey">The key type.</typeparam>
         </member>
-        <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,System.Linq.Expressions.Expression)">
+        <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,System.Object)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.Dispose">
@@ -2099,7 +2099,7 @@
             Represents singleton lifetime.
             </summary>
         </member>
-        <member name="M:IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,System.Linq.Expressions.Expression)">
+        <member name="M:IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,System.Object)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.SingletonLifetime.Dispose">

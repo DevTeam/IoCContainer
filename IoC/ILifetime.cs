@@ -1,13 +1,12 @@
 ﻿namespace IoC
 {
-    using System.Linq.Expressions;
     using Extensibility;
 
     /// <summary>
     /// Represents a lifetime for an instance.
     /// </summary>
     [PublicAPI]
-    public interface ILifetime: IExpressionBuilder<Expression>
+    public interface ILifetime: IExpressionBuilder<object>
     {
         /// <summary>
         /// Clone this lifetime to use with generic instances.

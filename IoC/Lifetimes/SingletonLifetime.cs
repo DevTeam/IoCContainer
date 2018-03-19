@@ -1,14 +1,9 @@
 ﻿namespace IoC.Lifetimes
 {
     using System;
-    using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
-    using System.Runtime.CompilerServices;
     using Core;
     using Extensibility;
-    using static Extensibility.WellknownExpressions;
-    using TypeExtensions = Core.TypeExtensions;
 
     /// <summary>
     /// Represents singleton lifetime.
@@ -16,25 +11,25 @@
     [PublicAPI]
     public sealed class SingletonLifetime : ILifetime, IDisposable
     {
-        [NotNull] private object _lockObject = new object();
+        [NotNull] internal object LockObject = new object();
         internal volatile object Instance;
 
-        private static readonly MethodInfo CreateInstanceMethodInfo = TypeExtensions.Info<SingletonLifetime>().DeclaredMethods.Single(i => i.Name == nameof(CreateInstance));
-
         /// <inheritdoc />
-        public Expression Build(Expression expression, IBuildContext buildContext, Expression resolver)
+        public Expression Build(Expression expression, IBuildContext buildContext, object state)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            if (resolver == null) throw new ArgumentNullException(nameof(resolver));
+            var type = expression.Type;
             var thisVar = buildContext.DefineValue(this);
+            var lockObjectField = Expression.Field(thisVar, nameof(LockObject));
             var instanceField = Expression.Field(thisVar, nameof(Instance));
-            var typedInstance = instanceField.Convert(expression.Type);
-            var methodInfo = CreateInstanceMethodInfo.MakeGenericMethod(expression.Type);
+            var typedInstance = instanceField.Convert(type);
             return Expression.Condition(
                 Expression.NotEqual(instanceField, ExpressionExtensions.NullConst),
                 typedInstance,
-                buildContext.PartiallyCloseBlock(Expression.Call(thisVar, methodInfo, ContainerParameter, ArgsParameter, resolver), resolver));
+                Expression.Block(
+                    Expression.Assign(instanceField, expression).LockExpression(lockObjectField),
+                    typedInstance));
         }
 
         /// <inheritdoc />
@@ -51,19 +46,5 @@
 
         /// <inheritdoc />
         public override string ToString() => Lifetime.Singleton.ToString();
-
-        [MethodImpl((MethodImplOptions)256)]
-        internal T CreateInstance<T>(IContainer container, object[] args, Resolver<T> resolver)
-        {
-            lock (_lockObject)
-            {
-                if (Instance == null)
-                {
-                    Instance = resolver(container, args);
-                }
-            }
-
-            return (T)Instance;
-        }
     }
 }

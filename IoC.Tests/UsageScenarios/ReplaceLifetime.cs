@@ -64,10 +64,10 @@ namespace IoC.Tests.UsageScenarios
                 _counter = counter;
             }
 
-            public Expression Build(Expression expression, IBuildContext buildContext, Expression context = default(Expression))
+            public Expression Build(Expression expression, IBuildContext buildContext, object state = default(object))
             {
                 // Build expression using base lifetime
-                expression = _baseSingletonLifetime.Build(expression, buildContext, context);
+                expression = _baseSingletonLifetime.Build(expression, buildContext, state);
 
                 // Define `this` variable
                 var thisVar = buildContext.DefineValue(this);

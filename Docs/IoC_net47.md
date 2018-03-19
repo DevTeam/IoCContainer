@@ -268,13 +268,13 @@
   - [OnNewInstanceCreated\`\`1()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-Scope,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.Scope,IoC.IContainer,System.Object[])')
   - [ToString()](#M-IoC-Lifetimes-ScopeSingletonLifetime-ToString 'IoC.Lifetimes.ScopeSingletonLifetime.ToString')
 - [SingletonBasedLifetime\`1](#T-IoC-Lifetimes-SingletonBasedLifetime`1 'IoC.Lifetimes.SingletonBasedLifetime`1')
-  - [Build()](#M-IoC-Lifetimes-SingletonBasedLifetime`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.SingletonBasedLifetime`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,System.Linq.Expressions.Expression)')
+  - [Build()](#M-IoC-Lifetimes-SingletonBasedLifetime`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,System-Object- 'IoC.Lifetimes.SingletonBasedLifetime`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,System.Object)')
   - [Clone()](#M-IoC-Lifetimes-SingletonBasedLifetime`1-Clone 'IoC.Lifetimes.SingletonBasedLifetime`1.Clone')
   - [CreateKey(container,args)](#M-IoC-Lifetimes-SingletonBasedLifetime`1-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.SingletonBasedLifetime`1.CreateKey(IoC.IContainer,System.Object[])')
   - [Dispose()](#M-IoC-Lifetimes-SingletonBasedLifetime`1-Dispose 'IoC.Lifetimes.SingletonBasedLifetime`1.Dispose')
   - [OnNewInstanceCreated\`\`1(newInstance,key,container,args)](#M-IoC-Lifetimes-SingletonBasedLifetime`1-OnNewInstanceCreated``1-``0,`0,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.SingletonBasedLifetime`1.OnNewInstanceCreated``1(``0,`0,IoC.IContainer,System.Object[])')
 - [SingletonLifetime](#T-IoC-Lifetimes-SingletonLifetime 'IoC.Lifetimes.SingletonLifetime')
-  - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,System.Linq.Expressions.Expression)')
+  - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,System-Object- 'IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,System.Object)')
   - [Clone()](#M-IoC-Lifetimes-SingletonLifetime-Clone 'IoC.Lifetimes.SingletonLifetime.Clone')
   - [Dispose()](#M-IoC-Lifetimes-SingletonLifetime-Dispose 'IoC.Lifetimes.SingletonLifetime.Dispose')
   - [ToString()](#M-IoC-Lifetimes-SingletonLifetime-ToString 'IoC.Lifetimes.SingletonLifetime.ToString')
@@ -4333,8 +4333,8 @@ Represents the abstaction for singleton based lifetimes.
 | ---- | ----------- |
 | TKey | The key type. |
 
-<a name='M-IoC-Lifetimes-SingletonBasedLifetime`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,System-Linq-Expressions-Expression-'></a>
-### Build() `method` [#](#M-IoC-Lifetimes-SingletonBasedLifetime`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,System-Linq-Expressions-Expression- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-Lifetimes-SingletonBasedLifetime`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,System-Object-'></a>
+### Build() `method` [#](#M-IoC-Lifetimes-SingletonBasedLifetime`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,System-Object- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -4411,8 +4411,8 @@ IoC.Lifetimes
 
 Represents singleton lifetime.
 
-<a name='M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,System-Linq-Expressions-Expression-'></a>
-### Build() `method` [#](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,System-Linq-Expressions-Expression- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,System-Object-'></a>
+### Build() `method` [#](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,System-Object- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 

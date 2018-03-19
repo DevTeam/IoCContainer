@@ -163,7 +163,7 @@
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
             var isRegistered = true;
-            var registeredKeys = new List<Key>();
+            var registeredKeys = new List<FullKey>();
             void UnregisterKeys()
             {
                 lock (_lockObject)
