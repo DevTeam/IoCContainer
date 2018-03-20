@@ -13,24 +13,24 @@
         {
         }
 
-        public Expression Build(Expression expression, IBuildContext buildContext, IDictionary<Type, Type> typesMap)
+        public Expression Build(Expression bodyExpression, IBuildContext buildContext, IDictionary<Type, Type> typesMap)
         {
-            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             typesMap = typesMap ?? new Dictionary<Type, Type>();
             var typeMapingExpressionVisitor = new TypeMapingExpressionVisitor(buildContext.Key.Type, typesMap);
-            typeMapingExpressionVisitor.Visit(expression);
+            typeMapingExpressionVisitor.Visit(bodyExpression);
             if (typesMap.Count > 0)
             {
                 var typeReplacingExpressionVisitor = new TypeReplacerExpressionVisitor(typesMap);
-                var newExpression = typeReplacingExpressionVisitor.Visit(expression);
+                var newExpression = typeReplacingExpressionVisitor.Visit(bodyExpression);
                 if (newExpression != null)
                 {
                     return newExpression;
                 }
             }
 
-            return expression;
+            return bodyExpression;
         }
     }
 }

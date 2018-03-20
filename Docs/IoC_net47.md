@@ -187,7 +187,7 @@
 - [IDependency](#T-IoC-IDependency 'IoC.IDependency')
   - [Expression](#P-IoC-IDependency-Expression 'IoC.IDependency.Expression')
 - [IExpressionBuilder\`1](#T-IoC-Extensibility-IExpressionBuilder`1 'IoC.Extensibility.IExpressionBuilder`1')
-  - [Build(expression,buildContext,context)](#M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,`0- 'IoC.Extensibility.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,`0)')
+  - [Build(bodyExpression,buildContext,context)](#M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,`0- 'IoC.Extensibility.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,`0)')
 - [IExpressionCompiler](#T-IoC-Extensibility-IExpressionCompiler 'IoC.Extensibility.IExpressionCompiler')
   - [IsSupportingCompextTypeConstant](#P-IoC-Extensibility-IExpressionCompiler-IsSupportingCompextTypeConstant 'IoC.Extensibility.IExpressionCompiler.IsSupportingCompextTypeConstant')
   - [Compile(resolverExpression)](#M-IoC-Extensibility-IExpressionCompiler-Compile-System-Linq-Expressions-LambdaExpression- 'IoC.Extensibility.IExpressionCompiler.Compile(System.Linq.Expressions.LambdaExpression)')
@@ -3270,7 +3270,7 @@ IoC.Extensibility
 Allows to build expresion for lifetimes.
 
 <a name='M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,`0-'></a>
-### Build(expression,buildContext,context) `method` [#](#M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,`0- 'Go To Here') [=](#contents 'Back To Contents')
+### Build(bodyExpression,buildContext,context) `method` [#](#M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,`0- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -3284,7 +3284,7 @@ The new expression.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| expression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression to get an instance. |
+| bodyExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The expression body to get an instance. |
 | buildContext | [IoC.Extensibility.IBuildContext](#T-IoC-Extensibility-IBuildContext 'IoC.Extensibility.IBuildContext') | The build context. |
 | context | [\`0](#T-`0 '`0') | The expression build context. |
 

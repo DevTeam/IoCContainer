@@ -4,7 +4,6 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Runtime.CompilerServices;
     using Core;
     using Core.Collections;
     using Extensibility;
@@ -22,43 +21,61 @@
         private static readonly MethodInfo GetMethodInfo = Info<Table<TKey, object>>().DeclaredMethods.Single(i => i.Name == nameof(Table<TKey, object>.Get));
         private static readonly MethodInfo SetMethodInfo = Info<Table<TKey, object>>().DeclaredMethods.Single(i => i.Name == nameof(Table<TKey, object>.Set));
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Info<SingletonBasedLifetime<TKey>>().DeclaredMethods.Single(i => i.Name == nameof(OnNewInstanceCreated));
+        private static readonly ParameterExpression KeyVar = Expression.Variable(typeof(TKey), "key");
 
         [NotNull] internal object LockObject = new object();
         internal volatile Table<TKey, object> Instances = Table<TKey, object>.Empty;
 
         /// <inheritdoc />
-        public Expression Build(Expression expression, IBuildContext buildContext, object state)
+        public Expression Build(Expression bodyExpression, IBuildContext buildContext, object state)
         {
-            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             var returnType = buildContext.Key.Type;
             var thisVar = buildContext.DefineValue(this);
-            var keyVar = Expression.Variable(typeof(TKey), "key");
-            var hashCodeVar = Expression.Variable(typeof(int), "hashCode");
-            var valVar = Expression.Variable(returnType, "val");
-            var assignKeyStatement = Expression.Assign(keyVar, Expression.Call(thisVar, CreateKeyMethodInfo, ContainerParameter, ArgsParameter));
-            var assignHashCodeStatement = Expression.Assign(hashCodeVar, Expression.Call(keyVar, ExpressionExtensions.GetHashCodeMethodInfo));
+            var instanceVar = Expression.Variable(returnType, "val");
             var instancesField = Expression.Field(thisVar, nameof(Instances));
-            var assignValStatement = Expression.Assign(valVar, Expression.Call(instancesField, GetMethodInfo, hashCodeVar, keyVar).Convert(returnType));
             var lockObjectField = Expression.Field(thisVar, nameof(LockObject));
             var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
-            var conditionStatement = Expression.Condition(
-                Expression.NotEqual(valVar, ExpressionExtensions.NullConst),
-                valVar,
-                Expression.Block(
-                    Expression.Block(
-                        Expression.Assign(valVar, expression),
-                        Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, hashCodeVar, keyVar, valVar))
-                        ).LockExpression(lockObjectField),
-                    Expression.Call(thisVar, onNewInstanceCreatedMethodInfo, valVar, keyVar, ContainerParameter, ArgsParameter),
-                    valVar));
-
+            var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, SingletonBasedLifetimeVars.HashCodeVar, KeyVar).Convert(returnType));
             return Expression.Block(
-                new[] { keyVar, hashCodeVar, valVar },
-                assignKeyStatement,
-                assignHashCodeStatement,
-                assignValStatement,
-                conditionStatement
+                // Key key;
+                // int hashCode;
+                // T instance;
+                new[] { KeyVar, SingletonBasedLifetimeVars.HashCodeVar, instanceVar },
+                // var key = CreateKey(container, args);
+                Expression.Assign(KeyVar, Expression.Call(thisVar, CreateKeyMethodInfo, ContainerParameter, ArgsParameter)),
+                // var hashCode = key.GetHashCode();
+                Expression.Assign(SingletonBasedLifetimeVars.HashCodeVar, Expression.Call(KeyVar, ExpressionExtensions.GetHashCodeMethodInfo)),
+                // var instance = (T)Instances.Get(hashCode, key);
+                assignInstanceExpression,
+                // if(instance != null)
+                Expression.Condition(
+                    Expression.NotEqual(instanceVar, ExpressionExtensions.NullConst),
+                    // return instance;
+                    instanceVar,
+                    // else {
+                    Expression.Block(
+                        // lock (this.LockObject)
+                        Expression.Block(
+                            // var instance = (T)Instances.Get(hashCode, key);
+                            assignInstanceExpression,
+                            // if(instance == null)
+                            Expression.IfThen(
+                                Expression.Equal(instanceVar, ExpressionExtensions.NullConst),
+                                Expression.Block(
+                                    // instance = new T();
+                                    Expression.Assign(instanceVar, bodyExpression),
+                                    // Instances = Instances.Set(hashCode, key, instance);
+                                    Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, SingletonBasedLifetimeVars.HashCodeVar, KeyVar, instanceVar))
+                                )
+                            )
+                        ).Lock(lockObjectField),
+                        // OnNewInstanceCreated(instance, key, container, args);
+                        Expression.Call(thisVar, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, ContainerParameter, ArgsParameter),
+                        // return instance;
+                        instanceVar))
+                    // }
             );
         }
 
@@ -94,5 +111,10 @@
         /// <param name="container">The target container.</param>
         /// <param name="args">Optional arguments.</param>
         protected abstract void OnNewInstanceCreated<T>(T newInstance, TKey key, IContainer container, object[] args);
+    }
+
+    internal static class SingletonBasedLifetimeVars
+    {
+        internal static readonly ParameterExpression HashCodeVar = Expression.Variable(typeof(int), "hashCode");
     }
 }

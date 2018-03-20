@@ -18,9 +18,13 @@
                 // When
                 using (container.Bind<MySimpleClass>().To(ctx => new MySimpleClass()))
                 {
-                    // Then
+                    var instance = container.Resolve<object>(typeof(MySimpleClass));
                     var instance1 = container.Resolve<MySimpleClass>();
                     var instance2 = container.Resolve<MySimpleClass>();
+
+                    // Then
+                    instance.ShouldNotBe(instance1);
+                    instance.ShouldNotBe(instance2);
                     instance1.ShouldNotBe(instance2);
                 }
             }

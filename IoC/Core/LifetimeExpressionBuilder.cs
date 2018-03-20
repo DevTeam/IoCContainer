@@ -12,10 +12,10 @@
         {
         }
 
-        public Expression Build(Expression expression, IBuildContext buildContext, ILifetime lifetime)
+        public Expression Build(Expression bodyExpression, IBuildContext buildContext, ILifetime lifetime)
         {
-            if (expression == null) throw new ArgumentNullException(nameof(expression));
-            return lifetime?.Build(expression, buildContext) ?? expression;
+            if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
+            return lifetime?.Build(bodyExpression, buildContext) ?? bodyExpression;
         }
     }
 }

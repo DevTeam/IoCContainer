@@ -41,7 +41,7 @@
         [NotNull] private readonly Dictionary<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = new Dictionary<ShortKey, RegistrationEntry>();
         [NotNull] internal volatile Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
         [NotNull] internal volatile Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
-        private volatile IEnumerable<FullKey>[] _allKeys;
+        private IEnumerable<FullKey>[] _allKeys;
 
         /// <summary>
         /// Creates a root container with default features.
@@ -286,7 +286,7 @@
                     return false;
                 }
 
-                resolver = AddResolver<T>(key, resolverDelegate, true);
+                resolver = AddResolver(key, (Resolver<T>)resolverDelegate, true);
                 return true;
             }
 
@@ -298,27 +298,21 @@
 
             if (container == this)
             {
-                resolver = AddResolver<T>(key, resolver, false);
+                resolver = AddResolver(key, resolver, false);
             }
 
             return true;
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        private Resolver<T> AddResolver<T>(FullKey key, ResolverDelegate resolverDelegate, bool currentContainer)
+        private Resolver<T> AddResolver<T>(FullKey key, [NotNull] Resolver<T> resolver, bool currentContainer)
         {
             lock (_lockObject)
             {
-                var resolver = (Resolver<T>)resolverDelegate;
-                if (typeof(T) == key.Type)
-                {
-                    resolverDelegate = resolver;
-                }
-
-                Resolvers = Resolvers.Set(key.GetHashCode(), key, resolverDelegate);
+                Resolvers = Resolvers.Set(key.GetHashCode(), key, resolver);
                 if (key.Tag == null)
                 {
-                    ResolversByType = ResolversByType.Set(key.Type.GetHashCode(), key.Type, resolverDelegate);
+                    ResolversByType = ResolversByType.Set(key.Type.GetHashCode(), key.Type, resolver);
                 }
 
                 return resolver;

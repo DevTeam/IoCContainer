@@ -37,22 +37,25 @@
             }
 
             var treeEntry = tree.Current;
-            if (tree.Height != 0 && ReferenceEquals(type, treeEntry.Key))
+            if (tree.Height != 0)
             {
-                return treeEntry.Value as Resolver<T>;
-            }
-
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree.Height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                if (ReferenceEquals(type, treeEntry.Key))
                 {
-                    if (!ReferenceEquals(entryDuplicates[i].Key, type))
-                    {
-                        continue;
-                    }
+                    return treeEntry.Value as Resolver<T>;
+                }
 
-                    return entryDuplicates[i].Value as Resolver<T>;
+                var entryDuplicates = treeEntry.Duplicates;
+                if (entryDuplicates != null)
+                {
+                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                    {
+                        if (!ReferenceEquals(entryDuplicates[i].Key, type))
+                        {
+                            continue;
+                        }
+
+                        return entryDuplicates[i].Value as Resolver<T>;
+                    }
                 }
             }
 
@@ -77,22 +80,25 @@
             }
 
             var treeEntry = tree.Current;
-            if (tree.Height != 0 && key.Equals(treeEntry.Key))
+            if (tree.Height != 0)
             {
-                return treeEntry.Value as Resolver<T>;
-            }
-
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree.Height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                if (key.Equals(treeEntry.Key))
                 {
-                    if (!Equals(entryDuplicates[i].Key, key))
-                    {
-                        continue;
-                    }
+                    return treeEntry.Value as Resolver<T>;
+                }
 
-                    return entryDuplicates[i].Value as Resolver<T>;
+                var entryDuplicates = treeEntry.Duplicates;
+                if (entryDuplicates != null)
+                {
+                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                    {
+                        if (!Equals(entryDuplicates[i].Key, key))
+                        {
+                            continue;
+                        }
+
+                        return entryDuplicates[i].Value as Resolver<T>;
+                    }
                 }
             }
 

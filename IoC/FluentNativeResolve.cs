@@ -17,8 +17,8 @@
         [MethodImpl((MethodImplOptions) 256)]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            var hashCode = HashCode<T>.Shared;
             var type = typeof(T);
+            var hashCode = HashCode<T>.Shared;
             var tree = container.ResolversByType.Buckets[hashCode & (container.ResolversByType.Divisor - 1)];
             while (tree.Height != 0 && tree.Current.HashCode != hashCode)
             {
@@ -26,26 +26,29 @@
             }
 
             var treeEntry = tree.Current;
-            if (tree.Height != 0 && ReferenceEquals(type, treeEntry.Key))
+            if (tree.Height != 0)
             {
-                return ((Resolver<T>) treeEntry.Value)(container, Container.EmptyArgs);
-            }
-
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree.Height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                if (type == treeEntry.Key)
                 {
-                    if (!ReferenceEquals(entryDuplicates[i].Key, type))
-                    {
-                        continue;
-                    }
+                    return ((Resolver<T>) treeEntry.Value)(container, Container.EmptyArgs);
+                }
 
-                    return ((Resolver<T>) entryDuplicates[i].Value)(container, Container.EmptyArgs);
+                var entryDuplicates = treeEntry.Duplicates;
+                if (entryDuplicates != null)
+                {
+                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                    {
+                        if (entryDuplicates[i].Key != type)
+                        {
+                            continue;
+                        }
+
+                        return ((Resolver<T>) entryDuplicates[i].Value)(container, Container.EmptyArgs);
+                    }
                 }
             }
 
-            return container.GetResolver<T>(type)(container, Container.EmptyArgs);
+            return container.GetResolver<T>()(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -68,22 +71,25 @@
             }
 
             var treeEntry = tree.Current;
-            if (tree.Height != 0 && Equals(key, treeEntry.Key))
+            if (tree.Height != 0)
             {
-                return ((Resolver<T>)treeEntry.Value)(container, Container.EmptyArgs);
-            }
-
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree.Height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                if (Equals(key, treeEntry.Key))
                 {
-                    if (!Equals(entryDuplicates[i].Key, key))
-                    {
-                        continue;
-                    }
+                    return ((Resolver<T>) treeEntry.Value)(container, Container.EmptyArgs);
+                }
 
-                    return ((Resolver<T>)entryDuplicates[i].Value)(container, Container.EmptyArgs);
+                var entryDuplicates = treeEntry.Duplicates;
+                if (entryDuplicates != null)
+                {
+                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                    {
+                        if (!Equals(entryDuplicates[i].Key, key))
+                        {
+                            continue;
+                        }
+
+                        return ((Resolver<T>) entryDuplicates[i].Value)(container, Container.EmptyArgs);
+                    }
                 }
             }
 
@@ -109,22 +115,25 @@
             }
 
             var treeEntry = tree.Current;
-            if (tree.Height != 0 && ReferenceEquals(type, treeEntry.Key))
+            if (tree.Height != 0)
             {
-                return ((Resolver<T>) treeEntry.Value)(container, args);
-            }
-
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree.Height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                if (ReferenceEquals(type, treeEntry.Key))
                 {
-                    if (!ReferenceEquals(entryDuplicates[i].Key, type))
-                    {
-                        continue;
-                    }
+                    return ((Resolver<T>) treeEntry.Value)(container, args);
+                }
 
-                    return ((Resolver<T>) entryDuplicates[i].Value)(container, args);
+                var entryDuplicates = treeEntry.Duplicates;
+                if (entryDuplicates != null)
+                {
+                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                    {
+                        if (!ReferenceEquals(entryDuplicates[i].Key, type))
+                        {
+                            continue;
+                        }
+
+                        return ((Resolver<T>) entryDuplicates[i].Value)(container, args);
+                    }
                 }
             }
 
@@ -152,22 +161,25 @@
             }
 
             var treeEntry = tree.Current;
-            if (tree.Height != 0 && Equals(key, treeEntry.Key))
+            if (tree.Height != 0)
             {
-                return ((Resolver<T>)treeEntry.Value)(container, args);
-            }
-
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree.Height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                if (Equals(key, treeEntry.Key))
                 {
-                    if (!Equals(entryDuplicates[i].Key, key))
-                    {
-                        continue;
-                    }
+                    return ((Resolver<T>) treeEntry.Value)(container, args);
+                }
 
-                    return ((Resolver<T>)entryDuplicates[i].Value)(container, args);
+                var entryDuplicates = treeEntry.Duplicates;
+                if (entryDuplicates != null)
+                {
+                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                    {
+                        if (!Equals(entryDuplicates[i].Key, key))
+                        {
+                            continue;
+                        }
+
+                        return ((Resolver<T>) entryDuplicates[i].Value)(container, args);
+                    }
                 }
             }
 
@@ -192,22 +204,25 @@
             }
 
             var treeEntry = tree.Current;
-            if (tree.Height != 0 && ReferenceEquals(type, treeEntry.Key))
+            if (tree.Height != 0)
             {
-                return ((Resolver<T>)treeEntry.Value)(container, Container.EmptyArgs);
-            }
-
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree.Height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                if (ReferenceEquals(type, treeEntry.Key))
                 {
-                    if (!ReferenceEquals(entryDuplicates[i].Key, type))
-                    {
-                        continue;
-                    }
+                    return ((Resolver<T>) treeEntry.Value)(container, Container.EmptyArgs);
+                }
 
-                    return ((Resolver<T>)entryDuplicates[i].Value)(container, Container.EmptyArgs);
+                var entryDuplicates = treeEntry.Duplicates;
+                if (entryDuplicates != null)
+                {
+                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                    {
+                        if (!ReferenceEquals(entryDuplicates[i].Key, type))
+                        {
+                            continue;
+                        }
+
+                        return ((Resolver<T>) entryDuplicates[i].Value)(container, Container.EmptyArgs);
+                    }
                 }
             }
 
@@ -234,22 +249,25 @@
             }
 
             var treeEntry = tree.Current;
-            if (tree.Height != 0 && Equals(key, treeEntry.Key))
+            if (tree.Height != 0)
             {
-                return ((Resolver<T>)treeEntry.Value)(container, Container.EmptyArgs);
-            }
-
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree.Height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                if (Equals(key, treeEntry.Key))
                 {
-                    if (!Equals(entryDuplicates[i].Key, key))
-                    {
-                        continue;
-                    }
+                    return ((Resolver<T>) treeEntry.Value)(container, Container.EmptyArgs);
+                }
 
-                    return ((Resolver<T>)entryDuplicates[i].Value)(container, Container.EmptyArgs);
+                var entryDuplicates = treeEntry.Duplicates;
+                if (entryDuplicates != null)
+                {
+                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                    {
+                        if (!Equals(entryDuplicates[i].Key, key))
+                        {
+                            continue;
+                        }
+
+                        return ((Resolver<T>) entryDuplicates[i].Value)(container, Container.EmptyArgs);
+                    }
                 }
             }
 
@@ -275,22 +293,25 @@
             }
 
             var treeEntry = tree.Current;
-            if (tree.Height != 0 && ReferenceEquals(type, treeEntry.Key))
+            if (tree.Height != 0)
             {
-                return ((Resolver<T>)treeEntry.Value)(container, Container.EmptyArgs);
-            }
-
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree.Height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                if (ReferenceEquals(type, treeEntry.Key))
                 {
-                    if (!ReferenceEquals(entryDuplicates[i].Key, type))
-                    {
-                        continue;
-                    }
+                    return ((Resolver<T>) treeEntry.Value)(container, Container.EmptyArgs);
+                }
 
-                    return ((Resolver<T>)entryDuplicates[i].Value)(container, args);
+                var entryDuplicates = treeEntry.Duplicates;
+                if (entryDuplicates != null)
+                {
+                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                    {
+                        if (!ReferenceEquals(entryDuplicates[i].Key, type))
+                        {
+                            continue;
+                        }
+
+                        return ((Resolver<T>) entryDuplicates[i].Value)(container, args);
+                    }
                 }
             }
 
@@ -318,22 +339,25 @@
             }
 
             var treeEntry = tree.Current;
-            if (tree.Height != 0 && Equals(key, treeEntry.Key))
+            if (tree.Height != 0)
             {
-                return ((Resolver<T>)treeEntry.Value)(container, args);
-            }
-
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree.Height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                if (Equals(key, treeEntry.Key))
                 {
-                    if (!Equals(entryDuplicates[i].Key, key))
-                    {
-                        continue;
-                    }
+                    return ((Resolver<T>) treeEntry.Value)(container, args);
+                }
 
-                    return ((Resolver<T>)entryDuplicates[i].Value)(container, args);
+                var entryDuplicates = treeEntry.Duplicates;
+                if (entryDuplicates != null)
+                {
+                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                    {
+                        if (!Equals(entryDuplicates[i].Key, key))
+                        {
+                            continue;
+                        }
+
+                        return ((Resolver<T>) entryDuplicates[i].Value)(container, args);
+                    }
                 }
             }
 

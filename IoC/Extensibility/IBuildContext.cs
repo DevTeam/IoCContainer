@@ -12,7 +12,7 @@
         /// <summary>
         /// The compiler.
         /// </summary>
-        IExpressionCompiler Compiler { get; }
+        [NotNull] IExpressionCompiler Compiler { get; }
 
         /// <summary>
         /// The target key.
@@ -22,7 +22,7 @@
         /// <summary>
         /// The target container.
         /// </summary>
-        IContainer Container { get; }
+        [NotNull] IContainer Container { get; }
 
         /// <summary>
         /// Creates a child context.
@@ -30,7 +30,7 @@
         /// <param name="key">The key</param>
         /// <param name="container">The container.</param>
         /// <returns>The new build context.</returns>
-        IBuildContext CreateChild(Key key, [NotNull] IContainer container);
+        [NotNull] IBuildContext CreateChild(Key key, [NotNull] IContainer container);
 
         /// <summary>
         /// Defines value.
@@ -38,7 +38,7 @@
         /// <param name="value">The value.</param>
         /// <param name="type">The value type.</param>
         /// <returns>The parameter expression.</returns>
-        Expression DefineValue([CanBeNull] object value, [NotNull] Type type);
+        [NotNull] Expression DefineValue([CanBeNull] object value, [NotNull] Type type);
 
         /// <summary>
         /// Defines value.
@@ -46,21 +46,21 @@
         /// <typeparam name="T">The value type.</typeparam>
         /// <param name="value">The value.</param>
         /// <returns>The parameter expression.</returns>
-        Expression DefineValue<T>([CanBeNull] T value);
+        [NotNull] Expression DefineValue<T>([CanBeNull] T value);
 
         /// <summary>
         /// Defines variable.
         /// </summary>
         /// <param name="expression">The value expression.</param>
         /// <returns>The parameter expression.</returns>
-        ParameterExpression DefineVariable([NotNull] Expression expression);
+        [NotNull] ParameterExpression DefineVariable([NotNull] Expression expression);
 
         /// <summary>
         /// Closes a block of statements.
         /// </summary>
         /// <param name="targetExpression">The target expression.</param>
         /// <returns>The result expression.</returns>
-        Expression CloseBlock([NotNull] Expression targetExpression);
+        [NotNull] Expression CloseBlock([NotNull] Expression targetExpression);
 
         /// <summary>
         /// Closes block for specified expressions.
@@ -68,6 +68,6 @@
         /// <param name="targetExpression">The target expression.</param>
         /// <param name="expressions">Assigment expressions.</param>
         /// <returns>The resulting block expression.</returns>
-        Expression PartiallyCloseBlock([NotNull] Expression targetExpression, [NotNull][ItemNotNull] params Expression[] expressions);
+        [NotNull] Expression PartiallyCloseBlock([NotNull] Expression targetExpression, [NotNull][ItemNotNull] params Expression[] expressions);
     }
 }

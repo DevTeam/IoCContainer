@@ -55,14 +55,14 @@
         [MethodImpl((MethodImplOptions)256)]
         public static Type ToResolverType(this Type type) => ResolverGenericTypeInfo.MakeGenericType(type);
 
-        public static BlockExpression LockExpression(this Expression body, MemberExpression lockObject)
+        [MethodImpl((MethodImplOptions)256)]
+        public static Expression Lock(this Expression body, MemberExpression lockObject)
         {
-            return Expression.Block(
-                Expression.TryFinally(
-                    Expression.Block(
-                        Expression.Call(EnterMethodInfo, lockObject),
-                        body), 
-                    Expression.Call(ExitMethodInfo, lockObject)));
+            return Expression.TryFinally(
+                Expression.Block(
+                    Expression.Call(EnterMethodInfo, lockObject),
+                    body), 
+                Expression.Call(ExitMethodInfo, lockObject));
         }
     }
 }

@@ -12,13 +12,13 @@
         {
         }
 
-        public Expression Build(Expression expression, IBuildContext buildContext, Expression thisExpression)
+        public Expression Build(Expression bodyExpression, IBuildContext buildContext, Expression thisExpression)
         {
-            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             var visitor = new DependencyInjectionExpressionVisitor(buildContext, thisExpression);
-            var newExpression = visitor.Visit(expression);
-            return newExpression ?? expression;
+            var newExpression = visitor.Visit(bodyExpression);
+            return newExpression ?? bodyExpression;
         }
     }
 }

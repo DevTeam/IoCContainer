@@ -116,24 +116,27 @@ namespace IoC.Core.Collections
             }
 
             var treeEntry = tree.Current;
-            if (tree.Height != 0 && (ReferenceEquals(key, treeEntry.Key) || key.Equals(treeEntry.Key)))
+            if (tree.Height != 0)
             {
-                value = treeEntry.Value;
-                return true;
-            }
-
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree.Height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                if (ReferenceEquals(key, treeEntry.Key) || key.Equals(treeEntry.Key))
                 {
-                    if (!Equals(entryDuplicates[i].Key, key))
-                    {
-                        continue;
-                    }
-
-                    value = entryDuplicates[i].Value;
+                    value = treeEntry.Value;
                     return true;
+                }
+
+                var entryDuplicates = treeEntry.Duplicates;
+                if (entryDuplicates != null)
+                {
+                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                    {
+                        if (!Equals(entryDuplicates[i].Key, key))
+                        {
+                            continue;
+                        }
+
+                        value = entryDuplicates[i].Value;
+                        return true;
+                    }
                 }
             }
 
@@ -151,22 +154,25 @@ namespace IoC.Core.Collections
             }
 
             var treeEntry = tree.Current;
-            if (tree.Height != 0 && (ReferenceEquals(key, treeEntry.Key) || key.Equals(treeEntry.Key)))
+            if (tree.Height != 0)
             {
-                return treeEntry.Value;
-            }
-
-            var entryDuplicates = treeEntry.Duplicates;
-            if (tree.Height != 0 && entryDuplicates != null)
-            {
-                for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                if (ReferenceEquals(key, treeEntry.Key) || key.Equals(treeEntry.Key))
                 {
-                    if (!Equals(entryDuplicates[i].Key, key))
-                    {
-                        continue;
-                    }
+                    return treeEntry.Value;
+                }
 
-                    return entryDuplicates[i].Value;
+                var entryDuplicates = treeEntry.Duplicates;
+                if (entryDuplicates != null)
+                {
+                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                    {
+                        if (!Equals(entryDuplicates[i].Key, key))
+                        {
+                            continue;
+                        }
+
+                        return entryDuplicates[i].Value;
+                    }
                 }
             }
 

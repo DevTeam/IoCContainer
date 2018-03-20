@@ -24,21 +24,33 @@
             var lockObjectField = Expression.Field(thisVar, nameof(LockObject));
             var instanceField = Expression.Field(thisVar, nameof(Instance));
             var typedInstance = instanceField.Convert(type);
+
+            // if(this.Instance != null)
             return Expression.Condition(
                 Expression.NotEqual(instanceField, ExpressionExtensions.NullConst),
+                // return (T)this.Instance;
                 typedInstance,
                 Expression.Block(
-                    Expression.Assign(instanceField, expression).LockExpression(lockObjectField),
+                    // lock(this.LockObject)
+                    Expression.IfThen(
+                        // if(this.Instance == null)
+                        Expression.Equal(instanceField, ExpressionExtensions.NullConst),
+                        // this.Instance = new T();
+                        Expression.Assign(instanceField, expression)).Lock(lockObjectField),
+                    // return (T)this.Instance;
                     typedInstance));
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            if (Instance is IDisposable disposable)
+            IDisposable disposable;
+            lock (LockObject)
             {
-                disposable.Dispose();
+                disposable = Instance as IDisposable;
             }
+
+            disposable?.Dispose();
         }
 
         /// <inheritdoc />
