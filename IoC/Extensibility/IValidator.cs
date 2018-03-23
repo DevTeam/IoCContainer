@@ -3,6 +3,7 @@
     /// <summary>
     /// Represents a container validator.
     /// </summary>
+    [PublicAPI]
     public interface IValidator
     {
         /// <summary>

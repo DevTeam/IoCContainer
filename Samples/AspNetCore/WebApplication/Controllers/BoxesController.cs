@@ -2,10 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using ConsoleApp;
     using Microsoft.AspNetCore.Mvc;
 
     [Route("api/[controller]")]
+    [SuppressMessage("ReSharper", "UnusedParameter.Global")]
     public class BoxesController : Controller
     {
         private readonly Func<IBox<ICat>> _boxFactory;

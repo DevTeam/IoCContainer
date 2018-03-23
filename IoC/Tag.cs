@@ -3,6 +3,8 @@
     /// <summary>
     /// Represents a tag holder.
     /// </summary>
+    [PublicAPI]
+
     public struct Tag
     {
         internal readonly object Value;

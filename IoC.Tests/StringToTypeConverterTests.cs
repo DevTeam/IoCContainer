@@ -3,6 +3,7 @@
 namespace IoC.Tests
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
     using Core.Configuration;
@@ -66,6 +67,7 @@ namespace IoC.Tests
         }
     }
 
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public class SomeClass
     {
         public class NestedClass

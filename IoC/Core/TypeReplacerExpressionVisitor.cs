@@ -86,6 +86,7 @@
                 return newNode;
             }
 
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
             if (node.IsByRef)
             {
                 newNode = Expression.Parameter(ReplaceType(node.Type).MakeByRefType(), node.Name);

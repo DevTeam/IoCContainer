@@ -4,16 +4,6 @@
 
     internal static class Strings
     {
-        public static string Width([NotNull] this string text, int value)
-        {
-            if (text.Length < value)
-            {
-                return text + new string(' ', value - text.Length);
-            }
-
-            return text;
-        }
-
         public static string ToShortString(this int number)
         {
             if (number > 999999999)

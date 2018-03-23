@@ -35,9 +35,6 @@ namespace IoC.Tests
                 new object[] { ".As(Lifetime.ScopeSingleton)", true, Lifetime.ScopeSingleton},
                 new object[] { ".As(Lifetime.ContainerSingleton)", true, Lifetime.ContainerSingleton},
                 new object[] { ".As(Lifetime.containerSingleton)", true, Lifetime.ContainerSingleton},
-#if !NETCOREAPP1_0
-                new object[] { ".As(Lifetime.ThreadSingleton)", true, Lifetime.ThreadSingleton},
-#endif
                 new object[] { ".As(ContainerSingleton)", true, Lifetime.ContainerSingleton},
                 new object[] { ".As(containerSingleton)", true, Lifetime.ContainerSingleton},
                 new object[] { ".As(Lifetime.Transient).As(Lifetime.Singleton)", true, Lifetime.Singleton},

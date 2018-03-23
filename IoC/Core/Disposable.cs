@@ -26,14 +26,6 @@
             return new CompositeDisposable(disposables);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public static IDisposable Create([NotNull][ItemCanBeNull] params IDisposable[] disposables)
-        {
-            if (disposables == null) throw new ArgumentNullException(nameof(disposables));
-            return new CompositeDisposable(disposables);
-        }
-
         private sealed class DisposableAction : IDisposable
         {
             [NotNull] private readonly Action _action;

@@ -6,6 +6,7 @@
     /// <summary>
     /// Represents a expression compiler.
     /// </summary>
+    [PublicAPI]
     public interface IExpressionCompiler
     {
         /// <summary>

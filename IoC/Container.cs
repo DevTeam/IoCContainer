@@ -243,7 +243,7 @@
         {
             if (tag == null)
             {
-                resolver = Extensions.TryGetResolver<T>(ResolversByType, type.GetHashCode(), type, container ?? this);
+                resolver = Extensions.TryGetResolver<T>(ResolversByType, type.GetHashCode(), type);
                 if (resolver != default(Resolver<T>))
                 {
                     return true;
@@ -251,7 +251,7 @@
             }
             else
             {
-                resolver = Extensions.TryGetResolver<T>(ResolversByType, Resolvers, type, tag, container ?? this);
+                resolver = Extensions.TryGetResolver<T>(ResolversByType, Resolvers, type, tag);
                 if (resolver != default(Resolver<T>))
                 {
                     return true;
@@ -266,7 +266,7 @@
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(ShortKey type, out Resolver<T> resolver, IContainer container = null)
         {
-            resolver = Extensions.TryGetResolver<T>(ResolversByType, type.GetHashCode(), type, container ?? this);
+            resolver = Extensions.TryGetResolver<T>(ResolversByType, type.GetHashCode(), type);
             if (resolver != default(Resolver<T>))
             {
                 return true;

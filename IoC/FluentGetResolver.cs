@@ -6,6 +6,7 @@
     /// <summary>
     /// Represents extensions to get a resolver from a container.
     /// </summary>
+    [PublicAPI]
     public static class FluentGetResolver
     {
         /// <summary>

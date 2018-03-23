@@ -7,7 +7,6 @@
     /// <summary>
     /// Represents a container's validation result.
     /// </summary>
-    [PublicAPI]
     public struct ValidationResult
     {
         /// <summary>

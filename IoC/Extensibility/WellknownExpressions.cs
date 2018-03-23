@@ -1,12 +1,11 @@
 ﻿namespace IoC.Extensibility
 {
-    using System;
-    using System.Linq;
     using System.Linq.Expressions;
 
     /// <summary>
     /// The list of well-known expressions.
     /// </summary>
+    [PublicAPI]
     public static class WellknownExpressions
     {
         /// <summary>

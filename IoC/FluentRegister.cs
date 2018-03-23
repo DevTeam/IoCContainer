@@ -13,6 +13,7 @@
     /// Represents extensions for registration in a container.
     /// </summary>
     [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
+    [PublicAPI]
     public static class FluentRegister
     {
         private static readonly IEnumerable<object> DefaultTags = new object[] { null };

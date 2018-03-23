@@ -2,8 +2,11 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
 
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    [SuppressMessage("ReSharper", "UnusedMemberInSuper.Global")]
     internal interface ITypeInfo
     {
         [NotNull] Type Type { get; }

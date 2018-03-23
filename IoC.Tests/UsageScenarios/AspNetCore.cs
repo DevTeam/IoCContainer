@@ -11,6 +11,7 @@ namespace IoC.Tests.UsageScenarios
     using Xunit;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "UnusedVariable")]
     public class AspNetCore
     {
         [Fact]

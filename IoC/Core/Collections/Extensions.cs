@@ -28,7 +28,7 @@
 
         [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
-        public static Resolver<T> TryGetResolver<T>(Table<Type, Delegate> resolversByType, int hashCode, Type type, IContainer container)
+        public static Resolver<T> TryGetResolver<T>(Table<Type, Delegate> resolversByType, int hashCode, Type type)
         {
             var tree = resolversByType.Buckets[hashCode & (resolversByType.Divisor - 1)];
             while (tree.Height != 0 && tree.Current.HashCode != hashCode)
@@ -64,11 +64,11 @@
 
         [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
-        public static Resolver<T> TryGetResolver<T>(Table<Type, Delegate> resolversByType, Table<Key, Delegate> resolvers, Type type, object tag, IContainer container)
+        public static Resolver<T> TryGetResolver<T>(Table<Type, Delegate> resolversByType, Table<Key, Delegate> resolvers, Type type, object tag)
         {
             if (tag == null)
             {
-                return TryGetResolver<T>(resolversByType, type.GetHashCode(), type, container);
+                return TryGetResolver<T>(resolversByType, type.GetHashCode(), type);
             }
 
             var key = new Key(type, tag);

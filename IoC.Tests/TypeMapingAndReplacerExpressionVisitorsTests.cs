@@ -11,6 +11,8 @@
 
     [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     [SuppressMessage("ReSharper", "SuspiciousTypeConversion.Global")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "FieldCanBeMadeReadOnly.Global")]
     public class TypeMapingAndReplacerExpressionVisitorsTests
     {
         [Fact]

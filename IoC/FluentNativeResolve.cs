@@ -6,6 +6,7 @@
     /// <summary>
     /// Represents extensions to resolve from a native container.
     /// </summary>
+    [PublicAPI]
     public static class FluentNativeResolve
     {
         /// <summary>

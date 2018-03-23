@@ -1,10 +1,12 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Moq;
     using Shouldly;
     using Xunit;
 
+    [SuppressMessage("ReSharper", "UnusedVariable")]
     public class SingletonTests
     {
         [Fact]

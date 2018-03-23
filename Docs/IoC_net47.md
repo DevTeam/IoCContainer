@@ -234,7 +234,6 @@
   - [ContainerSingleton](#F-IoC-Lifetime-ContainerSingleton 'IoC.Lifetime.ContainerSingleton')
   - [ScopeSingleton](#F-IoC-Lifetime-ScopeSingleton 'IoC.Lifetime.ScopeSingleton')
   - [Singleton](#F-IoC-Lifetime-Singleton 'IoC.Lifetime.Singleton')
-  - [ThreadSingleton](#F-IoC-Lifetime-ThreadSingleton 'IoC.Lifetime.ThreadSingleton')
   - [Transient](#F-IoC-Lifetime-Transient 'IoC.Lifetime.Transient')
 - [LinqTunnelAttribute](#T-IoC-LinqTunnelAttribute 'IoC.LinqTunnelAttribute')
 - [LocalizationRequiredAttribute](#T-IoC-LocalizationRequiredAttribute 'IoC.LocalizationRequiredAttribute')
@@ -287,11 +286,6 @@
   - [Default](#F-IoC-Features-TaskFeature-Default 'IoC.Features.TaskFeature.Default')
   - [Apply()](#M-IoC-Features-TaskFeature-Apply-IoC-IContainer- 'IoC.Features.TaskFeature.Apply(IoC.IContainer)')
 - [TerminatesProgramAttribute](#T-IoC-TerminatesProgramAttribute 'IoC.TerminatesProgramAttribute')
-- [ThreadSingletonLifetime](#T-IoC-Lifetimes-ThreadSingletonLifetime 'IoC.Lifetimes.ThreadSingletonLifetime')
-  - [Clone()](#M-IoC-Lifetimes-ThreadSingletonLifetime-Clone 'IoC.Lifetimes.ThreadSingletonLifetime.Clone')
-  - [CreateKey()](#M-IoC-Lifetimes-ThreadSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ThreadSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])')
-  - [OnNewInstanceCreated\`\`1()](#M-IoC-Lifetimes-ThreadSingletonLifetime-OnNewInstanceCreated``1-``0,System-Int32,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ThreadSingletonLifetime.OnNewInstanceCreated``1(``0,System.Int32,IoC.IContainer,System.Object[])')
-  - [ToString()](#M-IoC-Lifetimes-ThreadSingletonLifetime-ToString 'IoC.Lifetimes.ThreadSingletonLifetime.ToString')
 - [TT](#T-IoC-TT 'IoC.TT')
 - [TT1](#T-IoC-TT1 'IoC.TT1')
 - [TT2](#T-IoC-TT2 'IoC.TT2')
@@ -3856,13 +3850,6 @@ Singleton per scope
 
 Single instance per registration
 
-<a name='F-IoC-Lifetime-ThreadSingleton'></a>
-### ThreadSingleton `constants` [#](#F-IoC-Lifetime-ThreadSingleton 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Thread per thread
-
 <a name='F-IoC-Lifetime-Transient'></a>
 ### Transient `constants` [#](#F-IoC-Lifetime-Transient 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -4571,61 +4558,6 @@ IoC
 ##### Summary
 
 Indicates that the marked method unconditionally terminates control flow execution. For example, it could unconditionally throw exception.
-
-<a name='T-IoC-Lifetimes-ThreadSingletonLifetime'></a>
-## ThreadSingletonLifetime [#](#T-IoC-Lifetimes-ThreadSingletonLifetime 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Namespace
-
-IoC.Lifetimes
-
-##### Summary
-
-Represents singleton per thread lifetime.
-
-<a name='M-IoC-Lifetimes-ThreadSingletonLifetime-Clone'></a>
-### Clone() `method` [#](#M-IoC-Lifetimes-ThreadSingletonLifetime-Clone 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='M-IoC-Lifetimes-ThreadSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]-'></a>
-### CreateKey() `method` [#](#M-IoC-Lifetimes-ThreadSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='M-IoC-Lifetimes-ThreadSingletonLifetime-OnNewInstanceCreated``1-``0,System-Int32,IoC-IContainer,System-Object[]-'></a>
-### OnNewInstanceCreated\`\`1() `method` [#](#M-IoC-Lifetimes-ThreadSingletonLifetime-OnNewInstanceCreated``1-``0,System-Int32,IoC-IContainer,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='M-IoC-Lifetimes-ThreadSingletonLifetime-ToString'></a>
-### ToString() `method` [#](#M-IoC-Lifetimes-ThreadSingletonLifetime-ToString 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
 
 <a name='T-IoC-TT'></a>
 ## TT [#](#T-IoC-TT 'Go To Here') [=](#contents 'Back To Contents')

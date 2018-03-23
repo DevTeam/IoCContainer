@@ -9,6 +9,7 @@
     /// <summary>
     /// Represents extensons to configure a container.
     /// </summary>
+    [PublicAPI]
     public static class FluentConfiguration
     {
         /// <summary>

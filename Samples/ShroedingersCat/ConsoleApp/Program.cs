@@ -1,4 +1,5 @@
-﻿// ReSharper disable ClassNeverInstantiated.Global
+﻿// ReSharper disable UnusedMemberInSuper.Global
+// ReSharper disable ClassNeverInstantiated.Global
 namespace ConsoleApp
 {
     using System;

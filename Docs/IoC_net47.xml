@@ -2047,11 +2047,6 @@
             Singleton per scope
             </summary>
         </member>
-        <member name="F:IoC.Lifetime.ThreadSingleton">
-            <summary>
-            Thread per thread
-            </summary>
-        </member>
         <member name="T:IoC.Lifetimes.ContainerSingletonLifetime">
             <summary>
             Represents singleton per container lifetime.
@@ -2133,23 +2128,6 @@
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.SingletonLifetime.ToString">
-            <inheritdoc />
-        </member>
-        <member name="T:IoC.Lifetimes.ThreadSingletonLifetime">
-            <summary>
-            Represents singleton per thread lifetime.
-            </summary>
-        </member>
-        <member name="M:IoC.Lifetimes.ThreadSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])">
-            <inheritdoc />
-        </member>
-        <member name="M:IoC.Lifetimes.ThreadSingletonLifetime.ToString">
-            <inheritdoc />
-        </member>
-        <member name="M:IoC.Lifetimes.ThreadSingletonLifetime.Clone">
-            <inheritdoc />
-        </member>
-        <member name="M:IoC.Lifetimes.ThreadSingletonLifetime.OnNewInstanceCreated``1(``0,System.Int32,IoC.IContainer,System.Object[])">
             <inheritdoc />
         </member>
         <member name="T:IoC.Resolver`1">

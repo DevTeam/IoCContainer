@@ -10,15 +10,15 @@
     internal sealed class Table<TKey, TValue> : IEnumerable<Tree<TKey, TValue>.KeyValue>
     {
         public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>();
-        public readonly int Count;
         public readonly int Divisor;
         public readonly Tree<TKey, TValue>[] Buckets;
+        private readonly int _count;
 
         private Table(Table<TKey, TValue> origin, int hashCode, TKey key, TValue value)
         {
             int bucketIndex;
-            Count = origin.Count + 1;
-            if (origin.Count >= origin.Divisor)
+            _count = origin._count + 1;
+            if (origin._count >= origin.Divisor)
             {
                 Divisor = origin.Divisor << 1;
                 Buckets = new Tree<TKey, TValue>[Divisor];
@@ -47,7 +47,7 @@
         private Table(Table<TKey, TValue> origin)
         {
             Divisor = origin.Divisor;
-            Count = origin.Count;
+            _count = origin._count;
             var length = origin.Buckets.Length;
             Buckets = new Tree<TKey, TValue>[length];
             Array.Copy(origin.Buckets, Buckets, length);

@@ -9,7 +9,7 @@
     /// Represents the scope which could be used with <c>Lifetime.ScopeSingleton</c>
     /// </summary>
     [PublicAPI]
-    public class Scope: IDisposable
+    public sealed class Scope: IDisposable
     {
         [NotNull] private static readonly Scope Default = new Scope(DefaultScopeKey.Shared);
         [CanBeNull] [ThreadStatic] private static Scope _current;
