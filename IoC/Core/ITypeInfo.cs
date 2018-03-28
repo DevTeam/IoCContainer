@@ -51,6 +51,9 @@
         [NotNull][ItemNotNull]
         IEnumerable<MemberInfo> DeclaredMembers { get; }
 
+        [NotNull][ItemNotNull]
+        IEnumerable<FieldInfo> DeclaredFields { get; }
+
         Type BaseType { get; }
 
         [NotNull]

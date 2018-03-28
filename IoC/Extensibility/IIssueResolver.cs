@@ -1,6 +1,8 @@
 ﻿namespace IoC.Extensibility
 {
     using System;
+    using System.Linq.Expressions;
+    using System.Reflection;
 
     /// <summary>
     /// Allows to specify behaviour for cases with issue.
@@ -76,5 +78,21 @@
         /// <param name="tag">The text with a tag metadata.</param>
         /// <returns></returns>
         [CanBeNull] object CannotParseTag(string statementText, int statementLineNumber, int statementPosition, [NotNull] string tag);
+
+        /// <summary>
+        /// Handles the scenario when cannot build expression.
+        /// </summary>
+        /// <param name="buildContext">The build context.</param>
+        /// <param name="dependency">The dependeny.</param>
+        /// <param name="lifetime">The lifetime.</param>
+        /// <returns>The resulting expression.</returns>
+        [NotNull] Expression CannotBuildExpression([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, ILifetime lifetime = null);
+
+        /// <summary>
+        /// Handles the scenario when cannot find a constructor.
+        /// </summary>
+        /// <param name="type">The target type.</param>
+        /// <returns>The constructor information.</returns>
+        [NotNull] ConstructorInfo CannotFindConstructor([NotNull] Type type);
     }
 }

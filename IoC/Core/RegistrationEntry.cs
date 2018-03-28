@@ -3,11 +3,12 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
     using Collections;
+    using Extensibility;
 
     internal sealed class RegistrationEntry : IDisposable
     {
-        [NotNull] private readonly IResolverExpressionBuilder _resolverExpressionBuilder;
         [NotNull] internal readonly IDependency Dependency;
         [CanBeNull] private readonly ILifetime _lifetime;
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
@@ -16,13 +17,11 @@
         private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
 
         public RegistrationEntry(
-            [NotNull] IResolverExpressionBuilder resolverExpressionBuilder,
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource,
             [NotNull] List<Key> keys)
         {
-            _resolverExpressionBuilder = resolverExpressionBuilder ?? throw new ArgumentNullException(nameof(resolverExpressionBuilder));
             Dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
             _lifetime = lifetime;
             _resources.Add(resource ?? throw new ArgumentNullException(nameof(resource)));
@@ -38,12 +37,13 @@
             var typeInfo = key.Type.Info();
             var compiler = container.GetExpressionCompiler();
             var buildContext = new BuildContext(compiler, key, container, _resources);
-            if (!_resolverExpressionBuilder.TryBuild(buildContext, Dependency, GetLifetime(typeInfo), out var resolverExpression))
+            if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeInfo), out var expression))
             {
                 resolver = default(Delegate);
                 return false;
             }
 
+            var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, WellknownExpressions.ResolverParameters);
             resolver = compiler.Compile(resolverExpression);
             return true;
         }

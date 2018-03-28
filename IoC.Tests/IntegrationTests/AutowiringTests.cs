@@ -1,6 +1,9 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
     using Moq;
     using Shouldly;
     using Xunit;
@@ -175,6 +178,31 @@
             {
                 // When
                 using (container.Bind(typeof(IMyGenericService<,>)).As(Lifetime.Transient).To(typeof(MyGenericService<,>)))
+                {
+                    // Then
+                    var actualInstance = container.Resolve<IMyGenericService<int, string>>();
+                    actualInstance.ShouldBeOfType<MyGenericService<int, string>>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenAutowiringWithInitMethod()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                IEnumerable<MethodBase> MethodsProvider(IEnumerable<MethodBase> methods)
+                {
+                    return
+                        from method in methods
+                        where method.IsConstructor && method.GetParameters().Length == 0 || method.Name == nameof(MyGenericService<object, object>.Init)
+                        select method;
+                }
+
+                using (container.Bind<MySimpleClass>().To<MySimpleClass>())
+                using (container.Bind(typeof(IMyGenericService<,>)).As(Lifetime.Transient).To(typeof(MyGenericService<,>), MethodsProvider))
                 {
                     // Then
                     var actualInstance = container.Resolve<IMyGenericService<int, string>>();

@@ -34,6 +34,32 @@
         }
 
         [Fact]
+        public void ContainerShouldInjectWhenHasInitializerMethod()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                var expectedRef = Mock.Of<IMyService1>();
+                Func<IMyService1> func = () => expectedRef;
+
+                // When
+                using (container.Bind<MyHolder>().To<MyHolder>())
+                using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
+                using (container.Bind<IMyService>().As(Lifetime.Transient).To(
+                    ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>()),
+                    ctx => ctx.It.Init(ctx.Container.Inject<IMyService1>(), ctx.Container.Inject<IMyService1>(), (string) ctx.Args[1])))
+                {
+                    // Then
+                    var actualInstance = container.Resolve<MyHolder>("abc", "xyz");
+
+                    actualInstance.MyService.ShouldBeOfType<MyService>();
+                    ((MyService) actualInstance.MyService).Name.ShouldBe("xyz");
+                    ((MyService) actualInstance.MyService).SomeRef.ShouldBe(expectedRef);
+                }
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveWhenHasInitializerSetter()
         {
             // Given
@@ -99,6 +125,16 @@
                     actualInstance.ShouldBe(expectedRef);
                 }
             }
+        }
+
+        public class MyHolder
+        {
+            public MyHolder(IMyService myService)
+            {
+                MyService = myService;
+            }
+
+            public IMyService MyService { get; }
         }
     }
 }

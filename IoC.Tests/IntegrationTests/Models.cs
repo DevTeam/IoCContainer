@@ -81,6 +81,13 @@ namespace IoC.Tests.IntegrationTests
         public MyGenericService(string name)
         {
         }
+
+        public void Init(MySimpleClass mySimpleClass)
+        {
+            MySimpleClass = mySimpleClass;
+        }
+
+        public MySimpleClass MySimpleClass { get; private set; }
     }
 
     public interface IMyGenericService<T1, T2> : IMyGenericService1<T1>

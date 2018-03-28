@@ -12,17 +12,17 @@
         /// <summary>
         /// Keys that were resolved successfully.
         /// </summary>
-        [NotNull] public readonly IEnumerable<Key> ResolvedKey;
+        [NotNull] public readonly IEnumerable<Key> ResolvedKeys;
 
         /// <summary>
         /// Keys that were not resolved successfully.
         /// </summary>
         [NotNull] public readonly IEnumerable<Key> UnresolvedKeys;
 
-        internal ValidationResult([NotNull] List<Key> resolvedKey, [NotNull] List<Key> unresolvedKeys)
+        internal ValidationResult([NotNull] IEnumerable<Key> resolvedKeys, [NotNull] IEnumerable<Key> unresolvedKeys)
         {
-            ResolvedKey = resolvedKey ?? throw new ArgumentNullException(nameof(resolvedKey));
-            UnresolvedKeys = unresolvedKeys ?? throw new ArgumentNullException(nameof(unresolvedKeys));
+            ResolvedKeys = (resolvedKeys ?? throw new ArgumentNullException(nameof(resolvedKeys))).ToList();
+            UnresolvedKeys = (unresolvedKeys ?? throw new ArgumentNullException(nameof(unresolvedKeys))).ToList();
         }
 
         /// <summary>

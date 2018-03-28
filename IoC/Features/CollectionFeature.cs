@@ -8,6 +8,7 @@
     using System.Linq;
     using Core;
     using TypeExtensions = Core.TypeExtensions;
+  
 
     /// <summary>
     /// Allows to resolve enumeration of all instances related to corresponding bindings.

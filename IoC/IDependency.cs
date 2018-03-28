@@ -1,6 +1,7 @@
 ﻿namespace IoC
 {
     using System.Linq.Expressions;
+    using Extensibility;
 
     /// <summary>
     /// Represents a IoC dependency.
@@ -9,8 +10,12 @@
     public interface IDependency
     {
         /// <summary>
-        /// The expression for dependency which is used to create a build graph.
+        /// Builds an expression.
         /// </summary>
-        [NotNull] Expression Expression { get; }
+        /// <param name="buildContext">The build context,</param>
+        /// <param name="lifetime">The target lifetime,</param>
+        /// <param name="baseExpression">The resulting expression.</param>
+        /// <returns>True if success.</returns>
+        bool TryBuildExpression([NotNull] IBuildContext buildContext, [CanBeNull] ILifetime lifetime, out Expression baseExpression);
     }
 }

@@ -2,6 +2,8 @@
 {
     using System;
     using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
     using Extensibility;
 
     internal sealed class IssueResolver : IIssueResolver
@@ -59,6 +61,19 @@
         public object CannotParseTag(string statementText, int statementLineNumber, int statementPosition, string tag)
         {
             throw new InvalidOperationException($"Cannot parse the tag \"{tag}\" in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
+        }
+
+        public Expression CannotBuildExpression(IBuildContext buildContext, IDependency dependency, ILifetime lifetime)
+        {
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
+            throw new InvalidOperationException($"Cannot build expression for the key \"{buildContext.Key}\" from the container \"{buildContext.Container}\". Details:\n{GetContainerDetails(buildContext.Container)}");
+        }
+
+        public ConstructorInfo CannotFindConstructor(Type type)
+        {
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            throw new InvalidOperationException($"Cannot find a constructor for the type \"{type}\".");
         }
 
         private static string GetContainerDetails(IContainer container)

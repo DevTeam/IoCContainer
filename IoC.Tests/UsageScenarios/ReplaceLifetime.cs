@@ -70,7 +70,7 @@ namespace IoC.Tests.UsageScenarios
                 expression = _baseSingletonLifetime.Build(expression, buildContext, state);
 
                 // Define `this` variable
-                var thisVar = buildContext.DefineValue(this);
+                var thisVar = buildContext.AppendValue(this);
 
                 return Expression.Block(
                     // Adds statement this.IncrementCounter()

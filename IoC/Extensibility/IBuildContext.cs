@@ -10,14 +10,14 @@
     public interface IBuildContext
     {
         /// <summary>
-        /// The compiler.
-        /// </summary>
-        [NotNull] IExpressionCompiler Compiler { get; }
-
-        /// <summary>
         /// The target key.
         /// </summary>
         Key Key { get; }
+
+        /// <summary>
+        /// The depth of current context.
+        /// </summary>
+        int Depth { get; }
 
         /// <summary>
         /// The target container.
@@ -33,41 +33,50 @@
         [NotNull] IBuildContext CreateChild(Key key, [NotNull] IContainer container);
 
         /// <summary>
-        /// Defines value.
+        /// Prepares an expression.
+        /// </summary>
+        /// <param name="baseExpression">The base expression.</param>
+        /// <param name="instanceExpression">The instance expression.</param>
+        /// <returns>The resulting expression.</returns>
+        [NotNull] Expression Prepare([NotNull] Expression baseExpression, [CanBeNull] ParameterExpression instanceExpression = null);
+
+        /// <summary>
+        /// Wraps by lifetime.
+        /// </summary>
+        /// <param name="baseExpression">The base expression.</param>
+        /// <param name="lifetime">The target lifitime.</param>
+        /// <returns></returns>
+        [NotNull] Expression AppendLifetime([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
+
+        /// <summary>
+        /// Appends value.
         /// </summary>
         /// <param name="value">The value.</param>
         /// <param name="type">The value type.</param>
         /// <returns>The parameter expression.</returns>
-        [NotNull] Expression DefineValue([CanBeNull] object value, [NotNull] Type type);
+        [NotNull] Expression AppendValue([CanBeNull] object value, [NotNull] Type type);
 
         /// <summary>
-        /// Defines value.
+        /// Appends value.
         /// </summary>
         /// <typeparam name="T">The value type.</typeparam>
         /// <param name="value">The value.</param>
         /// <returns>The parameter expression.</returns>
-        [NotNull] Expression DefineValue<T>([CanBeNull] T value);
+        [NotNull] Expression AppendValue<T>([CanBeNull] T value);
 
         /// <summary>
-        /// Defines variable.
+        /// Appends variable.
         /// </summary>
         /// <param name="expression">The value expression.</param>
         /// <returns>The parameter expression.</returns>
-        [NotNull] ParameterExpression DefineVariable([NotNull] Expression expression);
+        [NotNull] ParameterExpression AppendVariable([NotNull] Expression expression);
 
         /// <summary>
-        /// Closes a block of statements.
+        /// Closes block for specified variables.
         /// </summary>
         /// <param name="targetExpression">The target expression.</param>
-        /// <returns>The result expression.</returns>
-        [NotNull] Expression CloseBlock([NotNull] Expression targetExpression);
-
-        /// <summary>
-        /// Closes block for specified expressions.
-        /// </summary>
-        /// <param name="targetExpression">The target expression.</param>
-        /// <param name="expressions">Assigment expressions.</param>
+        /// <param name="variableExpressions">Variable expressions.</param>
         /// <returns>The resulting block expression.</returns>
-        [NotNull] Expression PartiallyCloseBlock([NotNull] Expression targetExpression, [NotNull][ItemNotNull] params Expression[] expressions);
+        [NotNull] Expression CloseBlock([NotNull] Expression targetExpression, [NotNull][ItemNotNull] params ParameterExpression[] variableExpressions);
     }
 }

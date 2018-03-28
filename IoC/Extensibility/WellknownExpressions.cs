@@ -1,5 +1,6 @@
 ﻿namespace IoC.Extensibility
 {
+    using System.Collections.Generic;
     using System.Linq.Expressions;
 
     /// <summary>
@@ -23,7 +24,11 @@
         /// <summary>
         /// All resolver's parameters.
         /// </summary>
-        [NotNull]
-        public static readonly ParameterExpression[] ResolverParameters = { ContainerParameter, ArgsParameter };
+        [NotNull][ItemNotNull]
+#if !NETSTANDARD1_0
+        public static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression>{ ContainerParameter, ArgsParameter }.AsReadOnly();
+#else
+        public static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression>{ ContainerParameter, ArgsParameter };
+#endif
     }
 }

@@ -183,7 +183,6 @@
             }
 
             var registrationEntry = new RegistrationEntry(
-                ResolverExpressionBuilder.Shared,
                 dependency,
                 lifetime,
                 Disposable.Create(UnregisterKeys),

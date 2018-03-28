@@ -17,7 +17,7 @@
             var buildContext = new BuildContext(ExpressionCompilerDefault.Shared, new Key(typeof(T)), Mock.Of<IContainer>(), new List<IDisposable>());
             var lifetimeExpression = lifetime.Build(lambdaExpression.Body, buildContext);
             var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), lifetimeExpression, false, ResolverParameters);
-            return (Resolver<T>)buildContext.Compiler.Compile(resolverExpression);
+            return (Resolver<T>)ExpressionCompilerDefault.Shared.Compile(resolverExpression);
         }
     }
 }

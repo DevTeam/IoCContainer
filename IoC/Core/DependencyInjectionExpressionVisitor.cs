@@ -7,13 +7,13 @@
     using System.Reflection;
     using Extensibility;
     using static Extensibility.WellknownExpressions;
+    using static TypeExtensions;
 
     internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
     {
         private static readonly Key ContextKey = new Key(typeof(Context));
-        [NotNull] private static readonly ITypeInfo ContextTypeInfo = TypeExtensions.Info<Context>();
+        [NotNull] private static readonly ITypeInfo ContextTypeInfo = Info<Context>();
         [NotNull] private static readonly ITypeInfo GenericContextTypeInfo = typeof(Context<>).Info();
-        [NotNull] private static readonly ITypeInfo InstanceContextTypeInfo = typeof(Context<>).Info();
         [NotNull] private static readonly MethodInfo InjectMethodInfo;
         [NotNull] private static readonly MethodInfo InjectWithTagMethodInfo;
         private static readonly MethodInfo AssigmentCallExpressionMethodInfo;
@@ -22,7 +22,6 @@
         [NotNull] private readonly IContainer _container;
         [NotNull] private readonly IBuildContext _buildContext;
         [CanBeNull] private readonly Expression _thisExpression;
-        private int _reentrancy;
 
         static DependencyInjectionExpressionVisitor()
         {
@@ -32,7 +31,7 @@
             InjectWithTagMethodInfo = ((MethodCallExpression)injectWithTagExpression.Body).Method.GetGenericMethodDefinition();
             Expression<Action<object, object>> assigmentCallExpression = (item1, item2) => default(IContainer).Inject<object>(null, null);
             AssigmentCallExpressionMethodInfo = ((MethodCallExpression)assigmentCallExpression.Body).Method.GetGenericMethodDefinition();
-            ContextConstructor = TypeExtensions.Info<Context>().DeclaredConstructors.Single();
+            ContextConstructor = Info<Context>().DeclaredConstructors.Single();
         }
 
         public DependencyInjectionExpressionVisitor([NotNull] IBuildContext buildContext, [CanBeNull] Expression thisExpression)
@@ -118,7 +117,7 @@
             var typeInfo = node.Type.Info();
             if (typeInfo.IsConstructedGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Context<>))
             {
-                var contextType = InstanceContextTypeInfo.MakeGenericType(typeInfo.GenericTypeArguments).Info();
+                var contextType = GenericContextTypeInfo.MakeGenericType(typeInfo.GenericTypeArguments).Info();
                 var ctor = contextType.DeclaredConstructors.Single();
                 return Expression.New(
                     ctor,
@@ -191,66 +190,54 @@
             Key key,
             [CanBeNull] Expression containerExpression)
         {
-            Expression dependencyExpression;
-            ILifetime lifetime = null;
-            var selectedContainer = _container;
             if (Equals(key, ContextKey))
             {
-                dependencyExpression = CreateNewContextExpression();
+                return CreateNewContextExpression();
             }
-            else
+
+            var selectedContainer = SelectedContainer(containerExpression);
+            if (!selectedContainer.TryGetDependency(key, out var dependency, out var lifetime))
             {
-                selectedContainer = SelectedContainer(containerExpression);
-                if (!selectedContainer.TryGetDependency(key, out var dependency, out lifetime))
+                try
                 {
-                    try
-                    {
-                        var dependenctyInfo = _container.Resolve<IIssueResolver>().CannotResolveDependency(selectedContainer, key);
-                        dependency = dependenctyInfo.Item1;
-                        lifetime = dependenctyInfo.Item2;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new BuildExpressionException($"Cannot find dependency {key}.", ex);
-                    }
+                    var dependenctyInfo = _container.Resolve<IIssueResolver>().CannotResolveDependency(selectedContainer, key);
+                    dependency = dependenctyInfo.Item1;
+                    lifetime = dependenctyInfo.Item2;
                 }
-
-                dependencyExpression = dependency.Expression;
+                catch (Exception ex)
+                {
+                    throw new BuildExpressionException($"Cannot find dependency {key}.", ex);
+                }
             }
-
-            return CreateDependencyExpression(key, selectedContainer, dependencyExpression, lifetime);
-        }
-
-        [NotNull]
-        private Expression CreateDependencyExpression(
-            Key key,
-            IContainer container,
-            [NotNull] Expression dependencyExpression,
-            [CanBeNull] ILifetime lifetime)
-        {
-            if (dependencyExpression == null) throw new ArgumentNullException(nameof(dependencyExpression));
 
             _keys.Push(key);
             try
             {
-                _reentrancy++;
-                if (_reentrancy >= 64)
+                var childBuildContext = _buildContext.CreateChild(key, selectedContainer);
+                if (childBuildContext.Depth >= 64)
                 {
-                    _container.Resolve<IIssueResolver>().CyclicDependenceDetected(key, _reentrancy);
+                    _container.Resolve<IIssueResolver>().CyclicDependenceDetected(key, childBuildContext.Depth);
                 }
 
-                var childBuildContext = _buildContext.CreateChild(key, container);
-                dependencyExpression = TypeReplacerExpressionBuilder.Shared.Build(dependencyExpression, childBuildContext);
-                dependencyExpression = Visit(dependencyExpression);
-                dependencyExpression = dependencyExpression.Convert(key.Type);
-                dependencyExpression = LifetimeExpressionBuilder.Shared.Build(dependencyExpression, childBuildContext, lifetime);
-                dependencyExpression = childBuildContext.CloseBlock(dependencyExpression);
-                return Visit(dependencyExpression) ?? throw new BuildExpressionException(new InvalidOperationException("Null expression"));
+                if (dependency.TryBuildExpression(childBuildContext, lifetime, out var expression))
+                {
+                    return expression;
+                }
+                else
+                {
+                    try
+                    {
+                        return _container.Resolve<IIssueResolver>().CannotBuildExpression(childBuildContext, dependency, lifetime);
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new BuildExpressionException($"Cannot build dependency {key}.", ex);
+                    }
+                }
             }
             finally
             {
                 _keys.Pop();
-                _reentrancy--;
             }
         }
 

@@ -9,6 +9,7 @@
     using System.Runtime.CompilerServices;
     using Collections;
     using Extensibility;
+    using static TypeExtensions;
 
     /// <summary>
     /// Represents build context.
@@ -18,14 +19,15 @@
     internal class BuildContext : IBuildContext
     {
         internal static ResizableArray<BuildContext> Contexts = ResizableArray<BuildContext>.Empty;
-        private static readonly MemberInfo ContextsMemberInfo = TypeExtensions.Info<BuildContext>().DeclaredMembers.Single(i => i.Name == nameof(Contexts));
-        private static readonly FieldInfo ValuesFieldInfo = (FieldInfo)TypeExtensions.Info<BuildContext>().DeclaredMembers.Single(i => i.Name == nameof(Values));
-        private static readonly FieldInfo BuildContextItemsFieldInfo = (FieldInfo)TypeExtensions.Info<ResizableArray<BuildContext>>().DeclaredMembers.Single(i => i.Name == nameof(ResizableArray<object>.Items));
-        private static readonly FieldInfo ObjectItemsFieldInfo = (FieldInfo)TypeExtensions.Info<ResizableArray<object>>().DeclaredMembers.Single(i => i.Name == nameof(ResizableArray<object>.Items));
+        private static readonly MemberInfo ContextsMemberInfo = Info<BuildContext>().DeclaredMembers.Single(i => i.Name == nameof(Contexts));
+        private static readonly FieldInfo ValuesFieldInfo = Info<BuildContext>().DeclaredFields.Single(i => i.Name == nameof(Values));
+        private static readonly FieldInfo BuildContextItemsFieldInfo = Info<ResizableArray<BuildContext>>().DeclaredFields.Single(i => i.Name == nameof(ResizableArray<object>.Items));
+        private static readonly FieldInfo ObjectItemsFieldInfo = Info<ResizableArray<object>>().DeclaredFields.Single(i => i.Name == nameof(ResizableArray<object>.Items));
 
         internal ResizableArray<object> Values = ResizableArray<object>.Empty;
         private readonly ICollection<IDisposable> _resources;
         private readonly int _id;
+        private readonly IExpressionCompiler _compiler;
         private readonly List<ParameterExpression> _parameters = new List<ParameterExpression>();
         private readonly List<Expression> _statements = new List<Expression>();
         private int _curId;
@@ -33,12 +35,13 @@
         private ParameterExpression _contextExpression;
         private ParameterExpression _contextArrayExpression;
 
-        internal BuildContext([NotNull] IExpressionCompiler compiler, Key key, [NotNull] IContainer container, [NotNull] ICollection<IDisposable> resources)
+        internal BuildContext([NotNull] IExpressionCompiler compiler, Key key, [NotNull] IContainer container, [NotNull] ICollection<IDisposable> resources, int depth = 0)
         {
-            Compiler = compiler ?? throw new ArgumentNullException(nameof(compiler));
+            _compiler = compiler ?? throw new ArgumentNullException(nameof(compiler));
             Key = key;
             Container = container ?? throw new ArgumentNullException(nameof(container));
             _resources = resources ?? throw new ArgumentNullException(nameof(resources));
+            Depth = depth;
             _id = -1;
             var contexts = Contexts.Items;
             // Try finding an empty element
@@ -61,30 +64,30 @@
             }));
         }
 
-        public IExpressionCompiler Compiler { get; }
-
         public Key Key { get; }
 
         public IContainer Container { get; }
 
+        public int Depth { get; }
+
         public IBuildContext CreateChild(Key key, IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            var child = new BuildContext(Compiler, key, container, _resources);
+            var child = new BuildContext(_compiler, key, container, _resources, Depth + 1);
             child._parameters.AddRange(_parameters);
             child._statements.AddRange(_statements);
             return child;
         }
 
-        public Expression DefineValue(object value, Type type)
+        public Expression AppendValue(object value, Type type)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            if (Compiler.IsSupportingCompextTypeConstant)
+            if (_compiler.IsSupportingCompextTypeConstant)
             {
                 return Expression.Constant(value, type);
             }
 
-            var fieldInfo = (FieldInfo) TypeExtensions.Info<BuildContext>().DeclaredMembers.SingleOrDefault(i => i.Name == $"State{_valuesCount:00}");
+            var fieldInfo = (FieldInfo) Info<BuildContext>().DeclaredMembers.SingleOrDefault(i => i.Name == $"State{_valuesCount:00}");
             if (fieldInfo != null)
             {
                 _valuesCount++;
@@ -97,9 +100,9 @@
             return Expression.ArrayAccess(GetContextArrayExpression(), Expression.Constant(valueId)).Convert(type);
         }
 
-        public Expression DefineValue<T>(T value) => DefineValue(value, typeof(T));
+        public Expression AppendValue<T>(T value) => AppendValue(value, typeof(T));
 
-        public ParameterExpression DefineVariable(Expression expression)
+        public ParameterExpression AppendVariable(Expression expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             var varExpression = Expression.Variable(expression.Type, "var" + GenerateId());
@@ -108,7 +111,41 @@
             return varExpression;
         }
 
-        public Expression CloseBlock(Expression targetExpression)
+        public Expression Prepare(Expression baseExpression, ParameterExpression instanceExpression = null)
+        {
+            var typesMap = new Dictionary<Type, Type>();
+            var expression = TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, typesMap);
+            return DependencyInjectionExpressionBuilder.Shared.Build(expression, this, instanceExpression);
+        }
+
+        public Expression AppendLifetime(Expression baseExpression, ILifetime lifetime)
+        {
+            var expression = baseExpression.Convert(Key.Type);
+            expression = LifetimeExpressionBuilder.Shared.Build(expression, this, lifetime);
+            return CloseBlock(expression);
+        }
+
+        public Expression CloseBlock(Expression targetExpression, params ParameterExpression[] variableExpressions)
+        {
+            if (targetExpression == null) throw new ArgumentNullException(nameof(targetExpression));
+            if (variableExpressions == null) throw new ArgumentNullException(nameof(variableExpressions));
+            var statements = (
+                from binaryExpression in _statements.OfType<BinaryExpression>()
+                join parameterExpression in variableExpressions on binaryExpression.Left equals parameterExpression
+                select (Expression)binaryExpression).ToList();
+
+            var parameterExpressions = variableExpressions.OfType<ParameterExpression>();
+            if (!statements.Any() && !parameterExpressions.Any())
+            {
+                return targetExpression;
+            }
+
+            statements.Add(targetExpression);
+            return Expression.Block(variableExpressions, statements);
+        }
+
+        [NotNull]
+        private Expression CloseBlock([NotNull] Expression targetExpression)
         {
             if (targetExpression == null) throw new ArgumentNullException(nameof(targetExpression));
             if (!_parameters.Any() && !_statements.Any())
@@ -118,25 +155,6 @@
 
             _statements.Add(targetExpression);
             return Expression.Block(_parameters, _statements);
-        }
-
-        public Expression PartiallyCloseBlock(Expression targetExpression, params Expression[] expressions)
-        {
-            if (targetExpression == null) throw new ArgumentNullException(nameof(targetExpression));
-            if (expressions == null) throw new ArgumentNullException(nameof(expressions));
-            var statements = (
-                from binaryExpression in _statements.OfType<BinaryExpression>()
-                join parameterExpression in expressions on binaryExpression.Left equals parameterExpression
-                select (Expression)binaryExpression).ToList();
-
-            var parameterExpressions = expressions.OfType<ParameterExpression>();
-            if (!statements.Any() && !parameterExpressions.Any())
-            {
-                return targetExpression;
-            }
-
-            statements.Add(targetExpression);
-            return Expression.Block(expressions.OfType<ParameterExpression>(), statements);
         }
 
         [NotNull]

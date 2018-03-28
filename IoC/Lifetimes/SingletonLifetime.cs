@@ -1,9 +1,12 @@
 ﻿namespace IoC.Lifetimes
 {
     using System;
+    using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using Core;
     using Extensibility;
+    using static Core.TypeExtensions;
 
     /// <summary>
     /// Represents singleton lifetime.
@@ -11,6 +14,9 @@
     [PublicAPI]
     public sealed class SingletonLifetime : ILifetime, IDisposable
     {
+        private static readonly FieldInfo LockObjectFieldInfo = Info<SingletonLifetime>().DeclaredFields.Single(i => i.Name == nameof(LockObject));
+        private static readonly FieldInfo InstanceFieldInfo = Info<SingletonLifetime>().DeclaredFields.Single(i => i.Name == nameof(Instance));
+
         [NotNull] internal object LockObject = new object();
         internal volatile object Instance;
 
@@ -20,9 +26,9 @@
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             var type = expression.Type;
-            var thisVar = buildContext.DefineValue(this);
-            var lockObjectField = Expression.Field(thisVar, nameof(LockObject));
-            var instanceField = Expression.Field(thisVar, nameof(Instance));
+            var thisVar = buildContext.AppendValue(this);
+            var lockObjectField = Expression.Field(thisVar, LockObjectFieldInfo);
+            var instanceField = Expression.Field(thisVar, InstanceFieldInfo);
             var typedInstance = instanceField.Convert(type);
 
             // if(this.Instance != null)

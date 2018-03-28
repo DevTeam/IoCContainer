@@ -19,12 +19,13 @@
             lock (LockObject)
             {
                 var hashCode = type.GetHashCode();
-                if (!_typeInfos.TryGet(hashCode, type, out var typeInfo))
+                if (_typeInfos.TryGet(hashCode, type, out var typeInfo))
                 {
-                    typeInfo = new InternalTypeInfo(type);
-                    _typeInfos = _typeInfos.Set(hashCode, type, typeInfo);
+                    return typeInfo;
                 }
 
+                typeInfo = new InternalTypeInfo(type);
+                _typeInfos = _typeInfos.Set(hashCode, type, typeInfo);
                 return typeInfo;
             }
         }
@@ -135,6 +136,8 @@
 
             public IEnumerable<MemberInfo> DeclaredMembers => _typeInfo.Value.DeclaredMembers;
 
+            public IEnumerable<FieldInfo> DeclaredFields => _typeInfo.Value.DeclaredFields;
+
             public Type BaseType => _typeInfo.Value.BaseType;
 
             public IEnumerable<Type> ImplementedInterfaces => _typeInfo.Value.ImplementedInterfaces;
@@ -203,6 +206,8 @@
             public IEnumerable<MethodInfo> DeclaredMethods => _type.GetMethods(DefaultBindingFlags);
 
             public IEnumerable<MemberInfo> DeclaredMembers => _type.GetMembers(DefaultBindingFlags);
+
+            public IEnumerable<FieldInfo> DeclaredFields => _type.GetFields(DefaultBindingFlags);
 
             public Type BaseType => _type.BaseType;
 

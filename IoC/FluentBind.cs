@@ -1,6 +1,7 @@
 ﻿namespace IoC
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Runtime.CompilerServices;
@@ -243,14 +244,14 @@
         /// </summary>
         /// <param name="binding">The binding token.</param>
         /// <param name="type">The instance type.</param>
-        /// <param name="constructorFilter">The constructor's filter.</param>
+        /// <param name="methodsProvider">Provider of a costructor and initializing methods.</param>
         /// <returns>The registration token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable To([NotNull] this IBinding<object> binding, [NotNull] Type type, [CanBeNull] Predicate<ConstructorInfo> constructorFilter = null)
+        public static IDisposable To([NotNull] this IBinding<object> binding, [NotNull] Type type, [CanBeNull] Func<IEnumerable<MethodBase>, IEnumerable<MethodBase>> methodsProvider = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowring(type, constructorFilter)));
+            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(binding.Container, type, methodsProvider)));
         }
 
         /// <summary>
@@ -258,14 +259,14 @@
         /// </summary>
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="binding">The binding token.</param>
-        /// <param name="constructorFilter">The constructor's filter.</param>
+        /// <param name="methodsProvider">Provider of a costructor and initializing methods.</param>
         /// <returns>The registration token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] Predicate<ConstructorInfo> constructorFilter = null)
+        public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] Func<IEnumerable<MethodBase>, IEnumerable<MethodBase>> methodsProvider = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowring(typeof(T), constructorFilter)));
+            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(binding.Container, typeof(T), methodsProvider)));
         }
 
         /// <summary>
@@ -285,7 +286,7 @@
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new Autowring(factory, statements)));
+            return new RegistrationToken(binding.Container, CreateRegistration(binding, new AutowringDependency(factory, statements)));
         }
 
         /// <summary>

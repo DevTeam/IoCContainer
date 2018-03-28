@@ -749,14 +749,14 @@
             Represents the abstraction for build context.
             </summary>
         </member>
-        <member name="P:IoC.Extensibility.IBuildContext.Compiler">
-            <summary>
-            The compiler.
-            </summary>
-        </member>
         <member name="P:IoC.Extensibility.IBuildContext.Key">
             <summary>
             The target key.
+            </summary>
+        </member>
+        <member name="P:IoC.Extensibility.IBuildContext.Depth">
+            <summary>
+            The depth of current context.
             </summary>
         </member>
         <member name="P:IoC.Extensibility.IBuildContext.Container">
@@ -772,42 +772,51 @@
             <param name="container">The container.</param>
             <returns>The new build context.</returns>
         </member>
-        <member name="M:IoC.Extensibility.IBuildContext.DefineValue(System.Object,System.Type)">
+        <member name="M:IoC.Extensibility.IBuildContext.Prepare(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)">
             <summary>
-            Defines value.
+            Prepares an expression.
+            </summary>
+            <param name="baseExpression">The base expression.</param>
+            <param name="instanceExpression">The instance expression.</param>
+            <returns>The resulting expression.</returns>
+        </member>
+        <member name="M:IoC.Extensibility.IBuildContext.AppendLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)">
+            <summary>
+            Wraps by lifetime.
+            </summary>
+            <param name="baseExpression">The base expression.</param>
+            <param name="lifetime">The target lifitime.</param>
+            <returns></returns>
+        </member>
+        <member name="M:IoC.Extensibility.IBuildContext.AppendValue(System.Object,System.Type)">
+            <summary>
+            Appends value.
             </summary>
             <param name="value">The value.</param>
             <param name="type">The value type.</param>
             <returns>The parameter expression.</returns>
         </member>
-        <member name="M:IoC.Extensibility.IBuildContext.DefineValue``1(``0)">
+        <member name="M:IoC.Extensibility.IBuildContext.AppendValue``1(``0)">
             <summary>
-            Defines value.
+            Appends value.
             </summary>
             <typeparam name="T">The value type.</typeparam>
             <param name="value">The value.</param>
             <returns>The parameter expression.</returns>
         </member>
-        <member name="M:IoC.Extensibility.IBuildContext.DefineVariable(System.Linq.Expressions.Expression)">
+        <member name="M:IoC.Extensibility.IBuildContext.AppendVariable(System.Linq.Expressions.Expression)">
             <summary>
-            Defines variable.
+            Appends variable.
             </summary>
             <param name="expression">The value expression.</param>
             <returns>The parameter expression.</returns>
         </member>
-        <member name="M:IoC.Extensibility.IBuildContext.CloseBlock(System.Linq.Expressions.Expression)">
+        <member name="M:IoC.Extensibility.IBuildContext.CloseBlock(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression[])">
             <summary>
-            Closes a block of statements.
+            Closes block for specified variables.
             </summary>
             <param name="targetExpression">The target expression.</param>
-            <returns>The result expression.</returns>
-        </member>
-        <member name="M:IoC.Extensibility.IBuildContext.PartiallyCloseBlock(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression[])">
-            <summary>
-            Closes block for specified expressions.
-            </summary>
-            <param name="targetExpression">The target expression.</param>
-            <param name="expressions">Assigment expressions.</param>
+            <param name="variableExpressions">Variable expressions.</param>
             <returns>The resulting block expression.</returns>
         </member>
         <member name="T:IoC.Extensibility.IExpressionBuilder`1">
@@ -914,6 +923,22 @@
             <param name="statementPosition">The position at the line of the source data.</param>
             <param name="tag">The text with a tag metadata.</param>
             <returns></returns>
+        </member>
+        <member name="M:IoC.Extensibility.IIssueResolver.CannotBuildExpression(IoC.Extensibility.IBuildContext,IoC.IDependency,IoC.ILifetime)">
+            <summary>
+            Handles the scenario when cannot build expression.
+            </summary>
+            <param name="buildContext">The build context.</param>
+            <param name="dependency">The dependeny.</param>
+            <param name="lifetime">The lifetime.</param>
+            <returns>The resulting expression.</returns>
+        </member>
+        <member name="M:IoC.Extensibility.IIssueResolver.CannotFindConstructor(System.Type)">
+            <summary>
+            Handles the scenario when cannot find a constructor.
+            </summary>
+            <param name="type">The target type.</param>
+            <returns>The constructor information.</returns>
         </member>
         <member name="T:IoC.Extensibility.IValidator">
             <summary>
@@ -1234,22 +1259,22 @@
             <param name="binding">The binding token.</param>
             <returns>The binding token.</returns>
         </member>
-        <member name="M:IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,System.Predicate{System.Reflection.ConstructorInfo})">
+        <member name="M:IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}})">
             <summary>
             Creates full auto-wiring.
             </summary>
             <param name="binding">The binding token.</param>
             <param name="type">The instance type.</param>
-            <param name="constructorFilter">The constructor's filter.</param>
+            <param name="methodsProvider">Provider of a costructor and initializing methods.</param>
             <returns>The registration token.</returns>
         </member>
-        <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},System.Predicate{System.Reflection.ConstructorInfo})">
+        <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}})">
             <summary>
             Creates full auto-wiring.
             </summary>
             <typeparam name="T">The instance type.</typeparam>
             <param name="binding">The binding token.</param>
-            <param name="constructorFilter">The constructor's filter.</param>
+            <param name="methodsProvider">Provider of a costructor and initializing methods.</param>
             <returns>The registration token.</returns>
         </member>
         <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
@@ -1757,6 +1782,17 @@
             <param name="statements">The set of expressions to initialize an instance.</param>
             <returns>The registration token.</returns>
         </member>
+        <member name="M:IoC.FluentRegister.Register(IoC.IContainer,System.Collections.Generic.IEnumerable{System.Type},IoC.IDependency,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="types">The set of types.</param>
+            <param name="dependency">The dependency.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns></returns>
+        </member>
         <member name="T:IoC.FluentResolve">
             <summary>
             Represents extensions to resolve from a container.
@@ -1945,10 +1981,14 @@
             Represents a IoC dependency.
             </summary>
         </member>
-        <member name="P:IoC.IDependency.Expression">
+        <member name="M:IoC.IDependency.TryBuildExpression(IoC.Extensibility.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@)">
             <summary>
-            The expression for dependency which is used to create a build graph.
+            Builds an expression.
             </summary>
+            <param name="buildContext">The build context,</param>
+            <param name="lifetime">The target lifetime,</param>
+            <param name="baseExpression">The resulting expression.</param>
+            <returns>True if success.</returns>
         </member>
         <member name="T:IoC.ILifetime">
             <summary>
@@ -2137,7 +2177,7 @@
             <typeparam name="T">The type of resolving instance.</typeparam>
             <param name="container">The resolving container.</param>
             <param name="args">The optional resolving arguments.</param>
-            <returns></returns>
+            <returns>The resolved instance.</returns>
         </member>
         <member name="T:IoC.Scope">
             <summary>
@@ -2183,7 +2223,7 @@
             Represents a container's validation result.
             </summary>
         </member>
-        <member name="F:IoC.ValidationResult.ResolvedKey">
+        <member name="F:IoC.ValidationResult.ResolvedKeys">
             <summary>
             Keys that were resolved successfully.
             </summary>
