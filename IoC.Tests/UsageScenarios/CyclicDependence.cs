@@ -52,9 +52,7 @@ namespace IoC.Tests.UsageScenarios
 
         public class Link : ILink
         {
-            public Link(ILink link)
-            {
-            }
+            public Link(ILink link) { }
         }
         // }
     }

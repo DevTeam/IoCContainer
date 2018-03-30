@@ -1,12 +1,10 @@
 ﻿namespace IoC
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Linq.Expressions;
-    using System.Reflection;
     using Core;
 
     /// <summary>
@@ -244,14 +242,14 @@
         /// </summary>
         /// <param name="binding">The binding token.</param>
         /// <param name="type">The instance type.</param>
-        /// <param name="methodsProvider">Provider of a costructor and initializing methods.</param>
+        /// <param name="autowiringStrategy">The optional autowring strategy.</param>
         /// <returns>The registration token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable To([NotNull] this IBinding<object> binding, [NotNull] Type type, [CanBeNull] Func<IEnumerable<MethodBase>, IEnumerable<MethodBase>> methodsProvider = null)
+        public static IDisposable To([NotNull] this IBinding<object> binding, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(binding.Container, type, methodsProvider)));
+            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(binding.Container, type, autowiringStrategy)));
         }
 
         /// <summary>
@@ -259,14 +257,14 @@
         /// </summary>
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="binding">The binding token.</param>
-        /// <param name="methodsProvider">Provider of a costructor and initializing methods.</param>
+        /// <param name="autowiringStrategy">The optional autowring strategy.</param>
         /// <returns>The registration token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] Func<IEnumerable<MethodBase>, IEnumerable<MethodBase>> methodsProvider = null)
+        public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(binding.Container, typeof(T), methodsProvider)));
+            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(binding.Container, typeof(T), autowiringStrategy)));
         }
 
         /// <summary>

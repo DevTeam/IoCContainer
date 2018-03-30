@@ -27,10 +27,7 @@ namespace IoC.Tests.UsageScenarios
 
     public class Service : IService, IAnotherService
     {
-        public Service(IDependency dependency)
-        {
-            Dependency = dependency;
-        }
+        public Service(IDependency dependency) => Dependency = dependency;
 
         public Service(IDependency dependency, string state)
         {
@@ -63,10 +60,7 @@ namespace IoC.Tests.UsageScenarios
 
     public class NamedService : INamedService
     {
-        public NamedService(IDependency dependency, string name)
-        {
-            Name = name;
-        }
+        public NamedService(IDependency dependency, string name) => Name = name;
 
         public string Name { get; }
     }
@@ -80,10 +74,7 @@ namespace IoC.Tests.UsageScenarios
 
         public string Name { get; set; }
 
-        public void Initialize(string name, IDependency otherDependency)
-        {
-            Name = name;
-        }
+        public void Initialize(string name, IDependency otherDependency) => Name = name;
     }
     // }
 }

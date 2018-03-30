@@ -33,38 +33,28 @@
 
         bool IsGenericTypeArgument { get; }
 
-        [NotNull] [ItemNotNull]
-        IEnumerable<T> GetCustomAttributes<T>(bool inherit = true) where T : Attribute;
+        [NotNull] [ItemNotNull] IEnumerable<T> GetCustomAttributes<T>(bool inherit = true) where T : Attribute;
 
-        [NotNull][ItemNotNull]
-        Type[] GenericTypeArguments { get; }
+        [NotNull][ItemNotNull] Type[] GenericTypeArguments { get; }
 
-        [NotNull][ItemNotNull]
-        Type[] GenericTypeParameters { get; }
+        [NotNull][ItemNotNull] Type[] GenericTypeParameters { get; }
 
-        [NotNull][ItemNotNull]
-        IEnumerable<ConstructorInfo> DeclaredConstructors { get; }
+        [NotNull][ItemNotNull] IEnumerable<ConstructorInfo> DeclaredConstructors { get; }
 
-        [NotNull][ItemNotNull]
-        IEnumerable<MethodInfo> DeclaredMethods { get; }
+        [NotNull][ItemNotNull] IEnumerable<MethodInfo> DeclaredMethods { get; }
 
-        [NotNull][ItemNotNull]
-        IEnumerable<MemberInfo> DeclaredMembers { get; }
+        [NotNull][ItemNotNull] IEnumerable<MemberInfo> DeclaredMembers { get; }
 
-        [NotNull][ItemNotNull]
-        IEnumerable<FieldInfo> DeclaredFields { get; }
+        [NotNull][ItemNotNull] IEnumerable<FieldInfo> DeclaredFields { get; }
 
         Type BaseType { get; }
 
-        [NotNull]
-        IEnumerable<Type> ImplementedInterfaces { get; }
+        [NotNull] IEnumerable<Type> ImplementedInterfaces { get; }
 
         bool IsAssignableFrom([NotNull] ITypeInfo typeInfo);
 
-        [NotNull]
-        Type MakeGenericType([NotNull][ItemNotNull] params Type[] typeArguments);
+        [NotNull] Type MakeGenericType([NotNull][ItemNotNull] params Type[] typeArguments);
 
-        [NotNull]
-        Type GetGenericTypeDefinition();
+        [NotNull] Type GetGenericTypeDefinition();
     }
 }

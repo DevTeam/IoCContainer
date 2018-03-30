@@ -78,16 +78,10 @@ namespace IoC.Tests.UsageScenarios
                     expression);
             }
 
-            public ILifetime Clone()
-            {
-                return new MySingletonLifetime(_baseSingletonLifetime.Clone(), _counter);
-            }
+            public ILifetime Clone() => new MySingletonLifetime(_baseSingletonLifetime.Clone(), _counter);
 
-            internal void IncrementCounter()
-            {
-                // Just counting the number of calls
-                _counter.Increment();
-            }
+            // Just counting the number of calls
+            internal void IncrementCounter() => _counter.Increment();
         }
         // }
     }

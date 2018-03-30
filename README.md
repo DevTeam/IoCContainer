@@ -8,18 +8,19 @@ IoC.Container|[![NuGet Version and Downloads count](https://buildstats.info/nuge
 IoC.AspNetCore|[![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.AspNetCore?includePreReleases=true)](https://www.nuget.org/packages/IoC.AspNetCore)
 
 IoC.Container provides the following benefits:
-  - One of the fastest, almost as fast as operators `new`
+  - One of the [fastest](#why-this-one), almost as fast as operators `new`
   - Produces minimal memory trafic
   - Powerful auto-wiring
     - Checks the auto-wiring configuration at the compile time
     - Allows to not change a code design to use IoC
-    - Clear generic types' mapping
-    - The simple text metadata is supported
-  - Fully extensible and supports custom containers/lifetimes
-  - Reconfigurable on-the-fly
-  - Supports concurrent and asynchronous resolving
+    - [Clear generic types' mapping](#generic-auto-wiring)
+    - [The simple text metadata is supported](#configuration-via-a-text-metadata)
+	- Flexible autowiring configuration (as example a [custom Aspect Oriented Autowiring](#aspect-oriented-autowiring))
+  - Fully extensible and supports [custom containers](#custom-child-container)/[lifetimes](#custom-lifetime)
+  - [Reconfigurable on-the-fly](#change-configuration-on-the-fly)
+  - Supports [concurrent and asynchronous resolving](#asynchronous-resolve)
   - Does not need additional dependencies
-  - Supports ASP.NET Core
+  - Supports [ASP.NET Core](#aspnet-core)
 
 Supported platforms:
   - .NET 4.0+
@@ -231,7 +232,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
 * [Configuration class](#configuration-class)
 * [Configuration via a text metadata](#configuration-via-a-text-metadata)
 * [Change configuration on-the-fly](#change-configuration-on-the-fly)
-* [ASP Net Core Support](#asp-net-core-support)
+* [Aspect Oriented Autowiring](#aspect-oriented-autowiring)
 * [Custom Child Container](#custom-child-container)
 * [Custom Lifetime](#custom-lifetime)
 * [Replace Lifetime](#replace-lifetime)
@@ -881,48 +882,137 @@ using (container.Bind<IDependency>().To<Dependency>())
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ChangeConfigurationOnTheFly.cs)
 
-### ASP Net Core Support
+### Aspect Oriented Autowiring
 
 ``` CSharp
 public void Run()
 {
-    var mocks = new List<Mock<IMyController>>();
-    // Create a container
-    using (var container = Container.Create().Using(new AspNetCoreFeature()))
-    using (container.Bind<IMyController>().As(Lifetime.ScopeSingleton).To(ctx => CreateController(mocks)))
+    var console = new Mock<IConsole>();
+
+    // Create a base container
+    using (var baseContainer = Container.Create("base"))
+    // Configure some child container
+    using (var childContainer = baseContainer.CreateChild("child"))
+    // Configure the child container by custom aspect oriented autowring strategy
+    using (childContainer.Bind<IAutowiringStrategy>().To<AspectOrientedAutowiringStrategy>())
+    // Configure the container
+    using (childContainer.Bind<IConsole>().To(ctx => console.Object))
+    using (childContainer.Bind<IClock>().Tag("MyClock").To<Clock>())
+    using (childContainer.Bind<string>().Tag("Prefix").To(ctx => "info"))
+    using (childContainer.Bind<ILogger>().To<Logger>())
     {
-        var factory = container.Resolve<IServiceScopeFactory>();
-        using (var scope = factory.CreateScope())
-        {
-            var controller1 = (IMyController)scope.ServiceProvider.GetService(typeof(IMyController));
-        }
+        var logger = childContainer.Resolve<ILogger>();
 
-        using (var scope = factory.CreateScope())
-        {
-            var controller2 = (IMyController)scope.ServiceProvider.GetService(typeof(IMyController));
-        }
-
-        mocks.Count.ShouldBe(2);
-        foreach (var mock in mocks)
-        {
-            mock.Verify(i => i.Dispose(), Times.Once);
-        }
+        // Log message
+        logger.Log("Hello");
     }
+
+    // Check the console output
+    console.Verify(i => i.WriteLine(It.IsRegex(".+ - info: Hello")));
 }
 
-public IMyController CreateController(ICollection<Mock<IMyController>> mocks)
+/// <summary>
+/// Attribute for constructor or methods that is ready for autowiring
+/// </summary>
+[AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method)]
+public class AutowiringAttribute : Attribute
 {
-    var newMock = new Mock<IMyController>();
-    mocks.Add(newMock);
-    return newMock.Object;
+    public AutowiringAttribute(int order = 0, object defaultTag = null)
+    {
+        Order = order;
+        DefaultTag = defaultTag;
+    }
+
+    public int Order { get; }
+
+    public object DefaultTag { get; }
 }
 
-public interface IMyController: IDisposable
+/// <summary>
+/// Parameters` attribute to define a tag value
+/// </summary>
+[AttributeUsage(AttributeTargets.Parameter)]
+public class TagAttribute: Attribute
 {
+    public TagAttribute([CanBeNull] object tag) => Tag = tag;
+
+    [CanBeNull] public object Tag { get; }
 }
 
+private class AspectOrientedAutowiringStrategy : IAutowiringStrategy
+{
+    public IMethod<ConstructorInfo> SelectConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors) => (
+            from ctor in constructors
+            let autowringAttribute = ctor.Info.GetCustomAttribute<AutowiringAttribute>()
+            // filters constructors containing the attribute Autowiring
+            where ctor != null
+            // sorts constructors by autowringAttribute.Order
+            orderby autowringAttribute.Order
+            select ctor)
+        // Get a first appropriate constructor
+        .First();
+
+    public IEnumerable<IMethod<MethodInfo>> GetMethods(IEnumerable<IMethod<MethodInfo>> methods) =>
+        from method in methods
+        let autowringAttribute = method.Info.GetCustomAttribute<AutowiringAttribute>()
+        // filters methods/property setters containing the attribute Autowiring
+        where autowringAttribute != null
+        // sorts methods/property setters by autowringAttribute.Order
+        orderby autowringAttribute.Order
+        where (
+            from parameter in method.Info.GetParameters()
+            let injectAttribute = parameter.GetCustomAttribute<TagAttribute>()
+            // filters parameters containing a custom tag value to make a dependency injection
+            where injectAttribute?.Tag != null || autowringAttribute.DefaultTag != null
+            // redefines the default dependency
+            select method.TryInjectDependency(parameter.Position, parameter.ParameterType, injectAttribute?.Tag ?? autowringAttribute.DefaultTag))
+         // checks that all custom injection were successfully
+        .All(isInjected => isInjected)
+        select method;
+}
+
+public interface IConsole
+{
+    void WriteLine(string test);
+}
+
+public interface IClock
+{
+    DateTimeOffset Now { get; }
+}
+
+public class Clock : IClock
+{
+    [Autowiring] public Clock() { }
+
+    public DateTimeOffset Now => DateTimeOffset.Now;
+}
+
+public interface ILogger
+{
+    void Log(string message);
+}
+
+public class Logger : ILogger
+{
+    private readonly IConsole _console;
+    private IClock _clock;
+
+    // Constructor injection
+    [Autowiring]
+    public Logger(IConsole console) => _console = console;
+
+    // Method injection
+    [Autowiring(1)]
+    public void Initialize([Tag("MyClock")] IClock clock) => _clock = clock;
+
+    // Property injection
+    public string Prefix { get; [Autowiring(2, "Prefix")] set; }
+
+    public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");
+}
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AspNetCore.cs)
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AspectOrientedAutowiring.cs)
 
 ### Custom Child Container
 
@@ -950,49 +1040,30 @@ public void Run()
 [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
 public class MyContainer: IContainer
 {
-    public MyContainer(IContainer currentContainer)
-    {
-        Parent = currentContainer;
-    }
+    public MyContainer(IContainer currentContainer) => Parent = currentContainer;
 
     public IContainer Parent { get; }
 
-    public bool TryRegister(IEnumerable<Key> keys, IoC.IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
-    {
-        return Parent.TryRegister(keys, dependency, lifetime, out registrationToken);
-    }
+    public bool TryRegister(IEnumerable<Key> keys, IoC.IDependency dependency, ILifetime lifetime, out IDisposable registrationToken) 
+        => Parent.TryRegister(keys, dependency, lifetime, out registrationToken);
 
     public bool TryGetDependency(Key key, out IoC.IDependency dependency, out ILifetime lifetime)
-    {
-        return Parent.TryGetDependency(key, out dependency, out lifetime);
-    }
+        => Parent.TryGetDependency(key, out dependency, out lifetime);
 
     public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, IContainer container = null)
-    {
-        return Parent.TryGetResolver(type, out resolver, container);
-    }
+        => Parent.TryGetResolver(type, out resolver, container);
 
     public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
-    {
-        return Parent.TryGetResolver(type, tag, out resolver, container);
-    }
+        => Parent.TryGetResolver(type, tag, out resolver, container);
 
     public void Dispose() { }
 
     IEnumerator IEnumerable.GetEnumerator()
-    {
-        return GetEnumerator();
-    }
+        => GetEnumerator();
 
-    public IEnumerator<IEnumerable<Key>> GetEnumerator()
-    {
-        return Parent.GetEnumerator();
-    }
+    public IEnumerator<IEnumerable<Key>> GetEnumerator() => Parent.GetEnumerator();
 
-    public IDisposable Subscribe(IObserver<ContainerEvent> observer)
-    {
-        return Parent.Subscribe(observer);
-    }
+    public IDisposable Subscribe(IObserver<ContainerEvent> observer) => Parent.Subscribe(observer);
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomChildContainer.cs)
@@ -1017,15 +1088,10 @@ public void Run()
 
 public class MyTransientLifetime : ILifetime
 {
-    public Expression Build(Expression expression, IBuildContext buildContext, Expression context = default(Expression))
-    {
-        return expression;
-    }
+    public Expression Build(Expression expression, IBuildContext buildContext, object state = default(object))
+        => expression;
 
-    public ILifetime Clone()
-    {
-        return new MyTransientLifetime();
-    }
+    public ILifetime Clone() => new MyTransientLifetime();
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomLifetime.cs)
@@ -1080,13 +1146,13 @@ public class MySingletonLifetime : ILifetime
         _counter = counter;
     }
 
-    public Expression Build(Expression expression, IBuildContext buildContext, Expression context = default(Expression))
+    public Expression Build(Expression expression, IBuildContext buildContext, object state = default(object))
     {
         // Build expression using base lifetime
-        expression = _baseSingletonLifetime.Build(expression, buildContext, context);
+        expression = _baseSingletonLifetime.Build(expression, buildContext, state);
 
         // Define `this` variable
-        var thisVar = buildContext.DefineValue(this);
+        var thisVar = buildContext.AppendValue(this);
 
         return Expression.Block(
             // Adds statement this.IncrementCounter()
@@ -1094,16 +1160,10 @@ public class MySingletonLifetime : ILifetime
             expression);
     }
 
-    public ILifetime Clone()
-    {
-        return new MySingletonLifetime(_baseSingletonLifetime.Clone(), _counter);
-    }
+    public ILifetime Clone() => new MySingletonLifetime(_baseSingletonLifetime.Clone(), _counter);
 
-    internal void IncrementCounter()
-    {
-        // Just counting the number of calls
-        _counter.Increment();
-    }
+    // Just counting the number of calls
+    internal void IncrementCounter() => _counter.Increment();
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ReplaceLifetime.cs)
@@ -1205,30 +1265,19 @@ public class Logger : ILogger
 {
     private readonly IConsole _console;
 
-    public Logger(IConsole console)
-    {
-        _console = console;
-    }
+    public Logger(IConsole console) => _console = console;
 
-    public void Log(string message)
-    {
-        _console.WriteLine(message);
-    }
+    public void Log(string message) => _console.WriteLine(message);
 }
 
 public class TimeLogger: ILogger
 {
     private readonly ILogger _baseLogger;
 
-    public TimeLogger(ILogger baseLogger)
-    {
-        _baseLogger = baseLogger;
-    }
+    public TimeLogger(ILogger baseLogger) => _baseLogger = baseLogger;
 
-    public void Log(string message)
-    {
-        _baseLogger.Log(DateTimeOffset.Now + ": " + message);
-    }
+    // Adds current time before a message.
+    public void Log(string message) => _baseLogger.Log(DateTimeOffset.Now + ": " + message);
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Wrapper.cs)
@@ -1327,9 +1376,7 @@ public interface ILink
 
 public class Link : ILink
 {
-    public Link(ILink link)
-    {
-    }
+    public Link(ILink link) { }
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CyclicDependence.cs)
@@ -1400,10 +1447,7 @@ public class InstantMessenger<T> : IInstantMessenger<T>
     private readonly Func<string, string, T> _createMessage;
     private readonly List<IObserver<T>> _observers = new List<IObserver<T>>();
 
-    public InstantMessenger(Func<string, string, T> createMessage)
-    {
-        _createMessage = createMessage;
-    }
+    public InstantMessenger(Func<string, string, T> createMessage) => _createMessage = createMessage;
 
     public IDisposable Subscribe(IObserver<T> observer)
     {
@@ -1412,9 +1456,7 @@ public class InstantMessenger<T> : IInstantMessenger<T>
     }
 
     public void SendMessage(string address, string text)
-    {
-        _observers.ForEach(observer => observer.OnNext(_createMessage(address, text)));
-    }
+        => _observers.ForEach(observer => observer.OnNext(_createMessage(address, text)));
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SimpleInstantMessenger.cs)
@@ -1441,10 +1483,7 @@ public interface IDisposableService : IService, IDisposable
 
 public class Service : IService, IAnotherService
 {
-    public Service(IDependency dependency)
-    {
-        Dependency = dependency;
-    }
+    public Service(IDependency dependency) => Dependency = dependency;
 
     public Service(IDependency dependency, string state)
     {
@@ -1477,10 +1516,7 @@ public interface INamedService
 
 public class NamedService : INamedService
 {
-    public NamedService(IDependency dependency, string name)
-    {
-        Name = name;
-    }
+    public NamedService(IDependency dependency, string name) => Name = name;
 
     public string Name { get; }
 }
@@ -1494,10 +1530,7 @@ public class InitializingNamedService : INamedService
 
     public string Name { get; set; }
 
-    public void Initialize(string name, IDependency otherDependency)
-    {
-        Name = name;
-    }
+    public void Initialize(string name, IDependency otherDependency) => Name = name;
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Models.cs)

@@ -933,12 +933,12 @@
             <param name="lifetime">The lifetime.</param>
             <returns>The resulting expression.</returns>
         </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CannotFindConstructor(System.Type)">
+        <member name="M:IoC.Extensibility.IIssueResolver.CannotFindConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})">
             <summary>
             Handles the scenario when cannot find a constructor.
             </summary>
-            <param name="type">The target type.</param>
-            <returns>The constructor information.</returns>
+            <param name="constructors">Available constructors.</param>
+            <returns>The constructor.</returns>
         </member>
         <member name="T:IoC.Extensibility.IValidator">
             <summary>
@@ -1100,6 +1100,22 @@
             <param name="container">The target container.</param>
             <returns>The validation result.</returns>
         </member>
+        <member name="T:IoC.FluentAutowiring">
+            <summary>
+            Represents extensions for autowring.
+            </summary>
+        </member>
+        <member name="M:IoC.FluentAutowiring.TryInjectDependency``1(IoC.IMethod{``0},System.Int32,System.Type,System.Object)">
+            <summary>
+            Injects dependency to parameter.
+            </summary>
+            <typeparam name="TMethodInfo"></typeparam>
+            <param name="method">The target method or constructor.</param>
+            <param name="parameterPosition">The parameter's position.</param>
+            <param name="dependencyType">The dependency's type.</param>
+            <param name="dependencyTag">The optional dependency's tag value.</param>
+            <returns>True if success.</returns>
+        </member>
         <member name="T:IoC.FluentBind">
             <summary>
             Represents extensions to add bindings to a container.
@@ -1240,22 +1256,22 @@
             <param name="binding">The binding token.</param>
             <returns>The binding token.</returns>
         </member>
-        <member name="M:IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}})">
+        <member name="M:IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,IoC.IAutowiringStrategy)">
             <summary>
             Creates full auto-wiring.
             </summary>
             <param name="binding">The binding token.</param>
             <param name="type">The instance type.</param>
-            <param name="methodsProvider">Provider of a costructor and initializing methods.</param>
+            <param name="autowiringStrategy">The optional autowring strategy.</param>
             <returns>The registration token.</returns>
         </member>
-        <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}})">
+        <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},IoC.IAutowiringStrategy)">
             <summary>
             Creates full auto-wiring.
             </summary>
             <typeparam name="T">The instance type.</typeparam>
             <param name="binding">The binding token.</param>
-            <param name="methodsProvider">Provider of a costructor and initializing methods.</param>
+            <param name="autowiringStrategy">The optional autowring strategy.</param>
             <returns>The registration token.</returns>
         </member>
         <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
@@ -1869,6 +1885,25 @@
             Represents the generic type parameter marker.
             </summary>
         </member>
+        <member name="T:IoC.IAutowiringStrategy">
+            <summary>
+            Represents an abstraction for an autowirin method.
+            </summary>
+        </member>
+        <member name="M:IoC.IAutowiringStrategy.SelectConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})">
+            <summary>
+            Selects a constructor from a set of available constructors.
+            </summary>
+            <param name="constructors">The set of available constructors.</param>
+            <returns>The selected constructor.</returns>
+        </member>
+        <member name="M:IoC.IAutowiringStrategy.GetMethods(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}})">
+            <summary>
+            Provides methods from a set of available methods in the appropriate order.
+            </summary>
+            <param name="methods">The set of available methods.</param>
+            <returns>The set of initializing methods in the appropriate order.</returns>
+        </member>
         <member name="T:IoC.IBinding`1">
             <summary>
             The container's binding.
@@ -1980,6 +2015,24 @@
             <summary>
             Clone this lifetime to use with generic instances.
             </summary>
+            <returns></returns>
+        </member>
+        <member name="T:IoC.IMethod`1">
+            <summary>
+            Represents an abstraction for an autowirin method.
+            </summary>
+            <typeparam name="TMethodInfo">The type of method info.</typeparam>
+        </member>
+        <member name="P:IoC.IMethod`1.Info">
+            <summary>
+            The method's information.
+            </summary>
+        </member>
+        <member name="P:IoC.IMethod`1.Item(System.Int32)">
+            <summary>
+            Parameter's expression at the position.
+            </summary>
+            <param name="position"></param>
             <returns></returns>
         </member>
         <member name="T:IoC.Injections">

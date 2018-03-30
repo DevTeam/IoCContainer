@@ -58,30 +58,19 @@
         {
             private readonly IConsole _console;
 
-            public Logger(IConsole console)
-            {
-                _console = console;
-            }
+            public Logger(IConsole console) => _console = console;
 
-            public void Log(string message)
-            {
-                _console.WriteLine(message);
-            }
+            public void Log(string message) => _console.WriteLine(message);
         }
 
         public class TimeLogger: ILogger
         {
             private readonly ILogger _baseLogger;
 
-            public TimeLogger(ILogger baseLogger)
-            {
-                _baseLogger = baseLogger;
-            }
+            public TimeLogger(ILogger baseLogger) => _baseLogger = baseLogger;
 
-            public void Log(string message)
-            {
-                _baseLogger.Log(DateTimeOffset.Now + ": " + message);
-            }
+            // Adds current time before a message.
+            public void Log(string message) => _baseLogger.Log(DateTimeOffset.Now + ": " + message);
         }
         // }
     }

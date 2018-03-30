@@ -25,10 +25,6 @@
         /// All resolver's parameters.
         /// </summary>
         [NotNull][ItemNotNull]
-#if !NETSTANDARD1_0
-        public static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression>{ ContainerParameter, ArgsParameter }.AsReadOnly();
-#else
         public static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression>{ ContainerParameter, ArgsParameter };
-#endif
     }
 }

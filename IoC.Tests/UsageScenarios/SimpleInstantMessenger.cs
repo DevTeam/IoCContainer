@@ -80,10 +80,7 @@
             private readonly Func<string, string, T> _createMessage;
             private readonly List<IObserver<T>> _observers = new List<IObserver<T>>();
 
-            public InstantMessenger(Func<string, string, T> createMessage)
-            {
-                _createMessage = createMessage;
-            }
+            public InstantMessenger(Func<string, string, T> createMessage) => _createMessage = createMessage;
 
             public IDisposable Subscribe(IObserver<T> observer)
             {
@@ -92,9 +89,7 @@
             }
 
             public void SendMessage(string address, string text)
-            {
-                _observers.ForEach(observer => observer.OnNext(_createMessage(address, text)));
-            }
+                => _observers.ForEach(observer => observer.OnNext(_createMessage(address, text)));
         }
         // }
     }

@@ -31,14 +31,9 @@
         public class MyTransientLifetime : ILifetime
         {
             public Expression Build(Expression expression, IBuildContext buildContext, object state = default(object))
-            {
-                return expression;
-            }
+                => expression;
 
-            public ILifetime Clone()
-            {
-                return new MyTransientLifetime();
-            }
+            public ILifetime Clone() => new MyTransientLifetime();
         }
         // }
     }

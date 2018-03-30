@@ -38,49 +38,30 @@
         [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
         public class MyContainer: IContainer
         {
-            public MyContainer(IContainer currentContainer)
-            {
-                Parent = currentContainer;
-            }
+            public MyContainer(IContainer currentContainer) => Parent = currentContainer;
 
             public IContainer Parent { get; }
 
-            public bool TryRegister(IEnumerable<Key> keys, IoC.IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
-            {
-                return Parent.TryRegister(keys, dependency, lifetime, out registrationToken);
-            }
+            public bool TryRegister(IEnumerable<Key> keys, IoC.IDependency dependency, ILifetime lifetime, out IDisposable registrationToken) 
+                => Parent.TryRegister(keys, dependency, lifetime, out registrationToken);
 
             public bool TryGetDependency(Key key, out IoC.IDependency dependency, out ILifetime lifetime)
-            {
-                return Parent.TryGetDependency(key, out dependency, out lifetime);
-            }
+                => Parent.TryGetDependency(key, out dependency, out lifetime);
 
             public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, IContainer container = null)
-            {
-                return Parent.TryGetResolver(type, out resolver, container);
-            }
+                => Parent.TryGetResolver(type, out resolver, container);
 
             public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
-            {
-                return Parent.TryGetResolver(type, tag, out resolver, container);
-            }
+                => Parent.TryGetResolver(type, tag, out resolver, container);
 
             public void Dispose() { }
 
             IEnumerator IEnumerable.GetEnumerator()
-            {
-                return GetEnumerator();
-            }
+                => GetEnumerator();
 
-            public IEnumerator<IEnumerable<Key>> GetEnumerator()
-            {
-                return Parent.GetEnumerator();
-            }
+            public IEnumerator<IEnumerable<Key>> GetEnumerator() => Parent.GetEnumerator();
 
-            public IDisposable Subscribe(IObserver<ContainerEvent> observer)
-            {
-                return Parent.Subscribe(observer);
-            }
+            public IDisposable Subscribe(IObserver<ContainerEvent> observer) => Parent.Subscribe(observer);
         }
         // }
     }

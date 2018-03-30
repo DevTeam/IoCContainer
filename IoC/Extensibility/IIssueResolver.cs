@@ -1,6 +1,7 @@
 ﻿namespace IoC.Extensibility
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
 
@@ -91,8 +92,8 @@
         /// <summary>
         /// Handles the scenario when cannot find a constructor.
         /// </summary>
-        /// <param name="type">The target type.</param>
-        /// <returns>The constructor information.</returns>
-        [NotNull] ConstructorInfo CannotFindConstructor([NotNull] Type type);
+        /// <param name="constructors">Available constructors.</param>
+        /// <returns>The constructor.</returns>
+        [NotNull] IMethod<ConstructorInfo> CannotFindConstructor([NotNull] IEnumerable<IMethod<ConstructorInfo>> constructors);
     }
 }

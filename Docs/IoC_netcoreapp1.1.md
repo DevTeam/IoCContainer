@@ -98,8 +98,8 @@
   - [Bind\`\`8(container)](#M-IoC-FluentBind-Bind``8-IoC-IContainer- 'IoC.FluentBind.Bind``8(IoC.IContainer)')
   - [Lifetime\`\`1(binding,lifetime)](#M-IoC-FluentBind-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime- 'IoC.FluentBind.Lifetime``1(IoC.IBinding{``0},IoC.ILifetime)')
   - [Tag\`\`1(binding,tagValue)](#M-IoC-FluentBind-Tag``1-IoC-IBinding{``0},System-Object- 'IoC.FluentBind.Tag``1(IoC.IBinding{``0},System.Object)')
-  - [To(binding,type,constructorFilter)](#M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Predicate{System-Reflection-ConstructorInfo}- 'IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,System.Predicate{System.Reflection.ConstructorInfo})')
-  - [To\`\`1(binding,constructorFilter)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Predicate{System-Reflection-ConstructorInfo}- 'IoC.FluentBind.To``1(IoC.IBinding{``0},System.Predicate{System.Reflection.ConstructorInfo})')
+  - [To(binding,type,methodsProvider)](#M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Func{System-Collections-Generic-IEnumerable{System-Reflection-MethodBase},System-Collections-Generic-IEnumerable{System-Reflection-MethodBase}}- 'IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}})')
+  - [To\`\`1(binding,methodsProvider)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Func{System-Collections-Generic-IEnumerable{System-Reflection-MethodBase},System-Collections-Generic-IEnumerable{System-Reflection-MethodBase}}- 'IoC.FluentBind.To``1(IoC.IBinding{``0},System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}})')
   - [To\`\`1(binding,factory,statements)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
   - [ToSelf(registrationToken)](#M-IoC-FluentBind-ToSelf-System-IDisposable- 'IoC.FluentBind.ToSelf(System.IDisposable)')
 - [FluentConfiguration](#T-IoC-FluentConfiguration 'IoC.FluentConfiguration')
@@ -129,6 +129,7 @@
   - [Resolve\`\`1(container,type,args)](#M-IoC-FluentNativeResolve-Resolve``1-IoC-Container,System-Type,System-Object[]- 'IoC.FluentNativeResolve.Resolve``1(IoC.Container,System.Type,System.Object[])')
   - [Resolve\`\`1(container,type,tag,args)](#M-IoC-FluentNativeResolve-Resolve``1-IoC-Container,System-Type,IoC-Tag,System-Object[]- 'IoC.FluentNativeResolve.Resolve``1(IoC.Container,System.Type,IoC.Tag,System.Object[])')
 - [FluentRegister](#T-IoC-FluentRegister 'IoC.FluentRegister')
+  - [Register(container,types,dependency,lifetime,tags)](#M-IoC-FluentRegister-Register-IoC-IContainer,System-Collections-Generic-IEnumerable{System-Type},IoC-IDependency,IoC-ILifetime,System-Object[]- 'IoC.FluentRegister.Register(IoC.IContainer,System.Collections.Generic.IEnumerable{System.Type},IoC.IDependency,IoC.ILifetime,System.Object[])')
   - [Register\`\`1(container,lifetime,tags)](#M-IoC-FluentRegister-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.FluentRegister.Register``1(IoC.IContainer,IoC.ILifetime,System.Object[])')
   - [Register\`\`1(container,factory,lifetime,tags,statements)](#M-IoC-FluentRegister-Register``1-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentRegister.Register``1(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
   - [Register\`\`2(container,lifetime,tags)](#M-IoC-FluentRegister-Register``2-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.FluentRegister.Register``2(IoC.IContainer,IoC.ILifetime,System.Object[])')
@@ -163,15 +164,16 @@
   - [Tags](#P-IoC-IBinding`1-Tags 'IoC.IBinding`1.Tags')
   - [Types](#P-IoC-IBinding`1-Types 'IoC.IBinding`1.Types')
 - [IBuildContext](#T-IoC-Extensibility-IBuildContext 'IoC.Extensibility.IBuildContext')
-  - [Compiler](#P-IoC-Extensibility-IBuildContext-Compiler 'IoC.Extensibility.IBuildContext.Compiler')
   - [Container](#P-IoC-Extensibility-IBuildContext-Container 'IoC.Extensibility.IBuildContext.Container')
+  - [Depth](#P-IoC-Extensibility-IBuildContext-Depth 'IoC.Extensibility.IBuildContext.Depth')
   - [Key](#P-IoC-Extensibility-IBuildContext-Key 'IoC.Extensibility.IBuildContext.Key')
-  - [CloseBlock(targetExpression)](#M-IoC-Extensibility-IBuildContext-CloseBlock-System-Linq-Expressions-Expression- 'IoC.Extensibility.IBuildContext.CloseBlock(System.Linq.Expressions.Expression)')
+  - [AppendLifetime(baseExpression,lifetime)](#M-IoC-Extensibility-IBuildContext-AppendLifetime-System-Linq-Expressions-Expression,IoC-ILifetime- 'IoC.Extensibility.IBuildContext.AppendLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)')
+  - [AppendValue(value,type)](#M-IoC-Extensibility-IBuildContext-AppendValue-System-Object,System-Type- 'IoC.Extensibility.IBuildContext.AppendValue(System.Object,System.Type)')
+  - [AppendValue\`\`1(value)](#M-IoC-Extensibility-IBuildContext-AppendValue``1-``0- 'IoC.Extensibility.IBuildContext.AppendValue``1(``0)')
+  - [AppendVariable(expression)](#M-IoC-Extensibility-IBuildContext-AppendVariable-System-Linq-Expressions-Expression- 'IoC.Extensibility.IBuildContext.AppendVariable(System.Linq.Expressions.Expression)')
+  - [CloseBlock(targetExpression,variableExpressions)](#M-IoC-Extensibility-IBuildContext-CloseBlock-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression[]- 'IoC.Extensibility.IBuildContext.CloseBlock(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression[])')
   - [CreateChild(key,container)](#M-IoC-Extensibility-IBuildContext-CreateChild-IoC-Key,IoC-IContainer- 'IoC.Extensibility.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)')
-  - [DefineValue(value,type)](#M-IoC-Extensibility-IBuildContext-DefineValue-System-Object,System-Type- 'IoC.Extensibility.IBuildContext.DefineValue(System.Object,System.Type)')
-  - [DefineValue\`\`1(value)](#M-IoC-Extensibility-IBuildContext-DefineValue``1-``0- 'IoC.Extensibility.IBuildContext.DefineValue``1(``0)')
-  - [DefineVariable(expression)](#M-IoC-Extensibility-IBuildContext-DefineVariable-System-Linq-Expressions-Expression- 'IoC.Extensibility.IBuildContext.DefineVariable(System.Linq.Expressions.Expression)')
-  - [PartiallyCloseBlock(targetExpression,expressions)](#M-IoC-Extensibility-IBuildContext-PartiallyCloseBlock-System-Linq-Expressions-Expression,System-Linq-Expressions-Expression[]- 'IoC.Extensibility.IBuildContext.PartiallyCloseBlock(System.Linq.Expressions.Expression,System.Linq.Expressions.Expression[])')
+  - [Prepare(baseExpression,instanceExpression)](#M-IoC-Extensibility-IBuildContext-Prepare-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression- 'IoC.Extensibility.IBuildContext.Prepare(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)')
 - [IConfiguration](#T-IoC-IConfiguration 'IoC.IConfiguration')
   - [Apply(container)](#M-IoC-IConfiguration-Apply-IoC-IContainer- 'IoC.IConfiguration.Apply(IoC.IContainer)')
 - [IContainer](#T-IoC-IContainer 'IoC.IContainer')
@@ -181,13 +183,15 @@
   - [TryGetResolver\`\`1(type,resolver,container)](#M-IoC-IContainer-TryGetResolver``1-System-Type,IoC-Resolver{``0}@,IoC-IContainer- 'IoC.IContainer.TryGetResolver``1(System.Type,IoC.Resolver{``0}@,IoC.IContainer)')
   - [TryRegister(keys,dependency,lifetime,registrationToken)](#M-IoC-IContainer-TryRegister-System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime,System-IDisposable@- 'IoC.IContainer.TryRegister(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,System.IDisposable@)')
 - [IDependency](#T-IoC-IDependency 'IoC.IDependency')
-  - [Expression](#P-IoC-IDependency-Expression 'IoC.IDependency.Expression')
+  - [TryBuildExpression(buildContext,lifetime,baseExpression)](#M-IoC-IDependency-TryBuildExpression-IoC-Extensibility-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@- 'IoC.IDependency.TryBuildExpression(IoC.Extensibility.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@)')
 - [IExpressionBuilder\`1](#T-IoC-Extensibility-IExpressionBuilder`1 'IoC.Extensibility.IExpressionBuilder`1')
   - [Build(bodyExpression,buildContext,context)](#M-IoC-Extensibility-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-Extensibility-IBuildContext,`0- 'IoC.Extensibility.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,`0)')
 - [IExpressionCompiler](#T-IoC-Extensibility-IExpressionCompiler 'IoC.Extensibility.IExpressionCompiler')
   - [IsSupportingCompextTypeConstant](#P-IoC-Extensibility-IExpressionCompiler-IsSupportingCompextTypeConstant 'IoC.Extensibility.IExpressionCompiler.IsSupportingCompextTypeConstant')
   - [Compile(resolverExpression)](#M-IoC-Extensibility-IExpressionCompiler-Compile-System-Linq-Expressions-LambdaExpression- 'IoC.Extensibility.IExpressionCompiler.Compile(System.Linq.Expressions.LambdaExpression)')
 - [IIssueResolver](#T-IoC-Extensibility-IIssueResolver 'IoC.Extensibility.IIssueResolver')
+  - [CannotBuildExpression(buildContext,dependency,lifetime)](#M-IoC-Extensibility-IIssueResolver-CannotBuildExpression-IoC-Extensibility-IBuildContext,IoC-IDependency,IoC-ILifetime- 'IoC.Extensibility.IIssueResolver.CannotBuildExpression(IoC.Extensibility.IBuildContext,IoC.IDependency,IoC.ILifetime)')
+  - [CannotFindConstructor(type)](#M-IoC-Extensibility-IIssueResolver-CannotFindConstructor-System-Type- 'IoC.Extensibility.IIssueResolver.CannotFindConstructor(System.Type)')
   - [CannotGetGenericTypeArguments(type)](#M-IoC-Extensibility-IIssueResolver-CannotGetGenericTypeArguments-System-Type- 'IoC.Extensibility.IIssueResolver.CannotGetGenericTypeArguments(System.Type)')
   - [CannotGetResolver\`\`1(container,key)](#M-IoC-Extensibility-IIssueResolver-CannotGetResolver``1-IoC-IContainer,IoC-Key- 'IoC.Extensibility.IIssueResolver.CannotGetResolver``1(IoC.IContainer,IoC.Key)')
   - [CannotParseLifetime(statementText,statementLineNumber,statementPosition,lifetimeName)](#M-IoC-Extensibility-IIssueResolver-CannotParseLifetime-System-String,System-Int32,System-Int32,System-String- 'IoC.Extensibility.IIssueResolver.CannotParseLifetime(System.String,System.Int32,System.Int32,System.String)')
@@ -297,7 +301,7 @@
   - [Apply()](#M-IoC-Features-TupleFeature-Apply-IoC-IContainer- 'IoC.Features.TupleFeature.Apply(IoC.IContainer)')
 - [UsedImplicitlyAttribute](#T-IoC-UsedImplicitlyAttribute 'IoC.UsedImplicitlyAttribute')
 - [ValidationResult](#T-IoC-ValidationResult 'IoC.ValidationResult')
-  - [ResolvedKey](#F-IoC-ValidationResult-ResolvedKey 'IoC.ValidationResult.ResolvedKey')
+  - [ResolvedKeys](#F-IoC-ValidationResult-ResolvedKeys 'IoC.ValidationResult.ResolvedKeys')
   - [UnresolvedKeys](#F-IoC-ValidationResult-UnresolvedKeys 'IoC.ValidationResult.UnresolvedKeys')
   - [IsValid](#P-IoC-ValidationResult-IsValid 'IoC.ValidationResult.IsValid')
 - [ValueProviderAttribute](#T-IoC-ValueProviderAttribute 'IoC.ValueProviderAttribute')
@@ -1559,8 +1563,8 @@ The binding token.
 | ---- | ----------- |
 | T | The instance type. |
 
-<a name='M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Predicate{System-Reflection-ConstructorInfo}-'></a>
-### To(binding,type,constructorFilter) `method` [#](#M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Predicate{System-Reflection-ConstructorInfo}- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Func{System-Collections-Generic-IEnumerable{System-Reflection-MethodBase},System-Collections-Generic-IEnumerable{System-Reflection-MethodBase}}-'></a>
+### To(binding,type,methodsProvider) `method` [#](#M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Func{System-Collections-Generic-IEnumerable{System-Reflection-MethodBase},System-Collections-Generic-IEnumerable{System-Reflection-MethodBase}}- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -1576,10 +1580,10 @@ The registration token.
 | ---- | ---- | ----------- |
 | binding | [IoC.IBinding{System.Object}](#T-IoC-IBinding{System-Object} 'IoC.IBinding{System.Object}') | The binding token. |
 | type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
-| constructorFilter | [System.Predicate{System.Reflection.ConstructorInfo}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Predicate 'System.Predicate{System.Reflection.ConstructorInfo}') | The constructor's filter. |
+| methodsProvider | [System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Func 'System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}}') | Provider of a costructor and initializing methods. |
 
-<a name='M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Predicate{System-Reflection-ConstructorInfo}-'></a>
-### To\`\`1(binding,constructorFilter) `method` [#](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Predicate{System-Reflection-ConstructorInfo}- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Func{System-Collections-Generic-IEnumerable{System-Reflection-MethodBase},System-Collections-Generic-IEnumerable{System-Reflection-MethodBase}}-'></a>
+### To\`\`1(binding,methodsProvider) `method` [#](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Func{System-Collections-Generic-IEnumerable{System-Reflection-MethodBase},System-Collections-Generic-IEnumerable{System-Reflection-MethodBase}}- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -1594,7 +1598,7 @@ The registration token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') | The binding token. |
-| constructorFilter | [System.Predicate{System.Reflection.ConstructorInfo}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Predicate 'System.Predicate{System.Reflection.ConstructorInfo}') | The constructor's filter. |
+| methodsProvider | [System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Func 'System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}}') | Provider of a costructor and initializing methods. |
 
 ##### Generic Types
 
@@ -2177,6 +2181,27 @@ IoC
 ##### Summary
 
 Represents extensions for registration in a container.
+
+<a name='M-IoC-FluentRegister-Register-IoC-IContainer,System-Collections-Generic-IEnumerable{System-Type},IoC-IDependency,IoC-ILifetime,System-Object[]-'></a>
+### Register(container,types,dependency,lifetime,tags) `method` [#](#M-IoC-FluentRegister-Register-IoC-IContainer,System-Collections-Generic-IEnumerable{System-Type},IoC-IDependency,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Registers a binding.
+
+##### Returns
+
+
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| types | [System.Collections.Generic.IEnumerable{System.Type}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{System.Type}') | The set of types. |
+| dependency | [IoC.IDependency](#T-IoC-IDependency 'IoC.IDependency') | The dependency. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
 
 <a name='M-IoC-FluentRegister-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
 ### Register\`\`1(container,lifetime,tags) `method` [#](#M-IoC-FluentRegister-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]- 'Go To Here') [=](#contents 'Back To Contents')
@@ -2924,19 +2949,19 @@ IoC.Extensibility
 
 Represents the abstraction for build context.
 
-<a name='P-IoC-Extensibility-IBuildContext-Compiler'></a>
-### Compiler `property` [#](#P-IoC-Extensibility-IBuildContext-Compiler 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-The compiler.
-
 <a name='P-IoC-Extensibility-IBuildContext-Container'></a>
 ### Container `property` [#](#P-IoC-Extensibility-IBuildContext-Container 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
 The target container.
+
+<a name='P-IoC-Extensibility-IBuildContext-Depth'></a>
+### Depth `property` [#](#P-IoC-Extensibility-IBuildContext-Depth 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+The depth of current context.
 
 <a name='P-IoC-Extensibility-IBuildContext-Key'></a>
 ### Key `property` [#](#P-IoC-Extensibility-IBuildContext-Key 'Go To Here') [=](#contents 'Back To Contents')
@@ -2945,22 +2970,99 @@ The target container.
 
 The target key.
 
-<a name='M-IoC-Extensibility-IBuildContext-CloseBlock-System-Linq-Expressions-Expression-'></a>
-### CloseBlock(targetExpression) `method` [#](#M-IoC-Extensibility-IBuildContext-CloseBlock-System-Linq-Expressions-Expression- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-Extensibility-IBuildContext-AppendLifetime-System-Linq-Expressions-Expression,IoC-ILifetime-'></a>
+### AppendLifetime(baseExpression,lifetime) `method` [#](#M-IoC-Extensibility-IBuildContext-AppendLifetime-System-Linq-Expressions-Expression,IoC-ILifetime- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
-Closes a block of statements.
+Wraps by lifetime.
 
 ##### Returns
 
-The result expression.
+
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifitime. |
+
+<a name='M-IoC-Extensibility-IBuildContext-AppendValue-System-Object,System-Type-'></a>
+### AppendValue(value,type) `method` [#](#M-IoC-Extensibility-IBuildContext-AppendValue-System-Object,System-Type- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Appends value.
+
+##### Returns
+
+The parameter expression.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| value | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The value. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The value type. |
+
+<a name='M-IoC-Extensibility-IBuildContext-AppendValue``1-``0-'></a>
+### AppendValue\`\`1(value) `method` [#](#M-IoC-Extensibility-IBuildContext-AppendValue``1-``0- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Appends value.
+
+##### Returns
+
+The parameter expression.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| value | [\`\`0](#T-``0 '``0') | The value. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The value type. |
+
+<a name='M-IoC-Extensibility-IBuildContext-AppendVariable-System-Linq-Expressions-Expression-'></a>
+### AppendVariable(expression) `method` [#](#M-IoC-Extensibility-IBuildContext-AppendVariable-System-Linq-Expressions-Expression- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Appends variable.
+
+##### Returns
+
+The parameter expression.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| expression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The value expression. |
+
+<a name='M-IoC-Extensibility-IBuildContext-CloseBlock-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression[]-'></a>
+### CloseBlock(targetExpression,variableExpressions) `method` [#](#M-IoC-Extensibility-IBuildContext-CloseBlock-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression[]- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Closes block for specified variables.
+
+##### Returns
+
+The resulting block expression.
 
 ##### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | targetExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The target expression. |
+| variableExpressions | [System.Linq.Expressions.ParameterExpression[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.ParameterExpression[] 'System.Linq.Expressions.ParameterExpression[]') | Variable expressions. |
 
 <a name='M-IoC-Extensibility-IBuildContext-CreateChild-IoC-Key,IoC-IContainer-'></a>
 ### CreateChild(key,container) `method` [#](#M-IoC-Extensibility-IBuildContext-CreateChild-IoC-Key,IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
@@ -2980,81 +3082,23 @@ The new build context.
 | key | [IoC.Key](#T-IoC-Key 'IoC.Key') | The key |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The container. |
 
-<a name='M-IoC-Extensibility-IBuildContext-DefineValue-System-Object,System-Type-'></a>
-### DefineValue(value,type) `method` [#](#M-IoC-Extensibility-IBuildContext-DefineValue-System-Object,System-Type- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-Extensibility-IBuildContext-Prepare-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression-'></a>
+### Prepare(baseExpression,instanceExpression) `method` [#](#M-IoC-Extensibility-IBuildContext-Prepare-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
-Defines value.
+Prepares an expression.
 
 ##### Returns
 
-The parameter expression.
+The resulting expression.
 
 ##### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| value | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The value. |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The value type. |
-
-<a name='M-IoC-Extensibility-IBuildContext-DefineValue``1-``0-'></a>
-### DefineValue\`\`1(value) `method` [#](#M-IoC-Extensibility-IBuildContext-DefineValue``1-``0- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Defines value.
-
-##### Returns
-
-The parameter expression.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| value | [\`\`0](#T-``0 '``0') | The value. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T | The value type. |
-
-<a name='M-IoC-Extensibility-IBuildContext-DefineVariable-System-Linq-Expressions-Expression-'></a>
-### DefineVariable(expression) `method` [#](#M-IoC-Extensibility-IBuildContext-DefineVariable-System-Linq-Expressions-Expression- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Defines variable.
-
-##### Returns
-
-The parameter expression.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| expression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The value expression. |
-
-<a name='M-IoC-Extensibility-IBuildContext-PartiallyCloseBlock-System-Linq-Expressions-Expression,System-Linq-Expressions-Expression[]-'></a>
-### PartiallyCloseBlock(targetExpression,expressions) `method` [#](#M-IoC-Extensibility-IBuildContext-PartiallyCloseBlock-System-Linq-Expressions-Expression,System-Linq-Expressions-Expression[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Closes block for specified expressions.
-
-##### Returns
-
-The resulting block expression.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| targetExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The target expression. |
-| expressions | [System.Linq.Expressions.Expression[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression[] 'System.Linq.Expressions.Expression[]') | Assigment expressions. |
+| baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
+| instanceExpression | [System.Linq.Expressions.ParameterExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.ParameterExpression 'System.Linq.Expressions.ParameterExpression') | The instance expression. |
 
 <a name='T-IoC-IConfiguration'></a>
 ## IConfiguration [#](#T-IoC-IConfiguration 'Go To Here') [=](#contents 'Back To Contents')
@@ -3203,12 +3247,24 @@ IoC
 
 Represents a IoC dependency.
 
-<a name='P-IoC-IDependency-Expression'></a>
-### Expression `property` [#](#P-IoC-IDependency-Expression 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-IDependency-TryBuildExpression-IoC-Extensibility-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@-'></a>
+### TryBuildExpression(buildContext,lifetime,baseExpression) `method` [#](#M-IoC-IDependency-TryBuildExpression-IoC-Extensibility-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
-The expression for dependency which is used to create a build graph.
+Builds an expression.
+
+##### Returns
+
+True if success.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| buildContext | [IoC.Extensibility.IBuildContext](#T-IoC-Extensibility-IBuildContext 'IoC.Extensibility.IBuildContext') | The build context, |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime, |
+| baseExpression | [System.Linq.Expressions.Expression@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression@ 'System.Linq.Expressions.Expression@') | The resulting expression. |
 
 <a name='T-IoC-Extensibility-IExpressionBuilder`1'></a>
 ## IExpressionBuilder\`1 [#](#T-IoC-Extensibility-IExpressionBuilder`1 'Go To Here') [=](#contents 'Back To Contents')
@@ -3285,6 +3341,42 @@ IoC.Extensibility
 ##### Summary
 
 Allows to specify behaviour for cases with issue.
+
+<a name='M-IoC-Extensibility-IIssueResolver-CannotBuildExpression-IoC-Extensibility-IBuildContext,IoC-IDependency,IoC-ILifetime-'></a>
+### CannotBuildExpression(buildContext,dependency,lifetime) `method` [#](#M-IoC-Extensibility-IIssueResolver-CannotBuildExpression-IoC-Extensibility-IBuildContext,IoC-IDependency,IoC-ILifetime- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Handles the scenario when cannot build expression.
+
+##### Returns
+
+The resulting expression.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| buildContext | [IoC.Extensibility.IBuildContext](#T-IoC-Extensibility-IBuildContext 'IoC.Extensibility.IBuildContext') | The build context. |
+| dependency | [IoC.IDependency](#T-IoC-IDependency 'IoC.IDependency') | The dependeny. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The lifetime. |
+
+<a name='M-IoC-Extensibility-IIssueResolver-CannotFindConstructor-System-Type-'></a>
+### CannotFindConstructor(type) `method` [#](#M-IoC-Extensibility-IIssueResolver-CannotFindConstructor-System-Type- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Handles the scenario when cannot find a constructor.
+
+##### Returns
+
+The constructor information.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The target type. |
 
 <a name='M-IoC-Extensibility-IIssueResolver-CannotGetGenericTypeArguments-System-Type-'></a>
 ### CannotGetGenericTypeArguments(type) `method` [#](#M-IoC-Extensibility-IIssueResolver-CannotGetGenericTypeArguments-System-Type- 'Go To Here') [=](#contents 'Back To Contents')
@@ -4113,7 +4205,7 @@ Represents the resolver delegate.
 
 ##### Returns
 
-
+The resolved instance.
 
 ##### Parameters
 
@@ -4666,8 +4758,8 @@ IoC
 
 Represents a container's validation result.
 
-<a name='F-IoC-ValidationResult-ResolvedKey'></a>
-### ResolvedKey `constants` [#](#F-IoC-ValidationResult-ResolvedKey 'Go To Here') [=](#contents 'Back To Contents')
+<a name='F-IoC-ValidationResult-ResolvedKeys'></a>
+### ResolvedKeys `constants` [#](#F-IoC-ValidationResult-ResolvedKeys 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 

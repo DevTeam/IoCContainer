@@ -8,18 +8,19 @@ IoC.Container|[![NuGet Version and Downloads count](https://buildstats.info/nuge
 IoC.AspNetCore|[![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.AspNetCore?includePreReleases=true)](https://www.nuget.org/packages/IoC.AspNetCore)
 
 IoC.Container provides the following benefits:
-  - One of the fastest, almost as fast as operators `new`
+  - One of the [fastest](#why-this-one), almost as fast as operators `new`
   - Produces minimal memory trafic
   - Powerful auto-wiring
     - Checks the auto-wiring configuration at the compile time
     - Allows to not change a code design to use IoC
-    - Clear generic types' mapping
-    - The simple text metadata is supported
-  - Fully extensible and supports custom containers/lifetimes
-  - Reconfigurable on-the-fly
-  - Supports concurrent and asynchronous resolving
+    - [Clear generic types' mapping](#generic-auto-wiring)
+    - [The simple text metadata is supported](#configuration-via-a-text-metadata)
+	- Flexible autowiring configuration (as example a [custom Aspect Oriented Autowiring](#aspect-oriented-autowiring))
+  - Fully extensible and supports [custom containers](#custom-child-container)/[lifetimes](#custom-lifetime)
+  - [Reconfigurable on-the-fly](#change-configuration-on-the-fly)
+  - Supports [concurrent and asynchronous resolving](#asynchronous-resolve)
   - Does not need additional dependencies
-  - Supports ASP.NET Core
+  - Supports [ASP.NET Core](#aspnet-core)
 
 Supported platforms:
   - .NET 4.0+

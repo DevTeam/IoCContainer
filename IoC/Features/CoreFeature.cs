@@ -24,6 +24,7 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => IssueResolver.Shared);
+            yield return container.Register<IAutowiringStrategy>(ctx => new DefaultAutowiringStrategy(ctx.Container));
             yield return container.Register(ctx => ctx.Container.GetResolver<TT>(ctx.Key.Tag.AsTag()), null, Feature.AnyTag);
 
             // Lifetimes

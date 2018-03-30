@@ -1,6 +1,7 @@
 ﻿namespace IoC.Core
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -70,9 +71,10 @@
             throw new InvalidOperationException($"Cannot build expression for the key \"{buildContext.Key}\" from the container \"{buildContext.Container}\". Details:\n{GetContainerDetails(buildContext.Container)}");
         }
 
-        public ConstructorInfo CannotFindConstructor(Type type)
+        public IMethod<ConstructorInfo> CannotFindConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors)
         {
-            if (type == null) throw new ArgumentNullException(nameof(type));
+            if (constructors == null) throw new ArgumentNullException(nameof(constructors));
+            var type = constructors.Single().Info.DeclaringType;
             throw new InvalidOperationException($"Cannot find a constructor for the type \"{type}\".");
         }
 

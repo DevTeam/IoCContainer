@@ -193,21 +193,29 @@
             using (var container = Container.Create())
             {
                 // When
-                IEnumerable<MethodBase> MethodsProvider(IEnumerable<MethodBase> methods)
-                {
-                    return
-                        from method in methods
-                        where method.IsConstructor && method.GetParameters().Length == 0 || method.Name == nameof(MyGenericService<object, object>.Init)
-                        select method;
-                }
-
                 using (container.Bind<MySimpleClass>().To<MySimpleClass>())
-                using (container.Bind(typeof(IMyGenericService<,>)).As(Lifetime.Transient).To(typeof(MyGenericService<,>), MethodsProvider))
+                using (container.Bind(typeof(IMyGenericService<,>)).As(Lifetime.Transient).To(typeof(MyGenericService<,>), new AutowiringStrategy()))
                 {
                     // Then
                     var actualInstance = container.Resolve<IMyGenericService<int, string>>();
                     actualInstance.ShouldBeOfType<MyGenericService<int, string>>();
                 }
+            }
+        }
+
+        private class AutowiringStrategy: IAutowiringStrategy
+        {
+            public IMethod<ConstructorInfo> SelectConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors)
+            {
+                return constructors.Single(i => i.Info.GetParameters().Length == 0);
+            }
+
+            public IEnumerable<IMethod<MethodInfo>> GetMethods(IEnumerable<IMethod<MethodInfo>> methods)
+            {
+                return
+                    from method in methods
+                    where method.Info.Name == nameof(MyGenericService<object, object>.Init)
+                    select method;
             }
         }
     }
