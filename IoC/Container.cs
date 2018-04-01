@@ -81,57 +81,19 @@
             return Create(name, BasicRootContainer.Value);
         }
 
-        /// <summary>
-        /// Creates a root container with specified features.
-        /// </summary>
-        /// <param name="configurations">The set of features.</param>
-        /// <returns>The roor container.</returns>
         [NotNull]
-        public static Container Create([NotNull][ItemNotNull] params IConfiguration[] configurations)
-        {
-            if (configurations == null) throw new ArgumentNullException(nameof(configurations));
-            return Create(string.Empty, configurations);
-        }
-
-        /// <summary>
-        /// Creates a root container with basic features.
-        /// </summary>
-        /// <param name="name">The optional name of the container.</param>
-        /// <param name="baseContainer"></param>
-        /// <returns>The roor container.</returns>
-        [NotNull]
-        public static Container Create([NotNull] string name, [NotNull] IContainer baseContainer)
+        private static Container Create([NotNull] string name, [NotNull] IContainer baseContainer)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (baseContainer == null) throw new ArgumentNullException(nameof(baseContainer));
             return new Container(CreateContainerName(name), baseContainer, true);
         }
 
-        /// <summary>
-        /// Creates a root container with specified name and features.
-        /// </summary>
-        /// <param name="name">The optional name of the container.</param>
-        /// <param name="configurations">The set of features.</param>
-        /// <returns>The roor container.</returns>
-        [NotNull]
-        public static Container Create([NotNull] string name, [NotNull][ItemNotNull] params IConfiguration[] configurations)
-        {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            if (configurations == null) throw new ArgumentNullException(nameof(configurations));
-            return new Container(CreateContainerName(name), CreateRootContainer(configurations), true);
-        }
-
         private static Container CreateRootContainer([NotNull][ItemNotNull] IEnumerable<IConfiguration> configurations)
         {
-            var container = new Container(RootName);
+            var container = new Container(RootName, NullContainer.Shared, true);
             container.ApplyConfigurations(configurations);
             return container;
-        }
-
-        private Container([NotNull] string name = "")
-        {
-            _name = name ?? throw new ArgumentNullException(nameof(name));
-            _parent = new NullContainer();
         }
 
         internal Container([NotNull] string name, [NotNull] IContainer parent, bool root)

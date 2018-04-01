@@ -7,6 +7,12 @@
 
     internal sealed class NullContainer : IContainer
     {
+        public static readonly IContainer Shared = new NullContainer();
+
+        private NullContainer()
+        {
+        }
+
         public IContainer Parent => throw new NotSupportedException();
 
         public bool TryRegister(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)

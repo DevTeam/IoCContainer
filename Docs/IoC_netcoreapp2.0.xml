@@ -623,29 +623,6 @@
             <param name="name">The optional name of the container.</param>
             <returns>The roor container.</returns>
         </member>
-        <member name="M:IoC.Container.Create(IoC.IConfiguration[])">
-            <summary>
-            Creates a root container with specified features.
-            </summary>
-            <param name="configurations">The set of features.</param>
-            <returns>The roor container.</returns>
-        </member>
-        <member name="M:IoC.Container.Create(System.String,IoC.IContainer)">
-            <summary>
-            Creates a root container with basic features.
-            </summary>
-            <param name="name">The optional name of the container.</param>
-            <param name="baseContainer"></param>
-            <returns>The roor container.</returns>
-        </member>
-        <member name="M:IoC.Container.Create(System.String,IoC.IConfiguration[])">
-            <summary>
-            Creates a root container with specified name and features.
-            </summary>
-            <param name="name">The optional name of the container.</param>
-            <param name="configurations">The set of features.</param>
-            <returns>The roor container.</returns>
-        </member>
         <member name="P:IoC.Container.Parent">
             <inheritdoc />
         </member>

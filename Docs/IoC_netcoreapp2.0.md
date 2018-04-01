@@ -42,9 +42,6 @@
 - [Container](#T-IoC-Container 'IoC.Container')
   - [Parent](#P-IoC-Container-Parent 'IoC.Container.Parent')
   - [Create(name)](#M-IoC-Container-Create-System-String- 'IoC.Container.Create(System.String)')
-  - [Create(configurations)](#M-IoC-Container-Create-IoC-IConfiguration[]- 'IoC.Container.Create(IoC.IConfiguration[])')
-  - [Create(name,baseContainer)](#M-IoC-Container-Create-System-String,IoC-IContainer- 'IoC.Container.Create(System.String,IoC.IContainer)')
-  - [Create(name,configurations)](#M-IoC-Container-Create-System-String,IoC-IConfiguration[]- 'IoC.Container.Create(System.String,IoC.IConfiguration[])')
   - [CreateBasic(name)](#M-IoC-Container-CreateBasic-System-String- 'IoC.Container.CreateBasic(System.String)')
   - [CreateHighPerformance(name)](#M-IoC-Container-CreateHighPerformance-System-String- 'IoC.Container.CreateHighPerformance(System.String)')
   - [Dispose()](#M-IoC-Container-Dispose 'IoC.Container.Dispose')
@@ -771,59 +768,6 @@ The roor container.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The optional name of the container. |
-
-<a name='M-IoC-Container-Create-IoC-IConfiguration[]-'></a>
-### Create(configurations) `method` [#](#M-IoC-Container-Create-IoC-IConfiguration[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Creates a root container with specified features.
-
-##### Returns
-
-The roor container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The set of features. |
-
-<a name='M-IoC-Container-Create-System-String,IoC-IContainer-'></a>
-### Create(name,baseContainer) `method` [#](#M-IoC-Container-Create-System-String,IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Creates a root container with basic features.
-
-##### Returns
-
-The roor container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The optional name of the container. |
-| baseContainer | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') |  |
-
-<a name='M-IoC-Container-Create-System-String,IoC-IConfiguration[]-'></a>
-### Create(name,configurations) `method` [#](#M-IoC-Container-Create-System-String,IoC-IConfiguration[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Creates a root container with specified name and features.
-
-##### Returns
-
-The roor container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The optional name of the container. |
-| configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The set of features. |
 
 <a name='M-IoC-Container-CreateBasic-System-String-'></a>
 ### CreateBasic(name) `method` [#](#M-IoC-Container-CreateBasic-System-String- 'Go To Here') [=](#contents 'Back To Contents')
