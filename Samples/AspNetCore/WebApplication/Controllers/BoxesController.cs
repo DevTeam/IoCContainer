@@ -3,8 +3,8 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using ConsoleApp;
     using Microsoft.AspNetCore.Mvc;
+    using ShroedingersCat;
 
     [Route("api/[controller]")]
     [SuppressMessage("ReSharper", "UnusedParameter.Global")]

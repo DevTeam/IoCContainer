@@ -106,10 +106,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\IoC\IoC.csproj">
-      <Project>{f84ee174-3c3a-437f-b03f-26e78a8e6437}</Project>
-      <Name>IoC</Name>
-    </ProjectReference>
+    <PackageReference Include="IoC.Container">
+      <Version>1.1.0-beta187</Version>
+    </PackageReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

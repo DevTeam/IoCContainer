@@ -190,7 +190,7 @@ For more information see [this sample](Samples/AspNetCore).
 
 # [WPF](https://docs.microsoft.com/en-us/dotnet/framework/wpf/index)
 
-### Create the IoC container, like [here](Samples/Windows/WpfApp/App.xaml.cs)
+### Create the IoC container, like [here](Samples/WpfApp/App.xaml.cs)
 
 ```csharp
 public partial class App
@@ -212,9 +212,9 @@ public partial class App
 }
 ```
 
-Where _Configuration_ is the [configuration](Samples/Windows/WpfApp/Configuration.cs) of IoC container.
+Where _Configuration_ is the [configuration](Samples/WpfApp/Configuration.cs) of IoC container.
 
-### Implement a data provider class, for instance like [DataProvider](Samples/Windows/WpfApp/DataProvider.cs)
+### Implement a data provider class, for instance like [DataProvider](Samples/WpfApp/DataProvider.cs)
 
 ```csharp
 public class DataProvider: ObjectDataProvider
@@ -236,9 +236,9 @@ public class DataProvider: ObjectDataProvider
 }
 ```
 
-Where _ConfigurationDesignTime_ is the [desing time configuration](Samples/Windows/WpfApp/ConfigurationDesignTime.cs) of IoC container.
+Where _ConfigurationDesignTime_ is the [desing time configuration](Samples/WpfApp/ConfigurationDesignTime.cs) of IoC container.
 
-### Use it in XAML do bind view models like [here](Samples/Windows/WpfApp/Views/MainWindow.xaml)
+### Use it in XAML do bind view models like [here](Samples/WpfApp/Views/MainWindow.xaml)
 
 ```xml
 <Window x:Class="WpfApp.Views.MainWindow" x:ClassModifier="internal"
@@ -258,7 +258,7 @@ Where _ConfigurationDesignTime_ is the [desing time configuration](Samples/Windo
 </Window>
 ```
 
-For more information see [this sample](Samples/Windows/WpfApp).
+For more information see [this sample](Samples/WpfApp).
 
 ## Class References
 

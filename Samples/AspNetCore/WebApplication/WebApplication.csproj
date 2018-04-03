@@ -5,10 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="wwwroot\" />
+    <Compile Remove="wwwroot\**" />
+    <Content Remove="wwwroot\**" />
+    <EmbeddedResource Remove="wwwroot\**" />
+    <None Remove="wwwroot\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="IoC.AspNetCore" Version="1.1.0-beta187" />
+    <PackageReference Include="IoC.Container" Version="1.1.0-beta187" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
   </ItemGroup>
 
@@ -17,9 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
-    <ProjectReference Include="..\..\..\IoC\IoC.csproj" />
-    <ProjectReference Include="..\..\ShroedingersCat\ConsoleApp\ConsoleApp.csproj" />
+    <ProjectReference Include="..\..\ShroedingersCat\ShroedingersCat.csproj" />
   </ItemGroup>
 
 </Project>

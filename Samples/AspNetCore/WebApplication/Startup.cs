@@ -2,12 +2,12 @@
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using ConsoleApp;
     using IoC;
     using IoC.Features;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.DependencyInjection;
+    using ShroedingersCat;
     using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
     [SuppressMessage("ReSharper", "UnusedMember.Global")]

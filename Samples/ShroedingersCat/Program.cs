@@ -1,6 +1,6 @@
 ﻿// ReSharper disable UnusedMemberInSuper.Global
 // ReSharper disable ClassNeverInstantiated.Global
-namespace ConsoleApp
+namespace ShroedingersCat
 {
     using System;
     using System.Collections.Generic;
