@@ -1,4 +1,4 @@
-﻿namespace WpfApp
+﻿namespace UwpApp
 {
     using System;
     using System.Collections.Generic;
@@ -15,7 +15,7 @@
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             // Viwes
-            yield return container.Bind<IMainWindowView>().As(Lifetime.Singleton).To<MainWindow>();
+            yield return container.Bind<MainPage>().As(Lifetime.Singleton).To<MainPage>();
 
             // View Models
             yield return container.Bind<IClockViewModel>().As(Lifetime.Singleton).To<ClockViewModel>();

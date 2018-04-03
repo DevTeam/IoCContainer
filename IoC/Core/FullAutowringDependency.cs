@@ -70,7 +70,7 @@
         private static bool MethodFilter<T>([NotNull] T method)
             where T: MethodBase
         {
-            return !method.IsStatic && method.IsPublic;
+            return !method.IsStatic && (method.IsAssembly || method.IsPublic);
         }
 
         [NotNull]

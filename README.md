@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-Package| Link
+Package| Linku
 ---|:---:
 IoC.Container|[![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.Container?includePreReleases=true)](https://www.nuget.org/packages/IoC.Container)
 IoC.AspNetCore|[![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.AspNetCore?includePreReleases=true)](https://www.nuget.org/packages/IoC.AspNetCore)
@@ -22,11 +22,13 @@ IoC.Container provides the following benefits:
   - Does not need additional dependencies
   - Supports [ASP.NET Core](#aspnet-core)
   - Supports [Windows Presentation Foundation](#wpf)
+  - Supports [Universal Windows Platform](#uwp)
 
 Supported platforms:
   - .NET 4.0+
   - .NET Core 1.0+
   - .NET Standard 1.0+
+  - [UWP 10+](https://docs.microsoft.com/en-us/windows/uwp/index)
 
 ## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works
 
@@ -260,12 +262,96 @@ Where _ConfigurationDesignTime_ is the [desing time configuration](Samples/WpfAp
 
 For more information see [this sample](Samples/WpfApp).
 
+# [UWP](https://docs.microsoft.com/en-us/windows/uwp/index)
+
+### [Create the IoC container](Samples/UwpApp/App.xaml.cs#L26)
+
+```csharp
+Container = IoC.Container.Create().Using<Configuration>();
+```
+
+Where _Configuration_ is the [configuration](Samples/UwpApp/Configuration.cs) of IoC container.
+
+### [Subscribe to event _Navigating_](Samples/UwpApp/App.xaml.cs#L44)
+
+```csharp
+rootFrame.Navigating += OnNavigating;
+```
+
+```csharp
+private void OnNavigating(object sender, NavigatingCancelEventArgs navigatingCancelEventArgs)
+{
+    if (!(sender is Frame frame))
+    {
+        return;
+    }
+
+    frame.Content = Container.Resolve<Page>(navigatingCancelEventArgs.SourcePageType, navigatingCancelEventArgs.Parameter);
+    navigatingCancelEventArgs.Cancel = true;
+}
+```
+
+### Implement a data provider class, for instance like [DataProvider](Samples/Uwp/DataProvider.cs)
+
+```csharp
+internal class DataProvider
+{
+    // Design Time Container
+    private static readonly Lazy<IContainer> ContainerDesignTime 
+        = new Lazy<IContainer>(() => Container.Create().Using<ConfigurationDesignTime>());
+
+    private static readonly IEnumerable<TypeInfo> TypeInfos = typeof(DataProvider).GetTypeInfo().Assembly.DefinedTypes;
+    private Type _type;
+
+    public string ObjectType
+    {
+        private get => _type?.Name;
+        set => 
+            _type = value != null 
+            ? TypeInfos.First(i => i.Name.EndsWith(value, StringComparison.CurrentCultureIgnoreCase)).AsType()
+            : null;
+    }
+
+    public object Tag { get; set; }
+
+    public object It => 
+        Application.Current is App app 
+            ? app.Container.Resolve<object>(_type, Tag)
+            : ContainerDesignTime.Value.Resolve<object>(_type, Tag);
+}
+```
+
+Where _ConfigurationDesignTime_ is the [desing time configuration](Samples/UwpApp/ConfigurationDesignTime.cs) of IoC container.
+
+### Use it in XAML do bind view models like [here](Samples/UwpApp/Views/MainWindow.xaml)
+
+```xml
+<Page
+    x:Class="UwpApp.Views.MainPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:UwpApp">
+    <Page.Resources>
+        <local:DataProvider x:Key="ClockViewModel" ObjectType="IClockViewModel"/>
+    </Page.Resources>
+    <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" DataContext="{StaticResource ClockViewModel}">
+            <TextBlock Text="{Binding It.Date}" FontSize="64" />
+            <TextBlock Text="{Binding It.Time}" FontSize="64" />
+        </StackPanel>
+    </Grid>
+</Page>
+```
+
+For more information see [this sample](Samples/UwpApp).
+
 ## Class References
 
 - [.NET 4.0](Docs/IoC_net40.md)
 - [.NET 4.5](Docs/IoC_net45.md)
 - [.NET Standard 1.0](Docs/IoC_netstandard1.0.md)
 - [.NET Core 2.0](Docs/IoC_netcoreapp2.0.md)
+- [UWP 10.0](Docs/IoC_uap10.0.md)
 
 ## Why this one?
 

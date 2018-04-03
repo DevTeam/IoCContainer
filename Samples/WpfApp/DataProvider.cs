@@ -20,9 +20,13 @@
         {
             base.BeginQuery();
             if (Application.Current is App app)
+            {
                 OnQueryFinished(app.Container.Resolve<object>(ObjectType, Tag));
-            else 
+            }
+            else
+            {
                 OnQueryFinished(ContainerDesignTime.Value.Resolve<object>(ObjectType, Tag));
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace WpfApp.Models
+﻿namespace UwpApp.Models
 {
     public class Tick
     {
