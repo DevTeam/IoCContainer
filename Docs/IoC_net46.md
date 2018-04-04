@@ -42,9 +42,6 @@
 - [Container](#T-IoC-Container 'IoC.Container')
   - [Parent](#P-IoC-Container-Parent 'IoC.Container.Parent')
   - [Create(name)](#M-IoC-Container-Create-System-String- 'IoC.Container.Create(System.String)')
-  - [Create(configurations)](#M-IoC-Container-Create-IoC-IConfiguration[]- 'IoC.Container.Create(IoC.IConfiguration[])')
-  - [Create(name,baseContainer)](#M-IoC-Container-Create-System-String,IoC-IContainer- 'IoC.Container.Create(System.String,IoC.IContainer)')
-  - [Create(name,configurations)](#M-IoC-Container-Create-System-String,IoC-IConfiguration[]- 'IoC.Container.Create(System.String,IoC.IConfiguration[])')
   - [CreateBasic(name)](#M-IoC-Container-CreateBasic-System-String- 'IoC.Container.CreateBasic(System.String)')
   - [CreateHighPerformance(name)](#M-IoC-Container-CreateHighPerformance-System-String- 'IoC.Container.CreateHighPerformance(System.String)')
   - [Dispose()](#M-IoC-Container-Dispose 'IoC.Container.Dispose')
@@ -84,6 +81,8 @@
 - [Fluent](#T-IoC-Fluent 'IoC.Fluent')
   - [CreateChild(parent,name)](#M-IoC-Fluent-CreateChild-IoC-IContainer,System-String- 'IoC.Fluent.CreateChild(IoC.IContainer,System.String)')
   - [Validate(container)](#M-IoC-Fluent-Validate-IoC-IContainer- 'IoC.Fluent.Validate(IoC.IContainer)')
+- [FluentAutowiring](#T-IoC-FluentAutowiring 'IoC.FluentAutowiring')
+  - [TryInjectDependency\`\`1(method,parameterPosition,dependencyType,dependencyTag)](#M-IoC-FluentAutowiring-TryInjectDependency``1-IoC-IMethod{``0},System-Int32,System-Type,System-Object- 'IoC.FluentAutowiring.TryInjectDependency``1(IoC.IMethod{``0},System.Int32,System.Type,System.Object)')
 - [FluentBind](#T-IoC-FluentBind 'IoC.FluentBind')
   - [AnyTag\`\`1(binding)](#M-IoC-FluentBind-AnyTag``1-IoC-IBinding{``0}- 'IoC.FluentBind.AnyTag``1(IoC.IBinding{``0})')
   - [As\`\`1(binding,lifetime)](#M-IoC-FluentBind-As``1-IoC-IBinding{``0},IoC-Lifetime- 'IoC.FluentBind.As``1(IoC.IBinding{``0},IoC.Lifetime)')
@@ -98,8 +97,8 @@
   - [Bind\`\`8(container)](#M-IoC-FluentBind-Bind``8-IoC-IContainer- 'IoC.FluentBind.Bind``8(IoC.IContainer)')
   - [Lifetime\`\`1(binding,lifetime)](#M-IoC-FluentBind-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime- 'IoC.FluentBind.Lifetime``1(IoC.IBinding{``0},IoC.ILifetime)')
   - [Tag\`\`1(binding,tagValue)](#M-IoC-FluentBind-Tag``1-IoC-IBinding{``0},System-Object- 'IoC.FluentBind.Tag``1(IoC.IBinding{``0},System.Object)')
-  - [To(binding,type,methodsProvider)](#M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Func{System-Collections-Generic-IEnumerable{System-Reflection-MethodBase},System-Collections-Generic-IEnumerable{System-Reflection-MethodBase}}- 'IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}})')
-  - [To\`\`1(binding,methodsProvider)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Func{System-Collections-Generic-IEnumerable{System-Reflection-MethodBase},System-Collections-Generic-IEnumerable{System-Reflection-MethodBase}}- 'IoC.FluentBind.To``1(IoC.IBinding{``0},System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}})')
+  - [To(binding,type,autowiringStrategy)](#M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,IoC-IAutowiringStrategy- 'IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,IoC.IAutowiringStrategy)')
+  - [To\`\`1(binding,autowiringStrategy)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},IoC-IAutowiringStrategy- 'IoC.FluentBind.To``1(IoC.IBinding{``0},IoC.IAutowiringStrategy)')
   - [To\`\`1(binding,factory,statements)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
   - [ToSelf(registrationToken)](#M-IoC-FluentBind-ToSelf-System-IDisposable- 'IoC.FluentBind.ToSelf(System.IDisposable)')
 - [FluentConfiguration](#T-IoC-FluentConfiguration 'IoC.FluentConfiguration')
@@ -162,6 +161,9 @@
   - [Default](#F-IoC-Features-HighPerformanceFeature-Default 'IoC.Features.HighPerformanceFeature.Default')
   - [DynamicAssemblyName](#F-IoC-Features-HighPerformanceFeature-DynamicAssemblyName 'IoC.Features.HighPerformanceFeature.DynamicAssemblyName')
   - [Apply()](#M-IoC-Features-HighPerformanceFeature-Apply-IoC-IContainer- 'IoC.Features.HighPerformanceFeature.Apply(IoC.IContainer)')
+- [IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy')
+  - [GetMethods(methods)](#M-IoC-IAutowiringStrategy-GetMethods-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}- 'IoC.IAutowiringStrategy.GetMethods(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}})')
+  - [SelectConstructor(constructors)](#M-IoC-IAutowiringStrategy-SelectConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}}- 'IoC.IAutowiringStrategy.SelectConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})')
 - [IBinding\`1](#T-IoC-IBinding`1 'IoC.IBinding`1')
   - [Container](#P-IoC-IBinding`1-Container 'IoC.IBinding`1.Container')
   - [Lifetime](#P-IoC-IBinding`1-Lifetime 'IoC.IBinding`1.Lifetime')
@@ -195,7 +197,7 @@
   - [Compile(resolverExpression)](#M-IoC-Extensibility-IExpressionCompiler-Compile-System-Linq-Expressions-LambdaExpression- 'IoC.Extensibility.IExpressionCompiler.Compile(System.Linq.Expressions.LambdaExpression)')
 - [IIssueResolver](#T-IoC-Extensibility-IIssueResolver 'IoC.Extensibility.IIssueResolver')
   - [CannotBuildExpression(buildContext,dependency,lifetime)](#M-IoC-Extensibility-IIssueResolver-CannotBuildExpression-IoC-Extensibility-IBuildContext,IoC-IDependency,IoC-ILifetime- 'IoC.Extensibility.IIssueResolver.CannotBuildExpression(IoC.Extensibility.IBuildContext,IoC.IDependency,IoC.ILifetime)')
-  - [CannotFindConstructor(type)](#M-IoC-Extensibility-IIssueResolver-CannotFindConstructor-System-Type- 'IoC.Extensibility.IIssueResolver.CannotFindConstructor(System.Type)')
+  - [CannotFindConstructor(constructors)](#M-IoC-Extensibility-IIssueResolver-CannotFindConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}}- 'IoC.Extensibility.IIssueResolver.CannotFindConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})')
   - [CannotGetGenericTypeArguments(type)](#M-IoC-Extensibility-IIssueResolver-CannotGetGenericTypeArguments-System-Type- 'IoC.Extensibility.IIssueResolver.CannotGetGenericTypeArguments(System.Type)')
   - [CannotGetResolver\`\`1(container,key)](#M-IoC-Extensibility-IIssueResolver-CannotGetResolver``1-IoC-IContainer,IoC-Key- 'IoC.Extensibility.IIssueResolver.CannotGetResolver``1(IoC.IContainer,IoC.Key)')
   - [CannotParseLifetime(statementText,statementLineNumber,statementPosition,lifetimeName)](#M-IoC-Extensibility-IIssueResolver-CannotParseLifetime-System-String,System-Int32,System-Int32,System-String- 'IoC.Extensibility.IIssueResolver.CannotParseLifetime(System.String,System.Int32,System.Int32,System.String)')
@@ -206,6 +208,9 @@
   - [CyclicDependenceDetected(key,reentrancy)](#M-IoC-Extensibility-IIssueResolver-CyclicDependenceDetected-IoC-Key,System-Int32- 'IoC.Extensibility.IIssueResolver.CyclicDependenceDetected(IoC.Key,System.Int32)')
 - [ILifetime](#T-IoC-ILifetime 'IoC.ILifetime')
   - [Clone()](#M-IoC-ILifetime-Clone 'IoC.ILifetime.Clone')
+- [IMethod\`1](#T-IoC-IMethod`1 'IoC.IMethod`1')
+  - [Info](#P-IoC-IMethod`1-Info 'IoC.IMethod`1.Info')
+  - [Item](#P-IoC-IMethod`1-Item-System-Int32- 'IoC.IMethod`1.Item(System.Int32)')
 - [ImplicitNotNullAttribute](#T-IoC-ImplicitNotNullAttribute 'IoC.ImplicitNotNullAttribute')
 - [ImplicitUseKindFlags](#T-IoC-ImplicitUseKindFlags 'IoC.ImplicitUseKindFlags')
   - [Access](#F-IoC-ImplicitUseKindFlags-Access 'IoC.ImplicitUseKindFlags.Access')
@@ -768,59 +773,6 @@ The roor container.
 | ---- | ---- | ----------- |
 | name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The optional name of the container. |
 
-<a name='M-IoC-Container-Create-IoC-IConfiguration[]-'></a>
-### Create(configurations) `method` [#](#M-IoC-Container-Create-IoC-IConfiguration[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Creates a root container with specified features.
-
-##### Returns
-
-The roor container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The set of features. |
-
-<a name='M-IoC-Container-Create-System-String,IoC-IContainer-'></a>
-### Create(name,baseContainer) `method` [#](#M-IoC-Container-Create-System-String,IoC-IContainer- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Creates a root container with basic features.
-
-##### Returns
-
-The roor container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The optional name of the container. |
-| baseContainer | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') |  |
-
-<a name='M-IoC-Container-Create-System-String,IoC-IConfiguration[]-'></a>
-### Create(name,configurations) `method` [#](#M-IoC-Container-Create-System-String,IoC-IConfiguration[]- 'Go To Here') [=](#contents 'Back To Contents')
-
-##### Summary
-
-Creates a root container with specified name and features.
-
-##### Returns
-
-The roor container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The optional name of the container. |
-| configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The set of features. |
-
 <a name='M-IoC-Container-CreateBasic-System-String-'></a>
 ### CreateBasic(name) `method` [#](#M-IoC-Container-CreateBasic-System-String- 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -1231,6 +1183,43 @@ The validation result.
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
 
+<a name='T-IoC-FluentAutowiring'></a>
+## FluentAutowiring [#](#T-IoC-FluentAutowiring 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents extensions for autowring.
+
+<a name='M-IoC-FluentAutowiring-TryInjectDependency``1-IoC-IMethod{``0},System-Int32,System-Type,System-Object-'></a>
+### TryInjectDependency\`\`1(method,parameterPosition,dependencyType,dependencyTag) `method` [#](#M-IoC-FluentAutowiring-TryInjectDependency``1-IoC-IMethod{``0},System-Int32,System-Type,System-Object- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Injects dependency to parameter.
+
+##### Returns
+
+True if success.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| method | [IoC.IMethod{\`\`0}](#T-IoC-IMethod{``0} 'IoC.IMethod{``0}') | The target method or constructor. |
+| parameterPosition | [System.Int32](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Int32 'System.Int32') | The parameter's position. |
+| dependencyType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The dependency's type. |
+| dependencyTag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The optional dependency's tag value. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| TMethodInfo |  |
+
 <a name='T-IoC-FluentBind'></a>
 ## FluentBind [#](#T-IoC-FluentBind 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -1567,8 +1556,8 @@ The binding token.
 | ---- | ----------- |
 | T | The instance type. |
 
-<a name='M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Func{System-Collections-Generic-IEnumerable{System-Reflection-MethodBase},System-Collections-Generic-IEnumerable{System-Reflection-MethodBase}}-'></a>
-### To(binding,type,methodsProvider) `method` [#](#M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Func{System-Collections-Generic-IEnumerable{System-Reflection-MethodBase},System-Collections-Generic-IEnumerable{System-Reflection-MethodBase}}- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,IoC-IAutowiringStrategy-'></a>
+### To(binding,type,autowiringStrategy) `method` [#](#M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,IoC-IAutowiringStrategy- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -1584,10 +1573,10 @@ The registration token.
 | ---- | ---- | ----------- |
 | binding | [IoC.IBinding{System.Object}](#T-IoC-IBinding{System-Object} 'IoC.IBinding{System.Object}') | The binding token. |
 | type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
-| methodsProvider | [System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Func 'System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}}') | Provider of a costructor and initializing methods. |
+| autowiringStrategy | [IoC.IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy') | The optional autowring strategy. |
 
-<a name='M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Func{System-Collections-Generic-IEnumerable{System-Reflection-MethodBase},System-Collections-Generic-IEnumerable{System-Reflection-MethodBase}}-'></a>
-### To\`\`1(binding,methodsProvider) `method` [#](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Func{System-Collections-Generic-IEnumerable{System-Reflection-MethodBase},System-Collections-Generic-IEnumerable{System-Reflection-MethodBase}}- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-FluentBind-To``1-IoC-IBinding{``0},IoC-IAutowiringStrategy-'></a>
+### To\`\`1(binding,autowiringStrategy) `method` [#](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},IoC-IAutowiringStrategy- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -1602,7 +1591,7 @@ The registration token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') | The binding token. |
-| methodsProvider | [System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Func 'System.Func{System.Collections.Generic.IEnumerable{System.Reflection.MethodBase},System.Collections.Generic.IEnumerable{System.Reflection.MethodBase}}') | Provider of a costructor and initializing methods. |
+| autowiringStrategy | [IoC.IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy') | The optional autowring strategy. |
 
 ##### Generic Types
 
@@ -2935,6 +2924,51 @@ The full name of dynamic assembly. Could be use with `InternalsVisibleTo` attrib
 
 This method has no parameters.
 
+<a name='T-IoC-IAutowiringStrategy'></a>
+## IAutowiringStrategy [#](#T-IoC-IAutowiringStrategy 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents an abstraction for an autowirin method.
+
+<a name='M-IoC-IAutowiringStrategy-GetMethods-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}-'></a>
+### GetMethods(methods) `method` [#](#M-IoC-IAutowiringStrategy-GetMethods-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Provides methods from a set of available methods in the appropriate order.
+
+##### Returns
+
+The set of initializing methods in the appropriate order.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| methods | [System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}') | The set of available methods. |
+
+<a name='M-IoC-IAutowiringStrategy-SelectConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}}-'></a>
+### SelectConstructor(constructors) `method` [#](#M-IoC-IAutowiringStrategy-SelectConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}}- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Selects a constructor from a set of available constructors.
+
+##### Returns
+
+The selected constructor.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| constructors | [System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}}') | The set of available constructors. |
+
 <a name='T-IoC-IBinding`1'></a>
 ## IBinding\`1 [#](#T-IoC-IBinding`1 'Go To Here') [=](#contents 'Back To Contents')
 
@@ -3403,8 +3437,8 @@ The resulting expression.
 | dependency | [IoC.IDependency](#T-IoC-IDependency 'IoC.IDependency') | The dependeny. |
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The lifetime. |
 
-<a name='M-IoC-Extensibility-IIssueResolver-CannotFindConstructor-System-Type-'></a>
-### CannotFindConstructor(type) `method` [#](#M-IoC-Extensibility-IIssueResolver-CannotFindConstructor-System-Type- 'Go To Here') [=](#contents 'Back To Contents')
+<a name='M-IoC-Extensibility-IIssueResolver-CannotFindConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}}-'></a>
+### CannotFindConstructor(constructors) `method` [#](#M-IoC-Extensibility-IIssueResolver-CannotFindConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}}- 'Go To Here') [=](#contents 'Back To Contents')
 
 ##### Summary
 
@@ -3412,13 +3446,13 @@ Handles the scenario when cannot find a constructor.
 
 ##### Returns
 
-The constructor information.
+The constructor.
 
 ##### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The target type. |
+| constructors | [System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}}') | Available constructors. |
 
 <a name='M-IoC-Extensibility-IIssueResolver-CannotGetGenericTypeArguments-System-Type-'></a>
 ### CannotGetGenericTypeArguments(type) `method` [#](#M-IoC-Extensibility-IIssueResolver-CannotGetGenericTypeArguments-System-Type- 'Go To Here') [=](#contents 'Back To Contents')
@@ -3596,6 +3630,47 @@ Clone this lifetime to use with generic instances.
 ##### Parameters
 
 This method has no parameters.
+
+<a name='T-IoC-IMethod`1'></a>
+## IMethod\`1 [#](#T-IoC-IMethod`1 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents an abstraction for an autowirin method.
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| TMethodInfo | The type of method info. |
+
+<a name='P-IoC-IMethod`1-Info'></a>
+### Info `property` [#](#P-IoC-IMethod`1-Info 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+The method's information.
+
+<a name='P-IoC-IMethod`1-Item-System-Int32-'></a>
+### Item `property` [#](#P-IoC-IMethod`1-Item-System-Int32- 'Go To Here') [=](#contents 'Back To Contents')
+
+##### Summary
+
+Parameter's expression at the position.
+
+##### Returns
+
+
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| position | [System.Int32](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Int32 'System.Int32') |  |
 
 <a name='T-IoC-ImplicitNotNullAttribute'></a>
 ## ImplicitNotNullAttribute [#](#T-IoC-ImplicitNotNullAttribute 'Go To Here') [=](#contents 'Back To Contents')

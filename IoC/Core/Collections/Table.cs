@@ -67,12 +67,6 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool TryGet(int hashCode, TKey key, out TValue value)
-        {
-            return Buckets[hashCode & (Divisor - 1)].TryGet(hashCode, key, out value);
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
         public TValue Get(int hashCode, TKey key)
         {
             return Buckets[hashCode & (Divisor - 1)].Get(hashCode, key);

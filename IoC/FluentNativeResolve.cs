@@ -2,6 +2,7 @@
 {
     using System;
     using System.Runtime.CompilerServices;
+    using static Core.Collections.Extensions;
 
     /// <summary>
     /// Represents extensions to resolve from a native container.
@@ -18,38 +19,8 @@
         [MethodImpl((MethodImplOptions) 256)]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            var type = typeof(T);
-            var hashCode = HashCode<T>.Shared;
-            var tree = container.ResolversByType.Buckets[hashCode & (container.ResolversByType.Divisor - 1)];
-            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
-            {
-                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
-            }
-
-            var treeEntry = tree.Current;
-            if (tree.Height != 0)
-            {
-                if (type == treeEntry.Key)
-                {
-                    return ((Resolver<T>) treeEntry.Value)(container, Container.EmptyArgs);
-                }
-
-                var entryDuplicates = treeEntry.Duplicates;
-                if (entryDuplicates != null)
-                {
-                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
-                    {
-                        if (entryDuplicates[i].Key != type)
-                        {
-                            continue;
-                        }
-
-                        return ((Resolver<T>) entryDuplicates[i].Value)(container, Container.EmptyArgs);
-                    }
-                }
-            }
-
-            return container.GetResolver<T>()(container, Container.EmptyArgs);
+            return ((Resolver<T>)container.ResolversByType.GetByType(HashCode<T>.Shared, typeof(T))
+                 ?? container.GetResolver<T>())(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -62,39 +33,9 @@
         [MethodImpl((MethodImplOptions)256)]
         public static T Resolve<T>([NotNull] this Container container, Tag tag)
         {
-            var type = typeof(T);
-            var key = new Key(type, tag.Value);
-            var hashCode = key.GetHashCode();
-            var tree = container.Resolvers.Buckets[hashCode & (container.ResolversByType.Divisor - 1)];
-            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
-            {
-                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
-            }
-
-            var treeEntry = tree.Current;
-            if (tree.Height != 0)
-            {
-                if (Equals(key, treeEntry.Key))
-                {
-                    return ((Resolver<T>) treeEntry.Value)(container, Container.EmptyArgs);
-                }
-
-                var entryDuplicates = treeEntry.Duplicates;
-                if (entryDuplicates != null)
-                {
-                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
-                    {
-                        if (!Equals(entryDuplicates[i].Key, key))
-                        {
-                            continue;
-                        }
-
-                        return ((Resolver<T>) entryDuplicates[i].Value)(container, Container.EmptyArgs);
-                    }
-                }
-            }
-
-            return container.GetResolver<T>(tag)(container, Container.EmptyArgs);
+            var key = new Key(typeof(T), tag);
+            return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
+                    ?? container.GetResolver<T>(tag))(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -107,38 +48,8 @@
         [MethodImpl((MethodImplOptions) 256)]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            var hashCode = HashCode<T>.Shared;
-            var type = typeof(T);
-            var tree = container.ResolversByType.Buckets[hashCode & (container.ResolversByType.Divisor - 1)];
-            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
-            {
-                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
-            }
-
-            var treeEntry = tree.Current;
-            if (tree.Height != 0)
-            {
-                if (ReferenceEquals(type, treeEntry.Key))
-                {
-                    return ((Resolver<T>) treeEntry.Value)(container, args);
-                }
-
-                var entryDuplicates = treeEntry.Duplicates;
-                if (entryDuplicates != null)
-                {
-                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
-                    {
-                        if (!ReferenceEquals(entryDuplicates[i].Key, type))
-                        {
-                            continue;
-                        }
-
-                        return ((Resolver<T>) entryDuplicates[i].Value)(container, args);
-                    }
-                }
-            }
-
-            return container.GetResolver<T>(type)(container, args);
+            return ((Resolver<T>)container.ResolversByType.GetByType(HashCode<T>.Shared, typeof(T))
+                    ?? container.GetResolver<T>())(container, args);
         }
 
         /// <summary>
@@ -152,39 +63,9 @@
         [MethodImpl((MethodImplOptions)256)]
         public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            var type = typeof(T);
-            var key = new Key(type, tag.Value);
-            var hashCode = key.GetHashCode();
-            var tree = container.Resolvers.Buckets[hashCode & (container.ResolversByType.Divisor - 1)];
-            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
-            {
-                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
-            }
-
-            var treeEntry = tree.Current;
-            if (tree.Height != 0)
-            {
-                if (Equals(key, treeEntry.Key))
-                {
-                    return ((Resolver<T>) treeEntry.Value)(container, args);
-                }
-
-                var entryDuplicates = treeEntry.Duplicates;
-                if (entryDuplicates != null)
-                {
-                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
-                    {
-                        if (!Equals(entryDuplicates[i].Key, key))
-                        {
-                            continue;
-                        }
-
-                        return ((Resolver<T>) entryDuplicates[i].Value)(container, args);
-                    }
-                }
-            }
-
-            return container.GetResolver<T>(tag)(container, args);
+            var key = new Key(typeof(T), tag);
+            return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
+                    ?? container.GetResolver<T>(tag))(container, args);
         }
 
         /// <summary>
@@ -197,37 +78,8 @@
         [MethodImpl((MethodImplOptions)256)]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type)
         {
-            var hashCode = type.GetHashCode();
-            var tree = container.ResolversByType.Buckets[hashCode & (container.ResolversByType.Divisor - 1)];
-            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
-            {
-                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
-            }
-
-            var treeEntry = tree.Current;
-            if (tree.Height != 0)
-            {
-                if (ReferenceEquals(type, treeEntry.Key))
-                {
-                    return ((Resolver<T>) treeEntry.Value)(container, Container.EmptyArgs);
-                }
-
-                var entryDuplicates = treeEntry.Duplicates;
-                if (entryDuplicates != null)
-                {
-                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
-                    {
-                        if (!ReferenceEquals(entryDuplicates[i].Key, type))
-                        {
-                            continue;
-                        }
-
-                        return ((Resolver<T>) entryDuplicates[i].Value)(container, Container.EmptyArgs);
-                    }
-                }
-            }
-
-            return container.GetResolver<T>(type)(container, Container.EmptyArgs);
+            return ((Resolver<T>)container.ResolversByType.GetByType(type.GetHashCode(), typeof(T))
+                    ?? container.GetResolver<T>(type))(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -241,38 +93,9 @@
         [MethodImpl((MethodImplOptions)256)]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
-            var key = new Key(type, tag.Value);
-            var hashCode = key.GetHashCode();
-            var tree = container.Resolvers.Buckets[hashCode & (container.ResolversByType.Divisor - 1)];
-            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
-            {
-                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
-            }
-
-            var treeEntry = tree.Current;
-            if (tree.Height != 0)
-            {
-                if (Equals(key, treeEntry.Key))
-                {
-                    return ((Resolver<T>) treeEntry.Value)(container, Container.EmptyArgs);
-                }
-
-                var entryDuplicates = treeEntry.Duplicates;
-                if (entryDuplicates != null)
-                {
-                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
-                    {
-                        if (!Equals(entryDuplicates[i].Key, key))
-                        {
-                            continue;
-                        }
-
-                        return ((Resolver<T>) entryDuplicates[i].Value)(container, Container.EmptyArgs);
-                    }
-                }
-            }
-
-            return container.GetResolver<T>(type, tag)(container, Container.EmptyArgs);
+            var key = new Key(type, tag);
+            return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
+                    ?? container.GetResolver<T>(type, tag))(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -286,37 +109,8 @@
         [MethodImpl((MethodImplOptions)256)]
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            var hashCode = type.GetHashCode();
-            var tree = container.ResolversByType.Buckets[hashCode & (container.ResolversByType.Divisor - 1)];
-            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
-            {
-                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
-            }
-
-            var treeEntry = tree.Current;
-            if (tree.Height != 0)
-            {
-                if (ReferenceEquals(type, treeEntry.Key))
-                {
-                    return ((Resolver<T>) treeEntry.Value)(container, Container.EmptyArgs);
-                }
-
-                var entryDuplicates = treeEntry.Duplicates;
-                if (entryDuplicates != null)
-                {
-                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
-                    {
-                        if (!ReferenceEquals(entryDuplicates[i].Key, type))
-                        {
-                            continue;
-                        }
-
-                        return ((Resolver<T>) entryDuplicates[i].Value)(container, args);
-                    }
-                }
-            }
-
-            return container.GetResolver<T>(type)(container, args);
+            return ((Resolver<T>)container.ResolversByType.GetByType(type.GetHashCode(), typeof(T))
+                    ?? container.GetResolver<T>(type))(container, args);
         }
 
         /// <summary>
@@ -331,38 +125,9 @@
         [MethodImpl((MethodImplOptions)256)]
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            var key = new Key(type, tag.Value);
-            var hashCode = key.GetHashCode();
-            var tree = container.Resolvers.Buckets[hashCode & (container.ResolversByType.Divisor - 1)];
-            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
-            {
-                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
-            }
-
-            var treeEntry = tree.Current;
-            if (tree.Height != 0)
-            {
-                if (Equals(key, treeEntry.Key))
-                {
-                    return ((Resolver<T>) treeEntry.Value)(container, args);
-                }
-
-                var entryDuplicates = treeEntry.Duplicates;
-                if (entryDuplicates != null)
-                {
-                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
-                    {
-                        if (!Equals(entryDuplicates[i].Key, key))
-                        {
-                            continue;
-                        }
-
-                        return ((Resolver<T>) entryDuplicates[i].Value)(container, args);
-                    }
-                }
-            }
-
-            return container.GetResolver<T>(type, tag)(container, args);
+            var key = new Key(type, tag);
+            return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
+                    ?? container.GetResolver<T>(type, tag))(container, args);
         }
 
         private static class HashCode<T>

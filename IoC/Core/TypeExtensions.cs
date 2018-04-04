@@ -19,11 +19,12 @@
             lock (LockObject)
             {
                 var hashCode = type.GetHashCode();
-                if (_typeInfos.TryGet(hashCode, type, out var typeInfo))
+                var typeInfo = _typeInfos.GetByType(hashCode, type);
+                if (typeInfo != null)
                 {
                     return typeInfo;
                 }
-
+                
                 typeInfo = new InternalTypeInfo(type);
                 _typeInfos = _typeInfos.Set(hashCode, type, typeInfo);
                 return typeInfo;

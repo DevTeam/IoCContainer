@@ -17,6 +17,9 @@
     <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
     <DocumentationFile>..\Docs\IoC_$(TargetFramework).xml</DocumentationFile>
     <WarningsAsErrors />
+    <MSBuildNative>C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild</MSBuildNative>
+    <HasMSBuildNative Condition="Exists('$(XamlTargets)')">true</HasMSBuildNative>
+    <XamlTargets>$(MSBuildNative)\Microsoft\WindowsXaml\v15.0\8.21\Microsoft.Windows.UI.Xaml.CSharp.Targets</XamlTargets>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
@@ -26,7 +29,7 @@
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
-  <PropertyGroup Condition="'$(TargetFramework)' == 'uap10.0'">
+  <PropertyGroup Condition="'$(TargetFramework)'=='uap10.0'">
     <DefaultLanguage>en-US</DefaultLanguage>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
     <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
@@ -37,15 +40,15 @@
     <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
     <DefineConstants>$(DefineConstants);WINDOWS_UWP;NO_HTTPS</DefineConstants>
     <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
-    <LanguageTargets>C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild\Microsoft\WindowsXaml\v15.0\8.21\Microsoft.Windows.UI.Xaml.CSharp.Targets</LanguageTargets>
+    <LanguageTargets Condition="Exists('$(XamlTargets)')">$(XamlTargets)</LanguageTargets>
   </PropertyGroup>
 
-  <ItemGroup Condition=" '$(TargetFramework)' == 'uap10.0' ">
+  <ItemGroup Condition="'$(TargetFramework)'=='uap10.0'">
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform " Version="5.2.2" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Vsxmd" Version="1.2.0">
+    <PackageReference Include="Vsxmd" Version="1.2.0" Condition="$(HasMSBuildNative)=='true'">
         <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <None Update="README_TEMPLATE.md">

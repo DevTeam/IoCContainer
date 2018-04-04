@@ -42,6 +42,45 @@ namespace IoC.Core.Collections
             Height = height;
         }
 
+        [MethodImpl((MethodImplOptions)256)]
+        public TValue Get(int hashCode, TKey key)
+        {
+            var tree = this;
+            var height = Height;
+            var treeEntry = Current;
+            while (height != 0 && treeEntry.HashCode != hashCode)
+            {
+                tree = hashCode < treeEntry.HashCode ? tree.Left : tree.Right;
+                height = tree.Height;
+                treeEntry = tree.Current;
+            }
+
+            if (height != 0)
+            {
+                if (ReferenceEquals(key, treeEntry.Key) || key.Equals(treeEntry.Key))
+                {
+                    return treeEntry.Value;
+                }
+
+                var entryDuplicates = treeEntry.Duplicates;
+                if (entryDuplicates != null)
+                {
+                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
+                    {
+                        var dupKey = entryDuplicates[i].Key;
+                        if (!(ReferenceEquals(dupKey, key) || Equals(dupKey, key)))
+                        {
+                            continue;
+                        }
+
+                        return entryDuplicates[i].Value;
+                    }
+                }
+            }
+
+            return default(TValue);
+        }
+
         public Tree<TKey, TValue> Set(int hashCode, TKey key, TValue value)
         {
             if (Height == 0)
@@ -64,7 +103,7 @@ namespace IoC.Core.Collections
                 }
 
                 var duplicateIndex = entryDuplicates.Length - 1;
-                while (duplicateIndex >= 0 && !Equals(entryDuplicates[duplicateIndex].Key, entryKey))
+                while (duplicateIndex >= 0 && !(ReferenceEquals(entryDuplicates[duplicateIndex].Key, entryKey) || Equals(entryDuplicates[duplicateIndex].Key, entryKey)))
                 {
                     --duplicateIndex;
                 }
@@ -105,80 +144,7 @@ namespace IoC.Core.Collections
             // Too big depth
             return new Tree<TKey, TValue>(Current, Left, Right.Set(hashCode, key, value)).RebalanceTree();
         }
-
-        [MethodImpl((MethodImplOptions)256)]
-        public bool TryGet(int hashCode, TKey key, out TValue value)
-        {
-            var tree = this;
-            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
-            {
-                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
-            }
-
-            var treeEntry = tree.Current;
-            if (tree.Height != 0)
-            {
-                if (ReferenceEquals(key, treeEntry.Key) || key.Equals(treeEntry.Key))
-                {
-                    value = treeEntry.Value;
-                    return true;
-                }
-
-                var entryDuplicates = treeEntry.Duplicates;
-                if (entryDuplicates != null)
-                {
-                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
-                    {
-                        if (!Equals(entryDuplicates[i].Key, key))
-                        {
-                            continue;
-                        }
-
-                        value = entryDuplicates[i].Value;
-                        return true;
-                    }
-                }
-            }
-
-            value = default(TValue);
-            return false;
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        public TValue Get(int hashCode, TKey key)
-        {
-            var tree = this;
-            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
-            {
-                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
-            }
-
-            var treeEntry = tree.Current;
-            if (tree.Height != 0)
-            {
-                if (ReferenceEquals(key, treeEntry.Key) || key.Equals(treeEntry.Key))
-                {
-                    return treeEntry.Value;
-                }
-
-                var entryDuplicates = treeEntry.Duplicates;
-                if (entryDuplicates != null)
-                {
-                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
-                    {
-                        if (!Equals(entryDuplicates[i].Key, key))
-                        {
-                            continue;
-                        }
-
-                        return entryDuplicates[i].Value;
-                    }
-                }
-            }
-
-            return default(TValue);
-        }
-
+        
         public Tree<TKey, TValue> Remove(int hashCode, TKey key, bool ignoreKey = false)
         {
             if (Height == 0)

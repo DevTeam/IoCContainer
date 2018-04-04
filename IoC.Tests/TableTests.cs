@@ -20,11 +20,8 @@
             table = table.Set("c".GetHashCode(), "Z", "Z");
 
             // Then
-            table.TryGet("c".GetHashCode(), "c", out var val).ShouldBeTrue();
-            val.ShouldBe("c");
-
-            table.TryGet("c".GetHashCode(), "Z", out var val2).ShouldBeTrue();
-            val2.ShouldBe("Z");
+            table.Get("c".GetHashCode(), "c").ShouldBe("c");
+            table.Get("c".GetHashCode(), "Z").ShouldBe("Z");
         }
 
         [Fact]
@@ -42,7 +39,7 @@
             table = table.Remove("c".GetHashCode(), "c");
 
             // Then
-            table.TryGet("c".GetHashCode(), "c", out var _).ShouldBeFalse();
+            table.Get("c".GetHashCode(), "c").ShouldBe(null);
         }
     }
 }

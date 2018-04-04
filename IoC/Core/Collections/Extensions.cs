@@ -27,21 +27,23 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        [CanBeNull]
-        public static Resolver<T> TryGetResolver<T>(Table<Type, Delegate> resolversByType, int hashCode, Type type)
+        public static TValue GetByType<TValue>(this Table<Type, TValue> table, int hashCode, Type type)
         {
-            var tree = resolversByType.Buckets[hashCode & (resolversByType.Divisor - 1)];
-            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
+            var tree = table.Buckets[hashCode & (table.Divisor - 1)];
+            var height = tree.Height;
+            var treeEntry = tree.Current;
+            while (height != 0 && treeEntry.HashCode != hashCode)
             {
-                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
+                tree = hashCode < treeEntry.HashCode ? tree.Left : tree.Right;
+                height = tree.Height;
+                treeEntry = tree.Current;
             }
 
-            var treeEntry = tree.Current;
-            if (tree.Height != 0)
+            if (height != 0)
             {
-                if (ReferenceEquals(type, treeEntry.Key))
+                if (type == treeEntry.Key)
                 {
-                    return treeEntry.Value as Resolver<T>;
+                    return treeEntry.Value;
                 }
 
                 var entryDuplicates = treeEntry.Duplicates;
@@ -49,60 +51,17 @@
                 {
                     for (var i = entryDuplicates.Length - 1; i >= 0; --i)
                     {
-                        if (!ReferenceEquals(entryDuplicates[i].Key, type))
+                        if (entryDuplicates[i].Key != type)
                         {
                             continue;
                         }
 
-                        return entryDuplicates[i].Value as Resolver<T>;
+                        return entryDuplicates[i].Value;
                     }
                 }
             }
 
-            return null;
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        [CanBeNull]
-        public static Resolver<T> TryGetResolver<T>(Table<Type, Delegate> resolversByType, Table<Key, Delegate> resolvers, Type type, object tag)
-        {
-            if (tag == null)
-            {
-                return TryGetResolver<T>(resolversByType, type.GetHashCode(), type);
-            }
-
-            var key = new Key(type, tag);
-            var hashCode = key.GetHashCode();
-            var tree = resolvers.Buckets[hashCode & (resolvers.Divisor - 1)];
-            while (tree.Height != 0 && tree.Current.HashCode != hashCode)
-            {
-                tree = hashCode < tree.Current.HashCode ? tree.Left : tree.Right;
-            }
-
-            var treeEntry = tree.Current;
-            if (tree.Height != 0)
-            {
-                if (key.Equals(treeEntry.Key))
-                {
-                    return treeEntry.Value as Resolver<T>;
-                }
-
-                var entryDuplicates = treeEntry.Duplicates;
-                if (entryDuplicates != null)
-                {
-                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
-                    {
-                        if (!Equals(entryDuplicates[i].Key, key))
-                        {
-                            continue;
-                        }
-
-                        return entryDuplicates[i].Value as Resolver<T>;
-                    }
-                }
-            }
-
-            return null;
+            return default(TValue);
         }
     }
 }
