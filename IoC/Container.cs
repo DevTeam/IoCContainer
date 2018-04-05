@@ -204,7 +204,7 @@
         {
             if (tag == null)
             {
-                resolver = (Resolver<T>) ResolversByType.GetByType(type.GetHashCode(), type);
+                resolver = (Resolver<T>) ResolversByType.FastGet(type.GetHashCode(), type);
                 if (resolver != default(Resolver<T>))
                 {
                     return true;
@@ -228,7 +228,7 @@
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(ShortKey type, out Resolver<T> resolver, IContainer container = null)
         {
-            resolver = (Resolver<T>) ResolversByType.GetByType(type.GetHashCode(), type);
+            resolver = (Resolver<T>) ResolversByType.FastGet(type.GetHashCode(), type);
             if (resolver != default(Resolver<T>))
             {
                 return true;

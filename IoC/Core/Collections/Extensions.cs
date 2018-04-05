@@ -27,37 +27,16 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        public static TValue GetByType<TValue>(this Table<Type, TValue> table, int hashCode, Type type)
+        public static TValue FastGet<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
+            where TKey: class
         {
-            var tree = table.Buckets[hashCode & (table.Divisor - 1)];
-            var height = tree.Height;
-            var treeEntry = tree.Current;
-            while (height != 0 && treeEntry.HashCode != hashCode)
+            var bucket = table.Buckets.Items[hashCode & (table.Divisor - 1)];
+            for (var index = 0; index < bucket.Count; index++)
             {
-                tree = hashCode < treeEntry.HashCode ? tree.Left : tree.Right;
-                height = tree.Height;
-                treeEntry = tree.Current;
-            }
-
-            if (height != 0)
-            {
-                if (type == treeEntry.Key)
+                var keyValue = bucket.KeyValues.Items[index];
+                if (keyValue.Key == key)
                 {
-                    return treeEntry.Value;
-                }
-
-                var entryDuplicates = treeEntry.Duplicates;
-                if (entryDuplicates != null)
-                {
-                    for (var i = entryDuplicates.Length - 1; i >= 0; --i)
-                    {
-                        if (entryDuplicates[i].Key != type)
-                        {
-                            continue;
-                        }
-
-                        return entryDuplicates[i].Value;
-                    }
+                    return keyValue.Value;
                 }
             }
 

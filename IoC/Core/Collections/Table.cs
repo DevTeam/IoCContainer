@@ -1,107 +1,139 @@
 ﻿namespace IoC.Core.Collections
 {
-    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Runtime.CompilerServices;
 
-    internal sealed class Table<TKey, TValue> : IEnumerable<Tree<TKey, TValue>.KeyValue>
+    [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
+    internal sealed class Table<TKey, TValue>: IEnumerable<KeyValue<TKey, TValue>>
     {
         public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>();
         public readonly int Divisor;
-        public readonly Tree<TKey, TValue>[] Buckets;
+        public readonly ResizableArray<Bucket> Buckets;
         private readonly int _count;
 
+        [MethodImpl((MethodImplOptions)256)]
+        private Table()
+        {
+            Divisor = 2;
+            Buckets = ResizableArray<Bucket>.Create(Divisor, Bucket.EmptyBucket);
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
         private Table(Table<TKey, TValue> origin, int hashCode, TKey key, TValue value)
         {
-            int bucketIndex;
+            int newBucketIndex;
             _count = origin._count + 1;
             if (origin._count >= origin.Divisor)
             {
                 Divisor = origin.Divisor << 1;
-                Buckets = new Tree<TKey, TValue>[Divisor];
-                InitializeBuckets(0, Divisor);
-                var originBuckets = origin.Buckets;
-                foreach (var originBucket in originBuckets)
+                Buckets = ResizableArray<Bucket>.Create(Divisor, Bucket.EmptyBucket);
+                var originBuckets = origin.Buckets.Items;
+                for (var originBucketIndex = 0; originBucketIndex < originBuckets.Length; originBucketIndex++)
                 {
-                    foreach (var keyValue in originBucket)
+                    var originKeyValues = originBuckets[originBucketIndex].KeyValues.Items;
+                    for (var index = 0; index < originKeyValues.Length; index++)
                     {
-                        bucketIndex = keyValue.HashCode & (Divisor - 1);
-                        Buckets[bucketIndex] = Buckets[bucketIndex].Set(keyValue.HashCode, keyValue.Key, keyValue.Value);
+                        var keyValue = originKeyValues[index];
+                        newBucketIndex = keyValue.HashCode & (Divisor - 1);
+                        Buckets.Items[newBucketIndex] = Buckets.Items[newBucketIndex].Add(keyValue);
                     }
                 }
             }
             else
             {
                 Divisor = origin.Divisor;
-                Buckets = new Tree<TKey, TValue>[Divisor];
-                Array.Copy(origin.Buckets, Buckets, origin.Divisor);
+                Buckets = origin.Buckets.Copy();
             }
 
-            bucketIndex = hashCode & (Divisor - 1);
-            Buckets[bucketIndex] = Buckets[bucketIndex].Set(hashCode, key, value);
-        }
-
-        private Table(Table<TKey, TValue> origin)
-        {
-            Divisor = origin.Divisor;
-            _count = origin._count;
-            var length = origin.Buckets.Length;
-            Buckets = new Tree<TKey, TValue>[length];
-            Array.Copy(origin.Buckets, Buckets, length);
-        }
-
-        private Table()
-        {
-            Buckets = new Tree<TKey, TValue>[2];
-            Divisor = 2;
-            InitializeBuckets(0, 2);
+            newBucketIndex = hashCode & (Divisor - 1);
+            Buckets.Items[newBucketIndex] = Buckets.Items[newBucketIndex].Add(new KeyValue<TKey, TValue>(hashCode, key, value));
         }
 
         [MethodImpl((MethodImplOptions)256)]
+        [Pure]
+        public IEnumerator<KeyValue<TKey, TValue>> GetEnumerator()
+        {
+            for (var bucketIndex = 0; bucketIndex < Buckets.Items.Length; bucketIndex++)
+            {
+                var keyValues = Buckets.Items[bucketIndex].KeyValues.Items;
+                for (var index = 0; index < keyValues.Length; index++)
+                {
+                    var keyValue = keyValues[index];
+                    yield return keyValue;
+                }
+            }
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public Table<TKey, TValue> Set(int hashCode, TKey key, TValue value)
         {
             return new Table<TKey, TValue>(this, hashCode, key, value);
         }
 
         [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public TValue Get(int hashCode, TKey key)
         {
-            return Buckets[hashCode & (Divisor - 1)].Get(hashCode, key);
+            var bucket = Buckets.Items[hashCode & (Divisor - 1)];
+            var keyValues = bucket.KeyValues.Items;
+            for (var index = 0; index < bucket.Count; index++)
+            {
+                var keyValue = keyValues[index];
+                if (keyValue.HashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
+                {
+                    return keyValue.Value;
+                }
+            }
+
+            return default(TValue);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public Table<TKey, TValue> Remove(int hashCode, TKey key)
         {
-            var bucketIndex = hashCode & (Divisor - 1);
-            var newTable = new Table<TKey, TValue>(this);
-            newTable.Buckets[bucketIndex] = newTable.Buckets[bucketIndex].Remove(hashCode, key);
+            var newTable = new Table<TKey, TValue>();
+            foreach (var keyValue in this)
+            {
+                if (keyValue.HashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
+                {
+                    continue;
+                }
+
+                newTable = newTable.Set(keyValue.HashCode, keyValue.Key, keyValue.Value);
+            }
+            
             return newTable;
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
+        internal struct Bucket
         {
-            return GetEnumerator();
-        }
+            public static readonly Bucket EmptyBucket = new Bucket(ResizableArray<KeyValue<TKey, TValue>>.Empty);
+            public ResizableArray<KeyValue<TKey, TValue>> KeyValues;
+            public readonly int Count;
 
-        public IEnumerator<Tree<TKey, TValue>.KeyValue> GetEnumerator()
-        {
-            return Buckets.SelectMany(i => i).GetEnumerator();
-        }
-
-        [SuppressMessage("ReSharper", "UnusedParameter.Local")]
-        private void InitializeBuckets(int startIndex, int count)
-        {
-#if NETCOREAPP2_0
-            Array.Fill(Buckets, Tree<TKey, TValue>.Empty);
-#else
-            for (var i = startIndex; i < count; i++)
+            [MethodImpl((MethodImplOptions)256)]
+            private Bucket(ResizableArray<KeyValue<TKey, TValue>> keyValues)
             {
-                Buckets[i] = Tree<TKey, TValue>.Empty;
+                KeyValues = keyValues;
+                Count = keyValues.Items.Length;
             }
-#endif
+
+            [Pure]
+            [MethodImpl((MethodImplOptions)256)]
+            public Bucket Add(KeyValue<TKey, TValue> keyValue)
+            {
+                return new Bucket(KeyValues.Add(keyValue));
+            }
         }
     }
 }

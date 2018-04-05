@@ -17,10 +17,11 @@
         /// <param name="container">The target container.</param>
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByType(HashCode<T>.Shared, typeof(T))
-                 ?? container.GetResolver<T>())(container, Container.EmptyArgs);
+            return ((Resolver<T>)container.ResolversByType.FastGet(HashCode<T>.Shared, typeof(T))
+                    ?? container.GetResolver<T>())(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -31,6 +32,7 @@
         /// <param name="tag">The tag.</param>
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
         public static T Resolve<T>([NotNull] this Container container, Tag tag)
         {
             var key = new Key(typeof(T), tag);
@@ -46,9 +48,10 @@
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByType(HashCode<T>.Shared, typeof(T))
+            return ((Resolver<T>)container.ResolversByType.FastGet(HashCode<T>.Shared, typeof(T))
                     ?? container.GetResolver<T>())(container, args);
         }
 
@@ -61,6 +64,7 @@
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
         public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
             var key = new Key(typeof(T), tag);
@@ -76,9 +80,10 @@
         /// <param name="type">The resolving instance type.</param>
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByType(type.GetHashCode(), typeof(T))
+            return ((Resolver<T>)container.ResolversByType.FastGet(type.GetHashCode(), typeof(T))
                     ?? container.GetResolver<T>(type))(container, Container.EmptyArgs);
         }
 
@@ -91,6 +96,7 @@
         /// <param name="tag">The tag.</param>
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
             var key = new Key(type, tag);
@@ -107,9 +113,10 @@
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByType(type.GetHashCode(), typeof(T))
+            return ((Resolver<T>)container.ResolversByType.FastGet(type.GetHashCode(), typeof(T))
                     ?? container.GetResolver<T>(type))(container, args);
         }
 
@@ -123,6 +130,7 @@
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
             var key = new Key(type, tag);

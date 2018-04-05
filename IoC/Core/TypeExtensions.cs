@@ -19,7 +19,7 @@
             lock (LockObject)
             {
                 var hashCode = type.GetHashCode();
-                var typeInfo = _typeInfos.GetByType(hashCode, type);
+                var typeInfo = _typeInfos.FastGet(hashCode, type);
                 if (typeInfo != null)
                 {
                     return typeInfo;
