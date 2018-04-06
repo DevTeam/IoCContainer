@@ -1,6 +1,5 @@
 ﻿namespace IoC.Core.Collections
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
@@ -12,7 +11,6 @@
         {
             return ((System.Collections.IStructuralEquatable)array1).Equals(array2, System.Collections.StructuralComparisons.StructuralEqualityComparer);
         }
-
 
         [MethodImpl((MethodImplOptions)256)]
         public static int GetHash<T>([NotNull] this IEnumerable<T> items)

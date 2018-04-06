@@ -10,9 +10,9 @@
     public interface IExpressionCompiler
     {
         /// <summary>
-        /// True if supports a compext type constant.
+        /// True if a refernce constant is supported.
         /// </summary>
-        bool IsSupportingCompextTypeConstant { get; }
+        bool IsReferenceConstantSupported { get; }
 
         /// <summary>
         /// Compiles an expression to a delegate.

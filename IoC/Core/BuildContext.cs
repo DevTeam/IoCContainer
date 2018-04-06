@@ -82,7 +82,7 @@
         public Expression AppendValue(object value, Type type)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            if (_compiler.IsSupportingCompextTypeConstant)
+            if (_compiler.IsReferenceConstantSupported)
             {
                 return Expression.Constant(value, type);
             }

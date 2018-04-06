@@ -89,7 +89,7 @@ namespace IoC.Tests.UsageScenarios
                 // Get a first appropriate constructor
                 .First();
 
-            public IEnumerable<IMethod<MethodInfo>> GetMethods(IEnumerable<IMethod<MethodInfo>> methods) =>
+            public IEnumerable<IMethod<MethodInfo>> GetInitializers(IEnumerable<IMethod<MethodInfo>> methods) =>
                 from method in methods
                 let autowringAttribute = method.Info.GetCustomAttribute<AutowiringAttribute>()
                 // filters methods/property setters containing the attribute Autowiring

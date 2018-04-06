@@ -210,7 +210,7 @@
                 return constructors.Single(i => i.Info.GetParameters().Length == 0);
             }
 
-            public IEnumerable<IMethod<MethodInfo>> GetMethods(IEnumerable<IMethod<MethodInfo>> methods)
+            public IEnumerable<IMethod<MethodInfo>> GetInitializers(IEnumerable<IMethod<MethodInfo>> methods)
             {
                 return
                     from method in methods

@@ -11,6 +11,9 @@
     {
         [NotNull] private static readonly ITypeInfo GenericContextTypeInfo = typeof(Context<>).Info();
         [NotNull] private static readonly MethodInfo InjectMethodInfo;
+        [NotNull] private static Cache<ConstructorInfo, NewExpression> _constructors = new Cache<ConstructorInfo, NewExpression>();
+        [NotNull] private static Cache<Type, Expression> _this = new Cache<Type, Expression>();
+        [NotNull] private static Cache<Type, MethodCallExpression> _injections = new Cache<Type, MethodCallExpression>();
         [NotNull] private readonly AutowringDependency _autowringDependency;
 
         static FullAutowringDependency()
@@ -32,12 +35,16 @@
 
             var typeInfo = type.Info().ToDefinedGenericType().Info();
             var ctor = autowiringStrategy.SelectConstructor(GetDefaultConstructors(typeInfo).Select(i => new Method<ConstructorInfo>(i)));
-            var methods = autowiringStrategy.GetMethods(GetDefaultMethods(typeInfo).Select(i => new Method<MethodInfo>(i)));
-            var newExpression = Expression.New(ctor.Info, GetParameters(ctor));
+            var methods = autowiringStrategy.GetInitializers(GetDefaultMethods(typeInfo).Select(i => new Method<MethodInfo>(i)));
 
-            var contextType = GenericContextTypeInfo.MakeGenericType(typeInfo.Type);
-            var itFieldInfo = contextType.Info().DeclaredFields.Single(i => i.Name == nameof(Context<object>.It));
-            var thisExpression = Expression.Field(Expression.Parameter(contextType, "context"), itFieldInfo);
+            var newExpression = _constructors.GetOrCreate(ctor.Info, () => Expression.New(ctor.Info, GetParameters(ctor)));
+            var thisExpression = _this.GetOrCreate(typeInfo.Type, () =>
+            {
+                var contextType = GenericContextTypeInfo.MakeGenericType(typeInfo.Type);
+                var itFieldInfo = contextType.Info().DeclaredFields.Single(i => i.Name == nameof(Context<object>.It));
+                return Expression.Field(Expression.Parameter(contextType, "context"), itFieldInfo);
+            });
+
             var methodCallExpressions = (
                 from method in methods
                 select (Expression)Expression.Call(thisExpression, method.Info, GetParameters(method))).ToArray();
@@ -97,9 +104,12 @@
                 {
                     var parameter = parameters[i];
                     var paramType = parameter.ParameterType;
-                    var methodInfo = InjectMethodInfo.MakeGenericMethod(paramType);
-                    var containerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
-                    _parameters[i] = Expression.Call(methodInfo, containerExpression);
+                    _parameters[i] = _injections.GetOrCreate(paramType, () =>
+                    {
+                        var methodInfo = InjectMethodInfo.MakeGenericMethod(paramType);
+                        var containerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
+                        return Expression.Call(methodInfo, containerExpression);
+                    });
                 }
             }
 

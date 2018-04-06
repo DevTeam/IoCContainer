@@ -33,7 +33,7 @@ namespace IoC.Core
             }
         }
 
-        public bool IsSupportingCompextTypeConstant => false;
+        public bool IsReferenceConstantSupported => false;
 
         public Delegate Compile(LambdaExpression resolverExpression)
         {

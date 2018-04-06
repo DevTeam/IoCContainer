@@ -815,9 +815,9 @@
             Represents a expression compiler.
             </summary>
         </member>
-        <member name="P:IoC.Extensibility.IExpressionCompiler.IsSupportingCompextTypeConstant">
+        <member name="P:IoC.Extensibility.IExpressionCompiler.IsReferenceConstantSupported">
             <summary>
-            True if supports a compext type constant.
+            True if a refernce constant is supported.
             </summary>
         </member>
         <member name="M:IoC.Extensibility.IExpressionCompiler.Compile(System.Linq.Expressions.LambdaExpression)">
@@ -1893,9 +1893,9 @@
             <param name="constructors">The set of available constructors.</param>
             <returns>The selected constructor.</returns>
         </member>
-        <member name="M:IoC.IAutowiringStrategy.GetMethods(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}})">
+        <member name="M:IoC.IAutowiringStrategy.GetInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}})">
             <summary>
-            Provides methods from a set of available methods in the appropriate order.
+            Provides initializing methods from a set of available methods/setters in the order which will be used to invoke them.
             </summary>
             <param name="methods">The set of available methods.</param>
             <returns>The set of initializing methods in the appropriate order.</returns>

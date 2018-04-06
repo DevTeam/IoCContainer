@@ -17,10 +17,10 @@
         [NotNull] IMethod<ConstructorInfo> SelectConstructor([NotNull][ItemNotNull] IEnumerable<IMethod<ConstructorInfo>> constructors);
 
         /// <summary>
-        /// Provides methods from a set of available methods in the appropriate order.
+        /// Provides initializing methods from a set of available methods/setters in the order which will be used to invoke them.
         /// </summary>
         /// <param name="methods">The set of available methods.</param>
         /// <returns>The set of initializing methods in the appropriate order.</returns>
-        [NotNull][ItemNotNull] IEnumerable<IMethod<MethodInfo>> GetMethods([NotNull][ItemNotNull] IEnumerable<IMethod<MethodInfo>> methods);
+        [NotNull][ItemNotNull] IEnumerable<IMethod<MethodInfo>> GetInitializers([NotNull][ItemNotNull] IEnumerable<IMethod<MethodInfo>> methods);
     }
 }

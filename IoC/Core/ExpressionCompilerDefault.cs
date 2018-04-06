@@ -12,7 +12,7 @@
         {
         }
 
-        public bool IsSupportingCompextTypeConstant => true;
+        public bool IsReferenceConstantSupported => true;
 
         public Delegate Compile(LambdaExpression resolverExpression)
         {

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
     using Extensibility;
@@ -17,11 +18,10 @@
 
         public IMethod<ConstructorInfo> SelectConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors)
         {
-            var ctors = constructors.ToArray();
-            return ctors.FirstOrDefault() ?? _container.Resolve<IIssueResolver>().CannotFindConstructor(ctors);
+            return constructors.FirstOrDefault() ?? _container.Resolve<IIssueResolver>().CannotFindConstructor(Enumerable.Empty<IMethod<ConstructorInfo>>());
         }
 
-        public IEnumerable<IMethod<MethodInfo>> GetMethods(IEnumerable<IMethod<MethodInfo>> methods)
+        public IEnumerable<IMethod<MethodInfo>> GetInitializers(IEnumerable<IMethod<MethodInfo>> methods)
         {
             yield break;
         }
