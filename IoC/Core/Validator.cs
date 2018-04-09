@@ -23,7 +23,7 @@
             foreach (var key in container.SelectMany(i => i))
             {
                 var curTypeDescriptor = key.Type.Descriptor();
-                var curKey = new Key(curTypeDescriptor.ToDefinedGenericType(), key.Tag);
+                var curKey = new Key(curTypeDescriptor.ToDefinedGenericType(key.Type.Descriptor()), key.Tag);
                 var tryGetResolverInternal = TryGetResolverInternalMethodInfo.MakeGenericMethod(curKey.Type);
                 var resolved = (bool)tryGetResolverInternal.Invoke(null, new object[] { container, curKey });
                 if (resolved)

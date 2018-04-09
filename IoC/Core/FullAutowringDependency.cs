@@ -9,12 +9,13 @@
 
     internal class FullAutowringDependency: IDependency
     {
+        [NotNull] private readonly Type _type;
+        [NotNull] private readonly IAutowiringStrategy _autowiringStrategy;
         [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static readonly MethodInfo InjectMethodInfo;
         [NotNull] private static Cache<ConstructorInfo, NewExpression> _constructors = new Cache<ConstructorInfo, NewExpression>();
         [NotNull] private static Cache<Type, Expression> _this = new Cache<Type, Expression>();
         [NotNull] private static Cache<Type, MethodCallExpression> _injections = new Cache<Type, MethodCallExpression>();
-        [NotNull] private readonly AutowringDependency _autowringDependency;
 
         static FullAutowringDependency()
         {
@@ -25,17 +26,25 @@
         public FullAutowringDependency([NotNull] IContainer container, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            if (type == null) throw new ArgumentNullException(nameof(type));
+            _type = type ?? throw new ArgumentNullException(nameof(type));
             if (autowiringStrategy == null)
             {
-                autowiringStrategy = container.TryGetResolver<IAutowiringStrategy>(typeof(IAutowiringStrategy), out var contextResolver)
+                _autowiringStrategy = container.TryGetResolver<IAutowiringStrategy>(typeof(IAutowiringStrategy), out var contextResolver)
                     ? contextResolver(container)
                     : new DefaultAutowiringStrategy(container);
             }
+            else
+            {
+                _autowiringStrategy = autowiringStrategy;
+            }
+        }
 
-            var typeDescriptor = type.Descriptor().ToDefinedGenericType().Descriptor();
-            var ctor = autowiringStrategy.SelectConstructor(GetDefaultConstructors(typeDescriptor).Select(i => new Method<ConstructorInfo>(i)));
-            var methods = autowiringStrategy.GetInitializers(GetDefaultMethods(typeDescriptor).Select(i => new Method<MethodInfo>(i)));
+        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression)
+        {
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            var typeDescriptor = _type.Descriptor().ToDefinedGenericType(buildContext.Key.Type.Descriptor()).Descriptor();
+            var ctor = _autowiringStrategy.SelectConstructor(GetDefaultConstructors(typeDescriptor).Select(i => new Method<ConstructorInfo>(i)));
+            var methods = _autowiringStrategy.GetInitializers(GetDefaultMethods(typeDescriptor).Select(i => new Method<MethodInfo>(i)));
 
             var newExpression = _constructors.GetOrCreate(ctor.Info, () => Expression.New(ctor.Info, GetParameters(ctor)));
             var thisExpression = _this.GetOrCreate(typeDescriptor.AsType(), () =>
@@ -49,13 +58,8 @@
                 from method in methods
                 select (Expression)Expression.Call(thisExpression, method.Info, GetParameters(method))).ToArray();
 
-            _autowringDependency = new AutowringDependency(newExpression, methodCallExpressions);
-        }
-
-        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression)
-        {
-            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            return _autowringDependency.TryBuildExpression(buildContext, lifetime, out baseExpression);
+            var autowringDependency = new AutowringDependency(newExpression, methodCallExpressions);
+            return autowringDependency.TryBuildExpression(buildContext, lifetime, out baseExpression);
         }
 
         [NotNull]

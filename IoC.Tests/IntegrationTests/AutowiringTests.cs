@@ -187,6 +187,22 @@
         }
 
         [Fact]
+        public void ContainerShouldResolveWhenGenericWithConstraintAutowring()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind(typeof(IMyGenericServiceWithConstraint<,>)).To(typeof(MyGenericServiceWithConstraint<,>)))
+                {
+                    // Then
+                    var actualInstance = container.Resolve<IMyGenericServiceWithConstraint<IEnumerable<string>, int>>();
+                    actualInstance.ShouldBeOfType<MyGenericServiceWithConstraint<int, IEnumerable<string>>>();
+                }
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveWhenAutowiringWithInitMethod()
         {
             // Given
@@ -217,6 +233,16 @@
                     where method.Info.Name == nameof(MyGenericService<object, object>.Init)
                     select method;
             }
+        }
+
+        public interface IMyGenericServiceWithConstraint<TA1, TA2>
+            where TA1: IEnumerable<string>
+        {
+        }
+
+        public class MyGenericServiceWithConstraint<T1, T2>: IMyGenericServiceWithConstraint<T2, T1>
+            where T2: IEnumerable<string>
+        {
         }
     }
 }

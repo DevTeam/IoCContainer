@@ -42,7 +42,7 @@
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static Type ToDefinedGenericType([NotNull] this TypeDescriptor typeDescriptor)
+        public static Type ToDefinedGenericType([NotNull] this TypeDescriptor typeDescriptor, TypeDescriptor targetTypeDescriptor)
         {
             if (!typeDescriptor.IsGenericTypeDefinition())
             {
@@ -51,13 +51,38 @@
 
             var genericTypeParameters = typeDescriptor.GetGenericTypeParameters();
             var typesMap = genericTypeParameters.Distinct().Zip(GenericTypeArguments.Types, Tuple.Create).ToDictionary(i => i.Item1, i => i.Item2);
-            var genericTypeArguments = new Type[genericTypeParameters.Length];
+
+            var targetTypeDefenitionDescriptor = targetTypeDescriptor.GetGenericTypeDefinition().Descriptor();
+            var targetTypeDefenitionGenericTypeParameters = targetTypeDefenitionDescriptor.GetGenericTypeParameters();
+            var constraintsMap = targetTypeDescriptor.GetGenericTypeArguments().Zip(targetTypeDefenitionGenericTypeParameters, (targetType, typeDefenition) => Tuple.Create(targetType, typeDefenition.Descriptor().GetGenericParameterConstraints())).ToArray();
+
             for (var position = 0; position < genericTypeParameters.Length; position++)
             {
-                genericTypeArguments[position] = typesMap[genericTypeParameters[position]];
+                var genericType = genericTypeParameters[position];
+                if (!genericType.IsGenericParameter)
+                {
+                    continue;
+                }
+
+                var descriptor =  genericType.Descriptor();
+                var constraints = descriptor.GetGenericParameterConstraints();
+                if (constraints.Length == 0)
+                {
+                    genericTypeParameters[position] = typesMap[genericType];
+                    continue;
+                }
+
+                foreach (var constraintsEntry in constraintsMap)
+                {
+                    if (Extensions.SequenceEqual(constraints, constraintsEntry.Item2))
+                    {
+                        genericTypeParameters[position] = constraintsEntry.Item1;
+                        break;
+                    }
+                }
             }
 
-            return typeDescriptor.MakeGenericType(genericTypeArguments);
+            return typeDescriptor.MakeGenericType(genericTypeParameters);
         }
 
         [MethodImpl((MethodImplOptions)256)]

@@ -71,6 +71,10 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        public Type[] GetGenericParameterConstraints() => Type.GetGenericParameterConstraints();
+
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
         public Type[] GetGenericTypeParameters() => Type.GetGenericArguments();
 
         [MethodImpl((MethodImplOptions)256)]
