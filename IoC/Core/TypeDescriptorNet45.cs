@@ -58,9 +58,11 @@ namespace IoC.Core
         public bool IsGenericTypeDefinition() => TypeInfo.Value.IsGenericTypeDefinition;
 
         [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
         public Type[] GetGenericTypeArguments() => TypeInfo.Value.GenericTypeArguments;
 
         [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
         public Type[] GetGenericParameterConstraints() => TypeInfo.Value.GetGenericParameterConstraints();
 
         [MethodImpl((MethodImplOptions)256)]

@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IoC.AspNetCore" Version="1.1.0-beta194" />
-    <PackageReference Include="IoC.Container" Version="1.1.0-beta194" />
+    <PackageReference Include="IoC.AspNetCore" Version="1.1.0-beta197" />
+    <PackageReference Include="IoC.Container" Version="1.1.0-beta197" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.5" />
   </ItemGroup>
 
