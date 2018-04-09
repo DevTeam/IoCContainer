@@ -7,16 +7,16 @@
     using System.Runtime.CompilerServices;
     using System.Threading;
     using Extensibility;
-    using static TypeExtensions;
+    using static TypeDescriptorExtensions;
 
     internal static class ExpressionExtensions
     {
-        private static readonly ITypeInfo ResolverGenericTypeInfo = typeof(Resolver<>).Info();
+        private static readonly TypeDescriptor ResolverGenericTypeDescriptor = typeof(Resolver<>).Descriptor();
         [ThreadStatic] private static int _getExpressionCompilerReentrancy;
-        internal static readonly MethodInfo GetHashCodeMethodInfo = Info<object>().DeclaredMethods.Single(i => i.Name == nameof(GetHashCode));
+        internal static readonly MethodInfo GetHashCodeMethodInfo = Descriptor<object>().GetDeclaredMethods().Single(i => i.Name == nameof(GetHashCode));
         internal static readonly Expression NullConst = Expression.Constant(null);
-        private static readonly MethodInfo EnterMethodInfo = typeof(Monitor).Info().DeclaredMethods.Single(i => i.Name == nameof(Monitor.Enter) && i.GetParameters().Length == 1);
-        private static readonly MethodInfo ExitMethodInfo = typeof(Monitor).Info().DeclaredMethods.Single(i => i.Name == nameof(Monitor.Exit));
+        private static readonly MethodInfo EnterMethodInfo = typeof(Monitor).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Monitor.Enter) && i.GetParameters().Length == 1);
+        private static readonly MethodInfo ExitMethodInfo = typeof(Monitor).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Monitor.Exit));
 
         public static IExpressionCompiler GetExpressionCompiler(this IContainer container)
         {
@@ -42,9 +42,9 @@
         [MethodImpl((MethodImplOptions)256)]
         public static Expression Convert(this Expression expression, Type type)
         {
-            var baseTypeInfo = expression.Type.Info();
-            var typeInfo = type.Info();
-            if (typeInfo.IsAssignableFrom(baseTypeInfo))
+            var baseTypeDescriptor = expression.Type.Descriptor();
+            var typeDescriptor = type.Descriptor();
+            if (typeDescriptor.IsAssignableFrom(baseTypeDescriptor))
             {
                 return expression;
             }
@@ -53,7 +53,7 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        public static Type ToResolverType(this Type type) => ResolverGenericTypeInfo.MakeGenericType(type);
+        public static Type ToResolverType(this Type type) => ResolverGenericTypeDescriptor.MakeGenericType(type);
 
         [MethodImpl((MethodImplOptions)256)]
         public static Expression Lock(this Expression body, MemberExpression lockObject)

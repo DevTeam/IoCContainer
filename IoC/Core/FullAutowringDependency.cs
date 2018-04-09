@@ -9,7 +9,7 @@
 
     internal class FullAutowringDependency: IDependency
     {
-        [NotNull] private static readonly ITypeInfo GenericContextTypeInfo = typeof(Context<>).Info();
+        [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static readonly MethodInfo InjectMethodInfo;
         [NotNull] private static Cache<ConstructorInfo, NewExpression> _constructors = new Cache<ConstructorInfo, NewExpression>();
         [NotNull] private static Cache<Type, Expression> _this = new Cache<Type, Expression>();
@@ -33,15 +33,15 @@
                     : new DefaultAutowiringStrategy(container);
             }
 
-            var typeInfo = type.Info().ToDefinedGenericType().Info();
-            var ctor = autowiringStrategy.SelectConstructor(GetDefaultConstructors(typeInfo).Select(i => new Method<ConstructorInfo>(i)));
-            var methods = autowiringStrategy.GetInitializers(GetDefaultMethods(typeInfo).Select(i => new Method<MethodInfo>(i)));
+            var typeDescriptor = type.Descriptor().ToDefinedGenericType().Descriptor();
+            var ctor = autowiringStrategy.SelectConstructor(GetDefaultConstructors(typeDescriptor).Select(i => new Method<ConstructorInfo>(i)));
+            var methods = autowiringStrategy.GetInitializers(GetDefaultMethods(typeDescriptor).Select(i => new Method<MethodInfo>(i)));
 
             var newExpression = _constructors.GetOrCreate(ctor.Info, () => Expression.New(ctor.Info, GetParameters(ctor)));
-            var thisExpression = _this.GetOrCreate(typeInfo.Type, () =>
+            var thisExpression = _this.GetOrCreate(typeDescriptor.AsType(), () =>
             {
-                var contextType = GenericContextTypeInfo.MakeGenericType(typeInfo.Type);
-                var itFieldInfo = contextType.Info().DeclaredFields.Single(i => i.Name == nameof(Context<object>.It));
+                var contextType = GenericContextTypeDescriptor.MakeGenericType(typeDescriptor.AsType());
+                var itFieldInfo = contextType.Descriptor().GetDeclaredFields().Single(i => i.Name == nameof(Context<object>.It));
                 return Expression.Field(Expression.Parameter(contextType, "context"), itFieldInfo);
             });
 
@@ -59,17 +59,17 @@
         }
 
         [NotNull]
-        private static IEnumerable<ConstructorInfo> GetDefaultConstructors([NotNull] ITypeInfo typeInfo)
+        private static IEnumerable<ConstructorInfo> GetDefaultConstructors([NotNull] TypeDescriptor typeDescriptor)
         {
-            return typeInfo.DeclaredConstructors
+            return typeDescriptor.GetDeclaredConstructors()
                 .Where(MethodFilter)
                 .OrderBy(ctor => ctor.GetParameters().Length);
         }
 
         [NotNull]
-        private static IEnumerable<MethodInfo> GetDefaultMethods([NotNull] ITypeInfo typeInfo)
+        private static IEnumerable<MethodInfo> GetDefaultMethods([NotNull] TypeDescriptor typeDescriptor)
         {
-            return typeInfo.DeclaredMethods
+            return typeDescriptor.GetDeclaredMethods()
                 .Where(MethodFilter)
                 .OrderBy(methodInfo => methodInfo.GetParameters().Length);
         }

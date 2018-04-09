@@ -7,8 +7,7 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using Core;
-    using TypeExtensions = Core.TypeExtensions;
-  
+
 
     /// <summary>
     /// Allows to resolve enumeration of all instances related to corresponding bindings.
@@ -107,28 +106,28 @@
 
             private static IEnumerable<Resolver<T>> GetResolvers(IContainer container)
             {
-                var typeInfo = TypeExtensions.Info<T>();
+                var typeDescriptor = TypeDescriptorExtensions.Descriptor<T>();
                 return from keyGroup in container
-                    let item = keyGroup.Select(key => new {type = CreateType(key.Type.Info(), typeInfo), tag = key.Tag}).FirstOrDefault(i => i.type != null)
+                    let item = keyGroup.Select(key => new {type = CreateType(key.Type.Descriptor(), typeDescriptor), tag = key.Tag}).FirstOrDefault(i => i.type != null)
                     where item != null
                     select container.GetResolver<T>(item.type, item.tag.AsTag());
             }
 
-            private static Type CreateType(ITypeInfo registeredType, ITypeInfo targetType)
+            private static Type CreateType(TypeDescriptor registeredType, TypeDescriptor targetType)
             {
-                if (registeredType.IsGenericTypeDefinition)
+                if (registeredType.IsGenericTypeDefinition())
                 {
-                    if (targetType.IsConstructedGenericType)
+                    if (targetType.IsConstructedGenericType())
                     {
-                        var genericTargetType = targetType.GetGenericTypeDefinition().Info();
+                        var genericTargetType = targetType.GetGenericTypeDefinition().Descriptor();
                         if (genericTargetType.IsAssignableFrom(registeredType))
                         {
-                            return registeredType.MakeGenericType(targetType.GenericTypeArguments);
+                            return registeredType.MakeGenericType(targetType.GetGenericTypeArguments());
                         }
                     }
                 }
 
-                return targetType.IsAssignableFrom(registeredType) ? registeredType.Type : null;
+                return targetType.IsAssignableFrom(registeredType) ? registeredType.AsType() : null;
             }
         }
     }

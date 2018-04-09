@@ -34,10 +34,10 @@
 
         public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver)
         {
-            var typeInfo = key.Type.Info();
+            var typeDescriptor = key.Type.Descriptor();
             var compiler = container.GetExpressionCompiler();
             var buildContext = new BuildContext(compiler, key, container, _resources);
-            if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeInfo), out var expression))
+            if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression))
             {
                 resolver = default(Delegate);
                 return false;
@@ -51,18 +51,18 @@
         [CanBeNull]
         public ILifetime GetLifetime([NotNull] Type type)
         {
-            return GetLifetime(type.Info());
+            return GetLifetime(type.Descriptor());
         }
 
         [CanBeNull]
-        private ILifetime GetLifetime(ITypeInfo typeInfo)
+        private ILifetime GetLifetime(TypeDescriptor typeDescriptor)
         {
-            if (!typeInfo.IsConstructedGenericType)
+            if (!typeDescriptor.IsConstructedGenericType())
             {
                 return _lifetime;
             }
 
-            var lifetimeKey = new LifetimeKey(typeInfo.GenericTypeArguments);
+            var lifetimeKey = new LifetimeKey(typeDescriptor.GetGenericTypeArguments());
             ILifetime lifetime;
             lock (_lockObject)
             {

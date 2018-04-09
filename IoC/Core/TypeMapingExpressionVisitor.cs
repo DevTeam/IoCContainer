@@ -8,13 +8,13 @@
     internal class TypeMapingExpressionVisitor : ExpressionVisitor
     {
         private readonly IDictionary<Type, Type> _typesMap;
-        private readonly ITypeInfo _typeInfo;
+        private readonly TypeDescriptor _typeDescriptor;
 
         public TypeMapingExpressionVisitor([NotNull] Type type, [NotNull] IDictionary<Type, Type> typesMap)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
             _typesMap = typesMap ?? throw new ArgumentNullException(nameof(typesMap));
-            _typeInfo = type.Info();
+            _typeDescriptor = type.Descriptor();
         }
 
         public override Expression Visit(Expression node)
@@ -61,73 +61,73 @@
 
         private void UpdateMap(Type targetType)
         {
-            UpdateMap(_typeInfo, targetType.Info());
+            UpdateMap(_typeDescriptor, targetType.Descriptor());
         }
 
-        private void UpdateMap(ITypeInfo typeInfo, ITypeInfo targetTypeInfo)
+        private void UpdateMap(TypeDescriptor typeDescriptor, TypeDescriptor targetTypeDescriptor)
         {
-            var isConstructedGenericType = typeInfo.IsConstructedGenericType;
-            ITypeInfo genTypeInfo;
+            var isConstructedGenericType = typeDescriptor.IsConstructedGenericType();
+            TypeDescriptor genTypeDescriptor;
             if (isConstructedGenericType)
             {
-                genTypeInfo = typeInfo.GetGenericTypeDefinition().Info();
+                genTypeDescriptor = typeDescriptor.GetGenericTypeDefinition().Descriptor();
             }
             else
             {
-                if (targetTypeInfo.IsConstructedGenericType)
+                if (targetTypeDescriptor.IsConstructedGenericType())
                 {
                     return;
                 }
 
-                if (targetTypeInfo.IsGenericTypeArgument)
+                if (targetTypeDescriptor.IsGenericTypeArgument())
                 {
-                    _typesMap[targetTypeInfo.Type] = typeInfo.Type;
+                    _typesMap[targetTypeDescriptor.AsType()] = typeDescriptor.AsType();
                 }
 
                 return;
             }
 
-            if (!targetTypeInfo.IsConstructedGenericType)
+            if (!targetTypeDescriptor.IsConstructedGenericType())
             {
                 return;
             }
 
-            ITypeInfo realTargetTypeInfo = null;
-            if (genTypeInfo.IsInterface)
+            TypeDescriptor realTargetTypeDescriptor = null;
+            if (genTypeDescriptor.IsInterface())
             {
-                realTargetTypeInfo = targetTypeInfo.ImplementedInterfaces.FirstOrDefault(t =>
+                realTargetTypeDescriptor = targetTypeDescriptor.GetImplementedInterfaces().FirstOrDefault(t =>
                 {
-                    var curTypeInfo = t.Info();
-                    return curTypeInfo.IsConstructedGenericType && genTypeInfo.Type == curTypeInfo.GetGenericTypeDefinition();
-                })?.Info();
+                    var curTypeDescriptor = t.Descriptor();
+                    return curTypeDescriptor.IsConstructedGenericType() && genTypeDescriptor.AsType() == curTypeDescriptor.GetGenericTypeDefinition();
+                })?.Descriptor();
             }
             else
             {
-                var curType = targetTypeInfo;
+                var curType = targetTypeDescriptor;
                 while (curType != null)
                 {
-                    if (!curType.IsConstructedGenericType)
+                    if (!curType.IsConstructedGenericType())
                     {
                         break;
                     }
 
-                    if (curType.GetGenericTypeDefinition() == genTypeInfo.Type)
+                    if (curType.GetGenericTypeDefinition() == genTypeDescriptor.AsType())
                     {
-                        realTargetTypeInfo = curType;
+                        realTargetTypeDescriptor = curType;
                         break;
                     }
 
-                    curType = curType.BaseType?.Info();
+                    curType = curType.GetBaseType()?.Descriptor();
                 }
             }
 
-            if (realTargetTypeInfo == null)
+            if (realTargetTypeDescriptor == null)
             {
-                realTargetTypeInfo = targetTypeInfo;
+                realTargetTypeDescriptor = targetTypeDescriptor;
             }
 
-            var targetGenTypes = realTargetTypeInfo.GenericTypeArguments;
-            var genTypes = typeInfo.GenericTypeArguments;
+            var targetGenTypes = realTargetTypeDescriptor.GetGenericTypeArguments();
+            var genTypes = typeDescriptor.GetGenericTypeArguments();
             if (targetGenTypes.Length != genTypes.Length)
             {
                 return;
@@ -137,14 +137,14 @@
             {
                 var targetType = targetGenTypes[i];
                 var type = genTypes[i];
-                targetTypeInfo = targetType.Info();
-                if (!targetTypeInfo.IsGenericTypeArgument)
+                targetTypeDescriptor = targetType.Descriptor();
+                if (!targetTypeDescriptor.IsGenericTypeArgument())
                 {
                     continue;
                 }
                 
                 _typesMap[targetType] = type;
-                UpdateMap(type.Info(), targetTypeInfo);
+                UpdateMap(type.Descriptor(), targetTypeDescriptor);
             }
         }
     }

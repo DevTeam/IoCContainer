@@ -80,8 +80,7 @@
 
         private static string GetContainerDetails(IContainer container)
         {
-            var keys = string.Join(Environment.NewLine, container.SelectMany(i => i).Select(i => i.ToString()));
-            return keys;
+            return string.Join(Environment.NewLine, container.SelectMany(i => i).Select(i => i.ToString()));
         }
     }
 }

@@ -305,10 +305,10 @@
                 }
 
                 var type = key.Type;
-                var typeInfo = type.Info();
-                if (typeInfo.IsConstructedGenericType)
+                var typeDescriptor = type.Descriptor();
+                if (typeDescriptor.IsConstructedGenericType())
                 {
-                    var genericType = typeInfo.GetGenericTypeDefinition();
+                    var genericType = typeDescriptor.GetGenericTypeDefinition();
                     var genericKey = new FullKey(genericType, key.Tag);
                     if (_registrationEntries.TryGetValue(genericKey, out registrationEntry))
                     {

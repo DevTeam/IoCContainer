@@ -9,7 +9,7 @@
     internal class Validator : IValidator
     {
         public static readonly IValidator Shared = new Validator();
-        private static readonly MethodInfo TryGetResolverInternalMethodInfo = typeof(Validator).Info().DeclaredMethods.Single(i => i.Name == nameof(TryGetResolverInternal));
+        private static readonly MethodInfo TryGetResolverInternalMethodInfo = typeof(Validator).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(TryGetResolverInternal));
 
         private Validator()
         {
@@ -22,8 +22,8 @@
             var unresolvedKeys = new List<Key>();
             foreach (var key in container.SelectMany(i => i))
             {
-                var curTypeInfo = key.Type.Info();
-                var curKey = new Key(curTypeInfo.ToDefinedGenericType(), key.Tag);
+                var curTypeDescriptor = key.Type.Descriptor();
+                var curKey = new Key(curTypeDescriptor.ToDefinedGenericType(), key.Tag);
                 var tryGetResolverInternal = TryGetResolverInternalMethodInfo.MakeGenericMethod(curKey.Type);
                 var resolved = (bool)tryGetResolverInternal.Invoke(null, new object[] { container, curKey });
                 if (resolved)

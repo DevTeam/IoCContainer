@@ -18,8 +18,8 @@
 
         protected override Expression VisitNew(NewExpression node)
         {
-            var newTypeInfo = ReplaceType(node.Type).Info();
-            var newConstructor = newTypeInfo.DeclaredConstructors.Single(i => !i.IsPrivate && Match(node.Constructor.GetParameters(), i.GetParameters()));
+            var newTypeDescriptor = ReplaceType(node.Type).Descriptor();
+            var newConstructor = newTypeDescriptor.GetDeclaredConstructors().Single(i => !i.IsPrivate && Match(node.Constructor.GetParameters(), i.GetParameters()));
             var newArgs = ReplaceAll(node.Arguments).ToList();
             return Expression.New(newConstructor, newArgs);
         }
@@ -45,8 +45,8 @@
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
-            var newDeclaringType = ReplaceType(node.Method.DeclaringType).Info();
-            var newMethod = newDeclaringType.DeclaredMethods.SingleOrDefault(i => i.Name == node.Method.Name && Match(node.Method.GetParameters(), i.GetParameters()));
+            var newDeclaringType = ReplaceType(node.Method.DeclaringType).Descriptor();
+            var newMethod = newDeclaringType.GetDeclaredMethods().SingleOrDefault(i => i.Name == node.Method.Name && Match(node.Method.GetParameters(), i.GetParameters()));
             if (newMethod == null)
             {
                 throw new BuildExpressionException(new InvalidOperationException($"Cannot find method {node.Method} in the {node.Method.DeclaringType}."));
@@ -63,13 +63,13 @@
 
         protected override Expression VisitMember(MemberExpression node)
         {
-            var newDeclaringTypeInfo = ReplaceType(node.Member.DeclaringType).Info();
-            if (newDeclaringTypeInfo.IsConstructedGenericType)
+            var newDeclaringTypeDescriptor = ReplaceType(node.Member.DeclaringType).Descriptor();
+            if (newDeclaringTypeDescriptor.IsConstructedGenericType())
             {
-                newDeclaringTypeInfo = ReplaceType(newDeclaringTypeInfo.Type).Info();
+                newDeclaringTypeDescriptor = ReplaceType(newDeclaringTypeDescriptor.AsType()).Descriptor();
             }
 
-            var newMember = newDeclaringTypeInfo.DeclaredMembers.Single(i => i.Name == node.Member.Name);
+            var newMember = newDeclaringTypeDescriptor.GetDeclaredMembers().Single(i => i.Name == node.Member.Name);
             var newExpression = Visit(node.Expression);
             if (newExpression == null)
             {
@@ -150,8 +150,8 @@
 
         private ElementInit VisitInitializer(ElementInit node)
         {
-            var newDeclaringType = ReplaceType(node.AddMethod.DeclaringType).Info();
-            var newMethod = newDeclaringType.DeclaredMethods.SingleOrDefault(i => i.Name == node.AddMethod.Name && Match(node.AddMethod.GetParameters(), i.GetParameters()));
+            var newDeclaringType = ReplaceType(node.AddMethod.DeclaringType).Descriptor();
+            var newMethod = newDeclaringType.GetDeclaredMethods().SingleOrDefault(i => i.Name == node.AddMethod.Name && Match(node.AddMethod.GetParameters(), i.GetParameters()));
             if (newMethod == null)
             {
                 throw new BuildExpressionException(new InvalidOperationException($"Cannot find method {node.AddMethod} in the {node.AddMethod.DeclaringType}."));
@@ -180,13 +180,13 @@
                     return false;
                 }
 
-                var paramTypeInfo = newParams[i].ParameterType.Info();
-                if (paramTypeInfo.IsGenericParameter)
+                var paramTypeDescriptor = newParams[i].ParameterType.Descriptor();
+                if (paramTypeDescriptor.IsGenericParameter())
                 {
                     return true;
                 }
 
-                if (ReplaceType(baseParams[i].ParameterType).Info().Id != paramTypeInfo.Id)
+                if (ReplaceType(baseParams[i].ParameterType).Descriptor().GetId() != paramTypeDescriptor.GetId())
                 {
                     return false;
                 }
@@ -202,18 +202,18 @@
 
         private Type ReplaceType(Type type)
         {
-            var baseTypeInfo = type.Info();
-            if (!baseTypeInfo.IsConstructedGenericType)
+            var baseTypeDescriptor = type.Descriptor();
+            if (!baseTypeDescriptor.IsConstructedGenericType())
             {
                 if (_typesMap.TryGetValue(type, out var newType))
                 {
                     return newType;
                 }
 
-                if (baseTypeInfo.IsArray)
+                if (baseTypeDescriptor.IsArray())
                 {
-                    var elementType = baseTypeInfo.ElementType;
-                    var newElementType = ReplaceType(baseTypeInfo.ElementType);
+                    var elementType = baseTypeDescriptor.GetElementType();
+                    var newElementType = ReplaceType(baseTypeDescriptor.GetElementType());
                     if (elementType != newElementType)
                     {
                         return newElementType.MakeArrayType();
@@ -225,8 +225,8 @@
                 return type;
             }
 
-            var newGenericTypes = new Type[baseTypeInfo.GenericTypeArguments.Length];
-            var genericTypes = ReplaceTypes(baseTypeInfo.GenericTypeArguments);
+            var newGenericTypes = new Type[baseTypeDescriptor.GetGenericTypeArguments().Length];
+            var genericTypes = ReplaceTypes(baseTypeDescriptor.GetGenericTypeArguments());
             for (var i = 0; i < genericTypes.Length; i++)
             {
                 var genericType = genericTypes[i];
@@ -240,7 +240,7 @@
                 }
             }
 
-            return baseTypeInfo.GetGenericTypeDefinition().Info().MakeGenericType(newGenericTypes);
+            return baseTypeDescriptor.GetGenericTypeDefinition().Descriptor().MakeGenericType(newGenericTypes);
         }
 
         private IEnumerable<Expression> ReplaceAll(IEnumerable<Expression> expressions)

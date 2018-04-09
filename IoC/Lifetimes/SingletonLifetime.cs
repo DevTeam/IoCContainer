@@ -6,7 +6,7 @@
     using System.Reflection;
     using Core;
     using Extensibility;
-    using static Core.TypeExtensions;
+    using static Core.TypeDescriptorExtensions;
 
     /// <summary>
     /// Represents singleton lifetime.
@@ -14,8 +14,8 @@
     [PublicAPI]
     public sealed class SingletonLifetime : ILifetime, IDisposable
     {
-        private static readonly FieldInfo LockObjectFieldInfo = Info<SingletonLifetime>().DeclaredFields.Single(i => i.Name == nameof(LockObject));
-        private static readonly FieldInfo InstanceFieldInfo = Info<SingletonLifetime>().DeclaredFields.Single(i => i.Name == nameof(Instance));
+        private static readonly FieldInfo LockObjectFieldInfo = Descriptor<SingletonLifetime>().GetDeclaredFields().Single(i => i.Name == nameof(LockObject));
+        private static readonly FieldInfo InstanceFieldInfo = Descriptor<SingletonLifetime>().GetDeclaredFields().Single(i => i.Name == nameof(Instance));
 
         [NotNull] internal object LockObject = new object();
         internal volatile object Instance;

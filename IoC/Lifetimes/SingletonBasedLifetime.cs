@@ -7,7 +7,7 @@
     using Core;
     using Core.Collections;
     using Extensibility;
-    using static Core.TypeExtensions;
+    using static Core.TypeDescriptorExtensions;
     using static Extensibility.WellknownExpressions;
 
     /// <summary>
@@ -17,12 +17,12 @@
     [PublicAPI]
     public abstract class SingletonBasedLifetime<TKey>: ILifetime, IDisposable
     {
-        private static readonly FieldInfo LockObjectFieldInfo = Info<SingletonBasedLifetime<TKey>>().DeclaredFields.Single(i => i.Name == nameof(LockObject));
-        private static readonly FieldInfo InstancesFieldInfo = Info<SingletonBasedLifetime<TKey>>().DeclaredFields.Single(i => i.Name == nameof(Instances));
-        private static readonly MethodInfo CreateKeyMethodInfo = Info<SingletonBasedLifetime<TKey>>().DeclaredMethods.Single(i => i.Name == nameof(CreateKey));
-        private static readonly MethodInfo GetMethodInfo = Info<Table<TKey, object>>().DeclaredMethods.Single(i => i.Name == nameof(Table<TKey, object>.Get));
-        private static readonly MethodInfo SetMethodInfo = Info<Table<TKey, object>>().DeclaredMethods.Single(i => i.Name == nameof(Table<TKey, object>.Set));
-        private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Info<SingletonBasedLifetime<TKey>>().DeclaredMethods.Single(i => i.Name == nameof(OnNewInstanceCreated));
+        private static readonly FieldInfo LockObjectFieldInfo = Descriptor<SingletonBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(LockObject));
+        private static readonly FieldInfo InstancesFieldInfo = Descriptor<SingletonBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(Instances));
+        private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<SingletonBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
+        private static readonly MethodInfo GetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Get));
+        private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
+        private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<SingletonBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
         private static readonly ParameterExpression KeyVar = Expression.Variable(typeof(TKey), "key");
 
         [NotNull] internal object LockObject = new object();

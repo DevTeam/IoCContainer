@@ -56,7 +56,7 @@ public class IocExtensionElement: BehaviorExtensionElement
 }
 ```
 
-### Add several elements to the congiguration file, [for example](App.config)
+### Add several elements to the configuration file, [for example](App.config)
 
 Add the Ioc behavior to the WCF service:
 

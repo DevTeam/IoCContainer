@@ -7,13 +7,13 @@
     using System.Reflection;
     using Extensibility;
     using static Extensibility.WellknownExpressions;
-    using static TypeExtensions;
+    using static TypeDescriptorExtensions;
 
     internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
     {
         private static readonly Key ContextKey = new Key(typeof(Context));
-        [NotNull] private static readonly ITypeInfo ContextTypeInfo = Info<Context>();
-        [NotNull] private static readonly ITypeInfo GenericContextTypeInfo = typeof(Context<>).Info();
+        [NotNull] private static readonly TypeDescriptor ContextTypeDescriptor = Descriptor<Context>();
+        [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static readonly MethodInfo InjectMethodInfo;
         [NotNull] private static readonly MethodInfo InjectWithTagMethodInfo;
         private static readonly MethodInfo AssigmentCallExpressionMethodInfo;
@@ -31,7 +31,7 @@
             InjectWithTagMethodInfo = ((MethodCallExpression)injectWithTagExpression.Body).Method.GetGenericMethodDefinition();
             Expression<Action<object, object>> assigmentCallExpression = (item1, item2) => default(IContainer).Inject<object>(null, null);
             AssigmentCallExpressionMethodInfo = ((MethodCallExpression)assigmentCallExpression.Body).Method.GetGenericMethodDefinition();
-            ContextConstructor = Info<Context>().DeclaredConstructors.Single();
+            ContextConstructor = Descriptor<Context>().GetDeclaredConstructors().Single();
         }
 
         public DependencyInjectionExpressionVisitor([NotNull] IBuildContext buildContext, [CanBeNull] Expression thisExpression)
@@ -82,8 +82,8 @@
             // ctx.It
             if (methodCall.Object is MemberExpression memberExpression && memberExpression.Member is FieldInfo fieldInfo)
             {
-                var typeInfo = fieldInfo.DeclaringType.Info();
-                if (typeInfo.IsConstructedGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Context<>) && fieldInfo.Name == nameof(Context<object>.It))
+                var typeDescriptor = fieldInfo.DeclaringType.Descriptor();
+                if (typeDescriptor.IsConstructedGenericType() && typeDescriptor.GetGenericTypeDefinition() == typeof(Context<>) && fieldInfo.Name == nameof(Context<object>.It))
                 {
                     return Expression.Call(_thisExpression, methodCall.Method, InjectAll(methodCall.Arguments));
                 }
@@ -114,11 +114,11 @@
                 return CreateNewContextExpression();
             }
 
-            var typeInfo = node.Type.Info();
-            if (typeInfo.IsConstructedGenericType && typeInfo.GetGenericTypeDefinition() == typeof(Context<>))
+            var typeDescriptor = node.Type.Descriptor();
+            if (typeDescriptor.IsConstructedGenericType() && typeDescriptor.GetGenericTypeDefinition() == typeof(Context<>))
             {
-                var contextType = GenericContextTypeInfo.MakeGenericType(typeInfo.GenericTypeArguments).Info();
-                var ctor = contextType.DeclaredConstructors.Single();
+                var contextType = GenericContextTypeDescriptor.MakeGenericType(typeDescriptor.GetGenericTypeArguments()).Descriptor();
+                var ctor = contextType.GetDeclaredConstructors().Single();
                 return Expression.New(
                     ctor,
                     _thisExpression,
@@ -249,8 +249,8 @@
                 return false;
             }
 
-            var typeInfo = type.Info();
-            if (ContextTypeInfo.IsAssignableFrom(typeInfo))
+            var typeDescriptor = type.Descriptor();
+            if (ContextTypeDescriptor.IsAssignableFrom(typeDescriptor))
             {
                 // ctx.Key
                 if (name == nameof(Context.Key))
@@ -274,9 +274,9 @@
                 }
             }
 
-            if (typeInfo.IsConstructedGenericType)
+            if (typeDescriptor.IsConstructedGenericType())
             {
-                if (GenericContextTypeInfo.IsAssignableFrom(typeInfo.GetGenericTypeDefinition().Info()))
+                if (GenericContextTypeDescriptor.IsAssignableFrom(typeDescriptor.GetGenericTypeDefinition().Descriptor()))
                 {
                     // ctx.It
                     if (name == nameof(Context<object>.It))

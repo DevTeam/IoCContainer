@@ -1,12 +1,16 @@
 ﻿// ReSharper disable UnusedParameter.Global
 namespace IoC
 {
+    using System;
+
     /// <summary>
     /// Injection extensions.
     /// </summary>
     [PublicAPI]
     public static class Injections
     {
+        internal const string JustAMarkerError = "Just a marker. Should be used to configure dependency injection.";
+
         /// <summary>
         /// Injects the dependency. Just a marker.
         /// </summary>
@@ -15,7 +19,7 @@ namespace IoC
         /// <returns>The injected instance.</returns>
         public static T Inject<T>(this IContainer container)
         {
-            return default(T);
+            throw new NotImplementedException(JustAMarkerError);
         }
 
         /// <summary>
@@ -27,7 +31,7 @@ namespace IoC
         /// <returns>The injected instance.</returns>
         public static T Inject<T>(this IContainer container, [CanBeNull] object tag)
         {
-            return default(T);
+            throw new NotImplementedException(JustAMarkerError);
         }
 
         /// <summary>
@@ -39,6 +43,7 @@ namespace IoC
         /// <param name="source">The source of injection.</param>
         public static void Inject<T>(this IContainer container, [NotNull] T destination, [CanBeNull] T source)
         {
+            throw new NotImplementedException(JustAMarkerError);
         }
     }
 }

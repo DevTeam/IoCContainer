@@ -9,7 +9,7 @@
     using System.Runtime.CompilerServices;
     using Collections;
     using Extensibility;
-    using static TypeExtensions;
+    using static TypeDescriptorExtensions;
 
     /// <summary>
     /// Represents build context.
@@ -19,10 +19,10 @@
     internal class BuildContext : IBuildContext
     {
         internal static ResizableArray<BuildContext> Contexts = ResizableArray<BuildContext>.Empty;
-        private static readonly MemberInfo ContextsMemberInfo = Info<BuildContext>().DeclaredMembers.Single(i => i.Name == nameof(Contexts));
-        private static readonly FieldInfo ValuesFieldInfo = Info<BuildContext>().DeclaredFields.Single(i => i.Name == nameof(Values));
-        private static readonly FieldInfo BuildContextItemsFieldInfo = Info<ResizableArray<BuildContext>>().DeclaredFields.Single(i => i.Name == nameof(ResizableArray<object>.Items));
-        private static readonly FieldInfo ObjectItemsFieldInfo = Info<ResizableArray<object>>().DeclaredFields.Single(i => i.Name == nameof(ResizableArray<object>.Items));
+        private static readonly MemberInfo ContextsMemberInfo = Descriptor<BuildContext>().GetDeclaredMembers().Single(i => i.Name == nameof(Contexts));
+        private static readonly FieldInfo ValuesFieldInfo = Descriptor<BuildContext>().GetDeclaredFields().Single(i => i.Name == nameof(Values));
+        private static readonly FieldInfo BuildContextItemsFieldInfo = Descriptor<ResizableArray<BuildContext>>().GetDeclaredFields().Single(i => i.Name == nameof(ResizableArray<object>.Items));
+        private static readonly FieldInfo ObjectItemsFieldInfo = Descriptor<ResizableArray<object>>().GetDeclaredFields().Single(i => i.Name == nameof(ResizableArray<object>.Items));
 
         internal ResizableArray<object> Values = ResizableArray<object>.Empty;
         private readonly ICollection<IDisposable> _resources;
@@ -87,7 +87,7 @@
                 return Expression.Constant(value, type);
             }
 
-            var fieldInfo = (FieldInfo) Info<BuildContext>().DeclaredMembers.SingleOrDefault(i => i.Name == $"State{_valuesCount:00}");
+            var fieldInfo = (FieldInfo) Descriptor<BuildContext>().GetDeclaredMembers().SingleOrDefault(i => i.Name == $"State{_valuesCount:00}");
             if (fieldInfo != null)
             {
                 _valuesCount++;

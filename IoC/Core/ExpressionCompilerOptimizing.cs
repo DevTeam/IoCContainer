@@ -10,7 +10,7 @@ namespace IoC.Core
     using Extensibility;
     using Features;
     using static Extensibility.WellknownExpressions;
-    using static TypeExtensions;
+    using static TypeDescriptorExtensions;
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class ExpressionCompilerOptimizing : IExpressionCompiler
@@ -22,7 +22,7 @@ namespace IoC.Core
         static ExpressionCompilerOptimizing()
         {
             var domain = AppDomain.CurrentDomain;
-            var assembly = Info<ExpressionCompilerOptimizing>().Assembly;
+            var assembly = Descriptor<ExpressionCompilerOptimizing>().GetAssembly();
             using (var keyStream = assembly.GetManifestResourceStream("IoC.DevTeam.snk"))
             using (var keyReader = new BinaryReader(keyStream ?? throw new InvalidOperationException("Resource with key wsa not found.")))
             {
@@ -46,8 +46,8 @@ namespace IoC.Core
         {
             try
             {
-                var returnTypeInfo = resolverExpression.ReturnType.Info();
-                if (!returnTypeInfo.IsPublic)
+                var returnTypeDescriptor = resolverExpression.ReturnType.Descriptor();
+                if (!returnTypeDescriptor.IsPublic())
                 {
                     return null;
                 }

@@ -30,10 +30,10 @@ namespace IoC.Tests
         {
             private readonly List<object[]> _data = new List<object[]>
             {
-                new object[] {"ref IoC", true, new[] {typeof(IContainer).Info().Assembly}},
-                new object[] {"ref IoC, IoC", true, new[] {typeof(IContainer).Info().Assembly}},
-                new object[] {"ref IoC, IoC.Tests", true, new[] {typeof(IContainer).Info().Assembly, typeof(TestDataGenerator).Info().Assembly } },
-                new object[] {"ref IoC  ,IoC.Tests", true, new[] {typeof(IContainer).Info().Assembly, typeof(TestDataGenerator).Info().Assembly } },
+                new object[] {"ref IoC", true, new[] {typeof(IContainer).Descriptor().GetAssembly()}},
+                new object[] {"ref IoC, IoC", true, new[] {typeof(IContainer).Descriptor().GetAssembly()}},
+                new object[] {"ref IoC, IoC.Tests", true, new[] {typeof(IContainer).Descriptor().GetAssembly(), typeof(TestDataGenerator).Descriptor().GetAssembly() } },
+                new object[] {"ref IoC  ,IoC.Tests", true, new[] {typeof(IContainer).Descriptor().GetAssembly(), typeof(TestDataGenerator).Descriptor().GetAssembly() } },
             };
 
             public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
