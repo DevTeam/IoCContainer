@@ -221,17 +221,26 @@
 
         private class AutowiringStrategy: IAutowiringStrategy
         {
-            public IMethod<ConstructorInfo> SelectConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors)
+            public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
             {
-                return constructors.Single(i => i.Info.GetParameters().Length == 0);
+                instanceType = default(Type);
+                return false;
             }
 
-            public IEnumerable<IMethod<MethodInfo>> GetInitializers(IEnumerable<IMethod<MethodInfo>> methods)
+            public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
             {
-                return
+                constructor = constructors.Single(i => i.Info.GetParameters().Length == 0);
+                return true;
+            }
+
+            public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
+            {
+                initializers =
                     from method in methods
                     where method.Info.Name == nameof(MyGenericService<object, object>.Init)
                     select method;
+
+                return true;
             }
         }
 

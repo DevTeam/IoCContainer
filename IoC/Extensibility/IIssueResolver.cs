@@ -90,10 +90,18 @@
         [NotNull] Expression CannotBuildExpression([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, ILifetime lifetime = null);
 
         /// <summary>
-        /// Handles the scenario when cannot find a constructor.
+        /// Handles the scenario when cannot resolve a constructor.
         /// </summary>
         /// <param name="constructors">Available constructors.</param>
         /// <returns>The constructor.</returns>
-        [NotNull] IMethod<ConstructorInfo> CannotFindConstructor([NotNull] IEnumerable<IMethod<ConstructorInfo>> constructors);
+        [NotNull] IMethod<ConstructorInfo> CannotResolveConstructor([NotNull] IEnumerable<IMethod<ConstructorInfo>> constructors);
+
+        /// <summary>
+        /// Handles the scenario when cannot resolve the instance type.
+        /// </summary>
+        /// <param name="registeredType">Registered type.</param>
+        /// <param name="resolvingType">Resolving type.</param>
+        /// <returns>The type to create an instance.</returns>
+        Type CannotResolveType([NotNull] Type registeredType, [NotNull] Type resolvingType);
     }
 }

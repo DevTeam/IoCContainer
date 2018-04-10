@@ -2,11 +2,6 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-Package| Linku
----|:---:
-IoC.Container|[![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.Container?includePreReleases=true)](https://www.nuget.org/packages/IoC.Container)
-IoC.AspNetCore|[![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.AspNetCore?includePreReleases=true)](https://www.nuget.org/packages/IoC.AspNetCore)
-
 IoC.Container provides the following benefits:
   - One of the [fastest](#why-this-one), almost as fast as operators `new`
   - Produces minimal memory trafic
@@ -25,11 +20,17 @@ IoC.Container provides the following benefits:
   - Supports [Universal Windows Platform](Samples/UwpApp/README.md)
   - Supports [Windows Communication Foundation](Samples/WcfServiceLibrary/README.md)
 
+NuGet packages:
+  - IoC.Container
+    - [![NuGet IoC.Container](https://buildstats.info/nuget/IoC.Container?includePreReleases=true)](https://www.nuget.org/packages/IoC.Container)
+  - IoC.AspNetCore
+    - [![NuGet IoC.AspNetCore](https://buildstats.info/nuget/IoC.AspNetCore?includePreReleases=true)](https://www.nuget.org/packages/IoC.AspNetCore)
+
 Supported platforms:
   - .NET 4.0+
-  - .NET Core 1.0+
-  - .NET Standard 1.0+
-  - [UWP 10+](https://docs.microsoft.com/en-us/windows/uwp/index)
+  - [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/) 1.0+
+  - [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) 1.0+
+  - [UWP](https://docs.microsoft.com/en-us/windows/uwp/index) 10+
 
 ## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works
 

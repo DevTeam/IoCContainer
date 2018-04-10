@@ -71,11 +71,18 @@
             throw new InvalidOperationException($"Cannot build expression for the key \"{buildContext.Key}\" from the container \"{buildContext.Container}\". Details:\n{GetContainerDetails(buildContext.Container)}");
         }
 
-        public IMethod<ConstructorInfo> CannotFindConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors)
+        public IMethod<ConstructorInfo> CannotResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors)
         {
             if (constructors == null) throw new ArgumentNullException(nameof(constructors));
             var type = constructors.Single().Info.DeclaringType;
             throw new InvalidOperationException($"Cannot find a constructor for the type \"{type}\".");
+        }
+
+        public Type CannotResolveType(Type registeredType, Type resolvingType)
+        {
+            if (registeredType == null) throw new ArgumentNullException(nameof(registeredType));
+            if (resolvingType == null) throw new ArgumentNullException(nameof(resolvingType));
+            throw new InvalidOperationException($"Cannot resolve instance type based on the registered type \"{registeredType}\" for resolving type \"{registeredType}\".");
         }
 
         private static string GetContainerDetails(IContainer container)

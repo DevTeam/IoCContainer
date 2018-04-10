@@ -2,11 +2,6 @@
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 
-Package| Linku
----|:---:
-IoC.Container|[![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.Container?includePreReleases=true)](https://www.nuget.org/packages/IoC.Container)
-IoC.AspNetCore|[![NuGet Version and Downloads count](https://buildstats.info/nuget/IoC.AspNetCore?includePreReleases=true)](https://www.nuget.org/packages/IoC.AspNetCore)
-
 IoC.Container provides the following benefits:
   - One of the [fastest](#why-this-one), almost as fast as operators `new`
   - Produces minimal memory trafic
@@ -25,11 +20,17 @@ IoC.Container provides the following benefits:
   - Supports [Universal Windows Platform](Samples/UwpApp/README.md)
   - Supports [Windows Communication Foundation](Samples/WcfServiceLibrary/README.md)
 
+NuGet packages:
+  - IoC.Container
+    - [![NuGet IoC.Container](https://buildstats.info/nuget/IoC.Container?includePreReleases=true)](https://www.nuget.org/packages/IoC.Container)
+  - IoC.AspNetCore
+    - [![NuGet IoC.AspNetCore](https://buildstats.info/nuget/IoC.AspNetCore?includePreReleases=true)](https://www.nuget.org/packages/IoC.AspNetCore)
+
 Supported platforms:
   - .NET 4.0+
-  - .NET Core 1.0+
-  - .NET Standard 1.0+
-  - [UWP 10+](https://docs.microsoft.com/en-us/windows/uwp/index)
+  - [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/) 1.0+
+  - [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) 1.0+
+  - [UWP](https://docs.microsoft.com/en-us/windows/uwp/index) 10+
 
 ## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works
 
@@ -946,7 +947,15 @@ public class TagAttribute: Attribute
 
 private class AspectOrientedAutowiringStrategy : IAutowiringStrategy
 {
-    public IMethod<ConstructorInfo> SelectConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors) => (
+    public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
+    {
+        instanceType = default(Type);
+        return false;
+    }
+
+    public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
+    {
+        constructor = (
             from ctor in constructors
             let autowringAttribute = ctor.Info.GetCustomAttribute<AutowiringAttribute>()
             // filters constructors containing the attribute Autowiring
@@ -954,26 +963,34 @@ private class AspectOrientedAutowiringStrategy : IAutowiringStrategy
             // sorts constructors by autowringAttribute.Order
             orderby autowringAttribute.Order
             select ctor)
-        // Get a first appropriate constructor
-        .First();
+            // Get a first appropriate constructor
+            .First();
 
-    public IEnumerable<IMethod<MethodInfo>> GetInitializers(IEnumerable<IMethod<MethodInfo>> methods) =>
-        from method in methods
-        let autowringAttribute = method.Info.GetCustomAttribute<AutowiringAttribute>()
-        // filters methods/property setters containing the attribute Autowiring
-        where autowringAttribute != null
-        // sorts methods/property setters by autowringAttribute.Order
-        orderby autowringAttribute.Order
-        where (
-            from parameter in method.Info.GetParameters()
-            let injectAttribute = parameter.GetCustomAttribute<TagAttribute>()
-            // filters parameters containing a custom tag value to make a dependency injection
-            where injectAttribute?.Tag != null || autowringAttribute.DefaultTag != null
-            // redefines the default dependency
-            select method.TryInjectDependency(parameter.Position, parameter.ParameterType, injectAttribute?.Tag ?? autowringAttribute.DefaultTag))
-         // checks that all custom injection were successfully
-        .All(isInjected => isInjected)
-        select method;
+        return true;
+    }
+
+    public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
+    {
+        initializers =
+            from method in methods
+            let autowringAttribute = method.Info.GetCustomAttribute<AutowiringAttribute>()
+            // filters methods/property setters containing the attribute Autowiring
+            where autowringAttribute != null
+            // sorts methods/property setters by autowringAttribute.Order
+            orderby autowringAttribute.Order
+            where (
+                    from parameter in method.Info.GetParameters()
+                    let injectAttribute = parameter.GetCustomAttribute<TagAttribute>()
+                    // filters parameters containing a custom tag value to make a dependency injection
+                    where injectAttribute?.Tag != null || autowringAttribute.DefaultTag != null
+                    // redefines the default dependency
+                    select method.TryInjectDependency(parameter.Position, parameter.ParameterType, injectAttribute?.Tag ?? autowringAttribute.DefaultTag))
+                // checks that all custom injection were successfully
+                .All(isInjected => isInjected)
+            select method;
+
+        return true;
+    }
 }
 
 public interface IConsole

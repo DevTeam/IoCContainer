@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -9,8 +10,10 @@
 
     internal class FullAutowringDependency: IDependency
     {
+        [NotNull] private readonly IContainer _container;
         [NotNull] private readonly Type _type;
-        [NotNull] private readonly IAutowiringStrategy _autowiringStrategy;
+        [NotNull] private readonly IAutowiringStrategy _defaultAutowiringStrategy;
+        [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
         [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static readonly MethodInfo InjectMethodInfo;
         [NotNull] private static Cache<ConstructorInfo, NewExpression> _constructors = new Cache<ConstructorInfo, NewExpression>();
@@ -25,13 +28,15 @@
 
         public FullAutowringDependency([NotNull] IContainer container, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
-            if (container == null) throw new ArgumentNullException(nameof(container));
+            _container = container ?? throw new ArgumentNullException(nameof(container));
             _type = type ?? throw new ArgumentNullException(nameof(type));
+            _defaultAutowiringStrategy = new DefaultAutowiringStrategy(container);
             if (autowiringStrategy == null)
             {
-                _autowiringStrategy = container.TryGetResolver<IAutowiringStrategy>(typeof(IAutowiringStrategy), out var contextResolver)
-                    ? contextResolver(container)
-                    : new DefaultAutowiringStrategy(container);
+                if (container.TryGetResolver<IAutowiringStrategy>(typeof(IAutowiringStrategy), out var contextResolver))
+                {
+                    _autowiringStrategy = contextResolver(container);
+                }
             }
             else
             {
@@ -39,12 +44,43 @@
             }
         }
 
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            var typeDescriptor = _type.Descriptor().ToDefinedGenericType(buildContext.Key.Type.Descriptor()).Descriptor();
-            var ctor = _autowiringStrategy.SelectConstructor(GetDefaultConstructors(typeDescriptor).Select(i => new Method<ConstructorInfo>(i)));
-            var methods = _autowiringStrategy.GetInitializers(GetDefaultMethods(typeDescriptor).Select(i => new Method<MethodInfo>(i)));
+            Type instanceType = null;
+            if (!(_autowiringStrategy?.TryResolveType(_type, buildContext.Key.Type, out instanceType) ?? false))
+            {
+                if (!_defaultAutowiringStrategy.TryResolveType(_type, buildContext.Key.Type, out instanceType))
+                {
+                    instanceType = null;
+                }
+            }
+
+            var typeDescriptor = (instanceType ?? _container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)).Descriptor();
+            var defaultConstructors = GetDefaultConstructors(typeDescriptor);
+            IMethod<ConstructorInfo> ctor = null;
+            if (!(_autowiringStrategy?.TryResolveConstructor(defaultConstructors, out ctor) ?? false))
+            {
+                if (!_defaultAutowiringStrategy.TryResolveConstructor(defaultConstructors, out ctor))
+                {
+                    ctor = null;
+                }
+            }
+
+            ctor = ctor ?? _container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
+
+            var defaultMehods = GetDefaultMethods(typeDescriptor);
+            IEnumerable<IMethod<MethodInfo>> initializers = null;
+            if (!(_autowiringStrategy?.TryResolveInitializers(defaultMehods, out initializers) ?? false))
+            {
+                if (!_defaultAutowiringStrategy.TryResolveInitializers(defaultMehods, out initializers))
+                {
+                    initializers = null;
+                }
+            }
+
+            initializers = initializers ?? Enumerable.Empty<IMethod<MethodInfo>>();
 
             var newExpression = _constructors.GetOrCreate(ctor.Info, () => Expression.New(ctor.Info, GetParameters(ctor)));
             var thisExpression = _this.GetOrCreate(typeDescriptor.AsType(), () =>
@@ -55,27 +91,29 @@
             });
 
             var methodCallExpressions = (
-                from method in methods
-                select (Expression)Expression.Call(thisExpression, method.Info, GetParameters(method))).ToArray();
+                from initializer in initializers
+                select (Expression)Expression.Call(thisExpression, initializer.Info, GetParameters(initializer))).ToArray();
 
             var autowringDependency = new AutowringDependency(newExpression, methodCallExpressions);
             return autowringDependency.TryBuildExpression(buildContext, lifetime, out baseExpression);
         }
 
         [NotNull]
-        private static IEnumerable<ConstructorInfo> GetDefaultConstructors([NotNull] TypeDescriptor typeDescriptor)
+        private static IEnumerable<Method<ConstructorInfo>> GetDefaultConstructors([NotNull] TypeDescriptor typeDescriptor)
         {
             return typeDescriptor.GetDeclaredConstructors()
                 .Where(MethodFilter)
-                .OrderBy(ctor => ctor.GetParameters().Length);
+                .OrderBy(ctor => ctor.GetParameters().Length)
+                .Select(i => new Method<ConstructorInfo>(i));
         }
 
         [NotNull]
-        private static IEnumerable<MethodInfo> GetDefaultMethods([NotNull] TypeDescriptor typeDescriptor)
+        private static IEnumerable<Method<MethodInfo>> GetDefaultMethods([NotNull] TypeDescriptor typeDescriptor)
         {
             return typeDescriptor.GetDeclaredMethods()
                 .Where(MethodFilter)
-                .OrderBy(methodInfo => methodInfo.GetParameters().Length);
+                .OrderBy(methodInfo => methodInfo.GetParameters().Length)
+                .Select(i => new Method<MethodInfo>(i));
         }
 
         private static bool MethodFilter<T>([NotNull] T method)

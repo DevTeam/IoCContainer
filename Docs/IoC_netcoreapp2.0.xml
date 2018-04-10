@@ -910,24 +910,20 @@
             <param name="lifetime">The lifetime.</param>
             <returns>The resulting expression.</returns>
         </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CannotFindConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})">
+        <member name="M:IoC.Extensibility.IIssueResolver.CannotResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})">
             <summary>
-            Handles the scenario when cannot find a constructor.
+            Handles the scenario when cannot resolve a constructor.
             </summary>
             <param name="constructors">Available constructors.</param>
             <returns>The constructor.</returns>
         </member>
-        <member name="T:IoC.Extensibility.IValidator">
+        <member name="M:IoC.Extensibility.IIssueResolver.CannotResolveType(System.Type,System.Type)">
             <summary>
-            Represents a container validator.
+            Handles the scenario when cannot resolve the instance type.
             </summary>
-        </member>
-        <member name="M:IoC.Extensibility.IValidator.Validate(IoC.IContainer)">
-            <summary>
-            Calidates a container.
-            </summary>
-            <param name="container">The target container.</param>
-            <returns>The validation results.</returns>
+            <param name="registeredType">Registered type.</param>
+            <param name="resolvingType">Resolving type.</param>
+            <returns>The type to create an instance.</returns>
         </member>
         <member name="T:IoC.Extensibility.WellknownExpressions">
             <summary>
@@ -1069,13 +1065,6 @@
             <param name="parent">The parent container.</param>
             <param name="name">The name of child container.</param>
             <returns>The child container.</returns>
-        </member>
-        <member name="M:IoC.Fluent.Validate(IoC.IContainer)">
-            <summary>
-            Validates the target container.
-            </summary>
-            <param name="container">The target container.</param>
-            <returns>The validation result.</returns>
         </member>
         <member name="T:IoC.FluentAutowiring">
             <summary>
@@ -1867,19 +1856,30 @@
             Represents an abstraction for an autowirin method.
             </summary>
         </member>
-        <member name="M:IoC.IAutowiringStrategy.SelectConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})">
+        <member name="M:IoC.IAutowiringStrategy.TryResolveType(System.Type,System.Type,System.Type@)">
             <summary>
-            Selects a constructor from a set of available constructors.
+            Resolves type to create an instance.
+            </summary>
+            <param name="registeredType">Registered type.</param>
+            <param name="resolvingType">Resolving type.</param>
+            <param name="instanceType">The type to create an instance.</param>
+            <returns>True if the type was resolved.</returns>
+        </member>
+        <member name="M:IoC.IAutowiringStrategy.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
+            <summary>
+            Resolves a constructor from a set of available constructors.
             </summary>
             <param name="constructors">The set of available constructors.</param>
-            <returns>The selected constructor.</returns>
+            <param name="constructor">The resolved constructor.</param>
+            <returns>True if the constructor was resolved.</returns>
         </member>
-        <member name="M:IoC.IAutowiringStrategy.GetInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}})">
+        <member name="M:IoC.IAutowiringStrategy.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
             <summary>
-            Provides initializing methods from a set of available methods/setters in the order which will be used to invoke them.
+            Resolves initializing methods from a set of available methods/setters in the order which will be used to invoke them.
             </summary>
             <param name="methods">The set of available methods.</param>
-            <returns>The set of initializing methods in the appropriate order.</returns>
+            <param name="initializers">The set of initializing methods in the appropriate order.</param>
+            <returns>True if initializing methods were resolved.</returns>
         </member>
         <member name="T:IoC.IBinding`1">
             <summary>
@@ -2228,26 +2228,6 @@
         </member>
         <member name="M:IoC.Tag.ToString">
             <inheritdoc />
-        </member>
-        <member name="T:IoC.ValidationResult">
-            <summary>
-            Represents a container's validation result.
-            </summary>
-        </member>
-        <member name="F:IoC.ValidationResult.ResolvedKeys">
-            <summary>
-            Keys that were resolved successfully.
-            </summary>
-        </member>
-        <member name="F:IoC.ValidationResult.UnresolvedKeys">
-            <summary>
-            Keys that were not resolved successfully.
-            </summary>
-        </member>
-        <member name="P:IoC.ValidationResult.IsValid">
-            <summary>
-            True if the container could be used successfully.
-            </summary>
         </member>
         <member name="T:IoC.WellknownContainers">
             <summary>

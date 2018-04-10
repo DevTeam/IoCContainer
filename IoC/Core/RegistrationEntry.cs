@@ -104,7 +104,7 @@
 
             public override int GetHashCode() => _genericTypes != null ? _genericTypes.GetHash() : 0;
 
-            private bool Equals(LifetimeKey other) => Extensions.SequenceEqual(_genericTypes, other._genericTypes);
+            private bool Equals(LifetimeKey other) => _genericTypes.SequenceEqual(other._genericTypes);
         }
     }
 }

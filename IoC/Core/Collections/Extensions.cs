@@ -7,7 +7,7 @@
     internal static class Extensions
     {
         [MethodImpl((MethodImplOptions)256)]
-        public static bool SequenceEqual<T>([NotNull] T[] array1, [NotNull] T[] array2)
+        public static bool SequenceEqual<T>([NotNull] this T[] array1, [NotNull] T[] array2)
         {
             return ((System.Collections.IStructuralEquatable)array1).Equals(array2, System.Collections.StructuralComparisons.StructuralEqualityComparer);
         }

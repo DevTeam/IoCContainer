@@ -25,13 +25,6 @@
             return parent.GetResolver<IContainer>(WellknownContainers.Child.AsTag())(parent, name);
         }
 
-        /// <summary>
-        /// Validates the target container.
-        /// </summary>
-        /// <param name="container">The target container.</param>
-        /// <returns>The validation result.</returns>
-        public static ValidationResult Validate([NotNull] this IContainer container) => container.Resolve<IValidator>().Validate(container);
-
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         internal static IIssueResolver GetIssueResolver([NotNull] this IContainer container)

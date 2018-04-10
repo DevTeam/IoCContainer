@@ -42,51 +42,6 @@
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static Type ToDefinedGenericType([NotNull] this TypeDescriptor typeDescriptor, TypeDescriptor targetTypeDescriptor)
-        {
-            if (!typeDescriptor.IsGenericTypeDefinition())
-            {
-                return typeDescriptor.AsType();
-            }
-
-            var genericTypeParameters = typeDescriptor.GetGenericTypeParameters();
-            var typesMap = genericTypeParameters.Distinct().Zip(GenericTypeArguments.Types, Tuple.Create).ToDictionary(i => i.Item1, i => i.Item2);
-
-            var targetTypeDefenitionDescriptor = targetTypeDescriptor.GetGenericTypeDefinition().Descriptor();
-            var targetTypeDefenitionGenericTypeParameters = targetTypeDefenitionDescriptor.GetGenericTypeParameters();
-            var constraintsMap = targetTypeDescriptor.GetGenericTypeArguments().Zip(targetTypeDefenitionGenericTypeParameters, (targetType, typeDefenition) => Tuple.Create(targetType, typeDefenition.Descriptor().GetGenericParameterConstraints())).ToArray();
-
-            for (var position = 0; position < genericTypeParameters.Length; position++)
-            {
-                var genericType = genericTypeParameters[position];
-                if (!genericType.IsGenericParameter)
-                {
-                    continue;
-                }
-
-                var descriptor =  genericType.Descriptor();
-                var constraints = descriptor.GetGenericParameterConstraints();
-                if (constraints.Length == 0)
-                {
-                    genericTypeParameters[position] = typesMap[genericType];
-                    continue;
-                }
-
-                foreach (var constraintsEntry in constraintsMap)
-                {
-                    if (Extensions.SequenceEqual(constraints, constraintsEntry.Item2))
-                    {
-                        genericTypeParameters[position] = constraintsEntry.Item1;
-                        break;
-                    }
-                }
-            }
-
-            return typeDescriptor.MakeGenericType(genericTypeParameters);
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
         public static Type ToGenericType([NotNull] this Type type)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));

@@ -78,7 +78,15 @@ namespace IoC.Tests.UsageScenarios
 
         private class AspectOrientedAutowiringStrategy : IAutowiringStrategy
         {
-            public IMethod<ConstructorInfo> SelectConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors) => (
+            public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
+            {
+                instanceType = default(Type);
+                return false;
+            }
+
+            public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
+            {
+                constructor = (
                     from ctor in constructors
                     let autowringAttribute = ctor.Info.GetCustomAttribute<AutowiringAttribute>()
                     // filters constructors containing the attribute Autowiring
@@ -86,26 +94,34 @@ namespace IoC.Tests.UsageScenarios
                     // sorts constructors by autowringAttribute.Order
                     orderby autowringAttribute.Order
                     select ctor)
-                // Get a first appropriate constructor
-                .First();
+                    // Get a first appropriate constructor
+                    .First();
 
-            public IEnumerable<IMethod<MethodInfo>> GetInitializers(IEnumerable<IMethod<MethodInfo>> methods) =>
-                from method in methods
-                let autowringAttribute = method.Info.GetCustomAttribute<AutowiringAttribute>()
-                // filters methods/property setters containing the attribute Autowiring
-                where autowringAttribute != null
-                // sorts methods/property setters by autowringAttribute.Order
-                orderby autowringAttribute.Order
-                where (
-                    from parameter in method.Info.GetParameters()
-                    let injectAttribute = parameter.GetCustomAttribute<TagAttribute>()
-                    // filters parameters containing a custom tag value to make a dependency injection
-                    where injectAttribute?.Tag != null || autowringAttribute.DefaultTag != null
-                    // redefines the default dependency
-                    select method.TryInjectDependency(parameter.Position, parameter.ParameterType, injectAttribute?.Tag ?? autowringAttribute.DefaultTag))
-                 // checks that all custom injection were successfully
-                .All(isInjected => isInjected)
-                select method;
+                return true;
+            }
+
+            public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
+            {
+                initializers =
+                    from method in methods
+                    let autowringAttribute = method.Info.GetCustomAttribute<AutowiringAttribute>()
+                    // filters methods/property setters containing the attribute Autowiring
+                    where autowringAttribute != null
+                    // sorts methods/property setters by autowringAttribute.Order
+                    orderby autowringAttribute.Order
+                    where (
+                            from parameter in method.Info.GetParameters()
+                            let injectAttribute = parameter.GetCustomAttribute<TagAttribute>()
+                            // filters parameters containing a custom tag value to make a dependency injection
+                            where injectAttribute?.Tag != null || autowringAttribute.DefaultTag != null
+                            // redefines the default dependency
+                            select method.TryInjectDependency(parameter.Position, parameter.ParameterType, injectAttribute?.Tag ?? autowringAttribute.DefaultTag))
+                        // checks that all custom injection were successfully
+                        .All(isInjected => isInjected)
+                    select method;
+
+                return true;
+            }
         }
 
         public interface IConsole

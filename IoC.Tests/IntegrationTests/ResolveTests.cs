@@ -65,7 +65,6 @@
                     instance3.ShouldBeOfType<MyService>();
                     instance1.ShouldBeOfType<MyService>();
                     instance2.ShouldBeOfType<MyService>();
-                    container.Validate().IsValid.ShouldBeTrue();
                 }
             }
         }
