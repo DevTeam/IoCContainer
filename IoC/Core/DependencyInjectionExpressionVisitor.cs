@@ -14,9 +14,6 @@
         private static readonly Key ContextKey = new Key(typeof(Context));
         [NotNull] private static readonly TypeDescriptor ContextTypeDescriptor = Descriptor<Context>();
         [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
-        [NotNull] private static readonly MethodInfo InjectMethodInfo;
-        [NotNull] private static readonly MethodInfo InjectWithTagMethodInfo;
-        private static readonly MethodInfo AssigmentCallExpressionMethodInfo;
         [NotNull] private static readonly ConstructorInfo ContextConstructor;
         [NotNull] private readonly Stack<Key> _keys = new Stack<Key>();
         [NotNull] private readonly IContainer _container;
@@ -25,12 +22,6 @@
 
         static DependencyInjectionExpressionVisitor()
         {
-            Expression<Func<object>> injectExpression = () => default(IContainer).Inject<object>();
-            InjectMethodInfo = ((MethodCallExpression)injectExpression.Body).Method.GetGenericMethodDefinition();
-            Expression<Func<object>> injectWithTagExpression = () => default(IContainer).Inject<object>(null);
-            InjectWithTagMethodInfo = ((MethodCallExpression)injectWithTagExpression.Body).Method.GetGenericMethodDefinition();
-            Expression<Action<object, object>> assigmentCallExpression = (item1, item2) => default(IContainer).Inject<object>(null, null);
-            AssigmentCallExpressionMethodInfo = ((MethodCallExpression)assigmentCallExpression.Body).Method.GetGenericMethodDefinition();
             ContextConstructor = Descriptor<Context>().GetDeclaredConstructors().Single();
         }
 
@@ -48,7 +39,7 @@
             if (methodCall.Method.IsGenericMethod)
             {
                 // container.Inject<T>()
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), InjectMethodInfo))
+                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectMethodInfo))
                 {
                     var type = methodCall.Method.GetGenericArguments()[0];
                     var containerExpression = Visit(methodCall.Arguments[0]);
@@ -57,7 +48,7 @@
                 }
 
                 // container.Inject<T>(tag)
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), InjectWithTagMethodInfo))
+                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectWithTagMethodInfo))
                 {
                     var type = methodCall.Method.GetGenericArguments()[0];
                     var containerExpression = Visit(methodCall.Arguments[0]);
@@ -68,7 +59,7 @@
                 }
 
                 // container.Inject<T>(destination, source)
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), AssigmentCallExpressionMethodInfo))
+                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectingAssignmentMethodInfo))
                 {
                     var dstExpression = Visit(methodCall.Arguments[1]);
                     var srcExpression = Visit(methodCall.Arguments[2]);

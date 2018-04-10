@@ -1,0 +1,33 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard1.0</TargetFrameworks>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IncludeBuildOutput>false</IncludeBuildOutput>
+    <NuspecFile>IoC.Container.Source.nuspec</NuspecFile>
+    <WarningsAsErrors />
+    <TransformOnBuild>True</TransformOnBuild>
+    <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="**/*.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="IoC.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>IoC.cs</LastGenOutput>
+    </None>
+    <Content Include="IoC.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>IoC.tt</DependentUpon>
+    </Content>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+
+</Project>

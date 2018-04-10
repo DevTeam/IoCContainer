@@ -15,16 +15,10 @@
         [NotNull] private readonly IAutowiringStrategy _defaultAutowiringStrategy;
         [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
         [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
-        [NotNull] private static readonly MethodInfo InjectMethodInfo;
+        
         [NotNull] private static Cache<ConstructorInfo, NewExpression> _constructors = new Cache<ConstructorInfo, NewExpression>();
         [NotNull] private static Cache<Type, Expression> _this = new Cache<Type, Expression>();
         [NotNull] private static Cache<Type, MethodCallExpression> _injections = new Cache<Type, MethodCallExpression>();
-
-        static FullAutowringDependency()
-        {
-            Expression<Func<object>> injectExpression = () => default(IContainer).Inject<object>();
-            InjectMethodInfo = ((MethodCallExpression)injectExpression.Body).Method.GetGenericMethodDefinition();
-        }
 
         public FullAutowringDependency([NotNull] IContainer container, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
@@ -148,7 +142,7 @@
                     var paramType = parameter.ParameterType;
                     _parameters[i] = _injections.GetOrCreate(paramType, () =>
                     {
-                        var methodInfo = InjectMethodInfo.MakeGenericMethod(paramType);
+                        var methodInfo = Injections.InjectMethodInfo.MakeGenericMethod(paramType);
                         var containerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
                         return Expression.Call(methodInfo, containerExpression);
                     });

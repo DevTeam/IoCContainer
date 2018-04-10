@@ -2,6 +2,8 @@
 namespace IoC
 {
     using System;
+    using System.Linq.Expressions;
+    using System.Reflection;
 
     /// <summary>
     /// Injection extensions.
@@ -10,6 +12,19 @@ namespace IoC
     public static class Injections
     {
         internal const string JustAMarkerError = "Just a marker. Should be used to configure dependency injection.";
+        [NotNull] internal static readonly MethodInfo InjectMethodInfo;
+        [NotNull] internal static readonly MethodInfo InjectWithTagMethodInfo;
+        [NotNull] internal static readonly MethodInfo InjectingAssignmentMethodInfo;
+
+        static Injections()
+        {
+            Expression<Func<object>> injectExpression = () => default(IContainer).Inject<object>();
+            InjectMethodInfo = ((MethodCallExpression)injectExpression.Body).Method.GetGenericMethodDefinition();
+            Expression<Func<object>> injectWithTagExpression = () => default(IContainer).Inject<object>(null);
+            InjectWithTagMethodInfo = ((MethodCallExpression)injectWithTagExpression.Body).Method.GetGenericMethodDefinition();
+            Expression<Action<object, object>> assigmentCallExpression = (item1, item2) => default(IContainer).Inject<object>(null, null);
+            InjectingAssignmentMethodInfo = ((MethodCallExpression)assigmentCallExpression.Body).Method.GetGenericMethodDefinition();
+        }
 
         /// <summary>
         /// Injects the dependency. Just a marker.

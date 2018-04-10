@@ -9,14 +9,6 @@
     /// </summary>
     public static class FluentAutowiring
     {
-        [NotNull] private static readonly MethodInfo InjectMethodInfo;
-
-        static FluentAutowiring()
-        {
-            Expression<Func<object>> injectExpression = () => default(IContainer).Inject<object>(null);
-            InjectMethodInfo = ((MethodCallExpression)injectExpression.Body).Method.GetGenericMethodDefinition();
-        }
-
         /// <summary>
         /// Injects dependency to parameter.
         /// </summary>
@@ -32,7 +24,7 @@
             if (method == null) throw new ArgumentNullException(nameof(method));
             if (dependencyType == null) throw new ArgumentNullException(nameof(dependencyType));
             if (parameterPosition < 0) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
-            var methodInfo = InjectMethodInfo.MakeGenericMethod(dependencyType);
+            var methodInfo = Injections.InjectWithTagMethodInfo.MakeGenericMethod(dependencyType);
             var containerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
             var parameterExpression = Expression.Call(methodInfo, containerExpression, Expression.Constant(dependencyTag));
             method[parameterPosition] = parameterExpression;

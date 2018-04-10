@@ -20,6 +20,8 @@
     <MSBuildNative>C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild</MSBuildNative>
     <HasMSBuildNative Condition="Exists('$(XamlTargets)')">true</HasMSBuildNative>
     <XamlTargets>$(MSBuildNative)\Microsoft\WindowsXaml\v15.0\8.21\Microsoft.Windows.UI.Xaml.CSharp.Targets</XamlTargets>
+    <TransformOnBuild>True</TransformOnBuild>
+    <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
@@ -44,10 +46,12 @@
   </PropertyGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='uap10.0'">
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform " Version="5.2.2" />
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform " Version="6.0.8" />
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="IoC.tt" />
+    <Compile Remove="IoC.cs" />
     <PackageReference Include="Vsxmd" Version="1.2.0" Condition="$(HasMSBuildNative)=='true'">
         <PrivateAssets>all</PrivateAssets>
     </PackageReference>

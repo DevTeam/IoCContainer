@@ -1,6 +1,6 @@
 # Simple, powerful and fast IoC container
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
 IoC.Container provides the following benefits:
   - One of the [fastest](#why-this-one), almost as fast as operators `new`
@@ -22,9 +22,13 @@ IoC.Container provides the following benefits:
 
 NuGet packages:
   - IoC.Container
-    - [![NuGet IoC.Container](https://buildstats.info/nuget/IoC.Container?includePreReleases=true)](https://www.nuget.org/packages/IoC.Container)
+    - [![NuGet](https://buildstats.info/nuget/IoC.Container?includePreReleases=true)](https://www.nuget.org/packages/IoC.Container)
+  - IoC.Container.Source (embedding in code)
+    - [![NuGet](https://buildstats.info/nuget/IoC.Container.Source?includePreReleases=true)](https://www.nuget.org/packages/IoC.Container.Source)
   - IoC.AspNetCore
-    - [![NuGet IoC.AspNetCore](https://buildstats.info/nuget/IoC.AspNetCore?includePreReleases=true)](https://www.nuget.org/packages/IoC.AspNetCore)
+    - [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore?includePreReleases=true)](https://www.nuget.org/packages/IoC.AspNetCore)
+  - IoC.AspNetCore.Source (embedding in code)
+    - [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source?includePreReleases=true)](https://www.nuget.org/packages/IoC.AspNetCore.Source)
 
 Supported platforms:
   - .NET 4.0+

@@ -17,7 +17,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'!='net40'">
-    <PackageReference Include="Autofac" Version="4.6.2" />
+    <PackageReference Include="Autofac" Version="4.7.0" />
     <PackageReference Include="LightInject" Version="5.1.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
     <PackageReference Include="Moq" Version="4.8.2" />

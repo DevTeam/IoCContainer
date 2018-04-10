@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+  <metadata minClientVersion="3.3.0">
+    <id>IoC.AspNetCore.Source</id>
+    <authors>NikolayP</authors>
+    <version>$version$</version>
+    <copyright>Copyright (c) 2018 Nikolay Pianikov</copyright>
+    <iconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</iconUrl>
+    <projectUrl>https://github.com/DevTeam/IoCContainer/</projectUrl>
+    <licenseUrl>https://raw.githubusercontent.com/DevTeam/IoCContainer/master/LICENSE</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>AspNetCore feature for IoC container</description>
+    <tags>ASP net core IoC inversionofcontrol Container DI dependencyinjection</tags>
+    <contentFiles>
+      <files include="cs/any/*.cs" buildAction="Compile" />
+    </contentFiles>
+    <dependencies>
+      <dependency id="IoC.Container.Source" version="$version$" include="contentFiles"/>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="*.cs" target="contentFiles\cs\any" />
+  </files>
+</package>
