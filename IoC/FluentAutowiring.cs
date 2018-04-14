@@ -27,7 +27,7 @@
             var methodInfo = Injections.InjectWithTagMethodInfo.MakeGenericMethod(dependencyType);
             var containerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
             var parameterExpression = Expression.Call(methodInfo, containerExpression, Expression.Constant(dependencyTag));
-            method[parameterPosition] = parameterExpression;
+            method.SetParameterExpression(parameterPosition, parameterExpression);
             return true;
         }
     }

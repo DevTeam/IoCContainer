@@ -1781,7 +1781,7 @@ namespace IoC
             var methodInfo = Injections.InjectWithTagMethodInfo.MakeGenericMethod(dependencyType);
             var containerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
             var parameterExpression = Expression.Call(methodInfo, containerExpression, Expression.Constant(dependencyTag));
-            method[parameterPosition] = parameterExpression;
+            method.SetParameterExpression(parameterPosition, parameterExpression);
             return true;
         }
     }
@@ -3297,6 +3297,7 @@ namespace IoC
 namespace IoC
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
 
@@ -3314,13 +3315,17 @@ namespace IoC
         [NotNull] TMethodInfo Info { get; }
 
         /// <summary>
-        /// Parameter's expression at the position.
+        /// Provides parameters' expressions.
         /// </summary>
-        /// <param name="position"></param>
-        /// <returns></returns>
-        [NotNull] Expression this[int position] { get; set; }
+        /// <returns>Parameters' expressions</returns>
+        [NotNull] IEnumerable<Expression> GetParametersExpressions();
 
-        // void DefineParameter<T>(int position, [NotNull] Expression<Func<Context, T>> expression);
+        /// <summary>
+        /// Sets the parameter expression at the position.
+        /// </summary>
+        /// <param name="parameterPosition">The parameter position.</param>
+        /// <param name="parameterExpression">The parameter expression.</param>
+        void SetParameterExpression(int parameterPosition, [NotNull] Expression parameterExpression);
     }
 }
 
@@ -5979,6 +5984,7 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
     using Extensibility;
 
     internal class FullAutowringDependency: IDependency
@@ -5991,7 +5997,6 @@ namespace IoC.Core
         
         [NotNull] private static Cache<ConstructorInfo, NewExpression> _constructors = new Cache<ConstructorInfo, NewExpression>();
         [NotNull] private static Cache<Type, Expression> _this = new Cache<Type, Expression>();
-        [NotNull] private static Cache<Type, MethodCallExpression> _injections = new Cache<Type, MethodCallExpression>();
 
         public FullAutowringDependency([NotNull] IContainer container, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
@@ -6025,7 +6030,7 @@ namespace IoC.Core
             }
 
             var typeDescriptor = (instanceType ?? _container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)).Descriptor();
-            var defaultConstructors = GetDefaultConstructors(typeDescriptor);
+            var defaultConstructors = CreateMethods(typeDescriptor.GetDeclaredConstructors());
             IMethod<ConstructorInfo> ctor = null;
             if (!(_autowiringStrategy?.TryResolveConstructor(defaultConstructors, out ctor) ?? false))
             {
@@ -6037,7 +6042,7 @@ namespace IoC.Core
 
             ctor = ctor ?? _container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
 
-            var defaultMehods = GetDefaultMethods(typeDescriptor);
+            var defaultMehods = CreateMethods(typeDescriptor.GetDeclaredMethods());
             IEnumerable<IMethod<MethodInfo>> initializers = null;
             if (!(_autowiringStrategy?.TryResolveInitializers(defaultMehods, out initializers) ?? false))
             {
@@ -6049,7 +6054,7 @@ namespace IoC.Core
 
             initializers = initializers ?? Enumerable.Empty<IMethod<MethodInfo>>();
 
-            var newExpression = _constructors.GetOrCreate(ctor.Info, () => Expression.New(ctor.Info, GetParameters(ctor)));
+            var newExpression = _constructors.GetOrCreate(ctor.Info, () => Expression.New(ctor.Info, ctor.GetParametersExpressions()));
             var thisExpression = _this.GetOrCreate(typeDescriptor.AsType(), () =>
             {
                 var contextType = GenericContextTypeDescriptor.MakeGenericType(typeDescriptor.AsType());
@@ -6059,77 +6064,19 @@ namespace IoC.Core
 
             var methodCallExpressions = (
                 from initializer in initializers
-                select (Expression)Expression.Call(thisExpression, initializer.Info, GetParameters(initializer))).ToArray();
+                select (Expression)Expression.Call(thisExpression, initializer.Info, initializer.GetParametersExpressions())).ToArray();
 
             var autowringDependency = new AutowringDependency(newExpression, methodCallExpressions);
             return autowringDependency.TryBuildExpression(buildContext, lifetime, out baseExpression);
         }
 
         [NotNull]
-        private static IEnumerable<Method<ConstructorInfo>> GetDefaultConstructors([NotNull] TypeDescriptor typeDescriptor)
-        {
-            return typeDescriptor.GetDeclaredConstructors()
-                .Where(MethodFilter)
-                .OrderBy(ctor => ctor.GetParameters().Length)
-                .Select(i => new Method<ConstructorInfo>(i));
-        }
-
-        [NotNull]
-        private static IEnumerable<Method<MethodInfo>> GetDefaultMethods([NotNull] TypeDescriptor typeDescriptor)
-        {
-            return typeDescriptor.GetDeclaredMethods()
-                .Where(MethodFilter)
-                .OrderBy(methodInfo => methodInfo.GetParameters().Length)
-                .Select(i => new Method<MethodInfo>(i));
-        }
-
-        private static bool MethodFilter<T>([NotNull] T method)
-            where T: MethodBase
-        {
-            return !method.IsStatic && (method.IsAssembly || method.IsPublic);
-        }
-
-        [NotNull]
-        private static IEnumerable<Expression> GetParameters<TMethodInfo>(IMethod<TMethodInfo> method)
+        [MethodImpl((MethodImplOptions) 256)]
+        private static IEnumerable<Method<TMethodInfo>> CreateMethods<TMethodInfo>([NotNull] IEnumerable<TMethodInfo> methodInfos)
             where TMethodInfo: MethodBase
-        {
-            for (var position = 0; position < method.Info.GetParameters().Length; position++)
-            {
-                yield return method[position];
-            }
-        }
-
-        private class Method<TMethodInfo>: IMethod<TMethodInfo>
-            where TMethodInfo: MethodBase
-        {
-            private readonly Expression[] _parameters;
-
-            public Method([NotNull] TMethodInfo info)
-            {
-                Info = info ?? throw new ArgumentNullException(nameof(info));
-                var parameters = info.GetParameters();
-                _parameters = new Expression[parameters.Length];
-                for (var i = 0; i < _parameters.Length; i++)
-                {
-                    var parameter = parameters[i];
-                    var paramType = parameter.ParameterType;
-                    _parameters[i] = _injections.GetOrCreate(paramType, () =>
-                    {
-                        var methodInfo = Injections.InjectMethodInfo.MakeGenericMethod(paramType);
-                        var containerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
-                        return Expression.Call(methodInfo, containerExpression);
-                    });
-                }
-            }
-
-            public TMethodInfo Info { get; }
-
-            public Expression this[int position]
-            {
-                get => _parameters[position];
-                set => _parameters[position] = value ?? throw new ArgumentNullException();
-            }
-        }
+            => methodInfos
+                .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
+                .Select(info => new Method<TMethodInfo>(info));
     }
 }
 
@@ -6287,6 +6234,59 @@ namespace IoC.Core
     }
 }
 
+
+#endregion
+#region Method
+
+namespace IoC.Core
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using static Injections;
+
+    internal class Method<TMethodInfo>: IMethod<TMethodInfo> where TMethodInfo: MethodBase
+    {
+        // ReSharper disable once StaticMemberInGenericType
+        [NotNull] private static Cache<Type, MethodCallExpression> _injections = new Cache<Type, MethodCallExpression>();
+        private Lazy<Expression[]> _parametersExpressions;
+
+        public Method([NotNull] TMethodInfo info)
+        {
+            Info = info ?? throw new ArgumentNullException(nameof(info));
+            _parametersExpressions = new Lazy<Expression[]>(() => CreateParametersExpressions(info.GetParameters()));
+        }
+
+        public TMethodInfo Info { get; }
+
+        public IEnumerable<Expression> GetParametersExpressions() => _parametersExpressions.Value;
+
+        public void SetParameterExpression(int parameterPosition, Expression parameterExpression)
+        {
+            if (parameterPosition < 0 || parameterPosition >= _parametersExpressions.Value.Length) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
+            _parametersExpressions.Value[parameterPosition] = parameterExpression ?? throw new ArgumentNullException(nameof(parameterExpression));
+        }
+
+        private static Expression[] CreateParametersExpressions(ParameterInfo[] parameters)
+        {
+            var parametersExpressions = new Expression[parameters.Length];
+            for (var i = 0; i < parametersExpressions.Length; i++)
+            {
+                var parameter = parameters[i];
+                var paramType = parameter.ParameterType;
+                parametersExpressions[i] = _injections.GetOrCreate(paramType, () =>
+                {
+                    var methodInfo = InjectMethodInfo.MakeGenericMethod(paramType);
+                    var containerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
+                    return Expression.Call(methodInfo, containerExpression);
+                });
+            }
+
+            return parametersExpressions;
+        }
+    }
+}
 
 #endregion
 #region NullContainer

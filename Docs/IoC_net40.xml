@@ -2024,12 +2024,18 @@
             The method's information.
             </summary>
         </member>
-        <member name="P:IoC.IMethod`1.Item(System.Int32)">
+        <member name="M:IoC.IMethod`1.GetParametersExpressions">
             <summary>
-            Parameter's expression at the position.
+            Provides parameters' expressions.
             </summary>
-            <param name="position"></param>
-            <returns></returns>
+            <returns>Parameters' expressions</returns>
+        </member>
+        <member name="M:IoC.IMethod`1.SetParameterExpression(System.Int32,System.Linq.Expressions.Expression)">
+            <summary>
+            Sets the parameter expression at the position.
+            </summary>
+            <param name="parameterPosition">The parameter position.</param>
+            <param name="parameterExpression">The parameter expression.</param>
         </member>
         <member name="T:IoC.Injections">
             <summary>

@@ -1,6 +1,7 @@
 ﻿namespace IoC
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
 
@@ -18,12 +19,16 @@
         [NotNull] TMethodInfo Info { get; }
 
         /// <summary>
-        /// Parameter's expression at the position.
+        /// Provides parameters' expressions.
         /// </summary>
-        /// <param name="position"></param>
-        /// <returns></returns>
-        [NotNull] Expression this[int position] { get; set; }
+        /// <returns>Parameters' expressions</returns>
+        [NotNull] IEnumerable<Expression> GetParametersExpressions();
 
-        // void DefineParameter<T>(int position, [NotNull] Expression<Func<Context, T>> expression);
+        /// <summary>
+        /// Sets the parameter expression at the position.
+        /// </summary>
+        /// <param name="parameterPosition">The parameter position.</param>
+        /// <param name="parameterExpression">The parameter expression.</param>
+        void SetParameterExpression(int parameterPosition, [NotNull] Expression parameterExpression);
     }
 }
