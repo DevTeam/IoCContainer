@@ -2,7 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
 
+    [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
     internal class Subject<T>: IObservable<T>, IObserver<T>
     {
         private readonly List<IObserver<T>> _observers = new List<IObserver<T>>();
@@ -27,14 +29,9 @@
         {
             lock (_observers)
             {
-                if (_observers.Count == 0)
+                for (var index = 0; index < _observers.Count; index++)
                 {
-                    return;
-                }
-
-                foreach (var observer in _observers)
-                {
-                    observer.OnNext(value);
+                    _observers[index].OnNext(value);
                 }
             }
         }
@@ -43,9 +40,9 @@
         {
             lock (_observers)
             {
-                foreach (var observer in _observers)
+                for (var index = 0; index < _observers.Count; index++)
                 {
-                    observer.OnError(error);
+                    _observers[index].OnError(error);
                 }
             }
         }
@@ -54,9 +51,9 @@
         {
             lock (_observers)
             {
-                foreach (var observer in _observers)
+                for (var index = 0; index < _observers.Count; index++)
                 {
-                    observer.OnCompleted();
+                    _observers[index].OnCompleted();
                 }
             }
         }

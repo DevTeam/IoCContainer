@@ -29,7 +29,7 @@
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
-            => container.Register(new[] { typeof(T) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -44,7 +44,7 @@
         [NotNull]
         public static IDisposable Register<T, T1>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1 
-            => container.Register(new[] { typeof(T1) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -60,7 +60,7 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2 
-            => container.Register(new[] { typeof(T1), typeof(T2) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -77,7 +77,7 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3 
-            => container.Register(new[] {typeof(T1), typeof(T2), typeof(T3)}, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] {typeof(T1), typeof(T2), typeof(T3)}, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -95,7 +95,7 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -114,7 +114,7 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5 
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -133,7 +133,7 @@
         [MethodImpl((MethodImplOptions)256)]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -154,7 +154,7 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6, T7
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -176,7 +176,7 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6, T7, T8
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.

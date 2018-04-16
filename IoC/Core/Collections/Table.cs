@@ -14,9 +14,9 @@
         private readonly int _count;
 
         [MethodImpl((MethodImplOptions)256)]
-        private Table()
+        private Table(int divisor = 4)
         {
-            Divisor = 2;
+            Divisor = divisor;
             Buckets = ResizableArray<Bucket>.Create(Divisor, Bucket.EmptyBucket);
         }
 
@@ -99,13 +99,15 @@
         }
 
         [Pure]
-        public Table<TKey, TValue> Remove(int hashCode, TKey key)
+        public Table<TKey, TValue> Remove(int hashCode, TKey key, out bool removed)
         {
-            var newTable = new Table<TKey, TValue>();
+            removed = false;
+            var newTable = new Table<TKey, TValue>(Divisor);
             foreach (var keyValue in this)
             {
                 if (keyValue.HashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
                 {
+                    removed = true;
                     continue;
                 }
 

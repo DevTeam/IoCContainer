@@ -23,7 +23,7 @@ namespace IoC.Tests
         public void ShouldDefinedGenericType(Type type, Type targetType, Type expectedType, bool expectedResult)
         {
             // Given
-            var autowiringStrategy = new DefaultAutowiringStrategy(Mock.Of<IContainer>());
+            var autowiringStrategy = DefaultAutowiringStrategy.Shared;
 
             // When
             var actualResult = autowiringStrategy.TryResolveType(type, targetType, out var actualType);
@@ -44,7 +44,7 @@ namespace IoC.Tests
         public void ShouldResolveConstructor(Type type, bool expectedResult)
         {
             // Given
-            var autowiringStrategy = new DefaultAutowiringStrategy(Mock.Of<IContainer>());
+            var autowiringStrategy = DefaultAutowiringStrategy.Shared;
 
             // When
             var actualResult = autowiringStrategy.TryResolveConstructor(type.Descriptor().GetDeclaredConstructors().Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic)).Select(constructorInfo => new Method<ConstructorInfo>(constructorInfo)), out var actualConstructor);
@@ -63,7 +63,7 @@ namespace IoC.Tests
         public void ShouldResolveInitializers(Type type, bool expectedResult, int expectedInitializersCount)
         {
             // Given
-            var autowiringStrategy = new DefaultAutowiringStrategy(Mock.Of<IContainer>());
+            var autowiringStrategy = DefaultAutowiringStrategy.Shared;
 
             // When
             var actualResult = autowiringStrategy.TryResolveInitializers(type.Descriptor().GetDeclaredMethods().Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic)).Select(methodInfo => new Method<MethodInfo>(methodInfo)), out var actualInitializers);

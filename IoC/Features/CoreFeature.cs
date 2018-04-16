@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Threading;
     using Core;
     using Lifetimes;
@@ -24,8 +25,10 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => IssueResolver.Shared);
-            yield return container.Register<IAutowiringStrategy>(ctx => new DefaultAutowiringStrategy(ctx.Container));
+            yield return container.Register(ctx => DefaultAutowiringStrategy.Shared);
             yield return container.Register(ctx => ctx.Container.GetResolver<TT>(ctx.Key.Tag.AsTag()), null, Feature.AnyTag);
+            yield return container.Register<IMethod<ConstructorInfo>>(ctx => new Method<ConstructorInfo>((ConstructorInfo)ctx.Args[0]));
+            yield return container.Register<IMethod<MethodInfo>>(ctx => new Method<MethodInfo>((MethodInfo)ctx.Args[0]));
 
             // Lifetimes
             yield return container.Register<ILifetime>(ctx => new SingletonLifetime(), null, new object[] { Lifetime.Singleton });

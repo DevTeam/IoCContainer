@@ -7,10 +7,15 @@
 <#@ output extension=".cs" #>
 
 // IoC Container APS.NET core feature
+//
+// Important note: do not use any internal classes, structures, enums, interfaces, methods, fields or properties
+// because it may be changed even in minor updates of package.
+//
 // Copyright (c) 2018 Nikolay Pianikov
+//
 // ReSharper disable All
 <#
-    var currentPath = this.Host.ResolvePath("../IoC.AspNetCore");
+    var currentPath = this.Host.ResolvePath(".." + Path.DirectorySeparatorChar + "IoC.AspNetCore");
     var paths = new string[]{
         "."};
 

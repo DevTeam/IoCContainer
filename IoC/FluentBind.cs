@@ -249,7 +249,7 @@
         public static IDisposable To([NotNull] this IBinding<object> binding, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(binding.Container, type, autowiringStrategy)));
+            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(type, autowiringStrategy)));
         }
 
         /// <summary>
@@ -264,7 +264,7 @@
         public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(binding.Container, typeof(T), autowiringStrategy)));
+            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(typeof(T), autowiringStrategy)));
         }
 
         /// <summary>
@@ -292,17 +292,16 @@
         /// </summary>
         /// <param name="registrationToken"></param>
         [MethodImpl((MethodImplOptions)256)]
-        public static void ToSelf([NotNull] this IDisposable registrationToken)
+        public static IContainer ToSelf([NotNull] this IDisposable registrationToken)
         {
             if (registrationToken == null) throw new ArgumentNullException(nameof(registrationToken));
             if (registrationToken is RegistrationToken token)
             {
                 token.Container.Resolve<IResourceStore>().AddResource(registrationToken);
+                return token.Container;
             }
-            else
-            {
-                throw new NotSupportedException();
-            }
+
+            throw new NotSupportedException();
         }
 
         [NotNull]
@@ -312,17 +311,15 @@
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
 
-            var keys = (
+            var tags = binding.Tags.DefaultIfEmpty(null);
+            var keys =
                 from type in binding.Types
-                from tag in binding.Tags.DefaultIfEmpty(null)
-                select new Key(type, tag)).Distinct();
+                from tag in tags
+                select new Key(type, tag);
 
-            if (!binding.Container.TryRegister(keys, dependency, binding.Lifetime, out var registrationToken))
-            {
-                return binding.Container.GetIssueResolver().CannotRegister(binding.Container, keys.ToArray());
-            }
-
-            return registrationToken;
+            return binding.Container.TryRegister(keys, dependency, binding.Lifetime, out var registrationToken)
+                ? registrationToken
+                : binding.Container.GetIssueResolver().CannotRegister(binding.Container, keys.ToArray());
         }
     }
 }

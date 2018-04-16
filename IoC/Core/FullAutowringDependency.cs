@@ -11,64 +11,69 @@
 
     internal class FullAutowringDependency: IDependency
     {
-        [NotNull] private readonly IContainer _container;
-        [NotNull] private readonly Type _type;
-        [NotNull] private readonly IAutowiringStrategy _defaultAutowiringStrategy;
-        [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
         [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
-        
         [NotNull] private static Cache<ConstructorInfo, NewExpression> _constructors = new Cache<ConstructorInfo, NewExpression>();
         [NotNull] private static Cache<Type, Expression> _this = new Cache<Type, Expression>();
+        [NotNull] private readonly Type _type;
+        [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
 
-        public FullAutowringDependency([NotNull] IContainer container, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
+        public FullAutowringDependency([NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
-            _container = container ?? throw new ArgumentNullException(nameof(container));
             _type = type ?? throw new ArgumentNullException(nameof(type));
-            _defaultAutowiringStrategy = new DefaultAutowiringStrategy(container);
-            if (autowiringStrategy == null)
-            {
-                if (container.TryGetResolver<IAutowiringStrategy>(typeof(IAutowiringStrategy), out var contextResolver))
-                {
-                    _autowiringStrategy = contextResolver(container);
-                }
-            }
-            else
-            {
-                _autowiringStrategy = autowiringStrategy;
-            }
+            _autowiringStrategy = autowiringStrategy;
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            Type instanceType = null;
-            if (!(_autowiringStrategy?.TryResolveType(_type, buildContext.Key.Type, out instanceType) ?? false))
+            var autowiringStrategy = _autowiringStrategy;
+            if (
+                autowiringStrategy == null
+                && buildContext.Key.Type != typeof(IAutowiringStrategy)
+                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(typeof(IAutowiringStrategy), out var autowiringStrategyResolver))
             {
-                if (!_defaultAutowiringStrategy.TryResolveType(_type, buildContext.Key.Type, out instanceType))
+                autowiringStrategy = autowiringStrategyResolver(buildContext.Container);
+            }
+
+            Type instanceType = null;
+            if (!(autowiringStrategy?.TryResolveType(_type, buildContext.Key.Type, out instanceType) ?? false))
+            {
+                if (!DefaultAutowiringStrategy.Shared.TryResolveType(_type, buildContext.Key.Type, out instanceType))
                 {
                     instanceType = null;
                 }
             }
 
-            var typeDescriptor = (instanceType ?? _container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)).Descriptor();
-            var defaultConstructors = CreateMethods(typeDescriptor.GetDeclaredConstructors());
-            IMethod<ConstructorInfo> ctor = null;
-            if (!(_autowiringStrategy?.TryResolveConstructor(defaultConstructors, out ctor) ?? false))
+            var typeDescriptor = (instanceType ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)).Descriptor();
+            if (!buildContext.Container.TryGetResolver<IMethod<ConstructorInfo>>(typeof(IMethod<ConstructorInfo>), out var ctorResolver))
             {
-                if (!_defaultAutowiringStrategy.TryResolveConstructor(defaultConstructors, out ctor))
+                baseExpression = default(Expression);
+                return false;
+            }
+
+            var defaultConstructors = CreateMethods(buildContext.Container, ctorResolver, typeDescriptor.GetDeclaredConstructors());
+            IMethod<ConstructorInfo> ctor = null;
+            if (!(autowiringStrategy?.TryResolveConstructor(defaultConstructors, out ctor) ?? false))
+            {
+                if (!DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
                 {
                     ctor = null;
                 }
             }
 
-            ctor = ctor ?? _container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
-
-            var defaultMehods = CreateMethods(typeDescriptor.GetDeclaredMethods());
-            IEnumerable<IMethod<MethodInfo>> initializers = null;
-            if (!(_autowiringStrategy?.TryResolveInitializers(defaultMehods, out initializers) ?? false))
+            ctor = ctor ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
+            if (!buildContext.Container.TryGetResolver<IMethod<MethodInfo>>(typeof(IMethod<MethodInfo>), out var methodResolver))
             {
-                if (!_defaultAutowiringStrategy.TryResolveInitializers(defaultMehods, out initializers))
+                baseExpression = default(Expression);
+                return false;
+            }
+
+            var defaultMehods = CreateMethods(buildContext.Container, methodResolver, typeDescriptor.GetDeclaredMethods());
+            IEnumerable<IMethod<MethodInfo>> initializers = null;
+            if (!(autowiringStrategy?.TryResolveInitializers(defaultMehods, out initializers) ?? false))
+            {
+                if (!DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMehods, out initializers))
                 {
                     initializers = null;
                 }
@@ -86,7 +91,7 @@
 
             var methodCallExpressions = (
                 from initializer in initializers
-                select (Expression)Expression.Call(thisExpression, initializer.Info, initializer.GetParametersExpressions())).ToArray();
+                select (Expression) Expression.Call(thisExpression, initializer.Info, initializer.GetParametersExpressions())).ToArray();
 
             var autowringDependency = new AutowringDependency(newExpression, methodCallExpressions);
             return autowringDependency.TryBuildExpression(buildContext, lifetime, out baseExpression);
@@ -94,10 +99,10 @@
 
         [NotNull]
         [MethodImpl((MethodImplOptions) 256)]
-        private static IEnumerable<Method<TMethodInfo>> CreateMethods<TMethodInfo>([NotNull] IEnumerable<TMethodInfo> methodInfos)
+        private static IEnumerable<IMethod<TMethodInfo>> CreateMethods<TMethodInfo>(IContainer container, Resolver<IMethod<TMethodInfo>> methodResolver, [NotNull] IEnumerable<TMethodInfo> methodInfos)
             where TMethodInfo: MethodBase
             => methodInfos
                 .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
-                .Select(info => new Method<TMethodInfo>(info));
+                .Select(info => methodResolver(container, info));
     }
 }

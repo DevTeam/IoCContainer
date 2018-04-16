@@ -52,9 +52,10 @@
             table = table.Set("d".GetHashCode(), "d", "d");
 
             // When
-            table = table.Remove("c".GetHashCode(), "c");
+            table = table.Remove("c".GetHashCode(), "c", out var removed);
 
             // Then
+            removed.ShouldBe(true);
             table.Get("c".GetHashCode(), "c").ShouldBe(null);
         }
     }

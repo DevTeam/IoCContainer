@@ -6,15 +6,13 @@
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using Collections;
-    using Extensibility;
 
     internal class DefaultAutowiringStrategy: IAutowiringStrategy
     {
-        [NotNull] private readonly IContainer _container;
+        public static readonly IAutowiringStrategy Shared = new DefaultAutowiringStrategy();
 
-        public DefaultAutowiringStrategy([NotNull] IContainer container)
+        private DefaultAutowiringStrategy()
         {
-            _container = container ?? throw new ArgumentNullException(nameof(container));
         }
 
         [MethodImpl((MethodImplOptions)256)]

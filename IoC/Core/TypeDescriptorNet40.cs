@@ -12,13 +12,11 @@ namespace IoC.Core
         private const BindingFlags DefaultBindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.Static;
         // ReSharper disable once MemberCanBePrivate.Global
         internal readonly Type Type;
-        private readonly Lazy<bool> _isGenericTypeArgument;
 
         [MethodImpl((MethodImplOptions)256)]
         public TypeDescriptor([NotNull] Type type)
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
-            _isGenericTypeArgument = new Lazy<bool>(() => GetCustomAttributes<GenericTypeArgumentAttribute>(true).Any());
         }
 
         [MethodImpl((MethodImplOptions)256)]
@@ -57,13 +55,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         public bool IsGenericTypeDefinition() => Type.IsGenericTypeDefinition;
 
-        public bool IsGenericTypeArgument() => _isGenericTypeArgument.Value;
-
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public IEnumerable<T> GetCustomAttributes<T>(bool inherit)
-            where T : Attribute
-            => Type.GetCustomAttributes(typeof(T), inherit).Cast<T>();
+        public bool IsGenericTypeArgument() => Type.GetCustomAttributes(typeof(GenericTypeArgumentAttribute), true).Any();
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]

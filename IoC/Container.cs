@@ -37,8 +37,8 @@
         [NotNull] private readonly string _name;
         [NotNull] private readonly Subject<ContainerEvent> _eventSubject = new Subject<ContainerEvent>();
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
-        [NotNull] private readonly Dictionary<FullKey, RegistrationEntry> _registrationEntries = new Dictionary<FullKey, RegistrationEntry>();
-        [NotNull] private readonly Dictionary<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = new Dictionary<ShortKey, RegistrationEntry>();
+        [NotNull] private Table<FullKey, RegistrationEntry> _registrationEntries = Table<FullKey, RegistrationEntry>.Empty;
+        [NotNull] private Table<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = Table<ShortKey, RegistrationEntry>.Empty;
         [NotNull] internal volatile Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
         [NotNull] internal volatile Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
         private IEnumerable<FullKey>[] _allKeys;
@@ -120,38 +120,37 @@
         }
 
         /// <inheritdoc />
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public bool TryRegister(IEnumerable<FullKey> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
             var isRegistered = true;
-            var registeredKeys = new List<FullKey>();
+            var registrationEntry = new RegistrationEntry(dependency, lifetime, Disposable.Create(UnregisterKeys), keys);
+
             void UnregisterKeys()
             {
                 lock (_lockObject)
                 {
-                    foreach (var key in registeredKeys)
+                    foreach (var curKey in keys)
                     {
-                        if (key.Tag == AnyTag)
+                        if (curKey.Tag == AnyTag)
                         {
-                            TryUnregister(key, key.Type, _registrationEntriesForTagAny);
+                            TryUnregister(curKey, curKey.Type, ref _registrationEntriesForTagAny);
                         }
                         else
                         {
-                            TryUnregister(key, key, _registrationEntries);
+                            TryUnregister(curKey, curKey, ref _registrationEntries);
                         }
                     }
                 }
             }
 
-            var registrationEntry = new RegistrationEntry(
-                dependency,
-                lifetime,
-                Disposable.Create(UnregisterKeys),
-                registeredKeys);
-
             try
             {
+                var registrationEntriesForTagAny = _registrationEntriesForTagAny;
+                var registrationEntries = _registrationEntries;
+
                 lock (_lockObject)
                 {
                     foreach (var curKey in keys)
@@ -161,19 +160,23 @@
 
                         if (key.Tag == AnyTag)
                         {
-                            isRegistered &= TryRegister(key, key.Type, registrationEntry, _registrationEntriesForTagAny);
+                            isRegistered &= TryRegister(key, key.Type, registrationEntry, ref registrationEntriesForTagAny);
                         }
                         else
                         {
-                            isRegistered &= TryRegister(key, key, registrationEntry, _registrationEntries);
+                            isRegistered &= TryRegister(key, key, registrationEntry, ref registrationEntries);
                         }
 
                         if (!isRegistered)
                         {
                             break;
                         }
+                    }
 
-                        registeredKeys.Add(key);
+                    if (isRegistered)
+                    {
+                        _registrationEntriesForTagAny = registrationEntriesForTagAny;
+                        _registrationEntries = registrationEntries;
                     }
                 }
             }
@@ -299,7 +302,8 @@
         {
             lock (_lockObject)
             {
-                if (_registrationEntries.TryGetValue(key, out registrationEntry))
+                registrationEntry = _registrationEntries.Get(key.GetHashCode(), key);
+                if (registrationEntry != default(RegistrationEntry))
                 {
                     return true;
                 }
@@ -310,18 +314,21 @@
                 {
                     var genericType = typeDescriptor.GetGenericTypeDefinition();
                     var genericKey = new FullKey(genericType, key.Tag);
-                    if (_registrationEntries.TryGetValue(genericKey, out registrationEntry))
+                    registrationEntry = _registrationEntries.Get(genericKey.GetHashCode(), genericKey);
+                    if (registrationEntry != default(RegistrationEntry))
                     {
                         return true;
                     }
 
-                    if (_registrationEntriesForTagAny.TryGetValue(genericType, out registrationEntry))
+                    registrationEntry = _registrationEntriesForTagAny.FastGet(genericType.GetHashCode(), genericType);
+                    if (registrationEntry != default(RegistrationEntry))
                     {
                         return true;
                     }
                 }
 
-                if (_registrationEntriesForTagAny.TryGetValue(type, out registrationEntry))
+                registrationEntry = _registrationEntriesForTagAny.FastGet(type.GetHashCode(), type);
+                if (registrationEntry != default(RegistrationEntry))
                 {
                     return true;
                 }
@@ -342,9 +349,9 @@
             IDisposable resource;
             lock (_lockObject)
             {
-                entriesToDispose = _registrationEntries.Values.Concat(_registrationEntriesForTagAny.Values).ToList();
-                _registrationEntries.Clear();
-                _registrationEntriesForTagAny.Clear();
+                entriesToDispose = _registrationEntries.Select(i => i.Value).Concat(_registrationEntriesForTagAny.Select(i => i.Value)).ToList();
+                _registrationEntries = Table<FullKey, RegistrationEntry>.Empty;
+                _registrationEntriesForTagAny = Table<ShortKey, RegistrationEntry>.Empty;
                 Resolvers = Table<FullKey, ResolverDelegate>.Empty;
                 ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
                 resource = Disposable.Create(_resources);
@@ -392,7 +399,7 @@
         {
             lock (_lockObject)
             {
-                return _allKeys ?? (_allKeys = _registrationEntries.Select(i => i.Value).Distinct().Select(i => (IEnumerable<FullKey>) i.Keys).ToArray());
+                return _allKeys ?? (_allKeys = _registrationEntries.Select(i => i.Value.Keys).Distinct().ToArray());
             }
         }
 
@@ -402,43 +409,38 @@
             return _eventSubject.Subscribe(observer);
         }
 
-        private bool TryRegister<TKey>(FullKey originalKey, TKey key, [NotNull] RegistrationEntry registrationEntry, [NotNull] Dictionary<TKey, RegistrationEntry> entries)
+        private bool TryRegister<TKey>(FullKey originalKey, TKey key, [NotNull] RegistrationEntry registrationEntry, [NotNull] ref Table<TKey, RegistrationEntry> entries)
         {
-            var isRegistered = false;
+            var hashCode = key.GetHashCode();
+            var registered = entries.Get(hashCode, key) == default(RegistrationEntry);
+            if (!registered)
+            {
+                return false;
+            }
+
             try
             {
-                entries.Add(key, registrationEntry);
+                entries = entries.Set(hashCode, key, registrationEntry);
                 ResetResolvers();
                 _allKeys = null;
-                isRegistered = true;
             }
             catch (ArgumentException)
             {
-            }
-
-            if (!isRegistered)
-            {
-                return false;
             }
 
             _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Registration, originalKey));
             return true;
         }
 
-        private bool TryUnregister<TKey>(FullKey originalKey, TKey key, [NotNull] Dictionary<TKey, RegistrationEntry> entries)
+        private bool TryUnregister<TKey>(FullKey originalKey, TKey key, [NotNull] ref Table<TKey, RegistrationEntry> entries)
         {
-            var isUnregistered = entries.Remove(key);
-            if (isUnregistered)
-            {
-                ResetResolvers();
-                _allKeys = null;
-            }
-
-            if (!isUnregistered)
+            entries = entries.Remove(key.GetHashCode(), key, out var unregistered);
+            if (!unregistered)
             {
                 return false;
             }
 
+            _allKeys = null;
             _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Unregistration, originalKey));
             return true;
         }

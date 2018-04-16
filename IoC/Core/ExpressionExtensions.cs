@@ -20,9 +20,9 @@
 
         public static IExpressionCompiler GetExpressionCompiler(this IContainer container)
         {
+            _getExpressionCompilerReentrancy++;
             try
             {
-                _getExpressionCompilerReentrancy++;
                 if (_getExpressionCompilerReentrancy == 1)
                 {
                     if (container.TryGetResolver<IExpressionCompiler>(typeof(IExpressionCompiler), out var resolver))

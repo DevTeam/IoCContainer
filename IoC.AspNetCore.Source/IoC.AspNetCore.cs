@@ -1,6 +1,11 @@
 ﻿
 // IoC Container APS.NET core feature
+//
+// Important note: do not use any internal classes, structures, enums, interfaces, methods, fields or properties
+// because it may be changed even in minor updates of package.
+//
 // Copyright (c) 2018 Nikolay Pianikov
+//
 // ReSharper disable All
 
 #region IoC.AspNetCore

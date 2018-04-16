@@ -1,6 +1,11 @@
 ﻿
 // IoC Container
+//
+// Important note: do not use any internal classes, structures, enums, interfaces, methods, fields or properties
+// because it may be changed even in minor updates of package.
+//
 // Copyright (c) 2018 Nikolay Pianikov
+//
 // ReSharper disable All
 
 #region Properties
@@ -1137,8 +1142,8 @@ namespace IoC
         [NotNull] private readonly string _name;
         [NotNull] private readonly Subject<ContainerEvent> _eventSubject = new Subject<ContainerEvent>();
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
-        [NotNull] private readonly Dictionary<FullKey, RegistrationEntry> _registrationEntries = new Dictionary<FullKey, RegistrationEntry>();
-        [NotNull] private readonly Dictionary<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = new Dictionary<ShortKey, RegistrationEntry>();
+        [NotNull] private Table<FullKey, RegistrationEntry> _registrationEntries = Table<FullKey, RegistrationEntry>.Empty;
+        [NotNull] private Table<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = Table<ShortKey, RegistrationEntry>.Empty;
         [NotNull] internal volatile Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
         [NotNull] internal volatile Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
         private IEnumerable<FullKey>[] _allKeys;
@@ -1220,38 +1225,37 @@ namespace IoC
         }
 
         /// <inheritdoc />
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public bool TryRegister(IEnumerable<FullKey> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
             var isRegistered = true;
-            var registeredKeys = new List<FullKey>();
+            var registrationEntry = new RegistrationEntry(dependency, lifetime, Disposable.Create(UnregisterKeys), keys);
+
             void UnregisterKeys()
             {
                 lock (_lockObject)
                 {
-                    foreach (var key in registeredKeys)
+                    foreach (var curKey in keys)
                     {
-                        if (key.Tag == AnyTag)
+                        if (curKey.Tag == AnyTag)
                         {
-                            TryUnregister(key, key.Type, _registrationEntriesForTagAny);
+                            TryUnregister(curKey, curKey.Type, ref _registrationEntriesForTagAny);
                         }
                         else
                         {
-                            TryUnregister(key, key, _registrationEntries);
+                            TryUnregister(curKey, curKey, ref _registrationEntries);
                         }
                     }
                 }
             }
 
-            var registrationEntry = new RegistrationEntry(
-                dependency,
-                lifetime,
-                Disposable.Create(UnregisterKeys),
-                registeredKeys);
-
             try
             {
+                var registrationEntriesForTagAny = _registrationEntriesForTagAny;
+                var registrationEntries = _registrationEntries;
+
                 lock (_lockObject)
                 {
                     foreach (var curKey in keys)
@@ -1261,19 +1265,23 @@ namespace IoC
 
                         if (key.Tag == AnyTag)
                         {
-                            isRegistered &= TryRegister(key, key.Type, registrationEntry, _registrationEntriesForTagAny);
+                            isRegistered &= TryRegister(key, key.Type, registrationEntry, ref registrationEntriesForTagAny);
                         }
                         else
                         {
-                            isRegistered &= TryRegister(key, key, registrationEntry, _registrationEntries);
+                            isRegistered &= TryRegister(key, key, registrationEntry, ref registrationEntries);
                         }
 
                         if (!isRegistered)
                         {
                             break;
                         }
+                    }
 
-                        registeredKeys.Add(key);
+                    if (isRegistered)
+                    {
+                        _registrationEntriesForTagAny = registrationEntriesForTagAny;
+                        _registrationEntries = registrationEntries;
                     }
                 }
             }
@@ -1399,7 +1407,8 @@ namespace IoC
         {
             lock (_lockObject)
             {
-                if (_registrationEntries.TryGetValue(key, out registrationEntry))
+                registrationEntry = _registrationEntries.Get(key.GetHashCode(), key);
+                if (registrationEntry != default(RegistrationEntry))
                 {
                     return true;
                 }
@@ -1410,18 +1419,21 @@ namespace IoC
                 {
                     var genericType = typeDescriptor.GetGenericTypeDefinition();
                     var genericKey = new FullKey(genericType, key.Tag);
-                    if (_registrationEntries.TryGetValue(genericKey, out registrationEntry))
+                    registrationEntry = _registrationEntries.Get(genericKey.GetHashCode(), genericKey);
+                    if (registrationEntry != default(RegistrationEntry))
                     {
                         return true;
                     }
 
-                    if (_registrationEntriesForTagAny.TryGetValue(genericType, out registrationEntry))
+                    registrationEntry = _registrationEntriesForTagAny.FastGet(genericType.GetHashCode(), genericType);
+                    if (registrationEntry != default(RegistrationEntry))
                     {
                         return true;
                     }
                 }
 
-                if (_registrationEntriesForTagAny.TryGetValue(type, out registrationEntry))
+                registrationEntry = _registrationEntriesForTagAny.FastGet(type.GetHashCode(), type);
+                if (registrationEntry != default(RegistrationEntry))
                 {
                     return true;
                 }
@@ -1442,9 +1454,9 @@ namespace IoC
             IDisposable resource;
             lock (_lockObject)
             {
-                entriesToDispose = _registrationEntries.Values.Concat(_registrationEntriesForTagAny.Values).ToList();
-                _registrationEntries.Clear();
-                _registrationEntriesForTagAny.Clear();
+                entriesToDispose = _registrationEntries.Select(i => i.Value).Concat(_registrationEntriesForTagAny.Select(i => i.Value)).ToList();
+                _registrationEntries = Table<FullKey, RegistrationEntry>.Empty;
+                _registrationEntriesForTagAny = Table<ShortKey, RegistrationEntry>.Empty;
                 Resolvers = Table<FullKey, ResolverDelegate>.Empty;
                 ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
                 resource = Disposable.Create(_resources);
@@ -1492,7 +1504,7 @@ namespace IoC
         {
             lock (_lockObject)
             {
-                return _allKeys ?? (_allKeys = _registrationEntries.Select(i => i.Value).Distinct().Select(i => (IEnumerable<FullKey>) i.Keys).ToArray());
+                return _allKeys ?? (_allKeys = _registrationEntries.Select(i => i.Value.Keys).Distinct().ToArray());
             }
         }
 
@@ -1502,43 +1514,38 @@ namespace IoC
             return _eventSubject.Subscribe(observer);
         }
 
-        private bool TryRegister<TKey>(FullKey originalKey, TKey key, [NotNull] RegistrationEntry registrationEntry, [NotNull] Dictionary<TKey, RegistrationEntry> entries)
+        private bool TryRegister<TKey>(FullKey originalKey, TKey key, [NotNull] RegistrationEntry registrationEntry, [NotNull] ref Table<TKey, RegistrationEntry> entries)
         {
-            var isRegistered = false;
+            var hashCode = key.GetHashCode();
+            var registered = entries.Get(hashCode, key) == default(RegistrationEntry);
+            if (!registered)
+            {
+                return false;
+            }
+
             try
             {
-                entries.Add(key, registrationEntry);
+                entries = entries.Set(hashCode, key, registrationEntry);
                 ResetResolvers();
                 _allKeys = null;
-                isRegistered = true;
             }
             catch (ArgumentException)
             {
-            }
-
-            if (!isRegistered)
-            {
-                return false;
             }
 
             _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Registration, originalKey));
             return true;
         }
 
-        private bool TryUnregister<TKey>(FullKey originalKey, TKey key, [NotNull] Dictionary<TKey, RegistrationEntry> entries)
+        private bool TryUnregister<TKey>(FullKey originalKey, TKey key, [NotNull] ref Table<TKey, RegistrationEntry> entries)
         {
-            var isUnregistered = entries.Remove(key);
-            if (isUnregistered)
-            {
-                ResetResolvers();
-                _allKeys = null;
-            }
-
-            if (!isUnregistered)
+            entries = entries.Remove(key.GetHashCode(), key, out var unregistered);
+            if (!unregistered)
             {
                 return false;
             }
 
+            _allKeys = null;
             _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Unregistration, originalKey));
             return true;
         }
@@ -2042,7 +2049,7 @@ namespace IoC
         public static IDisposable To([NotNull] this IBinding<object> binding, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(binding.Container, type, autowiringStrategy)));
+            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(type, autowiringStrategy)));
         }
 
         /// <summary>
@@ -2057,7 +2064,7 @@ namespace IoC
         public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(binding.Container, typeof(T), autowiringStrategy)));
+            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(typeof(T), autowiringStrategy)));
         }
 
         /// <summary>
@@ -2085,17 +2092,16 @@ namespace IoC
         /// </summary>
         /// <param name="registrationToken"></param>
         [MethodImpl((MethodImplOptions)256)]
-        public static void ToSelf([NotNull] this IDisposable registrationToken)
+        public static IContainer ToSelf([NotNull] this IDisposable registrationToken)
         {
             if (registrationToken == null) throw new ArgumentNullException(nameof(registrationToken));
             if (registrationToken is RegistrationToken token)
             {
                 token.Container.Resolve<IResourceStore>().AddResource(registrationToken);
+                return token.Container;
             }
-            else
-            {
-                throw new NotSupportedException();
-            }
+
+            throw new NotSupportedException();
         }
 
         [NotNull]
@@ -2105,17 +2111,15 @@ namespace IoC
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
 
-            var keys = (
+            var tags = binding.Tags.DefaultIfEmpty(null);
+            var keys =
                 from type in binding.Types
-                from tag in binding.Tags.DefaultIfEmpty(null)
-                select new Key(type, tag)).Distinct();
+                from tag in tags
+                select new Key(type, tag);
 
-            if (!binding.Container.TryRegister(keys, dependency, binding.Lifetime, out var registrationToken))
-            {
-                return binding.Container.GetIssueResolver().CannotRegister(binding.Container, keys.ToArray());
-            }
-
-            return registrationToken;
+            return binding.Container.TryRegister(keys, dependency, binding.Lifetime, out var registrationToken)
+                ? registrationToken
+                : binding.Container.GetIssueResolver().CannotRegister(binding.Container, keys.ToArray());
         }
     }
 }
@@ -2563,7 +2567,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
-            => container.Register(new[] { typeof(T) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2578,7 +2582,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1 
-            => container.Register(new[] { typeof(T1) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2594,7 +2598,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2 
-            => container.Register(new[] { typeof(T1), typeof(T2) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2611,7 +2615,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3 
-            => container.Register(new[] {typeof(T1), typeof(T2), typeof(T3)}, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] {typeof(T1), typeof(T2), typeof(T3)}, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2629,7 +2633,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2648,7 +2652,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5 
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2667,7 +2671,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions)256)]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2688,7 +2692,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6, T7
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2710,7 +2714,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6, T7, T8
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8) }, new FullAutowringDependency(container, typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -3296,7 +3300,6 @@ namespace IoC
 
 namespace IoC
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -3318,7 +3321,7 @@ namespace IoC
         /// Provides parameters' expressions.
         /// </summary>
         /// <returns>Parameters' expressions</returns>
-        [NotNull] IEnumerable<Expression> GetParametersExpressions();
+        [NotNull][ItemNotNull] IEnumerable<Expression> GetParametersExpressions();
 
         /// <summary>
         /// Sets the parameter expression at the position.
@@ -3859,6 +3862,7 @@ namespace IoC.Features
 {
     using System;
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Threading;
     using Core;
     using Lifetimes;
@@ -3881,8 +3885,10 @@ namespace IoC.Features
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => IssueResolver.Shared);
-            yield return container.Register<IAutowiringStrategy>(ctx => new DefaultAutowiringStrategy(ctx.Container));
+            yield return container.Register(ctx => DefaultAutowiringStrategy.Shared);
             yield return container.Register(ctx => ctx.Container.GetResolver<TT>(ctx.Key.Tag.AsTag()), null, Feature.AnyTag);
+            yield return container.Register<IMethod<ConstructorInfo>>(ctx => new Method<ConstructorInfo>((ConstructorInfo)ctx.Args[0]));
+            yield return container.Register<IMethod<MethodInfo>>(ctx => new Method<MethodInfo>((MethodInfo)ctx.Args[0]));
 
             // Lifetimes
             yield return container.Register<ILifetime>(ctx => new SingletonLifetime(), null, new object[] { Lifetime.Singleton });
@@ -5291,15 +5297,13 @@ namespace IoC.Core
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using Collections;
-    using Extensibility;
 
     internal class DefaultAutowiringStrategy: IAutowiringStrategy
     {
-        [NotNull] private readonly IContainer _container;
+        public static readonly IAutowiringStrategy Shared = new DefaultAutowiringStrategy();
 
-        public DefaultAutowiringStrategy([NotNull] IContainer container)
+        private DefaultAutowiringStrategy()
         {
-            _container = container ?? throw new ArgumentNullException(nameof(container));
         }
 
         [MethodImpl((MethodImplOptions)256)]
@@ -5926,9 +5930,9 @@ namespace IoC.Core
 
         public static IExpressionCompiler GetExpressionCompiler(this IContainer container)
         {
+            _getExpressionCompilerReentrancy++;
             try
             {
-                _getExpressionCompilerReentrancy++;
                 if (_getExpressionCompilerReentrancy == 1)
                 {
                     if (container.TryGetResolver<IExpressionCompiler>(typeof(IExpressionCompiler), out var resolver))
@@ -5989,64 +5993,69 @@ namespace IoC.Core
 
     internal class FullAutowringDependency: IDependency
     {
-        [NotNull] private readonly IContainer _container;
-        [NotNull] private readonly Type _type;
-        [NotNull] private readonly IAutowiringStrategy _defaultAutowiringStrategy;
-        [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
         [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
-        
         [NotNull] private static Cache<ConstructorInfo, NewExpression> _constructors = new Cache<ConstructorInfo, NewExpression>();
         [NotNull] private static Cache<Type, Expression> _this = new Cache<Type, Expression>();
+        [NotNull] private readonly Type _type;
+        [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
 
-        public FullAutowringDependency([NotNull] IContainer container, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
+        public FullAutowringDependency([NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
-            _container = container ?? throw new ArgumentNullException(nameof(container));
             _type = type ?? throw new ArgumentNullException(nameof(type));
-            _defaultAutowiringStrategy = new DefaultAutowiringStrategy(container);
-            if (autowiringStrategy == null)
-            {
-                if (container.TryGetResolver<IAutowiringStrategy>(typeof(IAutowiringStrategy), out var contextResolver))
-                {
-                    _autowiringStrategy = contextResolver(container);
-                }
-            }
-            else
-            {
-                _autowiringStrategy = autowiringStrategy;
-            }
+            _autowiringStrategy = autowiringStrategy;
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            Type instanceType = null;
-            if (!(_autowiringStrategy?.TryResolveType(_type, buildContext.Key.Type, out instanceType) ?? false))
+            var autowiringStrategy = _autowiringStrategy;
+            if (
+                autowiringStrategy == null
+                && buildContext.Key.Type != typeof(IAutowiringStrategy)
+                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(typeof(IAutowiringStrategy), out var autowiringStrategyResolver))
             {
-                if (!_defaultAutowiringStrategy.TryResolveType(_type, buildContext.Key.Type, out instanceType))
+                autowiringStrategy = autowiringStrategyResolver(buildContext.Container);
+            }
+
+            Type instanceType = null;
+            if (!(autowiringStrategy?.TryResolveType(_type, buildContext.Key.Type, out instanceType) ?? false))
+            {
+                if (!DefaultAutowiringStrategy.Shared.TryResolveType(_type, buildContext.Key.Type, out instanceType))
                 {
                     instanceType = null;
                 }
             }
 
-            var typeDescriptor = (instanceType ?? _container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)).Descriptor();
-            var defaultConstructors = CreateMethods(typeDescriptor.GetDeclaredConstructors());
-            IMethod<ConstructorInfo> ctor = null;
-            if (!(_autowiringStrategy?.TryResolveConstructor(defaultConstructors, out ctor) ?? false))
+            var typeDescriptor = (instanceType ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)).Descriptor();
+            if (!buildContext.Container.TryGetResolver<IMethod<ConstructorInfo>>(typeof(IMethod<ConstructorInfo>), out var ctorResolver))
             {
-                if (!_defaultAutowiringStrategy.TryResolveConstructor(defaultConstructors, out ctor))
+                baseExpression = default(Expression);
+                return false;
+            }
+
+            var defaultConstructors = CreateMethods(buildContext.Container, ctorResolver, typeDescriptor.GetDeclaredConstructors());
+            IMethod<ConstructorInfo> ctor = null;
+            if (!(autowiringStrategy?.TryResolveConstructor(defaultConstructors, out ctor) ?? false))
+            {
+                if (!DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
                 {
                     ctor = null;
                 }
             }
 
-            ctor = ctor ?? _container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
-
-            var defaultMehods = CreateMethods(typeDescriptor.GetDeclaredMethods());
-            IEnumerable<IMethod<MethodInfo>> initializers = null;
-            if (!(_autowiringStrategy?.TryResolveInitializers(defaultMehods, out initializers) ?? false))
+            ctor = ctor ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
+            if (!buildContext.Container.TryGetResolver<IMethod<MethodInfo>>(typeof(IMethod<MethodInfo>), out var methodResolver))
             {
-                if (!_defaultAutowiringStrategy.TryResolveInitializers(defaultMehods, out initializers))
+                baseExpression = default(Expression);
+                return false;
+            }
+
+            var defaultMehods = CreateMethods(buildContext.Container, methodResolver, typeDescriptor.GetDeclaredMethods());
+            IEnumerable<IMethod<MethodInfo>> initializers = null;
+            if (!(autowiringStrategy?.TryResolveInitializers(defaultMehods, out initializers) ?? false))
+            {
+                if (!DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMehods, out initializers))
                 {
                     initializers = null;
                 }
@@ -6064,7 +6073,7 @@ namespace IoC.Core
 
             var methodCallExpressions = (
                 from initializer in initializers
-                select (Expression)Expression.Call(thisExpression, initializer.Info, initializer.GetParametersExpressions())).ToArray();
+                select (Expression) Expression.Call(thisExpression, initializer.Info, initializer.GetParametersExpressions())).ToArray();
 
             var autowringDependency = new AutowringDependency(newExpression, methodCallExpressions);
             return autowringDependency.TryBuildExpression(buildContext, lifetime, out baseExpression);
@@ -6072,11 +6081,11 @@ namespace IoC.Core
 
         [NotNull]
         [MethodImpl((MethodImplOptions) 256)]
-        private static IEnumerable<Method<TMethodInfo>> CreateMethods<TMethodInfo>([NotNull] IEnumerable<TMethodInfo> methodInfos)
+        private static IEnumerable<IMethod<TMethodInfo>> CreateMethods<TMethodInfo>(IContainer container, Resolver<IMethod<TMethodInfo>> methodResolver, [NotNull] IEnumerable<TMethodInfo> methodInfos)
             where TMethodInfo: MethodBase
             => methodInfos
                 .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
-                .Select(info => new Method<TMethodInfo>(info));
+                .Select(info => methodResolver(container, info));
     }
 }
 
@@ -6250,40 +6259,44 @@ namespace IoC.Core
     {
         // ReSharper disable once StaticMemberInGenericType
         [NotNull] private static Cache<Type, MethodCallExpression> _injections = new Cache<Type, MethodCallExpression>();
-        private Lazy<Expression[]> _parametersExpressions;
+        private readonly Expression[] _parametersExpressions;
+        private readonly ParameterInfo[] _parameters;
 
         public Method([NotNull] TMethodInfo info)
         {
             Info = info ?? throw new ArgumentNullException(nameof(info));
-            _parametersExpressions = new Lazy<Expression[]>(() => CreateParametersExpressions(info.GetParameters()));
+            _parameters = info.GetParameters();
+            _parametersExpressions = new Expression[_parameters.Length];
         }
 
         public TMethodInfo Info { get; }
 
-        public IEnumerable<Expression> GetParametersExpressions() => _parametersExpressions.Value;
+        public IEnumerable<Expression> GetParametersExpressions()
+        {
+            for (var parameterPosition = 0; parameterPosition < _parametersExpressions.Length; parameterPosition++)
+            {
+                var expression = _parametersExpressions[parameterPosition];
+                if (expression != null)
+                {
+                    yield return expression;
+                }
+                else
+                {
+                    var paramType = _parameters[parameterPosition].ParameterType;
+                    yield return _injections.GetOrCreate(paramType, () =>
+                    {
+                        var methodInfo = InjectMethodInfo.MakeGenericMethod(paramType);
+                        var containerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
+                        return Expression.Call(methodInfo, containerExpression);
+                    });
+                }
+            }
+        }
 
         public void SetParameterExpression(int parameterPosition, Expression parameterExpression)
         {
-            if (parameterPosition < 0 || parameterPosition >= _parametersExpressions.Value.Length) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
-            _parametersExpressions.Value[parameterPosition] = parameterExpression ?? throw new ArgumentNullException(nameof(parameterExpression));
-        }
-
-        private static Expression[] CreateParametersExpressions(ParameterInfo[] parameters)
-        {
-            var parametersExpressions = new Expression[parameters.Length];
-            for (var i = 0; i < parametersExpressions.Length; i++)
-            {
-                var parameter = parameters[i];
-                var paramType = parameter.ParameterType;
-                parametersExpressions[i] = _injections.GetOrCreate(paramType, () =>
-                {
-                    var methodInfo = InjectMethodInfo.MakeGenericMethod(paramType);
-                    var containerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
-                    return Expression.Call(methodInfo, containerExpression);
-                });
-            }
-
-            return parametersExpressions;
+            if (parameterPosition < 0 || parameterPosition >= _parametersExpressions.Length) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
+            _parametersExpressions[parameterPosition] = parameterExpression ?? throw new ArgumentNullException(nameof(parameterExpression));
         }
     }
 }
@@ -6361,7 +6374,7 @@ namespace IoC.Core
         [NotNull] internal readonly IDependency Dependency;
         [CanBeNull] private readonly ILifetime _lifetime;
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
-        [NotNull] public readonly List<Key> Keys;
+        [NotNull] public readonly IEnumerable<Key> Keys;
         private readonly object _lockObject = new object();
         private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
 
@@ -6369,7 +6382,7 @@ namespace IoC.Core
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource,
-            [NotNull] List<Key> keys)
+            [NotNull] IEnumerable<Key> keys)
         {
             Dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
             _lifetime = lifetime;
@@ -6489,7 +6502,9 @@ namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
 
+    [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
     internal class Subject<T>: IObservable<T>, IObserver<T>
     {
         private readonly List<IObserver<T>> _observers = new List<IObserver<T>>();
@@ -6514,14 +6529,9 @@ namespace IoC.Core
         {
             lock (_observers)
             {
-                if (_observers.Count == 0)
+                for (var index = 0; index < _observers.Count; index++)
                 {
-                    return;
-                }
-
-                foreach (var observer in _observers)
-                {
-                    observer.OnNext(value);
+                    _observers[index].OnNext(value);
                 }
             }
         }
@@ -6530,9 +6540,9 @@ namespace IoC.Core
         {
             lock (_observers)
             {
-                foreach (var observer in _observers)
+                for (var index = 0; index < _observers.Count; index++)
                 {
-                    observer.OnError(error);
+                    _observers[index].OnError(error);
                 }
             }
         }
@@ -6541,9 +6551,9 @@ namespace IoC.Core
         {
             lock (_observers)
             {
-                foreach (var observer in _observers)
+                for (var index = 0; index < _observers.Count; index++)
                 {
-                    observer.OnCompleted();
+                    _observers[index].OnCompleted();
                 }
             }
         }
@@ -6561,33 +6571,16 @@ namespace IoC.Core
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
-    using Collections;
 
     internal static class TypeDescriptorExtensions
     {
-        private static readonly object LockObject = new object();
-        private static Table<Type, TypeDescriptor> _typeDescriptors = Table<Type, TypeDescriptor>.Empty;
+        [MethodImpl((MethodImplOptions)256)]
+        public static TypeDescriptor Descriptor(this Type type) =>
+            new TypeDescriptor(type);
 
         [MethodImpl((MethodImplOptions)256)]
-        public static TypeDescriptor Descriptor(this Type type)
-        {
-            lock (LockObject)
-            {
-                var hashCode = type.GetHashCode();
-                var typeDescriptor = _typeDescriptors.FastGet(hashCode, type);
-                if (typeDescriptor != null)
-                {
-                    return typeDescriptor;
-                }
-                
-                typeDescriptor = new TypeDescriptor(type);
-                _typeDescriptors = _typeDescriptors.Set(hashCode, type, typeDescriptor);
-                return typeDescriptor;
-            }
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        public static TypeDescriptor Descriptor<T>() => TypeDescriptor<T>.Shared;
+        public static TypeDescriptor Descriptor<T>() =>
+            TypeDescriptor<T>.Shared;
 
         [MethodImpl((MethodImplOptions)256)]
         public static Assembly LoadAssembly(string assemblyName)
@@ -6601,15 +6594,15 @@ namespace IoC.Core
         public static Type ToGenericType([NotNull] this Type type)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            var typeInfo = type.Descriptor();
-            if (!typeInfo.IsConstructedGenericType())
+            var typeDescriptor = type.Descriptor();
+            if (!typeDescriptor.IsConstructedGenericType())
             {
                 return type;
             }
 
-            if (typeInfo.GetGenericTypeArguments().Any(t => Descriptor(t).IsGenericTypeArgument()))
+            if (typeDescriptor.GetGenericTypeArguments().Any(t => Descriptor(t).IsGenericTypeArgument()))
             {
-                return typeInfo.GetGenericTypeDefinition();
+                return typeDescriptor.GetGenericTypeDefinition();
             }
 
             return type;
@@ -6640,13 +6633,11 @@ namespace IoC.Core
         private const BindingFlags DefaultBindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.Static;
         // ReSharper disable once MemberCanBePrivate.Global
         internal readonly Type Type;
-        private readonly Lazy<bool> _isGenericTypeArgument;
 
         [MethodImpl((MethodImplOptions)256)]
         public TypeDescriptor([NotNull] Type type)
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
-            _isGenericTypeArgument = new Lazy<bool>(() => GetCustomAttributes<GenericTypeArgumentAttribute>(true).Any());
         }
 
         [MethodImpl((MethodImplOptions)256)]
@@ -6685,13 +6676,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         public bool IsGenericTypeDefinition() => Type.IsGenericTypeDefinition;
 
-        public bool IsGenericTypeArgument() => _isGenericTypeArgument.Value;
-
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public IEnumerable<T> GetCustomAttributes<T>(bool inherit)
-            where T : Attribute
-            => Type.GetCustomAttributes(typeof(T), inherit).Cast<T>();
+        public bool IsGenericTypeArgument() => Type.GetCustomAttributes(typeof(GenericTypeArgumentAttribute), true).Any();
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
@@ -6768,14 +6753,12 @@ namespace IoC.Core
     {
         internal readonly Type Type;
         internal readonly Lazy<TypeInfo> TypeInfo;
-        private readonly Lazy<bool> _isGenericTypeArgument;
 
         [MethodImpl((MethodImplOptions)256)]
         public TypeDescriptor([NotNull] Type type)
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
             TypeInfo = new Lazy<TypeInfo>(type.GetTypeInfo);
-            _isGenericTypeArgument = new Lazy<bool>(() => GetCustomAttributes<GenericTypeArgumentAttribute>(true).Any());
         }
 
         [MethodImpl((MethodImplOptions)256)]
@@ -6827,7 +6810,7 @@ namespace IoC.Core
         public Type[] GetGenericTypeParameters() => TypeInfo.Value.GenericTypeParameters;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsGenericTypeArgument() => _isGenericTypeArgument.Value;
+        public bool IsGenericTypeArgument() => TypeInfo.Value.GetCustomAttribute<GenericTypeArgumentAttribute>(true) != null;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
@@ -7504,9 +7487,9 @@ namespace IoC.Core.Collections
         private readonly int _count;
 
         [MethodImpl((MethodImplOptions)256)]
-        private Table()
+        private Table(int divisor = 4)
         {
-            Divisor = 2;
+            Divisor = divisor;
             Buckets = ResizableArray<Bucket>.Create(Divisor, Bucket.EmptyBucket);
         }
 
@@ -7589,13 +7572,15 @@ namespace IoC.Core.Collections
         }
 
         [Pure]
-        public Table<TKey, TValue> Remove(int hashCode, TKey key)
+        public Table<TKey, TValue> Remove(int hashCode, TKey key, out bool removed)
         {
-            var newTable = new Table<TKey, TValue>();
+            removed = false;
+            var newTable = new Table<TKey, TValue>(Divisor);
             foreach (var keyValue in this)
             {
                 if (keyValue.HashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
                 {
+                    removed = true;
                     continue;
                 }
 

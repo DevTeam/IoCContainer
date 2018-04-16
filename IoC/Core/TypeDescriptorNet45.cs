@@ -11,14 +11,12 @@ namespace IoC.Core
     {
         internal readonly Type Type;
         internal readonly Lazy<TypeInfo> TypeInfo;
-        private readonly Lazy<bool> _isGenericTypeArgument;
 
         [MethodImpl((MethodImplOptions)256)]
         public TypeDescriptor([NotNull] Type type)
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
             TypeInfo = new Lazy<TypeInfo>(type.GetTypeInfo);
-            _isGenericTypeArgument = new Lazy<bool>(() => GetCustomAttributes<GenericTypeArgumentAttribute>(true).Any());
         }
 
         [MethodImpl((MethodImplOptions)256)]
@@ -70,7 +68,7 @@ namespace IoC.Core
         public Type[] GetGenericTypeParameters() => TypeInfo.Value.GenericTypeParameters;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsGenericTypeArgument() => _isGenericTypeArgument.Value;
+        public bool IsGenericTypeArgument() => TypeInfo.Value.GetCustomAttribute<GenericTypeArgumentAttribute>(true) != null;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]

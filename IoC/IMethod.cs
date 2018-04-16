@@ -1,6 +1,5 @@
 ﻿namespace IoC
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -22,7 +21,7 @@
         /// Provides parameters' expressions.
         /// </summary>
         /// <returns>Parameters' expressions</returns>
-        [NotNull] IEnumerable<Expression> GetParametersExpressions();
+        [NotNull][ItemNotNull] IEnumerable<Expression> GetParametersExpressions();
 
         /// <summary>
         /// Sets the parameter expression at the position.

@@ -90,7 +90,7 @@ namespace IoC.Tests.UsageScenarios
                     from ctor in constructors
                     let autowringAttribute = ctor.Info.GetCustomAttribute<AutowiringAttribute>()
                     // filters constructors containing the attribute Autowiring
-                    where ctor != null
+                    where autowringAttribute != null
                     // sorts constructors by autowringAttribute.Order
                     orderby autowringAttribute.Order
                     select ctor)

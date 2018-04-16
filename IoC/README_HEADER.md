@@ -74,7 +74,7 @@ _**It is important to note that our abstraction and our implementation do not kn
 
 ### Add the [package reference](https://www.nuget.org/packages/IoC.Container)
 
-IoC.Container ships entirely as NuGet packages. Using NuGet packages allows you to optimize your app to include only the necessary dependencies.
+IoC.Container ships entirely as NuGet packages. Using NuGet packages allows you to optimize your application to include only the necessary dependencies.
 
 - Package Manager
 
@@ -145,13 +145,13 @@ using (var container = Container.Create().Using<Glue>())
 
 ### Under the hood
 
-Actually these resolvers are represented just as set of operators `new` that allow to create (or get) required instances.
+Actually these resolvers are represented just as a set of operators `new` which allow to create (or to get) required instances.
 
 ```csharp
 var box = new CardboardBox<ShroedingersCat>(new ShroedingersCat());
 ```
 
-There is only one difference - these resolvers are wrapped to compiled lambda functions and the each call of these lambdas spends some minimal time in the operator `call`, but in actual scenarios it is not required to make these lambdas each time to create an instance.
+There is only one difference - these resolvers are wrapped to compiled lambda-functions and an each call of these lambda-functions spends some minimal time in the operator `call`, but in actual scenarios it is not required to make these calls each time to create instances.
 When some dependencies are injected to an instance they are injected without any lambdas at all but just as a minimal set of instruction to create these dependencies:
 
 ```csharp
