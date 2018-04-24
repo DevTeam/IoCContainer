@@ -23,14 +23,12 @@
     <TransformOnBuild>True</TransformOnBuild>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;net40;net45;net46;net47;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;uap10.0</TargetFrameworks>
     <Optimize>true</Optimize>
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
-
   <PropertyGroup Condition="'$(TargetFramework)'=='uap10.0'">
     <DefaultLanguage>en-US</DefaultLanguage>
     <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
@@ -44,16 +42,14 @@
     <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
     <LanguageTargets Condition="Exists('$(XamlTargets)')">$(XamlTargets)</LanguageTargets>
   </PropertyGroup>
-
   <ItemGroup Condition="'$(TargetFramework)'=='uap10.0'">
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform " Version="6.0.8" />
   </ItemGroup>
-
   <ItemGroup>
     <None Remove="IoC.tt" />
     <Compile Remove="IoC.cs" />
     <PackageReference Include="Vsxmd" Version="1.2.0" Condition="$(HasMSBuildNative)=='true'">
-        <PrivateAssets>all</PrivateAssets>
+      <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <None Update="README_TEMPLATE.md">
       <DesignTime>True</DesignTime>
@@ -66,9 +62,7 @@
     </None>
     <EmbeddedResource Include="DevTeam.snk" />
   </ItemGroup>
-
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
-
 </Project>

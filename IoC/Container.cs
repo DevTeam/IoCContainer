@@ -82,11 +82,11 @@
         }
 
         [NotNull]
-        private static Container Create([NotNull] string name, [NotNull] IContainer baseContainer)
+        private static Container Create([NotNull] string name, [NotNull] IContainer parentContainer)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            if (baseContainer == null) throw new ArgumentNullException(nameof(baseContainer));
-            return new Container(CreateContainerName(name), baseContainer, true);
+            if (parentContainer == null) throw new ArgumentNullException(nameof(parentContainer));
+            return new Container(CreateContainerName(name), parentContainer, true);
         }
 
         private static Container CreateRootContainer([NotNull][ItemNotNull] IEnumerable<IConfiguration> configurations)
@@ -240,50 +240,6 @@
             return TryCreateResolver(new FullKey(type), out resolver, container ?? this);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
-        private bool TryCreateResolver<T>(FullKey key, out Resolver<T> resolver, IContainer container)
-        {
-            if (TryGetRegistrationEntry(key, out var registrationEntry))
-            {
-                if (!registrationEntry.TryCreateResolver(key, container, out var resolverDelegate))
-                {
-                    resolver = default(Resolver<T>);
-                    return false;
-                }
-
-                resolver = AddResolver(key, (Resolver<T>)resolverDelegate, true);
-                return true;
-            }
-
-            if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, container))
-            {
-                resolver = default(Resolver<T>);
-                return false;
-            }
-
-            if (container == this)
-            {
-                resolver = AddResolver(key, resolver, false);
-            }
-
-            return true;
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        private Resolver<T> AddResolver<T>(FullKey key, [NotNull] Resolver<T> resolver, bool currentContainer)
-        {
-            lock (_lockObject)
-            {
-                Resolvers = Resolvers.Set(key.GetHashCode(), key, resolver);
-                if (key.Tag == null)
-                {
-                    ResolversByType = ResolversByType.Set(key.Type.GetHashCode(), key.Type, resolver);
-                }
-
-                return resolver;
-            }
-        }
-
         /// <inheritdoc />
         public bool TryGetDependency(FullKey key, out IDependency dependency, out ILifetime lifetime)
         {
@@ -295,46 +251,6 @@
             }
 
             return _parent.TryGetDependency(key, out dependency, out lifetime);
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        private bool TryGetRegistrationEntry(FullKey key, out RegistrationEntry registrationEntry)
-        {
-            lock (_lockObject)
-            {
-                registrationEntry = _registrationEntries.Get(key.GetHashCode(), key);
-                if (registrationEntry != default(RegistrationEntry))
-                {
-                    return true;
-                }
-
-                var type = key.Type;
-                var typeDescriptor = type.Descriptor();
-                if (typeDescriptor.IsConstructedGenericType())
-                {
-                    var genericType = typeDescriptor.GetGenericTypeDefinition();
-                    var genericKey = new FullKey(genericType, key.Tag);
-                    registrationEntry = _registrationEntries.Get(genericKey.GetHashCode(), genericKey);
-                    if (registrationEntry != default(RegistrationEntry))
-                    {
-                        return true;
-                    }
-
-                    registrationEntry = _registrationEntriesForTagAny.FastGet(genericType.GetHashCode(), genericType);
-                    if (registrationEntry != default(RegistrationEntry))
-                    {
-                        return true;
-                    }
-                }
-
-                registrationEntry = _registrationEntriesForTagAny.FastGet(type.GetHashCode(), type);
-                if (registrationEntry != default(RegistrationEntry))
-                {
-                    return true;
-                }
-
-                return false;
-            }
         }
 
         /// <inheritdoc />
@@ -395,6 +311,34 @@
             return GetAllKeys().Concat(_parent).GetEnumerator();
         }
 
+        /// <inheritdoc />
+        public IDisposable Subscribe(IObserver<ContainerEvent> observer)
+        {
+            return _eventSubject.Subscribe(observer);
+        }
+        
+        void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
+        {
+            if (value.Container == this)
+            {
+                return;
+            }
+
+            lock (_lockObject)
+            {
+                ResetResolvers();
+            }
+        }
+
+        void IObserver<ContainerEvent>.OnError(Exception error)
+        {
+        }
+
+        void IObserver<ContainerEvent>.OnCompleted()
+        {
+        }
+
+        [MethodImpl((MethodImplOptions) 256)]
         private IEnumerable<IEnumerable<FullKey>> GetAllKeys()
         {
             lock (_lockObject)
@@ -403,12 +347,7 @@
             }
         }
 
-        /// <inheritdoc />
-        public IDisposable Subscribe(IObserver<ContainerEvent> observer)
-        {
-            return _eventSubject.Subscribe(observer);
-        }
-
+        [MethodImpl((MethodImplOptions) 256)]
         private bool TryRegister<TKey>(FullKey originalKey, TKey key, [NotNull] RegistrationEntry registrationEntry, [NotNull] ref Table<TKey, RegistrationEntry> entries)
         {
             var hashCode = key.GetHashCode();
@@ -432,6 +371,7 @@
             return true;
         }
 
+        [MethodImpl((MethodImplOptions) 256)]
         private bool TryUnregister<TKey>(FullKey originalKey, TKey key, [NotNull] ref Table<TKey, RegistrationEntry> entries)
         {
             entries = entries.Remove(key.GetHashCode(), key, out var unregistered);
@@ -445,33 +385,14 @@
             return true;
         }
 
+        [MethodImpl((MethodImplOptions) 256)]
         private void ResetResolvers()
         {
             Resolvers = Table<FullKey, ResolverDelegate>.Empty;
             ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
         }
 
-        void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
-        {
-            if (value.Container == this)
-            {
-                return;
-            }
-
-            lock (_lockObject)
-            {
-                ResetResolvers();
-            }
-        }
-
-        void IObserver<ContainerEvent>.OnError(Exception error)
-        {
-        }
-
-        void IObserver<ContainerEvent>.OnCompleted()
-        {
-        }
-
+        [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         internal static string CreateContainerName([CanBeNull] string name = "")
         {
@@ -479,9 +400,94 @@
             return !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
         }
 
+        [MethodImpl((MethodImplOptions) 256)]
         private void ApplyConfigurations(IEnumerable<IConfiguration> configurations)
         {
             _resources.Add(this.Apply(configurations));
+        }
+        
+        [MethodImpl((MethodImplOptions)256)]
+        private bool TryCreateResolver<T>(FullKey key, out Resolver<T> resolver, IContainer container)
+        {
+            if (TryGetRegistrationEntry(key, out var registrationEntry))
+            {
+                if (!registrationEntry.TryCreateResolver(key, container, out var resolverDelegate))
+                {
+                    resolver = default(Resolver<T>);
+                    return false;
+                }
+
+                resolver = AddResolver(key, (Resolver<T>)resolverDelegate, true);
+                return true;
+            }
+
+            if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, container))
+            {
+                resolver = default(Resolver<T>);
+                return false;
+            }
+
+            if (container == this)
+            {
+                resolver = AddResolver(key, resolver, false);
+            }
+
+            return true;
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        private Resolver<T> AddResolver<T>(FullKey key, [NotNull] Resolver<T> resolver, bool currentContainer)
+        {
+            lock (_lockObject)
+            {
+                Resolvers = Resolvers.Set(key.GetHashCode(), key, resolver);
+                if (key.Tag == null)
+                {
+                    ResolversByType = ResolversByType.Set(key.Type.GetHashCode(), key.Type, resolver);
+                }
+
+                return resolver;
+            }
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        private bool TryGetRegistrationEntry(FullKey key, out RegistrationEntry registrationEntry)
+        {
+            lock (_lockObject)
+            {
+                registrationEntry = _registrationEntries.Get(key.GetHashCode(), key);
+                if (registrationEntry != default(RegistrationEntry))
+                {
+                    return true;
+                }
+
+                var type = key.Type;
+                var typeDescriptor = type.Descriptor();
+                if (typeDescriptor.IsConstructedGenericType())
+                {
+                    var genericType = typeDescriptor.GetGenericTypeDefinition();
+                    var genericKey = new FullKey(genericType, key.Tag);
+                    registrationEntry = _registrationEntries.Get(genericKey.GetHashCode(), genericKey);
+                    if (registrationEntry != default(RegistrationEntry))
+                    {
+                        return true;
+                    }
+
+                    registrationEntry = _registrationEntriesForTagAny.FastGet(genericType.GetHashCode(), genericType);
+                    if (registrationEntry != default(RegistrationEntry))
+                    {
+                        return true;
+                    }
+                }
+
+                registrationEntry = _registrationEntriesForTagAny.FastGet(type.GetHashCode(), type);
+                if (registrationEntry != default(RegistrationEntry))
+                {
+                    return true;
+                }
+
+                return false;
+            }
         }
     }
 }

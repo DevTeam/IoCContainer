@@ -8,9 +8,7 @@
     {
         public static readonly IExpressionBuilder<ILifetime> Shared = new LifetimeExpressionBuilder();
 
-        private LifetimeExpressionBuilder()
-        {
-        }
+        private LifetimeExpressionBuilder() { }
 
         public Expression Build(Expression bodyExpression, IBuildContext buildContext, ILifetime lifetime)
         {

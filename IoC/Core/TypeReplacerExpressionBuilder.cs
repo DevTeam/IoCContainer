@@ -9,9 +9,7 @@
     {
         public static readonly IExpressionBuilder<IDictionary<Type, Type>> Shared = new TypeReplacerExpressionBuilder();
 
-        private TypeReplacerExpressionBuilder()
-        {
-        }
+        private TypeReplacerExpressionBuilder() { }
 
         public Expression Build(Expression bodyExpression, IBuildContext buildContext, IDictionary<Type, Type> typesMap)
         {

@@ -5,13 +5,18 @@
     </assembly>
     <members>
         <member name="T:IoC.Features.AspNetCoreFeature">
-            <inheritdoc />
+            <inheritdoc cref="T:IoC.IConfiguration" />
         </member>
-        <member name="M:IoC.Features.AspNetCoreFeature.#ctor(System.Collections.Generic.IEnumerable{Microsoft.Extensions.DependencyInjection.ServiceDescriptor})">
+        <member name="M:IoC.Features.AspNetCoreFeature.#ctor">
             <summary>
-            Creates an instance.
+            Defaut constructor.
             </summary>
-            <param name="services"></param>
+        </member>
+        <member name="M:IoC.Features.AspNetCoreFeature.#ctor(System.Collections.Generic.IList{Microsoft.Extensions.DependencyInjection.ServiceDescriptor})">
+            <summary>
+            Creates an instance of feature based on a list of ServiceDescriptor.
+            </summary>
+            <param name="list"></param>
         </member>
         <member name="M:IoC.Features.AspNetCoreFeature.Apply(IoC.IContainer)">
             <inheritdoc />

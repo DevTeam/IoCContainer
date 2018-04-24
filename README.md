@@ -850,7 +850,7 @@ public class Glue : IConfiguration
 using (var container = Container.Create().Using(
     "ref IoC.Tests;" +
     "using IoC.Tests.UsageScenarios;" +
-    "Bind<IDependency>().To<Dependency>();" +
+    "Bind<IDependency>().As(Singleton).To<Dependency>();" +
     "Bind<IService>().To<Service>();"))
 {
     // Resolve an instance

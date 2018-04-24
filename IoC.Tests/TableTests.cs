@@ -57,6 +57,8 @@
             // Then
             removed.ShouldBe(true);
             table.Get("c".GetHashCode(), "c").ShouldBe(null);
+            table.Count().ShouldBe(4);
+            table.Count.ShouldBe(4);
         }
     }
 }

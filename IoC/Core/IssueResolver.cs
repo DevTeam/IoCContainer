@@ -11,9 +11,7 @@
     {
         public static readonly IIssueResolver Shared = new IssueResolver();
 
-        private IssueResolver()
-        {
-        }
+        private IssueResolver() { }
 
         public Tuple<IDependency, ILifetime> CannotResolveDependency(IContainer container, Key key)
         {

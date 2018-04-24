@@ -77,10 +77,7 @@
 
 
         public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
-        {
-            constructor = constructors.OrderBy(i => GetOrder(i.Info)).FirstOrDefault();
-            return constructor != null;
-        }
+            => (constructor = constructors.OrderBy(i => GetOrder(i.Info)).FirstOrDefault()) != null;
 
         public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
         {
@@ -88,9 +85,11 @@
             return true;
         }
 
-        private int GetOrder(MethodBase method)
+        [MethodImpl((MethodImplOptions)256)]
+        private static int GetOrder(MethodBase method)
         {
-            return (method.GetParameters().Length + 1) * (method.IsPublic ? 1 : 1000);
+            var order = method.GetParameters().Length + 1;
+            return method.IsPublic ? order : order << 10;
         }
     }
 }

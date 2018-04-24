@@ -46,13 +46,7 @@
             }
 
             var typeDescriptor = (instanceType ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)).Descriptor();
-            if (!buildContext.Container.TryGetResolver<IMethod<ConstructorInfo>>(typeof(IMethod<ConstructorInfo>), out var ctorResolver))
-            {
-                baseExpression = default(Expression);
-                return false;
-            }
-
-            var defaultConstructors = CreateMethods(buildContext.Container, ctorResolver, typeDescriptor.GetDeclaredConstructors());
+            var defaultConstructors = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredConstructors());
             IMethod<ConstructorInfo> ctor = null;
             if (!(autowiringStrategy?.TryResolveConstructor(defaultConstructors, out ctor) ?? false))
             {
@@ -63,13 +57,7 @@
             }
 
             ctor = ctor ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
-            if (!buildContext.Container.TryGetResolver<IMethod<MethodInfo>>(typeof(IMethod<MethodInfo>), out var methodResolver))
-            {
-                baseExpression = default(Expression);
-                return false;
-            }
-
-            var defaultMehods = CreateMethods(buildContext.Container, methodResolver, typeDescriptor.GetDeclaredMethods());
+            var defaultMehods = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredMethods());
             IEnumerable<IMethod<MethodInfo>> initializers = null;
             if (!(autowiringStrategy?.TryResolveInitializers(defaultMehods, out initializers) ?? false))
             {
@@ -99,10 +87,10 @@
 
         [NotNull]
         [MethodImpl((MethodImplOptions) 256)]
-        private static IEnumerable<IMethod<TMethodInfo>> CreateMethods<TMethodInfo>(IContainer container, Resolver<IMethod<TMethodInfo>> methodResolver, [NotNull] IEnumerable<TMethodInfo> methodInfos)
+        private static IEnumerable<IMethod<TMethodInfo>> CreateMethods<TMethodInfo>(IContainer container, [NotNull] IEnumerable<TMethodInfo> methodInfos)
             where TMethodInfo: MethodBase
             => methodInfos
                 .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
-                .Select(info => methodResolver(container, info));
+                .Select(info => new Method<TMethodInfo>(info));
     }
 }

@@ -18,12 +18,14 @@
     [PublicAPI]
     internal class BuildContext : IBuildContext
     {
+        // Should be at least internal to be accessable from for compiled code from expressions
         internal static ResizableArray<BuildContext> Contexts = ResizableArray<BuildContext>.Empty;
         private static readonly MemberInfo ContextsMemberInfo = Descriptor<BuildContext>().GetDeclaredMembers().Single(i => i.Name == nameof(Contexts));
         private static readonly FieldInfo ValuesFieldInfo = Descriptor<BuildContext>().GetDeclaredFields().Single(i => i.Name == nameof(Values));
         private static readonly FieldInfo BuildContextItemsFieldInfo = Descriptor<ResizableArray<BuildContext>>().GetDeclaredFields().Single(i => i.Name == nameof(ResizableArray<object>.Items));
         private static readonly FieldInfo ObjectItemsFieldInfo = Descriptor<ResizableArray<object>>().GetDeclaredFields().Single(i => i.Name == nameof(ResizableArray<object>.Items));
 
+        // Should be at least internal to be accessable from for compiled code from expressions
         internal ResizableArray<object> Values = ResizableArray<object>.Empty;
         private readonly ICollection<IDisposable> _resources;
         private readonly int _id;

@@ -751,7 +751,7 @@
         </member>
         <member name="M:IoC.Extensibility.IBuildContext.Prepare(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)">
             <summary>
-            Prepares an expression.
+            Prepares an expression. Replace generic types' markers and injection statements. 
             </summary>
             <param name="baseExpression">The base expression.</param>
             <param name="instanceExpression">The instance expression.</param>

@@ -8,24 +8,25 @@
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
     internal sealed class Table<TKey, TValue>: IEnumerable<KeyValue<TKey, TValue>>
     {
-        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>();
+        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(ResizableArray<Bucket>.Create(4, Bucket.EmptyBucket), 4, 0);
         public readonly int Divisor;
         public readonly ResizableArray<Bucket> Buckets;
-        private readonly int _count;
+        public readonly int Count;
 
         [MethodImpl((MethodImplOptions)256)]
-        private Table(int divisor = 4)
+        private Table(ResizableArray<Bucket> buckets, int divisor, int count)
         {
+            Buckets = buckets;
             Divisor = divisor;
-            Buckets = ResizableArray<Bucket>.Create(Divisor, Bucket.EmptyBucket);
+            Count = count;
         }
 
         [MethodImpl((MethodImplOptions)256)]
         private Table(Table<TKey, TValue> origin, int hashCode, TKey key, TValue value)
         {
             int newBucketIndex;
-            _count = origin._count + 1;
-            if (origin._count >= origin.Divisor)
+            Count = origin.Count + 1;
+            if (origin.Count >= origin.Divisor)
             {
                 Divisor = origin.Divisor << 1;
                 Buckets = ResizableArray<Bucket>.Create(Divisor, Bucket.EmptyBucket);
@@ -84,12 +85,11 @@
         [Pure]
         public TValue Get(int hashCode, TKey key)
         {
-            var bucket = Buckets.Items[hashCode & (Divisor - 1)];
-            var keyValues = bucket.KeyValues.Items;
-            for (var index = 0; index < bucket.Count; index++)
+            var keyValues = Buckets.Items[hashCode & (Divisor - 1)].KeyValues.Items;
+            for (var index = 0; index < keyValues.Length; index++)
             {
                 var keyValue = keyValues[index];
-                if (keyValue.HashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
+                if (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key))
                 {
                     return keyValue.Value;
                 }
@@ -102,32 +102,56 @@
         public Table<TKey, TValue> Remove(int hashCode, TKey key, out bool removed)
         {
             removed = false;
-            var newTable = new Table<TKey, TValue>(Divisor);
-            foreach (var keyValue in this)
+            var newBuckets = ResizableArray<Bucket>.Create(Divisor, Bucket.EmptyBucket);
+            var newBucketsArray = newBuckets.Items;
+            var bucketIndex = hashCode & (Divisor - 1);
+            for (var curBucketInex = 0; curBucketInex < Buckets.Items.Length; curBucketInex++)
             {
-                if (keyValue.HashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
+                if (curBucketInex != bucketIndex)
                 {
-                    removed = true;
+                    newBucketsArray[curBucketInex] = Buckets.Items[curBucketInex].Copy();
                     continue;
                 }
 
-                newTable = newTable.Set(keyValue.HashCode, keyValue.Key, keyValue.Value);
+                // Bucket to remove an element
+                var bucket = Buckets.Items[bucketIndex];
+                var keyValues = bucket.KeyValues.Items;
+                for (var index = 0; index < keyValues.Length; index++)
+                {
+                    var keyValue = keyValues[index];
+                    // Remove the element
+                    if (keyValue.HashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
+                    {
+                        newBucketsArray[bucketIndex] = bucket.Remove(index);
+                        removed = true;
+                    }
+                }
             }
-            
-            return newTable;
+
+            return new Table<TKey, TValue>(newBuckets, Divisor, removed ? Count - 1: Count);
         }
 
         internal struct Bucket
         {
-            public static readonly Bucket EmptyBucket = new Bucket(ResizableArray<KeyValue<TKey, TValue>>.Empty);
-            public ResizableArray<KeyValue<TKey, TValue>> KeyValues;
-            public readonly int Count;
+            public static readonly Bucket EmptyBucket = new Bucket(0);
+            public readonly ResizableArray<KeyValue<TKey, TValue>> KeyValues;
 
             [MethodImpl((MethodImplOptions)256)]
             private Bucket(ResizableArray<KeyValue<TKey, TValue>> keyValues)
             {
-                KeyValues = keyValues;
-                Count = keyValues.Items.Length;
+                KeyValues = keyValues.Items.Length > 0 ? keyValues.Copy() : ResizableArray<KeyValue<TKey, TValue>>.Empty;
+            }
+
+            [MethodImpl((MethodImplOptions)256)]
+            private Bucket(int count)
+            {
+                KeyValues = ResizableArray<KeyValue<TKey, TValue>>.Create(count);
+            }
+
+            [MethodImpl((MethodImplOptions)256)]
+            public Bucket Copy()
+            {
+                return new Bucket(KeyValues);
             }
 
             [Pure]
@@ -135,6 +159,27 @@
             public Bucket Add(KeyValue<TKey, TValue> keyValue)
             {
                 return new Bucket(KeyValues.Add(keyValue));
+            }
+
+            [Pure]
+            [MethodImpl((MethodImplOptions)256)]
+            public Bucket Remove(int index)
+            {
+                var count = KeyValues.Items.Length;
+                var newBucket = new Bucket(count - 1);
+                var newKeyValues = newBucket.KeyValues.Items;
+                var keyValues = KeyValues.Items;
+                for (var newIndex = 0; newIndex < index; newIndex++)
+                {
+                    newKeyValues[newIndex] = keyValues[newIndex];
+                }
+
+                for (var newIndex = index + 1; newIndex < count; newIndex++)
+                {
+                    newKeyValues[newIndex - 1] = keyValues[newIndex];
+                }
+
+                return newBucket;
             }
         }
     }

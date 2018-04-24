@@ -54,9 +54,9 @@
 #endif
             );
 
-        private static IConfiguration[] Combine(params IEnumerable<IConfiguration>[] configurations)
+        private static IEnumerable<IConfiguration> Combine(params IEnumerable<IConfiguration>[] configurations)
         {
-            return configurations.SelectMany(i => i).ToArray();
+            return configurations.SelectMany(i => i);
         }
     }
 }

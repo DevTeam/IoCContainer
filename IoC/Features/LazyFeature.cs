@@ -11,9 +11,7 @@
         /// The default instance.
         public static readonly IConfiguration Default = new LazyFeature();
 
-        private LazyFeature()
-        {
-        }
+        private LazyFeature() { }
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)

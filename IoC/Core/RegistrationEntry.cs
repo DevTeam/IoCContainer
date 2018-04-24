@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Runtime.CompilerServices;
     using Collections;
     using Extensibility;
 
@@ -15,6 +16,7 @@
         [NotNull] public readonly IEnumerable<Key> Keys;
         private readonly object _lockObject = new object();
         private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
+        private bool _disposed;
 
         public RegistrationEntry(
             [NotNull] IDependency dependency,
@@ -48,15 +50,22 @@
             return true;
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
         public ILifetime GetLifetime([NotNull] Type type)
         {
             return GetLifetime(type.Descriptor());
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
         private ILifetime GetLifetime(TypeDescriptor typeDescriptor)
         {
+            if (_lifetime == null)
+            {
+                return null;
+            }
+            
             if (!typeDescriptor.IsConstructedGenericType())
             {
                 return _lifetime;
@@ -68,12 +77,7 @@
             {
                 if (!_lifetimes.TryGetValue(lifetimeKey, out lifetime))
                 {
-                    lifetime = _lifetime?.Clone();
-                    if (lifetime is IDisposable disposableLifetime)
-                    {
-                        _resources.Add(disposableLifetime);
-                    }
-
+                    lifetime = _lifetime.Clone();
                     _lifetimes.Add(lifetimeKey, lifetime);
                 }
             }
@@ -83,12 +87,28 @@
 
         public void Dispose()
         {
+            lock(_lockObject)
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+                
+                _disposed = true;
+            }
+            
             foreach (var resource in _resources)
             {
                 resource.Dispose();
             }
-
-            _resources.Clear();
+            
+            foreach (var lifetime in _lifetimes.Values)
+            {
+                if (lifetime is IDisposable disposableLifetime)
+                {
+                    disposableLifetime.Dispose();
+                }
+            }
         }
 
         public override string ToString()

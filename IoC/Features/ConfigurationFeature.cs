@@ -16,9 +16,7 @@
         /// </summary>
         public static readonly IConfiguration Default = new ConfigurationFeature();
 
-        private ConfigurationFeature()
-        {
-        }
+        private ConfigurationFeature() { }
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)

@@ -16,9 +16,7 @@
         /// The default instance.
         public static readonly IConfiguration Default = new CoreFeature();
 
-        private CoreFeature()
-        {
-        }
+        private CoreFeature() { }
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
@@ -27,8 +25,6 @@
             yield return container.Register(ctx => IssueResolver.Shared);
             yield return container.Register(ctx => DefaultAutowiringStrategy.Shared);
             yield return container.Register(ctx => ctx.Container.GetResolver<TT>(ctx.Key.Tag.AsTag()), null, Feature.AnyTag);
-            yield return container.Register<IMethod<ConstructorInfo>>(ctx => new Method<ConstructorInfo>((ConstructorInfo)ctx.Args[0]));
-            yield return container.Register<IMethod<MethodInfo>>(ctx => new Method<MethodInfo>((MethodInfo)ctx.Args[0]));
 
             // Lifetimes
             yield return container.Register<ILifetime>(ctx => new SingletonLifetime(), null, new object[] { Lifetime.Singleton });
@@ -42,9 +38,15 @@
 
             // Containers
             yield return container.Register(ctx => ctx.Container, null, new object[] { null, WellknownContainers.Current } );
-            yield return container.Register<IContainer>(ctx => new Container(ctx.Args.Length == 1 ? Container.CreateContainerName(ctx.Args[0] as string) : Container.CreateContainerName(string.Empty), ctx.Container, false), null, new object[] { WellknownContainers.Child });
+            yield return container.Register<IContainer>(
+                ctx => new Container(
+                    ctx.Args.Length == 1
+                        ? Container.CreateContainerName(ctx.Args[0] as string)
+                        : Container.CreateContainerName(string.Empty), ctx.Container, false),
+                null,
+                new object[] { WellknownContainers.Child });
+            
             yield return container.Register(ctx => ctx.Container.Parent, null, new object[] { WellknownContainers.Parent });
-
             yield return container.Register(ctx => (IResourceStore)ctx.Container.Inject<IContainer>(WellknownContainers.Current));
         }
     }

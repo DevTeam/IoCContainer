@@ -87,7 +87,7 @@ namespace IoC.Comparison
         {
             if (!int.TryParse(Environment.GetEnvironmentVariable("SERIES"), out var series))
             {
-                series = 1000000;
+                series = 10000000;
             }
 
             var results = new List<TestResult>();

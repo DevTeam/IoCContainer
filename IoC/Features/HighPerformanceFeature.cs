@@ -24,9 +24,7 @@ namespace IoC.Features
         /// The default instance.
         public static readonly IConfiguration Default = new HighPerformanceFeature();
 
-        private HighPerformanceFeature()
-        {
-        }
+        private HighPerformanceFeature() { }
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)

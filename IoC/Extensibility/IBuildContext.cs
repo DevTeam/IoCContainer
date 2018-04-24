@@ -33,7 +33,7 @@
         [NotNull] IBuildContext CreateChild(Key key, [NotNull] IContainer container);
 
         /// <summary>
-        /// Prepares an expression.
+        /// Prepares an expression. Replace generic types' markers and injection statements. 
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
         /// <param name="instanceExpression">The instance expression.</param>

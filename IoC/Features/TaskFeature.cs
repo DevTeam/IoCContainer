@@ -13,9 +13,7 @@
         /// The default instance.
         public static readonly IConfiguration Default = new TaskFeature();
 
-        private TaskFeature()
-        {
-        }
+        private TaskFeature() { }
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
@@ -23,7 +21,7 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => TaskScheduler.Current);
             yield return container.Register(ctx => StartTask(new Task<TT>(ctx.Container.Inject<Func<TT>>(ctx.Key.Tag)), ctx.Container.Inject<TaskScheduler>()), null, Feature.AnyTag);
-#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NET40 && !NET45 && !NET46 && !NET47 && !WINDOWS_UWP
+#if NETCOREAPP2_0
             yield return container.Register(ctx => new ValueTask<TT>(ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Feature.AnyTag);
 #endif
         }

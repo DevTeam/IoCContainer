@@ -8,13 +8,15 @@
     internal static class Disposable
     {
         [NotNull]
-        public static readonly IDisposable Empty = new EmptyDisposable();
+        public static readonly IDisposable Empty = EmptyDisposable.Shared;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Create([NotNull] Action action)
         {
+#if DEBUG   
             if (action == null) throw new ArgumentNullException(nameof(action));
+#endif
             return new DisposableAction(action);
         }
 
@@ -22,55 +24,85 @@
         [NotNull]
         public static IDisposable Create([NotNull][ItemCanBeNull] IEnumerable<IDisposable> disposables)
         {
+#if DEBUG   
             if (disposables == null) throw new ArgumentNullException(nameof(disposables));
+#endif
             return new CompositeDisposable(disposables);
         }
 
         private sealed class DisposableAction : IDisposable
         {
             [NotNull] private readonly Action _action;
-            private bool _disposed;
+            private volatile object _lockObject = new object();
 
             public DisposableAction([NotNull] Action action)
             {
                 _action = action;
-                _disposed = false;
             }
 
             public void Dispose()
             {
-                if (_disposed)
+                var lockObject = _lockObject;
+                if (lockObject == null)
                 {
                     return;
                 }
+                
+                lock (lockObject)
+                {
+                    if (_lockObject == null)
+                    {
+                        return;
+                    }
 
-                _disposed = true;
+                    _lockObject = null;
+                }
+
                 _action();
             }
         }
 
         private sealed class CompositeDisposable : IDisposable
         {
-            private readonly List<IDisposable> _disposables;
-
-            public CompositeDisposable(IEnumerable<IDisposable> disposables) => _disposables = disposables.ToList();
+            private IDisposable[] _disposables;
+            
+            public CompositeDisposable(IEnumerable<IDisposable> disposables)
+                => _disposables = disposables.ToArray();
 
             public void Dispose()
             {
-                foreach (var disposable in _disposables)
+                var disposables = _disposables;
+                if (disposables == null)
                 {
-                    disposable?.Dispose();
+                    return;
                 }
 
-                _disposables.Clear();
+                lock (disposables)
+                {
+                    if (_disposables == null)
+                    {
+                        return;
+                    }
+
+                    _disposables = null;
+                }
+
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var index = 0; index < disposables.Length; index++)
+                {
+                    disposables[index]?.Dispose();
+                }
             }
         }
 
         private class EmptyDisposable: IDisposable
         {
-            public void Dispose()
-            {
-            }
+            [NotNull]
+            public static readonly IDisposable Shared = new EmptyDisposable();
+
+            private EmptyDisposable() { }
+
+            public void Dispose() { }
         }
     }
 }

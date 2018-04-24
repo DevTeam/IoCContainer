@@ -1,11 +1,33 @@
 ﻿
-// IoC Container
-//
-// Important note: do not use any internal classes, structures, enums, interfaces, methods, fields or properties
-// because it may be changed even in minor updates of package.
-//
-// Copyright (c) 2018 Nikolay Pianikov
-//
+/* 
+IoC Container
+
+Important note: do not use any internal classes, structures, enums, interfaces, methods, fields or properties
+because it may be changed even in minor updates of package.
+
+MIT License
+
+Copyright (c) 2018 Nikolay Pianikov
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
 // ReSharper disable All
 
 #region Properties
@@ -1187,11 +1209,11 @@ namespace IoC
         }
 
         [NotNull]
-        private static Container Create([NotNull] string name, [NotNull] IContainer baseContainer)
+        private static Container Create([NotNull] string name, [NotNull] IContainer parentContainer)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            if (baseContainer == null) throw new ArgumentNullException(nameof(baseContainer));
-            return new Container(CreateContainerName(name), baseContainer, true);
+            if (parentContainer == null) throw new ArgumentNullException(nameof(parentContainer));
+            return new Container(CreateContainerName(name), parentContainer, true);
         }
 
         private static Container CreateRootContainer([NotNull][ItemNotNull] IEnumerable<IConfiguration> configurations)
@@ -1345,50 +1367,6 @@ namespace IoC
             return TryCreateResolver(new FullKey(type), out resolver, container ?? this);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
-        private bool TryCreateResolver<T>(FullKey key, out Resolver<T> resolver, IContainer container)
-        {
-            if (TryGetRegistrationEntry(key, out var registrationEntry))
-            {
-                if (!registrationEntry.TryCreateResolver(key, container, out var resolverDelegate))
-                {
-                    resolver = default(Resolver<T>);
-                    return false;
-                }
-
-                resolver = AddResolver(key, (Resolver<T>)resolverDelegate, true);
-                return true;
-            }
-
-            if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, container))
-            {
-                resolver = default(Resolver<T>);
-                return false;
-            }
-
-            if (container == this)
-            {
-                resolver = AddResolver(key, resolver, false);
-            }
-
-            return true;
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        private Resolver<T> AddResolver<T>(FullKey key, [NotNull] Resolver<T> resolver, bool currentContainer)
-        {
-            lock (_lockObject)
-            {
-                Resolvers = Resolvers.Set(key.GetHashCode(), key, resolver);
-                if (key.Tag == null)
-                {
-                    ResolversByType = ResolversByType.Set(key.Type.GetHashCode(), key.Type, resolver);
-                }
-
-                return resolver;
-            }
-        }
-
         /// <inheritdoc />
         public bool TryGetDependency(FullKey key, out IDependency dependency, out ILifetime lifetime)
         {
@@ -1400,46 +1378,6 @@ namespace IoC
             }
 
             return _parent.TryGetDependency(key, out dependency, out lifetime);
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        private bool TryGetRegistrationEntry(FullKey key, out RegistrationEntry registrationEntry)
-        {
-            lock (_lockObject)
-            {
-                registrationEntry = _registrationEntries.Get(key.GetHashCode(), key);
-                if (registrationEntry != default(RegistrationEntry))
-                {
-                    return true;
-                }
-
-                var type = key.Type;
-                var typeDescriptor = type.Descriptor();
-                if (typeDescriptor.IsConstructedGenericType())
-                {
-                    var genericType = typeDescriptor.GetGenericTypeDefinition();
-                    var genericKey = new FullKey(genericType, key.Tag);
-                    registrationEntry = _registrationEntries.Get(genericKey.GetHashCode(), genericKey);
-                    if (registrationEntry != default(RegistrationEntry))
-                    {
-                        return true;
-                    }
-
-                    registrationEntry = _registrationEntriesForTagAny.FastGet(genericType.GetHashCode(), genericType);
-                    if (registrationEntry != default(RegistrationEntry))
-                    {
-                        return true;
-                    }
-                }
-
-                registrationEntry = _registrationEntriesForTagAny.FastGet(type.GetHashCode(), type);
-                if (registrationEntry != default(RegistrationEntry))
-                {
-                    return true;
-                }
-
-                return false;
-            }
         }
 
         /// <inheritdoc />
@@ -1500,6 +1438,34 @@ namespace IoC
             return GetAllKeys().Concat(_parent).GetEnumerator();
         }
 
+        /// <inheritdoc />
+        public IDisposable Subscribe(IObserver<ContainerEvent> observer)
+        {
+            return _eventSubject.Subscribe(observer);
+        }
+        
+        void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
+        {
+            if (value.Container == this)
+            {
+                return;
+            }
+
+            lock (_lockObject)
+            {
+                ResetResolvers();
+            }
+        }
+
+        void IObserver<ContainerEvent>.OnError(Exception error)
+        {
+        }
+
+        void IObserver<ContainerEvent>.OnCompleted()
+        {
+        }
+
+        [MethodImpl((MethodImplOptions) 256)]
         private IEnumerable<IEnumerable<FullKey>> GetAllKeys()
         {
             lock (_lockObject)
@@ -1508,12 +1474,7 @@ namespace IoC
             }
         }
 
-        /// <inheritdoc />
-        public IDisposable Subscribe(IObserver<ContainerEvent> observer)
-        {
-            return _eventSubject.Subscribe(observer);
-        }
-
+        [MethodImpl((MethodImplOptions) 256)]
         private bool TryRegister<TKey>(FullKey originalKey, TKey key, [NotNull] RegistrationEntry registrationEntry, [NotNull] ref Table<TKey, RegistrationEntry> entries)
         {
             var hashCode = key.GetHashCode();
@@ -1537,6 +1498,7 @@ namespace IoC
             return true;
         }
 
+        [MethodImpl((MethodImplOptions) 256)]
         private bool TryUnregister<TKey>(FullKey originalKey, TKey key, [NotNull] ref Table<TKey, RegistrationEntry> entries)
         {
             entries = entries.Remove(key.GetHashCode(), key, out var unregistered);
@@ -1550,33 +1512,14 @@ namespace IoC
             return true;
         }
 
+        [MethodImpl((MethodImplOptions) 256)]
         private void ResetResolvers()
         {
             Resolvers = Table<FullKey, ResolverDelegate>.Empty;
             ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
         }
 
-        void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
-        {
-            if (value.Container == this)
-            {
-                return;
-            }
-
-            lock (_lockObject)
-            {
-                ResetResolvers();
-            }
-        }
-
-        void IObserver<ContainerEvent>.OnError(Exception error)
-        {
-        }
-
-        void IObserver<ContainerEvent>.OnCompleted()
-        {
-        }
-
+        [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         internal static string CreateContainerName([CanBeNull] string name = "")
         {
@@ -1584,9 +1527,94 @@ namespace IoC
             return !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
         }
 
+        [MethodImpl((MethodImplOptions) 256)]
         private void ApplyConfigurations(IEnumerable<IConfiguration> configurations)
         {
             _resources.Add(this.Apply(configurations));
+        }
+        
+        [MethodImpl((MethodImplOptions)256)]
+        private bool TryCreateResolver<T>(FullKey key, out Resolver<T> resolver, IContainer container)
+        {
+            if (TryGetRegistrationEntry(key, out var registrationEntry))
+            {
+                if (!registrationEntry.TryCreateResolver(key, container, out var resolverDelegate))
+                {
+                    resolver = default(Resolver<T>);
+                    return false;
+                }
+
+                resolver = AddResolver(key, (Resolver<T>)resolverDelegate, true);
+                return true;
+            }
+
+            if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, container))
+            {
+                resolver = default(Resolver<T>);
+                return false;
+            }
+
+            if (container == this)
+            {
+                resolver = AddResolver(key, resolver, false);
+            }
+
+            return true;
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        private Resolver<T> AddResolver<T>(FullKey key, [NotNull] Resolver<T> resolver, bool currentContainer)
+        {
+            lock (_lockObject)
+            {
+                Resolvers = Resolvers.Set(key.GetHashCode(), key, resolver);
+                if (key.Tag == null)
+                {
+                    ResolversByType = ResolversByType.Set(key.Type.GetHashCode(), key.Type, resolver);
+                }
+
+                return resolver;
+            }
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        private bool TryGetRegistrationEntry(FullKey key, out RegistrationEntry registrationEntry)
+        {
+            lock (_lockObject)
+            {
+                registrationEntry = _registrationEntries.Get(key.GetHashCode(), key);
+                if (registrationEntry != default(RegistrationEntry))
+                {
+                    return true;
+                }
+
+                var type = key.Type;
+                var typeDescriptor = type.Descriptor();
+                if (typeDescriptor.IsConstructedGenericType())
+                {
+                    var genericType = typeDescriptor.GetGenericTypeDefinition();
+                    var genericKey = new FullKey(genericType, key.Tag);
+                    registrationEntry = _registrationEntries.Get(genericKey.GetHashCode(), genericKey);
+                    if (registrationEntry != default(RegistrationEntry))
+                    {
+                        return true;
+                    }
+
+                    registrationEntry = _registrationEntriesForTagAny.FastGet(genericType.GetHashCode(), genericType);
+                    if (registrationEntry != default(RegistrationEntry))
+                    {
+                        return true;
+                    }
+                }
+
+                registrationEntry = _registrationEntriesForTagAny.FastGet(type.GetHashCode(), type);
+                if (registrationEntry != default(RegistrationEntry))
+                {
+                    return true;
+                }
+
+                return false;
+            }
         }
     }
 }
@@ -3803,9 +3831,7 @@ namespace IoC.Features
         /// </summary>
         public static readonly IConfiguration Default = new ConfigurationFeature();
 
-        private ConfigurationFeature()
-        {
-        }
+        private ConfigurationFeature() { }
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
@@ -3876,9 +3902,7 @@ namespace IoC.Features
         /// The default instance.
         public static readonly IConfiguration Default = new CoreFeature();
 
-        private CoreFeature()
-        {
-        }
+        private CoreFeature() { }
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
@@ -3887,8 +3911,6 @@ namespace IoC.Features
             yield return container.Register(ctx => IssueResolver.Shared);
             yield return container.Register(ctx => DefaultAutowiringStrategy.Shared);
             yield return container.Register(ctx => ctx.Container.GetResolver<TT>(ctx.Key.Tag.AsTag()), null, Feature.AnyTag);
-            yield return container.Register<IMethod<ConstructorInfo>>(ctx => new Method<ConstructorInfo>((ConstructorInfo)ctx.Args[0]));
-            yield return container.Register<IMethod<MethodInfo>>(ctx => new Method<MethodInfo>((MethodInfo)ctx.Args[0]));
 
             // Lifetimes
             yield return container.Register<ILifetime>(ctx => new SingletonLifetime(), null, new object[] { Lifetime.Singleton });
@@ -3902,9 +3924,15 @@ namespace IoC.Features
 
             // Containers
             yield return container.Register(ctx => ctx.Container, null, new object[] { null, WellknownContainers.Current } );
-            yield return container.Register<IContainer>(ctx => new Container(ctx.Args.Length == 1 ? Container.CreateContainerName(ctx.Args[0] as string) : Container.CreateContainerName(string.Empty), ctx.Container, false), null, new object[] { WellknownContainers.Child });
+            yield return container.Register<IContainer>(
+                ctx => new Container(
+                    ctx.Args.Length == 1
+                        ? Container.CreateContainerName(ctx.Args[0] as string)
+                        : Container.CreateContainerName(string.Empty), ctx.Container, false),
+                null,
+                new object[] { WellknownContainers.Child });
+            
             yield return container.Register(ctx => ctx.Container.Parent, null, new object[] { WellknownContainers.Parent });
-
             yield return container.Register(ctx => (IResourceStore)ctx.Container.Inject<IContainer>(WellknownContainers.Current));
         }
     }
@@ -3970,9 +3998,9 @@ namespace IoC.Features
 #endif
             );
 
-        private static IConfiguration[] Combine(params IEnumerable<IConfiguration>[] configurations)
+        private static IEnumerable<IConfiguration> Combine(params IEnumerable<IConfiguration>[] configurations)
         {
-            return configurations.SelectMany(i => i).ToArray();
+            return configurations.SelectMany(i => i);
         }
     }
 }
@@ -4051,9 +4079,7 @@ namespace IoC.Features
         /// The default instance.
         public static readonly IConfiguration Default = new HighPerformanceFeature();
 
-        private HighPerformanceFeature()
-        {
-        }
+        private HighPerformanceFeature() { }
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
@@ -4080,9 +4106,7 @@ namespace IoC.Features
         /// The default instance.
         public static readonly IConfiguration Default = new LazyFeature();
 
-        private LazyFeature()
-        {
-        }
+        private LazyFeature() { }
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
@@ -4112,9 +4136,7 @@ namespace IoC.Features
         /// The default instance.
         public static readonly IConfiguration Default = new TaskFeature();
 
-        private TaskFeature()
-        {
-        }
+        private TaskFeature() { }
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
@@ -4122,7 +4144,7 @@ namespace IoC.Features
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => TaskScheduler.Current);
             yield return container.Register(ctx => StartTask(new Task<TT>(ctx.Container.Inject<Func<TT>>(ctx.Key.Tag)), ctx.Container.Inject<TaskScheduler>()), null, Feature.AnyTag);
-#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NET40 && !NET45 && !NET46 && !NET47 && !WINDOWS_UWP
+#if NETCOREAPP2_0
             yield return container.Register(ctx => new ValueTask<TT>(ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Feature.AnyTag);
 #endif
         }
@@ -4217,7 +4239,7 @@ namespace IoC.Features
                     ctx.Container.Inject<TT8>(ctx.Key.Tag)), null, Feature.AnyTag);
             }
 
-#if !NET40 && !NET45 && !NET46 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !WINDOWS_UWP
+#if !NET40 && !NET403 && !NET45 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2&& !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !WINDOWS_UWP
             yield return container.Register(ctx => CreateTuple(
                 ctx.Container.Inject<TT1>(ctx.Key.Tag),
                 ctx.Container.Inject<TT2>(ctx.Key.Tag)), null, Feature.AnyTag);
@@ -4272,7 +4294,7 @@ namespace IoC.Features
 #endif
         }
 
-#if !NET40 && !NET45 && !NET46 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2&& !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !WINDOWS_UWP
+#if !NET40 && !NET403 && !NET45 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2&& !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !WINDOWS_UWP
         internal static (T1, T2) CreateTuple<T1, T2>(T1 val1, T2 val2) => (val1, val2);
         internal static (T1, T2, T3) CreateTuple<T1, T2, T3>(T1 val1, T2 val2, T3 val3) => (val1, val2, val3);
         internal static (T1, T2, T3, T4) CreateTuple<T1, T2, T3, T4>(T1 val1, T2 val2, T3 val3, T4 val4) => (val1, val2, val3, val4);
@@ -4602,7 +4624,7 @@ namespace IoC.Extensibility
         [NotNull] IBuildContext CreateChild(Key key, [NotNull] IContainer container);
 
         /// <summary>
-        /// Prepares an expression.
+        /// Prepares an expression. Replace generic types' markers and injection statements. 
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
         /// <param name="instanceExpression">The instance expression.</param>
@@ -5011,12 +5033,14 @@ namespace IoC.Core
     [PublicAPI]
     internal class BuildContext : IBuildContext
     {
+        // Should be at least internal to be accessable from for compiled code from expressions
         internal static ResizableArray<BuildContext> Contexts = ResizableArray<BuildContext>.Empty;
         private static readonly MemberInfo ContextsMemberInfo = Descriptor<BuildContext>().GetDeclaredMembers().Single(i => i.Name == nameof(Contexts));
         private static readonly FieldInfo ValuesFieldInfo = Descriptor<BuildContext>().GetDeclaredFields().Single(i => i.Name == nameof(Values));
         private static readonly FieldInfo BuildContextItemsFieldInfo = Descriptor<ResizableArray<BuildContext>>().GetDeclaredFields().Single(i => i.Name == nameof(ResizableArray<object>.Items));
         private static readonly FieldInfo ObjectItemsFieldInfo = Descriptor<ResizableArray<object>>().GetDeclaredFields().Single(i => i.Name == nameof(ResizableArray<object>.Items));
 
+        // Should be at least internal to be accessable from for compiled code from expressions
         internal ResizableArray<object> Values = ResizableArray<object>.Empty;
         private readonly ICollection<IDisposable> _resources;
         private readonly int _id;
@@ -5368,10 +5392,7 @@ namespace IoC.Core
 
 
         public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
-        {
-            constructor = constructors.OrderBy(i => GetOrder(i.Info)).FirstOrDefault();
-            return constructor != null;
-        }
+            => (constructor = constructors.OrderBy(i => GetOrder(i.Info)).FirstOrDefault()) != null;
 
         public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
         {
@@ -5379,9 +5400,11 @@ namespace IoC.Core
             return true;
         }
 
-        private int GetOrder(MethodBase method)
+        [MethodImpl((MethodImplOptions)256)]
+        private static int GetOrder(MethodBase method)
         {
-            return (method.GetParameters().Length + 1) * (method.IsPublic ? 1 : 1000);
+            var order = method.GetParameters().Length + 1;
+            return method.IsPublic ? order : order << 10;
         }
     }
 }
@@ -5721,13 +5744,15 @@ namespace IoC.Core
     internal static class Disposable
     {
         [NotNull]
-        public static readonly IDisposable Empty = new EmptyDisposable();
+        public static readonly IDisposable Empty = EmptyDisposable.Shared;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Create([NotNull] Action action)
         {
+#if DEBUG   
             if (action == null) throw new ArgumentNullException(nameof(action));
+#endif
             return new DisposableAction(action);
         }
 
@@ -5735,55 +5760,85 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Create([NotNull][ItemCanBeNull] IEnumerable<IDisposable> disposables)
         {
+#if DEBUG   
             if (disposables == null) throw new ArgumentNullException(nameof(disposables));
+#endif
             return new CompositeDisposable(disposables);
         }
 
         private sealed class DisposableAction : IDisposable
         {
             [NotNull] private readonly Action _action;
-            private bool _disposed;
+            private volatile object _lockObject = new object();
 
             public DisposableAction([NotNull] Action action)
             {
                 _action = action;
-                _disposed = false;
             }
 
             public void Dispose()
             {
-                if (_disposed)
+                var lockObject = _lockObject;
+                if (lockObject == null)
                 {
                     return;
                 }
+                
+                lock (lockObject)
+                {
+                    if (_lockObject == null)
+                    {
+                        return;
+                    }
 
-                _disposed = true;
+                    _lockObject = null;
+                }
+
                 _action();
             }
         }
 
         private sealed class CompositeDisposable : IDisposable
         {
-            private readonly List<IDisposable> _disposables;
-
-            public CompositeDisposable(IEnumerable<IDisposable> disposables) => _disposables = disposables.ToList();
+            private IDisposable[] _disposables;
+            
+            public CompositeDisposable(IEnumerable<IDisposable> disposables)
+                => _disposables = disposables.ToArray();
 
             public void Dispose()
             {
-                foreach (var disposable in _disposables)
+                var disposables = _disposables;
+                if (disposables == null)
                 {
-                    disposable?.Dispose();
+                    return;
                 }
 
-                _disposables.Clear();
+                lock (disposables)
+                {
+                    if (_disposables == null)
+                    {
+                        return;
+                    }
+
+                    _disposables = null;
+                }
+
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var index = 0; index < disposables.Length; index++)
+                {
+                    disposables[index]?.Dispose();
+                }
             }
         }
 
         private class EmptyDisposable: IDisposable
         {
-            public void Dispose()
-            {
-            }
+            [NotNull]
+            public static readonly IDisposable Shared = new EmptyDisposable();
+
+            private EmptyDisposable() { }
+
+            public void Dispose() { }
         }
     }
 }
@@ -5841,6 +5896,11 @@ namespace IoC.Core
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class ExpressionCompilerOptimizing : IExpressionCompiler
     {
+        private const string ResolverModuleName = "DynamicModule";
+        private const string ResolverTypeName = "DynamicResolver";
+        private const string ResolveMethodName = "Resolve";
+        private const string SnkResourceKey = "IoC.DevTeam.snk";
+
         [NotNull] private static readonly Type[] ResolverParameterTypes = ResolverParameters.Select(i => i.Type).ToArray();
         [NotNull] private static readonly ModuleBuilder ModuleBuilder;
         private static int _resolverTypeId;
@@ -5849,23 +5909,20 @@ namespace IoC.Core
         {
             var domain = AppDomain.CurrentDomain;
             var assembly = Descriptor<ExpressionCompilerOptimizing>().GetAssembly();
-            using (var keyStream = assembly.GetManifestResourceStream("IoC.DevTeam.snk"))
-            using (var keyReader = new BinaryReader(keyStream ?? throw new InvalidOperationException("Resource with key wsa not found.")))
+            using (var keyStream = assembly.GetManifestResourceStream(SnkResourceKey))
+            using (var keyReader = new BinaryReader(keyStream ?? throw new InvalidOperationException($"Resource with key \"{SnkResourceKey}\" was not found.")))
             {
                 var key = keyReader.ReadBytes((int)keyStream.Length);
                 var assemblyName = new AssemblyName { Name = HighPerformanceFeature.ShortDynamicAssemblyName, KeyPair = new StrongNameKeyPair(key) };
                 var assemblyBuilder = domain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-                ModuleBuilder = assemblyBuilder.DefineDynamicModule("DynamicModule");
+                ModuleBuilder = assemblyBuilder.DefineDynamicModule(ResolverModuleName);
             }
         }
 
         public bool IsReferenceConstantSupported => false;
 
         public Delegate Compile(LambdaExpression resolverExpression)
-        {
-            if (resolverExpression == null) throw new ArgumentNullException(nameof(resolverExpression));
-            return TryCompile(resolverExpression) ?? ExpressionCompilerDefault.Shared.Compile(resolverExpression);
-        }
+            => TryCompile(resolverExpression ?? throw new ArgumentNullException(nameof(resolverExpression))) ?? ExpressionCompilerDefault.Shared.Compile(resolverExpression);
 
         [CanBeNull]
         private Delegate TryCompile(LambdaExpression resolverExpression)
@@ -5883,17 +5940,12 @@ namespace IoC.Core
                     resolverExpression = (LambdaExpression)resolverExpression.Reduce();
                 }
 
-                var typeName = "DynamicResolver" + System.Threading.Interlocked.Increment(ref _resolverTypeId);
+                var typeName = ResolverTypeName + System.Threading.Interlocked.Increment(ref _resolverTypeId);
                 var typeBuilder = ModuleBuilder.DefineType(typeName, TypeAttributes.Public);
-                var methodBuilder = typeBuilder.DefineMethod("Resolve", MethodAttributes.Public | MethodAttributes.Static, resolverExpression.ReturnType, ResolverParameterTypes);
+                var methodBuilder = typeBuilder.DefineMethod(ResolveMethodName, MethodAttributes.Public | MethodAttributes.Static, resolverExpression.ReturnType, ResolverParameterTypes);
                 resolverExpression.CompileToMethod(methodBuilder);
-                var methodInfo = typeBuilder.CreateType().GetMethod("Resolve");
-                if (methodInfo == null)
-                {
-                    return null;
-                }
-
-                return Delegate.CreateDelegate(resolverExpression.ReturnType.ToResolverType(), methodInfo);
+                var methodInfo = typeBuilder.CreateType().GetMethod(ResolveMethodName);
+                return methodInfo == null ? null : Delegate.CreateDelegate(resolverExpression.ReturnType.ToResolverType(), methodInfo);
             }
             catch
             {
@@ -6028,13 +6080,7 @@ namespace IoC.Core
             }
 
             var typeDescriptor = (instanceType ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)).Descriptor();
-            if (!buildContext.Container.TryGetResolver<IMethod<ConstructorInfo>>(typeof(IMethod<ConstructorInfo>), out var ctorResolver))
-            {
-                baseExpression = default(Expression);
-                return false;
-            }
-
-            var defaultConstructors = CreateMethods(buildContext.Container, ctorResolver, typeDescriptor.GetDeclaredConstructors());
+            var defaultConstructors = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredConstructors());
             IMethod<ConstructorInfo> ctor = null;
             if (!(autowiringStrategy?.TryResolveConstructor(defaultConstructors, out ctor) ?? false))
             {
@@ -6045,13 +6091,7 @@ namespace IoC.Core
             }
 
             ctor = ctor ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
-            if (!buildContext.Container.TryGetResolver<IMethod<MethodInfo>>(typeof(IMethod<MethodInfo>), out var methodResolver))
-            {
-                baseExpression = default(Expression);
-                return false;
-            }
-
-            var defaultMehods = CreateMethods(buildContext.Container, methodResolver, typeDescriptor.GetDeclaredMethods());
+            var defaultMehods = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredMethods());
             IEnumerable<IMethod<MethodInfo>> initializers = null;
             if (!(autowiringStrategy?.TryResolveInitializers(defaultMehods, out initializers) ?? false))
             {
@@ -6081,28 +6121,14 @@ namespace IoC.Core
 
         [NotNull]
         [MethodImpl((MethodImplOptions) 256)]
-        private static IEnumerable<IMethod<TMethodInfo>> CreateMethods<TMethodInfo>(IContainer container, Resolver<IMethod<TMethodInfo>> methodResolver, [NotNull] IEnumerable<TMethodInfo> methodInfos)
+        private static IEnumerable<IMethod<TMethodInfo>> CreateMethods<TMethodInfo>(IContainer container, [NotNull] IEnumerable<TMethodInfo> methodInfos)
             where TMethodInfo: MethodBase
             => methodInfos
                 .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
-                .Select(info => methodResolver(container, info));
+                .Select(info => new Method<TMethodInfo>(info));
     }
 }
 
-
-#endregion
-#region IResolverExpressionBuilder
-
-namespace IoC.Core
-{
-    using System.Linq.Expressions;
-    using Extensibility;
-
-    internal interface IResolverExpressionBuilder
-    {
-        bool TryBuild([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out LambdaExpression resolverExpression);
-    }
-}
 
 #endregion
 #region IResourceStore
@@ -6136,9 +6162,7 @@ namespace IoC.Core
     {
         public static readonly IIssueResolver Shared = new IssueResolver();
 
-        private IssueResolver()
-        {
-        }
+        private IssueResolver() { }
 
         public Tuple<IDependency, ILifetime> CannotResolveDependency(IContainer container, Key key)
         {
@@ -6231,9 +6255,7 @@ namespace IoC.Core
     {
         public static readonly IExpressionBuilder<ILifetime> Shared = new LifetimeExpressionBuilder();
 
-        private LifetimeExpressionBuilder()
-        {
-        }
+        private LifetimeExpressionBuilder() { }
 
         public Expression Build(Expression bodyExpression, IBuildContext buildContext, ILifetime lifetime)
         {
@@ -6315,9 +6337,7 @@ namespace IoC.Core
     {
         public static readonly IContainer Shared = new NullContainer();
 
-        private NullContainer()
-        {
-        }
+        private NullContainer() { }
 
         public IContainer Parent => throw new NotSupportedException();
 
@@ -6343,9 +6363,7 @@ namespace IoC.Core
             return false;
         }
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -6366,6 +6384,7 @@ namespace IoC.Core
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Runtime.CompilerServices;
     using Collections;
     using Extensibility;
 
@@ -6377,6 +6396,7 @@ namespace IoC.Core
         [NotNull] public readonly IEnumerable<Key> Keys;
         private readonly object _lockObject = new object();
         private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
+        private bool _disposed;
 
         public RegistrationEntry(
             [NotNull] IDependency dependency,
@@ -6410,15 +6430,22 @@ namespace IoC.Core
             return true;
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
         public ILifetime GetLifetime([NotNull] Type type)
         {
             return GetLifetime(type.Descriptor());
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
         private ILifetime GetLifetime(TypeDescriptor typeDescriptor)
         {
+            if (_lifetime == null)
+            {
+                return null;
+            }
+            
             if (!typeDescriptor.IsConstructedGenericType())
             {
                 return _lifetime;
@@ -6430,12 +6457,7 @@ namespace IoC.Core
             {
                 if (!_lifetimes.TryGetValue(lifetimeKey, out lifetime))
                 {
-                    lifetime = _lifetime?.Clone();
-                    if (lifetime is IDisposable disposableLifetime)
-                    {
-                        _resources.Add(disposableLifetime);
-                    }
-
+                    lifetime = _lifetime.Clone();
                     _lifetimes.Add(lifetimeKey, lifetime);
                 }
             }
@@ -6445,12 +6467,28 @@ namespace IoC.Core
 
         public void Dispose()
         {
+            lock(_lockObject)
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+                
+                _disposed = true;
+            }
+            
             foreach (var resource in _resources)
             {
                 resource.Dispose();
             }
-
-            _resources.Clear();
+            
+            foreach (var lifetime in _lifetimes.Values)
+            {
+                if (lifetime is IDisposable disposableLifetime)
+                {
+                    disposableLifetime.Dispose();
+                }
+            }
         }
 
         public override string ToString()
@@ -6478,6 +6516,7 @@ namespace IoC.Core
 namespace IoC.Core
 {
     using System;
+    using System.Runtime.CompilerServices;
 
     internal struct RegistrationToken: IDisposable
     {
@@ -6490,6 +6529,7 @@ namespace IoC.Core
             _registration = registration ?? throw new ArgumentNullException(nameof(registration));
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         public void Dispose() => _registration.Dispose();
     }
 }
@@ -6503,12 +6543,14 @@ namespace IoC.Core
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Runtime.CompilerServices;
 
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
     internal class Subject<T>: IObservable<T>, IObserver<T>
     {
         private readonly List<IObserver<T>> _observers = new List<IObserver<T>>();
 
+        [MethodImpl((MethodImplOptions)256)]
         public IDisposable Subscribe(IObserver<T> observer)
         {
             lock (_observers)
@@ -6525,6 +6567,7 @@ namespace IoC.Core
             });
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         public void OnNext(T value)
         {
             lock (_observers)
@@ -6536,6 +6579,7 @@ namespace IoC.Core
             }
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         public void OnError(Exception error)
         {
             lock (_observers)
@@ -6547,6 +6591,7 @@ namespace IoC.Core
             }
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         public void OnCompleted()
         {
             lock (_observers)
@@ -7035,9 +7080,7 @@ namespace IoC.Core
     {
         public static readonly IExpressionBuilder<IDictionary<Type, Type>> Shared = new TypeReplacerExpressionBuilder();
 
-        private TypeReplacerExpressionBuilder()
-        {
-        }
+        private TypeReplacerExpressionBuilder() { }
 
         public Expression Build(Expression bodyExpression, IBuildContext buildContext, IDictionary<Type, Type> typesMap)
         {
@@ -7356,10 +7399,10 @@ namespace IoC.Core.Collections
         public static TValue FastGet<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
             where TKey: class
         {
-            var bucket = table.Buckets.Items[hashCode & (table.Divisor - 1)];
-            for (var index = 0; index < bucket.Count; index++)
+            var items = table.Buckets.Items[hashCode & (table.Divisor - 1)].KeyValues.Items;
+            for (var index = 0; index < items.Length; index++)
             {
-                var keyValue = bucket.KeyValues.Items[index];
+                var keyValue = items[index];
                 if (keyValue.Key == key)
                 {
                     return keyValue.Value;
@@ -7407,9 +7450,9 @@ namespace IoC.Core.Collections
     internal struct ResizableArray<T>
     {
         public static readonly ResizableArray<T> Empty = new ResizableArray<T>(0);
-        public readonly T[] Items;
+        [NotNull] public readonly T[] Items;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions) 256)]
         public static ResizableArray<T> Create(int size = 0, T value = default(T))
         {
             if (size == 0)
@@ -7429,14 +7472,14 @@ namespace IoC.Core.Collections
             return array;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions) 256)]
         private ResizableArray(int size)
         {
             Items = new T[size];
         }
 
-        [MethodImpl((MethodImplOptions)256)]
-        private ResizableArray(ResizableArray<T> previous, T value)
+        [MethodImpl((MethodImplOptions) 256)]
+        private ResizableArray(ResizableArray<T> previous, [CanBeNull] T value)
         {
             var length = previous.Items.Length;
             Items = new T[length + 1];
@@ -7444,7 +7487,7 @@ namespace IoC.Core.Collections
             Items[length] = value;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions) 256)]
         private ResizableArray(ResizableArray<T> previous)
         {
             var length = previous.Items.Length;
@@ -7452,14 +7495,14 @@ namespace IoC.Core.Collections
             Array.Copy(previous.Items, Items, length);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions) 256)]
         [Pure]
-        public ResizableArray<T> Add(T value)
+        public ResizableArray<T> Add([CanBeNull] T value)
         {
             return new ResizableArray<T>(this, value);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions) 256)]
         [Pure]
         public ResizableArray<T> Copy()
         {
@@ -7481,24 +7524,25 @@ namespace IoC.Core.Collections
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
     internal sealed class Table<TKey, TValue>: IEnumerable<KeyValue<TKey, TValue>>
     {
-        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>();
+        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(ResizableArray<Bucket>.Create(4, Bucket.EmptyBucket), 4, 0);
         public readonly int Divisor;
         public readonly ResizableArray<Bucket> Buckets;
-        private readonly int _count;
+        public readonly int Count;
 
         [MethodImpl((MethodImplOptions)256)]
-        private Table(int divisor = 4)
+        private Table(ResizableArray<Bucket> buckets, int divisor, int count)
         {
+            Buckets = buckets;
             Divisor = divisor;
-            Buckets = ResizableArray<Bucket>.Create(Divisor, Bucket.EmptyBucket);
+            Count = count;
         }
 
         [MethodImpl((MethodImplOptions)256)]
         private Table(Table<TKey, TValue> origin, int hashCode, TKey key, TValue value)
         {
             int newBucketIndex;
-            _count = origin._count + 1;
-            if (origin._count >= origin.Divisor)
+            Count = origin.Count + 1;
+            if (origin.Count >= origin.Divisor)
             {
                 Divisor = origin.Divisor << 1;
                 Buckets = ResizableArray<Bucket>.Create(Divisor, Bucket.EmptyBucket);
@@ -7557,12 +7601,11 @@ namespace IoC.Core.Collections
         [Pure]
         public TValue Get(int hashCode, TKey key)
         {
-            var bucket = Buckets.Items[hashCode & (Divisor - 1)];
-            var keyValues = bucket.KeyValues.Items;
-            for (var index = 0; index < bucket.Count; index++)
+            var keyValues = Buckets.Items[hashCode & (Divisor - 1)].KeyValues.Items;
+            for (var index = 0; index < keyValues.Length; index++)
             {
                 var keyValue = keyValues[index];
-                if (keyValue.HashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
+                if (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key))
                 {
                     return keyValue.Value;
                 }
@@ -7575,32 +7618,56 @@ namespace IoC.Core.Collections
         public Table<TKey, TValue> Remove(int hashCode, TKey key, out bool removed)
         {
             removed = false;
-            var newTable = new Table<TKey, TValue>(Divisor);
-            foreach (var keyValue in this)
+            var newBuckets = ResizableArray<Bucket>.Create(Divisor, Bucket.EmptyBucket);
+            var newBucketsArray = newBuckets.Items;
+            var bucketIndex = hashCode & (Divisor - 1);
+            for (var curBucketInex = 0; curBucketInex < Buckets.Items.Length; curBucketInex++)
             {
-                if (keyValue.HashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
+                if (curBucketInex != bucketIndex)
                 {
-                    removed = true;
+                    newBucketsArray[curBucketInex] = Buckets.Items[curBucketInex].Copy();
                     continue;
                 }
 
-                newTable = newTable.Set(keyValue.HashCode, keyValue.Key, keyValue.Value);
+                // Bucket to remove an element
+                var bucket = Buckets.Items[bucketIndex];
+                var keyValues = bucket.KeyValues.Items;
+                for (var index = 0; index < keyValues.Length; index++)
+                {
+                    var keyValue = keyValues[index];
+                    // Remove the element
+                    if (keyValue.HashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
+                    {
+                        newBucketsArray[bucketIndex] = bucket.Remove(index);
+                        removed = true;
+                    }
+                }
             }
-            
-            return newTable;
+
+            return new Table<TKey, TValue>(newBuckets, Divisor, removed ? Count - 1: Count);
         }
 
         internal struct Bucket
         {
-            public static readonly Bucket EmptyBucket = new Bucket(ResizableArray<KeyValue<TKey, TValue>>.Empty);
-            public ResizableArray<KeyValue<TKey, TValue>> KeyValues;
-            public readonly int Count;
+            public static readonly Bucket EmptyBucket = new Bucket(0);
+            public readonly ResizableArray<KeyValue<TKey, TValue>> KeyValues;
 
             [MethodImpl((MethodImplOptions)256)]
             private Bucket(ResizableArray<KeyValue<TKey, TValue>> keyValues)
             {
-                KeyValues = keyValues;
-                Count = keyValues.Items.Length;
+                KeyValues = keyValues.Items.Length > 0 ? keyValues.Copy() : ResizableArray<KeyValue<TKey, TValue>>.Empty;
+            }
+
+            [MethodImpl((MethodImplOptions)256)]
+            private Bucket(int count)
+            {
+                KeyValues = ResizableArray<KeyValue<TKey, TValue>>.Create(count);
+            }
+
+            [MethodImpl((MethodImplOptions)256)]
+            public Bucket Copy()
+            {
+                return new Bucket(KeyValues);
             }
 
             [Pure]
@@ -7608,6 +7675,27 @@ namespace IoC.Core.Collections
             public Bucket Add(KeyValue<TKey, TValue> keyValue)
             {
                 return new Bucket(KeyValues.Add(keyValue));
+            }
+
+            [Pure]
+            [MethodImpl((MethodImplOptions)256)]
+            public Bucket Remove(int index)
+            {
+                var count = KeyValues.Items.Length;
+                var newBucket = new Bucket(count - 1);
+                var newKeyValues = newBucket.KeyValues.Items;
+                var keyValues = KeyValues.Items;
+                for (var newIndex = 0; newIndex < index; newIndex++)
+                {
+                    newKeyValues[newIndex] = keyValues[newIndex];
+                }
+
+                for (var newIndex = index + 1; newIndex < count; newIndex++)
+                {
+                    newKeyValues[newIndex - 1] = keyValues[newIndex];
+                }
+
+                return newBucket;
             }
         }
     }

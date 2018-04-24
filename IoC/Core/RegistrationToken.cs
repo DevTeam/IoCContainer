@@ -1,6 +1,7 @@
 ﻿namespace IoC.Core
 {
     using System;
+    using System.Runtime.CompilerServices;
 
     internal struct RegistrationToken: IDisposable
     {
@@ -13,6 +14,7 @@
             _registration = registration ?? throw new ArgumentNullException(nameof(registration));
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         public void Dispose() => _registration.Dispose();
     }
 }

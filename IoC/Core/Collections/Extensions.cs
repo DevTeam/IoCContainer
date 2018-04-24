@@ -28,10 +28,10 @@
         public static TValue FastGet<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
             where TKey: class
         {
-            var bucket = table.Buckets.Items[hashCode & (table.Divisor - 1)];
-            for (var index = 0; index < bucket.Count; index++)
+            var items = table.Buckets.Items[hashCode & (table.Divisor - 1)].KeyValues.Items;
+            for (var index = 0; index < items.Length; index++)
             {
-                var keyValue = bucket.KeyValues.Items[index];
+                var keyValue = items[index];
                 if (keyValue.Key == key)
                 {
                     return keyValue.Value;

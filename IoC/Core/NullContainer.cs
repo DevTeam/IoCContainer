@@ -9,9 +9,7 @@
     {
         public static readonly IContainer Shared = new NullContainer();
 
-        private NullContainer()
-        {
-        }
+        private NullContainer() { }
 
         public IContainer Parent => throw new NotSupportedException();
 
@@ -37,9 +35,7 @@
             return false;
         }
 
-        public void Dispose()
-        {
-        }
+        public void Dispose() { }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
