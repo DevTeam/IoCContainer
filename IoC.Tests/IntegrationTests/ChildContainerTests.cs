@@ -1,10 +1,12 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Moq;
     using Shouldly;
     using Xunit;
 
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
     public class ChildContainerTests
     {
         [Fact]
@@ -21,6 +23,26 @@
                 childContainer1.Parent.ShouldBe(parentContainer);
                 childContainer2.Parent.ShouldBe(parentContainer);
                 childContainer1.ShouldNotBeSameAs(childContainer2);
+            }
+        }
+
+        [Fact]
+        public void ShouldResolveChildContainer_MT()
+        {
+            // Given
+            using (var parentContainer = Container.Create("parent"))
+            {
+                TestsExtensions.Parallelize(() =>
+                {
+                    // When
+                    var childContainer1 = parentContainer.CreateChild("child_1");
+                    var childContainer2 = parentContainer.CreateChild("child_2");
+
+                    // Then
+                    childContainer1.Parent.ShouldBe(parentContainer);
+                    childContainer2.Parent.ShouldBe(parentContainer);
+                    childContainer1.ShouldNotBeSameAs(childContainer2);
+                });
             }
         }
 

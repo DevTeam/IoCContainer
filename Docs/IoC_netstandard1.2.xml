@@ -607,18 +607,16 @@
             <param name="name">The optional name of the container.</param>
             <returns>The roor container.</returns>
         </member>
-        <member name="M:IoC.Container.CreateHighPerformance(System.String)">
+        <member name="M:IoC.Container.CreateCore(System.String)">
             <summary>
-            Creates a high-performance root container.
-            It requires access permissions to types/constructors/initialization methods.
-            Also you could add the attribute <code>[assembly: InternalsVisibleTo(IoC.Features.HighPerformanceFeature.DynamicAssemblyName)]</code> for your assembly to allow use internal classes/methods/properties in a dependency injection.
+            Creates a root container with minimal set of features.
             </summary>
             <param name="name">The optional name of the container.</param>
             <returns>The roor container.</returns>
         </member>
-        <member name="M:IoC.Container.CreateBasic(System.String)">
+        <member name="M:IoC.Container.CreateLight(System.String)">
             <summary>
-            Creates a root container with basic features.
+            Creates a root container with minimalist default features.
             </summary>
             <param name="name">The optional name of the container.</param>
             <returns>The roor container.</returns>
@@ -629,19 +627,22 @@
         <member name="M:IoC.Container.ToString">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Container.TryRegister(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,System.IDisposable@)">
+        <member name="M:IoC.Container.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,System.IDisposable@)">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Container.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,IoC.IContainer)">
-            <inheritdoc />
-        </member>
-        <member name="M:IoC.Container.TryGetResolver``1(System.Type,IoC.Resolver{``0}@,IoC.IContainer)">
+        <member name="M:IoC.Container.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,System.Exception@,IoC.IContainer)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Container.TryGetDependency(IoC.Key,IoC.IDependency@,IoC.ILifetime@)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Container.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Container.RegisterResource(System.IDisposable)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Container.UnregisterResource(System.IDisposable)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Container.GetEnumerator">
@@ -668,21 +669,6 @@
         <member name="F:IoC.ContainerEvent.Key">
             <summary>
             The chenged binding key.
-            </summary>
-        </member>
-        <member name="T:IoC.ContainerEvent.EventType">
-            <summary>
-            The types of event.
-            </summary>
-        </member>
-        <member name="F:IoC.ContainerEvent.EventType.Registration">
-            <summary>
-            A new registration was created.
-            </summary>
-        </member>
-        <member name="F:IoC.ContainerEvent.EventType.Unregistration">
-            <summary>
-            The registration was removed.
             </summary>
         </member>
         <member name="T:IoC.Context`1">
@@ -719,6 +705,21 @@
         <member name="T:IoC.Core.BuildContext">
             <summary>
             Represents build context.
+            </summary>
+        </member>
+        <member name="T:IoC.EventType">
+            <summary>
+            The types of event.
+            </summary>
+        </member>
+        <member name="F:IoC.EventType.DependencyRegistration">
+            <summary>
+            The dependency was registered.
+            </summary>
+        </member>
+        <member name="F:IoC.EventType.DependencyUnregistration">
+            <summary>
+            The dependency was unregistered.
             </summary>
         </member>
         <member name="T:IoC.Extensibility.IBuildContext">
@@ -815,11 +816,6 @@
             Represents a expression compiler.
             </summary>
         </member>
-        <member name="P:IoC.Extensibility.IExpressionCompiler.IsReferenceConstantSupported">
-            <summary>
-            True if a refernce constant is supported.
-            </summary>
-        </member>
         <member name="M:IoC.Extensibility.IExpressionCompiler.Compile(System.Linq.Expressions.LambdaExpression)">
             <summary>
             Compiles an expression to a delegate.
@@ -838,7 +834,7 @@
             </summary>
             <param name="container">The target container.</param>
             <param name="keys">The set of binding keys.</param>
-            <returns>The registration tiken.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.Extensibility.IIssueResolver.CannotResolveDependency(IoC.IContainer,IoC.Key)">
             <summary>
@@ -848,13 +844,14 @@
             <param name="key">The resolving key.</param>
             <returns>The pair of the dependency and of the lifetime.</returns>
         </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CannotGetResolver``1(IoC.IContainer,IoC.Key)">
+        <member name="M:IoC.Extensibility.IIssueResolver.CannotGetResolver``1(IoC.IContainer,IoC.Key,System.Exception)">
             <summary>
             Handles the scenario when cannot get a resolver.
             </summary>
             <typeparam name="T">The instance type.</typeparam>
             <param name="container">The resolving container.</param>
             <param name="key">The resolving key.</param>
+            <param name="error">The error.</param>
             <returns>The resolver.</returns>
         </member>
         <member name="M:IoC.Extensibility.IIssueResolver.CannotGetGenericTypeArguments(System.Type)">
@@ -953,7 +950,7 @@
         <member name="F:IoC.Features.CollectionFeature.Default">
             The default instance.
         </member>
-        <member name="F:IoC.Features.CollectionFeature.HighPerformance">
+        <member name="F:IoC.Features.CollectionFeature.Light">
             The high-performance instance.
         </member>
         <member name="M:IoC.Features.CollectionFeature.Apply(IoC.IContainer)">
@@ -988,19 +985,19 @@
             Provides defaults for features.
             </summary>
         </member>
-        <member name="F:IoC.Features.Feature.BasicSet">
+        <member name="F:IoC.Features.Feature.CoreSet">
             <summary>
-            The enumeration of default features.
+            Core features.
             </summary>
         </member>
         <member name="F:IoC.Features.Feature.DefaultSet">
             <summary>
-            The enumeration of default features.
+            Default features.
             </summary>
         </member>
-        <member name="F:IoC.Features.Feature.HighPerformanceSet">
+        <member name="F:IoC.Features.Feature.LightSet">
             <summary>
-            The enumeration of default features.
+            The light set of features.
             </summary>
         </member>
         <member name="T:IoC.Features.FuncFeature">
@@ -1011,7 +1008,7 @@
         <member name="F:IoC.Features.FuncFeature.Default">
             The default instance.
         </member>
-        <member name="F:IoC.Features.FuncFeature.HighPerformance">
+        <member name="F:IoC.Features.FuncFeature.Light">
             The high-performance instance.
         </member>
         <member name="M:IoC.Features.FuncFeature.Apply(IoC.IContainer)">
@@ -1047,7 +1044,7 @@
         <member name="F:IoC.Features.TupleFeature.Default">
             The default instance.
         </member>
-        <member name="F:IoC.Features.TupleFeature.HighPerformance">
+        <member name="F:IoC.Features.TupleFeature.Light">
             The high-performance instance.
         </member>
         <member name="M:IoC.Features.TupleFeature.Apply(IoC.IContainer)">
@@ -1229,7 +1226,7 @@
             <param name="binding">The binding token.</param>
             <param name="type">The instance type.</param>
             <param name="autowiringStrategy">The optional autowring strategy.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},IoC.IAutowiringStrategy)">
             <summary>
@@ -1238,7 +1235,7 @@
             <typeparam name="T">The instance type.</typeparam>
             <param name="binding">The binding token.</param>
             <param name="autowiringStrategy">The optional autowring strategy.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
             <summary>
@@ -1248,13 +1245,13 @@
             <param name="binding">The binding token.</param>
             <param name="factory">The expression to create an instance.</param>
             <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentBind.ToSelf(System.IDisposable)">
             <summary>
-            Puts the registration token to the target contaier to manage it.
+            Puts the dependency token into the target contaier to manage it.
             </summary>
-            <param name="registrationToken"></param>
+            <param name="dependencyToken"></param>
         </member>
         <member name="T:IoC.FluentConfiguration">
             <summary>
@@ -1267,7 +1264,7 @@
             </summary>
             <param name="container">The target container.</param>
             <param name="configurationText">The text configurations.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentConfiguration.Apply(IoC.IContainer,System.IO.Stream[])">
             <summary>
@@ -1275,7 +1272,7 @@
             </summary>
             <param name="container">The target container.</param>
             <param name="configurationStreams">The set of streams with text configurations.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentConfiguration.Apply(IoC.IContainer,System.IO.TextReader[])">
             <summary>
@@ -1283,7 +1280,7 @@
             </summary>
             <param name="container">The target container.</param>
             <param name="configurationReaders">The set of text readers with text configurations.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentConfiguration.Using(IoC.IContainer,System.String[])">
             <summary>
@@ -1315,7 +1312,7 @@
             </summary>
             <param name="container">The target container.</param>
             <param name="configurations">The configurations.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentConfiguration.Apply(IoC.IContainer,IoC.IConfiguration[])">
             <summary>
@@ -1323,7 +1320,7 @@
             </summary>
             <param name="container">The target container.</param>
             <param name="configurations">The configurations.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentConfiguration.Using(IoC.IContainer,IoC.IConfiguration[])">
             <summary>
@@ -1353,8 +1350,19 @@
             <typeparam name="T">The resolver type.</typeparam>
             <param name="type">The target type.</param>
             <param name="tag">The tag of binding.</param>
-            <param name="container"></param>
+            <param name="container">The target container.</param>
             <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentGetResolver.TryGetResolver``1(IoC.IContainer,System.Type,IoC.Tag,IoC.Resolver{``0}@)">
+            <summary>
+            Tries getting the resolver.
+            </summary>
+            <typeparam name="T">The resolver type.</typeparam>
+            <param name="type">The target type.</param>
+            <param name="tag">The tag of binding.</param>
+            <param name="container"></param>
+            <param name="resolver"></param>
+            <returns>True if success.</returns>
         </member>
         <member name="M:IoC.FluentGetResolver.GetResolver``1(IoC.IContainer,IoC.Tag)">
             <summary>
@@ -1362,8 +1370,18 @@
             </summary>
             <typeparam name="T">The instance type.</typeparam>
             <param name="tag">The tag of binding.</param>
-            <param name="container"></param>
+            <param name="container">The target container.</param>
             <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentGetResolver.TryGetResolver``1(IoC.IContainer,IoC.Tag,IoC.Resolver{``0}@)">
+            <summary>
+            Tries getting the resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="tag">The tag of binding.</param>
+            <param name="container">The target container.</param>
+            <param name="resolver"></param>
+            <returns>True if success.</returns>
         </member>
         <member name="M:IoC.FluentGetResolver.GetResolver``1(IoC.IContainer,System.Type)">
             <summary>
@@ -1371,16 +1389,35 @@
             </summary>
             <typeparam name="T">The resolver type.</typeparam>
             <param name="type">The target type.</param>
-            <param name="container"></param>
+            <param name="container">The target container.</param>
             <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentGetResolver.TryGetResolver``1(IoC.IContainer,System.Type,IoC.Resolver{``0}@)">
+            <summary>
+            Tries getting the resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="type">The target type.</param>
+            <param name="container">The target container.</param>
+            <param name="resolver"></param>
+            <returns>True if success.</returns>
         </member>
         <member name="M:IoC.FluentGetResolver.GetResolver``1(IoC.IContainer)">
             <summary>
             Gets the resolver.
             </summary>
             <typeparam name="T">The instance type.</typeparam>
-            <param name="container"></param>
+            <param name="container">The target container.</param>
             <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentGetResolver.TryGetResolver``1(IoC.IContainer,IoC.Resolver{``0}@)">
+            <summary>
+            Tries getting the resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="resolver"></param>
+            <returns>True if success.</returns>
         </member>
         <member name="M:IoC.FluentGetResolver.AsTag(System.Object)">
             <summary>
@@ -1472,7 +1509,7 @@
         </member>
         <member name="T:IoC.FluentRegister">
             <summary>
-            Represents extensions for registration in a container.
+            Represents extensions to register a dependency in a container.
             </summary>
         </member>
         <member name="M:IoC.FluentRegister.Register``1(IoC.IContainer,IoC.ILifetime,System.Object[])">
@@ -1483,7 +1520,7 @@
             <param name="container">The target container.</param>
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``2(IoC.IContainer,IoC.ILifetime,System.Object[])">
             <summary>
@@ -1494,7 +1531,7 @@
             <param name="container">The target container.</param>
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``3(IoC.IContainer,IoC.ILifetime,System.Object[])">
             <summary>
@@ -1506,7 +1543,7 @@
             <param name="container">The target container.</param>
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``4(IoC.IContainer,IoC.ILifetime,System.Object[])">
             <summary>
@@ -1519,7 +1556,7 @@
             <param name="container">The target container.</param>
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``5(IoC.IContainer,IoC.ILifetime,System.Object[])">
             <summary>
@@ -1533,7 +1570,7 @@
             <param name="container">The target container.</param>
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``6(IoC.IContainer,IoC.ILifetime,System.Object[])">
             <summary>
@@ -1548,7 +1585,7 @@
             <param name="container">The target container.</param>
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``7(IoC.IContainer,IoC.ILifetime,System.Object[])">
             <summary>
@@ -1564,7 +1601,7 @@
             <param name="container">The target container.</param>
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``8(IoC.IContainer,IoC.ILifetime,System.Object[])">
             <summary>
@@ -1581,7 +1618,7 @@
             <param name="container">The target container.</param>
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``9(IoC.IContainer,IoC.ILifetime,System.Object[])">
             <summary>
@@ -1599,7 +1636,7 @@
             <param name="container">The target container.</param>
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``1(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
             <summary>
@@ -1611,7 +1648,7 @@
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
             <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``2(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
             <summary>
@@ -1624,7 +1661,7 @@
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
             <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``3(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
             <summary>
@@ -1638,7 +1675,7 @@
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
             <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``4(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
             <summary>
@@ -1653,7 +1690,7 @@
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
             <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``5(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
             <summary>
@@ -1669,7 +1706,7 @@
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
             <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``6(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
             <summary>
@@ -1686,7 +1723,7 @@
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
             <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``7(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
             <summary>
@@ -1704,7 +1741,7 @@
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
             <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``8(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
             <summary>
@@ -1723,7 +1760,7 @@
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
             <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register``9(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
             <summary>
@@ -1743,7 +1780,7 @@
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
             <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The registration token.</returns>
+            <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentRegister.Register(IoC.IContainer,System.Collections.Generic.IEnumerable{System.Type},IoC.IDependency,IoC.ILifetime,System.Object[])">
             <summary>
@@ -1917,56 +1954,47 @@
             Apply the configuration for the target container.
             </summary>
             <param name="container">The target container.</param>
-            <returns>The enumeration of registration tokens.</returns>
+            <returns>The enumeration of dependency tokens.</returns>
         </member>
         <member name="T:IoC.IContainer">
             <summary>
-            The IoC container.
+            The Inversion of Control container.
             </summary>
         </member>
         <member name="P:IoC.IContainer.Parent">
             <summary>
-            The parent container.
+            The parent container or null if it has no a parent.
             </summary>
         </member>
-        <member name="M:IoC.IContainer.TryRegister(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,System.IDisposable@)">
+        <member name="M:IoC.IContainer.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,System.IDisposable@)">
             <summary>
-            Registers the binding to the target container.
+            Tries registering the dependency with lifetime.
             </summary>
-            <param name="keys">The set of keys.</param>
+            <param name="keys">The set of keys to register.</param>
             <param name="dependency">The dependency.</param>
             <param name="lifetime">The lifetime.</param>
-            <param name="registrationToken">The registration token.</param>
+            <param name="dependencyToken">The deoendency token.</param>
             <returns>True if successful.</returns>
         </member>
         <member name="M:IoC.IContainer.TryGetDependency(IoC.Key,IoC.IDependency@,IoC.ILifetime@)">
             <summary>
-            Registers the dependency and lifetime.
+            Tries getting the dependency with lifetime.
             </summary>
-            <param name="key">The key.</param>
+            <param name="key">The key to get a dependency.</param>
             <param name="dependency">The dependency.</param>
             <param name="lifetime">The lifetime.</param>
             <returns>True if successful.</returns>
         </member>
-        <member name="M:IoC.IContainer.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,IoC.IContainer)">
+        <member name="M:IoC.IContainer.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,System.Exception@,IoC.IContainer)">
             <summary>
-            Gets the resolver.
+            Tries getting the resolver.
             </summary>
-            <typeparam name="T">The resolver type.</typeparam>
-            <param name="type">The target type.</param>
-            <param name="tag">The tag of binding.</param>
+            <typeparam name="T">The type of instance producing by the resolver.</typeparam>
+            <param name="type">The binding's type.</param>
+            <param name="tag">The binding's tag or null if there is no tag.</param>
             <param name="resolver">The resolver.</param>
-            <param name="container">The resolving container.</param>
-            <returns>True if successful.</returns>
-        </member>
-        <member name="M:IoC.IContainer.TryGetResolver``1(System.Type,IoC.Resolver{``0}@,IoC.IContainer)">
-            <summary>
-            Gets the resolver.
-            </summary>
-            <typeparam name="T">The resolver type.</typeparam>
-            <param name="type">The target type.</param>
-            <param name="resolver">The resolver.</param>
-            <param name="container">The resolving container.</param>
+            <param name="error">The error occurring during resolving.</param>
+            <param name="resolvingContainer">The resolving container and null if it is the current container.</param>
             <returns>True if successful.</returns>
         </member>
         <member name="T:IoC.IDependency">
@@ -1974,13 +2002,14 @@
             Represents a IoC dependency.
             </summary>
         </member>
-        <member name="M:IoC.IDependency.TryBuildExpression(IoC.Extensibility.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@)">
+        <member name="M:IoC.IDependency.TryBuildExpression(IoC.Extensibility.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)">
             <summary>
             Builds an expression.
             </summary>
             <param name="buildContext">The build context,</param>
             <param name="lifetime">The target lifetime,</param>
             <param name="baseExpression">The resulting expression.</param>
+            <param name="error">The error.</param>
             <returns>True if success.</returns>
         </member>
         <member name="T:IoC.ILifetime">
@@ -1988,9 +2017,9 @@
             Represents a lifetime for an instance.
             </summary>
         </member>
-        <member name="M:IoC.ILifetime.Clone">
+        <member name="M:IoC.ILifetime.Create">
             <summary>
-            Clone this lifetime to use with generic instances.
+            Creates the similar lifetime to use with generic instances.
             </summary>
             <returns></returns>
         </member>
@@ -2049,9 +2078,26 @@
             <param name="destination">The destination member for injection.</param>
             <param name="source">The source of injection.</param>
         </member>
+        <member name="T:IoC.IResourceRegistry">
+            <summary>
+            Represents the resource's registry.
+            </summary>
+        </member>
+        <member name="M:IoC.IResourceRegistry.RegisterResource(System.IDisposable)">
+            <summary>
+            Registers a resource to the registry.
+            </summary>
+            <param name="resource">The target resource.</param>
+        </member>
+        <member name="M:IoC.IResourceRegistry.UnregisterResource(System.IDisposable)">
+            <summary>
+            Unregisters a resource from the registry.
+            </summary>
+            <param name="resource">The target resource.</param>
+        </member>
         <member name="T:IoC.Key">
             <summary>
-            Represents the key of binding.
+            Represents the container key.
             </summary>
         </member>
         <member name="F:IoC.Key.AnyTag">
@@ -2100,7 +2146,7 @@
         </member>
         <member name="F:IoC.Lifetime.Singleton">
             <summary>
-            Single instance per registration
+            Single instance per dependency
             </summary>
         </member>
         <member name="F:IoC.Lifetime.ContainerSingleton">
@@ -2124,7 +2170,7 @@
         <member name="M:IoC.Lifetimes.ContainerSingletonLifetime.ToString">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Lifetimes.ContainerSingletonLifetime.Clone">
+        <member name="M:IoC.Lifetimes.ContainerSingletonLifetime.Create">
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.ContainerSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.IContainer,IoC.IContainer,System.Object[])">
@@ -2145,7 +2191,7 @@
         <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.Dispose">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.Clone">
+        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.Create">
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.CreateKey(IoC.IContainer,System.Object[])">
@@ -2184,7 +2230,7 @@
         <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.ToString">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.Clone">
+        <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.Create">
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.Scope,IoC.IContainer,System.Object[])">
@@ -2204,7 +2250,7 @@
         <member name="M:IoC.Lifetimes.SingletonLifetime.Dispose">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Lifetimes.SingletonLifetime.Clone">
+        <member name="M:IoC.Lifetimes.SingletonLifetime.Create">
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.SingletonLifetime.ToString">
@@ -2263,17 +2309,12 @@
             Represents the enumeration of well-known containers.
             </summary>
         </member>
-        <member name="F:IoC.WellknownContainers.Current">
-            <summary>
-            Current container.
-            </summary>
-        </member>
         <member name="F:IoC.WellknownContainers.Parent">
             <summary>
             Parent container.
             </summary>
         </member>
-        <member name="F:IoC.WellknownContainers.Child">
+        <member name="F:IoC.WellknownContainers.NewChild">
             <summary>
             Creates new child container.
             </summary>

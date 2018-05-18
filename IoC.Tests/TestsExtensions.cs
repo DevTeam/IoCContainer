@@ -2,9 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
+    using System.Threading;
+    using System.Threading.Tasks;
     using Core;
     using Moq;
+    using Shouldly;
     using static Extensibility.WellknownExpressions;
 
     internal static class TestsExtensions
@@ -14,10 +18,46 @@
         {
             if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
             if (lambdaExpression == null) throw new ArgumentNullException(nameof(lambdaExpression));
-            var buildContext = new BuildContext(ExpressionCompilerDefault.Shared, TypeDescriptor<T>.Key, Mock.Of<IContainer>(), new List<IDisposable>());
+            var buildContext = new BuildContext(ExpressionCompiler.Shared, TypeDescriptor<T>.Key, Mock.Of<IContainer>(), new List<IDisposable>());
             var lifetimeExpression = lifetime.Build(lambdaExpression.Body, buildContext);
             var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), lifetimeExpression, false, ResolverParameters);
-            return (Resolver<T>)ExpressionCompilerDefault.Shared.Compile(resolverExpression);
+            return (Resolver<T>)ExpressionCompiler.Shared.Compile(resolverExpression);
+        }
+
+        public static void Parallelize(Action action, int count = 10, int parallelism = 100)
+        {
+            var exceptions = new List<Exception>();
+            void RunAction(object state)
+            {
+                try
+                {
+                    for (var i = 0; i < count; i++)
+                    {
+                        action();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    lock (exceptions)
+                    {
+                        exceptions.Add(ex);
+                    }
+                }
+            }
+
+            var threads = new List<Thread>();
+            for (var i = 0; i < parallelism; i++)
+            {
+                threads.Add(new Thread(RunAction) { IsBackground = true });
+            }
+
+            threads.ForEach(i => i.Start());
+            threads.ForEach(i => i.Join());
+
+            if (exceptions.Count > 0)
+            {
+                throw exceptions[0];
+            }
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿namespace IoC.Comparison
+﻿#if !NETCOREAPP1_1
+namespace IoC.Comparison
 {
     using System;
     using JetBrains.dotMemoryUnit;
@@ -44,3 +45,4 @@
         }
     }
 }
+#endif

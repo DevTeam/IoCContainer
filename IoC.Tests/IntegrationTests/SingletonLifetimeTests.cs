@@ -7,6 +7,7 @@
     using Xunit;
 
     [SuppressMessage("ReSharper", "UnusedVariable")]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
     public class SingletonLifetimeTests
     {
         [Fact]
@@ -30,6 +31,34 @@
                         instance1.ShouldBe(instance2);
                         instance1.ShouldBe(instance3);
                     }
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenSingletonLifetime_MT()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                Func<IMyService> func = Mock.Of<IMyService>;
+                // When
+                using (container.Bind<IMyService>().As(Lifetime.Singleton).To(ctx => func()))
+                {
+                    TestsExtensions.Parallelize(() =>
+                    {
+                        // Then
+                        var instance1 = container.Resolve<IMyService>();
+                        var instance2 = container.Resolve<IMyService>();
+                        using (var childContainer = container.CreateChild())
+                        {
+                            // Then
+                            var instance3 = childContainer.Resolve<IMyService>();
+                            instance1.ShouldNotBeNull();
+                            instance1.ShouldBe(instance2);
+                            instance1.ShouldBe(instance3);
+                        }
+                    });
                 }
             }
         }

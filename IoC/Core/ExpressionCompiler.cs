@@ -4,15 +4,11 @@
     using System.Linq.Expressions;
     using Extensibility;
 
-    internal class ExpressionCompilerDefault : IExpressionCompiler
+    internal class ExpressionCompiler : IExpressionCompiler
     {
-        public static readonly IExpressionCompiler Shared = new ExpressionCompilerDefault();
+        public static readonly IExpressionCompiler Shared = new ExpressionCompiler();
 
-        private ExpressionCompilerDefault()
-        {
-        }
-
-        public bool IsReferenceConstantSupported => true;
+        private ExpressionCompiler() { }
 
         public Delegate Compile(LambdaExpression resolverExpression)
         {

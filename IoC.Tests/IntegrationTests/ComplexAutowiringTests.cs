@@ -135,6 +135,37 @@
         }
 
         [Fact]
+        public void ContainerShouldResolveFromParentOfParent_MT()
+        {
+            // Given
+            var expectedRef = Mock.Of<IMyService1>();
+            Func<IMyService1> func = () => expectedRef;
+
+            using (var container = Container.Create())
+            using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
+            {
+                var childRef = Mock.Of<IMyService>();
+                Func<IMyService1> childFunc = () => childRef;
+
+                TestsExtensions.Parallelize(() =>
+                {
+                    // When
+                    using (var childContainer1 = container.CreateChild())
+                    using (var childContainer2 = childContainer1.CreateChild())
+                    using (childContainer2.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => childFunc()))
+                    using (childContainer2.Bind<IMyService>().As(Lifetime.Transient).To(
+                        ctx => new MyService((string) ctx.Args[0], ctx.Container.Parent.Parent.Inject<IMyService1>())))
+                    {
+                        // Then
+                        var actualInstance = childContainer2.Resolve<IMyService>("abc");
+                        actualInstance.ShouldBeOfType<MyService>();
+                        ((MyService) actualInstance).SomeRef.ShouldBe(expectedRef);
+                    }
+                });
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveWhenGenericIntiMethodCall()
         {
             // Given

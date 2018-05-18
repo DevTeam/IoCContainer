@@ -2,12 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Reflection;
     using Moq;
     using Shouldly;
     using Xunit;
 
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
     public class AutowiringTests
     {
         [Fact]
@@ -171,6 +173,28 @@
         }
 
         [Fact]
+        public void ContainerShouldSupportWrapping_MT()
+        {
+            // Given
+            using (var container = Container.Create())
+            using (container.Bind<IMyWrapper>().To<Wrappered>())
+            {
+                TestsExtensions.Parallelize(() =>
+                {
+                    // When
+                    using (var childContainer = container.CreateChild())
+                    using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Parent.Inject<IMyWrapper>())))
+                    {
+                        // Then
+                        var actualInstance = childContainer.Resolve<IMyWrapper>();
+                        actualInstance.ShouldBeOfType<Wrapper>();
+                        actualInstance.Wrapped.ShouldBeOfType<Wrappered>();
+                    }
+                });
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveWhenGenericAutowring()
         {
             // Given
@@ -182,6 +206,25 @@
                     // Then
                     var actualInstance = container.Resolve<IMyGenericService<int, string>>();
                     actualInstance.ShouldBeOfType<MyGenericService<int, string>>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenGenericAutowring_MT()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind(typeof(IMyGenericService<,>)).As(Lifetime.Transient).To(typeof(MyGenericService<,>)))
+                {
+                    TestsExtensions.Parallelize(() =>
+                    {
+                        // Then
+                        var actualInstance = container.Resolve<IMyGenericService<int, string>>();
+                        actualInstance.ShouldBeOfType<MyGenericService<int, string>>();
+                    });
                 }
             }
         }

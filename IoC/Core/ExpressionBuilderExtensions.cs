@@ -9,7 +9,7 @@
     using Extensibility;
     using static TypeDescriptorExtensions;
 
-    internal static class ExpressionExtensions
+    internal static class ExpressionBuilderExtensions
     {
         private static readonly TypeDescriptor ResolverGenericTypeDescriptor = typeof(Resolver<>).Descriptor();
         [ThreadStatic] private static int _getExpressionCompilerReentrancy;
@@ -31,7 +31,7 @@
                     }
                 }
 
-                return ExpressionCompilerDefault.Shared;
+                return ExpressionCompiler.Shared;
             }
             finally
             {

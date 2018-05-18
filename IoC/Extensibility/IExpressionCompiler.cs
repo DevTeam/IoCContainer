@@ -10,11 +10,6 @@
     public interface IExpressionCompiler
     {
         /// <summary>
-        /// True if a refernce constant is supported.
-        /// </summary>
-        bool IsReferenceConstantSupported { get; }
-
-        /// <summary>
         /// Compiles an expression to a delegate.
         /// </summary>
         /// <param name="resolverExpression">The lambda expression.</param>

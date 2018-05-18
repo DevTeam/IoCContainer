@@ -30,7 +30,7 @@
             var lockObjectField = Expression.Field(thisVar, LockObjectFieldInfo);
             var instanceField = Expression.Field(thisVar, InstanceFieldInfo);
             var typedInstance = instanceField.Convert(type);
-            var isNullExpression = Expression.ReferenceEqual(instanceField, ExpressionExtensions.NullConst);
+            var isNullExpression = Expression.ReferenceEqual(instanceField, ExpressionBuilderExtensions.NullConst);
 
             // if(this.Instance == null)
             return Expression.Condition(

@@ -12,11 +12,11 @@
         /// The default instance.
         public static readonly IConfiguration Default = new TupleFeature();
         /// The high-performance instance.
-        public static readonly IConfiguration HighPerformance = new TupleFeature(true);
+        public static readonly IConfiguration Light = new TupleFeature(true);
 
-        private readonly bool _highPerformance;
+        private readonly bool _light;
 
-        private TupleFeature(bool highPerformance = false) => _highPerformance = highPerformance;
+        private TupleFeature(bool light = false) => _light = light;
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
@@ -39,7 +39,7 @@
                 ctx.Container.Inject<TT3>(ctx.Key.Tag),
                 ctx.Container.Inject<TT4>(ctx.Key.Tag)), null, Feature.AnyTag);
 
-            if (!_highPerformance)
+            if (!_light)
             {
                 yield return container.Register(ctx => new Tuple<TT1, TT2, TT3, TT4, TT5>(
                     ctx.Container.Inject<TT1>(ctx.Key.Tag),
@@ -92,7 +92,7 @@
                 ctx.Container.Inject<TT3>(ctx.Key.Tag),
                 ctx.Container.Inject<TT4>(ctx.Key.Tag)), null, Feature.AnyTag);
 
-            if (!_highPerformance)
+            if (!_light)
             {
                 yield return container.Bind<(TT1, TT2, TT3, TT4, TT5)>().AnyTag().To(ctx => CreateTuple(
                     ctx.Container.Inject<TT1>(ctx.Key.Tag),

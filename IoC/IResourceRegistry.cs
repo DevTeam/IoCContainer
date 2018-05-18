@@ -1,4 +1,4 @@
-﻿namespace IoC.Core
+﻿namespace IoC
 {
     using System;
 

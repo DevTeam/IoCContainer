@@ -26,9 +26,9 @@
     public sealed class Container: IContainer, IObserver<ContainerEvent>
     {
         private static long _containerId;
-        [NotNull] private static readonly Lazy<Container> BasicRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.BasicSet), true);
+        [NotNull] private static readonly Lazy<Container> CoreRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.CoreSet), true);
         [NotNull] private static readonly Lazy<Container> DefultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.DefaultSet), true);
-        [NotNull] private static readonly Lazy<Container> HighPerformanceRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.HighPerformanceSet), true);
+        [NotNull] private static readonly Lazy<Container> LightRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.LightSet), true);
 
         [NotNull] private readonly IContainer _parent;
         [NotNull] private readonly string _name;
@@ -52,29 +52,27 @@
         }
 
         /// <summary>
-        /// Creates a high-performance root container.
-        /// It requires access permissions to types/constructors/initialization methods.
-        /// Also you could add the attribute <code>[assembly: InternalsVisibleTo(IoC.Features.HighPerformanceFeature.DynamicAssemblyName)]</code> for your assembly to allow use internal classes/methods/properties in a dependency injection.
+        /// Creates a root container with minimal set of features.
         /// </summary>
         /// <param name="name">The optional name of the container.</param>
         /// <returns>The roor container.</returns>
         [NotNull]
-        public static Container CreateHighPerformance([NotNull] string name = "")
+        public static Container CreateCore([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return Create(name, HighPerformanceRootContainer.Value);
+            return Create(name, CoreRootContainer.Value);
         }
 
         /// <summary>
-        /// Creates a root container with basic features.
+        /// Creates a root container with minimalist default features.
         /// </summary>
         /// <param name="name">The optional name of the container.</param>
         /// <returns>The roor container.</returns>
         [NotNull]
-        public static Container CreateBasic([NotNull] string name = "")
+        public static Container CreateLight([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return Create(name, BasicRootContainer.Value);
+            return Create(name, LightRootContainer.Value);
         }
 
         [NotNull]

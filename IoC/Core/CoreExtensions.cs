@@ -3,7 +3,7 @@
     using System;
     using System.Runtime.CompilerServices;
 
-    internal static class CollectionExtensions
+    internal static class CoreExtensions
     {
         [MethodImpl((MethodImplOptions)256)]
         public static bool SequenceEqual<T>([NotNull] this T[] array1, [NotNull] T[] array2)

@@ -8,7 +8,7 @@
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
     internal class Table<TKey, TValue>: IEnumerable<Table<TKey, TValue>.KeyValue>
     {
-        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CollectionExtensions.CreateArray(4, Bucket.EmptyBucket), 3, 0);
+        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(4, Bucket.EmptyBucket), 3, 0);
         public readonly int Count;
         private readonly int _divisor;
         private readonly Bucket[] _buckets;
@@ -29,7 +29,7 @@
             if (origin.Count > origin._divisor)
             {
                 _divisor = (origin._divisor + 1) << 2 - 1;
-                _buckets = CollectionExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
+                _buckets = CoreExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
                 var originBuckets = origin._buckets;
                 for (var originBucketIndex = 0; originBucketIndex < originBuckets.Length; originBucketIndex++)
                 {
@@ -92,7 +92,7 @@
         public Table<TKey, TValue> Remove(int hashCode, TKey key, out bool removed)
         {
             removed = false;
-            var newBuckets = CollectionExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
+            var newBuckets = CoreExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
             var newBucketsArray = newBuckets;
             var bucketIndex = hashCode & _divisor;
             for (var curBucketInex = 0; curBucketInex < _buckets.Length; curBucketInex++)
@@ -144,13 +144,13 @@
             [MethodImpl((MethodImplOptions)256)]
             private Bucket(KeyValue[] keyValues)
             {
-                KeyValues = keyValues.Length == 0 ? CollectionExtensions.EmptyArray<KeyValue>() : keyValues.Copy();
+                KeyValues = keyValues.Length == 0 ? CoreExtensions.EmptyArray<KeyValue>() : keyValues.Copy();
             }
 
             [MethodImpl((MethodImplOptions)256)]
             private Bucket(int count)
             {
-                KeyValues = CollectionExtensions.CreateArray<KeyValue>(count);
+                KeyValues = CoreExtensions.CreateArray<KeyValue>(count);
             }
 
             [MethodImpl((MethodImplOptions)256)]

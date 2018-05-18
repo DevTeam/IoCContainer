@@ -607,18 +607,16 @@
             <param name="name">The optional name of the container.</param>
             <returns>The roor container.</returns>
         </member>
-        <member name="M:IoC.Container.CreateHighPerformance(System.String)">
+        <member name="M:IoC.Container.CreateCore(System.String)">
             <summary>
-            Creates a high-performance root container.
-            It requires access permissions to types/constructors/initialization methods.
-            Also you could add the attribute <code>[assembly: InternalsVisibleTo(IoC.Features.HighPerformanceFeature.DynamicAssemblyName)]</code> for your assembly to allow use internal classes/methods/properties in a dependency injection.
+            Creates a root container with minimal set of features.
             </summary>
             <param name="name">The optional name of the container.</param>
             <returns>The roor container.</returns>
         </member>
-        <member name="M:IoC.Container.CreateBasic(System.String)">
+        <member name="M:IoC.Container.CreateLight(System.String)">
             <summary>
-            Creates a root container with basic features.
+            Creates a root container with minimalist default features.
             </summary>
             <param name="name">The optional name of the container.</param>
             <returns>The roor container.</returns>
@@ -708,23 +706,6 @@
             <summary>
             Represents build context.
             </summary>
-        </member>
-        <member name="T:IoC.Core.IResourceRegistry">
-            <summary>
-            Represents the resource's registry.
-            </summary>
-        </member>
-        <member name="M:IoC.Core.IResourceRegistry.RegisterResource(System.IDisposable)">
-            <summary>
-            Registers a resource to the registry.
-            </summary>
-            <param name="resource">The target resource.</param>
-        </member>
-        <member name="M:IoC.Core.IResourceRegistry.UnregisterResource(System.IDisposable)">
-            <summary>
-            Unregisters a resource from the registry.
-            </summary>
-            <param name="resource">The target resource.</param>
         </member>
         <member name="T:IoC.EventType">
             <summary>
@@ -833,11 +814,6 @@
         <member name="T:IoC.Extensibility.IExpressionCompiler">
             <summary>
             Represents a expression compiler.
-            </summary>
-        </member>
-        <member name="P:IoC.Extensibility.IExpressionCompiler.IsReferenceConstantSupported">
-            <summary>
-            True if a refernce constant is supported.
             </summary>
         </member>
         <member name="M:IoC.Extensibility.IExpressionCompiler.Compile(System.Linq.Expressions.LambdaExpression)">
@@ -974,7 +950,7 @@
         <member name="F:IoC.Features.CollectionFeature.Default">
             The default instance.
         </member>
-        <member name="F:IoC.Features.CollectionFeature.HighPerformance">
+        <member name="F:IoC.Features.CollectionFeature.Light">
             The high-performance instance.
         </member>
         <member name="M:IoC.Features.CollectionFeature.Apply(IoC.IContainer)">
@@ -1009,19 +985,19 @@
             Provides defaults for features.
             </summary>
         </member>
-        <member name="F:IoC.Features.Feature.BasicSet">
+        <member name="F:IoC.Features.Feature.CoreSet">
             <summary>
-            The enumeration of default features.
+            Core features.
             </summary>
         </member>
         <member name="F:IoC.Features.Feature.DefaultSet">
             <summary>
-            The enumeration of default features.
+            Default features.
             </summary>
         </member>
-        <member name="F:IoC.Features.Feature.HighPerformanceSet">
+        <member name="F:IoC.Features.Feature.LightSet">
             <summary>
-            The enumeration of default features.
+            The light set of features.
             </summary>
         </member>
         <member name="T:IoC.Features.FuncFeature">
@@ -1032,7 +1008,7 @@
         <member name="F:IoC.Features.FuncFeature.Default">
             The default instance.
         </member>
-        <member name="F:IoC.Features.FuncFeature.HighPerformance">
+        <member name="F:IoC.Features.FuncFeature.Light">
             The high-performance instance.
         </member>
         <member name="M:IoC.Features.FuncFeature.Apply(IoC.IContainer)">
@@ -1068,7 +1044,7 @@
         <member name="F:IoC.Features.TupleFeature.Default">
             The default instance.
         </member>
-        <member name="F:IoC.Features.TupleFeature.HighPerformance">
+        <member name="F:IoC.Features.TupleFeature.Light">
             The high-performance instance.
         </member>
         <member name="M:IoC.Features.TupleFeature.Apply(IoC.IContainer)">
@@ -2101,6 +2077,23 @@
             <param name="container">The resolving container.</param>
             <param name="destination">The destination member for injection.</param>
             <param name="source">The source of injection.</param>
+        </member>
+        <member name="T:IoC.IResourceRegistry">
+            <summary>
+            Represents the resource's registry.
+            </summary>
+        </member>
+        <member name="M:IoC.IResourceRegistry.RegisterResource(System.IDisposable)">
+            <summary>
+            Registers a resource to the registry.
+            </summary>
+            <param name="resource">The target resource.</param>
+        </member>
+        <member name="M:IoC.IResourceRegistry.UnregisterResource(System.IDisposable)">
+            <summary>
+            Unregisters a resource from the registry.
+            </summary>
+            <param name="resource">The target resource.</param>
         </member>
         <member name="T:IoC.Key">
             <summary>

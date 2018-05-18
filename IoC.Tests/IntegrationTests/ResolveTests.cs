@@ -1,12 +1,14 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     // ReSharper disable once RedundantUsingDirective
     using System.Threading.Tasks;
     using Moq;
     using Shouldly;
     using Xunit;
 
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
     public class ResolveTests
     {
         [Fact]
@@ -26,6 +28,30 @@
                     instance.ShouldNotBe(instance1);
                     instance.ShouldNotBe(instance2);
                     instance1.ShouldNotBe(instance2);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenRef_MT()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<MySimpleClass>().To(ctx => new MySimpleClass()))
+                {
+                    TestsExtensions.Parallelize(() =>
+                    {
+                        var instance = container.Resolve<object>(typeof(MySimpleClass));
+                        var instance1 = container.Resolve<MySimpleClass>();
+                        var instance2 = container.Resolve<MySimpleClass>();
+
+                        // Then
+                        instance.ShouldNotBe(instance1);
+                        instance.ShouldNotBe(instance2);
+                        instance1.ShouldNotBe(instance2);
+                    });
                 }
             }
         }
@@ -52,7 +78,7 @@
         public void ContainerShouldResolveWhenInherited()
         {
             // Given
-            using (var container = Container.CreateBasic())
+            using (var container = Container.CreateCore())
             {
                 // When
                 using (container.Bind<MyService, IMyService>().To(ctx => new MyService("abc", null)))

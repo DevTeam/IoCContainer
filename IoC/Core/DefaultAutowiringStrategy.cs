@@ -53,7 +53,7 @@
                 var isDefined = false;
                 foreach (var constraintsEntry in constraintsMap)
                 {
-                    if (!CollectionExtensions.SequenceEqual(constraints, constraintsEntry.Item2))
+                    if (!CoreExtensions.SequenceEqual(constraints, constraintsEntry.Item2))
                     {
                         continue;
                     }

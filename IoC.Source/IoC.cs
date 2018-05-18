@@ -38,11 +38,6 @@ SOFTWARE.
 
 using System.Runtime.CompilerServices;
 
-#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETCOREAPP2_0 && !NETCOREAPP2_1 && !WINDOWS_UWP
-using IoC.Features;
-[assembly: InternalsVisibleTo(HighPerformanceFeature.DynamicAssemblyName)]
-#endif
-
 [assembly: InternalsVisibleTo("IoC.Tests, PublicKey=00240000048000009400000006020000002400005253413100040000010001003fa521b0b16e978a933ecce70646c632538351d320a226a64b2c93238b3ba699cb66233e5722c25dd64f816c2aef8d2f1426983ea8c4750902f4a8b03cb00da22e7c978f56cdcfc711ea0a3625016a2ec2238093912799a3cda4ee787592738c7d21f6eed5e3a6d1b03f657ac3880672f2394144bd2359fddf17e464abd947a0")]
 [assembly: InternalsVisibleTo("DynamicProxyGenAssembly2, PublicKey=0024000004800000940000000602000000240000525341310004000001000100c547cac37abd99c8db225ef2f6c8a3602f3b3606cc9891605d02baa56104f4cfc0734aa39b93bf7852f7d9266654753cc297e7d2edfe0bac1cdcf9f717241550e0a7b191195b7667bb4f64bcb8e2121380fd1d9d46ad2d92d2d15605093924cceaf74c4861eff62abf69b9291ed0a340e113be11e6a7d3113e92484cf7045cc7")]
 
@@ -1155,9 +1150,9 @@ namespace IoC
     public sealed class Container: IContainer, IObserver<ContainerEvent>
     {
         private static long _containerId;
-        [NotNull] private static readonly Lazy<Container> BasicRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.BasicSet), true);
+        [NotNull] private static readonly Lazy<Container> CoreRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.CoreSet), true);
         [NotNull] private static readonly Lazy<Container> DefultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.DefaultSet), true);
-        [NotNull] private static readonly Lazy<Container> HighPerformanceRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.HighPerformanceSet), true);
+        [NotNull] private static readonly Lazy<Container> LightRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.LightSet), true);
 
         [NotNull] private readonly IContainer _parent;
         [NotNull] private readonly string _name;
@@ -1181,29 +1176,27 @@ namespace IoC
         }
 
         /// <summary>
-        /// Creates a high-performance root container.
-        /// It requires access permissions to types/constructors/initialization methods.
-        /// Also you could add the attribute <code>[assembly: InternalsVisibleTo(IoC.Features.HighPerformanceFeature.DynamicAssemblyName)]</code> for your assembly to allow use internal classes/methods/properties in a dependency injection.
+        /// Creates a root container with minimal set of features.
         /// </summary>
         /// <param name="name">The optional name of the container.</param>
         /// <returns>The roor container.</returns>
         [NotNull]
-        public static Container CreateHighPerformance([NotNull] string name = "")
+        public static Container CreateCore([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return Create(name, HighPerformanceRootContainer.Value);
+            return Create(name, CoreRootContainer.Value);
         }
 
         /// <summary>
-        /// Creates a root container with basic features.
+        /// Creates a root container with minimalist default features.
         /// </summary>
         /// <param name="name">The optional name of the container.</param>
         /// <returns>The roor container.</returns>
         [NotNull]
-        public static Container CreateBasic([NotNull] string name = "")
+        public static Container CreateLight([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return Create(name, BasicRootContainer.Value);
+            return Create(name, LightRootContainer.Value);
         }
 
         [NotNull]
@@ -2465,7 +2458,7 @@ namespace IoC
     public static class FluentNativeResolve
     {
         // ReSharper disable once RedundantNameQualifier
-        private static readonly object[] EmptyArgs = Core.CollectionExtensions.EmptyArray<object>();
+        private static readonly object[] EmptyArgs = Core.CoreExtensions.EmptyArray<object>();
 
         /// <summary>
         /// Resolves an instance.
@@ -3464,7 +3457,7 @@ namespace IoC
 #endregion
 #region IResourceRegistry
 
-namespace IoC.Core
+namespace IoC
 {
     using System;
 
@@ -3775,18 +3768,18 @@ namespace IoC.Features
         /// The default instance.
         public static readonly IConfiguration Default = new CollectionFeature();
         /// The high-performance instance.
-        public static readonly IConfiguration HighPerformance = new CollectionFeature(true);
+        public static readonly IConfiguration Light = new CollectionFeature(true);
 
-        private readonly bool _highPerformance;
+        private readonly bool _light;
 
-        private CollectionFeature(bool highPerformance = false) => _highPerformance = highPerformance;
+        private CollectionFeature(bool light = false) => _light = light;
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var containerSingletonResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
-            if (_highPerformance)
+            if (_light)
             {
                 yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx.Container, ctx.Args).ToArray(), containerSingletonResolver(container));
             }
@@ -3969,7 +3962,6 @@ namespace IoC.Features
 {
     using System;
     using System.Collections.Generic;
-    using System.Reflection;
     using System.Threading;
     using Core;
     using Lifetimes;
@@ -4037,18 +4029,18 @@ namespace IoC.Features
         public static readonly object[] AnyTag = { Key.AnyTag };
 
         /// <summary>
-        /// The enumeration of default features.
+        /// Core features.
         /// </summary>
-        public static readonly IEnumerable<IConfiguration> BasicSet = new[]
+        public static readonly IEnumerable<IConfiguration> CoreSet = new[]
         {
             CoreFeature.Default
         };
 
         /// <summary>
-        /// The enumeration of default features.
+        /// Default features.
         /// </summary>
         public static readonly IEnumerable<IConfiguration> DefaultSet = Combine(
-            BasicSet,
+            CoreSet,
             new[]
             {
                 CollectionFeature.Default,
@@ -4060,25 +4052,19 @@ namespace IoC.Features
             });
 
         /// <summary>
-        /// The enumeration of default features.
+        /// The light set of features.
         /// </summary>
-        public static readonly IEnumerable<IConfiguration> HighPerformanceSet = Combine(
-            BasicSet,
+        public static readonly IEnumerable<IConfiguration> LightSet = Combine(
+            CoreSet,
             new[]
             {
-                CollectionFeature.HighPerformance,
-                FuncFeature.HighPerformance,
+                CollectionFeature.Light,
+                FuncFeature.Light,
                 TaskFeature.Default,
-                TupleFeature.HighPerformance,
-                LazyFeature.Default
-            }
-#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETCOREAPP2_0 && !NETCOREAPP2_1 && !WINDOWS_UWP
-            , new []
-            {
-                HighPerformanceFeature.Default,
-            }
-#endif
-            );
+                TupleFeature.Light,
+                LazyFeature.Default,
+                ConfigurationFeature.Default
+            });
 
         private static IEnumerable<IConfiguration> Combine(params IEnumerable<IConfiguration>[] configurations)
         {
@@ -4105,11 +4091,11 @@ namespace IoC.Features
         /// The default instance.
         public static readonly IConfiguration Default = new FuncFeature();
         /// The high-performance instance.
-        public static readonly IConfiguration HighPerformance = new FuncFeature(true);
+        public static readonly IConfiguration Light = new FuncFeature(true);
 
-        private readonly bool _highPerformance;
+        private readonly bool _light;
 
-        private FuncFeature(bool highPerformance = false) => _highPerformance = highPerformance;
+        private FuncFeature(bool light = false) => _light = light;
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
@@ -4120,7 +4106,7 @@ namespace IoC.Features
             yield return container.Register<Func<TT1, TT2, TT>>(ctx => ((arg1, arg2) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2)), null, Feature.AnyTag);
             yield return container.Register<Func<TT1, TT2, TT3, TT>>(ctx => ((arg1, arg2, arg3) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3)), null, Feature.AnyTag);
             yield return container.Register<Func<TT1, TT2, TT3, TT4, TT>>(ctx => ((arg1, arg2, arg3, arg4) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4)), null, Feature.AnyTag);
-            if (!_highPerformance)
+            if (!_light)
             {
                 yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT>>(ctx => ((arg1, arg2, arg3, arg4, arg5) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5)), null, Feature.AnyTag);
                 yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>>(ctx => ((arg1, arg2, arg3, arg4, arg5, arg6) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6)), null, Feature.AnyTag);
@@ -4131,46 +4117,6 @@ namespace IoC.Features
     }
 }
 
-
-#endregion
-#region HighPerformanceFeature
-
-#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETCOREAPP2_0 && !NETCOREAPP2_1 && !WINDOWS_UWP
-namespace IoC.Features
-{
-    using System;
-    using System.Collections.Generic;
-    using Core;
-    using Extensibility;
-
-    /// <summary>
-    /// Allows to compile fast delegates.
-    /// It requires access permissions to types/constructors/initialization methods.
-    /// Also you could add the attribute <code>[assembly: InternalsVisibleTo(IoC.Features.HighPerformanceFeature.DynamicAssemblyName)]</code> for your assembly to allow use internal classes/methods/properties in a dependency injection.
-    /// </summary>
-    public class HighPerformanceFeature : IConfiguration
-    {
-        internal const string ShortDynamicAssemblyName = "IoC.DynamicAssembly";
-
-        /// <summary>
-        /// The full name of dynamic assembly.
-        /// Could be use with <c>InternalsVisibleTo</c> attribute.
-        /// </summary>
-        public const string DynamicAssemblyName = ShortDynamicAssemblyName + ", PublicKey=00240000048000009400000006020000002400005253413100040000010001003fa521b0b16e978a933ecce70646c632538351d320a226a64b2c93238b3ba699cb66233e5722c25dd64f816c2aef8d2f1426983ea8c4750902f4a8b03cb00da22e7c978f56cdcfc711ea0a3625016a2ec2238093912799a3cda4ee787592738c7d21f6eed5e3a6d1b03f657ac3880672f2394144bd2359fddf17e464abd947a0";
-        
-        /// The default instance.
-        public static readonly IConfiguration Default = new HighPerformanceFeature();
-
-        private HighPerformanceFeature() { }
-
-        /// <inheritdoc />
-        public IEnumerable<IDisposable> Apply(IContainer container)
-        {
-            yield return container.Register<ExpressionCompilerOptimizing, IExpressionCompiler>();
-        }
-    }
-}
-#endif
 
 #endregion
 #region LazyFeature
@@ -4257,11 +4203,11 @@ namespace IoC.Features
         /// The default instance.
         public static readonly IConfiguration Default = new TupleFeature();
         /// The high-performance instance.
-        public static readonly IConfiguration HighPerformance = new TupleFeature(true);
+        public static readonly IConfiguration Light = new TupleFeature(true);
 
-        private readonly bool _highPerformance;
+        private readonly bool _light;
 
-        private TupleFeature(bool highPerformance = false) => _highPerformance = highPerformance;
+        private TupleFeature(bool light = false) => _light = light;
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
@@ -4284,7 +4230,7 @@ namespace IoC.Features
                 ctx.Container.Inject<TT3>(ctx.Key.Tag),
                 ctx.Container.Inject<TT4>(ctx.Key.Tag)), null, Feature.AnyTag);
 
-            if (!_highPerformance)
+            if (!_light)
             {
                 yield return container.Register(ctx => new Tuple<TT1, TT2, TT3, TT4, TT5>(
                     ctx.Container.Inject<TT1>(ctx.Key.Tag),
@@ -4337,7 +4283,7 @@ namespace IoC.Features
                 ctx.Container.Inject<TT3>(ctx.Key.Tag),
                 ctx.Container.Inject<TT4>(ctx.Key.Tag)), null, Feature.AnyTag);
 
-            if (!_highPerformance)
+            if (!_light)
             {
                 yield return container.Bind<(TT1, TT2, TT3, TT4, TT5)>().AnyTag().To(ctx => CreateTuple(
                     ctx.Container.Inject<TT1>(ctx.Key.Tag),
@@ -4465,7 +4411,7 @@ namespace IoC.Lifetimes
         private static readonly FieldInfo LockObjectFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(LockObject));
         private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(Instances));
         private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
-        private static readonly MethodInfo GetMethodInfo = typeof(CollectionExtensions).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(CollectionExtensions.GetByRef)).MakeGenericMethod(typeof(TKey), typeof(object));
+        private static readonly MethodInfo GetMethodInfo = typeof(CoreExtensions).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(CoreExtensions.GetByRef)).MakeGenericMethod(typeof(TKey), typeof(object));
         private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
         private static readonly ParameterExpression KeyVar = Expression.Variable(TypeDescriptor<TKey>.Type, "key");
@@ -4485,7 +4431,7 @@ namespace IoC.Lifetimes
             var lockObjectField = Expression.Field(thisVar, LockObjectFieldInfo);
             var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
             var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(null, GetMethodInfo, instancesField, SingletonBasedLifetimeShared.HashCodeVar, KeyVar).Convert(returnType));
-            var isNullExpression = Expression.ReferenceEqual(instanceVar, ExpressionExtensions.NullConst);
+            var isNullExpression = Expression.ReferenceEqual(instanceVar, ExpressionBuilderExtensions.NullConst);
 
             return Expression.Block(
                 // Key key;
@@ -4495,7 +4441,7 @@ namespace IoC.Lifetimes
                 // var key = CreateKey(container, args);
                 Expression.Assign(KeyVar, Expression.Call(thisVar, CreateKeyMethodInfo, ContainerParameter, ArgsParameter)),
                 // var hashCode = key.GetHashCode();
-                Expression.Assign(SingletonBasedLifetimeShared.HashCodeVar, Expression.Call(KeyVar, ExpressionExtensions.GetHashCodeMethodInfo)),
+                Expression.Assign(SingletonBasedLifetimeShared.HashCodeVar, Expression.Call(KeyVar, ExpressionBuilderExtensions.GetHashCodeMethodInfo)),
                 // var instance = (T)Instances.Get(hashCode, key);
                 assignInstanceExpression,
                 // if(instance == null)
@@ -4508,7 +4454,7 @@ namespace IoC.Lifetimes
                             assignInstanceExpression,
                             // if(instance == null)
                             Expression.IfThen(
-                                Expression.Equal(instanceVar, ExpressionExtensions.NullConst),
+                                Expression.Equal(instanceVar, ExpressionBuilderExtensions.NullConst),
                                 Expression.Block(
                                     // instance = new T();
                                     Expression.Assign(instanceVar, bodyExpression),
@@ -4660,7 +4606,7 @@ namespace IoC.Lifetimes
             var lockObjectField = Expression.Field(thisVar, LockObjectFieldInfo);
             var instanceField = Expression.Field(thisVar, InstanceFieldInfo);
             var typedInstance = instanceField.Convert(type);
-            var isNullExpression = Expression.ReferenceEqual(instanceField, ExpressionExtensions.NullConst);
+            var isNullExpression = Expression.ReferenceEqual(instanceField, ExpressionBuilderExtensions.NullConst);
 
             // if(this.Instance == null)
             return Expression.Condition(
@@ -4829,11 +4775,6 @@ namespace IoC.Extensibility
     [PublicAPI]
     public interface IExpressionCompiler
     {
-        /// <summary>
-        /// True if a refernce constant is supported.
-        /// </summary>
-        bool IsReferenceConstantSupported { get; }
-
         /// <summary>
         /// Compiles an expression to a delegate.
         /// </summary>
@@ -5142,10 +5083,8 @@ namespace IoC.Core
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using System.Runtime.CompilerServices;
     using Extensibility;
-    using static TypeDescriptorExtensions;
 
     /// <summary>
     /// Represents build context.
@@ -5155,21 +5094,11 @@ namespace IoC.Core
     internal class BuildContext : IBuildContext
     {
         // Should be at least internal to be accessable from for compiled code from expressions
-        internal static BuildContext[] Contexts = Core.CollectionExtensions.EmptyArray<BuildContext>();
-        private static readonly MemberInfo ContextsMemberInfo = Descriptor<BuildContext>().GetDeclaredMembers().Single(i => i.Name == nameof(Contexts));
-        private static readonly FieldInfo ValuesFieldInfo = Descriptor<BuildContext>().GetDeclaredFields().Single(i => i.Name == nameof(Values));
-
-        // Should be at least internal to be accessable from for compiled code from expressions
-        internal object[] Values = CollectionExtensions.EmptyArray<object>();
         private readonly ICollection<IDisposable> _resources;
-        private readonly int _id;
         private readonly IExpressionCompiler _compiler;
         private readonly List<ParameterExpression> _parameters = new List<ParameterExpression>();
         private readonly List<Expression> _statements = new List<Expression>();
         private int _curId;
-        private int _valuesCount;
-        private ParameterExpression _contextExpression;
-        private ParameterExpression _contextArrayExpression;
 
         internal BuildContext([NotNull] IExpressionCompiler compiler, Key key, [NotNull] IContainer container, [NotNull] ICollection<IDisposable> resources, int depth = 0)
         {
@@ -5178,25 +5107,6 @@ namespace IoC.Core
             Container = container ?? throw new ArgumentNullException(nameof(container));
             _resources = resources ?? throw new ArgumentNullException(nameof(resources));
             Depth = depth;
-            _id = -1;
-            // Try finding an empty element
-            for (var i = 0; i < Contexts.Length; i++)
-            {
-                if (Contexts[i] == null)
-                {
-                    _id = i;
-                    Contexts[i] = this;
-                    return;
-                }
-            }
-
-            // An empty element was not found
-            _id = Contexts.Length;
-            Contexts = Contexts.Add(this);
-            resources.Add(Disposable.Create(() =>
-            {
-                Contexts[_id] = null;
-            }));
         }
 
         public Key Key { get; }
@@ -5217,22 +5127,7 @@ namespace IoC.Core
         public Expression AppendValue(object value, Type type)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            if (type.Descriptor().IsValueType() || _compiler.IsReferenceConstantSupported)
-            {
-                return Expression.Constant(value, type);
-            }
-
-            var fieldInfo = (FieldInfo) Descriptor<BuildContext>().GetDeclaredMembers().SingleOrDefault(i => i.Name == $"State{_valuesCount:00}");
-            if (fieldInfo != null && _valuesCount < StatesCount)
-            {
-                _valuesCount++;
-                fieldInfo.SetValue(this, value);
-                return Expression.Field(GetContextExpression(), fieldInfo).Convert(type);
-            }
-
-            var valueId = Values.Length;
-            Values = Values.Add(value);
-            return Expression.ArrayAccess(GetContextArrayExpression(), Expression.Constant(valueId)).Convert(type);
+            return Expression.Constant(value, type);
         }
 
         public Expression AppendValue<T>(T value) => AppendValue(value, TypeDescriptor<T>.Type);
@@ -5292,93 +5187,8 @@ namespace IoC.Core
             return Expression.Block(_parameters, _statements);
         }
 
-        [NotNull]
-        private ParameterExpression GetContextArrayExpression()
-        {
-            if (_contextArrayExpression != null)
-            {
-                return _contextArrayExpression;
-            }
-
-            _contextArrayExpression = Expression.Variable(TypeDescriptor<object[]>.Type, "contextArray" + GenerateId());
-            var getExpression = 
-                // Contexts[_id].Values
-                Expression.Field(
-                    // Contexts[_id].Values
-                    GetContextExpression(),
-                    ValuesFieldInfo);
-
-            _parameters.Insert(1, _contextArrayExpression);
-            _statements.Insert(1, Expression.Assign(_contextArrayExpression, getExpression));
-            return _contextArrayExpression;
-        }
-
-        [NotNull]
-        private ParameterExpression GetContextExpression()
-        {
-            if (_contextExpression != null)
-            {
-                return _contextExpression;
-            }
-
-            _contextExpression = Expression.Variable(TypeDescriptor<BuildContext>.Type, "context" + GenerateId());
-            var getExpression = Expression.ArrayAccess(
-                // Contexts
-                Expression.MakeMemberAccess(null, ContextsMemberInfo),
-                Expression.Constant(_id));
-
-            _parameters.Insert(0, _contextExpression);
-            _statements.Insert(0, Expression.Assign(_contextExpression, getExpression));
-            return _contextExpression;
-        }
-
         [MethodImpl((MethodImplOptions)256)]
         private int GenerateId() => System.Threading.Interlocked.Increment(ref _curId);
-
-        private const int StatesCount = 40;
-
-        internal object State00;
-        internal object State01;
-        internal object State02;
-        internal object State03;
-        internal object State04;
-        internal object State05;
-        internal object State06;
-        internal object State07;
-        internal object State08;
-        internal object State09;
-
-        internal object State11;
-        internal object State12;
-        internal object State13;
-        internal object State14;
-        internal object State15;
-        internal object State16;
-        internal object State17;
-        internal object State18;
-        internal object State19;
-
-        internal object State20;
-        internal object State21;
-        internal object State22;
-        internal object State23;
-        internal object State24;
-        internal object State25;
-        internal object State26;
-        internal object State27;
-        internal object State28;
-        internal object State29;
-
-        internal object State30;
-        internal object State31;
-        internal object State32;
-        internal object State33;
-        internal object State34;
-        internal object State35;
-        internal object State36;
-        internal object State37;
-        internal object State38;
-        internal object State39;
     }
 }
 
@@ -5390,6 +5200,9 @@ namespace IoC.Core
 {
     using System;
 
+#if !WINDOWS_UWP && !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
+    [Serializable]
+#endif
     internal class BuildExpressionException: InvalidOperationException
     {
         public BuildExpressionException(string message, [CanBeNull] Exception innerException)
@@ -5435,14 +5248,14 @@ namespace IoC.Core
 
 
 #endregion
-#region CollectionExtensions
+#region CoreExtensions
 
 namespace IoC.Core
 {
     using System;
     using System.Runtime.CompilerServices;
 
-    internal static class CollectionExtensions
+    internal static class CoreExtensions
     {
         [MethodImpl((MethodImplOptions)256)]
         public static bool SequenceEqual<T>([NotNull] this T[] array1, [NotNull] T[] array2)
@@ -5618,7 +5431,7 @@ namespace IoC.Core
                 var isDefined = false;
                 foreach (var constraintsEntry in constraintsMap)
                 {
-                    if (!CollectionExtensions.SequenceEqual(constraints, constraintsEntry.Item2))
+                    if (!CoreExtensions.SequenceEqual(constraints, constraintsEntry.Item2))
                     {
                         continue;
                     }
@@ -5788,7 +5601,7 @@ namespace IoC.Core
 
             public override int GetHashCode() => _genericTypes != null ? _genericTypes.GetHash() : 0;
 
-            private bool Equals(LifetimeKey other) => CollectionExtensions.SequenceEqual(_genericTypes, other._genericTypes);
+            private bool Equals(LifetimeKey other) => CoreExtensions.SequenceEqual(_genericTypes, other._genericTypes);
         }
     }
 }
@@ -6252,120 +6065,7 @@ namespace IoC.Core
 
 
 #endregion
-#region ExpressionCompilerDefault
-
-namespace IoC.Core
-{
-    using System;
-    using System.Linq.Expressions;
-    using Extensibility;
-
-    internal class ExpressionCompilerDefault : IExpressionCompiler
-    {
-        public static readonly IExpressionCompiler Shared = new ExpressionCompilerDefault();
-
-        private ExpressionCompilerDefault()
-        {
-        }
-
-        public bool IsReferenceConstantSupported => true;
-
-        public Delegate Compile(LambdaExpression resolverExpression)
-        {
-            if (resolverExpression == null) throw new ArgumentNullException(nameof(resolverExpression));
-            if (resolverExpression.CanReduce)
-            {
-                resolverExpression = (LambdaExpression)resolverExpression.Reduce();
-            }
-
-            return resolverExpression.Compile();
-        }
-    }
-}
-
-#endregion
-#region ExpressionCompilerOptimizing
-
-#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETCOREAPP2_0 && !NETCOREAPP2_1 && !WINDOWS_UWP
-namespace IoC.Core
-{
-    using System;
-    using System.IO;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using System.Reflection.Emit;
-    using Extensibility;
-    using Features;
-    using static Extensibility.WellknownExpressions;
-    using static TypeDescriptorExtensions;
-
-    // ReSharper disable once ClassNeverInstantiated.Global
-    internal class ExpressionCompilerOptimizing : IExpressionCompiler
-    {
-        private const string ResolverModuleName = "DynamicModule";
-        private const string ResolverTypeName = "DynamicResolver";
-        private const string ResolveMethodName = "Resolve";
-        private const string SnkResourceKey = "IoC.DevTeam.snk";
-
-        [NotNull] private static readonly Type[] ResolverParameterTypes = ResolverParameters.Select(i => i.Type).ToArray();
-        [NotNull] private static readonly ModuleBuilder ModuleBuilder;
-        private static int _resolverTypeId;
-
-        static ExpressionCompilerOptimizing()
-        {
-            var domain = AppDomain.CurrentDomain;
-            var assembly = Descriptor<ExpressionCompilerOptimizing>().GetAssembly();
-            using (var keyStream = assembly.GetManifestResourceStream(SnkResourceKey))
-            using (var keyReader = new BinaryReader(keyStream ?? throw new InvalidOperationException($"Resource with key \"{SnkResourceKey}\" was not found.")))
-            {
-                var key = keyReader.ReadBytes((int)keyStream.Length);
-                var assemblyName = new AssemblyName { Name = HighPerformanceFeature.ShortDynamicAssemblyName, KeyPair = new StrongNameKeyPair(key) };
-                var assemblyBuilder = domain.DefineDynamicAssembly(assemblyName, AssemblyBuilderAccess.Run);
-                ModuleBuilder = assemblyBuilder.DefineDynamicModule(ResolverModuleName);
-            }
-        }
-
-        public bool IsReferenceConstantSupported => false;
-
-        public Delegate Compile(LambdaExpression resolverExpression)
-            => TryCompile(resolverExpression ?? throw new ArgumentNullException(nameof(resolverExpression))) ?? ExpressionCompilerDefault.Shared.Compile(resolverExpression);
-
-        [CanBeNull]
-        private Delegate TryCompile(LambdaExpression resolverExpression)
-        {
-            try
-            {
-                var returnTypeDescriptor = resolverExpression.ReturnType.Descriptor();
-                if (!returnTypeDescriptor.IsPublic())
-                {
-                    return null;
-                }
-
-                if (resolverExpression.CanReduce)
-                {
-                    resolverExpression = (LambdaExpression)resolverExpression.Reduce();
-                }
-
-                var typeName = ResolverTypeName + System.Threading.Interlocked.Increment(ref _resolverTypeId);
-                var typeBuilder = ModuleBuilder.DefineType(typeName, TypeAttributes.Public);
-                var methodBuilder = typeBuilder.DefineMethod(ResolveMethodName, MethodAttributes.Public | MethodAttributes.Static, resolverExpression.ReturnType, ResolverParameterTypes);
-                resolverExpression.CompileToMethod(methodBuilder);
-                var methodInfo = typeBuilder.CreateType().GetMethod(ResolveMethodName);
-                return methodInfo == null ? null : Delegate.CreateDelegate(resolverExpression.ReturnType.ToResolverType(), methodInfo);
-            }
-            catch
-            {
-                return null;
-            }
-        }
-    }
-}
-#endif
-
-
-#endregion
-#region ExpressionExtensions
+#region ExpressionBuilderExtensions
 
 namespace IoC.Core
 {
@@ -6378,7 +6078,7 @@ namespace IoC.Core
     using Extensibility;
     using static TypeDescriptorExtensions;
 
-    internal static class ExpressionExtensions
+    internal static class ExpressionBuilderExtensions
     {
         private static readonly TypeDescriptor ResolverGenericTypeDescriptor = typeof(Resolver<>).Descriptor();
         [ThreadStatic] private static int _getExpressionCompilerReentrancy;
@@ -6400,7 +6100,7 @@ namespace IoC.Core
                     }
                 }
 
-                return ExpressionCompilerDefault.Shared;
+                return ExpressionCompiler.Shared;
             }
             finally
             {
@@ -6432,6 +6132,34 @@ namespace IoC.Core
                     Expression.Call(EnterMethodInfo, lockObject),
                     body), 
                 Expression.Call(ExitMethodInfo, lockObject));
+        }
+    }
+}
+
+#endregion
+#region ExpressionCompiler
+
+namespace IoC.Core
+{
+    using System;
+    using System.Linq.Expressions;
+    using Extensibility;
+
+    internal class ExpressionCompiler : IExpressionCompiler
+    {
+        public static readonly IExpressionCompiler Shared = new ExpressionCompiler();
+
+        private ExpressionCompiler() { }
+
+        public Delegate Compile(LambdaExpression resolverExpression)
+        {
+            if (resolverExpression == null) throw new ArgumentNullException(nameof(resolverExpression));
+            if (resolverExpression.CanReduce)
+            {
+                resolverExpression = (LambdaExpression)resolverExpression.Reduce();
+            }
+
+            return resolverExpression.Compile();
         }
     }
 }
@@ -6847,7 +6575,7 @@ namespace IoC.Core
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
     internal class Table<TKey, TValue>: IEnumerable<Table<TKey, TValue>.KeyValue>
     {
-        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CollectionExtensions.CreateArray(4, Bucket.EmptyBucket), 3, 0);
+        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(4, Bucket.EmptyBucket), 3, 0);
         public readonly int Count;
         private readonly int _divisor;
         private readonly Bucket[] _buckets;
@@ -6868,7 +6596,7 @@ namespace IoC.Core
             if (origin.Count > origin._divisor)
             {
                 _divisor = (origin._divisor + 1) << 2 - 1;
-                _buckets = CollectionExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
+                _buckets = CoreExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
                 var originBuckets = origin._buckets;
                 for (var originBucketIndex = 0; originBucketIndex < originBuckets.Length; originBucketIndex++)
                 {
@@ -6931,7 +6659,7 @@ namespace IoC.Core
         public Table<TKey, TValue> Remove(int hashCode, TKey key, out bool removed)
         {
             removed = false;
-            var newBuckets = CollectionExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
+            var newBuckets = CoreExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
             var newBucketsArray = newBuckets;
             var bucketIndex = hashCode & _divisor;
             for (var curBucketInex = 0; curBucketInex < _buckets.Length; curBucketInex++)
@@ -6983,13 +6711,13 @@ namespace IoC.Core
             [MethodImpl((MethodImplOptions)256)]
             private Bucket(KeyValue[] keyValues)
             {
-                KeyValues = keyValues.Length == 0 ? CollectionExtensions.EmptyArray<KeyValue>() : keyValues.Copy();
+                KeyValues = keyValues.Length == 0 ? CoreExtensions.EmptyArray<KeyValue>() : keyValues.Copy();
             }
 
             [MethodImpl((MethodImplOptions)256)]
             private Bucket(int count)
             {
-                KeyValues = CollectionExtensions.CreateArray<KeyValue>(count);
+                KeyValues = CoreExtensions.CreateArray<KeyValue>(count);
             }
 
             [MethodImpl((MethodImplOptions)256)]

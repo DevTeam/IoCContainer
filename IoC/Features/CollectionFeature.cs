@@ -18,18 +18,18 @@
         /// The default instance.
         public static readonly IConfiguration Default = new CollectionFeature();
         /// The high-performance instance.
-        public static readonly IConfiguration HighPerformance = new CollectionFeature(true);
+        public static readonly IConfiguration Light = new CollectionFeature(true);
 
-        private readonly bool _highPerformance;
+        private readonly bool _light;
 
-        private CollectionFeature(bool highPerformance = false) => _highPerformance = highPerformance;
+        private CollectionFeature(bool light = false) => _light = light;
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var containerSingletonResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
-            if (_highPerformance)
+            if (_light)
             {
                 yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx.Container, ctx.Args).ToArray(), containerSingletonResolver(container));
             }
