@@ -78,7 +78,7 @@ namespace IoC.Tests.UsageScenarios
                     expression);
             }
 
-            public ILifetime Clone() => new MySingletonLifetime(_baseSingletonLifetime.Clone(), _counter);
+            public ILifetime Create() => new MySingletonLifetime(_baseSingletonLifetime.Create(), _counter);
 
             // Just counting the number of calls
             internal void IncrementCounter() => _counter.Increment();

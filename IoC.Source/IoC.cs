@@ -1152,25 +1152,21 @@ namespace IoC
     [PublicAPI]
     [DebuggerDisplay("Name = {" + nameof(ToString) + "()}")]
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
-    public sealed class Container: IContainer, IResourceStore, IObserver<ContainerEvent>
+    public sealed class Container: IContainer, IObserver<ContainerEvent>
     {
         private static long _containerId;
-
-        // ReSharper disable once RedundantNameQualifier
-        internal static readonly object[] EmptyArgs = Core.CollectionExtensions.EmptyArray<object>();
         [NotNull] private static readonly Lazy<Container> BasicRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.BasicSet), true);
         [NotNull] private static readonly Lazy<Container> DefultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.DefaultSet), true);
         [NotNull] private static readonly Lazy<Container> HighPerformanceRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.HighPerformanceSet), true);
-        [NotNull] private readonly object _lockObject = new object();
+
         [NotNull] private readonly IContainer _parent;
         [NotNull] private readonly string _name;
         [NotNull] private readonly Subject<ContainerEvent> _eventSubject = new Subject<ContainerEvent>();
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
-        [NotNull] private Table<FullKey, RegistrationEntry> _registrationEntries = Table<FullKey, RegistrationEntry>.Empty;
-        [NotNull] private Table<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = Table<ShortKey, RegistrationEntry>.Empty;
+        [NotNull] private Table<FullKey, DependencyEntry> _dependencies = Table<FullKey, DependencyEntry>.Empty;
+        [NotNull] private Table<ShortKey, DependencyEntry> _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
         [NotNull] internal volatile Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
         [NotNull] internal volatile Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
-        private IEnumerable<FullKey>[] _allKeys;
 
         /// <summary>
         /// Creates a root container with default features.
@@ -1230,16 +1226,14 @@ namespace IoC
             _name = $"{parent}/{name ?? throw new ArgumentNullException(nameof(name))}";
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
 
-            if (!(this is IResourceStore resourceStore))
-            {
-                throw new NotSupportedException();
-            }
-
             // Subscribe to events from the parent container
-            resourceStore.AddResource(_parent.Subscribe(_eventSubject));
+            RegisterResource(_parent.Subscribe(_eventSubject));
 
             // Subscribe to reset resolvers
-            resourceStore.AddResource(_eventSubject.Subscribe(this));
+            RegisterResource(_eventSubject.Subscribe(this));
+
+            // Register current container in the parent container.
+            _parent.RegisterResource(this);
         }
 
         /// <inheritdoc />
@@ -1255,27 +1249,27 @@ namespace IoC
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public bool TryRegister(IEnumerable<FullKey> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
+        public bool TryRegisterDependency(IEnumerable<FullKey> keys, IDependency dependency, ILifetime lifetime, out IDisposable dependencyToken)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
             var isRegistered = true;
             var registeredKeys = new List<FullKey>();
-            var registrationEntry = new RegistrationEntry(dependency, lifetime, Disposable.Create(UnregisterKeys), registeredKeys);
+            var dependencyEntry = new DependencyEntry(dependency, lifetime, Disposable.Create(UnregisterKeys), registeredKeys);
 
             void UnregisterKeys()
             {
-                lock (_lockObject)
+                lock (_eventSubject)
                 {
                     foreach (var curKey in registeredKeys)
                     {
                         if (curKey.Tag == AnyTag)
                         {
-                            TryUnregister(curKey, curKey.Type, ref _registrationEntriesForTagAny);
+                            TryUnregister(curKey, curKey.Type, ref _dependenciesForTagAny);
                         }
                         else
                         {
-                            TryUnregister(curKey, curKey, ref _registrationEntries);
+                            TryUnregister(curKey, curKey, ref _dependencies);
                         }
                     }
                 }
@@ -1283,10 +1277,10 @@ namespace IoC
 
             try
             {
-                var registrationEntriesForTagAny = _registrationEntriesForTagAny;
-                var registrationEntries = _registrationEntries;
+                var dependenciesForTagAny = _dependenciesForTagAny;
+                var dependencies = _dependencies;
 
-                lock (_lockObject)
+                lock (_eventSubject)
                 {
                     foreach (var curKey in keys)
                     {
@@ -1296,19 +1290,19 @@ namespace IoC
                         if (key.Tag == AnyTag)
                         {
                             var hashCode = key.Type.GetHashCode();
-                            isRegistered &= registrationEntriesForTagAny.GetByRef(hashCode, key.Type) == default(RegistrationEntry);
+                            isRegistered &= dependenciesForTagAny.GetByRef(hashCode, key.Type) == default(DependencyEntry);
                             if (isRegistered)
                             {
-                                Register(key, key.Type, hashCode, registrationEntry, ref registrationEntriesForTagAny);
+                                Register(key, key.Type, hashCode, dependencyEntry, ref dependenciesForTagAny);
                             }
                         }
                         else
                         {
                             var hashCode = key.GetHashCode();
-                            isRegistered &= registrationEntries.Get(hashCode, key) == default(RegistrationEntry);
+                            isRegistered &= dependencies.Get(hashCode, key) == default(DependencyEntry);
                             if (isRegistered)
                             {
-                                Register(key, key, hashCode, registrationEntry, ref registrationEntries);
+                                Register(key, key, hashCode, dependencyEntry, ref dependencies);
                             }
                         }
 
@@ -1322,8 +1316,8 @@ namespace IoC
 
                     if (isRegistered)
                     {
-                        _registrationEntriesForTagAny = registrationEntriesForTagAny;
-                        _registrationEntries = registrationEntries;
+                        _dependenciesForTagAny = dependenciesForTagAny;
+                        _dependencies = dependencies;
                     }
                 }
             }
@@ -1336,12 +1330,12 @@ namespace IoC
             {
                 if (isRegistered)
                 {
-                    registrationToken = registrationEntry;
+                    dependencyToken = dependencyEntry;
                 }
                 else
                 {
-                    registrationEntry.Dispose();
-                    registrationToken = default(IDisposable);
+                    dependencyEntry.Dispose();
+                    dependencyToken = default(IDisposable);
                 }
             }
 
@@ -1378,11 +1372,11 @@ namespace IoC
                 }
             }
 
-            // tries finding in registrations
-            if (TryGetRegistrationEntry(key, hashCode, out var registrationEntry))
+            // tries finding in dependencies
+            if (TryGetDependency(key, hashCode, out var dependencyEntry))
             {
                 // tries creating resolver
-                if (!registrationEntry.TryCreateResolver(key, resolvingContainer ?? this, out var resolverDelegate, out error))
+                if (!dependencyEntry.TryCreateResolver(key, resolvingContainer ?? this, out var resolverDelegate, out error))
                 {
                     resolver = default(Resolver<T>);
                     return false;
@@ -1404,7 +1398,7 @@ namespace IoC
             if (resolvingContainer == null || resolvingContainer == this)
             {
                 // Add resolver to tables
-                lock (_lockObject)
+                lock (_eventSubject)
                 {
                     Resolvers = Resolvers.Set(hashCode, key, resolver);
                     if (tag == null)
@@ -1421,59 +1415,57 @@ namespace IoC
         /// <inheritdoc />
         public bool TryGetDependency(FullKey key, out IDependency dependency, out ILifetime lifetime)
         {
-            if (!TryGetRegistrationEntry(key, key.GetHashCode(), out var registrationEntry))
+            if (!TryGetDependency(key, key.GetHashCode(), out var dependencyEntry))
             {
                 return _parent.TryGetDependency(key, out dependency, out lifetime);
             }
 
-            dependency = registrationEntry.Dependency;
-            lifetime = registrationEntry.GetLifetime(key.Type);
+            dependency = dependencyEntry.Dependency;
+            lifetime = dependencyEntry.GetLifetime(key.Type);
             return true;
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            if (_parent is IResourceStore resourceStore)
+            _parent.UnregisterResource(this);
+            var entriesToDispose = new List<IDisposable>(_dependencies.Count + _dependenciesForTagAny.Count + _resources.Count);
+            lock (_eventSubject)
             {
-                resourceStore.RemoveResource(this);
-            }
-
-            List<RegistrationEntry> entriesToDispose;
-            IDisposable resource;
-            lock (_lockObject)
-            {
-                entriesToDispose = _registrationEntries.Select(i => i.Value).Concat(_registrationEntriesForTagAny.Select(i => i.Value)).ToList();
-                _registrationEntries = Table<FullKey, RegistrationEntry>.Empty;
-                _registrationEntriesForTagAny = Table<ShortKey, RegistrationEntry>.Empty;
+                entriesToDispose.AddRange(_dependencies.Select(i => i.Value));
+                entriesToDispose.AddRange(_dependenciesForTagAny.Select(i => i.Value));
+                entriesToDispose.AddRange(_resources);
+                _dependencies = Table<FullKey, DependencyEntry>.Empty;
+                _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
                 Resolvers = Table<FullKey, ResolverDelegate>.Empty;
                 ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
-                resource = Disposable.Create(_resources);
                 _resources.Clear();
             }
 
-            foreach (var entry in entriesToDispose)
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 0; index < entriesToDispose.Count; index++)
             {
-                entry.Dispose();
+                entriesToDispose[index].Dispose();
             }
 
-            resource.Dispose();
             _eventSubject.OnCompleted();
         }
 
-        void IResourceStore.AddResource(IDisposable resource)
+        /// <inheritdoc />
+        public void RegisterResource(IDisposable resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
-            lock (_lockObject)
+            lock (_eventSubject)
             {
                 _resources.Add(resource);
             }
         }
 
-        void IResourceStore.RemoveResource(IDisposable resource)
+        /// <inheritdoc />
+        public void UnregisterResource(IDisposable resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
-            lock (_lockObject)
+            lock (_eventSubject)
             {
                 _resources.Remove(resource);
             }
@@ -1493,19 +1485,16 @@ namespace IoC
         /// <inheritdoc />
         public IDisposable Subscribe(IObserver<ContainerEvent> observer)
         {
+            if (observer == null) throw new ArgumentNullException(nameof(observer));
             return _eventSubject.Subscribe(observer);
         }
         
         void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
         {
-            if (value.Container == this)
+            lock (_eventSubject)
             {
-                return;
-            }
-
-            lock (_lockObject)
-            {
-                ResetResolvers();
+                Resolvers = Table<FullKey, ResolverDelegate>.Empty;
+                ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
             }
         }
 
@@ -1516,23 +1505,21 @@ namespace IoC
         [MethodImpl((MethodImplOptions) 256)]
         private IEnumerable<IEnumerable<FullKey>> GetAllKeys()
         {
-            lock (_lockObject)
+            lock (_eventSubject)
             {
-                return _allKeys ?? (_allKeys = _registrationEntries.Select(i => i.Value.Keys).Distinct().ToArray());
+                return _dependencies.Select(i => i.Value.Keys).Concat(_dependenciesForTagAny.Select(i => i.Value.Keys)).Distinct();
             }
         }
 
         [MethodImpl((MethodImplOptions) 256)]
-        private void Register<TKey>(FullKey originalKey, TKey key, int hashCode, [NotNull] RegistrationEntry registrationEntry, [NotNull] ref Table<TKey, RegistrationEntry> entries)
+        private void Register<TKey>(FullKey originalKey, TKey key, int hashCode, [NotNull] DependencyEntry dependencyEntry, [NotNull] ref Table<TKey, DependencyEntry> entries)
         {
-            entries = entries.Set(hashCode, key, registrationEntry);
-            ResetResolvers();
-            _allKeys = null;
-            _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Registration, originalKey));
+            entries = entries.Set(hashCode, key, dependencyEntry);
+            _eventSubject.OnNext(new ContainerEvent(this, EventType.DependencyRegistration, originalKey));
         }
 
         [MethodImpl((MethodImplOptions) 256)]
-        private bool TryUnregister<TKey>(FullKey originalKey, TKey key, [NotNull] ref Table<TKey, RegistrationEntry> entries)
+        private bool TryUnregister<TKey>(FullKey originalKey, TKey key, [NotNull] ref Table<TKey, DependencyEntry> entries)
         {
             entries = entries.Remove(key.GetHashCode(), key, out var unregistered);
             if (!unregistered)
@@ -1540,16 +1527,8 @@ namespace IoC
                 return false;
             }
 
-            _allKeys = null;
-            _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Unregistration, originalKey));
+            _eventSubject.OnNext(new ContainerEvent(this, EventType.DependencyUnregistration, originalKey));
             return true;
-        }
-
-        [MethodImpl((MethodImplOptions) 256)]
-        private void ResetResolvers()
-        {
-            Resolvers = Table<FullKey, ResolverDelegate>.Empty;
-            ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
         }
 
         [MethodImpl((MethodImplOptions) 256)]
@@ -1567,12 +1546,12 @@ namespace IoC
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        private bool TryGetRegistrationEntry(FullKey key, int hashCode, out RegistrationEntry registrationEntry)
+        private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)
         {
-            lock (_lockObject)
+            lock (_eventSubject)
             {
-                registrationEntry = _registrationEntries.Get(hashCode, key);
-                if (registrationEntry != default(RegistrationEntry))
+                dependencyEntry = _dependencies.Get(hashCode, key);
+                if (dependencyEntry != default(DependencyEntry))
                 {
                     return true;
                 }
@@ -1583,21 +1562,21 @@ namespace IoC
                 {
                     var genericType = typeDescriptor.GetGenericTypeDefinition();
                     var genericKey = new FullKey(genericType, key.Tag);
-                    registrationEntry = _registrationEntries.Get(genericKey.GetHashCode(), genericKey);
-                    if (registrationEntry != default(RegistrationEntry))
+                    dependencyEntry = _dependencies.Get(genericKey.GetHashCode(), genericKey);
+                    if (dependencyEntry != default(DependencyEntry))
                     {
                         return true;
                     }
 
-                    registrationEntry = _registrationEntriesForTagAny.GetByRef(genericType.GetHashCode(), genericType);
-                    if (registrationEntry != default(RegistrationEntry))
+                    dependencyEntry = _dependenciesForTagAny.GetByRef(genericType.GetHashCode(), genericType);
+                    if (dependencyEntry != default(DependencyEntry))
                     {
                         return true;
                     }
                 }
 
-                registrationEntry = _registrationEntriesForTagAny.GetByRef(type.GetHashCode(), type);
-                return registrationEntry != default(RegistrationEntry);
+                dependencyEntry = _dependenciesForTagAny.GetByRef(type.GetHashCode(), type);
+                return dependencyEntry != default(DependencyEntry);
             }
         }
 
@@ -1657,22 +1636,6 @@ namespace IoC
             Container = container ?? throw new ArgumentNullException(nameof(container));
             EventTypeType = eventTypeType;
             Key = key;
-        }
-
-        /// <summary>
-        /// The types of event.
-        /// </summary>
-        public enum EventType
-        {
-            /// <summary>
-            /// A new registration was created.
-            /// </summary>
-            Registration,
-
-            /// <summary>
-            /// The registration was removed.
-            /// </summary>
-            Unregistration,
         }
     }
 }
@@ -1748,6 +1711,28 @@ namespace IoC
 
 
 #endregion
+#region EventType
+
+namespace IoC
+{
+    /// <summary>
+    /// The types of event.
+    /// </summary>
+    public enum EventType
+    {
+        /// <summary>
+        /// The dependency was registered.
+        /// </summary>
+        DependencyRegistration,
+
+        /// <summary>
+        /// The dependency was unregistered.
+        /// </summary>
+        DependencyUnregistration,
+    }
+}
+
+#endregion
 #region Fluent
 
 namespace IoC
@@ -1774,7 +1759,7 @@ namespace IoC
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return parent.GetResolver<IContainer>(WellknownContainers.Child.AsTag())(parent, name);
+            return parent.GetResolver<IContainer>(WellknownContainers.NewChild.AsTag())(parent, name);
         }
 
         [MethodImpl((MethodImplOptions)256)]
@@ -2076,13 +2061,13 @@ namespace IoC
         /// <param name="binding">The binding token.</param>
         /// <param name="type">The instance type.</param>
         /// <param name="autowiringStrategy">The optional autowring strategy.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable To([NotNull] this IBinding<object> binding, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(type, autowiringStrategy)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowringDependency(type, autowiringStrategy)));
         }
 
         /// <summary>
@@ -2091,13 +2076,13 @@ namespace IoC
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="binding">The binding token.</param>
         /// <param name="autowiringStrategy">The optional autowring strategy.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(TypeDescriptor<T>.Type, autowiringStrategy)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowringDependency(TypeDescriptor<T>.Type, autowiringStrategy)));
         }
 
         /// <summary>
@@ -2107,7 +2092,7 @@ namespace IoC
         /// <param name="binding">The binding token.</param>
         /// <param name="factory">The expression to create an instance.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable To<T>(
@@ -2117,20 +2102,20 @@ namespace IoC
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new AutowringDependency(factory, statements)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new AutowringDependency(factory, statements)));
         }
 
         /// <summary>
-        /// Puts the registration token to the target contaier to manage it.
+        /// Puts the dependency token into the target contaier to manage it.
         /// </summary>
-        /// <param name="registrationToken"></param>
+        /// <param name="dependencyToken"></param>
         [MethodImpl((MethodImplOptions)256)]
-        public static IContainer ToSelf([NotNull] this IDisposable registrationToken)
+        public static IContainer ToSelf([NotNull] this IDisposable dependencyToken)
         {
-            if (registrationToken == null) throw new ArgumentNullException(nameof(registrationToken));
-            if (registrationToken is RegistrationToken token)
+            if (dependencyToken == null) throw new ArgumentNullException(nameof(dependencyToken));
+            if (dependencyToken is DependencyToken token)
             {
-                token.Container.Resolve<IResourceStore>().AddResource(registrationToken);
+                token.Container.RegisterResource(dependencyToken);
                 return token.Container;
             }
 
@@ -2139,7 +2124,7 @@ namespace IoC
 
         [NotNull]
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        private static IDisposable CreateRegistration<T>([NotNull] this IBinding<T> binding, [NotNull] IDependency dependency)
+        private static IDisposable CreateDependency<T>([NotNull] this IBinding<T> binding, [NotNull] IDependency dependency)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
@@ -2150,8 +2135,8 @@ namespace IoC
                 from tag in tags
                 select new Key(type, tag);
 
-            return binding.Container.TryRegister(keys, dependency, binding.Lifetime, out var registrationToken)
-                ? registrationToken
+            return binding.Container.TryRegisterDependency(keys, dependency, binding.Lifetime, out var dependencyToken)
+                ? dependencyToken
                 : binding.Container.GetIssueResolver().CannotRegister(binding.Container, keys.ToArray());
         }
     }
@@ -2179,7 +2164,7 @@ namespace IoC
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="configurationText">The text configurations.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [NotNull]
         public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
         {
@@ -2194,7 +2179,7 @@ namespace IoC
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="configurationStreams">The set of streams with text configurations.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [NotNull]
         public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
         {
@@ -2209,7 +2194,7 @@ namespace IoC
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="configurationReaders">The set of text readers with text configurations.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [NotNull]
         public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
         {
@@ -2269,7 +2254,7 @@ namespace IoC
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [NotNull]
         public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations)
         {
@@ -2283,7 +2268,7 @@ namespace IoC
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [NotNull]
         public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
@@ -2305,7 +2290,7 @@ namespace IoC
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
             if (configurations.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurations));
-            container.Resolve<IResourceStore>().AddResource(container.Apply(configurations));
+            container.RegisterResource(container.Apply(configurations));
             return container;
         }
 
@@ -2479,6 +2464,9 @@ namespace IoC
     [PublicAPI]
     public static class FluentNativeResolve
     {
+        // ReSharper disable once RedundantNameQualifier
+        private static readonly object[] EmptyArgs = Core.CollectionExtensions.EmptyArray<object>();
+
         /// <summary>
         /// Resolves an instance.
         /// </summary>
@@ -2490,7 +2478,7 @@ namespace IoC
         public static T Resolve<T>([NotNull] this Container container)
         {
             return ((Resolver<T>)container.ResolversByType.GetByRef(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
-                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, Container.EmptyArgs);
+                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, EmptyArgs);
         }
 
         /// <summary>
@@ -2506,7 +2494,7 @@ namespace IoC
         {
             var key = new Key(TypeDescriptor<T>.Type, tag);
             return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
-                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, Container.EmptyArgs);
+                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, EmptyArgs);
         }
 
         /// <summary>
@@ -2553,7 +2541,7 @@ namespace IoC
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type)
         {
             return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), type)
-                    ?? container.GetResolver<T>(type))(container, Container.EmptyArgs);
+                    ?? container.GetResolver<T>(type))(container, EmptyArgs);
         }
 
         /// <summary>
@@ -2570,7 +2558,7 @@ namespace IoC
         {
             var key = new Key(type, tag);
             return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
-                    ?? container.GetResolver<T>(type, tag))(container, Container.EmptyArgs);
+                    ?? container.GetResolver<T>(type, tag))(container, EmptyArgs);
         }
 
         /// <summary>
@@ -2624,7 +2612,7 @@ namespace IoC
     using Extensibility;
 
     /// <summary>
-    /// Represents extensions for registration in a container.
+    /// Represents extensions to register a dependency in a container.
     /// </summary>
     [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
     [PublicAPI]
@@ -2639,7 +2627,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
@@ -2653,7 +2641,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T, T1>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
@@ -2669,7 +2657,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T, T1, T2>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
@@ -2686,7 +2674,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
@@ -2704,7 +2692,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
@@ -2723,7 +2711,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
@@ -2743,7 +2731,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6
@@ -2763,7 +2751,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
@@ -2785,7 +2773,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
@@ -2801,7 +2789,7 @@ namespace IoC
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
@@ -2817,7 +2805,7 @@ namespace IoC
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T, T1>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
@@ -2835,7 +2823,7 @@ namespace IoC
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T, T1, T2>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
@@ -2854,7 +2842,7 @@ namespace IoC
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
@@ -2874,7 +2862,7 @@ namespace IoC
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
@@ -2895,7 +2883,7 @@ namespace IoC
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
@@ -2917,7 +2905,7 @@ namespace IoC
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
@@ -2940,7 +2928,7 @@ namespace IoC
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
@@ -2964,7 +2952,7 @@ namespace IoC
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
@@ -2992,8 +2980,8 @@ namespace IoC
                 from tag in tags ?? DefaultTags
                 select new Key(type, tag);
 
-            return container.TryRegister(keys, dependency, lifetime, out var registrationToken) 
-                ? registrationToken
+            return container.TryRegisterDependency(keys, dependency, lifetime, out var dependencyToken) 
+                ? dependencyToken
                 : container.Resolve<IIssueResolver>().CannotRegister(container, keys.ToArray());
         }
     }
@@ -3256,7 +3244,7 @@ namespace IoC
         /// Apply the configuration for the target container.
         /// </summary>
         /// <param name="container">The target container.</param>
-        /// <returns>The enumeration of registration tokens.</returns>
+        /// <returns>The enumeration of dependency tokens.</returns>
         [NotNull][ItemNotNull] IEnumerable<IDisposable> Apply([NotNull] IContainer container);
     }
 }
@@ -3269,12 +3257,13 @@ namespace IoC
 {
     using System;
     using System.Collections.Generic;
+    using Core;
 
     /// <summary>
     /// The Inversion of Control container.
     /// </summary>
     [PublicAPI]
-    public interface IContainer: IEnumerable<IEnumerable<Key>>, IObservable<ContainerEvent>, IDisposable
+    public interface IContainer: IEnumerable<IEnumerable<Key>>, IObservable<ContainerEvent>, IResourceRegistry
     {
         /// <summary>
         /// The parent container or null if it has no a parent.
@@ -3282,17 +3271,17 @@ namespace IoC
         [CanBeNull] IContainer Parent { get; }
 
         /// <summary>
-        /// Tries registering the binding to the target container.
+        /// Tries registering the dependency with lifetime.
         /// </summary>
         /// <param name="keys">The set of keys to register.</param>
         /// <param name="dependency">The dependency.</param>
         /// <param name="lifetime">The lifetime.</param>
-        /// <param name="registrationToken">The registration token.</param>
+        /// <param name="dependencyToken">The deoendency token.</param>
         /// <returns>True if successful.</returns>
-        bool TryRegister([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IDisposable registrationToken);
+        bool TryRegisterDependency([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IDisposable dependencyToken);
 
         /// <summary>
-        /// Tries getting the dependency and the its lifetime.
+        /// Tries getting the dependency with lifetime.
         /// </summary>
         /// <param name="key">The key to get a dependency.</param>
         /// <param name="dependency">The dependency.</param>
@@ -3357,10 +3346,10 @@ namespace IoC
     public interface ILifetime: IExpressionBuilder<object>
     {
         /// <summary>
-        /// Clone this lifetime to use with generic instances.
+        /// Creates the similar lifetime to use with generic instances.
         /// </summary>
         /// <returns></returns>
-        ILifetime Clone();
+        ILifetime Create();
     }
 }
 
@@ -3473,6 +3462,34 @@ namespace IoC
 
 
 #endregion
+#region IResourceRegistry
+
+namespace IoC.Core
+{
+    using System;
+
+    /// <summary>
+    /// Represents the resource's registry.
+    /// </summary>
+    [PublicAPI]
+    public interface IResourceRegistry: IDisposable
+    {
+        /// <summary>
+        /// Registers a resource to the registry.
+        /// </summary>
+        /// <param name="resource">The target resource.</param>
+        void RegisterResource([NotNull] IDisposable resource);
+
+        /// <summary>
+        /// Unregisters a resource from the registry.
+        /// </summary>
+        /// <param name="resource">The target resource.</param>
+        void UnregisterResource([NotNull] IDisposable resource);
+    }
+}
+
+
+#endregion
 #region Key
 
 namespace IoC
@@ -3566,7 +3583,7 @@ namespace IoC
         Transient = 1,
 
         /// <summary>
-        /// Single instance per registration
+        /// Single instance per dependency
         /// </summary>
         Singleton = 2,
 
@@ -3718,19 +3735,14 @@ namespace IoC
     public enum WellknownContainers
     {
         /// <summary>
-        /// Current container.
-        /// </summary>
-        Current = 1,
-
-        /// <summary>
         /// Parent container.
         /// </summary>
-        Parent = 2,
+        Parent = 1,
 
         /// <summary>
         /// Creates new child container.
         /// </summary>
-        Child = 3
+        NewChild = 2
     }
 }
 
@@ -3922,7 +3934,7 @@ namespace IoC.Features
             if (ctx.Args.Length != 1)
             {
                 // ReSharper disable once NotResolvedInText
-                throw new ArgumentOutOfRangeException("Should have one argument.");
+                throw new ArgumentOutOfRangeException("Should have single argument.");
             }
 
             TextReader reader;
@@ -3992,17 +4004,18 @@ namespace IoC.Features
             yield return container.Register(ctx => new Scope(createScopeId()));
 
             // Containers
-            yield return container.Register(ctx => ctx.Container, null, new object[] { null, WellknownContainers.Current } );
+            // Current
+            yield return container.Register<IContainer, IResourceRegistry, IObservable<ContainerEvent>>(ctx => ctx.Container);
+            // New child
             yield return container.Register<IContainer>(
                 ctx => new Container(
                     ctx.Args.Length == 1
                         ? Container.CreateContainerName(ctx.Args[0] as string)
                         : Container.CreateContainerName(string.Empty), ctx.Container, false),
                 null,
-                new object[] { WellknownContainers.Child });
-            
+                new object[] { WellknownContainers.NewChild });
+            // Parent
             yield return container.Register(ctx => ctx.Container.Parent, null, new object[] { WellknownContainers.Parent });
-            yield return container.Register(ctx => (IResourceStore)ctx.Container.Inject<IContainer>(WellknownContainers.Current));
         }
     }
 }
@@ -4402,14 +4415,14 @@ namespace IoC.Lifetimes
         public override string ToString() => Lifetime.ContainerSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Clone() => new ContainerSingletonLifetime();
+        public override ILifetime Create() => new ContainerSingletonLifetime();
 
         /// <inheritdoc />
         protected override T OnNewInstanceCreated<T>(T newInstance, IContainer targetContainer, IContainer container, object[] args)
         {
-            if (newInstance is IDisposable disposable && targetContainer is IResourceStore resourceStore)
+            if (newInstance is IDisposable disposable)
             {
-                resourceStore.AddResource(disposable);
+                targetContainer.RegisterResource(disposable);
             }
 
             return newInstance;
@@ -4420,11 +4433,7 @@ namespace IoC.Lifetimes
         {
             if (releasedInstance is IDisposable disposable)
             {
-                if (targetContainer is IResourceStore resourceStore)
-                {
-                    resourceStore.RemoveResource(disposable);
-                }
-
+                targetContainer.UnregisterResource(disposable);
                 disposable.Dispose();
             }
         }
@@ -4535,7 +4544,7 @@ namespace IoC.Lifetimes
         }
 
         /// <inheritdoc />
-        public abstract ILifetime Clone();
+        public abstract ILifetime Create();
 
         /// <summary>
         /// Creates key for singleton.
@@ -4590,7 +4599,7 @@ namespace IoC.Lifetimes
         public override string ToString() => Lifetime.ScopeSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Clone() => new ScopeSingletonLifetime();
+        public override ILifetime Create() => new ScopeSingletonLifetime();
 
         /// <inheritdoc />
         protected override T OnNewInstanceCreated<T>(T newInstance, Scope scope, IContainer container, object[] args)
@@ -4682,7 +4691,7 @@ namespace IoC.Lifetimes
         }
 
         /// <inheritdoc />
-        public ILifetime Clone() => new SingletonLifetime();
+        public ILifetime Create() => new SingletonLifetime();
 
         /// <inheritdoc />
         public override string ToString() => Lifetime.Singleton.ToString();
@@ -4856,7 +4865,7 @@ namespace IoC.Extensibility
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="keys">The set of binding keys.</param>
-        /// <returns>The registration tiken.</returns>
+        /// <returns>The dependency token.</returns>
         [NotNull] IDisposable CannotRegister([NotNull] IContainer container, [NotNull] Key[] keys);
 
         /// <summary>
@@ -5651,6 +5660,141 @@ namespace IoC.Core
 
 
 #endregion
+#region DependencyEntry
+
+namespace IoC.Core
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Runtime.CompilerServices;
+    using Extensibility;
+
+    internal sealed class DependencyEntry : IDisposable
+    {
+        [NotNull] internal readonly IDependency Dependency;
+        [CanBeNull] private readonly ILifetime _lifetime;
+        [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
+        [NotNull] public readonly IEnumerable<Key> Keys;
+        private readonly object _lockObject = new object();
+        private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
+        private bool _disposed;
+
+        public DependencyEntry(
+            [NotNull] IDependency dependency,
+            [CanBeNull] ILifetime lifetime,
+            [NotNull] IDisposable resource,
+            [NotNull] IEnumerable<Key> keys)
+        {
+            Dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
+            _lifetime = lifetime;
+            _resources.Add(resource ?? throw new ArgumentNullException(nameof(resource)));
+            Keys = keys ?? throw new ArgumentNullException(nameof(keys));
+            if (lifetime is IDisposable disposableLifetime)
+            {
+                _resources.Add(disposableLifetime);
+            }
+        }
+
+        public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver, out Exception error)
+        {
+            var typeDescriptor = key.Type.Descriptor();
+            var compiler = container.GetExpressionCompiler();
+            var buildContext = new BuildContext(compiler, key, container, _resources);
+            if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression, out error))
+            {
+                resolver = default(Delegate);
+                return false;
+            }
+
+            var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, WellknownExpressions.ResolverParameters);
+            resolver = compiler.Compile(resolverExpression);
+            error = default(Exception);
+            return true;
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        [CanBeNull]
+        public ILifetime GetLifetime([NotNull] Type type)
+        {
+            return GetLifetime(type.Descriptor());
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        [CanBeNull]
+        private ILifetime GetLifetime(TypeDescriptor typeDescriptor)
+        {
+            if (_lifetime == null)
+            {
+                return null;
+            }
+            
+            if (!typeDescriptor.IsConstructedGenericType())
+            {
+                return _lifetime;
+            }
+
+            var lifetimeKey = new LifetimeKey(typeDescriptor.GetGenericTypeArguments());
+            ILifetime lifetime;
+            lock (_lockObject)
+            {
+                if (!_lifetimes.TryGetValue(lifetimeKey, out lifetime))
+                {
+                    lifetime = _lifetime.Create();
+                    _lifetimes.Add(lifetimeKey, lifetime);
+                }
+            }
+
+            return lifetime;
+        }
+
+        public void Dispose()
+        {
+            lock(_lockObject)
+            {
+                if (_disposed)
+                {
+                    return;
+                }
+                
+                _disposed = true;
+            }
+            
+            foreach (var resource in _resources)
+            {
+                resource.Dispose();
+            }
+            
+            foreach (var lifetime in _lifetimes.Values)
+            {
+                if (lifetime is IDisposable disposableLifetime)
+                {
+                    disposableLifetime.Dispose();
+                }
+            }
+        }
+
+        public override string ToString()
+            => $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {_lifetime?.ToString() ?? Lifetime.Transient.ToString()}";
+
+        private struct LifetimeKey
+        {
+            private readonly Type[] _genericTypes;
+
+            public LifetimeKey(Type[] genericTypes) => _genericTypes = genericTypes;
+
+            public override bool Equals(object obj) => obj is LifetimeKey key && Equals(key);
+
+            public override int GetHashCode() => _genericTypes != null ? _genericTypes.GetHash() : 0;
+
+            private bool Equals(LifetimeKey other) => CollectionExtensions.SequenceEqual(_genericTypes, other._genericTypes);
+        }
+    }
+}
+
+
+#endregion
 #region DependencyInjectionExpressionBuilder
 
 namespace IoC.Core
@@ -5965,6 +6109,31 @@ namespace IoC.Core
         }
 
         private delegate IContainer ContainerSelector(IContainer container);
+    }
+}
+
+
+#endregion
+#region DependencyToken
+
+namespace IoC.Core
+{
+    using System;
+    using System.Runtime.CompilerServices;
+
+    internal struct DependencyToken: IDisposable
+    {
+        [NotNull] internal readonly IContainer Container;
+        [NotNull] private readonly IDisposable _dependencyToken;
+
+        public DependencyToken([NotNull] IContainer container, [NotNull] IDisposable dependencyToken)
+        {
+            Container = container ?? throw new ArgumentNullException(nameof(container));
+            _dependencyToken = dependencyToken ?? throw new ArgumentNullException(nameof(dependencyToken));
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        public void Dispose() => _dependencyToken.Dispose();
     }
 }
 
@@ -6369,22 +6538,6 @@ namespace IoC.Core
 
 
 #endregion
-#region IResourceStore
-
-namespace IoC.Core
-{
-    using System;
-
-    internal interface IResourceStore: IDisposable
-    {
-        void AddResource([NotNull] IDisposable resource);
-
-        void RemoveResource([NotNull] IDisposable resource);
-    }
-}
-
-
-#endregion
 #region IssueResolver
 
 namespace IoC.Core
@@ -6576,7 +6729,7 @@ namespace IoC.Core
 
         public IContainer Parent => throw new NotSupportedException();
 
-        public bool TryRegister(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
+        public bool TryRegisterDependency(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IDisposable dependencyToken)
             => throw NotSupportedException;
 
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
@@ -6593,6 +6746,11 @@ namespace IoC.Core
             return false;
         }
 
+
+        public void RegisterResource(IDisposable resource) { }
+
+        public void UnregisterResource(IDisposable resource) { }
+
         public void Dispose() { }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
@@ -6604,166 +6762,6 @@ namespace IoC.Core
         public override string ToString() => string.Empty;
     }
 }
-
-#endregion
-#region RegistrationEntry
-
-namespace IoC.Core
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Runtime.CompilerServices;
-    using Extensibility;
-
-    internal sealed class RegistrationEntry : IDisposable
-    {
-        [NotNull] internal readonly IDependency Dependency;
-        [CanBeNull] private readonly ILifetime _lifetime;
-        [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
-        [NotNull] public readonly IEnumerable<Key> Keys;
-        private readonly object _lockObject = new object();
-        private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
-        private bool _disposed;
-
-        public RegistrationEntry(
-            [NotNull] IDependency dependency,
-            [CanBeNull] ILifetime lifetime,
-            [NotNull] IDisposable resource,
-            [NotNull] IEnumerable<Key> keys)
-        {
-            Dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
-            _lifetime = lifetime;
-            _resources.Add(resource ?? throw new ArgumentNullException(nameof(resource)));
-            Keys = keys ?? throw new ArgumentNullException(nameof(keys));
-            if (lifetime is IDisposable disposableLifetime)
-            {
-                _resources.Add(disposableLifetime);
-            }
-        }
-
-        public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver, out Exception error)
-        {
-            var typeDescriptor = key.Type.Descriptor();
-            var compiler = container.GetExpressionCompiler();
-            var buildContext = new BuildContext(compiler, key, container, _resources);
-            if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression, out error))
-            {
-                resolver = default(Delegate);
-                return false;
-            }
-
-            var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, WellknownExpressions.ResolverParameters);
-            resolver = compiler.Compile(resolverExpression);
-            error = default(Exception);
-            return true;
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        [CanBeNull]
-        public ILifetime GetLifetime([NotNull] Type type)
-        {
-            return GetLifetime(type.Descriptor());
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        [CanBeNull]
-        private ILifetime GetLifetime(TypeDescriptor typeDescriptor)
-        {
-            if (_lifetime == null)
-            {
-                return null;
-            }
-            
-            if (!typeDescriptor.IsConstructedGenericType())
-            {
-                return _lifetime;
-            }
-
-            var lifetimeKey = new LifetimeKey(typeDescriptor.GetGenericTypeArguments());
-            ILifetime lifetime;
-            lock (_lockObject)
-            {
-                if (!_lifetimes.TryGetValue(lifetimeKey, out lifetime))
-                {
-                    lifetime = _lifetime.Clone();
-                    _lifetimes.Add(lifetimeKey, lifetime);
-                }
-            }
-
-            return lifetime;
-        }
-
-        public void Dispose()
-        {
-            lock(_lockObject)
-            {
-                if (_disposed)
-                {
-                    return;
-                }
-                
-                _disposed = true;
-            }
-            
-            foreach (var resource in _resources)
-            {
-                resource.Dispose();
-            }
-            
-            foreach (var lifetime in _lifetimes.Values)
-            {
-                if (lifetime is IDisposable disposableLifetime)
-                {
-                    disposableLifetime.Dispose();
-                }
-            }
-        }
-
-        public override string ToString()
-            => $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {_lifetime?.ToString() ?? Lifetime.Transient.ToString()}";
-
-        private struct LifetimeKey
-        {
-            private readonly Type[] _genericTypes;
-
-            public LifetimeKey(Type[] genericTypes) => _genericTypes = genericTypes;
-
-            public override bool Equals(object obj) => obj is LifetimeKey key && Equals(key);
-
-            public override int GetHashCode() => _genericTypes != null ? _genericTypes.GetHash() : 0;
-
-            private bool Equals(LifetimeKey other) => CollectionExtensions.SequenceEqual(_genericTypes, other._genericTypes);
-        }
-    }
-}
-
-
-#endregion
-#region RegistrationToken
-
-namespace IoC.Core
-{
-    using System;
-    using System.Runtime.CompilerServices;
-
-    internal struct RegistrationToken: IDisposable
-    {
-        [NotNull] internal readonly IContainer Container;
-        [NotNull] private readonly IDisposable _registration;
-
-        public RegistrationToken([NotNull] IContainer container, [NotNull] IDisposable registration)
-        {
-            Container = container ?? throw new ArgumentNullException(nameof(container));
-            _registration = registration ?? throw new ArgumentNullException(nameof(registration));
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        public void Dispose() => _registration.Dispose();
-    }
-}
-
 
 #endregion
 #region Subject
@@ -8663,10 +8661,10 @@ namespace IoC.Core.Configuration
             {
                 return
                     from binding in context.Bindings
-                    let registration = binding.Tags.Aggregate(
+                    let curBinding = binding.Tags.Aggregate(
                         container.Bind(binding.Types).As(binding.Lifetime),
                         (current, tag) => current.Tag(tag))
-                    select registration.As(binding.Lifetime).To(binding.InstanceType);
+                    select curBinding.As(binding.Lifetime).To(binding.InstanceType);
             }
 
             return Enumerable.Empty<IDisposable>();

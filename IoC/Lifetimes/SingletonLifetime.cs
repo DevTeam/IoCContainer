@@ -61,7 +61,7 @@
         }
 
         /// <inheritdoc />
-        public ILifetime Clone() => new SingletonLifetime();
+        public ILifetime Create() => new SingletonLifetime();
 
         /// <inheritdoc />
         public override string ToString() => Lifetime.Singleton.ToString();

@@ -38,7 +38,7 @@
             if (ctx.Args.Length != 1)
             {
                 // ReSharper disable once NotResolvedInText
-                throw new ArgumentOutOfRangeException("Should have one argument.");
+                throw new ArgumentOutOfRangeException("Should have single argument.");
             }
 
             TextReader reader;

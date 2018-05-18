@@ -33,7 +33,7 @@
             public Expression Build(Expression expression, IBuildContext buildContext, object state = default(object))
                 => expression;
 
-            public ILifetime Clone() => new MyTransientLifetime();
+            public ILifetime Create() => new MyTransientLifetime();
         }
         // }
     }

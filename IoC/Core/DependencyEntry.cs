@@ -7,7 +7,7 @@
     using System.Runtime.CompilerServices;
     using Extensibility;
 
-    internal sealed class RegistrationEntry : IDisposable
+    internal sealed class DependencyEntry : IDisposable
     {
         [NotNull] internal readonly IDependency Dependency;
         [CanBeNull] private readonly ILifetime _lifetime;
@@ -17,7 +17,7 @@
         private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
         private bool _disposed;
 
-        public RegistrationEntry(
+        public DependencyEntry(
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource,
@@ -77,7 +77,7 @@
             {
                 if (!_lifetimes.TryGetValue(lifetimeKey, out lifetime))
                 {
-                    lifetime = _lifetime.Clone();
+                    lifetime = _lifetime.Create();
                     _lifetimes.Add(lifetimeKey, lifetime);
                 }
             }

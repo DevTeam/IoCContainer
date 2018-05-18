@@ -22,7 +22,7 @@
         {
             if (parent == null) throw new ArgumentNullException(nameof(parent));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return parent.GetResolver<IContainer>(WellknownContainers.Child.AsTag())(parent, name);
+            return parent.GetResolver<IContainer>(WellknownContainers.NewChild.AsTag())(parent, name);
         }
 
         [MethodImpl((MethodImplOptions)256)]

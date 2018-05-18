@@ -13,7 +13,7 @@
         /// Apply the configuration for the target container.
         /// </summary>
         /// <param name="container">The target container.</param>
-        /// <returns>The enumeration of registration tokens.</returns>
+        /// <returns>The enumeration of dependency tokens.</returns>
         [NotNull][ItemNotNull] IEnumerable<IDisposable> Apply([NotNull] IContainer container);
     }
 }

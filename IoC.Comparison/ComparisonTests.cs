@@ -215,7 +215,7 @@ namespace IoC.Comparison
             {
                 using (performanceCounter.Run())
                 {
-                    container.TryGetResolver<IService1>(typeof(IService1), null, out var resolver, out var error);
+                    container.TryGetResolver<IService1>(typeof(IService1), null, out var resolver, out _);
                     for (var i = 0; i < series; i++)
                     {
                         resolver(container).DoSomething();
@@ -234,7 +234,7 @@ namespace IoC.Comparison
             {
                 using (performanceCounter.Run())
                 {
-                    container.TryGetResolver<IService1>(typeof(IService1), null, out var resolver, out var error);
+                    container.TryGetResolver<IService1>(typeof(IService1), null, out var resolver, out _);
                     for (var i = 0; i < series; i++)
                     {
                         resolver(container).DoSomething();

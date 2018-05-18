@@ -14,7 +14,7 @@
 
         public IContainer Parent => throw new NotSupportedException();
 
-        public bool TryRegister(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
+        public bool TryRegisterDependency(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IDisposable dependencyToken)
             => throw NotSupportedException;
 
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
@@ -30,6 +30,11 @@
             error = NotSupportedException;
             return false;
         }
+
+
+        public void RegisterResource(IDisposable resource) { }
+
+        public void UnregisterResource(IDisposable resource) { }
 
         public void Dispose() { }
 

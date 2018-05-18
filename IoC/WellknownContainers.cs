@@ -7,18 +7,13 @@
     public enum WellknownContainers
     {
         /// <summary>
-        /// Current container.
-        /// </summary>
-        Current = 1,
-
-        /// <summary>
         /// Parent container.
         /// </summary>
-        Parent = 2,
+        Parent = 1,
 
         /// <summary>
         /// Creates new child container.
         /// </summary>
-        Child = 3
+        NewChild = 2
     }
 }

@@ -26,10 +26,10 @@
             {
                 return
                     from binding in context.Bindings
-                    let registration = binding.Tags.Aggregate(
+                    let curBinding = binding.Tags.Aggregate(
                         container.Bind(binding.Types).As(binding.Lifetime),
                         (current, tag) => current.Tag(tag))
-                    select registration.As(binding.Lifetime).To(binding.InstanceType);
+                    select curBinding.As(binding.Lifetime).To(binding.InstanceType);
             }
 
             return Enumerable.Empty<IDisposable>();

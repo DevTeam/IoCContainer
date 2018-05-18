@@ -98,7 +98,7 @@
         }
 
         /// <inheritdoc />
-        public abstract ILifetime Clone();
+        public abstract ILifetime Create();
 
         /// <summary>
         /// Creates key for singleton.

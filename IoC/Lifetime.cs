@@ -12,7 +12,7 @@
         Transient = 1,
 
         /// <summary>
-        /// Single instance per registration
+        /// Single instance per dependency
         /// </summary>
         Singleton = 2,
 

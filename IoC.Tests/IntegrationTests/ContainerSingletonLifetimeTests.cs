@@ -74,7 +74,7 @@
         }
 
         [Fact]
-        public void ContainerShouldDiposeWhenRegistrationTokenDisposed()
+        public void ContainerShouldDiposeWhenDependencyTokenDisposed()
         {
             // Given
             using (var container = Container.Create())

@@ -10,6 +10,9 @@
     [PublicAPI]
     public static class FluentNativeResolve
     {
+        // ReSharper disable once RedundantNameQualifier
+        private static readonly object[] EmptyArgs = Core.CollectionExtensions.EmptyArray<object>();
+
         /// <summary>
         /// Resolves an instance.
         /// </summary>
@@ -21,7 +24,7 @@
         public static T Resolve<T>([NotNull] this Container container)
         {
             return ((Resolver<T>)container.ResolversByType.GetByRef(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
-                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, Container.EmptyArgs);
+                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, EmptyArgs);
         }
 
         /// <summary>
@@ -37,7 +40,7 @@
         {
             var key = new Key(TypeDescriptor<T>.Type, tag);
             return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
-                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, Container.EmptyArgs);
+                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, EmptyArgs);
         }
 
         /// <summary>
@@ -84,7 +87,7 @@
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type)
         {
             return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), type)
-                    ?? container.GetResolver<T>(type))(container, Container.EmptyArgs);
+                    ?? container.GetResolver<T>(type))(container, EmptyArgs);
         }
 
         /// <summary>
@@ -101,7 +104,7 @@
         {
             var key = new Key(type, tag);
             return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
-                    ?? container.GetResolver<T>(type, tag))(container, Container.EmptyArgs);
+                    ?? container.GetResolver<T>(type, tag))(container, EmptyArgs);
         }
 
         /// <summary>

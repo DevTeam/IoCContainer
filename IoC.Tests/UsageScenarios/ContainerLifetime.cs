@@ -35,11 +35,11 @@
                 }
             }
 
-            // Other lifetimes:
+            // Lifetimes:
             // Transient - A new instance each time (default)
+            // Singleton - Single instance per dependency
             // ContainerSingleton - Singleton per container
             // ScopeSingleton - Singleton per scope
-            // ThreadSingleton - Singleton per thread for NET 4.0+, .NET Core 1.0+, .NET Standard 2.0+
             // }
         }
     }

@@ -29,21 +29,5 @@
             EventTypeType = eventTypeType;
             Key = key;
         }
-
-        /// <summary>
-        /// The types of event.
-        /// </summary>
-        public enum EventType
-        {
-            /// <summary>
-            /// A new registration was created.
-            /// </summary>
-            Registration,
-
-            /// <summary>
-            /// The registration was removed.
-            /// </summary>
-            Unregistration,
-        }
     }
 }

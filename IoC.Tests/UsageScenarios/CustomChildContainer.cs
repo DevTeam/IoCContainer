@@ -20,7 +20,7 @@
             // Create a root container
             using (var container = Container.Create())
             // Configure the root container to use a custom container as a child container
-            using (container.Bind<IContainer>().Tag(WellknownContainers.Child).To<MyContainer>())
+            using (container.Bind<IContainer>().Tag(WellknownContainers.NewChild).To<MyContainer>())
             // Create the custom child container
             using (var childContainer = container.CreateChild("abc"))
             // Configure our container
@@ -42,14 +42,18 @@
 
             public IContainer Parent { get; }
 
-            public bool TryRegister(IEnumerable<Key> keys, IoC.IDependency dependency, ILifetime lifetime, out IDisposable registrationToken) 
-                => Parent.TryRegister(keys, dependency, lifetime, out registrationToken);
+            public bool TryRegisterDependency(IEnumerable<Key> keys, IoC.IDependency dependency, ILifetime lifetime, out IDisposable dependencyToken) 
+                => Parent.TryRegisterDependency(keys, dependency, lifetime, out dependencyToken);
 
             public bool TryGetDependency(Key key, out IoC.IDependency dependency, out ILifetime lifetime)
                 => Parent.TryGetDependency(key, out dependency, out lifetime);
 
             public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
                 => Parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer);
+
+            public void RegisterResource(IDisposable resource) { }
+
+            public void UnregisterResource(IDisposable resource) { }
 
             public void Dispose() { }
 

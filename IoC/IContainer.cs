@@ -2,12 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
+    using Core;
 
     /// <summary>
     /// The Inversion of Control container.
     /// </summary>
     [PublicAPI]
-    public interface IContainer: IEnumerable<IEnumerable<Key>>, IObservable<ContainerEvent>, IDisposable
+    public interface IContainer: IEnumerable<IEnumerable<Key>>, IObservable<ContainerEvent>, IResourceRegistry
     {
         /// <summary>
         /// The parent container or null if it has no a parent.
@@ -15,17 +16,17 @@
         [CanBeNull] IContainer Parent { get; }
 
         /// <summary>
-        /// Tries registering the binding to the target container.
+        /// Tries registering the dependency with lifetime.
         /// </summary>
         /// <param name="keys">The set of keys to register.</param>
         /// <param name="dependency">The dependency.</param>
         /// <param name="lifetime">The lifetime.</param>
-        /// <param name="registrationToken">The registration token.</param>
+        /// <param name="dependencyToken">The deoendency token.</param>
         /// <returns>True if successful.</returns>
-        bool TryRegister([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IDisposable registrationToken);
+        bool TryRegisterDependency([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IDisposable dependencyToken);
 
         /// <summary>
-        /// Tries getting the dependency and the its lifetime.
+        /// Tries getting the dependency with lifetime.
         /// </summary>
         /// <param name="key">The key to get a dependency.</param>
         /// <param name="dependency">The dependency.</param>

@@ -17,7 +17,7 @@
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="configurationText">The text configurations.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [NotNull]
         public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
         {
@@ -32,7 +32,7 @@
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="configurationStreams">The set of streams with text configurations.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [NotNull]
         public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
         {
@@ -47,7 +47,7 @@
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="configurationReaders">The set of text readers with text configurations.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [NotNull]
         public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
         {
@@ -107,7 +107,7 @@
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [NotNull]
         public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations)
         {
@@ -121,7 +121,7 @@
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [NotNull]
         public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
@@ -143,7 +143,7 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
             if (configurations.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurations));
-            container.Resolve<IResourceStore>().AddResource(container.Apply(configurations));
+            container.RegisterResource(container.Apply(configurations));
             return container;
         }
 

@@ -16,7 +16,7 @@
 
                 // When
                 using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
-                using (var childContainer = container.Resolve<IContainer>(WellknownContainers.Child.AsTag()))
+                using (var childContainer = container.Resolve<IContainer>(WellknownContainers.NewChild.AsTag()))
                 {
                     // Then
                     var actualInstance = childContainer.Resolve<IMyService>();
@@ -28,7 +28,6 @@
 #if !NET40
         [Theory]
         [InlineData(null)]
-        [InlineData(WellknownContainers.Current)]
         public void ContainerShouldResolveCurrentContainer(WellknownContainers? wellknownContainer)
         {
             // Given

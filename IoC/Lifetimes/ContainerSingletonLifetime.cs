@@ -16,14 +16,14 @@
         public override string ToString() => Lifetime.ContainerSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Clone() => new ContainerSingletonLifetime();
+        public override ILifetime Create() => new ContainerSingletonLifetime();
 
         /// <inheritdoc />
         protected override T OnNewInstanceCreated<T>(T newInstance, IContainer targetContainer, IContainer container, object[] args)
         {
-            if (newInstance is IDisposable disposable && targetContainer is IResourceStore resourceStore)
+            if (newInstance is IDisposable disposable)
             {
-                resourceStore.AddResource(disposable);
+                targetContainer.RegisterResource(disposable);
             }
 
             return newInstance;
@@ -34,11 +34,7 @@
         {
             if (releasedInstance is IDisposable disposable)
             {
-                if (targetContainer is IResourceStore resourceStore)
-                {
-                    resourceStore.RemoveResource(disposable);
-                }
-
+                targetContainer.UnregisterResource(disposable);
                 disposable.Dispose();
             }
         }

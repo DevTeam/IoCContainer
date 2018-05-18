@@ -243,13 +243,13 @@
         /// <param name="binding">The binding token.</param>
         /// <param name="type">The instance type.</param>
         /// <param name="autowiringStrategy">The optional autowring strategy.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable To([NotNull] this IBinding<object> binding, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(type, autowiringStrategy)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowringDependency(type, autowiringStrategy)));
         }
 
         /// <summary>
@@ -258,13 +258,13 @@
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="binding">The binding token.</param>
         /// <param name="autowiringStrategy">The optional autowring strategy.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(TypeDescriptor<T>.Type, autowiringStrategy)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowringDependency(TypeDescriptor<T>.Type, autowiringStrategy)));
         }
 
         /// <summary>
@@ -274,7 +274,7 @@
         /// <param name="binding">The binding token.</param>
         /// <param name="factory">The expression to create an instance.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The registration token.</returns>
+        /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable To<T>(
@@ -284,20 +284,20 @@
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new AutowringDependency(factory, statements)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new AutowringDependency(factory, statements)));
         }
 
         /// <summary>
-        /// Puts the registration token to the target contaier to manage it.
+        /// Puts the dependency token into the target contaier to manage it.
         /// </summary>
-        /// <param name="registrationToken"></param>
+        /// <param name="dependencyToken"></param>
         [MethodImpl((MethodImplOptions)256)]
-        public static IContainer ToSelf([NotNull] this IDisposable registrationToken)
+        public static IContainer ToSelf([NotNull] this IDisposable dependencyToken)
         {
-            if (registrationToken == null) throw new ArgumentNullException(nameof(registrationToken));
-            if (registrationToken is RegistrationToken token)
+            if (dependencyToken == null) throw new ArgumentNullException(nameof(dependencyToken));
+            if (dependencyToken is DependencyToken token)
             {
-                token.Container.Resolve<IResourceStore>().AddResource(registrationToken);
+                token.Container.RegisterResource(dependencyToken);
                 return token.Container;
             }
 
@@ -306,7 +306,7 @@
 
         [NotNull]
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        private static IDisposable CreateRegistration<T>([NotNull] this IBinding<T> binding, [NotNull] IDependency dependency)
+        private static IDisposable CreateDependency<T>([NotNull] this IBinding<T> binding, [NotNull] IDependency dependency)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
@@ -317,8 +317,8 @@
                 from tag in tags
                 select new Key(type, tag);
 
-            return binding.Container.TryRegister(keys, dependency, binding.Lifetime, out var registrationToken)
-                ? registrationToken
+            return binding.Container.TryRegisterDependency(keys, dependency, binding.Lifetime, out var dependencyToken)
+                ? dependencyToken
                 : binding.Container.GetIssueResolver().CannotRegister(binding.Container, keys.ToArray());
         }
     }

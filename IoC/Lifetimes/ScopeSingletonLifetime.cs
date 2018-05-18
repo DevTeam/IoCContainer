@@ -15,7 +15,7 @@
         public override string ToString() => Lifetime.ScopeSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Clone() => new ScopeSingletonLifetime();
+        public override ILifetime Create() => new ScopeSingletonLifetime();
 
         /// <inheritdoc />
         protected override T OnNewInstanceCreated<T>(T newInstance, Scope scope, IContainer container, object[] args)

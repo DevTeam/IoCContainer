@@ -23,25 +23,21 @@
     [PublicAPI]
     [DebuggerDisplay("Name = {" + nameof(ToString) + "()}")]
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
-    public sealed class Container: IContainer, IResourceStore, IObserver<ContainerEvent>
+    public sealed class Container: IContainer, IObserver<ContainerEvent>
     {
         private static long _containerId;
-
-        // ReSharper disable once RedundantNameQualifier
-        internal static readonly object[] EmptyArgs = Core.CollectionExtensions.EmptyArray<object>();
         [NotNull] private static readonly Lazy<Container> BasicRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.BasicSet), true);
         [NotNull] private static readonly Lazy<Container> DefultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.DefaultSet), true);
         [NotNull] private static readonly Lazy<Container> HighPerformanceRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.HighPerformanceSet), true);
-        [NotNull] private readonly object _lockObject = new object();
+
         [NotNull] private readonly IContainer _parent;
         [NotNull] private readonly string _name;
         [NotNull] private readonly Subject<ContainerEvent> _eventSubject = new Subject<ContainerEvent>();
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
-        [NotNull] private Table<FullKey, RegistrationEntry> _registrationEntries = Table<FullKey, RegistrationEntry>.Empty;
-        [NotNull] private Table<ShortKey, RegistrationEntry> _registrationEntriesForTagAny = Table<ShortKey, RegistrationEntry>.Empty;
+        [NotNull] private Table<FullKey, DependencyEntry> _dependencies = Table<FullKey, DependencyEntry>.Empty;
+        [NotNull] private Table<ShortKey, DependencyEntry> _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
         [NotNull] internal volatile Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
         [NotNull] internal volatile Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
-        private IEnumerable<FullKey>[] _allKeys;
 
         /// <summary>
         /// Creates a root container with default features.
@@ -101,16 +97,14 @@
             _name = $"{parent}/{name ?? throw new ArgumentNullException(nameof(name))}";
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
 
-            if (!(this is IResourceStore resourceStore))
-            {
-                throw new NotSupportedException();
-            }
-
             // Subscribe to events from the parent container
-            resourceStore.AddResource(_parent.Subscribe(_eventSubject));
+            RegisterResource(_parent.Subscribe(_eventSubject));
 
             // Subscribe to reset resolvers
-            resourceStore.AddResource(_eventSubject.Subscribe(this));
+            RegisterResource(_eventSubject.Subscribe(this));
+
+            // Register current container in the parent container.
+            _parent.RegisterResource(this);
         }
 
         /// <inheritdoc />
@@ -126,27 +120,27 @@
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public bool TryRegister(IEnumerable<FullKey> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
+        public bool TryRegisterDependency(IEnumerable<FullKey> keys, IDependency dependency, ILifetime lifetime, out IDisposable dependencyToken)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
             var isRegistered = true;
             var registeredKeys = new List<FullKey>();
-            var registrationEntry = new RegistrationEntry(dependency, lifetime, Disposable.Create(UnregisterKeys), registeredKeys);
+            var dependencyEntry = new DependencyEntry(dependency, lifetime, Disposable.Create(UnregisterKeys), registeredKeys);
 
             void UnregisterKeys()
             {
-                lock (_lockObject)
+                lock (_eventSubject)
                 {
                     foreach (var curKey in registeredKeys)
                     {
                         if (curKey.Tag == AnyTag)
                         {
-                            TryUnregister(curKey, curKey.Type, ref _registrationEntriesForTagAny);
+                            TryUnregister(curKey, curKey.Type, ref _dependenciesForTagAny);
                         }
                         else
                         {
-                            TryUnregister(curKey, curKey, ref _registrationEntries);
+                            TryUnregister(curKey, curKey, ref _dependencies);
                         }
                     }
                 }
@@ -154,10 +148,10 @@
 
             try
             {
-                var registrationEntriesForTagAny = _registrationEntriesForTagAny;
-                var registrationEntries = _registrationEntries;
+                var dependenciesForTagAny = _dependenciesForTagAny;
+                var dependencies = _dependencies;
 
-                lock (_lockObject)
+                lock (_eventSubject)
                 {
                     foreach (var curKey in keys)
                     {
@@ -167,19 +161,19 @@
                         if (key.Tag == AnyTag)
                         {
                             var hashCode = key.Type.GetHashCode();
-                            isRegistered &= registrationEntriesForTagAny.GetByRef(hashCode, key.Type) == default(RegistrationEntry);
+                            isRegistered &= dependenciesForTagAny.GetByRef(hashCode, key.Type) == default(DependencyEntry);
                             if (isRegistered)
                             {
-                                Register(key, key.Type, hashCode, registrationEntry, ref registrationEntriesForTagAny);
+                                Register(key, key.Type, hashCode, dependencyEntry, ref dependenciesForTagAny);
                             }
                         }
                         else
                         {
                             var hashCode = key.GetHashCode();
-                            isRegistered &= registrationEntries.Get(hashCode, key) == default(RegistrationEntry);
+                            isRegistered &= dependencies.Get(hashCode, key) == default(DependencyEntry);
                             if (isRegistered)
                             {
-                                Register(key, key, hashCode, registrationEntry, ref registrationEntries);
+                                Register(key, key, hashCode, dependencyEntry, ref dependencies);
                             }
                         }
 
@@ -193,8 +187,8 @@
 
                     if (isRegistered)
                     {
-                        _registrationEntriesForTagAny = registrationEntriesForTagAny;
-                        _registrationEntries = registrationEntries;
+                        _dependenciesForTagAny = dependenciesForTagAny;
+                        _dependencies = dependencies;
                     }
                 }
             }
@@ -207,12 +201,12 @@
             {
                 if (isRegistered)
                 {
-                    registrationToken = registrationEntry;
+                    dependencyToken = dependencyEntry;
                 }
                 else
                 {
-                    registrationEntry.Dispose();
-                    registrationToken = default(IDisposable);
+                    dependencyEntry.Dispose();
+                    dependencyToken = default(IDisposable);
                 }
             }
 
@@ -249,11 +243,11 @@
                 }
             }
 
-            // tries finding in registrations
-            if (TryGetRegistrationEntry(key, hashCode, out var registrationEntry))
+            // tries finding in dependencies
+            if (TryGetDependency(key, hashCode, out var dependencyEntry))
             {
                 // tries creating resolver
-                if (!registrationEntry.TryCreateResolver(key, resolvingContainer ?? this, out var resolverDelegate, out error))
+                if (!dependencyEntry.TryCreateResolver(key, resolvingContainer ?? this, out var resolverDelegate, out error))
                 {
                     resolver = default(Resolver<T>);
                     return false;
@@ -275,7 +269,7 @@
             if (resolvingContainer == null || resolvingContainer == this)
             {
                 // Add resolver to tables
-                lock (_lockObject)
+                lock (_eventSubject)
                 {
                     Resolvers = Resolvers.Set(hashCode, key, resolver);
                     if (tag == null)
@@ -292,59 +286,57 @@
         /// <inheritdoc />
         public bool TryGetDependency(FullKey key, out IDependency dependency, out ILifetime lifetime)
         {
-            if (!TryGetRegistrationEntry(key, key.GetHashCode(), out var registrationEntry))
+            if (!TryGetDependency(key, key.GetHashCode(), out var dependencyEntry))
             {
                 return _parent.TryGetDependency(key, out dependency, out lifetime);
             }
 
-            dependency = registrationEntry.Dependency;
-            lifetime = registrationEntry.GetLifetime(key.Type);
+            dependency = dependencyEntry.Dependency;
+            lifetime = dependencyEntry.GetLifetime(key.Type);
             return true;
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            if (_parent is IResourceStore resourceStore)
+            _parent.UnregisterResource(this);
+            var entriesToDispose = new List<IDisposable>(_dependencies.Count + _dependenciesForTagAny.Count + _resources.Count);
+            lock (_eventSubject)
             {
-                resourceStore.RemoveResource(this);
-            }
-
-            List<RegistrationEntry> entriesToDispose;
-            IDisposable resource;
-            lock (_lockObject)
-            {
-                entriesToDispose = _registrationEntries.Select(i => i.Value).Concat(_registrationEntriesForTagAny.Select(i => i.Value)).ToList();
-                _registrationEntries = Table<FullKey, RegistrationEntry>.Empty;
-                _registrationEntriesForTagAny = Table<ShortKey, RegistrationEntry>.Empty;
+                entriesToDispose.AddRange(_dependencies.Select(i => i.Value));
+                entriesToDispose.AddRange(_dependenciesForTagAny.Select(i => i.Value));
+                entriesToDispose.AddRange(_resources);
+                _dependencies = Table<FullKey, DependencyEntry>.Empty;
+                _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
                 Resolvers = Table<FullKey, ResolverDelegate>.Empty;
                 ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
-                resource = Disposable.Create(_resources);
                 _resources.Clear();
             }
 
-            foreach (var entry in entriesToDispose)
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 0; index < entriesToDispose.Count; index++)
             {
-                entry.Dispose();
+                entriesToDispose[index].Dispose();
             }
 
-            resource.Dispose();
             _eventSubject.OnCompleted();
         }
 
-        void IResourceStore.AddResource(IDisposable resource)
+        /// <inheritdoc />
+        public void RegisterResource(IDisposable resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
-            lock (_lockObject)
+            lock (_eventSubject)
             {
                 _resources.Add(resource);
             }
         }
 
-        void IResourceStore.RemoveResource(IDisposable resource)
+        /// <inheritdoc />
+        public void UnregisterResource(IDisposable resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
-            lock (_lockObject)
+            lock (_eventSubject)
             {
                 _resources.Remove(resource);
             }
@@ -364,19 +356,16 @@
         /// <inheritdoc />
         public IDisposable Subscribe(IObserver<ContainerEvent> observer)
         {
+            if (observer == null) throw new ArgumentNullException(nameof(observer));
             return _eventSubject.Subscribe(observer);
         }
         
         void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
         {
-            if (value.Container == this)
+            lock (_eventSubject)
             {
-                return;
-            }
-
-            lock (_lockObject)
-            {
-                ResetResolvers();
+                Resolvers = Table<FullKey, ResolverDelegate>.Empty;
+                ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
             }
         }
 
@@ -387,23 +376,21 @@
         [MethodImpl((MethodImplOptions) 256)]
         private IEnumerable<IEnumerable<FullKey>> GetAllKeys()
         {
-            lock (_lockObject)
+            lock (_eventSubject)
             {
-                return _allKeys ?? (_allKeys = _registrationEntries.Select(i => i.Value.Keys).Distinct().ToArray());
+                return _dependencies.Select(i => i.Value.Keys).Concat(_dependenciesForTagAny.Select(i => i.Value.Keys)).Distinct();
             }
         }
 
         [MethodImpl((MethodImplOptions) 256)]
-        private void Register<TKey>(FullKey originalKey, TKey key, int hashCode, [NotNull] RegistrationEntry registrationEntry, [NotNull] ref Table<TKey, RegistrationEntry> entries)
+        private void Register<TKey>(FullKey originalKey, TKey key, int hashCode, [NotNull] DependencyEntry dependencyEntry, [NotNull] ref Table<TKey, DependencyEntry> entries)
         {
-            entries = entries.Set(hashCode, key, registrationEntry);
-            ResetResolvers();
-            _allKeys = null;
-            _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Registration, originalKey));
+            entries = entries.Set(hashCode, key, dependencyEntry);
+            _eventSubject.OnNext(new ContainerEvent(this, EventType.DependencyRegistration, originalKey));
         }
 
         [MethodImpl((MethodImplOptions) 256)]
-        private bool TryUnregister<TKey>(FullKey originalKey, TKey key, [NotNull] ref Table<TKey, RegistrationEntry> entries)
+        private bool TryUnregister<TKey>(FullKey originalKey, TKey key, [NotNull] ref Table<TKey, DependencyEntry> entries)
         {
             entries = entries.Remove(key.GetHashCode(), key, out var unregistered);
             if (!unregistered)
@@ -411,16 +398,8 @@
                 return false;
             }
 
-            _allKeys = null;
-            _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Unregistration, originalKey));
+            _eventSubject.OnNext(new ContainerEvent(this, EventType.DependencyUnregistration, originalKey));
             return true;
-        }
-
-        [MethodImpl((MethodImplOptions) 256)]
-        private void ResetResolvers()
-        {
-            Resolvers = Table<FullKey, ResolverDelegate>.Empty;
-            ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
         }
 
         [MethodImpl((MethodImplOptions) 256)]
@@ -438,12 +417,12 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        private bool TryGetRegistrationEntry(FullKey key, int hashCode, out RegistrationEntry registrationEntry)
+        private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)
         {
-            lock (_lockObject)
+            lock (_eventSubject)
             {
-                registrationEntry = _registrationEntries.Get(hashCode, key);
-                if (registrationEntry != default(RegistrationEntry))
+                dependencyEntry = _dependencies.Get(hashCode, key);
+                if (dependencyEntry != default(DependencyEntry))
                 {
                     return true;
                 }
@@ -454,21 +433,21 @@
                 {
                     var genericType = typeDescriptor.GetGenericTypeDefinition();
                     var genericKey = new FullKey(genericType, key.Tag);
-                    registrationEntry = _registrationEntries.Get(genericKey.GetHashCode(), genericKey);
-                    if (registrationEntry != default(RegistrationEntry))
+                    dependencyEntry = _dependencies.Get(genericKey.GetHashCode(), genericKey);
+                    if (dependencyEntry != default(DependencyEntry))
                     {
                         return true;
                     }
 
-                    registrationEntry = _registrationEntriesForTagAny.GetByRef(genericType.GetHashCode(), genericType);
-                    if (registrationEntry != default(RegistrationEntry))
+                    dependencyEntry = _dependenciesForTagAny.GetByRef(genericType.GetHashCode(), genericType);
+                    if (dependencyEntry != default(DependencyEntry))
                     {
                         return true;
                     }
                 }
 
-                registrationEntry = _registrationEntriesForTagAny.GetByRef(type.GetHashCode(), type);
-                return registrationEntry != default(RegistrationEntry);
+                dependencyEntry = _dependenciesForTagAny.GetByRef(type.GetHashCode(), type);
+                return dependencyEntry != default(DependencyEntry);
             }
         }
 
