@@ -920,6 +920,9 @@ public class MyTransientLifetime : ILifetime
 
     public ILifetime Create() => new MyTransientLifetime();
 
+    public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+        resolvingContainer;
+
     public void Dispose() { }
 }
 ```
@@ -989,7 +992,13 @@ public class MySingletonLifetime : ILifetime
             expression);
     }
 
+    public IContainer SelectDependenciesContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+        _baseSingletonLifetime.SelectResolvingContainer(registrationContainer, resolvingContainer);
+
     public ILifetime Create() => new MySingletonLifetime(_baseSingletonLifetime.Create(), _counter);
+
+    public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+        _baseSingletonLifetime.SelectResolvingContainer(registrationContainer, resolvingContainer);
 
     public void Dispose()
     {

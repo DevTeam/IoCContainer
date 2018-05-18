@@ -9,7 +9,7 @@
     internal sealed class DependencyEntry : IDisposable
     {
         [NotNull] internal readonly IDependency Dependency;
-        [CanBeNull] private readonly ILifetime _lifetime;
+        [CanBeNull] public readonly ILifetime Lifetime;
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
         [NotNull] public readonly IEnumerable<Key> Keys;
         private readonly object _lockObject = new object();
@@ -23,7 +23,7 @@
             [NotNull] IEnumerable<Key> keys)
         {
             Dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
-            _lifetime = lifetime;
+            Lifetime = lifetime;
             _resources.Add(resource ?? throw new ArgumentNullException(nameof(resource)));
             Keys = keys ?? throw new ArgumentNullException(nameof(keys));
             if (lifetime is IDisposable disposableLifetime)
@@ -32,10 +32,10 @@
             }
         }
 
-        public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver, out Exception error)
+        public bool TryCreateResolver(Key key, [NotNull] IContainer resolvingContainer, out Delegate resolver, out Exception error)
         {
             var typeDescriptor = key.Type.Descriptor();
-            var buildContext = new BuildContext(key, container, _resources);
+            var buildContext = new BuildContext(key, resolvingContainer, _resources);
             if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression, out error))
             {
                 resolver = default(Delegate);
@@ -59,14 +59,14 @@
         [CanBeNull]
         private ILifetime GetLifetime(TypeDescriptor typeDescriptor)
         {
-            if (_lifetime == null)
+            if (Lifetime == null)
             {
                 return null;
             }
             
             if (!typeDescriptor.IsConstructedGenericType())
             {
-                return _lifetime;
+                return Lifetime;
             }
 
             var lifetimeKey = new LifetimeKey(typeDescriptor.GetGenericTypeArguments());
@@ -75,7 +75,7 @@
             {
                 if (!_lifetimes.TryGetValue(lifetimeKey, out lifetime))
                 {
-                    lifetime = _lifetime.Create();
+                    lifetime = Lifetime.Create();
                     _lifetimes.Add(lifetimeKey, lifetime);
                 }
             }
@@ -107,7 +107,7 @@
         }
 
         public override string ToString()
-            => $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {_lifetime?.ToString() ?? Lifetime.Transient.ToString()}";
+            => $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
 
         private struct LifetimeKey
         {

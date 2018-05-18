@@ -220,7 +220,7 @@
             {
                 hashCode = type.GetHashCode();
                 resolver = (Resolver<T>) ResolversByType.GetByRef(hashCode, type);
-                if (resolver != default(Resolver<T>)) // finded in resolvers by type
+                if (resolver != default(Resolver<T>)) // found in resolvers by type
                 {
                     error = default(Exception);
                     return true;
@@ -233,7 +233,7 @@
                 key = new FullKey(type, tag);
                 hashCode = key.GetHashCode();
                 resolver = (Resolver<T>)Resolvers.Get(hashCode, key);
-                if (resolver != default(Resolver<T>)) // finded in resolvers
+                if (resolver != default(Resolver<T>)) // found in resolvers
                 {
                     error = default(Exception);
                     return true;
@@ -244,7 +244,9 @@
             if (TryGetDependency(key, hashCode, out var dependencyEntry))
             {
                 // tries creating resolver
-                if (!dependencyEntry.TryCreateResolver(key, resolvingContainer ?? this, out var resolverDelegate, out error))
+                resolvingContainer = resolvingContainer ?? this;
+                resolvingContainer = dependencyEntry.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
+                if (!dependencyEntry.TryCreateResolver(key, resolvingContainer, out var resolverDelegate, out error))
                 {
                     resolver = default(Resolver<T>);
                     return false;

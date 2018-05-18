@@ -34,6 +34,9 @@
 
             public ILifetime Create() => new MyTransientLifetime();
 
+            public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+                resolvingContainer;
+
             public void Dispose() { }
         }
         // }

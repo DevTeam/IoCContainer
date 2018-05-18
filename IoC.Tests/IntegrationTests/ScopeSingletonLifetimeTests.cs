@@ -47,6 +47,7 @@
         }
 
         [Fact]
+        [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
         public void ContainerShouldResolveWhenScopeLifetime_MT()
         {
             // Given
@@ -87,7 +88,7 @@
         }
 
         [Fact]
-        public void ContainerShouldDiposeWhenScopeDisposed()
+        public void ContainerShouldDisposeWhenScopeDisposed()
         {
             // Given
             var mock = new Mock<IMyDisposableService>();
@@ -103,6 +104,35 @@
 
                 // Then
                 mock.Verify(i => i.Dispose(), Times.Once);
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveDependencyFromRegistrationContainerWhenScopeSingletonLifetime()
+        {
+            // Given
+            var myService1 = new Mock<IMyService1>();
+            var myService12 = new Mock<IMyService1>();
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyService>().As(Lifetime.ScopeSingleton).To<MyService>())
+                using (container.Bind<IMyService1>().To(ctx => myService1.Object))
+                using (container.Bind<string>().To(ctx => "abc"))
+                {
+                    // Then
+                    using (var childContainer = container.CreateChild())
+                    using (childContainer.Bind<IMyService1>().To(ctx => myService12.Object))
+                    using (childContainer.Bind<string>().To(ctx => "xyz"))
+                    using (var scope = new Scope(99))
+                    {
+                        // Then
+                        var instance = childContainer.Resolve<IMyService>();
+                        instance.ShouldNotBeNull();
+                        instance.Name.ShouldBe("xyz");
+                        instance.SomeRef.ShouldBe(myService12.Object);
+                    }
+                }
             }
         }
     }

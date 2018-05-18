@@ -1344,7 +1344,7 @@ namespace IoC
             {
                 hashCode = type.GetHashCode();
                 resolver = (Resolver<T>) ResolversByType.GetByRef(hashCode, type);
-                if (resolver != default(Resolver<T>)) // finded in resolvers by type
+                if (resolver != default(Resolver<T>)) // found in resolvers by type
                 {
                     error = default(Exception);
                     return true;
@@ -1357,7 +1357,7 @@ namespace IoC
                 key = new FullKey(type, tag);
                 hashCode = key.GetHashCode();
                 resolver = (Resolver<T>)Resolvers.Get(hashCode, key);
-                if (resolver != default(Resolver<T>)) // finded in resolvers
+                if (resolver != default(Resolver<T>)) // found in resolvers
                 {
                     error = default(Exception);
                     return true;
@@ -1368,7 +1368,9 @@ namespace IoC
             if (TryGetDependency(key, hashCode, out var dependencyEntry))
             {
                 // tries creating resolver
-                if (!dependencyEntry.TryCreateResolver(key, resolvingContainer ?? this, out var resolverDelegate, out error))
+                resolvingContainer = resolvingContainer ?? this;
+                resolvingContainer = dependencyEntry.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
+                if (!dependencyEntry.TryCreateResolver(key, resolvingContainer, out var resolverDelegate, out error))
                 {
                     resolver = default(Resolver<T>);
                     return false;
@@ -3547,6 +3549,14 @@ namespace IoC
         /// </summary>
         /// <returns></returns>
         ILifetime Create();
+
+        /// <summary>
+        /// Select default container to resolve dependencies.
+        /// </summary>
+        /// <param name="registrationContainer">The container where the entry was registered.</param>
+        /// <param name="resolvingContainer">The container which is used to resolve an instance.</param>
+        /// <returns>The selected container.</returns>
+        [NotNull] IContainer SelectResolvingContainer([NotNull] IContainer registrationContainer, [NotNull] IContainer resolvingContainer);
     }
 }
 
@@ -4640,7 +4650,7 @@ namespace IoC.Lifetimes
     using static WellknownExpressions;
 
     /// <summary>
-    /// Represents the abstaction for singleton based lifetimes.
+    /// Represents the abstraction for singleton based lifetimes.
     /// </summary>
     /// <typeparam name="TKey">The key type.</typeparam>
     [PublicAPI]
@@ -4709,6 +4719,10 @@ namespace IoC.Lifetimes
                     // }
             );
         }
+
+        /// <inheritdoc />
+        public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+            resolvingContainer;
 
         /// <inheritdoc />
         public virtual void Dispose()
@@ -4857,6 +4871,10 @@ namespace IoC.Lifetimes
                 // return this._instance
                 typedInstance);
         }
+
+        /// <inheritdoc />
+        public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+            registrationContainer;
 
         /// <inheritdoc />
         public void Dispose()
@@ -5042,10 +5060,10 @@ namespace IoC.Core
         private readonly List<Expression> _statements = new List<Expression>();
         private int _curId;
 
-        internal BuildContext(Key key, [NotNull] IContainer container, [NotNull] ICollection<IDisposable> resources, int depth = 0)
+        internal BuildContext(Key key, [NotNull] IContainer resolvingContainer, [NotNull] ICollection<IDisposable> resources, int depth = 0)
         {
             Key = key;
-            Container = container ?? throw new ArgumentNullException(nameof(container));
+            Container = resolvingContainer ?? throw new ArgumentNullException(nameof(resolvingContainer));
             _resources = resources ?? throw new ArgumentNullException(nameof(resources));
             Depth = depth;
         }
@@ -5427,7 +5445,7 @@ namespace IoC.Core
     internal sealed class DependencyEntry : IDisposable
     {
         [NotNull] internal readonly IDependency Dependency;
-        [CanBeNull] private readonly ILifetime _lifetime;
+        [CanBeNull] public readonly ILifetime Lifetime;
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
         [NotNull] public readonly IEnumerable<Key> Keys;
         private readonly object _lockObject = new object();
@@ -5441,7 +5459,7 @@ namespace IoC.Core
             [NotNull] IEnumerable<Key> keys)
         {
             Dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
-            _lifetime = lifetime;
+            Lifetime = lifetime;
             _resources.Add(resource ?? throw new ArgumentNullException(nameof(resource)));
             Keys = keys ?? throw new ArgumentNullException(nameof(keys));
             if (lifetime is IDisposable disposableLifetime)
@@ -5450,10 +5468,10 @@ namespace IoC.Core
             }
         }
 
-        public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver, out Exception error)
+        public bool TryCreateResolver(Key key, [NotNull] IContainer resolvingContainer, out Delegate resolver, out Exception error)
         {
             var typeDescriptor = key.Type.Descriptor();
-            var buildContext = new BuildContext(key, container, _resources);
+            var buildContext = new BuildContext(key, resolvingContainer, _resources);
             if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression, out error))
             {
                 resolver = default(Delegate);
@@ -5477,14 +5495,14 @@ namespace IoC.Core
         [CanBeNull]
         private ILifetime GetLifetime(TypeDescriptor typeDescriptor)
         {
-            if (_lifetime == null)
+            if (Lifetime == null)
             {
                 return null;
             }
             
             if (!typeDescriptor.IsConstructedGenericType())
             {
-                return _lifetime;
+                return Lifetime;
             }
 
             var lifetimeKey = new LifetimeKey(typeDescriptor.GetGenericTypeArguments());
@@ -5493,7 +5511,7 @@ namespace IoC.Core
             {
                 if (!_lifetimes.TryGetValue(lifetimeKey, out lifetime))
                 {
-                    lifetime = _lifetime.Create();
+                    lifetime = Lifetime.Create();
                     _lifetimes.Add(lifetimeKey, lifetime);
                 }
             }
@@ -5525,7 +5543,7 @@ namespace IoC.Core
         }
 
         public override string ToString()
-            => $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {_lifetime?.ToString() ?? Lifetime.Transient.ToString()}";
+            => $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
 
         private struct LifetimeKey
         {
@@ -5764,9 +5782,9 @@ namespace IoC.Core
             {
                 try
                 {
-                    var dependenctyInfo = _container.Resolve<IIssueResolver>().CannotResolveDependency(selectedContainer, key);
-                    dependency = dependenctyInfo.Item1;
-                    lifetime = dependenctyInfo.Item2;
+                    var dependencyInfo = _container.Resolve<IIssueResolver>().CannotResolveDependency(selectedContainer, key);
+                    dependency = dependencyInfo.Item1;
+                    lifetime = dependencyInfo.Item2;
                 }
                 catch (Exception ex)
                 {
@@ -6105,17 +6123,17 @@ namespace IoC.Core
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            var autowiringStrategy = _autowiringStrategy;
+            var autoWiringStrategy = _autowiringStrategy;
             if (
-                autowiringStrategy == null
+                autoWiringStrategy == null
                 && buildContext.Key.Type != TypeDescriptor<IAutowiringStrategy>.Type
-                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(TypeDescriptor<IAutowiringStrategy>.Type, null, out var autowiringStrategyResolver, out error))
+                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(TypeDescriptor<IAutowiringStrategy>.Type, null, out var autoWiringStrategyResolver, out error))
             {
-                autowiringStrategy = autowiringStrategyResolver(buildContext.Container);
+                autoWiringStrategy = autoWiringStrategyResolver(buildContext.Container);
             }
 
             Type instanceType = null;
-            if (!(autowiringStrategy?.TryResolveType(_type, buildContext.Key.Type, out instanceType) ?? false))
+            if (!(autoWiringStrategy?.TryResolveType(_type, buildContext.Key.Type, out instanceType) ?? false))
             {
                 if (!DefaultAutowiringStrategy.Shared.TryResolveType(_type, buildContext.Key.Type, out instanceType))
                 {
@@ -6126,7 +6144,7 @@ namespace IoC.Core
             var typeDescriptor = (instanceType ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)).Descriptor();
             var defaultConstructors = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredConstructors());
             IMethod<ConstructorInfo> ctor = null;
-            if (!(autowiringStrategy?.TryResolveConstructor(defaultConstructors, out ctor) ?? false))
+            if (!(autoWiringStrategy?.TryResolveConstructor(defaultConstructors, out ctor) ?? false))
             {
                 if (!DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
                 {
@@ -6135,11 +6153,11 @@ namespace IoC.Core
             }
 
             ctor = ctor ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
-            var defaultMehods = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredMethods());
+            var defaultMethods = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredMethods());
             IEnumerable<IMethod<MethodInfo>> initializers = null;
-            if (!(autowiringStrategy?.TryResolveInitializers(defaultMehods, out initializers) ?? false))
+            if (!(autoWiringStrategy?.TryResolveInitializers(defaultMethods, out initializers) ?? false))
             {
-                if (!DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMehods, out initializers))
+                if (!DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
                 {
                     initializers = null;
                 }

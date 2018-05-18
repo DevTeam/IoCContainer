@@ -2011,6 +2011,14 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:IoC.ILifetime.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)">
+            <summary>
+            Select default container to resolve dependencies.
+            </summary>
+            <param name="registrationContainer">The container where the entry was registered.</param>
+            <param name="resolvingContainer">The container which is used to resolve an instance.</param>
+            <returns>The selected container.</returns>
+        </member>
         <member name="T:IoC.IMethod`1">
             <summary>
             Represents an abstraction for an autowirin method.
@@ -2169,11 +2177,14 @@
         </member>
         <member name="T:IoC.Lifetimes.KeyBasedLifetime`1">
             <summary>
-            Represents the abstaction for singleton based lifetimes.
+            Represents the abstraction for singleton based lifetimes.
             </summary>
             <typeparam name="TKey">The key type.</typeparam>
         </member>
         <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.Dispose">
@@ -2233,6 +2244,9 @@
             </summary>
         </member>
         <member name="M:IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.SingletonLifetime.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.SingletonLifetime.Dispose">

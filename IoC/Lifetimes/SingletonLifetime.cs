@@ -46,6 +46,10 @@
         }
 
         /// <inheritdoc />
+        public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+            registrationContainer;
+
+        /// <inheritdoc />
         public void Dispose()
         {
             IDisposable disposable;

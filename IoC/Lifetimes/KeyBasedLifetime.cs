@@ -9,7 +9,7 @@
     using static WellknownExpressions;
 
     /// <summary>
-    /// Represents the abstaction for singleton based lifetimes.
+    /// Represents the abstraction for singleton based lifetimes.
     /// </summary>
     /// <typeparam name="TKey">The key type.</typeparam>
     [PublicAPI]
@@ -78,6 +78,10 @@
                     // }
             );
         }
+
+        /// <inheritdoc />
+        public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+            resolvingContainer;
 
         /// <inheritdoc />
         public virtual void Dispose()

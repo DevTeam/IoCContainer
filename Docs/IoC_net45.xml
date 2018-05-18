@@ -707,6 +707,32 @@
             Represents build context.
             </summary>
         </member>
+        <member name="T:IoC.Core.IExpressionBuilder`1">
+            <summary>
+            Allows to build expresion for lifetimes.
+            </summary>
+        </member>
+        <member name="M:IoC.Core.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext,`0)">
+            <summary>
+            Builds the expression.
+            </summary>
+            <param name="bodyExpression">The expression body to get an instance.</param>
+            <param name="buildContext">The build context.</param>
+            <param name="context">The expression build context.</param>
+            <returns>The new expression.</returns>
+        </member>
+        <member name="T:IoC.Core.IExpressionCompiler">
+            <summary>
+            Represents a expression compiler.
+            </summary>
+        </member>
+        <member name="M:IoC.Core.IExpressionCompiler.Compile(System.Linq.Expressions.LambdaExpression)">
+            <summary>
+            Compiles an expression to a delegate.
+            </summary>
+            <param name="resolverExpression">The lambda expression.</param>
+            <returns>The resulting delegate.</returns>
+        </member>
         <member name="T:IoC.EventType">
             <summary>
             The types of event.
@@ -720,226 +746,6 @@
         <member name="F:IoC.EventType.DependencyUnregistration">
             <summary>
             The dependency was unregistered.
-            </summary>
-        </member>
-        <member name="T:IoC.Extensibility.IBuildContext">
-            <summary>
-            Represents the abstraction for build context.
-            </summary>
-        </member>
-        <member name="P:IoC.Extensibility.IBuildContext.Key">
-            <summary>
-            The target key.
-            </summary>
-        </member>
-        <member name="P:IoC.Extensibility.IBuildContext.Depth">
-            <summary>
-            The depth of current context.
-            </summary>
-        </member>
-        <member name="P:IoC.Extensibility.IBuildContext.Container">
-            <summary>
-            The target container.
-            </summary>
-        </member>
-        <member name="M:IoC.Extensibility.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)">
-            <summary>
-            Creates a child context.
-            </summary>
-            <param name="key">The key</param>
-            <param name="container">The container.</param>
-            <returns>The new build context.</returns>
-        </member>
-        <member name="M:IoC.Extensibility.IBuildContext.Prepare(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)">
-            <summary>
-            Prepares an expression. Replace generic types' markers and injection statements. 
-            </summary>
-            <param name="baseExpression">The base expression.</param>
-            <param name="instanceExpression">The instance expression.</param>
-            <returns>The resulting expression.</returns>
-        </member>
-        <member name="M:IoC.Extensibility.IBuildContext.AppendLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)">
-            <summary>
-            Wraps by lifetime.
-            </summary>
-            <param name="baseExpression">The base expression.</param>
-            <param name="lifetime">The target lifitime.</param>
-            <returns></returns>
-        </member>
-        <member name="M:IoC.Extensibility.IBuildContext.AppendValue(System.Object,System.Type)">
-            <summary>
-            Appends value.
-            </summary>
-            <param name="value">The value.</param>
-            <param name="type">The value type.</param>
-            <returns>The parameter expression.</returns>
-        </member>
-        <member name="M:IoC.Extensibility.IBuildContext.AppendValue``1(``0)">
-            <summary>
-            Appends value.
-            </summary>
-            <typeparam name="T">The value type.</typeparam>
-            <param name="value">The value.</param>
-            <returns>The parameter expression.</returns>
-        </member>
-        <member name="M:IoC.Extensibility.IBuildContext.AppendVariable(System.Linq.Expressions.Expression)">
-            <summary>
-            Appends variable.
-            </summary>
-            <param name="expression">The value expression.</param>
-            <returns>The parameter expression.</returns>
-        </member>
-        <member name="M:IoC.Extensibility.IBuildContext.CloseBlock(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression[])">
-            <summary>
-            Closes block for specified variables.
-            </summary>
-            <param name="targetExpression">The target expression.</param>
-            <param name="variableExpressions">Variable expressions.</param>
-            <returns>The resulting block expression.</returns>
-        </member>
-        <member name="T:IoC.Extensibility.IExpressionBuilder`1">
-            <summary>
-            Allows to build expresion for lifetimes.
-            </summary>
-        </member>
-        <member name="M:IoC.Extensibility.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,`0)">
-            <summary>
-            Builds the expression.
-            </summary>
-            <param name="bodyExpression">The expression body to get an instance.</param>
-            <param name="buildContext">The build context.</param>
-            <param name="context">The expression build context.</param>
-            <returns>The new expression.</returns>
-        </member>
-        <member name="T:IoC.Extensibility.IExpressionCompiler">
-            <summary>
-            Represents a expression compiler.
-            </summary>
-        </member>
-        <member name="M:IoC.Extensibility.IExpressionCompiler.Compile(System.Linq.Expressions.LambdaExpression)">
-            <summary>
-            Compiles an expression to a delegate.
-            </summary>
-            <param name="resolverExpression">The lambda expression.</param>
-            <returns>The resulting delegate.</returns>
-        </member>
-        <member name="T:IoC.Extensibility.IIssueResolver">
-            <summary>
-            Allows to specify behaviour for cases with issue.
-            </summary>
-        </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CannotRegister(IoC.IContainer,IoC.Key[])">
-            <summary>
-            Handles the scenario when binding cannot be registered.
-            </summary>
-            <param name="container">The target container.</param>
-            <param name="keys">The set of binding keys.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CannotResolveDependency(IoC.IContainer,IoC.Key)">
-            <summary>
-            Handles the scenario when the dependency cannot be resolved.
-            </summary>
-            <param name="container">The resolving container.</param>
-            <param name="key">The resolving key.</param>
-            <returns>The pair of the dependency and of the lifetime.</returns>
-        </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CannotGetResolver``1(IoC.IContainer,IoC.Key,System.Exception)">
-            <summary>
-            Handles the scenario when cannot get a resolver.
-            </summary>
-            <typeparam name="T">The instance type.</typeparam>
-            <param name="container">The resolving container.</param>
-            <param name="key">The resolving key.</param>
-            <param name="error">The error.</param>
-            <returns>The resolver.</returns>
-        </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CannotGetGenericTypeArguments(System.Type)">
-            <summary>
-            Handles the scenario when cannot extract generic type arguments.
-            </summary>
-            <param name="type">The instance type.</param>
-            <returns>The extracted generic type arguments.</returns>
-        </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CyclicDependenceDetected(IoC.Key,System.Int32)">
-            <summary>
-            Handles the scenario when a cyclic dependence was detected.
-            </summary>
-            <param name="key">The resolving key.</param>
-            <param name="reentrancy">The level of reentrancy.</param>
-        </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CannotParseType(System.String,System.Int32,System.Int32,System.String)">
-            <summary>
-            Handles the scenario when cannot parse a type from a text.
-            </summary>
-            <param name="statementText">The statement containing a type metadata.</param>
-            <param name="statementLineNumber">The line number in the source data.</param>
-            <param name="statementPosition">The position at the line of the source data.</param>
-            <param name="typeName">The text with a type metadata.</param>
-            <returns></returns>
-        </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CannotParseLifetime(System.String,System.Int32,System.Int32,System.String)">
-            <summary>
-            Handles the scenario when cannot parse a lifetime from a text.
-            </summary>
-            <param name="statementText">The statement containing a lifetime metadata.</param>
-            <param name="statementLineNumber">The line number in the source data.</param>
-            <param name="statementPosition">The position at the line of the source data.</param>
-            <param name="lifetimeName">The text with a lifetime metadata.</param>
-            <returns></returns>
-        </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CannotParseTag(System.String,System.Int32,System.Int32,System.String)">
-            <summary>
-            Handles the scenario when cannot parse a tag from a text.
-            </summary>
-            <param name="statementText">The statement containing a tag metadata.</param>
-            <param name="statementLineNumber">The line number in the source data.</param>
-            <param name="statementPosition">The position at the line of the source data.</param>
-            <param name="tag">The text with a tag metadata.</param>
-            <returns></returns>
-        </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CannotBuildExpression(IoC.Extensibility.IBuildContext,IoC.IDependency,IoC.ILifetime)">
-            <summary>
-            Handles the scenario when cannot build expression.
-            </summary>
-            <param name="buildContext">The build context.</param>
-            <param name="dependency">The dependeny.</param>
-            <param name="lifetime">The lifetime.</param>
-            <returns>The resulting expression.</returns>
-        </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CannotResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})">
-            <summary>
-            Handles the scenario when cannot resolve a constructor.
-            </summary>
-            <param name="constructors">Available constructors.</param>
-            <returns>The constructor.</returns>
-        </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CannotResolveType(System.Type,System.Type)">
-            <summary>
-            Handles the scenario when cannot resolve the instance type.
-            </summary>
-            <param name="registeredType">Registered type.</param>
-            <param name="resolvingType">Resolving type.</param>
-            <returns>The type to create an instance.</returns>
-        </member>
-        <member name="T:IoC.Extensibility.WellknownExpressions">
-            <summary>
-            The list of well-known expressions.
-            </summary>
-        </member>
-        <member name="F:IoC.Extensibility.WellknownExpressions.ContainerParameter">
-            <summary>
-            The container parameter.
-            </summary>
-        </member>
-        <member name="F:IoC.Extensibility.WellknownExpressions.ArgsParameter">
-            <summary>
-            The args parameters.
-            </summary>
-        </member>
-        <member name="F:IoC.Extensibility.WellknownExpressions.ResolverParameters">
-            <summary>
-            All resolver's parameters.
             </summary>
         </member>
         <member name="T:IoC.Features.CollectionFeature">
@@ -1944,6 +1750,81 @@
             The specified lifetime instance or null.
             </summary>
         </member>
+        <member name="T:IoC.IBuildContext">
+            <summary>
+            Represents the abstraction for build context.
+            </summary>
+        </member>
+        <member name="P:IoC.IBuildContext.Key">
+            <summary>
+            The target key.
+            </summary>
+        </member>
+        <member name="P:IoC.IBuildContext.Depth">
+            <summary>
+            The depth of current context.
+            </summary>
+        </member>
+        <member name="P:IoC.IBuildContext.Container">
+            <summary>
+            The target container.
+            </summary>
+        </member>
+        <member name="M:IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)">
+            <summary>
+            Creates a child context.
+            </summary>
+            <param name="key">The key</param>
+            <param name="container">The container.</param>
+            <returns>The new build context.</returns>
+        </member>
+        <member name="M:IoC.IBuildContext.Prepare(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)">
+            <summary>
+            Prepares an expression. Replace generic types' markers and injection statements. 
+            </summary>
+            <param name="baseExpression">The base expression.</param>
+            <param name="instanceExpression">The instance expression.</param>
+            <returns>The resulting expression.</returns>
+        </member>
+        <member name="M:IoC.IBuildContext.AppendLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)">
+            <summary>
+            Wraps by lifetime.
+            </summary>
+            <param name="baseExpression">The base expression.</param>
+            <param name="lifetime">The target lifitime.</param>
+            <returns></returns>
+        </member>
+        <member name="M:IoC.IBuildContext.AppendValue(System.Object,System.Type)">
+            <summary>
+            Appends value.
+            </summary>
+            <param name="value">The value.</param>
+            <param name="type">The value type.</param>
+            <returns>The parameter expression.</returns>
+        </member>
+        <member name="M:IoC.IBuildContext.AppendValue``1(``0)">
+            <summary>
+            Appends value.
+            </summary>
+            <typeparam name="T">The value type.</typeparam>
+            <param name="value">The value.</param>
+            <returns>The parameter expression.</returns>
+        </member>
+        <member name="M:IoC.IBuildContext.AppendVariable(System.Linq.Expressions.Expression)">
+            <summary>
+            Appends variable.
+            </summary>
+            <param name="expression">The value expression.</param>
+            <returns>The parameter expression.</returns>
+        </member>
+        <member name="M:IoC.IBuildContext.CloseBlock(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression[])">
+            <summary>
+            Closes block for specified variables.
+            </summary>
+            <param name="targetExpression">The target expression.</param>
+            <param name="variableExpressions">Variable expressions.</param>
+            <returns>The resulting block expression.</returns>
+        </member>
         <member name="T:IoC.IConfiguration">
             <summary>
             The container's configuration.
@@ -2002,7 +1883,7 @@
             Represents a IoC dependency.
             </summary>
         </member>
-        <member name="M:IoC.IDependency.TryBuildExpression(IoC.Extensibility.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)">
+        <member name="M:IoC.IDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)">
             <summary>
             Builds an expression.
             </summary>
@@ -2012,16 +1893,131 @@
             <param name="error">The error.</param>
             <returns>True if success.</returns>
         </member>
+        <member name="T:IoC.IIssueResolver">
+            <summary>
+            Allows to specify behaviour for cases with issue.
+            </summary>
+        </member>
+        <member name="M:IoC.IIssueResolver.CannotRegister(IoC.IContainer,IoC.Key[])">
+            <summary>
+            Handles the scenario when binding cannot be registered.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="keys">The set of binding keys.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.IIssueResolver.CannotResolveDependency(IoC.IContainer,IoC.Key)">
+            <summary>
+            Handles the scenario when the dependency cannot be resolved.
+            </summary>
+            <param name="container">The resolving container.</param>
+            <param name="key">The resolving key.</param>
+            <returns>The pair of the dependency and of the lifetime.</returns>
+        </member>
+        <member name="M:IoC.IIssueResolver.CannotGetResolver``1(IoC.IContainer,IoC.Key,System.Exception)">
+            <summary>
+            Handles the scenario when cannot get a resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The resolving container.</param>
+            <param name="key">The resolving key.</param>
+            <param name="error">The error.</param>
+            <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.IIssueResolver.CannotGetGenericTypeArguments(System.Type)">
+            <summary>
+            Handles the scenario when cannot extract generic type arguments.
+            </summary>
+            <param name="type">The instance type.</param>
+            <returns>The extracted generic type arguments.</returns>
+        </member>
+        <member name="M:IoC.IIssueResolver.CyclicDependenceDetected(IoC.Key,System.Int32)">
+            <summary>
+            Handles the scenario when a cyclic dependence was detected.
+            </summary>
+            <param name="key">The resolving key.</param>
+            <param name="reentrancy">The level of reentrancy.</param>
+        </member>
+        <member name="M:IoC.IIssueResolver.CannotParseType(System.String,System.Int32,System.Int32,System.String)">
+            <summary>
+            Handles the scenario when cannot parse a type from a text.
+            </summary>
+            <param name="statementText">The statement containing a type metadata.</param>
+            <param name="statementLineNumber">The line number in the source data.</param>
+            <param name="statementPosition">The position at the line of the source data.</param>
+            <param name="typeName">The text with a type metadata.</param>
+            <returns></returns>
+        </member>
+        <member name="M:IoC.IIssueResolver.CannotParseLifetime(System.String,System.Int32,System.Int32,System.String)">
+            <summary>
+            Handles the scenario when cannot parse a lifetime from a text.
+            </summary>
+            <param name="statementText">The statement containing a lifetime metadata.</param>
+            <param name="statementLineNumber">The line number in the source data.</param>
+            <param name="statementPosition">The position at the line of the source data.</param>
+            <param name="lifetimeName">The text with a lifetime metadata.</param>
+            <returns></returns>
+        </member>
+        <member name="M:IoC.IIssueResolver.CannotParseTag(System.String,System.Int32,System.Int32,System.String)">
+            <summary>
+            Handles the scenario when cannot parse a tag from a text.
+            </summary>
+            <param name="statementText">The statement containing a tag metadata.</param>
+            <param name="statementLineNumber">The line number in the source data.</param>
+            <param name="statementPosition">The position at the line of the source data.</param>
+            <param name="tag">The text with a tag metadata.</param>
+            <returns></returns>
+        </member>
+        <member name="M:IoC.IIssueResolver.CannotBuildExpression(IoC.IBuildContext,IoC.IDependency,IoC.ILifetime)">
+            <summary>
+            Handles the scenario when cannot build expression.
+            </summary>
+            <param name="buildContext">The build context.</param>
+            <param name="dependency">The dependeny.</param>
+            <param name="lifetime">The lifetime.</param>
+            <returns>The resulting expression.</returns>
+        </member>
+        <member name="M:IoC.IIssueResolver.CannotResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})">
+            <summary>
+            Handles the scenario when cannot resolve a constructor.
+            </summary>
+            <param name="constructors">Available constructors.</param>
+            <returns>The constructor.</returns>
+        </member>
+        <member name="M:IoC.IIssueResolver.CannotResolveType(System.Type,System.Type)">
+            <summary>
+            Handles the scenario when cannot resolve the instance type.
+            </summary>
+            <param name="registeredType">Registered type.</param>
+            <param name="resolvingType">Resolving type.</param>
+            <returns>The type to create an instance.</returns>
+        </member>
         <member name="T:IoC.ILifetime">
             <summary>
             Represents a lifetime for an instance.
             </summary>
+        </member>
+        <member name="M:IoC.ILifetime.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)">
+            <summary>
+            Builds the expression.
+            </summary>
+            <param name="bodyExpression">The expression body to get an instance.</param>
+            <param name="buildContext">The build context.</param>
+            <returns>The new expression.</returns>
         </member>
         <member name="M:IoC.ILifetime.Create">
             <summary>
             Creates the similar lifetime to use with generic instances.
             </summary>
             <returns></returns>
+        </member>
+        <member name="M:IoC.ILifetime.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)">
+            <summary>
+            Select default container to resolve dependencies.
+            </summary>
+            <param name="registrationContainer">The container where the entry was registered.</param>
+            <param name="resolvingContainer">The container which is used to resolve an instance.</param>
+            <returns>The selected container.</returns>
         </member>
         <member name="T:IoC.IMethod`1">
             <summary>
@@ -2181,11 +2177,14 @@
         </member>
         <member name="T:IoC.Lifetimes.KeyBasedLifetime`1">
             <summary>
-            Represents the abstaction for singleton based lifetimes.
+            Represents the abstraction for singleton based lifetimes.
             </summary>
             <typeparam name="TKey">The key type.</typeparam>
         </member>
-        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,System.Object)">
+        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.Dispose">
@@ -2244,7 +2243,10 @@
             Represents singleton lifetime.
             </summary>
         </member>
-        <member name="M:IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,System.Object)">
+        <member name="M:IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.SingletonLifetime.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.SingletonLifetime.Dispose">
@@ -2317,6 +2319,26 @@
         <member name="F:IoC.WellknownContainers.NewChild">
             <summary>
             Creates new child container.
+            </summary>
+        </member>
+        <member name="T:IoC.WellknownExpressions">
+            <summary>
+            The list of well-known expressions.
+            </summary>
+        </member>
+        <member name="F:IoC.WellknownExpressions.ContainerParameter">
+            <summary>
+            The container parameter.
+            </summary>
+        </member>
+        <member name="F:IoC.WellknownExpressions.ArgsParameter">
+            <summary>
+            The args parameters.
+            </summary>
+        </member>
+        <member name="F:IoC.WellknownExpressions.ResolverParameters">
+            <summary>
+            All resolver's parameters.
             </summary>
         </member>
     </members>

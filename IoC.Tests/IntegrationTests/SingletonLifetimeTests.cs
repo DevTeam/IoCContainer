@@ -25,7 +25,6 @@
                     var instance2 = container.Resolve<IMyService>();
                     using (var childContainer = container.CreateChild())
                     {
-                        // Then
                         var instance3 = childContainer.Resolve<IMyService>();
                         instance1.ShouldNotBeNull();
                         instance1.ShouldBe(instance2);
@@ -52,7 +51,6 @@
                         var instance2 = container.Resolve<IMyService>();
                         using (var childContainer = container.CreateChild())
                         {
-                            // Then
                             var instance3 = childContainer.Resolve<IMyService>();
                             instance1.ShouldNotBeNull();
                             instance1.ShouldBe(instance2);
@@ -78,7 +76,6 @@
                     var instance2 = container.Resolve<IMyService1>();
                     using (var childContainer = container.CreateChild())
                     {
-                        // Then
                         var instance3 = childContainer.Resolve<IMyService>();
                         var instance4 = childContainer.Resolve<IMyService1>();
                         instance1.ShouldBe(instance2);
@@ -90,7 +87,7 @@
         }
 
         [Fact]
-        public void ContainerShouldDiposeWhenDependencyTokenDisposed()
+        public void ContainerShouldDisposeWhenDependencyTokenDisposed()
         {
             // Given
             using (var container = Container.Create())
@@ -108,7 +105,7 @@
         }
 
         [Fact]
-        public void ContainerShouldDiposeWhenContainerDisposed()
+        public void ContainerShouldDisposeWhenContainerDisposed()
         {
             // Given
             var mock = new Mock<IMyDisposableService>();
@@ -140,6 +137,34 @@
                     var instance4 = container.Resolve<IMyGenericService<string, object>>();
                     instance1.ShouldBe(instance3);
                     instance2.ShouldBe(instance4);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveDependencyFromRegistrationContainerWhenSingletonLifetime()
+        {
+            // Given
+            var myService1 = new Mock<IMyService1>();
+            var myService12 = new Mock<IMyService1>();
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyService>().As(Lifetime.Singleton).To<MyService>())
+                using (container.Bind<IMyService1>().To(ctx => myService1.Object))
+                using (container.Bind<string>().To(ctx => "abc"))
+                {
+                    // Then
+                    using (var childContainer = container.CreateChild())
+                    using (childContainer.Bind<IMyService1>().To(ctx => myService12.Object))
+                    using (childContainer.Bind<string>().To(ctx => "xyz"))
+                    {
+                        // Then
+                        var instance = childContainer.Resolve<IMyService>();
+                        instance.ShouldNotBeNull();
+                        instance.Name.ShouldBe("abc");
+                        instance.SomeRef.ShouldBe(myService1.Object);
+                    }
                 }
             }
         }

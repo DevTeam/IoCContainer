@@ -188,9 +188,9 @@
             {
                 try
                 {
-                    var dependenctyInfo = _container.Resolve<IIssueResolver>().CannotResolveDependency(selectedContainer, key);
-                    dependency = dependenctyInfo.Item1;
-                    lifetime = dependenctyInfo.Item2;
+                    var dependencyInfo = _container.Resolve<IIssueResolver>().CannotResolveDependency(selectedContainer, key);
+                    dependency = dependencyInfo.Item1;
+                    lifetime = dependencyInfo.Item2;
                 }
                 catch (Exception ex)
                 {

@@ -20,10 +20,10 @@
         private readonly List<Expression> _statements = new List<Expression>();
         private int _curId;
 
-        internal BuildContext(Key key, [NotNull] IContainer container, [NotNull] ICollection<IDisposable> resources, int depth = 0)
+        internal BuildContext(Key key, [NotNull] IContainer resolvingContainer, [NotNull] ICollection<IDisposable> resources, int depth = 0)
         {
             Key = key;
-            Container = container ?? throw new ArgumentNullException(nameof(container));
+            Container = resolvingContainer ?? throw new ArgumentNullException(nameof(resolvingContainer));
             _resources = resources ?? throw new ArgumentNullException(nameof(resources));
             Depth = depth;
         }
