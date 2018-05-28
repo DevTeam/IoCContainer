@@ -5,7 +5,6 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
-    using Collections;
     using Extensibility;
 
     internal sealed class RegistrationEntry : IDisposable
@@ -124,7 +123,7 @@
 
             public override int GetHashCode() => _genericTypes != null ? _genericTypes.GetHash() : 0;
 
-            private bool Equals(LifetimeKey other) => _genericTypes.SequenceEqual(other._genericTypes);
+            private bool Equals(LifetimeKey other) => CollectionExtensions.SequenceEqual(_genericTypes, other._genericTypes);
         }
     }
 }

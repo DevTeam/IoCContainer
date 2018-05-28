@@ -7,9 +7,9 @@
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Runtime.CompilerServices;
-    using Collections;
     using Extensibility;
     using static TypeDescriptorExtensions;
+    using CollectionExtensions = Core.CollectionExtensions;
 
     /// <summary>
     /// Represents build context.
@@ -19,14 +19,12 @@
     internal class BuildContext : IBuildContext
     {
         // Should be at least internal to be accessable from for compiled code from expressions
-        internal static ResizableArray<BuildContext> Contexts = ResizableArray<BuildContext>.Empty;
+        internal static BuildContext[] Contexts = Core.CollectionExtensions.EmptyArray<BuildContext>();
         private static readonly MemberInfo ContextsMemberInfo = Descriptor<BuildContext>().GetDeclaredMembers().Single(i => i.Name == nameof(Contexts));
         private static readonly FieldInfo ValuesFieldInfo = Descriptor<BuildContext>().GetDeclaredFields().Single(i => i.Name == nameof(Values));
-        private static readonly FieldInfo BuildContextItemsFieldInfo = Descriptor<ResizableArray<BuildContext>>().GetDeclaredFields().Single(i => i.Name == nameof(ResizableArray<object>.Items));
-        private static readonly FieldInfo ObjectItemsFieldInfo = Descriptor<ResizableArray<object>>().GetDeclaredFields().Single(i => i.Name == nameof(ResizableArray<object>.Items));
 
         // Should be at least internal to be accessable from for compiled code from expressions
-        internal ResizableArray<object> Values = ResizableArray<object>.Empty;
+        internal object[] Values = Core.CollectionExtensions.EmptyArray<object>();
         private readonly ICollection<IDisposable> _resources;
         private readonly int _id;
         private readonly IExpressionCompiler _compiler;
@@ -45,24 +43,23 @@
             _resources = resources ?? throw new ArgumentNullException(nameof(resources));
             Depth = depth;
             _id = -1;
-            var contexts = Contexts.Items;
             // Try finding an empty element
-            for (var i = 0; i < contexts.Length; i++)
+            for (var i = 0; i < Contexts.Length; i++)
             {
-                if (contexts[i] == null)
+                if (Contexts[i] == null)
                 {
                     _id = i;
-                    contexts[i] = this;
+                    Contexts[i] = this;
                     return;
                 }
             }
 
             // An empty element was not found
-            _id = contexts.Length;
+            _id = Contexts.Length;
             Contexts = Contexts.Add(this);
             resources.Add(Disposable.Create(() =>
             {
-                Contexts.Items[_id] = null;
+                Contexts[_id] = null;
             }));
         }
 
@@ -84,20 +81,20 @@
         public Expression AppendValue(object value, Type type)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            if (_compiler.IsReferenceConstantSupported)
+            if (type.Descriptor().IsValueType() || _compiler.IsReferenceConstantSupported)
             {
                 return Expression.Constant(value, type);
             }
 
             var fieldInfo = (FieldInfo) Descriptor<BuildContext>().GetDeclaredMembers().SingleOrDefault(i => i.Name == $"State{_valuesCount:00}");
-            if (fieldInfo != null)
+            if (fieldInfo != null && _valuesCount < StatesCount)
             {
                 _valuesCount++;
                 fieldInfo.SetValue(this, value);
                 return Expression.Field(GetContextExpression(), fieldInfo).Convert(type);
             }
 
-            var valueId = Values.Items.Length;
+            var valueId = Values.Length;
             Values = Values.Add(value);
             return Expression.ArrayAccess(GetContextArrayExpression(), Expression.Constant(valueId)).Convert(type);
         }
@@ -168,13 +165,12 @@
             }
 
             _contextArrayExpression = Expression.Variable(typeof(object[]), "contextArray" + GenerateId());
-            var getExpression = Expression.Field(
-                // Contexts[_id].Values.Items
+            var getExpression = 
+                // Contexts[_id].Values
                 Expression.Field(
                     // Contexts[_id].Values
                     GetContextExpression(),
-                    ValuesFieldInfo),
-                ObjectItemsFieldInfo);
+                    ValuesFieldInfo);
 
             _parameters.Insert(1, _contextArrayExpression);
             _statements.Insert(1, Expression.Assign(_contextArrayExpression, getExpression));
@@ -192,10 +188,7 @@
             _contextExpression = Expression.Variable(typeof(BuildContext), "context" + GenerateId());
             var getExpression = Expression.ArrayAccess(
                 // Contexts
-                // ReSharper disable once AssignNullToNotNullAttribute
-                Expression.Field(
-                    Expression.MakeMemberAccess(null, ContextsMemberInfo),
-                    BuildContextItemsFieldInfo),
+                Expression.MakeMemberAccess(null, ContextsMemberInfo),
                 Expression.Constant(_id));
 
             _parameters.Insert(0, _contextExpression);
@@ -205,6 +198,8 @@
 
         [MethodImpl((MethodImplOptions)256)]
         private int GenerateId() => System.Threading.Interlocked.Increment(ref _curId);
+
+        private const int StatesCount = 40;
 
         internal object State00;
         internal object State01;
@@ -237,5 +232,16 @@
         internal object State27;
         internal object State28;
         internal object State29;
+
+        internal object State30;
+        internal object State31;
+        internal object State32;
+        internal object State33;
+        internal object State34;
+        internal object State35;
+        internal object State36;
+        internal object State37;
+        internal object State38;
+        internal object State39;
     }
 }

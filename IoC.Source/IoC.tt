@@ -6,7 +6,7 @@
 <#@ import namespace="System.Collections.Generic" #>
 <#@ output extension=".cs" #>
 
-/* 
+/*
 IoC Container
 
 Important note: do not use any internal classes, structures, enums, interfaces, methods, fields or properties
@@ -45,7 +45,6 @@ SOFTWARE.
         "Lifetimes",
         "Extensibility",
         "Core",
-        "Core" + Path.DirectorySeparatorChar + "Collections",
         "Core" + Path.DirectorySeparatorChar + "Configuration"};
 
     var infos = new List<Dictionary<string, string>>();

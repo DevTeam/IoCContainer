@@ -2079,6 +2079,12 @@
         <member name="M:IoC.Key.ToString">
             <inheritdoc />
         </member>
+        <member name="M:IoC.Key.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Key.GetHashCode">
+            <inheritdoc />
+        </member>
         <member name="T:IoC.Lifetime">
             <summary>
             The enumeration of well-known lifetimes.
@@ -2121,6 +2127,49 @@
         <member name="M:IoC.Lifetimes.ContainerSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.IContainer,IoC.IContainer,System.Object[])">
             <inheritdoc />
         </member>
+        <member name="M:IoC.Lifetimes.ContainerSingletonLifetime.OnInstanceReleased(System.Object,IoC.IContainer)">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Lifetimes.KeyBasedLifetime`1">
+            <summary>
+            Represents the abstaction for singleton based lifetimes.
+            </summary>
+            <typeparam name="TKey">The key type.</typeparam>
+        </member>
+        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.Clone">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.CreateKey(IoC.IContainer,System.Object[])">
+            <summary>
+            Creates key for singleton.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="args">The arfuments.</param>
+            <returns>The created key.</returns>
+        </member>
+        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.OnNewInstanceCreated``1(``0,`0,IoC.IContainer,System.Object[])">
+            <summary>
+            Is invoked on the new instance creation.
+            </summary>
+            <param name="newInstance">The new instance.</param>
+            <param name="key">The instance key.</param>
+            <param name="container">The target container.</param>
+            <param name="args">Optional arguments.</param>
+            <returns>The created instance.</returns>
+        </member>
+        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.OnInstanceReleased(System.Object,`0)">
+            <summary>
+            Is invoked on the instance was released.
+            </summary>
+            <param name="releasedInstance">The released instance.</param>
+            <param name="key">The instance key.</param>
+        </member>
         <member name="T:IoC.Lifetimes.ScopeSingletonLifetime">
             <summary>
             Represents singleton per scope lifetime.
@@ -2138,37 +2187,8 @@
         <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.Scope,IoC.IContainer,System.Object[])">
             <inheritdoc />
         </member>
-        <member name="T:IoC.Lifetimes.SingletonBasedLifetime`1">
-            <summary>
-            Represents the abstaction for singleton based lifetimes.
-            </summary>
-            <typeparam name="TKey">The key type.</typeparam>
-        </member>
-        <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.Build(System.Linq.Expressions.Expression,IoC.Extensibility.IBuildContext,System.Object)">
+        <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.OnInstanceReleased(System.Object,IoC.Scope)">
             <inheritdoc />
-        </member>
-        <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.Dispose">
-            <inheritdoc />
-        </member>
-        <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.Clone">
-            <inheritdoc />
-        </member>
-        <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.CreateKey(IoC.IContainer,System.Object[])">
-            <summary>
-            Creates key for singleton.
-            </summary>
-            <param name="container">The target container.</param>
-            <param name="args">The arfuments.</param>
-            <returns>The created key.</returns>
-        </member>
-        <member name="M:IoC.Lifetimes.SingletonBasedLifetime`1.OnNewInstanceCreated``1(``0,`0,IoC.IContainer,System.Object[])">
-            <summary>
-            Is invoked on the new instance creation.
-            </summary>
-            <param name="newInstance">The new instance.</param>
-            <param name="key">The instance key.</param>
-            <param name="container">The target container.</param>
-            <param name="args">Optional arguments.</param>
         </member>
         <member name="T:IoC.Lifetimes.SingletonLifetime">
             <summary>

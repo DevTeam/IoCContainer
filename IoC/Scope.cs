@@ -63,6 +63,8 @@
 
         internal void AddResource(IDisposable resource) => _resources.Add(resource);
 
+        internal void RemoveResource(IDisposable resource) => _resources.Remove(resource);
+
         private class DefaultScopeKey
         {
             public static readonly object Shared = new DefaultScopeKey();

@@ -10,7 +10,6 @@
     using System.Runtime.CompilerServices;
     using System.Threading;
     using Core;
-    using Core.Collections;
     using Extensibility;
     using Features;
     using static Key;
@@ -160,11 +159,21 @@
 
                         if (key.Tag == AnyTag)
                         {
-                            isRegistered &= TryRegister(key, key.Type, registrationEntry, ref registrationEntriesForTagAny);
+                            var hashCode = key.Type.GetHashCode();
+                            isRegistered &= registrationEntriesForTagAny.GetByRef(hashCode, key.Type) == default(RegistrationEntry);
+                            if (isRegistered)
+                            {
+                                Register(key, key.Type, hashCode, registrationEntry, ref registrationEntriesForTagAny);
+                            }
                         }
                         else
                         {
-                            isRegistered &= TryRegister(key, key, registrationEntry, ref registrationEntries);
+                            var hashCode = key.GetHashCode();
+                            isRegistered &= registrationEntries.Get(hashCode, key) == default(RegistrationEntry);
+                            if (isRegistered)
+                            {
+                                Register(key, key, hashCode, registrationEntry, ref registrationEntries);
+                            }
                         }
 
                         if (!isRegistered)
@@ -207,7 +216,7 @@
         {
             if (tag == null)
             {
-                resolver = (Resolver<T>) ResolversByType.FastGet(type.GetHashCode(), type);
+                resolver = (Resolver<T>) ResolversByType.GetByRef(type.GetHashCode(), type);
                 if (resolver != default(Resolver<T>))
                 {
                     return true;
@@ -231,7 +240,7 @@
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
         public bool TryGetResolver<T>(ShortKey type, out Resolver<T> resolver, IContainer container = null)
         {
-            resolver = (Resolver<T>) ResolversByType.FastGet(type.GetHashCode(), type);
+            resolver = (Resolver<T>) ResolversByType.GetByRef(type.GetHashCode(), type);
             if (resolver != default(Resolver<T>))
             {
                 return true;
@@ -280,6 +289,7 @@
             }
 
             resource.Dispose();
+            _eventSubject.OnCompleted();
         }
 
         void IResourceStore.AddResource(IDisposable resource)
@@ -348,27 +358,12 @@
         }
 
         [MethodImpl((MethodImplOptions) 256)]
-        private bool TryRegister<TKey>(FullKey originalKey, TKey key, [NotNull] RegistrationEntry registrationEntry, [NotNull] ref Table<TKey, RegistrationEntry> entries)
+        private void Register<TKey>(FullKey originalKey, TKey key, int hashCode, [NotNull] RegistrationEntry registrationEntry, [NotNull] ref Table<TKey, RegistrationEntry> entries)
         {
-            var hashCode = key.GetHashCode();
-            var registered = entries.Get(hashCode, key) == default(RegistrationEntry);
-            if (!registered)
-            {
-                return false;
-            }
-
-            try
-            {
-                entries = entries.Set(hashCode, key, registrationEntry);
-                ResetResolvers();
-                _allKeys = null;
-            }
-            catch (ArgumentException)
-            {
-            }
-
+            entries = entries.Set(hashCode, key, registrationEntry);
+            ResetResolvers();
+            _allKeys = null;
             _eventSubject.OnNext(new ContainerEvent(this, ContainerEvent.EventType.Registration, originalKey));
-            return true;
         }
 
         [MethodImpl((MethodImplOptions) 256)]
@@ -473,14 +468,14 @@
                         return true;
                     }
 
-                    registrationEntry = _registrationEntriesForTagAny.FastGet(genericType.GetHashCode(), genericType);
+                    registrationEntry = _registrationEntriesForTagAny.GetByRef(genericType.GetHashCode(), genericType);
                     if (registrationEntry != default(RegistrationEntry))
                     {
                         return true;
                     }
                 }
 
-                registrationEntry = _registrationEntriesForTagAny.FastGet(type.GetHashCode(), type);
+                registrationEntry = _registrationEntriesForTagAny.GetByRef(type.GetHashCode(), type);
                 if (registrationEntry != default(RegistrationEntry))
                 {
                     return true;

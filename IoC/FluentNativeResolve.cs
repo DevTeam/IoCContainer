@@ -2,7 +2,7 @@
 {
     using System;
     using System.Runtime.CompilerServices;
-    using static Core.Collections.Extensions;
+    using static Core.CollectionExtensions;
 
     /// <summary>
     /// Represents extensions to resolve from a native container.
@@ -20,8 +20,8 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            return ((Resolver<T>)container.ResolversByType.FastGet(HashCode<T>.Shared, typeof(T))
-                    ?? container.GetResolver<T>())(container, Container.EmptyArgs);
+            return ((Resolver<T>)container.ResolversByType.GetByRef(HashCode<T>.Shared, typeof(T))
+                    ?? container.GetResolver<T>(typeof(T)))(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -37,7 +37,7 @@
         {
             var key = new Key(typeof(T), tag);
             return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
-                    ?? container.GetResolver<T>(tag))(container, Container.EmptyArgs);
+                    ?? container.GetResolver<T>(typeof(T), tag))(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -51,8 +51,8 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.FastGet(HashCode<T>.Shared, typeof(T))
-                    ?? container.GetResolver<T>())(container, args);
+            return ((Resolver<T>)container.ResolversByType.GetByRef(HashCode<T>.Shared, typeof(T))
+                    ?? container.GetResolver<T>(typeof(T)))(container, args);
         }
 
         /// <summary>
@@ -69,7 +69,7 @@
         {
             var key = new Key(typeof(T), tag);
             return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
-                    ?? container.GetResolver<T>(tag))(container, args);
+                    ?? container.GetResolver<T>(typeof(T), tag))(container, args);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type)
         {
-            return ((Resolver<T>)container.ResolversByType.FastGet(type.GetHashCode(), typeof(T))
+            return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), typeof(T))
                     ?? container.GetResolver<T>(type))(container, Container.EmptyArgs);
         }
 
@@ -116,7 +116,7 @@
         [NotNull]
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.FastGet(type.GetHashCode(), typeof(T))
+            return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), typeof(T))
                     ?? container.GetResolver<T>(type))(container, args);
         }
 

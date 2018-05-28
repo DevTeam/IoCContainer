@@ -2079,6 +2079,12 @@
         <member name="M:IoC.Key.ToString">
             <inheritdoc />
         </member>
+        <member name="M:IoC.Key.Equals(System.Object)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Key.GetHashCode">
+            <inheritdoc />
+        </member>
         <member name="T:IoC.Lifetime">
             <summary>
             The enumeration of well-known lifetimes.

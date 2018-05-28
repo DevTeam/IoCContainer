@@ -1,7 +1,7 @@
 ﻿namespace IoC.Tests
 {
     using System.Linq;
-    using Core.Collections;
+    using Core;
     using Shouldly;
     using Xunit;
 
@@ -36,8 +36,8 @@
 
             // Then
             table.Count().ShouldBe(5);
-            table.Get("c".GetHashCode(), "c").ShouldBe("c");
-            table.Get("c".GetHashCode(), "Z").ShouldBe("Z");
+            table.GetByRef("c".GetHashCode(), "c").ShouldBe("c");
+            table.GetByRef("c".GetHashCode(), "Z").ShouldBe("Z");
         }
 
         [Fact]
@@ -56,7 +56,7 @@
 
             // Then
             removed.ShouldBe(true);
-            table.Get("c".GetHashCode(), "c").ShouldBe(null);
+            table.GetByRef("c".GetHashCode(), "c").ShouldBe(null);
             table.Count().ShouldBe(4);
             table.Count.ShouldBe(4);
         }

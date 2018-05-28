@@ -2,9 +2,9 @@
 {
     using System;
     using System.Runtime.CompilerServices;
-    using Collections;
 
     internal class Cache<TKey, TValue>
+        where TKey: class
     {
         [NotNull] private readonly object _lockObject = new object();
         [NotNull] private Table<TKey, TValue> _table = Table<TKey, TValue>.Empty;
@@ -15,7 +15,7 @@
             var hashCode = key.GetHashCode();
             lock (_lockObject)
             {
-                var value = _table.Get(hashCode, key);
+                var value = _table.GetByRef(hashCode, key);
                 if (Equals(value, default(TValue)))
                 {
                     value = factory();

@@ -5,7 +5,6 @@
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
-    using Collections;
 
     internal class DefaultAutowiringStrategy: IAutowiringStrategy
     {
@@ -54,7 +53,7 @@
                 var isDefined = false;
                 foreach (var constraintsEntry in constraintsMap)
                 {
-                    if (!constraints.SequenceEqual(constraintsEntry.Item2))
+                    if (!CollectionExtensions.SequenceEqual(constraints, constraintsEntry.Item2))
                     {
                         continue;
                     }

@@ -7,7 +7,7 @@
     /// Represents singleton per container lifetime.
     /// </summary>
     [PublicAPI]
-    public sealed class ContainerSingletonLifetime: SingletonBasedLifetime<IContainer>
+    public sealed class ContainerSingletonLifetime: KeyBasedLifetime<IContainer>
     {
         /// <inheritdoc />
         protected override IContainer CreateKey(IContainer container, object[] args) => container;
@@ -19,11 +19,27 @@
         public override ILifetime Clone() => new ContainerSingletonLifetime();
 
         /// <inheritdoc />
-        protected override void OnNewInstanceCreated<T>(T newInstance, IContainer targetContainer, IContainer container, object[] args)
+        protected override T OnNewInstanceCreated<T>(T newInstance, IContainer targetContainer, IContainer container, object[] args)
         {
             if (newInstance is IDisposable disposable && targetContainer is IResourceStore resourceStore)
             {
                 resourceStore.AddResource(disposable);
+            }
+
+            return newInstance;
+        }
+
+        /// <inheritdoc />
+        protected override void OnInstanceReleased(object releasedInstance, IContainer targetContainer)
+        {
+            if (releasedInstance is IDisposable disposable)
+            {
+                if (targetContainer is IResourceStore resourceStore)
+                {
+                    resourceStore.RemoveResource(disposable);
+                }
+
+                disposable.Dispose();
             }
         }
     }

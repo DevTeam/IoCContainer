@@ -2,6 +2,7 @@
 {
     using System;
     using System.Diagnostics;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Represents the key of binding.
@@ -38,6 +39,24 @@
 
         /// <inheritdoc />
         public override string ToString() => $"Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {GetHashCode()}";
+
+        /// <inheritdoc />
+        [MethodImpl((MethodImplOptions)256)]
+        public override bool Equals(object obj)
+        {
+            var other = (Key) obj;
+            return Type == other.Type && Equals(Tag, other.Tag);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl((MethodImplOptions)256)]
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Type.GetHashCode() * 397) ^ (Tag != null ? Tag.GetHashCode() : 0);
+            }
+        }
 
         private struct AnyTagObject
         {
