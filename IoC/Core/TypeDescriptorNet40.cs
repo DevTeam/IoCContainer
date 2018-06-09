@@ -55,7 +55,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         public bool IsGenericTypeDefinition() => Type.IsGenericTypeDefinition;
 
-        public bool IsGenericTypeArgument() => Type.GetCustomAttributes(typeof(GenericTypeArgumentAttribute), true).Any();
+        public bool IsGenericTypeArgument() => Type.GetCustomAttributes(TypeDescriptor<GenericTypeArgumentAttribute>.Type, true).Any();
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]

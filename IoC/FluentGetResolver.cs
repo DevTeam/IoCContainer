@@ -2,6 +2,7 @@
 {
     using System;
     using System.Runtime.CompilerServices;
+    using Core;
 
     /// <summary>
     /// Represents extensions to get a resolver from a container.
@@ -32,7 +33,7 @@
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, Tag tag)
-            => container.GetResolver<T>(typeof(T), tag);
+            => container.GetResolver<T>(TypeDescriptor<T>.Type, tag);
 
         /// <summary>
         /// Gets the resolver.
@@ -55,7 +56,7 @@
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container)
-            => container.GetResolver<T>(typeof(T));
+            => container.GetResolver<T>(TypeDescriptor<T>.Type);
 
         /// <summary>
         /// Creates tag.

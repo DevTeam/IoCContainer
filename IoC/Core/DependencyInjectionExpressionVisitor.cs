@@ -11,8 +11,8 @@
 
     internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
     {
-        private static readonly Key ContextKey = new Key(typeof(Context));
-        [NotNull] private static readonly TypeDescriptor ContextTypeDescriptor = Descriptor<Context>();
+        private static readonly Key ContextKey = new Key(TypeDescriptor<Context>.Type);
+        [NotNull] private static readonly TypeDescriptor ContextTypeDescriptor = TypeDescriptor<Context>.Descriptor;
         [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static readonly ConstructorInfo ContextConstructor;
         [NotNull] private readonly Stack<Key> _keys = new Stack<Key>();
@@ -100,7 +100,7 @@
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            if (node.Type == typeof(Context))
+            if (node.Type == TypeDescriptor<Context>.Type)
             {
                 return CreateNewContextExpression();
             }
@@ -163,7 +163,7 @@
         {
             if (containerExpression != null)
             {
-                if (containerExpression is ParameterExpression parameterExpression && parameterExpression.Type == typeof(IContainer))
+                if (containerExpression is ParameterExpression parameterExpression && parameterExpression.Type == TypeDescriptor<IContainer>.Type)
                 {
                     return _container;
                 }

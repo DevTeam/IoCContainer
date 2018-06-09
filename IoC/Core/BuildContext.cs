@@ -99,7 +99,7 @@
             return Expression.ArrayAccess(GetContextArrayExpression(), Expression.Constant(valueId)).Convert(type);
         }
 
-        public Expression AppendValue<T>(T value) => AppendValue(value, typeof(T));
+        public Expression AppendValue<T>(T value) => AppendValue(value, TypeDescriptor<T>.Type);
 
         public ParameterExpression AppendVariable(Expression expression)
         {
@@ -164,7 +164,7 @@
                 return _contextArrayExpression;
             }
 
-            _contextArrayExpression = Expression.Variable(typeof(object[]), "contextArray" + GenerateId());
+            _contextArrayExpression = Expression.Variable(TypeDescriptor<object[]>.Type, "contextArray" + GenerateId());
             var getExpression = 
                 // Contexts[_id].Values
                 Expression.Field(
@@ -185,7 +185,7 @@
                 return _contextExpression;
             }
 
-            _contextExpression = Expression.Variable(typeof(BuildContext), "context" + GenerateId());
+            _contextExpression = Expression.Variable(TypeDescriptor<BuildContext>.Type, "context" + GenerateId());
             var getExpression = Expression.ArrayAccess(
                 // Contexts
                 Expression.MakeMemberAccess(null, ContextsMemberInfo),

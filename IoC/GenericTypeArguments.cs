@@ -3,6 +3,7 @@
 namespace IoC
 {
     using System;
+    using Core;
 
     /// <summary>
     /// Represents the generic type parameter marker.
@@ -60,6 +61,6 @@ namespace IoC
 
     internal static class GenericTypeArguments
     {
-        public static readonly Type[] Types = {typeof(TT), typeof(TT1), typeof(TT2), typeof(TT3), typeof(TT4), typeof(TT5), typeof(TT6), typeof(TT7), typeof(TT8)};
+        public static readonly Type[] Types = {TypeDescriptor<TT>.Type, TypeDescriptor<TT1>.Type, TypeDescriptor<TT2>.Type, TypeDescriptor<TT3>.Type, TypeDescriptor<TT4>.Type, TypeDescriptor<TT5>.Type, TypeDescriptor<TT6>.Type, TypeDescriptor<TT7>.Type, TypeDescriptor<TT8>.Type};
     }
 }

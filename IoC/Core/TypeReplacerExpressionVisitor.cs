@@ -102,7 +102,7 @@
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (node.Type == typeof(Type))
+            if (node.Type == TypeDescriptor<Type>.Type)
             {
                 return Expression.Constant(ReplaceType((Type)node.Value), node.Type);
             }

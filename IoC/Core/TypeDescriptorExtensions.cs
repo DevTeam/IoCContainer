@@ -12,9 +12,9 @@
         public static TypeDescriptor Descriptor(this Type type) =>
             new TypeDescriptor(type);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions) 256)]
         public static TypeDescriptor Descriptor<T>() =>
-            TypeDescriptor<T>.Shared;
+            TypeDescriptor<T>.Descriptor;
 
         [MethodImpl((MethodImplOptions)256)]
         public static Assembly LoadAssembly(string assemblyName)
@@ -40,11 +40,6 @@
             }
 
             return type;
-        }
-
-        private static class TypeDescriptor<T>
-        {
-            [NotNull] public static readonly TypeDescriptor Shared = typeof(T).Descriptor();
         }
     }
 }

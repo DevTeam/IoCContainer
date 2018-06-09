@@ -3,6 +3,7 @@
     using System;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Core;
 
     /// <summary>
     /// Represents extensions for autowring.
@@ -25,7 +26,7 @@
             if (dependencyType == null) throw new ArgumentNullException(nameof(dependencyType));
             if (parameterPosition < 0) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
             var methodInfo = Injections.InjectWithTagMethodInfo.MakeGenericMethod(dependencyType);
-            var containerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
+            var containerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
             var parameterExpression = Expression.Call(methodInfo, containerExpression, Expression.Constant(dependencyTag));
             method.SetParameterExpression(parameterPosition, parameterExpression);
             return true;

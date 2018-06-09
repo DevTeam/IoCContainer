@@ -37,7 +37,7 @@
                     yield return _injections.GetOrCreate(paramType, () =>
                     {
                         var methodInfo = InjectMethodInfo.MakeGenericMethod(paramType);
-                        var containerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
+                        var containerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
                         return Expression.Call(methodInfo, containerExpression);
                     });
                 }

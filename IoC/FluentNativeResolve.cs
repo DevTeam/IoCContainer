@@ -2,7 +2,7 @@
 {
     using System;
     using System.Runtime.CompilerServices;
-    using static Core.CollectionExtensions;
+    using Core;
 
     /// <summary>
     /// Represents extensions to resolve from a native container.
@@ -20,8 +20,8 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(HashCode<T>.Shared, typeof(T))
-                    ?? container.GetResolver<T>(typeof(T)))(container, Container.EmptyArgs);
+            return ((Resolver<T>)container.ResolversByType.GetByRef(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
+                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -35,9 +35,9 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, Tag tag)
         {
-            var key = new Key(typeof(T), tag);
+            var key = new Key(TypeDescriptor<T>.Type, tag);
             return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
-                    ?? container.GetResolver<T>(typeof(T), tag))(container, Container.EmptyArgs);
+                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -51,8 +51,8 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(HashCode<T>.Shared, typeof(T))
-                    ?? container.GetResolver<T>(typeof(T)))(container, args);
+            return ((Resolver<T>)container.ResolversByType.GetByRef(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
+                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, args);
         }
 
         /// <summary>
@@ -67,9 +67,9 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            var key = new Key(typeof(T), tag);
+            var key = new Key(TypeDescriptor<T>.Type, tag);
             return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
-                    ?? container.GetResolver<T>(typeof(T), tag))(container, args);
+                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, args);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), typeof(T))
+            return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), type)
                     ?? container.GetResolver<T>(type))(container, Container.EmptyArgs);
         }
 
@@ -116,7 +116,7 @@
         [NotNull]
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), typeof(T))
+            return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), type)
                     ?? container.GetResolver<T>(type))(container, args);
         }
 
@@ -136,11 +136,6 @@
             var key = new Key(type, tag);
             return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
                     ?? container.GetResolver<T>(type, tag))(container, args);
-        }
-
-        private static class HashCode<T>
-        {
-            public static readonly int Shared = typeof(T).GetHashCode();
         }
     }
 }

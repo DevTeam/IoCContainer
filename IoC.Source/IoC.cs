@@ -1787,6 +1787,7 @@ namespace IoC
     using System;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Core;
 
     /// <summary>
     /// Represents extensions for autowring.
@@ -1809,7 +1810,7 @@ namespace IoC
             if (dependencyType == null) throw new ArgumentNullException(nameof(dependencyType));
             if (parameterPosition < 0) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
             var methodInfo = Injections.InjectWithTagMethodInfo.MakeGenericMethod(dependencyType);
-            var containerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
+            var containerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
             var parameterExpression = Expression.Call(methodInfo, containerExpression, Expression.Constant(dependencyTag));
             method.SetParameterExpression(parameterPosition, parameterExpression);
             return true;
@@ -1863,7 +1864,7 @@ namespace IoC
         public static IBinding<T> Bind<T>([NotNull] this IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T));
+            return new Binding<T>(container, TypeDescriptor<T>.Type);
         }
 
         /// <summary>
@@ -1879,7 +1880,7 @@ namespace IoC
             where T : T1
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T), typeof(T1));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type);
         }
 
         /// <summary>
@@ -1896,7 +1897,7 @@ namespace IoC
             where T : T1, T2
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type);
         }
 
         /// <summary>
@@ -1914,7 +1915,7 @@ namespace IoC
             where T : T1, T2, T3
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type);
         }
 
         /// <summary>
@@ -1933,7 +1934,7 @@ namespace IoC
             where T : T1, T2, T3, T4
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type);
         }
 
         /// <summary>
@@ -1953,7 +1954,7 @@ namespace IoC
             where T : T1, T2, T3, T4, T5
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type);
         }
 
         /// <summary>
@@ -1974,7 +1975,7 @@ namespace IoC
             where T : T1, T2, T3, T4, T5, T6
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type);
         }
 
         /// <summary>
@@ -1996,7 +1997,7 @@ namespace IoC
             where T : T1, T2, T3, T4, T5, T6, T7
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type);
         }
 
 
@@ -2087,7 +2088,7 @@ namespace IoC
         public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(typeof(T), autowiringStrategy)));
+            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(TypeDescriptor<T>.Type, autowiringStrategy)));
         }
 
         /// <summary>
@@ -2340,6 +2341,7 @@ namespace IoC
 {
     using System;
     using System.Runtime.CompilerServices;
+    using Core;
 
     /// <summary>
     /// Represents extensions to get a resolver from a container.
@@ -2370,7 +2372,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, Tag tag)
-            => container.GetResolver<T>(typeof(T), tag);
+            => container.GetResolver<T>(TypeDescriptor<T>.Type, tag);
 
         /// <summary>
         /// Gets the resolver.
@@ -2393,7 +2395,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container)
-            => container.GetResolver<T>(typeof(T));
+            => container.GetResolver<T>(TypeDescriptor<T>.Type);
 
         /// <summary>
         /// Creates tag.
@@ -2413,7 +2415,7 @@ namespace IoC
 {
     using System;
     using System.Runtime.CompilerServices;
-    using static Core.CollectionExtensions;
+    using Core;
 
     /// <summary>
     /// Represents extensions to resolve from a native container.
@@ -2431,8 +2433,8 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(HashCode<T>.Shared, typeof(T))
-                    ?? container.GetResolver<T>(typeof(T)))(container, Container.EmptyArgs);
+            return ((Resolver<T>)container.ResolversByType.GetByRef(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
+                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -2446,9 +2448,9 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, Tag tag)
         {
-            var key = new Key(typeof(T), tag);
+            var key = new Key(TypeDescriptor<T>.Type, tag);
             return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
-                    ?? container.GetResolver<T>(typeof(T), tag))(container, Container.EmptyArgs);
+                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, Container.EmptyArgs);
         }
 
         /// <summary>
@@ -2462,8 +2464,8 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(HashCode<T>.Shared, typeof(T))
-                    ?? container.GetResolver<T>(typeof(T)))(container, args);
+            return ((Resolver<T>)container.ResolversByType.GetByRef(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
+                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, args);
         }
 
         /// <summary>
@@ -2478,9 +2480,9 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            var key = new Key(typeof(T), tag);
+            var key = new Key(TypeDescriptor<T>.Type, tag);
             return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
-                    ?? container.GetResolver<T>(typeof(T), tag))(container, args);
+                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, args);
         }
 
         /// <summary>
@@ -2494,7 +2496,7 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), typeof(T))
+            return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), type)
                     ?? container.GetResolver<T>(type))(container, Container.EmptyArgs);
         }
 
@@ -2527,7 +2529,7 @@ namespace IoC
         [NotNull]
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), typeof(T))
+            return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), type)
                     ?? container.GetResolver<T>(type))(container, args);
         }
 
@@ -2547,11 +2549,6 @@ namespace IoC
             var key = new Key(type, tag);
             return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
                     ?? container.GetResolver<T>(type, tag))(container, args);
-        }
-
-        private static class HashCode<T>
-        {
-            public static readonly int Shared = typeof(T).GetHashCode();
         }
     }
 }
@@ -2590,7 +2587,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
-            => container.Register(new[] { typeof(T) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type }, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2605,7 +2602,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1 
-            => container.Register(new[] { typeof(T1) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type }, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2621,7 +2618,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2 
-            => container.Register(new[] { typeof(T1), typeof(T2) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2638,7 +2635,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3 
-            => container.Register(new[] {typeof(T1), typeof(T2), typeof(T3)}, new FullAutowringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] {TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type}, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2656,7 +2653,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type }, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2675,7 +2672,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5 
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type }, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2694,7 +2691,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions)256)]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type }, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2715,7 +2712,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6, T7
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type }, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2752,7 +2749,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            => container.Register(new[] { typeof(T) }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2769,7 +2766,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1
-            => container.Register(new[] { typeof(T), typeof(T1) }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2787,7 +2784,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2
-            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2) }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2806,7 +2803,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3
-            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2), typeof(T3) }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2826,7 +2823,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4
-            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4) }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2847,7 +2844,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4, T5
-            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5) }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2869,7 +2866,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4, T5, T6
-            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6) }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2892,7 +2889,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4, T5, T6, T7
-            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7) }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -2916,7 +2913,7 @@ namespace IoC
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4, T5, T6, T7, T8
-            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8) }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -3040,6 +3037,7 @@ namespace IoC
 namespace IoC
 {
     using System;
+    using Core;
 
     /// <summary>
     /// Represents the generic type parameter marker.
@@ -3097,7 +3095,7 @@ namespace IoC
 
     internal static class GenericTypeArguments
     {
-        public static readonly Type[] Types = {typeof(TT), typeof(TT1), typeof(TT2), typeof(TT3), typeof(TT4), typeof(TT5), typeof(TT6), typeof(TT7), typeof(TT8)};
+        public static readonly Type[] Types = {TypeDescriptor<TT>.Type, TypeDescriptor<TT1>.Type, TypeDescriptor<TT2>.Type, TypeDescriptor<TT3>.Type, TypeDescriptor<TT4>.Type, TypeDescriptor<TT5>.Type, TypeDescriptor<TT6>.Type, TypeDescriptor<TT7>.Type, TypeDescriptor<TT8>.Type};
     }
 }
 
@@ -4406,7 +4404,7 @@ namespace IoC.Lifetimes
         private static readonly MethodInfo GetMethodInfo = typeof(CollectionExtensions).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(CollectionExtensions.GetByRef)).MakeGenericMethod(typeof(TKey), typeof(object));
         private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
-        private static readonly ParameterExpression KeyVar = Expression.Variable(typeof(TKey), "key");
+        private static readonly ParameterExpression KeyVar = Expression.Variable(TypeDescriptor<TKey>.Type, "key");
 
         [NotNull] internal object LockObject = new object();
         internal volatile Table<TKey, object> Instances = Table<TKey, object>.Empty;
@@ -4509,7 +4507,7 @@ namespace IoC.Lifetimes
 
     internal static class SingletonBasedLifetimeShared
     {
-        internal static readonly ParameterExpression HashCodeVar = Expression.Variable(typeof(int), "hashCode");
+        internal static readonly ParameterExpression HashCodeVar = Expression.Variable(TypeDescriptor<int>.Type, "hashCode");
     }
 }
 
@@ -4897,6 +4895,7 @@ namespace IoC.Extensibility
 {
     using System.Collections.Generic;
     using System.Linq.Expressions;
+    using Core;
 
     /// <summary>
     /// The list of well-known expressions.
@@ -4908,13 +4907,13 @@ namespace IoC.Extensibility
         /// The container parameter.
         /// </summary>
         [NotNull]
-        public static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer), nameof(Context.Container));
+        public static readonly ParameterExpression ContainerParameter = Expression.Parameter(TypeDescriptor<IContainer>.Type, nameof(Context.Container));
 
         /// <summary>
         /// The args parameters.
         /// </summary>
         [NotNull]
-        public static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]), nameof(Context.Args));
+        public static readonly ParameterExpression ArgsParameter = Expression.Parameter(TypeDescriptor<object[]>.Type, nameof(Context.Args));
 
         /// <summary>
         /// All resolver's parameters.
@@ -5166,7 +5165,7 @@ namespace IoC.Core
             return Expression.ArrayAccess(GetContextArrayExpression(), Expression.Constant(valueId)).Convert(type);
         }
 
-        public Expression AppendValue<T>(T value) => AppendValue(value, typeof(T));
+        public Expression AppendValue<T>(T value) => AppendValue(value, TypeDescriptor<T>.Type);
 
         public ParameterExpression AppendVariable(Expression expression)
         {
@@ -5231,7 +5230,7 @@ namespace IoC.Core
                 return _contextArrayExpression;
             }
 
-            _contextArrayExpression = Expression.Variable(typeof(object[]), "contextArray" + GenerateId());
+            _contextArrayExpression = Expression.Variable(TypeDescriptor<object[]>.Type, "contextArray" + GenerateId());
             var getExpression = 
                 // Contexts[_id].Values
                 Expression.Field(
@@ -5252,7 +5251,7 @@ namespace IoC.Core
                 return _contextExpression;
             }
 
-            _contextExpression = Expression.Variable(typeof(BuildContext), "context" + GenerateId());
+            _contextExpression = Expression.Variable(TypeDescriptor<BuildContext>.Type, "context" + GenerateId());
             var getExpression = Expression.ArrayAccess(
                 // Contexts
                 Expression.MakeMemberAccess(null, ContextsMemberInfo),
@@ -5638,8 +5637,8 @@ namespace IoC.Core
 
     internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
     {
-        private static readonly Key ContextKey = new Key(typeof(Context));
-        [NotNull] private static readonly TypeDescriptor ContextTypeDescriptor = Descriptor<Context>();
+        private static readonly Key ContextKey = new Key(TypeDescriptor<Context>.Type);
+        [NotNull] private static readonly TypeDescriptor ContextTypeDescriptor = TypeDescriptor<Context>.Descriptor;
         [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static readonly ConstructorInfo ContextConstructor;
         [NotNull] private readonly Stack<Key> _keys = new Stack<Key>();
@@ -5727,7 +5726,7 @@ namespace IoC.Core
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            if (node.Type == typeof(Context))
+            if (node.Type == TypeDescriptor<Context>.Type)
             {
                 return CreateNewContextExpression();
             }
@@ -5790,7 +5789,7 @@ namespace IoC.Core
         {
             if (containerExpression != null)
             {
-                if (containerExpression is ParameterExpression parameterExpression && parameterExpression.Type == typeof(IContainer))
+                if (containerExpression is ParameterExpression parameterExpression && parameterExpression.Type == TypeDescriptor<IContainer>.Type)
                 {
                     return _container;
                 }
@@ -6170,7 +6169,7 @@ namespace IoC.Core
             {
                 if (_getExpressionCompilerReentrancy == 1)
                 {
-                    if (container.TryGetResolver<IExpressionCompiler>(typeof(IExpressionCompiler), out var resolver))
+                    if (container.TryGetResolver<IExpressionCompiler>(TypeDescriptor<IExpressionCompiler>.Type, out var resolver))
                     {
                         return resolver(container);
                     }
@@ -6247,8 +6246,8 @@ namespace IoC.Core
             var autowiringStrategy = _autowiringStrategy;
             if (
                 autowiringStrategy == null
-                && buildContext.Key.Type != typeof(IAutowiringStrategy)
-                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(typeof(IAutowiringStrategy), out var autowiringStrategyResolver))
+                && buildContext.Key.Type != TypeDescriptor<IAutowiringStrategy>.Type
+                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(TypeDescriptor<IAutowiringStrategy>.Type, out var autowiringStrategyResolver))
             {
                 autowiringStrategy = autowiringStrategyResolver(buildContext.Container);
             }
@@ -6491,7 +6490,7 @@ namespace IoC.Core
                     yield return _injections.GetOrCreate(paramType, () =>
                     {
                         var methodInfo = InjectMethodInfo.MakeGenericMethod(paramType);
-                        var containerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
+                        var containerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
                         return Expression.Call(methodInfo, containerExpression);
                     });
                 }
@@ -6977,6 +6976,24 @@ namespace IoC.Core
 }
 
 #endregion
+#region TypeDescriptor
+
+namespace IoC.Core
+{
+    using System;
+
+    internal static class TypeDescriptor<T>
+    {
+        [NotNull] public static readonly Type Type = typeof(T);
+        // ReSharper disable once StaticMemberInGenericType
+        public static readonly int HashCode = Type.GetHashCode();
+        // ReSharper disable once StaticMemberInGenericType
+        [NotNull] public static readonly TypeDescriptor Descriptor = Type.Descriptor();
+    }
+}
+
+
+#endregion
 #region TypeDescriptorExtensions
 
 namespace IoC.Core
@@ -6993,9 +7010,9 @@ namespace IoC.Core
         public static TypeDescriptor Descriptor(this Type type) =>
             new TypeDescriptor(type);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions) 256)]
         public static TypeDescriptor Descriptor<T>() =>
-            TypeDescriptor<T>.Shared;
+            TypeDescriptor<T>.Descriptor;
 
         [MethodImpl((MethodImplOptions)256)]
         public static Assembly LoadAssembly(string assemblyName)
@@ -7021,11 +7038,6 @@ namespace IoC.Core
             }
 
             return type;
-        }
-
-        private static class TypeDescriptor<T>
-        {
-            [NotNull] public static readonly TypeDescriptor Shared = typeof(T).Descriptor();
         }
     }
 }
@@ -7091,7 +7103,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         public bool IsGenericTypeDefinition() => Type.IsGenericTypeDefinition;
 
-        public bool IsGenericTypeArgument() => Type.GetCustomAttributes(typeof(GenericTypeArgumentAttribute), true).Any();
+        public bool IsGenericTypeArgument() => Type.GetCustomAttributes(TypeDescriptor<GenericTypeArgumentAttribute>.Type, true).Any();
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
@@ -7582,7 +7594,7 @@ namespace IoC.Core
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (node.Type == typeof(Type))
+            if (node.Type == TypeDescriptor<Type>.Type)
             {
                 return Expression.Constant(ReplaceType((Type)node.Value), node.Type);
             }
@@ -8096,7 +8108,7 @@ namespace IoC.Core.Configuration
                 var lifetimeName = match.Groups[1].Value.Replace(" ", string.Empty).Replace($"{nameof(Lifetime)}.", string.Empty).Trim();
                 try
                 {
-                    lifetime = (Lifetime) Enum.Parse(typeof(Lifetime), lifetimeName, true);
+                    lifetime = (Lifetime) Enum.Parse(TypeDescriptor<Lifetime>.Type, lifetimeName, true);
                 }
                 catch (Exception)
                 {
@@ -8216,20 +8228,20 @@ namespace IoC.Core.Configuration
         // ReSharper disable StringLiteralTypo
         private static readonly Dictionary<string, Type> PrimitiveTypes = new Dictionary<string, Type>
         {
-            {"byte", typeof(byte)},
-            {"sbyte", typeof(sbyte)},
-            {"int", typeof(int)},
-            {"uint", typeof(uint)},
-            {"short", typeof(short)},
-            {"ushort", typeof(ushort)},
-            {"long", typeof(long)},
-            {"ulong", typeof(ulong)},
-            {"float", typeof(float)},
-            {"double", typeof(double)},
-            {"char", typeof(char)},
-            {"object", typeof(object)},
-            {"string", typeof(string)},
-            {"decimal", typeof(decimal)}
+            {"byte", TypeDescriptor<byte>.Type},
+            {"sbyte", TypeDescriptor<sbyte>.Type},
+            {"int", TypeDescriptor<int>.Type},
+            {"uint", TypeDescriptor<uint>.Type},
+            {"short", TypeDescriptor<short>.Type},
+            {"ushort", TypeDescriptor<ushort>.Type},
+            {"long", TypeDescriptor<long>.Type},
+            {"ulong", TypeDescriptor<ulong>.Type},
+            {"float", TypeDescriptor<float>.Type},
+            {"double", TypeDescriptor<double>.Type},
+            {"char", TypeDescriptor<char>.Type},
+            {"object", TypeDescriptor<object>.Type},
+            {"string", TypeDescriptor<string>.Type},
+            {"decimal", TypeDescriptor<decimal>.Type}
         };
 
         public bool TryConvert(BindingContext context, string typeName, out Type type)

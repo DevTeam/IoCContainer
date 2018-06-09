@@ -40,7 +40,7 @@
         public static IBinding<T> Bind<T>([NotNull] this IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T));
+            return new Binding<T>(container, TypeDescriptor<T>.Type);
         }
 
         /// <summary>
@@ -56,7 +56,7 @@
             where T : T1
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T), typeof(T1));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type);
         }
 
         /// <summary>
@@ -73,7 +73,7 @@
             where T : T1, T2
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type);
         }
 
         /// <summary>
@@ -91,7 +91,7 @@
             where T : T1, T2, T3
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type);
         }
 
         /// <summary>
@@ -110,7 +110,7 @@
             where T : T1, T2, T3, T4
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type);
         }
 
         /// <summary>
@@ -130,7 +130,7 @@
             where T : T1, T2, T3, T4, T5
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type);
         }
 
         /// <summary>
@@ -151,7 +151,7 @@
             where T : T1, T2, T3, T4, T5, T6
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type);
         }
 
         /// <summary>
@@ -173,7 +173,7 @@
             where T : T1, T2, T3, T4, T5, T6, T7
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type);
         }
 
 
@@ -264,7 +264,7 @@
         public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(typeof(T), autowiringStrategy)));
+            return new RegistrationToken(binding.Container, CreateRegistration(binding, new FullAutowringDependency(TypeDescriptor<T>.Type, autowiringStrategy)));
         }
 
         /// <summary>

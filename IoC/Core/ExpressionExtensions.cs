@@ -25,7 +25,7 @@
             {
                 if (_getExpressionCompilerReentrancy == 1)
                 {
-                    if (container.TryGetResolver<IExpressionCompiler>(typeof(IExpressionCompiler), out var resolver))
+                    if (container.TryGetResolver<IExpressionCompiler>(TypeDescriptor<IExpressionCompiler>.Type, out var resolver))
                     {
                         return resolver(container);
                     }

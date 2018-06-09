@@ -10,7 +10,6 @@ namespace IoC.Tests
     using System.Reflection;
     using Core;
     using IntegrationTests;
-    using Moq;
     using Shouldly;
     using Xunit;
 
