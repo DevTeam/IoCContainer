@@ -36,7 +36,7 @@ SOFTWARE.
 
 using System.Runtime.CompilerServices;
 
-#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETCOREAPP2_0 && !WINDOWS_UWP
+#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETCOREAPP2_0 && !NETCOREAPP2_1 && !WINDOWS_UWP
 using IoC.Features;
 [assembly: InternalsVisibleTo(HighPerformanceFeature.DynamicAssemblyName)]
 #endif
@@ -1151,10 +1151,10 @@ namespace IoC
     [DebuggerDisplay("Name = {" + nameof(ToString) + "()}")]
     public sealed class Container: IContainer, IResourceStore, IObserver<ContainerEvent>
     {
-        private const string RootName = "root:/";
+        private const string RootName = "/";
         private static long _containerId;
 
-        internal static readonly object[] EmptyArgs = new object[0];
+        internal static readonly object[] EmptyArgs = Core.CollectionExtensions.EmptyArray<object>();
         [NotNull] private static readonly Lazy<Container> BasicRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.BasicSet), true);
         [NotNull] private static readonly Lazy<Container> DefultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.DefaultSet), true);
         [NotNull] private static readonly Lazy<Container> HighPerformanceRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.HighPerformanceSet), true);
@@ -1539,7 +1539,8 @@ namespace IoC
                     return false;
                 }
 
-                resolver = AddResolver(key, (Resolver<T>)resolverDelegate, true);
+                resolver = (Resolver<T>)resolverDelegate;
+                AddResolver(key, resolver, true);
                 return true;
             }
 
@@ -1551,14 +1552,14 @@ namespace IoC
 
             if (container == this)
             {
-                resolver = AddResolver(key, resolver, false);
+                AddResolver(key, resolver, false);
             }
 
             return true;
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        private Resolver<T> AddResolver<T>(FullKey key, [NotNull] Resolver<T> resolver, bool currentContainer)
+        private void AddResolver(FullKey key, [NotNull] Delegate resolver, bool currentContainer)
         {
             lock (_lockObject)
             {
@@ -1567,8 +1568,6 @@ namespace IoC
                 {
                     ResolversByType = ResolversByType.Set(key.Type.GetHashCode(), key.Type, resolver);
                 }
-
-                return resolver;
             }
         }
 
@@ -3437,7 +3436,7 @@ namespace IoC
     /// </summary>
     [PublicAPI]
     [DebuggerDisplay("Type = {" + nameof(Type) + "}, Tag = {" + nameof(Tag) + "}")]
-    public struct Key
+    public struct Key: IEquatable<Key>
     {
         /// <summary>
         /// The marker object for any tag.
@@ -3472,8 +3471,14 @@ namespace IoC
         [MethodImpl((MethodImplOptions)256)]
         public override bool Equals(object obj)
         {
-            var other = (Key) obj;
-            return Type == other.Type && Equals(Tag, other.Tag);
+            return Equals((Key)obj);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl((MethodImplOptions)256)]
+        public bool Equals(Key other)
+        {
+            return ReferenceEquals(Type, other.Type) && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
         }
 
         /// <inheritdoc />
@@ -4004,7 +4009,7 @@ namespace IoC.Features
                 TupleFeature.HighPerformance,
                 LazyFeature.Default
             }
-#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETCOREAPP2_0 && !WINDOWS_UWP
+#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETCOREAPP2_0 && !NETCOREAPP2_1 && !WINDOWS_UWP
             , new []
             {
                 HighPerformanceFeature.Default,
@@ -4067,7 +4072,7 @@ namespace IoC.Features
 #endregion
 #region HighPerformanceFeature
 
-#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETCOREAPP2_0 && !WINDOWS_UWP
+#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETCOREAPP2_0 && !NETCOREAPP2_1 && !WINDOWS_UWP
 namespace IoC.Features
 {
     using System;
@@ -4158,7 +4163,7 @@ namespace IoC.Features
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => TaskScheduler.Current);
             yield return container.Register(ctx => StartTask(new Task<TT>(ctx.Container.Inject<Func<TT>>(ctx.Key.Tag)), ctx.Container.Inject<TaskScheduler>()), null, Feature.AnyTag);
-#if NETCOREAPP2_0
+#if NETCOREAPP2_0 || NETCOREAPP2_1
             yield return container.Register(ctx => new ValueTask<TT>(ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Feature.AnyTag);
 #endif
         }
@@ -4421,6 +4426,8 @@ namespace IoC.Lifetimes
             var lockObjectField = Expression.Field(thisVar, LockObjectFieldInfo);
             var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
             var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(null, GetMethodInfo, instancesField, SingletonBasedLifetimeShared.HashCodeVar, KeyVar).Convert(returnType));
+            var isNullExpression = Expression.ReferenceEqual(instanceVar, ExpressionExtensions.NullConst);
+
             return Expression.Block(
                 // Key key;
                 // int hashCode;
@@ -4432,12 +4439,9 @@ namespace IoC.Lifetimes
                 Expression.Assign(SingletonBasedLifetimeShared.HashCodeVar, Expression.Call(KeyVar, ExpressionExtensions.GetHashCodeMethodInfo)),
                 // var instance = (T)Instances.Get(hashCode, key);
                 assignInstanceExpression,
-                // if(instance != null)
+                // if(instance == null)
                 Expression.Condition(
-                    Expression.NotEqual(instanceVar, ExpressionExtensions.NullConst),
-                    // return instance;
-                    instanceVar,
-                    // else {
+                    isNullExpression,
                     Expression.Block(
                         // lock (this.LockObject)
                         Expression.Block(
@@ -4455,7 +4459,11 @@ namespace IoC.Lifetimes
                             )
                         ).Lock(lockObjectField),
                         // OnNewInstanceCreated(instance, key, container, args);
-                        Expression.Call(thisVar, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, ContainerParameter, ArgsParameter)))
+                        Expression.Call(thisVar, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, ContainerParameter, ArgsParameter)),
+                        // else {
+                        // return instance;
+                        instanceVar
+                    )
                     // }
             );
         }
@@ -4593,21 +4601,22 @@ namespace IoC.Lifetimes
             var lockObjectField = Expression.Field(thisVar, LockObjectFieldInfo);
             var instanceField = Expression.Field(thisVar, InstanceFieldInfo);
             var typedInstance = instanceField.Convert(type);
+            var isNullExpression = Expression.ReferenceEqual(instanceField, ExpressionExtensions.NullConst);
 
-            // if(this.Instance != null)
+            // if(this.Instance == null)
             return Expression.Condition(
-                Expression.NotEqual(instanceField, ExpressionExtensions.NullConst),
-                // return (T)this.Instance;
-                typedInstance,
+                isNullExpression,
                 Expression.Block(
                     // lock(this.LockObject)
                     Expression.IfThen(
-                        // if(this.Instance == null)
-                        Expression.Equal(instanceField, ExpressionExtensions.NullConst),
+                        // if(this.Instance != null)
+                        isNullExpression,
                         // this.Instance = new T();
                         Expression.Assign(instanceField, expression)).Lock(lockObjectField),
                     // return (T)this.Instance;
-                    typedInstance));
+                    typedInstance),
+                // return (T)this.Instance;
+                typedInstance);
         }
 
         /// <inheritdoc />
@@ -5075,7 +5084,6 @@ namespace IoC.Core
     using System.Runtime.CompilerServices;
     using Extensibility;
     using static TypeDescriptorExtensions;
-    using CollectionExtensions = Core.CollectionExtensions;
 
     /// <summary>
     /// Represents build context.
@@ -5090,7 +5098,7 @@ namespace IoC.Core
         private static readonly FieldInfo ValuesFieldInfo = Descriptor<BuildContext>().GetDeclaredFields().Single(i => i.Name == nameof(Values));
 
         // Should be at least internal to be accessable from for compiled code from expressions
-        internal object[] Values = Core.CollectionExtensions.EmptyArray<object>();
+        internal object[] Values = CollectionExtensions.EmptyArray<object>();
         private readonly ICollection<IDisposable> _resources;
         private readonly int _id;
         private readonly IExpressionCompiler _compiler;
@@ -5414,7 +5422,7 @@ namespace IoC.Core
             }
 
             var array = new T[size];
-#if NETCOREAPP2_0
+#if NETCOREAPP2_0 || NETCOREAPP2_1
             Array.Fill(array, value);
 #else
             for (var i = 0; i < size; i++)
@@ -5452,12 +5460,12 @@ namespace IoC.Core
         public static TValue Get<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
             where TKey: struct
         {
-            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
+            var items = table.GetBucket(hashCode).KeyValues;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
-                if (Equals(item.Key, key))
+                if (item.Key.Equals(key))
                 {
                     return item.Value;
                 }
@@ -5471,7 +5479,7 @@ namespace IoC.Core
         public static TValue GetByRef<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
             where TKey: class
         {
-            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
+            var items = table.GetBucket(hashCode).KeyValues;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
@@ -6061,7 +6069,7 @@ namespace IoC.Core
 #endregion
 #region ExpressionCompilerOptimizing
 
-#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETCOREAPP2_0 && !WINDOWS_UWP
+#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETCOREAPP2_0 && !NETCOREAPP2_1 && !WINDOWS_UWP
 namespace IoC.Core
 {
     using System;
@@ -6798,18 +6806,18 @@ namespace IoC.Core
     using System.Runtime.CompilerServices;
 
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-    internal sealed class Table<TKey, TValue>: IEnumerable<Table<TKey, TValue>.KeyValue>
+    internal class Table<TKey, TValue>: IEnumerable<Table<TKey, TValue>.KeyValue>
     {
         public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CollectionExtensions.CreateArray(4, Bucket.EmptyBucket), 3, 0);
-        public readonly int Divisor;
-        public readonly Bucket[] Buckets;
         public readonly int Count;
+        private readonly int _divisor;
+        private readonly Bucket[] _buckets;
 
         [MethodImpl((MethodImplOptions)256)]
         private Table(Bucket[] buckets, int divisor, int count)
         {
-            Buckets = buckets;
-            Divisor = divisor;
+            _buckets = buckets;
+            _divisor = divisor;
             Count = count;
         }
 
@@ -6818,39 +6826,46 @@ namespace IoC.Core
         {
             int newBucketIndex;
             Count = origin.Count + 1;
-            if (origin.Count > origin.Divisor)
+            if (origin.Count > origin._divisor)
             {
-                Divisor = (origin.Divisor + 1) << 1 - 1;
-                Buckets = CollectionExtensions.CreateArray(Divisor + 1, Bucket.EmptyBucket);
-                var originBuckets = origin.Buckets;
+                _divisor = (origin._divisor + 1) << 1 - 1;
+                _buckets = CollectionExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
+                var originBuckets = origin._buckets;
                 for (var originBucketIndex = 0; originBucketIndex < originBuckets.Length; originBucketIndex++)
                 {
                     var originKeyValues = originBuckets[originBucketIndex].KeyValues;
                     for (var index = 0; index < originKeyValues.Length; index++)
                     {
                         var keyValue = originKeyValues[index];
-                        newBucketIndex = keyValue.HashCode & Divisor;
-                        Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(keyValue);
+                        newBucketIndex = keyValue.HashCode & _divisor;
+                        _buckets[newBucketIndex] = _buckets[newBucketIndex].Add(keyValue);
                     }
                 }
             }
             else
             {
-                Divisor = origin.Divisor;
-                Buckets = origin.Buckets.Copy();
+                _divisor = origin._divisor;
+                _buckets = origin._buckets.Copy();
             }
 
-            newBucketIndex = hashCode & Divisor;
-            Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(new KeyValue(hashCode, key, value));
+            newBucketIndex = hashCode & _divisor;
+            _buckets[newBucketIndex] = _buckets[newBucketIndex].Add(new KeyValue(hashCode, key, value));
+        }
+
+        [MethodImpl((MethodImplOptions) 256)]
+        [Pure]
+        public Bucket GetBucket(int hashCode)
+        {
+            return _buckets[hashCode & _divisor];
         }
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
         public IEnumerator<KeyValue> GetEnumerator()
         {
-            for (var bucketIndex = 0; bucketIndex < Buckets.Length; bucketIndex++)
+            for (var bucketIndex = 0; bucketIndex < _buckets.Length; bucketIndex++)
             {
-                var keyValues = Buckets[bucketIndex].KeyValues;
+                var keyValues = _buckets[bucketIndex].KeyValues;
                 for (var index = 0; index < keyValues.Length; index++)
                 {
                     var keyValue = keyValues[index];
@@ -6877,19 +6892,19 @@ namespace IoC.Core
         public Table<TKey, TValue> Remove(int hashCode, TKey key, out bool removed)
         {
             removed = false;
-            var newBuckets = CollectionExtensions.CreateArray(Divisor + 1, Bucket.EmptyBucket);
+            var newBuckets = CollectionExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
             var newBucketsArray = newBuckets;
-            var bucketIndex = hashCode & Divisor;
-            for (var curBucketInex = 0; curBucketInex < Buckets.Length; curBucketInex++)
+            var bucketIndex = hashCode & _divisor;
+            for (var curBucketInex = 0; curBucketInex < _buckets.Length; curBucketInex++)
             {
                 if (curBucketInex != bucketIndex)
                 {
-                    newBucketsArray[curBucketInex] = Buckets[curBucketInex].Copy();
+                    newBucketsArray[curBucketInex] = _buckets[curBucketInex].Copy();
                     continue;
                 }
 
                 // Bucket to remove an element
-                var bucket = Buckets[bucketIndex];
+                var bucket = _buckets[bucketIndex];
                 var keyValues = bucket.KeyValues;
                 for (var index = 0; index < keyValues.Length; index++)
                 {
@@ -6903,7 +6918,7 @@ namespace IoC.Core
                 }
             }
 
-            return new Table<TKey, TValue>(newBuckets, Divisor, removed ? Count - 1: Count);
+            return new Table<TKey, TValue>(newBuckets, _divisor, removed ? Count - 1: Count);
         }
 
         internal sealed class KeyValue

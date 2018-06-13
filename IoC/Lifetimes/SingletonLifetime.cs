@@ -30,21 +30,22 @@
             var lockObjectField = Expression.Field(thisVar, LockObjectFieldInfo);
             var instanceField = Expression.Field(thisVar, InstanceFieldInfo);
             var typedInstance = instanceField.Convert(type);
+            var isNullExpression = Expression.ReferenceEqual(instanceField, ExpressionExtensions.NullConst);
 
-            // if(this.Instance != null)
+            // if(this.Instance == null)
             return Expression.Condition(
-                Expression.NotEqual(instanceField, ExpressionExtensions.NullConst),
-                // return (T)this.Instance;
-                typedInstance,
+                isNullExpression,
                 Expression.Block(
                     // lock(this.LockObject)
                     Expression.IfThen(
-                        // if(this.Instance == null)
-                        Expression.Equal(instanceField, ExpressionExtensions.NullConst),
+                        // if(this.Instance != null)
+                        isNullExpression,
                         // this.Instance = new T();
                         Expression.Assign(instanceField, expression)).Lock(lockObjectField),
                     // return (T)this.Instance;
-                    typedInstance));
+                    typedInstance),
+                // return (T)this.Instance;
+                typedInstance);
         }
 
         /// <inheritdoc />

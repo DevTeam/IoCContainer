@@ -36,9 +36,9 @@ namespace IoC.Comparison
 
         private static readonly List<TestInfo> IocsGraphOf3ObjectsWithSingleton = new List<TestInfo>
         {
-            new TestInfo("operators 'new'", CtorSingleton),
             new TestInfo($"{ThisIocName} actual DI", ThisByFuncSingleton),
             new TestInfo(ThisIocName, ThisSingleton),
+            new TestInfo("operators 'new'", CtorSingleton),
             new TestInfo("LightInject", LightInjectSingleton),
             new TestInfo("DryIoc", DryIocSingleton),
             new TestInfo("Castle Windsor", CastleWindsorSingleton){ PerformanceRate = 10 },
@@ -49,9 +49,9 @@ namespace IoC.Comparison
 
         private static readonly List<TestInfo> IocsGraphOf3Transient = new List<TestInfo>
         {
-            new TestInfo("operators 'new'", CtorTransient),
             new TestInfo($"{ThisIocName} actual DI", ThisByFuncTransient),
             new TestInfo(ThisIocName, ThisTransient),
+            new TestInfo("operators 'new'", CtorTransient),
             new TestInfo("LightInject", LightInjectTransient),
             new TestInfo("DryIoc", DryIocTransient),
             new TestInfo("Castle Windsor", CastleWindsorTransient) { PerformanceRate = 10 },

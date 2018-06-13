@@ -1,7 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp2.0;net40;net47</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp2.1;net40;net47</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
     <IsPackable>false</IsPackable>
@@ -9,38 +8,31 @@
     <WarningsAsErrors />
     <NoWarn>1701;1702;1705;8002</NoWarn>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Shouldly" Version="3.0.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
   </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)'!='net40'">
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.2" />
     <PackageReference Include="Moq" Version="4.8.2" />
-    <PackageReference Include="xunit" Version="2.3.1" />	
+    <PackageReference Include="xunit" Version="2.3.1" />
   </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)'=='net40'">
     <PackageReference Include="Moq" Version="4.2.1510.2205" />
-    <PackageReference Include="xunit" Version="1.9.2" />	    
+    <PackageReference Include="xunit" Version="1.9.2" />
   </ItemGroup>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.0'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.0.0" />    
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.0' or '$(TargetFramework)'=='netcoreapp2.1'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.0" />
     <ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
-  </ItemGroup>  
-
-  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp2.0' AND '$(TargetFramework)'!='net40'">
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp2.0' and '$(TargetFramework)'!='netcoreapp2.1' and '$(TargetFramework)'!='net40'">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
     <ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
-  </ItemGroup>  
-
-  <ItemGroup>    
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\IoC\IoC.csproj" />
   </ItemGroup>
-
   <ItemGroup>
     <None Update="UsageScenarios\README.md">
       <DesignTime>True</DesignTime>
@@ -51,5 +43,4 @@
       <Generator>TextTemplatingFileGenerator</Generator>
     </None>
   </ItemGroup>
-
 </Project>

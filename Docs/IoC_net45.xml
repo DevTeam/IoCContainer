@@ -2101,6 +2101,9 @@
         <member name="M:IoC.Key.Equals(System.Object)">
             <inheritdoc />
         </member>
+        <member name="M:IoC.Key.Equals(IoC.Key)">
+            <inheritdoc />
+        </member>
         <member name="M:IoC.Key.GetHashCode">
             <inheritdoc />
         </member>

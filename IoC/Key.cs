@@ -9,7 +9,7 @@
     /// </summary>
     [PublicAPI]
     [DebuggerDisplay("Type = {" + nameof(Type) + "}, Tag = {" + nameof(Tag) + "}")]
-    public struct Key
+    public struct Key: IEquatable<Key>
     {
         /// <summary>
         /// The marker object for any tag.
@@ -44,8 +44,14 @@
         [MethodImpl((MethodImplOptions)256)]
         public override bool Equals(object obj)
         {
-            var other = (Key) obj;
-            return Type == other.Type && Equals(Tag, other.Tag);
+            return Equals((Key)obj);
+        }
+
+        /// <inheritdoc />
+        [MethodImpl((MethodImplOptions)256)]
+        public bool Equals(Key other)
+        {
+            return ReferenceEquals(Type, other.Type) && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
         }
 
         /// <inheritdoc />

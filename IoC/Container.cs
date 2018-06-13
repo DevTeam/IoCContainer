@@ -24,10 +24,10 @@
     [DebuggerDisplay("Name = {" + nameof(ToString) + "()}")]
     public sealed class Container: IContainer, IResourceStore, IObserver<ContainerEvent>
     {
-        private const string RootName = "root:/";
+        private const string RootName = "/";
         private static long _containerId;
 
-        internal static readonly object[] EmptyArgs = new object[0];
+        internal static readonly object[] EmptyArgs = Core.CollectionExtensions.EmptyArray<object>();
         [NotNull] private static readonly Lazy<Container> BasicRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.BasicSet), true);
         [NotNull] private static readonly Lazy<Container> DefultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.DefaultSet), true);
         [NotNull] private static readonly Lazy<Container> HighPerformanceRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.HighPerformanceSet), true);
@@ -412,7 +412,8 @@
                     return false;
                 }
 
-                resolver = AddResolver(key, (Resolver<T>)resolverDelegate, true);
+                resolver = (Resolver<T>)resolverDelegate;
+                AddResolver(key, resolver, true);
                 return true;
             }
 
@@ -424,14 +425,14 @@
 
             if (container == this)
             {
-                resolver = AddResolver(key, resolver, false);
+                AddResolver(key, resolver, false);
             }
 
             return true;
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        private Resolver<T> AddResolver<T>(FullKey key, [NotNull] Resolver<T> resolver, bool currentContainer)
+        private void AddResolver(FullKey key, [NotNull] Delegate resolver, bool currentContainer)
         {
             lock (_lockObject)
             {
@@ -440,8 +441,6 @@
                 {
                     ResolversByType = ResolversByType.Set(key.Type.GetHashCode(), key.Type, resolver);
                 }
-
-                return resolver;
             }
         }
 

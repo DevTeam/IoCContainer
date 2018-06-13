@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>IoC.AspNetCore</name>
+    </assembly>
+    <members>
+        <member name="T:IoC.Features.AspNetCoreFeature">
+            <inheritdoc cref="T:IoC.IConfiguration" />
+        </member>
+        <member name="M:IoC.Features.AspNetCoreFeature.#ctor">
+            <summary>
+            Defaut constructor.
+            </summary>
+        </member>
+        <member name="M:IoC.Features.AspNetCoreFeature.#ctor(System.Collections.Generic.IList{Microsoft.Extensions.DependencyInjection.ServiceDescriptor})">
+            <summary>
+            Creates an instance of feature based on a list of ServiceDescriptor.
+            </summary>
+            <param name="list"></param>
+        </member>
+        <member name="M:IoC.Features.AspNetCoreFeature.Apply(IoC.IContainer)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>

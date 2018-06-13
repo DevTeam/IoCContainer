@@ -1,5 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFrameworks>netstandard1.0</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -9,7 +8,6 @@
     <TransformOnBuild>True</TransformOnBuild>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="**/*.cs" />
     <None Update="IoC.AspNetCore.tt">
@@ -24,9 +22,7 @@
     <ProjectReference Include="..\IoC\IoC.csproj" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
   </ItemGroup>
-
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
   </ItemGroup>
-
 </Project>

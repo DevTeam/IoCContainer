@@ -42,7 +42,7 @@
             }
 
             var array = new T[size];
-#if NETCOREAPP2_0
+#if NETCOREAPP2_0 || NETCOREAPP2_1
             Array.Fill(array, value);
 #else
             for (var i = 0; i < size; i++)
@@ -80,12 +80,12 @@
         public static TValue Get<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
             where TKey: struct
         {
-            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
+            var items = table.GetBucket(hashCode).KeyValues;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
-                if (Equals(item.Key, key))
+                if (item.Key.Equals(key))
                 {
                     return item.Value;
                 }
@@ -99,7 +99,7 @@
         public static TValue GetByRef<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
             where TKey: class
         {
-            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
+            var items = table.GetBucket(hashCode).KeyValues;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {

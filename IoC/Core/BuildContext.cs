@@ -9,7 +9,6 @@
     using System.Runtime.CompilerServices;
     using Extensibility;
     using static TypeDescriptorExtensions;
-    using CollectionExtensions = Core.CollectionExtensions;
 
     /// <summary>
     /// Represents build context.
@@ -24,7 +23,7 @@
         private static readonly FieldInfo ValuesFieldInfo = Descriptor<BuildContext>().GetDeclaredFields().Single(i => i.Name == nameof(Values));
 
         // Should be at least internal to be accessable from for compiled code from expressions
-        internal object[] Values = Core.CollectionExtensions.EmptyArray<object>();
+        internal object[] Values = CollectionExtensions.EmptyArray<object>();
         private readonly ICollection<IDisposable> _resources;
         private readonly int _id;
         private readonly IExpressionCompiler _compiler;

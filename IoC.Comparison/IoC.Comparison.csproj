@@ -1,42 +1,36 @@
-<Project Sdk="Microsoft.NET.Sdk">
-
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.0;net40;net47</TargetFrameworks>
+    <TargetFrameworks>net40;net47;netcoreapp2.1</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="DryIoc.dll" Version="2.12.10" />
     <PackageReference Include="JetBrains.dotMemoryUnit" Version="3.0.20171219.105559" />
     <PackageReference Include="Shouldly" Version="3.0.0" />
-    <PackageReference Include="System.ValueTuple" Version="4.4.0" />
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="Unity" Version="5.8.6" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.3.1" />
   </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)'!='net40'">
-    <PackageReference Include="Autofac" Version="4.8.0" />
+    <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="LightInject" Version="5.1.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.7.0" />
     <PackageReference Include="Moq" Version="4.8.2" />
     <PackageReference Include="Ninject" Version="3.3.4" />
     <PackageReference Include="Castle.Windsor" Version="4.1.0" />
-    <PackageReference Include="xunit" Version="2.3.1" />	
+    <PackageReference Include="xunit" Version="2.3.1" />
   </ItemGroup>
-
   <ItemGroup Condition="'$(TargetFramework)'=='net40'">
     <PackageReference Include="Autofac" Version="3.5.2" />
     <PackageReference Include="LightInject" Version="3.0.2.7" />
     <PackageReference Include="Moq" Version="4.2.1510.2205" />
     <PackageReference Include="Ninject" Version="3.2.2.0" />
     <PackageReference Include="Castle.Windsor" Version="3.4.0" />
-    <PackageReference Include="xunit" Version="1.9.2" />	    
+    <PackageReference Include="xunit" Version="1.9.2" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\IoC\IoC.csproj" />
   </ItemGroup>
-
 </Project>

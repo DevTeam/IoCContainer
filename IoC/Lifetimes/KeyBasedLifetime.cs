@@ -39,6 +39,8 @@
             var lockObjectField = Expression.Field(thisVar, LockObjectFieldInfo);
             var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
             var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(null, GetMethodInfo, instancesField, SingletonBasedLifetimeShared.HashCodeVar, KeyVar).Convert(returnType));
+            var isNullExpression = Expression.ReferenceEqual(instanceVar, ExpressionExtensions.NullConst);
+
             return Expression.Block(
                 // Key key;
                 // int hashCode;
@@ -50,12 +52,9 @@
                 Expression.Assign(SingletonBasedLifetimeShared.HashCodeVar, Expression.Call(KeyVar, ExpressionExtensions.GetHashCodeMethodInfo)),
                 // var instance = (T)Instances.Get(hashCode, key);
                 assignInstanceExpression,
-                // if(instance != null)
+                // if(instance == null)
                 Expression.Condition(
-                    Expression.NotEqual(instanceVar, ExpressionExtensions.NullConst),
-                    // return instance;
-                    instanceVar,
-                    // else {
+                    isNullExpression,
                     Expression.Block(
                         // lock (this.LockObject)
                         Expression.Block(
@@ -73,7 +72,11 @@
                             )
                         ).Lock(lockObjectField),
                         // OnNewInstanceCreated(instance, key, container, args);
-                        Expression.Call(thisVar, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, ContainerParameter, ArgsParameter)))
+                        Expression.Call(thisVar, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, ContainerParameter, ArgsParameter)),
+                        // else {
+                        // return instance;
+                        instanceVar
+                    )
                     // }
             );
         }
