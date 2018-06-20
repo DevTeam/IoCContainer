@@ -22,13 +22,13 @@ IoC.Container provides the following benefits:
 
 NuGet packages:
   - IoC.Container
-    - [![NuGet](https://buildstats.info/nuget/IoC.Container?includePreReleases=true)](https://www.nuget.org/packages/IoC.Container)
+    - [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container)
   - IoC.Container.Source, embedded-in-code
-    - [![NuGet](https://buildstats.info/nuget/IoC.Container.Source?includePreReleases=true)](https://www.nuget.org/packages/IoC.Container.Source)
+    - [![NuGet](https://buildstats.info/nuget/IoC.Container.Source)](https://www.nuget.org/packages/IoC.Container.Source)
   - IoC.AspNetCore
-    - [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore?includePreReleases=true)](https://www.nuget.org/packages/IoC.AspNetCore)
+    - [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore)
   - IoC.AspNetCore.Source, embedded-in-code
-    - [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source?includePreReleases=true)](https://www.nuget.org/packages/IoC.AspNetCore.Source)
+    - [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source)
 
 Embedded-in-code packages require C# 7.0 or higher
 
