@@ -30,7 +30,7 @@ NuGet packages:
   - IoC.AspNetCore.Source, embedded-in-code
     - [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source?includePreReleases=true)](https://www.nuget.org/packages/IoC.AspNetCore.Source)
 
-Embedded-in-code packages requires C# 7.0 or higher
+Embedded-in-code packages require C# 7.0 or higher
 
 Supported platforms:
   - .NET 4.0+
