@@ -24,7 +24,6 @@
     [DebuggerDisplay("Name = {" + nameof(ToString) + "()}")]
     public sealed class Container: IContainer, IResourceStore, IObserver<ContainerEvent>
     {
-        private const string RootName = "/";
         private static long _containerId;
 
         internal static readonly object[] EmptyArgs = Core.CollectionExtensions.EmptyArray<object>();
@@ -90,7 +89,7 @@
 
         private static Container CreateRootContainer([NotNull][ItemNotNull] IEnumerable<IConfiguration> configurations)
         {
-            var container = new Container(RootName, NullContainer.Shared, true);
+            var container = new Container(string.Empty, NullContainer.Shared, true);
             container.ApplyConfigurations(configurations);
             return container;
         }
@@ -125,13 +124,14 @@
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
             var isRegistered = true;
-            var registrationEntry = new RegistrationEntry(dependency, lifetime, Disposable.Create(UnregisterKeys), keys);
+            var registeredKeys = new List<FullKey>();
+            var registrationEntry = new RegistrationEntry(dependency, lifetime, Disposable.Create(UnregisterKeys), registeredKeys);
 
             void UnregisterKeys()
             {
                 lock (_lockObject)
                 {
-                    foreach (var curKey in keys)
+                    foreach (var curKey in registeredKeys)
                     {
                         if (curKey.Tag == AnyTag)
                         {
@@ -180,6 +180,8 @@
                         {
                             break;
                         }
+
+                        registeredKeys.Add(key);
                     }
 
                     if (isRegistered)

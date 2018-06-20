@@ -30,6 +30,26 @@
         }
 
         [Fact]
+        public void ContainerShouldResolveGenericEnumerable()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                Func<IMyService> func = Mock.Of<IMyService>;
+                // When
+                using (container.Bind<IMyService>().As(Lifetime.Singleton).To(ctx => func()))
+                using (container.Bind<IMyGenericService<TT>>().To(ctx => new MyGenericService<TT>(default(TT), ctx.Container.Inject<IMyService>())))
+                using (container.Bind<IMyGenericService<TT>>().Tag(1).To(ctx => new MyGenericService<TT>(default(TT), ctx.Container.Inject<IMyService>())))
+                using (container.Bind<IMyGenericService<TT>>().Tag("abc").To(ctx => new MyGenericService<TT>(default(TT), ctx.Container.Inject<IMyService>())))
+                {
+                    // Then
+                    var actualInstances = container.Resolve<IEnumerable<IMyGenericService<string>>>().ToList();
+                    actualInstances.Count.ShouldBe(3);
+                }
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveEnumerableAfterContainerChanged()
         {
             // Given
