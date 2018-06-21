@@ -25,6 +25,7 @@ namespace IoC.Comparison
 #endif
 
     using ThisContainer = Container;
+    using static Lifetime;
 
     [SuppressMessage("ReSharper", "UnusedMember.Local")]
     [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
@@ -85,7 +86,7 @@ namespace IoC.Comparison
         [Trait("Category", "Performance")]
         public void PerformanceTest()
         {
-            if (!int.TryParse(Environment.GetEnvironmentVariable("SERIES"), out var series))
+            if (!long.TryParse(Environment.GetEnvironmentVariable("SERIES"), out var series))
             {
                 series = 10000000;
             }
@@ -105,7 +106,7 @@ namespace IoC.Comparison
                 results.Add(result);
             }
 
-            SaveResults(results, $"5 instances and 1 singleton {series.ToShortString()} times");
+            SaveResults(results, $"20 instances and 1 singleton {series.ToShortString()} times");
             results.Clear();
 
             foreach (var ioc in IocsGraphOf3Transient)
@@ -122,7 +123,7 @@ namespace IoC.Comparison
                 results.Add(result);
             }
 
-            SaveResults(results, $"6 instances {series.ToShortString()} times");
+            SaveResults(results, $"27 instances {series.ToShortString()} times");
             results.Clear();
         }
 
@@ -136,7 +137,7 @@ namespace IoC.Comparison
                 return;
             }
 
-            const int series = 10;
+            const long series = 10;
 
             var results = new List<TestResult>();
             foreach (var ioc in IocsGraphOf3ObjectsWithSingleton)
@@ -168,12 +169,13 @@ namespace IoC.Comparison
             results.Clear();
         }
 
-        private static void ThisSingleton(int series, IPerformanceCounter performanceCounter)
+        private static void ThisSingleton(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = ThisContainer.CreateHighPerformance())
             using (container.Bind<IService1>().To<Service1>())
-            using (container.Bind<IService2>().As(Lifetime.Singleton).To<Service2>())
+            using (container.Bind<IService2>().As(Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
+            using (container.Bind<IService4>().To<Service4>())
             {
                 using (performanceCounter.Run())
                 {
@@ -185,12 +187,13 @@ namespace IoC.Comparison
             }
         }
 
-        private static void ThisTransient(int series, IPerformanceCounter performanceCounter)
+        private static void ThisTransient(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = ThisContainer.CreateHighPerformance())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
+            using (container.Bind<IService4>().To<Service4>())
             {
                 using (performanceCounter.Run())
                 {
@@ -202,12 +205,13 @@ namespace IoC.Comparison
             }
         }
 
-        private static void ThisByFuncSingleton(int series, IPerformanceCounter performanceCounter)
+        private static void ThisByFuncSingleton(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = ThisContainer.CreateHighPerformance())
             using (container.Bind<IService1>().To<Service1>())
-            using (container.Bind<IService2>().As(Lifetime.Singleton).To<Service2>())
+            using (container.Bind<IService2>().As(Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
+            using (container.Bind<IService4>().To<Service4>())
             {
                 using (performanceCounter.Run())
                 {
@@ -220,12 +224,13 @@ namespace IoC.Comparison
             }
         }
 
-        private static void ThisByFuncTransient(int series, IPerformanceCounter performanceCounter)
+        private static void ThisByFuncTransient(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = ThisContainer.CreateHighPerformance())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
+            using (container.Bind<IService4>().To<Service4>())
             {
                 using (performanceCounter.Run())
                 {
@@ -238,13 +243,14 @@ namespace IoC.Comparison
             }
         }
 
-        private static void UnitySingleton(int series, IPerformanceCounter performanceCounter)
+        private static void UnitySingleton(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = new UnityContainer())
             {
                 container.RegisterType<IService1, Service1>();
                 container.RegisterType<IService2, Service2>(new ContainerControlledLifetimeManager());
                 container.RegisterType<IService3, Service3>();
+                container.RegisterType<IService4, Service4>();
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -255,13 +261,14 @@ namespace IoC.Comparison
             }
         }
 
-        private static void UnityTransient(int series, IPerformanceCounter performanceCounter)
+        private static void UnityTransient(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = new UnityContainer())
             {
                 container.RegisterType<IService1, Service1>();
                 container.RegisterType<IService2, Service2>(new ContainerControlledLifetimeManager());
                 container.RegisterType<IService3, Service3>();
+                container.RegisterType<IService4, Service4>();
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -272,13 +279,14 @@ namespace IoC.Comparison
             }
         }
 
-        private static void NinjectSingleton(int series, IPerformanceCounter performanceCounter)
+        private static void NinjectSingleton(long series, IPerformanceCounter performanceCounter)
         {
             using (var kernel = new StandardKernel())
             {
                 kernel.Bind<IService1>().To<Service1>();
                 kernel.Bind<IService2>().To<Service2>().InSingletonScope();
                 kernel.Bind<IService3>().To<Service3>();
+                kernel.Bind<IService4>().To<Service4>();
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -289,13 +297,14 @@ namespace IoC.Comparison
             }
         }
 
-        private static void NinjectTransient(int series, IPerformanceCounter performanceCounter)
+        private static void NinjectTransient(long series, IPerformanceCounter performanceCounter)
         {
             using (var kernel = new StandardKernel())
             {
                 kernel.Bind<IService1>().To<Service1>();
                 kernel.Bind<IService2>().To<Service2>();
                 kernel.Bind<IService3>().To<Service3>();
+                kernel.Bind<IService4>().To<Service4>();
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -306,12 +315,13 @@ namespace IoC.Comparison
             }
         }
 
-        private static void AutofacSingleton(int series, IPerformanceCounter performanceCounter)
+        private static void AutofacSingleton(long series, IPerformanceCounter performanceCounter)
         {
             var builder = new ContainerBuilder();
             builder.RegisterType<Service1>().As<IService1>();
             builder.RegisterType<Service2>().As<IService2>().SingleInstance();
             builder.RegisterType<Service3>().As<IService3>();
+            builder.RegisterType<Service4>().As<IService4>();
             using (var container = builder.Build())
             using (performanceCounter.Run())
             {
@@ -322,12 +332,13 @@ namespace IoC.Comparison
             }
         }
 
-        private static void AutofacTransient(int series, IPerformanceCounter performanceCounter)
+        private static void AutofacTransient(long series, IPerformanceCounter performanceCounter)
         {
             var builder = new ContainerBuilder();
             builder.RegisterType<Service1>().As<IService1>();
             builder.RegisterType<Service2>().As<IService2>();
             builder.RegisterType<Service3>().As<IService3>();
+            builder.RegisterType<Service4>().As<IService4>();
             using (var container = builder.Build())
             using (performanceCounter.Run())
             {
@@ -338,13 +349,14 @@ namespace IoC.Comparison
             }
         }
 
-        private static void CastleWindsorSingleton(int series, IPerformanceCounter performanceCounter)
+        private static void CastleWindsorSingleton(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = new WindsorContainer())
             {
                 container.Register(Component.For<IService1>().ImplementedBy<Service1>());
                 container.Register(Component.For<IService2>().ImplementedBy<Service2>().LifestyleSingleton());
                 container.Register(Component.For<IService3>().ImplementedBy<Service3>());
+                container.Register(Component.For<IService4>().ImplementedBy<Service4>());
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -355,13 +367,14 @@ namespace IoC.Comparison
             }
         }
 
-        private static void CastleWindsorTransient(int series, IPerformanceCounter performanceCounter)
+        private static void CastleWindsorTransient(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = new WindsorContainer())
             {
                 container.Register(Component.For<IService1>().ImplementedBy<Service1>());
                 container.Register(Component.For<IService2>().ImplementedBy<Service2>());
                 container.Register(Component.For<IService3>().ImplementedBy<Service3>());
+                container.Register(Component.For<IService4>().ImplementedBy<Service4>());
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -372,13 +385,14 @@ namespace IoC.Comparison
             }
         }
 
-        private static void LightInjectSingleton(int series, IPerformanceCounter performanceCounter)
+        private static void LightInjectSingleton(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = new ServiceContainer())
             {
                 container.Register<IService1, Service1>();
                 container.Register<IService2, Service2>(new PerContainerLifetime());
                 container.Register<IService3, Service3>();
+                container.Register<IService4, Service4>();
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -389,13 +403,14 @@ namespace IoC.Comparison
             }
         }
 
-        private static void LightInjectTransient(int series, IPerformanceCounter performanceCounter)
+        private static void LightInjectTransient(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = new ServiceContainer())
             {
                 container.Register<IService1, Service1>();
                 container.Register<IService2, Service2>();
                 container.Register<IService3, Service3>();
+                container.Register<IService4, Service4>();
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -406,13 +421,14 @@ namespace IoC.Comparison
             }
         }
 
-        private static void DryIocSingleton(int series, IPerformanceCounter performanceCounter)
+        private static void DryIocSingleton(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = new Container())
             {
                 container.Register<IService1, Service1>();
                 container.Register<IService2, Service2>(Reuse.Singleton);
                 container.Register<IService3, Service3>();
+                container.Register<IService4, Service4>();
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -423,13 +439,14 @@ namespace IoC.Comparison
             }
         }
 
-        private static void DryIocTransient(int series, IPerformanceCounter performanceCounter)
+        private static void DryIocTransient(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = new Container())
             {
                 container.Register<IService1, Service1>();
                 container.Register<IService2, Service2>();
                 container.Register<IService3, Service3>();
+                container.Register<IService4, Service4>();
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -443,7 +460,7 @@ namespace IoC.Comparison
         private static readonly object LockObject = new object();
         private static volatile Service2 _service2;
 
-        private static void CtorSingleton(int series, IPerformanceCounter performanceCounter)
+        private static void CtorSingleton(long series, IPerformanceCounter performanceCounter)
         {
             using (performanceCounter.Run())
             {
@@ -467,15 +484,15 @@ namespace IoC.Comparison
                 {
                     if (_service2 == null)
                     {
-                        _service2 = new Service2(new Service3());
+                        _service2 = new Service2(new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()));
                     }
                 }
             }
 
-            return new Service1(_service2, new Service3(), new Service3(), new Service3());
+            return new Service1(_service2, new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service4());
         }
 
-        private static void CtorTransient(int series, IPerformanceCounter performanceCounter)
+        private static void CtorTransient(long series, IPerformanceCounter performanceCounter)
         {
             using (performanceCounter.Run())
             {
@@ -488,7 +505,7 @@ namespace IoC.Comparison
 
         private static IService1 CreateTransientService()
         {
-            return new Service1(new Service2(new Service3()), new Service3(), new Service3(), new Service3());
+            return new Service1(new Service2(new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4())), new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service4());
         }
 
         private static string GetBinDirectory()
@@ -538,7 +555,7 @@ namespace IoC.Comparison
     [SuppressMessage("ReSharper", "UnusedParameter.Local")]
     public sealed class Service1 : IService1
     {
-        public Service1(IService2 service2, IService3 service31, IService3 service32, IService3 service33)
+        public Service1(IService2 service2, IService3 service31, IService3 service32, IService3 service33, IService4 service4)
         {
         }
 
@@ -566,6 +583,19 @@ namespace IoC.Comparison
 
     // ReSharper disable once ClassNeverInstantiated.Global
     public sealed class Service3 : IService3
+    {
+        [SuppressMessage("ReSharper", "UnusedParameter.Local")]
+        public Service3(IService4 service41, IService4 service42, IService4 service43, IService4 service44, IService4 service45)
+        {
+        }
+    }
+
+    public interface IService4
+    {
+    }
+
+    // ReSharper disable once ClassNeverInstantiated.Global
+    public sealed class Service4 : IService4
     {
     }
 }

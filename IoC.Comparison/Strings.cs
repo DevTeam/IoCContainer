@@ -4,7 +4,7 @@
 
     internal static class Strings
     {
-        public static string ToShortString(this int number)
+        public static string ToShortString(this long number)
         {
             if (number > 999999999)
             {
