@@ -42,7 +42,7 @@ Supported platforms:
 
 ### The reality is that
 
-![Cat](Docs/Images/cat.jpg)
+![Cat](https://github.com/DevTeam/IoCContainer/blob/master/Docs/Images/cat.jpg?raw=true)
 
 ### Let's create an abstraction
 
