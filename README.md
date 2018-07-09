@@ -1078,11 +1078,11 @@ public class MyContainer: IContainer
     public bool TryGetDependency(Key key, out IoC.IDependency dependency, out ILifetime lifetime)
         => Parent.TryGetDependency(key, out dependency, out lifetime);
 
-    public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, IContainer container = null)
-        => Parent.TryGetResolver(type, out resolver, container);
+    public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, out Exception error, IContainer container = null)
+        => Parent.TryGetResolver(type, out resolver, out error, container);
 
-    public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
-        => Parent.TryGetResolver(type, tag, out resolver, container);
+    public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer container = null)
+        => Parent.TryGetResolver(type, tag, out resolver, out error, container);
 
     public void Dispose() { }
 

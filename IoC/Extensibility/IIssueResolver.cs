@@ -33,8 +33,9 @@
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="container">The resolving container.</param>
         /// <param name="key">The resolving key.</param>
+        /// <param name="error">The error.</param>
         /// <returns>The resolver.</returns>
-        [NotNull] Resolver<T> CannotGetResolver<T>([NotNull] IContainer container, Key key);
+        [NotNull] Resolver<T> CannotGetResolver<T>([NotNull] IContainer container, Key key, [NotNull] Exception error);
 
         /// <summary>
         /// Handles the scenario when cannot extract generic type arguments.

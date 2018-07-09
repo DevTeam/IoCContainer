@@ -33,12 +33,12 @@
             }
         }
 
-        public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver)
+        public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver, out Exception error)
         {
             var typeDescriptor = key.Type.Descriptor();
             var compiler = container.GetExpressionCompiler();
             var buildContext = new BuildContext(compiler, key, container, _resources);
-            if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression))
+            if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression, out error))
             {
                 resolver = default(Delegate);
                 return false;
@@ -46,6 +46,7 @@
 
             var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, WellknownExpressions.ResolverParameters);
             resolver = compiler.Compile(resolverExpression);
+            error = default(Exception);
             return true;
         }
 

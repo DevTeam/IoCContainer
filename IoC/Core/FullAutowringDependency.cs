@@ -24,14 +24,14 @@
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression)
+        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             var autowiringStrategy = _autowiringStrategy;
             if (
                 autowiringStrategy == null
                 && buildContext.Key.Type != TypeDescriptor<IAutowiringStrategy>.Type
-                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(TypeDescriptor<IAutowiringStrategy>.Type, out var autowiringStrategyResolver))
+                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(TypeDescriptor<IAutowiringStrategy>.Type, out var autowiringStrategyResolver, out error))
             {
                 autowiringStrategy = autowiringStrategyResolver(buildContext.Container);
             }
@@ -82,7 +82,7 @@
                 select (Expression) Expression.Call(thisExpression, initializer.Info, initializer.GetParametersExpressions())).ToArray();
 
             var autowringDependency = new AutowringDependency(newExpression, methodCallExpressions);
-            return autowringDependency.TryBuildExpression(buildContext, lifetime, out baseExpression);
+            return autowringDependency.TryBuildExpression(buildContext, lifetime, out baseExpression, out error);
         }
 
         [NotNull]

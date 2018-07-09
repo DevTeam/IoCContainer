@@ -1149,6 +1149,7 @@ namespace IoC
     /// </summary>
     [PublicAPI]
     [DebuggerDisplay("Name = {" + nameof(ToString) + "()}")]
+    [DebuggerTypeProxy(typeof(ContainerDebugView))]
     public sealed class Container: IContainer, IResourceStore, IObserver<ContainerEvent>
     {
         private static long _containerId;
@@ -1341,13 +1342,14 @@ namespace IoC
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-        public bool TryGetResolver<T>(ShortKey type, object tag, out Resolver<T> resolver, IContainer container = null)
+        public bool TryGetResolver<T>(ShortKey type, object tag, out Resolver<T> resolver, out Exception error, IContainer container = null)
         {
             if (tag == null)
             {
                 resolver = (Resolver<T>) ResolversByType.GetByRef(type.GetHashCode(), type);
                 if (resolver != default(Resolver<T>))
                 {
+                    error = default(Exception);
                     return true;
                 }
             }
@@ -1357,25 +1359,27 @@ namespace IoC
                 resolver = (Resolver<T>)Resolvers.Get(key.GetHashCode(), key);
                 if (resolver != default(Resolver<T>))
                 {
+                    error = default(Exception);
                     return true;
                 }
             }
 
-            return TryCreateResolver(new FullKey(type, tag), out resolver, container ?? this);
+            return TryCreateResolver(new FullKey(type, tag), out resolver, out error, container ?? this);
         }
 
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-        public bool TryGetResolver<T>(ShortKey type, out Resolver<T> resolver, IContainer container = null)
+        public bool TryGetResolver<T>(ShortKey type, out Resolver<T> resolver, out Exception error, IContainer container = null)
         {
             resolver = (Resolver<T>) ResolversByType.GetByRef(type.GetHashCode(), type);
             if (resolver != default(Resolver<T>))
             {
+                error = default(Exception);
                 return true;
             }
 
-            return TryCreateResolver(new FullKey(type), out resolver, container ?? this);
+            return TryCreateResolver(new FullKey(type), out resolver, out error, container ?? this);
         }
 
         /// <inheritdoc />
@@ -1531,22 +1535,23 @@ namespace IoC
         }
         
         [MethodImpl((MethodImplOptions)256)]
-        private bool TryCreateResolver<T>(FullKey key, out Resolver<T> resolver, IContainer container)
+        private bool TryCreateResolver<T>(FullKey key, out Resolver<T> resolver, out Exception error, IContainer container)
         {
             if (TryGetRegistrationEntry(key, out var registrationEntry))
             {
-                if (!registrationEntry.TryCreateResolver(key, container, out var resolverDelegate))
+                if (!registrationEntry.TryCreateResolver(key, container, out var resolverDelegate, out error))
                 {
                     resolver = default(Resolver<T>);
                     return false;
                 }
 
                 resolver = (Resolver<T>)resolverDelegate;
+                error = default(Exception);
                 AddResolver(key, resolver, true);
                 return true;
             }
 
-            if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, container))
+            if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, out error, container))
             {
                 resolver = default(Resolver<T>);
                 return false;
@@ -1557,6 +1562,7 @@ namespace IoC
                 AddResolver(key, resolver, false);
             }
 
+            error = default(Exception);
             return true;
         }
 
@@ -1611,6 +1617,26 @@ namespace IoC
 
                 return false;
             }
+        }
+
+        [SuppressMessage("ReSharper", "UnusedMember.Local")]
+        private class ContainerDebugView
+        {
+            private readonly Container _container;
+
+            public ContainerDebugView([NotNull] Container container)
+            {
+                _container = container ?? throw new ArgumentNullException(nameof(container));
+            }
+
+            [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
+            public FullKey[] Keys => _container._allKeys.SelectMany(i => i).ToArray();
+
+            public IContainer Parent => _container.Parent is NullContainer ? null : _container.Parent;
+
+            public int ResolversCount => _container.Resolvers.Count + _container.ResolversByType.Count;
+
+            public int ResourcesCount => _container._resources.Count;
         }
     }
 }
@@ -2361,7 +2387,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag)
-            => container.TryGetResolver<T>(type, tag.Value, out var resolver, container) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type, tag));
+            => container.TryGetResolver<T>(type, tag.Value, out var resolver, out var error, container) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type, tag), error);
 
         /// <summary>
         /// Gets the resolver.
@@ -2385,7 +2411,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type)
-            => container.TryGetResolver<T>(type, out var resolver, container) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type));
+            => container.TryGetResolver<T>(type, out var resolver, out var error, container) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type), error);
 
         /// <summary>
         /// Gets the resolver.
@@ -2404,7 +2430,6 @@ namespace IoC
         /// <param name="tagValue">The tage value.</param>
         /// <returns>The tag.</returns>
         [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
         public static Tag AsTag([CanBeNull] this object tagValue) => new Tag(tagValue);
     }
 }
@@ -3252,9 +3277,10 @@ namespace IoC
         /// <param name="type">The target type.</param>
         /// <param name="tag">The tag of binding.</param>
         /// <param name="resolver">The resolver.</param>
+        /// <param name="error">The error during resolving.</param>
         /// <param name="container">The resolving container.</param>
         /// <returns>True if successful.</returns>
-        bool TryGetResolver<T>([NotNull] Type type, [CanBeNull] object tag, out Resolver<T> resolver, [CanBeNull] IContainer container = null);
+        bool TryGetResolver<T>([NotNull] Type type, [CanBeNull] object tag, out Resolver<T> resolver, out Exception error, [CanBeNull] IContainer container = null);
 
         /// <summary>
         /// Gets the resolver.
@@ -3262,9 +3288,10 @@ namespace IoC
         /// <typeparam name="T">The resolver type.</typeparam>
         /// <param name="type">The target type.</param>
         /// <param name="resolver">The resolver.</param>
+        /// <param name="error">The error during resolving</param>
         /// <param name="container">The resolving container.</param>
         /// <returns>True if successful.</returns>
-        bool TryGetResolver<T>([NotNull] Type type, out Resolver<T> resolver, [CanBeNull] IContainer container = null);
+        bool TryGetResolver<T>([NotNull] Type type, out Resolver<T> resolver, out Exception error, [CanBeNull] IContainer container = null);
     }
 }
 
@@ -3274,6 +3301,7 @@ namespace IoC
 
 namespace IoC
 {
+    using System;
     using System.Linq.Expressions;
     using Extensibility;
 
@@ -3289,8 +3317,9 @@ namespace IoC
         /// <param name="buildContext">The build context,</param>
         /// <param name="lifetime">The target lifetime,</param>
         /// <param name="baseExpression">The resulting expression.</param>
+        /// <param name="error">The error.</param>
         /// <returns>True if success.</returns>
-        bool TryBuildExpression([NotNull] IBuildContext buildContext, [CanBeNull] ILifetime lifetime, out Expression baseExpression);
+        bool TryBuildExpression([NotNull] IBuildContext buildContext, [CanBeNull] ILifetime lifetime, out Expression baseExpression, out Exception error);
     }
 }
 
@@ -3434,7 +3463,7 @@ namespace IoC
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// Represents the key of binding.
+    /// Represents the container key.
     /// </summary>
     [PublicAPI]
     [DebuggerDisplay("Type = {" + nameof(Type) + "}, Tag = {" + nameof(Tag) + "}")]
@@ -3467,7 +3496,7 @@ namespace IoC
         }
 
         /// <inheritdoc />
-        public override string ToString() => $"Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {GetHashCode()}";
+        public override string ToString() => $"[Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {GetHashCode()}]";
 
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]
@@ -4825,8 +4854,9 @@ namespace IoC.Extensibility
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="container">The resolving container.</param>
         /// <param name="key">The resolving key.</param>
+        /// <param name="error">The error.</param>
         /// <returns>The resolver.</returns>
-        [NotNull] Resolver<T> CannotGetResolver<T>([NotNull] IContainer container, Key key);
+        [NotNull] Resolver<T> CannotGetResolver<T>([NotNull] IContainer container, Key key, [NotNull] Exception error);
 
         /// <summary>
         /// Handles the scenario when cannot extract generic type arguments.
@@ -4974,7 +5004,7 @@ namespace IoC.Core
 
         public Expression Expression { get; }
 
-        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression)
+        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             try
@@ -4986,11 +5016,13 @@ namespace IoC.Core
                 }
 
                 baseExpression = buildContext.AppendLifetime(baseExpression, lifetime);
+                error = default(Exception);
                 return true;
             }
-            catch (BuildExpressionException)
+            catch (BuildExpressionException ex)
             {
-                baseExpression = default(LambdaExpression);
+                error = ex;
+                baseExpression = default(Expression);
                 return false;
             }
         }
@@ -5332,11 +5364,8 @@ namespace IoC.Core
 
     internal class BuildExpressionException: InvalidOperationException
     {
-        public BuildExpressionException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        public BuildExpressionException(Exception innerException) : base(innerException.Message, innerException)
+        public BuildExpressionException(string message, [CanBeNull] Exception innerException)
+            : base(message, innerException)
         {
         }
     }
@@ -5779,7 +5808,7 @@ namespace IoC.Core
                     break;
 
                 default:
-                    var expression = Visit(tagExpression) ?? throw new BuildExpressionException(new InvalidOperationException("Null expression"));
+                    var expression = Visit(tagExpression) ?? throw new BuildExpressionException($"Invalid tag expression {tagExpression}.", new InvalidOperationException());
                     var tagFunc = Expression.Lambda<Func<object>>(expression, true).Compile();
                     tag = tagFunc();
                     break;
@@ -5813,9 +5842,7 @@ namespace IoC.Core
         }
 
         [NotNull]
-        private Expression CreateDependencyExpression(
-            Key key,
-            [CanBeNull] Expression containerExpression)
+        private Expression CreateDependencyExpression(Key key, [CanBeNull] Expression containerExpression)
         {
             if (Equals(key, ContextKey))
             {
@@ -5833,7 +5860,7 @@ namespace IoC.Core
                 }
                 catch (Exception ex)
                 {
-                    throw new BuildExpressionException($"Cannot find dependency {key}.", ex);
+                    throw new BuildExpressionException(ex.Message, ex.InnerException);
                 }
             }
 
@@ -5846,7 +5873,7 @@ namespace IoC.Core
                     _container.Resolve<IIssueResolver>().CyclicDependenceDetected(key, childBuildContext.Depth);
                 }
 
-                if (dependency.TryBuildExpression(childBuildContext, lifetime, out var expression))
+                if (dependency.TryBuildExpression(childBuildContext, lifetime, out var expression, out var error))
                 {
                     return expression;
                 }
@@ -5856,9 +5883,9 @@ namespace IoC.Core
                     {
                         return _container.Resolve<IIssueResolver>().CannotBuildExpression(childBuildContext, dependency, lifetime);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        throw new BuildExpressionException($"Cannot build dependency {key}.", ex);
+                        throw error;
                     }
                 }
             }
@@ -6179,7 +6206,7 @@ namespace IoC.Core
             {
                 if (_getExpressionCompilerReentrancy == 1)
                 {
-                    if (container.TryGetResolver<IExpressionCompiler>(TypeDescriptor<IExpressionCompiler>.Type, out var resolver))
+                    if (container.TryGetResolver<IExpressionCompiler>(TypeDescriptor<IExpressionCompiler>.Type, out var resolver, out _))
                     {
                         return resolver(container);
                     }
@@ -6250,14 +6277,14 @@ namespace IoC.Core
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression)
+        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             var autowiringStrategy = _autowiringStrategy;
             if (
                 autowiringStrategy == null
                 && buildContext.Key.Type != TypeDescriptor<IAutowiringStrategy>.Type
-                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(TypeDescriptor<IAutowiringStrategy>.Type, out var autowiringStrategyResolver))
+                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(TypeDescriptor<IAutowiringStrategy>.Type, out var autowiringStrategyResolver, out error))
             {
                 autowiringStrategy = autowiringStrategyResolver(buildContext.Container);
             }
@@ -6308,7 +6335,7 @@ namespace IoC.Core
                 select (Expression) Expression.Call(thisExpression, initializer.Info, initializer.GetParametersExpressions())).ToArray();
 
             var autowringDependency = new AutowringDependency(newExpression, methodCallExpressions);
-            return autowringDependency.TryBuildExpression(buildContext, lifetime, out baseExpression);
+            return autowringDependency.TryBuildExpression(buildContext, lifetime, out baseExpression, out error);
         }
 
         [NotNull]
@@ -6359,19 +6386,20 @@ namespace IoC.Core
         public Tuple<IDependency, ILifetime> CannotResolveDependency(IContainer container, Key key)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            throw new InvalidOperationException($"Cannot find the dependency for the key \"{key}\" from  the container \"{container}\". Details:\n{GetContainerDetails(container)}");
+            throw new InvalidOperationException($"Cannot find the dependency for the key {key} in the container {container}.");
         }
 
-        public Resolver<T> CannotGetResolver<T>(IContainer container, Key key)
+        public Resolver<T> CannotGetResolver<T>(IContainer container, Key key, Exception error)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            throw new InvalidOperationException($"Cannot get resolver for the key \"{key}\" from the container \"{container}\". Details:\n{GetContainerDetails(container)}");
+            if (error == null) throw new ArgumentNullException(nameof(error));
+            throw new InvalidOperationException($"Cannot get resolver for the key {key} from the container {container}.", error);
         }
 
         public Type[] CannotGetGenericTypeArguments(Type type)
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
-            throw new InvalidOperationException($"Cannot get generic type arguments from the type \"{type.Name}\".");
+            throw new InvalidOperationException($"Cannot get generic type arguments from the type {type.Name}.");
         }
 
         public void CyclicDependenceDetected(Key key, int reentrancy)
@@ -6379,7 +6407,7 @@ namespace IoC.Core
             if (reentrancy <= 0) throw new ArgumentOutOfRangeException(nameof(reentrancy));
             if (reentrancy >= 256)
             {
-                throw new InvalidOperationException($"The cyclic dependence detected resolving the dependency \"{key}\". The reentrancy is {reentrancy}.");
+                throw new InvalidOperationException($"The cyclic dependence detected resolving the dependency {key}. The reentrancy is {reentrancy}.");
             }
         }
 
@@ -6387,48 +6415,43 @@ namespace IoC.Core
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (keys == null) throw new ArgumentNullException(nameof(keys));
-            throw new InvalidOperationException($"Keys {string.Join(", ", keys.Select(i => i.ToString()))} cannot be registered in the container \"{container}\". Details:\n{GetContainerDetails(container)}");
+            throw new InvalidOperationException($"Keys {string.Join(", ", keys.Select(i => i.ToString()))} cannot be registered in the container {container}.");
         }
 
         public Type CannotParseType(string statementText, int statementLineNumber, int statementPosition, string typeName)
         {
-            throw new InvalidOperationException($"Cannot parse the type \"{typeName}\" in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
+            throw new InvalidOperationException($"Cannot parse the type {typeName} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
         }
 
         public Lifetime CannotParseLifetime(string statementText, int statementLineNumber, int statementPosition, string lifetimeName)
         {
-            throw new InvalidOperationException($"Cannot parse the lifetime \"{lifetimeName}\" in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
+            throw new InvalidOperationException($"Cannot parse the lifetime {lifetimeName} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
         }
 
         public object CannotParseTag(string statementText, int statementLineNumber, int statementPosition, string tag)
         {
-            throw new InvalidOperationException($"Cannot parse the tag \"{tag}\" in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
+            throw new InvalidOperationException($"Cannot parse the tag {tag} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
         }
 
         public Expression CannotBuildExpression(IBuildContext buildContext, IDependency dependency, ILifetime lifetime)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
-            throw new InvalidOperationException($"Cannot build expression for the key \"{buildContext.Key}\" from the container \"{buildContext.Container}\". Details:\n{GetContainerDetails(buildContext.Container)}");
+            throw new InvalidOperationException($"Cannot build expression for the key {buildContext.Key} in the container {buildContext.Container}.");
         }
 
         public IMethod<ConstructorInfo> CannotResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors)
         {
             if (constructors == null) throw new ArgumentNullException(nameof(constructors));
             var type = constructors.Single().Info.DeclaringType;
-            throw new InvalidOperationException($"Cannot find a constructor for the type \"{type}\".");
+            throw new InvalidOperationException($"Cannot find a constructor for the type {type}.");
         }
 
         public Type CannotResolveType(Type registeredType, Type resolvingType)
         {
             if (registeredType == null) throw new ArgumentNullException(nameof(registeredType));
             if (resolvingType == null) throw new ArgumentNullException(nameof(resolvingType));
-            throw new InvalidOperationException($"Cannot resolve instance type based on the registered type \"{registeredType}\" for resolving type \"{registeredType}\".");
-        }
-
-        private static string GetContainerDetails(IContainer container)
-        {
-            return string.Join(Environment.NewLine, container.SelectMany(i => i).Select(i => i.ToString()));
+            throw new InvalidOperationException($"Cannot resolve instance type based on the registered type {registeredType} for resolving type {registeredType}.");
         }
     }
 }
@@ -6528,13 +6551,14 @@ namespace IoC.Core
     internal sealed class NullContainer : IContainer
     {
         public static readonly IContainer Shared = new NullContainer();
+        private static readonly NotSupportedException NotSupportedException = new NotSupportedException();
 
         private NullContainer() { }
 
         public IContainer Parent => throw new NotSupportedException();
 
         public bool TryRegister(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
-            => throw new NotSupportedException();
+            => throw NotSupportedException;
 
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
         {
@@ -6543,15 +6567,17 @@ namespace IoC.Core
             return false;
         }
 
-        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
+        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer container = null)
         {
             resolver = default(Resolver<T>);
+            error = NotSupportedException;
             return false;
         }
 
-        public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, IContainer container = null)
+        public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, out Exception error, IContainer container = null)
         {
             resolver = default(Resolver<T>);
+            error = NotSupportedException;
             return false;
         }
 
@@ -6605,12 +6631,12 @@ namespace IoC.Core
             }
         }
 
-        public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver)
+        public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver, out Exception error)
         {
             var typeDescriptor = key.Type.Descriptor();
             var compiler = container.GetExpressionCompiler();
             var buildContext = new BuildContext(compiler, key, container, _resources);
-            if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression))
+            if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression, out error))
             {
                 resolver = default(Delegate);
                 return false;
@@ -6618,6 +6644,7 @@ namespace IoC.Core
 
             var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, WellknownExpressions.ResolverParameters);
             resolver = compiler.Compile(resolverExpression);
+            error = default(Exception);
             return true;
         }
 
@@ -7558,7 +7585,7 @@ namespace IoC.Core
             var newMethod = newDeclaringType.GetDeclaredMethods().SingleOrDefault(i => i.Name == node.Method.Name && Match(node.Method.GetParameters(), i.GetParameters()));
             if (newMethod == null)
             {
-                throw new BuildExpressionException(new InvalidOperationException($"Cannot find method {node.Method} in the {node.Method.DeclaringType}."));
+                throw new BuildExpressionException($"Cannot find method {node.Method} in the {node.Method.DeclaringType}.", new InvalidOperationException());
             }
 
             if (newMethod.IsGenericMethod)
@@ -7663,7 +7690,7 @@ namespace IoC.Core
             var newMethod = newDeclaringType.GetDeclaredMethods().SingleOrDefault(i => i.Name == node.AddMethod.Name && Match(node.AddMethod.GetParameters(), i.GetParameters()));
             if (newMethod == null)
             {
-                throw new BuildExpressionException(new InvalidOperationException($"Cannot find method {node.AddMethod} in the {node.AddMethod.DeclaringType}."));
+                throw new BuildExpressionException($"Cannot find method {node.AddMethod} in the {node.AddMethod.DeclaringType}.", new InvalidOperationException());
             }
 
             if (newMethod.IsGenericMethod)

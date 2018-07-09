@@ -5,7 +5,7 @@
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// Represents the key of binding.
+    /// Represents the container key.
     /// </summary>
     [PublicAPI]
     [DebuggerDisplay("Type = {" + nameof(Type) + "}, Tag = {" + nameof(Tag) + "}")]
@@ -38,7 +38,7 @@
         }
 
         /// <inheritdoc />
-        public override string ToString() => $"Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {GetHashCode()}";
+        public override string ToString() => $"[Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {GetHashCode()}]";
 
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]

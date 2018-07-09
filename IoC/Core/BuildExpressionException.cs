@@ -4,11 +4,8 @@
 
     internal class BuildExpressionException: InvalidOperationException
     {
-        public BuildExpressionException(string message, Exception innerException) : base(message, innerException)
-        {
-        }
-
-        public BuildExpressionException(Exception innerException) : base(innerException.Message, innerException)
+        public BuildExpressionException(string message, [CanBeNull] Exception innerException)
+            : base(message, innerException)
         {
         }
     }

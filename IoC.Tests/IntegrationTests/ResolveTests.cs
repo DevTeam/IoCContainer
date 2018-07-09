@@ -365,5 +365,29 @@
                 }
             }
         }
+
+        [Fact]
+        public void ContainerShouldThrowDetailedExceptionWhenResolvingWasFailed()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                using (container.Bind<IMyService>().To(ctx => new MyService("abc", ctx.Container.Inject<IMyService1>())))
+                {
+                    // When
+                    try
+                    {
+                        container.Resolve<IMyService>();
+                    }
+                    catch (Exception ex)
+                    {
+                        // Then
+                        ex.InnerException.ShouldNotBeNull();
+                        ex.InnerException.Message.ShouldContain("Cannot find the dependency for the key");
+                        ex.InnerException.Message.ShouldContain("IoC.Tests.IntegrationTests.IMyService1");
+                    }
+                }
+            }
+        }
     }
 }

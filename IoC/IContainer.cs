@@ -40,9 +40,10 @@
         /// <param name="type">The target type.</param>
         /// <param name="tag">The tag of binding.</param>
         /// <param name="resolver">The resolver.</param>
+        /// <param name="error">The error during resolving.</param>
         /// <param name="container">The resolving container.</param>
         /// <returns>True if successful.</returns>
-        bool TryGetResolver<T>([NotNull] Type type, [CanBeNull] object tag, out Resolver<T> resolver, [CanBeNull] IContainer container = null);
+        bool TryGetResolver<T>([NotNull] Type type, [CanBeNull] object tag, out Resolver<T> resolver, out Exception error, [CanBeNull] IContainer container = null);
 
         /// <summary>
         /// Gets the resolver.
@@ -50,8 +51,9 @@
         /// <typeparam name="T">The resolver type.</typeparam>
         /// <param name="type">The target type.</param>
         /// <param name="resolver">The resolver.</param>
+        /// <param name="error">The error during resolving</param>
         /// <param name="container">The resolving container.</param>
         /// <returns>True if successful.</returns>
-        bool TryGetResolver<T>([NotNull] Type type, out Resolver<T> resolver, [CanBeNull] IContainer container = null);
+        bool TryGetResolver<T>([NotNull] Type type, out Resolver<T> resolver, out Exception error, [CanBeNull] IContainer container = null);
     }
 }

@@ -29,7 +29,7 @@
 
         public Expression Expression { get; }
 
-        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression)
+        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             try
@@ -41,11 +41,13 @@
                 }
 
                 baseExpression = buildContext.AppendLifetime(baseExpression, lifetime);
+                error = default(Exception);
                 return true;
             }
-            catch (BuildExpressionException)
+            catch (BuildExpressionException ex)
             {
-                baseExpression = default(LambdaExpression);
+                error = ex;
+                baseExpression = default(Expression);
                 return false;
             }
         }

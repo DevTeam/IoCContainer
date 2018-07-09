@@ -632,10 +632,10 @@
         <member name="M:IoC.Container.TryRegister(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,System.IDisposable@)">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Container.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,IoC.IContainer)">
+        <member name="M:IoC.Container.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,System.Exception@,IoC.IContainer)">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Container.TryGetResolver``1(System.Type,IoC.Resolver{``0}@,IoC.IContainer)">
+        <member name="M:IoC.Container.TryGetResolver``1(System.Type,IoC.Resolver{``0}@,System.Exception@,IoC.IContainer)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Container.TryGetDependency(IoC.Key,IoC.IDependency@,IoC.ILifetime@)">
@@ -848,13 +848,14 @@
             <param name="key">The resolving key.</param>
             <returns>The pair of the dependency and of the lifetime.</returns>
         </member>
-        <member name="M:IoC.Extensibility.IIssueResolver.CannotGetResolver``1(IoC.IContainer,IoC.Key)">
+        <member name="M:IoC.Extensibility.IIssueResolver.CannotGetResolver``1(IoC.IContainer,IoC.Key,System.Exception)">
             <summary>
             Handles the scenario when cannot get a resolver.
             </summary>
             <typeparam name="T">The instance type.</typeparam>
             <param name="container">The resolving container.</param>
             <param name="key">The resolving key.</param>
+            <param name="error">The error.</param>
             <returns>The resolver.</returns>
         </member>
         <member name="M:IoC.Extensibility.IIssueResolver.CannotGetGenericTypeArguments(System.Type)">
@@ -1948,7 +1949,7 @@
             <param name="lifetime">The lifetime.</param>
             <returns>True if successful.</returns>
         </member>
-        <member name="M:IoC.IContainer.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,IoC.IContainer)">
+        <member name="M:IoC.IContainer.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,System.Exception@,IoC.IContainer)">
             <summary>
             Gets the resolver.
             </summary>
@@ -1956,16 +1957,18 @@
             <param name="type">The target type.</param>
             <param name="tag">The tag of binding.</param>
             <param name="resolver">The resolver.</param>
+            <param name="error">The error during resolving.</param>
             <param name="container">The resolving container.</param>
             <returns>True if successful.</returns>
         </member>
-        <member name="M:IoC.IContainer.TryGetResolver``1(System.Type,IoC.Resolver{``0}@,IoC.IContainer)">
+        <member name="M:IoC.IContainer.TryGetResolver``1(System.Type,IoC.Resolver{``0}@,System.Exception@,IoC.IContainer)">
             <summary>
             Gets the resolver.
             </summary>
             <typeparam name="T">The resolver type.</typeparam>
             <param name="type">The target type.</param>
             <param name="resolver">The resolver.</param>
+            <param name="error">The error during resolving</param>
             <param name="container">The resolving container.</param>
             <returns>True if successful.</returns>
         </member>
@@ -1974,13 +1977,14 @@
             Represents a IoC dependency.
             </summary>
         </member>
-        <member name="M:IoC.IDependency.TryBuildExpression(IoC.Extensibility.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@)">
+        <member name="M:IoC.IDependency.TryBuildExpression(IoC.Extensibility.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)">
             <summary>
             Builds an expression.
             </summary>
             <param name="buildContext">The build context,</param>
             <param name="lifetime">The target lifetime,</param>
             <param name="baseExpression">The resulting expression.</param>
+            <param name="error">The error.</param>
             <returns>True if success.</returns>
         </member>
         <member name="T:IoC.ILifetime">
@@ -2051,7 +2055,7 @@
         </member>
         <member name="T:IoC.Key">
             <summary>
-            Represents the key of binding.
+            Represents the container key.
             </summary>
         </member>
         <member name="F:IoC.Key.AnyTag">

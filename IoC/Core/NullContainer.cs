@@ -8,13 +8,14 @@
     internal sealed class NullContainer : IContainer
     {
         public static readonly IContainer Shared = new NullContainer();
+        private static readonly NotSupportedException NotSupportedException = new NotSupportedException();
 
         private NullContainer() { }
 
         public IContainer Parent => throw new NotSupportedException();
 
         public bool TryRegister(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IDisposable registrationToken)
-            => throw new NotSupportedException();
+            => throw NotSupportedException;
 
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
         {
@@ -23,15 +24,17 @@
             return false;
         }
 
-        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, IContainer container = null)
+        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer container = null)
         {
             resolver = default(Resolver<T>);
+            error = NotSupportedException;
             return false;
         }
 
-        public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, IContainer container = null)
+        public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, out Exception error, IContainer container = null)
         {
             resolver = default(Resolver<T>);
+            error = NotSupportedException;
             return false;
         }
 

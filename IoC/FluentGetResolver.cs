@@ -21,7 +21,7 @@
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag)
-            => container.TryGetResolver<T>(type, tag.Value, out var resolver, container) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type, tag));
+            => container.TryGetResolver<T>(type, tag.Value, out var resolver, out var error, container) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type, tag), error);
 
         /// <summary>
         /// Gets the resolver.
@@ -45,7 +45,7 @@
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type)
-            => container.TryGetResolver<T>(type, out var resolver, container) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type));
+            => container.TryGetResolver<T>(type, out var resolver, out var error, container) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type), error);
 
         /// <summary>
         /// Gets the resolver.
@@ -64,7 +64,6 @@
         /// <param name="tagValue">The tage value.</param>
         /// <returns>The tag.</returns>
         [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
         public static Tag AsTag([CanBeNull] this object tagValue) => new Tag(tagValue);
     }
 }

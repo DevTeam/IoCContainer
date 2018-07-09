@@ -143,7 +143,7 @@
                     break;
 
                 default:
-                    var expression = Visit(tagExpression) ?? throw new BuildExpressionException(new InvalidOperationException("Null expression"));
+                    var expression = Visit(tagExpression) ?? throw new BuildExpressionException($"Invalid tag expression {tagExpression}.", new InvalidOperationException());
                     var tagFunc = Expression.Lambda<Func<object>>(expression, true).Compile();
                     tag = tagFunc();
                     break;
@@ -177,9 +177,7 @@
         }
 
         [NotNull]
-        private Expression CreateDependencyExpression(
-            Key key,
-            [CanBeNull] Expression containerExpression)
+        private Expression CreateDependencyExpression(Key key, [CanBeNull] Expression containerExpression)
         {
             if (Equals(key, ContextKey))
             {
@@ -197,7 +195,7 @@
                 }
                 catch (Exception ex)
                 {
-                    throw new BuildExpressionException($"Cannot find dependency {key}.", ex);
+                    throw new BuildExpressionException(ex.Message, ex.InnerException);
                 }
             }
 
@@ -210,7 +208,7 @@
                     _container.Resolve<IIssueResolver>().CyclicDependenceDetected(key, childBuildContext.Depth);
                 }
 
-                if (dependency.TryBuildExpression(childBuildContext, lifetime, out var expression))
+                if (dependency.TryBuildExpression(childBuildContext, lifetime, out var expression, out var error))
                 {
                     return expression;
                 }
@@ -220,9 +218,9 @@
                     {
                         return _container.Resolve<IIssueResolver>().CannotBuildExpression(childBuildContext, dependency, lifetime);
                     }
-                    catch (Exception ex)
+                    catch (Exception)
                     {
-                        throw new BuildExpressionException($"Cannot build dependency {key}.", ex);
+                        throw error;
                     }
                 }
             }

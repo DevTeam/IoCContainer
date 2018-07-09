@@ -49,7 +49,7 @@
             var newMethod = newDeclaringType.GetDeclaredMethods().SingleOrDefault(i => i.Name == node.Method.Name && Match(node.Method.GetParameters(), i.GetParameters()));
             if (newMethod == null)
             {
-                throw new BuildExpressionException(new InvalidOperationException($"Cannot find method {node.Method} in the {node.Method.DeclaringType}."));
+                throw new BuildExpressionException($"Cannot find method {node.Method} in the {node.Method.DeclaringType}.", new InvalidOperationException());
             }
 
             if (newMethod.IsGenericMethod)
@@ -154,7 +154,7 @@
             var newMethod = newDeclaringType.GetDeclaredMethods().SingleOrDefault(i => i.Name == node.AddMethod.Name && Match(node.AddMethod.GetParameters(), i.GetParameters()));
             if (newMethod == null)
             {
-                throw new BuildExpressionException(new InvalidOperationException($"Cannot find method {node.AddMethod} in the {node.AddMethod.DeclaringType}."));
+                throw new BuildExpressionException($"Cannot find method {node.AddMethod} in the {node.AddMethod.DeclaringType}.", new InvalidOperationException());
             }
 
             if (newMethod.IsGenericMethod)

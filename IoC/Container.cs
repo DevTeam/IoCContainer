@@ -22,6 +22,7 @@
     /// </summary>
     [PublicAPI]
     [DebuggerDisplay("Name = {" + nameof(ToString) + "()}")]
+    [DebuggerTypeProxy(typeof(ContainerDebugView))]
     public sealed class Container: IContainer, IResourceStore, IObserver<ContainerEvent>
     {
         private static long _containerId;
@@ -214,13 +215,14 @@
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-        public bool TryGetResolver<T>(ShortKey type, object tag, out Resolver<T> resolver, IContainer container = null)
+        public bool TryGetResolver<T>(ShortKey type, object tag, out Resolver<T> resolver, out Exception error, IContainer container = null)
         {
             if (tag == null)
             {
                 resolver = (Resolver<T>) ResolversByType.GetByRef(type.GetHashCode(), type);
                 if (resolver != default(Resolver<T>))
                 {
+                    error = default(Exception);
                     return true;
                 }
             }
@@ -230,25 +232,27 @@
                 resolver = (Resolver<T>)Resolvers.Get(key.GetHashCode(), key);
                 if (resolver != default(Resolver<T>))
                 {
+                    error = default(Exception);
                     return true;
                 }
             }
 
-            return TryCreateResolver(new FullKey(type, tag), out resolver, container ?? this);
+            return TryCreateResolver(new FullKey(type, tag), out resolver, out error, container ?? this);
         }
 
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-        public bool TryGetResolver<T>(ShortKey type, out Resolver<T> resolver, IContainer container = null)
+        public bool TryGetResolver<T>(ShortKey type, out Resolver<T> resolver, out Exception error, IContainer container = null)
         {
             resolver = (Resolver<T>) ResolversByType.GetByRef(type.GetHashCode(), type);
             if (resolver != default(Resolver<T>))
             {
+                error = default(Exception);
                 return true;
             }
 
-            return TryCreateResolver(new FullKey(type), out resolver, container ?? this);
+            return TryCreateResolver(new FullKey(type), out resolver, out error, container ?? this);
         }
 
         /// <inheritdoc />
@@ -404,22 +408,23 @@
         }
         
         [MethodImpl((MethodImplOptions)256)]
-        private bool TryCreateResolver<T>(FullKey key, out Resolver<T> resolver, IContainer container)
+        private bool TryCreateResolver<T>(FullKey key, out Resolver<T> resolver, out Exception error, IContainer container)
         {
             if (TryGetRegistrationEntry(key, out var registrationEntry))
             {
-                if (!registrationEntry.TryCreateResolver(key, container, out var resolverDelegate))
+                if (!registrationEntry.TryCreateResolver(key, container, out var resolverDelegate, out error))
                 {
                     resolver = default(Resolver<T>);
                     return false;
                 }
 
                 resolver = (Resolver<T>)resolverDelegate;
+                error = default(Exception);
                 AddResolver(key, resolver, true);
                 return true;
             }
 
-            if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, container))
+            if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, out error, container))
             {
                 resolver = default(Resolver<T>);
                 return false;
@@ -430,6 +435,7 @@
                 AddResolver(key, resolver, false);
             }
 
+            error = default(Exception);
             return true;
         }
 
@@ -484,6 +490,26 @@
 
                 return false;
             }
+        }
+
+        [SuppressMessage("ReSharper", "UnusedMember.Local")]
+        private class ContainerDebugView
+        {
+            private readonly Container _container;
+
+            public ContainerDebugView([NotNull] Container container)
+            {
+                _container = container ?? throw new ArgumentNullException(nameof(container));
+            }
+
+            [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
+            public FullKey[] Keys => _container._allKeys.SelectMany(i => i).ToArray();
+
+            public IContainer Parent => _container.Parent is NullContainer ? null : _container.Parent;
+
+            public int ResolversCount => _container.Resolvers.Count + _container.ResolversByType.Count;
+
+            public int ResourcesCount => _container._resources.Count;
         }
     }
 }
