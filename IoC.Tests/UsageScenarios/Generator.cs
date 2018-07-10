@@ -13,7 +13,7 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $group=09
+        // $tag=samples
         // $priority=00
         // $description=Generator
         // {

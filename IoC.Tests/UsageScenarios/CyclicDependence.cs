@@ -13,7 +13,7 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $group=10
+        // $tag=samples
         // $priority=00
         // $description=Cyclic Dependence
         // {

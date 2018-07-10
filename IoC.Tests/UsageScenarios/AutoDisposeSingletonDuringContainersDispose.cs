@@ -10,7 +10,7 @@
         public void Run()
         {
             // $visible=true
-            // $group=01
+            // $tag=binding
             // $priority=06
             // $description=Auto dispose singleton during container's dispose
             // {

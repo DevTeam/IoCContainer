@@ -9,7 +9,7 @@
         public void Run()
         {
             // $visible=true
-            // $group=01
+            // $tag=binding
             // $priority=04
             // $description=Manual Auto-wiring
             // {

@@ -10,7 +10,7 @@
         public void Run()
         {
             // $visible=true
-            // $group=01
+            // $tag=injection
             // $priority=03
             // $description=Method Injection
             // {

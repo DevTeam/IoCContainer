@@ -11,7 +11,7 @@
         public void Run()
         {
             // $visible=true
-            // $group=01
+            // $tag=injection
             // $priority=05
             // $description=Resolve all appropriate instances as IEnumerable
             // {

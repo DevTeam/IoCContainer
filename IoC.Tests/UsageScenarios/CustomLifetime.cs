@@ -9,7 +9,7 @@
     {
         [Fact]
         // $visible=true
-        // $group=08
+        // $tag=customization
         // $priority=00
         // $description=Custom Lifetime
         // {

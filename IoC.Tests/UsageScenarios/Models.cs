@@ -4,7 +4,7 @@ namespace IoC.Tests.UsageScenarios
     using System;
 
     // $visible=true
-    // $group=99
+    // $tag=samples
     // $priority=00
     // $description=Samples Model
     // {

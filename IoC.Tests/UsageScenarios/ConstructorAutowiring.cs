@@ -9,7 +9,7 @@
         public void Run()
         {
             // $visible=true
-            // $group=01
+            // $tag=injection
             // $priority=04
             // $description=Constructor Auto-wiring
             // {

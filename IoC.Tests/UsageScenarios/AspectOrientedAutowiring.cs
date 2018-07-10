@@ -18,8 +18,8 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $group=08
-        // $priority=00
+        // $tag=binding
+        // $priority=10
         // $description=Aspect Oriented Autowiring
         // {
         public void Run()

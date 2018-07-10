@@ -9,8 +9,8 @@
         public void Run()
         {
             // $visible=true
-            // $group=02
-            // $priority=00
+            // $tag=binding
+            // $priority=07
             // $description=Configuration via a text metadata
             // {
             // Create a container and configure it from the metadata string

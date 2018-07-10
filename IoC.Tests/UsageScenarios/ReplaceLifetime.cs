@@ -13,7 +13,7 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $group=08
+        // $tag=customization
         // $priority=00
         // $description=Replace Lifetime
         // {

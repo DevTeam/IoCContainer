@@ -12,7 +12,7 @@ namespace IoC.Tests.UsageScenarios
         public void Run()
         {
             // $visible=true
-            // $group=01
+            // $tag=injection
             // $priority=02
             // $description=Resolve ValueTuple
             // {

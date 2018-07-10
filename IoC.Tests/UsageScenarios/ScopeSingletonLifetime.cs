@@ -9,7 +9,7 @@
         public void Run()
         {
             // $visible=true
-            // $group=08
+            // $tag=binding
             // $priority=00
             // $description=Scope Singleton lifetime
             // {

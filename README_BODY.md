@@ -1,26 +1,5 @@
-# Simple, powerful and fast IoC container
+## NuGet Packages
 
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-
-IoC.Container provides the following benefits:
-  - One of the [fastest](#why-this-one), almost as fast as operators `new`
-  - Produces minimal memory trafic
-  - Powerful auto-wiring
-    - Checks the auto-wiring configuration at the compile time
-    - Allows to not change a code design to use IoC
-    - [Clear generic types' mapping](#generic-auto-wiring)
-    - [The simple text metadata is supported](#configuration-via-a-text-metadata)
-    - Flexible autowiring configuration (as example a [custom Aspect Oriented Autowiring](#aspect-oriented-autowiring))
-  - Fully extensible and supports [custom containers](#custom-child-container)/[lifetimes](#custom-lifetime)
-  - [Reconfigurable on-the-fly](#change-configuration-on-the-fly)
-  - Supports [concurrent and asynchronous resolving](#asynchronous-resolve)
-  - Does not need additional dependencies
-  - Supports [ASP.NET Core](#aspnet-core)
-  - Supports [Windows Presentation Foundation](Samples/WpfApp/README.md)
-  - Supports [Universal Windows Platform](Samples/UwpApp/README.md)
-  - Supports [Windows Communication Foundation](Samples/WcfServiceLibrary/README.md)
-
-NuGet packages:
   - IoC.Container
     - [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container)
   - IoC.Container.Source, embedded-in-code
@@ -30,13 +9,7 @@ NuGet packages:
   - IoC.AspNetCore.Source, embedded-in-code
     - [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source)
 
-Embedded-in-code packages require C# 7.0 or higher
-
-Supported platforms:
-  - .NET 4.0+
-  - [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/) 1.0+
-  - [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) 1.0+
-  - [UWP](https://docs.microsoft.com/en-us/windows/uwp/index) 10+
+Embedding-in-code packages require C# 7.0 or higher
 
 ## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works
 
@@ -147,20 +120,22 @@ using (var container = Container.Create().Using<Glue>())
 
 ### Under the hood
 
-Actually these resolvers are represented just as a set of operators `new` which allow to create (or to get) required instances.
+Actually each instance is resolved by strongly-typed function which is represented just as a graph of operators `new` compiled from expression trees which allow to create (or to get) required instances with minimal performance and memory impact. Thus the code like
 
 ```csharp
-var box = new CardboardBox<ShroedingersCat>(new ShroedingersCat());
+var box = container.Resolve<IBox<ICat>>();
 ```
 
-There is only one difference - these resolvers are wrapped to compiled lambda-functions and an each call of these lambda-functions spends some minimal time in the operator `call`, but in actual scenarios it is not required to make these calls each time to create instances.
-When some dependencies are injected to an instance they are injected without any lambdas at all but just as a minimal set of instruction to create these dependencies:
+will be compiled as invocation of the following strongly-typed function `Resolve();` excluding any boxing/unboxing statements:
 
 ```csharp
-new ShroedingersCat()
+CardboardBox<ShroedingersCat> Resolve()
+{
+  new CardboardBox<ShroedingersCat>(new ShroedingersCat());
+}
 ```
 
-Thus this IoC container makes the minimal impact in terms of perfomrance and of memory trafic on a creation of instances of classes and might be used everywhere and everytime in accordance with the [SOLID principles](https://en.wikipedia.org/wiki/SOLID_\(object-oriented_design\)).
+This function contains a set of operators `new` and calls of initializers in the case of methods injection or properties injection.
 
 ## [ASP.NET Core](https://github.com/aspnet/Home)
 

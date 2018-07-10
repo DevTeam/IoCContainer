@@ -9,7 +9,7 @@
         public void Run()
         {
             // $visible=true
-            // $group=02
+            // $tag=design
             // $priority=01
             // $description=Change configuration on-the-fly
             // {

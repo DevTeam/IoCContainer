@@ -10,7 +10,7 @@
         public void Run()
         {
             // $visible=true
-            // $group=01
+            // $tag=binding
             // $priority=05
             // $description=Func With Arguments
             // {

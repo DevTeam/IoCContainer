@@ -1354,8 +1354,19 @@
             <typeparam name="T">The resolver type.</typeparam>
             <param name="type">The target type.</param>
             <param name="tag">The tag of binding.</param>
-            <param name="container"></param>
+            <param name="container">The target container.</param>
             <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentGetResolver.TryGetResolver``1(IoC.IContainer,System.Type,IoC.Tag,IoC.Resolver{``0}@)">
+            <summary>
+            Tries getting the resolver.
+            </summary>
+            <typeparam name="T">The resolver type.</typeparam>
+            <param name="type">The target type.</param>
+            <param name="tag">The tag of binding.</param>
+            <param name="container"></param>
+            <param name="resolver"></param>
+            <returns>True if success.</returns>
         </member>
         <member name="M:IoC.FluentGetResolver.GetResolver``1(IoC.IContainer,IoC.Tag)">
             <summary>
@@ -1363,8 +1374,18 @@
             </summary>
             <typeparam name="T">The instance type.</typeparam>
             <param name="tag">The tag of binding.</param>
-            <param name="container"></param>
+            <param name="container">The target container.</param>
             <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentGetResolver.TryGetResolver``1(IoC.IContainer,IoC.Tag,IoC.Resolver{``0}@)">
+            <summary>
+            Tries getting the resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="tag">The tag of binding.</param>
+            <param name="container">The target container.</param>
+            <param name="resolver"></param>
+            <returns>True if success.</returns>
         </member>
         <member name="M:IoC.FluentGetResolver.GetResolver``1(IoC.IContainer,System.Type)">
             <summary>
@@ -1372,16 +1393,35 @@
             </summary>
             <typeparam name="T">The resolver type.</typeparam>
             <param name="type">The target type.</param>
-            <param name="container"></param>
+            <param name="container">The target container.</param>
             <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentGetResolver.TryGetResolver``1(IoC.IContainer,System.Type,IoC.Resolver{``0}@)">
+            <summary>
+            Tries getting the resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="type">The target type.</param>
+            <param name="container">The target container.</param>
+            <param name="resolver"></param>
+            <returns>True if success.</returns>
         </member>
         <member name="M:IoC.FluentGetResolver.GetResolver``1(IoC.IContainer)">
             <summary>
             Gets the resolver.
             </summary>
             <typeparam name="T">The instance type.</typeparam>
-            <param name="container"></param>
+            <param name="container">The target container.</param>
             <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentGetResolver.TryGetResolver``1(IoC.IContainer,IoC.Resolver{``0}@)">
+            <summary>
+            Tries getting the resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="resolver"></param>
+            <returns>True if success.</returns>
         </member>
         <member name="M:IoC.FluentGetResolver.AsTag(System.Object)">
             <summary>

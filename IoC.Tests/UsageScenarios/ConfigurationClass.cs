@@ -9,7 +9,7 @@
     {
         [Fact]
         // $visible=true
-        // $group=02
+        // $tag=design
         // $priority=00
         // $description=Configuration class
         // {

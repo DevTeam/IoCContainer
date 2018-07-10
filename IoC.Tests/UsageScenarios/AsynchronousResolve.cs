@@ -14,7 +14,7 @@ namespace IoC.Tests.UsageScenarios
         public async void Run()
         {
             // $visible=true
-            // $group=01
+            // $tag=multithreading
             // $priority=02
             // $description=Asynchronous resolve
             // {

@@ -23,7 +23,7 @@
             if(vars.Count == 0)
             {
                 vars["visible"] = "false";
-                vars["group"] = string.Empty;
+                vars["tag"] = string.Empty;
                 vars["priority"] = string.Empty;
                 vars["description"] = Path.GetFileNameWithoutExtension(file);
                 vars["file"] = file;
@@ -74,18 +74,29 @@
 ## Usage Scenarios
 
 <#
-    var orderedInfos = infos.OrderBy(i => i["group"] + i["priority"]).Where(info => info["visible"] == "true").ToList();
-    foreach(var info in orderedInfos)
+    foreach(var group in infos.Where(info => info["visible"] == "true").GroupBy(i => i["tag"]))
     {
-        var description = info["description"];
-        var reference = "#" + description.Replace(" ", "-").Replace("'", string.Empty).ToLowerInvariant();
-#>* [<#=description#>](<#=reference#>)
+        var groupName = group.Key;
+        groupName = groupName.Replace("binding", "Flexible Binding");
+        groupName = groupName.Replace("multithreading", "Multithreading-Ready");
+        groupName = groupName.Replace("design", "Design Aspects");
+        groupName = groupName.Replace("injection", "Powerful Injection");
+        groupName = groupName.Replace("customization", "Fully Customizable");
+        groupName = groupName.Replace("samples", "Other Samples");
+    #>- <#=groupName#>
 <#
+        foreach(var info in group.OrderBy(i => i["priority"]))
+        {
+            var description = info["description"];
+            var reference = "#" + description.Replace(" ", "-").Replace("'", string.Empty).ToLowerInvariant();
+#>  - [<#=description#>](<#=reference#>)
+<#
+        }
     }
 #>
 
 <#
-    foreach(var info in orderedInfos)
+    foreach(var info in infos.OrderBy(i => i["tag"] + i["priority"]).Where(info => info["visible"] == "true"))
     {
 #>### <#=info["description"]#>
 
@@ -96,16 +107,28 @@
 <#
     }
 
-    var readmeHeaderFile = Path.Combine(currentPath, "README_HEADER.md");
-    var readmeFooterFile = Path.Combine(currentPath, "README_FOOTER.md");
+    var readmeHeaderFile = Path.Combine(solutionPath, "README_HEADER.md");
+    var readmeFeaturesFile = Path.Combine(solutionPath, "README_FEATURES.md");
+    var readmeBodyFile = Path.Combine(solutionPath, "README_BODY.md");
+    var readmeFooterFile = Path.Combine(solutionPath, "README_FOOTER.md");
     var readmeFile = Path.Combine(solutionPath, "README.md");
-    var scenariousFile = Path.Combine(currentPath, "README_TEMPLATE.md");
+    var samplesFile = Path.Combine(currentPath, "README_TEMPLATE.md");
+    var nugetReadmeFile = Path.Combine(solutionPath, "README_NUGET.md");
 
     File.Copy(readmeHeaderFile, readmeFile, true);
 
-    var scenarious = File.ReadAllText(scenariousFile);
-    File.AppendAllText(readmeFile, scenarious);
+    var featuresContent = File.ReadAllText(readmeFeaturesFile);
+    File.AppendAllText(readmeFile, featuresContent);
 
-    var footer = File.ReadAllText(readmeFooterFile);
-    File.AppendAllText(readmeFile, footer);
+    var bodyContent = File.ReadAllText(readmeBodyFile);
+    File.AppendAllText(readmeFile, bodyContent);
+
+    var samplesContent = File.ReadAllText(samplesFile);
+    File.AppendAllText(readmeFile, samplesContent);
+
+    var footerContent = File.ReadAllText(readmeFooterFile);
+    File.AppendAllText(readmeFile, footerContent);
+
+    var nugetContent = featuresContent.Replace("](#", "](https://github.com/DevTeam/IoCContainer#");
+    File.AppendAllText(nugetReadmeFile, nugetContent);
 #>

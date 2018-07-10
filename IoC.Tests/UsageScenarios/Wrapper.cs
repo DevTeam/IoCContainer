@@ -11,7 +11,7 @@
     {
         [Fact]
         // $visible=true
-        // $group=08
+        // $tag=samples
         // $priority=00
         // $description=Wrapper
         // {

@@ -9,6 +9,8 @@
 /* 
 IoC Container APS.NET Core feature
 
+https://github.com/DevTeam/IoCContainer
+
 Important note: do not use any internal classes, structures, enums, interfaces, methods, fields or properties
 because it may be changed even in minor updates of package.
 
