@@ -11,7 +11,7 @@
   - [Customizable aspect oriented autowiring](#aspect-oriented-autowiring)
   - Easy expandable set of lifetimes
     - [Singleton](#singleton-lifetime) with [auto-disposing](#auto-dispose-singleton-during-containers-dispose)
-    - Singleton per container
+    - [Singleton per container](#container-singleton-lifetime)
     - [Singleton per scope](#scope-singleton-lifetime)
   - Binding to
     - [Several Contracts](#several-contracts)

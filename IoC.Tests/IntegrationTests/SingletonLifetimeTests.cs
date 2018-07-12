@@ -7,7 +7,7 @@
     using Xunit;
 
     [SuppressMessage("ReSharper", "UnusedVariable")]
-    public class SingletonTests
+    public class SingletonLifetimeTests
     {
         [Fact]
         public void ContainerShouldResolveWhenSingletonLifetime()

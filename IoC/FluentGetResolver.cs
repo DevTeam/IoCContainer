@@ -21,7 +21,7 @@
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag)
-            => container.TryGetResolver<T>(type, tag.Value, out var resolver, out var error, container) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type, tag), error);
+            => container.TryGetResolver<T>(type, tag.Value, out var resolver, out var error) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type, tag), error);
 
         /// <summary>
         /// Tries getting the resolver.
@@ -33,9 +33,8 @@
         /// <param name="resolver"></param>
         /// <returns>True if success.</returns>
         [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag, [NotNull] out Resolver<T> resolver)
-            => container.TryGetResolver(type, tag.Value, out resolver, out _, container);
+            => container.TryGetResolver(type, tag.Value, out resolver, out _);
 
         /// <summary>
         /// Gets the resolver.
@@ -58,7 +57,6 @@
         /// <param name="resolver"></param>
         /// <returns>True if success.</returns>
         [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, Tag tag, [NotNull] out Resolver<T> resolver)
             => container.TryGetResolver(TypeDescriptor<T>.Type, tag, out resolver);
 
@@ -72,7 +70,7 @@
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type)
-            => container.TryGetResolver<T>(type, out var resolver, out var error, container) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type), error);
+            => container.TryGetResolver<T>(type, null, out var resolver, out var error) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type), error);
 
         /// <summary>
         /// Tries getting the resolver.
@@ -83,9 +81,8 @@
         /// <param name="resolver"></param>
         /// <returns>True if success.</returns>
         [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, [NotNull] out Resolver<T> resolver)
-            => container.TryGetResolver(type, out resolver, out _, container);
+            => container.TryGetResolver(type, null, out resolver, out _);
 
         /// <summary>
         /// Gets the resolver.
@@ -106,7 +103,6 @@
         /// <param name="resolver"></param>
         /// <returns>True if success.</returns>
         [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, [NotNull] out Resolver<T> resolver)
             => container.TryGetResolver(TypeDescriptor<T>.Type, out resolver);
 

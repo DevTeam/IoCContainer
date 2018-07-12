@@ -27,6 +27,7 @@
     {
         private static long _containerId;
 
+        // ReSharper disable once RedundantNameQualifier
         internal static readonly object[] EmptyArgs = Core.CollectionExtensions.EmptyArray<object>();
         [NotNull] private static readonly Lazy<Container> BasicRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.BasicSet), true);
         [NotNull] private static readonly Lazy<Container> DefultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.DefaultSet), true);
@@ -100,11 +101,16 @@
             _name = $"{parent}/{name ?? throw new ArgumentNullException(nameof(name))}";
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
 
+            if (!(this is IResourceStore resourceStore))
+            {
+                throw new NotSupportedException();
+            }
+
             // Subscribe to events from the parent container
-            ((IResourceStore)this).AddResource(_parent.Subscribe(_eventSubject));
+            resourceStore.AddResource(_parent.Subscribe(_eventSubject));
 
             // Subscribe to reset resolvers
-            ((IResourceStore)this).AddResource(_eventSubject.Subscribe(this));
+            resourceStore.AddResource(_eventSubject.Subscribe(this));
         }
 
         /// <inheritdoc />
@@ -215,57 +221,85 @@
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-        public bool TryGetResolver<T>(ShortKey type, object tag, out Resolver<T> resolver, out Exception error, IContainer container = null)
+        public bool TryGetResolver<T>(ShortKey type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
         {
+            FullKey key;
+            int hashCode;
             if (tag == null)
             {
-                resolver = (Resolver<T>) ResolversByType.GetByRef(type.GetHashCode(), type);
-                if (resolver != default(Resolver<T>))
+                hashCode = type.GetHashCode();
+                resolver = (Resolver<T>) ResolversByType.GetByRef(hashCode, type);
+                if (resolver != default(Resolver<T>)) // finded in resolvers by type
                 {
                     error = default(Exception);
                     return true;
                 }
+
+                key = new FullKey(type);
             }
             else
             {
-                var key = new FullKey(type, tag);
-                resolver = (Resolver<T>)Resolvers.Get(key.GetHashCode(), key);
-                if (resolver != default(Resolver<T>))
+                key = new FullKey(type, tag);
+                hashCode = key.GetHashCode();
+                resolver = (Resolver<T>)Resolvers.Get(hashCode, key);
+                if (resolver != default(Resolver<T>)) // finded in resolvers
                 {
                     error = default(Exception);
                     return true;
                 }
             }
 
-            return TryCreateResolver(new FullKey(type, tag), out resolver, out error, container ?? this);
-        }
-
-        /// <inheritdoc />
-        [MethodImpl((MethodImplOptions)256)]
-        [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-        public bool TryGetResolver<T>(ShortKey type, out Resolver<T> resolver, out Exception error, IContainer container = null)
-        {
-            resolver = (Resolver<T>) ResolversByType.GetByRef(type.GetHashCode(), type);
-            if (resolver != default(Resolver<T>))
+            // tries finding in registrations
+            if (TryGetRegistrationEntry(key, hashCode, out var registrationEntry))
             {
-                error = default(Exception);
-                return true;
+                // tries creating resolver
+                if (!registrationEntry.TryCreateResolver(key, resolvingContainer ?? this, out var resolverDelegate, out error))
+                {
+                    resolver = default(Resolver<T>);
+                    return false;
+                }
+
+                resolver = (Resolver<T>)resolverDelegate;
+            }
+            else
+            {
+                // tries finding in parent
+                if (!_parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer ?? this))
+                {
+                    resolver = default(Resolver<T>);
+                    return false;
+                }
             }
 
-            return TryCreateResolver(new FullKey(type), out resolver, out error, container ?? this);
+            // If it is resolving container only
+            if (resolvingContainer == null || resolvingContainer == this)
+            {
+                // Add resolver to tables
+                lock (_lockObject)
+                {
+                    Resolvers = Resolvers.Set(hashCode, key, resolver);
+                    if (tag == null)
+                    {
+                        ResolversByType = ResolversByType.Set(hashCode, type, resolver);
+                    }
+                }
+            }
+
+            error = default(Exception);
+            return true;
         }
 
         /// <inheritdoc />
         public bool TryGetDependency(FullKey key, out IDependency dependency, out ILifetime lifetime)
         {
-            if (TryGetRegistrationEntry(key, out var registrationEntry))
+            if (!TryGetRegistrationEntry(key, key.GetHashCode(), out var registrationEntry))
             {
-                dependency = registrationEntry.Dependency;
-                lifetime = registrationEntry.GetLifetime(key.Type);
-                return true;
+                return _parent.TryGetDependency(key, out dependency, out lifetime);
             }
 
-            return _parent.TryGetDependency(key, out dependency, out lifetime);
+            dependency = registrationEntry.Dependency;
+            lifetime = registrationEntry.GetLifetime(key.Type);
+            return true;
         }
 
         /// <inheritdoc />
@@ -346,13 +380,9 @@
             }
         }
 
-        void IObserver<ContainerEvent>.OnError(Exception error)
-        {
-        }
+        void IObserver<ContainerEvent>.OnError(Exception error) { }
 
-        void IObserver<ContainerEvent>.OnCompleted()
-        {
-        }
+        void IObserver<ContainerEvent>.OnCompleted() { }
 
         [MethodImpl((MethodImplOptions) 256)]
         private IEnumerable<IEnumerable<FullKey>> GetAllKeys()
@@ -406,58 +436,13 @@
         {
             _resources.Add(this.Apply(configurations));
         }
-        
-        [MethodImpl((MethodImplOptions)256)]
-        private bool TryCreateResolver<T>(FullKey key, out Resolver<T> resolver, out Exception error, IContainer container)
-        {
-            if (TryGetRegistrationEntry(key, out var registrationEntry))
-            {
-                if (!registrationEntry.TryCreateResolver(key, container, out var resolverDelegate, out error))
-                {
-                    resolver = default(Resolver<T>);
-                    return false;
-                }
-
-                resolver = (Resolver<T>)resolverDelegate;
-                error = default(Exception);
-                AddResolver(key, resolver, true);
-                return true;
-            }
-
-            if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, out error, container))
-            {
-                resolver = default(Resolver<T>);
-                return false;
-            }
-
-            if (container == this)
-            {
-                AddResolver(key, resolver, false);
-            }
-
-            error = default(Exception);
-            return true;
-        }
 
         [MethodImpl((MethodImplOptions)256)]
-        private void AddResolver(FullKey key, [NotNull] Delegate resolver, bool currentContainer)
+        private bool TryGetRegistrationEntry(FullKey key, int hashCode, out RegistrationEntry registrationEntry)
         {
             lock (_lockObject)
             {
-                Resolvers = Resolvers.Set(key.GetHashCode(), key, resolver);
-                if (key.Tag == null)
-                {
-                    ResolversByType = ResolversByType.Set(key.Type.GetHashCode(), key.Type, resolver);
-                }
-            }
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        private bool TryGetRegistrationEntry(FullKey key, out RegistrationEntry registrationEntry)
-        {
-            lock (_lockObject)
-            {
-                registrationEntry = _registrationEntries.Get(key.GetHashCode(), key);
+                registrationEntry = _registrationEntries.Get(hashCode, key);
                 if (registrationEntry != default(RegistrationEntry))
                 {
                     return true;
@@ -483,12 +468,7 @@
                 }
 
                 registrationEntry = _registrationEntriesForTagAny.GetByRef(type.GetHashCode(), type);
-                if (registrationEntry != default(RegistrationEntry))
-                {
-                    return true;
-                }
-
-                return false;
+                return registrationEntry != default(RegistrationEntry);
             }
         }
 
@@ -503,7 +483,7 @@
             }
 
             [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-            public FullKey[] Keys => _container._allKeys.SelectMany(i => i).ToArray();
+            public FullKey[] Keys => _container.GetAllKeys().SelectMany(i => i).ToArray();
 
             public IContainer Parent => _container.Parent is NullContainer ? null : _container.Parent;
 

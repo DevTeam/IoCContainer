@@ -3,7 +3,7 @@
     using Shouldly;
     using Xunit;
 
-    public class SingletonLifetime
+    public class ContainerLifetime
     {
         [Fact]
         public void Run()
@@ -11,13 +11,13 @@
             // $visible=true
             // $tag=binding
             // $priority=03
-            // $description=Singleton lifetime
+            // $description=Container Singleton lifetime
             // {
             // Create a container
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
+            using (container.Bind<IService>().As(Lifetime.ContainerSingleton).To<Service>())
             {
                 // Resolve one instance twice
                 var instance1 = container.Resolve<IService>();
@@ -27,9 +27,11 @@
                 using (var childContainer = container.CreateChild())
                 {
                     var instance3 = childContainer.Resolve<IService>();
+                    var instance4 = childContainer.Resolve<IService>();
 
                     instance1.ShouldBe(instance2);
-                    instance1.ShouldBe(instance3);
+                    instance1.ShouldNotBe(instance3);
+                    instance3.ShouldBe(instance4);
                 }
             }
 

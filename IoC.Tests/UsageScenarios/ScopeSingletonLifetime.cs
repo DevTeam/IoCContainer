@@ -10,7 +10,7 @@
         {
             // $visible=true
             // $tag=binding
-            // $priority=00
+            // $priority=03
             // $description=Scope Singleton lifetime
             // {
             // Create a container

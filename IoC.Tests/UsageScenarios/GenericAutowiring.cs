@@ -10,7 +10,7 @@
         {
             // $visible=true
             // $tag=binding
-            // $priority=02
+            // $priority=00
             // $description=Generic Auto-wiring
             // {
             // Create a container

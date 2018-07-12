@@ -60,7 +60,7 @@
         {
             unchecked
             {
-                return (Type.GetHashCode() * 397) ^ (Tag != null ? Tag.GetHashCode() : 0);
+                return (Tag != null ? Tag.GetHashCode() * 397 : 0) ^ Type.GetHashCode();
             }
         }
 

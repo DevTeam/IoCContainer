@@ -1156,6 +1156,7 @@ namespace IoC
     {
         private static long _containerId;
 
+        // ReSharper disable once RedundantNameQualifier
         internal static readonly object[] EmptyArgs = Core.CollectionExtensions.EmptyArray<object>();
         [NotNull] private static readonly Lazy<Container> BasicRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.BasicSet), true);
         [NotNull] private static readonly Lazy<Container> DefultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.DefaultSet), true);
@@ -1229,11 +1230,16 @@ namespace IoC
             _name = $"{parent}/{name ?? throw new ArgumentNullException(nameof(name))}";
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
 
+            if (!(this is IResourceStore resourceStore))
+            {
+                throw new NotSupportedException();
+            }
+
             // Subscribe to events from the parent container
-            ((IResourceStore)this).AddResource(_parent.Subscribe(_eventSubject));
+            resourceStore.AddResource(_parent.Subscribe(_eventSubject));
 
             // Subscribe to reset resolvers
-            ((IResourceStore)this).AddResource(_eventSubject.Subscribe(this));
+            resourceStore.AddResource(_eventSubject.Subscribe(this));
         }
 
         /// <inheritdoc />
@@ -1344,57 +1350,85 @@ namespace IoC
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-        public bool TryGetResolver<T>(ShortKey type, object tag, out Resolver<T> resolver, out Exception error, IContainer container = null)
+        public bool TryGetResolver<T>(ShortKey type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
         {
+            FullKey key;
+            int hashCode;
             if (tag == null)
             {
-                resolver = (Resolver<T>) ResolversByType.GetByRef(type.GetHashCode(), type);
-                if (resolver != default(Resolver<T>))
+                hashCode = type.GetHashCode();
+                resolver = (Resolver<T>) ResolversByType.GetByRef(hashCode, type);
+                if (resolver != default(Resolver<T>)) // finded in resolvers by type
                 {
                     error = default(Exception);
                     return true;
                 }
+
+                key = new FullKey(type);
             }
             else
             {
-                var key = new FullKey(type, tag);
-                resolver = (Resolver<T>)Resolvers.Get(key.GetHashCode(), key);
-                if (resolver != default(Resolver<T>))
+                key = new FullKey(type, tag);
+                hashCode = key.GetHashCode();
+                resolver = (Resolver<T>)Resolvers.Get(hashCode, key);
+                if (resolver != default(Resolver<T>)) // finded in resolvers
                 {
                     error = default(Exception);
                     return true;
                 }
             }
 
-            return TryCreateResolver(new FullKey(type, tag), out resolver, out error, container ?? this);
-        }
-
-        /// <inheritdoc />
-        [MethodImpl((MethodImplOptions)256)]
-        [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-        public bool TryGetResolver<T>(ShortKey type, out Resolver<T> resolver, out Exception error, IContainer container = null)
-        {
-            resolver = (Resolver<T>) ResolversByType.GetByRef(type.GetHashCode(), type);
-            if (resolver != default(Resolver<T>))
+            // tries finding in registrations
+            if (TryGetRegistrationEntry(key, hashCode, out var registrationEntry))
             {
-                error = default(Exception);
-                return true;
+                // tries creating resolver
+                if (!registrationEntry.TryCreateResolver(key, resolvingContainer ?? this, out var resolverDelegate, out error))
+                {
+                    resolver = default(Resolver<T>);
+                    return false;
+                }
+
+                resolver = (Resolver<T>)resolverDelegate;
+            }
+            else
+            {
+                // tries finding in parent
+                if (!_parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer ?? this))
+                {
+                    resolver = default(Resolver<T>);
+                    return false;
+                }
             }
 
-            return TryCreateResolver(new FullKey(type), out resolver, out error, container ?? this);
+            // If it is resolving container only
+            if (resolvingContainer == null || resolvingContainer == this)
+            {
+                // Add resolver to tables
+                lock (_lockObject)
+                {
+                    Resolvers = Resolvers.Set(hashCode, key, resolver);
+                    if (tag == null)
+                    {
+                        ResolversByType = ResolversByType.Set(hashCode, type, resolver);
+                    }
+                }
+            }
+
+            error = default(Exception);
+            return true;
         }
 
         /// <inheritdoc />
         public bool TryGetDependency(FullKey key, out IDependency dependency, out ILifetime lifetime)
         {
-            if (TryGetRegistrationEntry(key, out var registrationEntry))
+            if (!TryGetRegistrationEntry(key, key.GetHashCode(), out var registrationEntry))
             {
-                dependency = registrationEntry.Dependency;
-                lifetime = registrationEntry.GetLifetime(key.Type);
-                return true;
+                return _parent.TryGetDependency(key, out dependency, out lifetime);
             }
 
-            return _parent.TryGetDependency(key, out dependency, out lifetime);
+            dependency = registrationEntry.Dependency;
+            lifetime = registrationEntry.GetLifetime(key.Type);
+            return true;
         }
 
         /// <inheritdoc />
@@ -1475,13 +1509,9 @@ namespace IoC
             }
         }
 
-        void IObserver<ContainerEvent>.OnError(Exception error)
-        {
-        }
+        void IObserver<ContainerEvent>.OnError(Exception error) { }
 
-        void IObserver<ContainerEvent>.OnCompleted()
-        {
-        }
+        void IObserver<ContainerEvent>.OnCompleted() { }
 
         [MethodImpl((MethodImplOptions) 256)]
         private IEnumerable<IEnumerable<FullKey>> GetAllKeys()
@@ -1535,58 +1565,13 @@ namespace IoC
         {
             _resources.Add(this.Apply(configurations));
         }
-        
-        [MethodImpl((MethodImplOptions)256)]
-        private bool TryCreateResolver<T>(FullKey key, out Resolver<T> resolver, out Exception error, IContainer container)
-        {
-            if (TryGetRegistrationEntry(key, out var registrationEntry))
-            {
-                if (!registrationEntry.TryCreateResolver(key, container, out var resolverDelegate, out error))
-                {
-                    resolver = default(Resolver<T>);
-                    return false;
-                }
-
-                resolver = (Resolver<T>)resolverDelegate;
-                error = default(Exception);
-                AddResolver(key, resolver, true);
-                return true;
-            }
-
-            if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, out error, container))
-            {
-                resolver = default(Resolver<T>);
-                return false;
-            }
-
-            if (container == this)
-            {
-                AddResolver(key, resolver, false);
-            }
-
-            error = default(Exception);
-            return true;
-        }
 
         [MethodImpl((MethodImplOptions)256)]
-        private void AddResolver(FullKey key, [NotNull] Delegate resolver, bool currentContainer)
+        private bool TryGetRegistrationEntry(FullKey key, int hashCode, out RegistrationEntry registrationEntry)
         {
             lock (_lockObject)
             {
-                Resolvers = Resolvers.Set(key.GetHashCode(), key, resolver);
-                if (key.Tag == null)
-                {
-                    ResolversByType = ResolversByType.Set(key.Type.GetHashCode(), key.Type, resolver);
-                }
-            }
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        private bool TryGetRegistrationEntry(FullKey key, out RegistrationEntry registrationEntry)
-        {
-            lock (_lockObject)
-            {
-                registrationEntry = _registrationEntries.Get(key.GetHashCode(), key);
+                registrationEntry = _registrationEntries.Get(hashCode, key);
                 if (registrationEntry != default(RegistrationEntry))
                 {
                     return true;
@@ -1612,12 +1597,7 @@ namespace IoC
                 }
 
                 registrationEntry = _registrationEntriesForTagAny.GetByRef(type.GetHashCode(), type);
-                if (registrationEntry != default(RegistrationEntry))
-                {
-                    return true;
-                }
-
-                return false;
+                return registrationEntry != default(RegistrationEntry);
             }
         }
 
@@ -1632,7 +1612,7 @@ namespace IoC
             }
 
             [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
-            public FullKey[] Keys => _container._allKeys.SelectMany(i => i).ToArray();
+            public FullKey[] Keys => _container.GetAllKeys().SelectMany(i => i).ToArray();
 
             public IContainer Parent => _container.Parent is NullContainer ? null : _container.Parent;
 
@@ -2389,7 +2369,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag)
-            => container.TryGetResolver<T>(type, tag.Value, out var resolver, out var error, container) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type, tag), error);
+            => container.TryGetResolver<T>(type, tag.Value, out var resolver, out var error) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type, tag), error);
 
         /// <summary>
         /// Tries getting the resolver.
@@ -2401,9 +2381,8 @@ namespace IoC
         /// <param name="resolver"></param>
         /// <returns>True if success.</returns>
         [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag, [NotNull] out Resolver<T> resolver)
-            => container.TryGetResolver(type, tag.Value, out resolver, out _, container);
+            => container.TryGetResolver(type, tag.Value, out resolver, out _);
 
         /// <summary>
         /// Gets the resolver.
@@ -2426,7 +2405,6 @@ namespace IoC
         /// <param name="resolver"></param>
         /// <returns>True if success.</returns>
         [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, Tag tag, [NotNull] out Resolver<T> resolver)
             => container.TryGetResolver(TypeDescriptor<T>.Type, tag, out resolver);
 
@@ -2440,7 +2418,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type)
-            => container.TryGetResolver<T>(type, out var resolver, out var error, container) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type), error);
+            => container.TryGetResolver<T>(type, null, out var resolver, out var error) ? resolver : container.GetIssueResolver().CannotGetResolver<T>(container, new Key(type), error);
 
         /// <summary>
         /// Tries getting the resolver.
@@ -2451,9 +2429,8 @@ namespace IoC
         /// <param name="resolver"></param>
         /// <returns>True if success.</returns>
         [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, [NotNull] out Resolver<T> resolver)
-            => container.TryGetResolver(type, out resolver, out _, container);
+            => container.TryGetResolver(type, null, out resolver, out _);
 
         /// <summary>
         /// Gets the resolver.
@@ -2474,7 +2451,6 @@ namespace IoC
         /// <param name="resolver"></param>
         /// <returns>True if success.</returns>
         [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, [NotNull] out Resolver<T> resolver)
             => container.TryGetResolver(TypeDescriptor<T>.Type, out resolver);
 
@@ -3295,20 +3271,20 @@ namespace IoC
     using System.Collections.Generic;
 
     /// <summary>
-    /// The IoC container.
+    /// The Inversion of Control container.
     /// </summary>
     [PublicAPI]
     public interface IContainer: IEnumerable<IEnumerable<Key>>, IObservable<ContainerEvent>, IDisposable
     {
         /// <summary>
-        /// The parent container.
+        /// The parent container or null if it has no a parent.
         /// </summary>
         [CanBeNull] IContainer Parent { get; }
 
         /// <summary>
-        /// Registers the binding to the target container.
+        /// Tries registering the binding to the target container.
         /// </summary>
-        /// <param name="keys">The set of keys.</param>
+        /// <param name="keys">The set of keys to register.</param>
         /// <param name="dependency">The dependency.</param>
         /// <param name="lifetime">The lifetime.</param>
         /// <param name="registrationToken">The registration token.</param>
@@ -3316,36 +3292,25 @@ namespace IoC
         bool TryRegister([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IDisposable registrationToken);
 
         /// <summary>
-        /// Registers the dependency and lifetime.
+        /// Tries getting the dependency and the its lifetime.
         /// </summary>
-        /// <param name="key">The key.</param>
+        /// <param name="key">The key to get a dependency.</param>
         /// <param name="dependency">The dependency.</param>
         /// <param name="lifetime">The lifetime.</param>
         /// <returns>True if successful.</returns>
         bool TryGetDependency(Key key, out IDependency dependency, [CanBeNull] out ILifetime lifetime);
 
         /// <summary>
-        /// Gets the resolver.
+        /// Tries getting the resolver.
         /// </summary>
-        /// <typeparam name="T">The resolver type.</typeparam>
-        /// <param name="type">The target type.</param>
-        /// <param name="tag">The tag of binding.</param>
+        /// <typeparam name="T">The type of instance producing by the resolver.</typeparam>
+        /// <param name="type">The binding's type.</param>
+        /// <param name="tag">The binding's tag or null if there is no tag.</param>
         /// <param name="resolver">The resolver.</param>
-        /// <param name="error">The error during resolving.</param>
-        /// <param name="container">The resolving container.</param>
+        /// <param name="error">The error occurring during resolving.</param>
+        /// <param name="resolvingContainer">The resolving container and null if it is the current container.</param>
         /// <returns>True if successful.</returns>
-        bool TryGetResolver<T>([NotNull] Type type, [CanBeNull] object tag, out Resolver<T> resolver, out Exception error, [CanBeNull] IContainer container = null);
-
-        /// <summary>
-        /// Gets the resolver.
-        /// </summary>
-        /// <typeparam name="T">The resolver type.</typeparam>
-        /// <param name="type">The target type.</param>
-        /// <param name="resolver">The resolver.</param>
-        /// <param name="error">The error during resolving</param>
-        /// <param name="container">The resolving container.</param>
-        /// <returns>True if successful.</returns>
-        bool TryGetResolver<T>([NotNull] Type type, out Resolver<T> resolver, out Exception error, [CanBeNull] IContainer container = null);
+        bool TryGetResolver<T>([NotNull] Type type, [CanBeNull] object tag, out Resolver<T> resolver, out Exception error, [CanBeNull] IContainer resolvingContainer = null);
     }
 }
 
@@ -3572,7 +3537,7 @@ namespace IoC
         {
             unchecked
             {
-                return (Type.GetHashCode() * 397) ^ (Tag != null ? Tag.GetHashCode() : 0);
+                return (Tag != null ? Tag.GetHashCode() * 397 : 0) ^ Type.GetHashCode();
             }
         }
 
@@ -5730,7 +5695,7 @@ namespace IoC.Core
 
     internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
     {
-        private static readonly Key ContextKey = new Key(TypeDescriptor<Context>.Type);
+        private static readonly Key ContextKey = TypeDescriptor<Context>.Key;
         [NotNull] private static readonly TypeDescriptor ContextTypeDescriptor = TypeDescriptor<Context>.Descriptor;
         [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static readonly ConstructorInfo ContextConstructor;
@@ -6260,7 +6225,7 @@ namespace IoC.Core
             {
                 if (_getExpressionCompilerReentrancy == 1)
                 {
-                    if (container.TryGetResolver<IExpressionCompiler>(TypeDescriptor<IExpressionCompiler>.Type, out var resolver, out _))
+                    if (container.TryGetResolver<IExpressionCompiler>(TypeDescriptor<IExpressionCompiler>.Type, null, out var resolver, out _))
                     {
                         return resolver(container);
                     }
@@ -6338,7 +6303,7 @@ namespace IoC.Core
             if (
                 autowiringStrategy == null
                 && buildContext.Key.Type != TypeDescriptor<IAutowiringStrategy>.Type
-                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(TypeDescriptor<IAutowiringStrategy>.Type, out var autowiringStrategyResolver, out error))
+                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(TypeDescriptor<IAutowiringStrategy>.Type, null, out var autowiringStrategyResolver, out error))
             {
                 autowiringStrategy = autowiringStrategyResolver(buildContext.Container);
             }
@@ -6621,14 +6586,7 @@ namespace IoC.Core
             return false;
         }
 
-        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer container = null)
-        {
-            resolver = default(Resolver<T>);
-            error = NotSupportedException;
-            return false;
-        }
-
-        public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, out Exception error, IContainer container = null)
+        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
         {
             resolver = default(Resolver<T>);
             error = NotSupportedException;
@@ -7083,10 +7041,14 @@ namespace IoC.Core
     internal static class TypeDescriptor<T>
     {
         [NotNull] public static readonly Type Type = typeof(T);
+
         // ReSharper disable once StaticMemberInGenericType
         public static readonly int HashCode = Type.GetHashCode();
+
         // ReSharper disable once StaticMemberInGenericType
         [NotNull] public static readonly TypeDescriptor Descriptor = Type.Descriptor();
+
+        public static readonly Key Key = new Key(typeof(T));
     }
 }
 

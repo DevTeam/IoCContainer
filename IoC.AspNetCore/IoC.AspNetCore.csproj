@@ -8,7 +8,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackageId>IoC.AspNetCore</PackageId>
     <Authors>NikolayP</Authors>
-    <Description>AspNetCore feature for IoC container</Description>
+    <Description>AspNetCore feature for IoC container.</Description>
     <PackageLicenseUrl>https://raw.githubusercontent.com/DevTeam/IoCContainer/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/DevTeam/IoCContainer/</PackageProjectUrl>
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</PackageIconUrl>
@@ -33,7 +33,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.0' or '$(TargetFramework)'=='netcoreapp2.1'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.0" />    
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.1" />    
   </ItemGroup>  
 
   <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp2.0' and '$(TargetFramework)'!='netcoreapp2.1'">

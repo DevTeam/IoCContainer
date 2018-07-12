@@ -10,7 +10,7 @@
         {
             // $visible=true
             // $tag=binding
-            // $priority=02
+            // $priority=01
             // $description=Generics
             // {
             // Create a container

@@ -24,14 +24,7 @@
             return false;
         }
 
-        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer container = null)
-        {
-            resolver = default(Resolver<T>);
-            error = NotSupportedException;
-            return false;
-        }
-
-        public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, out Exception error, IContainer container = null)
+        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
         {
             resolver = default(Resolver<T>);
             error = NotSupportedException;

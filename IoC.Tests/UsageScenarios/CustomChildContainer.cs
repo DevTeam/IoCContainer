@@ -48,16 +48,12 @@
             public bool TryGetDependency(Key key, out IoC.IDependency dependency, out ILifetime lifetime)
                 => Parent.TryGetDependency(key, out dependency, out lifetime);
 
-            public bool TryGetResolver<T>(Type type, out Resolver<T> resolver, out Exception error, IContainer container = null)
-                => Parent.TryGetResolver(type, out resolver, out error, container);
-
-            public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer container = null)
-                => Parent.TryGetResolver(type, tag, out resolver, out error, container);
+            public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
+                => Parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer);
 
             public void Dispose() { }
 
-            IEnumerator IEnumerable.GetEnumerator()
-                => GetEnumerator();
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             public IEnumerator<IEnumerable<Key>> GetEnumerator() => Parent.GetEnumerator();
 

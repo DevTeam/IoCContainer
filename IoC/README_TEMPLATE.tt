@@ -130,5 +130,5 @@
     File.AppendAllText(readmeFile, footerContent);
 
     var nugetContent = featuresContent.Replace("](#", "](https://github.com/DevTeam/IoCContainer#");
-    File.AppendAllText(nugetReadmeFile, nugetContent);
+    File.WriteAllText(nugetReadmeFile, nugetContent);
 #>

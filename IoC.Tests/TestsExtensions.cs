@@ -14,7 +14,7 @@
         {
             if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
             if (lambdaExpression == null) throw new ArgumentNullException(nameof(lambdaExpression));
-            var buildContext = new BuildContext(ExpressionCompilerDefault.Shared, new Key(typeof(T)), Mock.Of<IContainer>(), new List<IDisposable>());
+            var buildContext = new BuildContext(ExpressionCompilerDefault.Shared, TypeDescriptor<T>.Key, Mock.Of<IContainer>(), new List<IDisposable>());
             var lifetimeExpression = lifetime.Build(lambdaExpression.Body, buildContext);
             var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), lifetimeExpression, false, ResolverParameters);
             return (Resolver<T>)ExpressionCompilerDefault.Shared.Compile(resolverExpression);

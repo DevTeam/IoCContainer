@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/DevTeam/IoCContainer/</projectUrl>
     <licenseUrl>https://raw.githubusercontent.com/DevTeam/IoCContainer/master/LICENSE</licenseUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>AspNetCore feature for IoC container</description>
+    <description>AspNetCore feature for IoC container as embedding-in-code package.</description>
     <tags>ASP net core IoC inversionofcontrol Container DI dependencyinjection</tags>
     <contentFiles>
       <files include="cs/any/*.cs" buildAction="Compile" />

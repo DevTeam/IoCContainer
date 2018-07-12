@@ -31,7 +31,7 @@
             if (
                 autowiringStrategy == null
                 && buildContext.Key.Type != TypeDescriptor<IAutowiringStrategy>.Type
-                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(TypeDescriptor<IAutowiringStrategy>.Type, out var autowiringStrategyResolver, out error))
+                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(TypeDescriptor<IAutowiringStrategy>.Type, null, out var autowiringStrategyResolver, out error))
             {
                 autowiringStrategy = autowiringStrategyResolver(buildContext.Container);
             }

@@ -11,7 +11,7 @@
 
     internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
     {
-        private static readonly Key ContextKey = new Key(TypeDescriptor<Context>.Type);
+        private static readonly Key ContextKey = TypeDescriptor<Context>.Key;
         [NotNull] private static readonly TypeDescriptor ContextTypeDescriptor = TypeDescriptor<Context>.Descriptor;
         [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static readonly ConstructorInfo ContextConstructor;
