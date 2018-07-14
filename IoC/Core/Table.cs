@@ -28,7 +28,7 @@
             Count = origin.Count + 1;
             if (origin.Count > origin._divisor)
             {
-                _divisor = (origin._divisor + 1) << 1 - 1;
+                _divisor = (origin._divisor + 1) << 2 - 1;
                 _buckets = CollectionExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
                 var originBuckets = origin._buckets;
                 for (var originBucketIndex = 0; originBucketIndex < originBuckets.Length; originBucketIndex++)
@@ -121,7 +121,7 @@
             return new Table<TKey, TValue>(newBuckets, _divisor, removed ? Count - 1: Count);
         }
 
-        internal sealed class KeyValue
+        internal struct KeyValue
         {
             public readonly int HashCode;
             public readonly TKey Key;
