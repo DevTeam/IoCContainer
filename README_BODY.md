@@ -47,9 +47,9 @@ class ShroedingersCat : ICat
 
 _**It is important to note that our abstraction and our implementation do not know anything about IoC containers**_
 
-### Add the [package reference](https://www.nuget.org/packages/IoC.Container)
+### Let's glue all together
 
-IoC.Container ships entirely as NuGet packages. Using NuGet packages allows you to optimize your application to include only the necessary dependencies.
+At first add the package reference to [IoC.Container](https://www.nuget.org/packages/IoC.Container). It ships entirely as NuGet packages. Using NuGet packages allows you to optimize your application to include only the necessary dependencies.
 
 - Package Manager
 
@@ -63,7 +63,7 @@ IoC.Container ships entirely as NuGet packages. Using NuGet packages allows you 
   dotnet add package IoC.Container
   ```
 
-### Let's glue all together
+You could use a dedicated class(es) to declare dependencies.
 
 ```csharp
 class Glue : IConfiguration
@@ -76,7 +76,7 @@ class Glue : IConfiguration
 }
 ```
 
-### Just configure the container and check it works as expected
+### Time to open boxes!
 
 ```csharp
 using (var container = Container.Create().Using<Glue>())
@@ -118,6 +118,8 @@ using (var container = Container.Create().Using<Glue>())
 }
 ```
 
+Let's take a note that the real "Inversion of Control container" scenario is not supposing using any resolving methods, except a single root resolving (just imagine here that boxes equal to root instances in the sample above). It is better when all dependencies are injected automatically via constructors, initializing methods, properties or even fields.
+
 ### Under the hood
 
 Actually each instance is resolved by strongly-typed function which is represented just as a graph of operators `new` compiled from expression trees which allow to create (or to get) required instances with minimal performance and memory impact. Thus the code like
@@ -126,7 +128,7 @@ Actually each instance is resolved by strongly-typed function which is represent
 var box = container.Resolve<IBox<ICat>>();
 ```
 
-will be compiled as invocation of the following strongly-typed function `Resolve();` excluding any boxing/unboxing statements:
+will be compiled as invocation of the following strongly-typed function `Resolve()` excluding any boxing/unboxing statements:
 
 ```csharp
 CardboardBox<ShroedingersCat> Resolve()
@@ -135,7 +137,7 @@ CardboardBox<ShroedingersCat> Resolve()
 }
 ```
 
-This function contains a set of operators `new` and calls of initializers in the case of methods injection or properties injection.
+This single function contains a full set of operators `new` related constructors of all dependencies. This is also true for any initializers like methods, properties or fields.
 
 ## [ASP.NET Core](https://github.com/aspnet/Home)
 
