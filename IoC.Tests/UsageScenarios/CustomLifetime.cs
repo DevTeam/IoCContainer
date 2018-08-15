@@ -1,7 +1,6 @@
 ﻿namespace IoC.Tests.UsageScenarios
 {
     using System.Linq.Expressions;
-    using Extensibility;
     using Shouldly;
     using Xunit;
 
@@ -30,10 +29,12 @@
 
         public class MyTransientLifetime : ILifetime
         {
-            public Expression Build(Expression expression, IBuildContext buildContext, object state = default(object))
+            public Expression Build(Expression expression, IBuildContext buildContext)
                 => expression;
 
             public ILifetime Create() => new MyTransientLifetime();
+
+            public void Dispose() { }
         }
         // }
     }

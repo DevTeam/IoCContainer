@@ -2,7 +2,6 @@
 {
     using System;
     using System.Linq.Expressions;
-    using Extensibility;
 
     /// <summary>
     /// Represents a IoC dependency.

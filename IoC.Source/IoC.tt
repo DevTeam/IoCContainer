@@ -45,7 +45,6 @@ SOFTWARE.
         ".",
         "Features",
         "Lifetimes",
-        "Extensibility",
         "Core",
         "Core" + Path.DirectorySeparatorChar + "Configuration"};
 

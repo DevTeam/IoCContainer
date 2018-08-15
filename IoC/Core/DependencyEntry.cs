@@ -5,7 +5,6 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
-    using Extensibility;
 
     internal sealed class DependencyEntry : IDisposable
     {
@@ -36,8 +35,7 @@
         public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver, out Exception error)
         {
             var typeDescriptor = key.Type.Descriptor();
-            var compiler = container.GetExpressionCompiler();
-            var buildContext = new BuildContext(compiler, key, container, _resources);
+            var buildContext = new BuildContext(key, container, _resources);
             if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression, out error))
             {
                 resolver = default(Delegate);
@@ -45,7 +43,7 @@
             }
 
             var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, WellknownExpressions.ResolverParameters);
-            resolver = compiler.Compile(resolverExpression);
+            resolver = ExpressionCompiler.Shared.Compile(resolverExpression);
             error = default(Exception);
             return true;
         }
@@ -104,10 +102,7 @@
             
             foreach (var lifetime in _lifetimes.Values)
             {
-                if (lifetime is IDisposable disposableLifetime)
-                {
-                    disposableLifetime.Dispose();
-                }
+                lifetime.Dispose();
             }
         }
 

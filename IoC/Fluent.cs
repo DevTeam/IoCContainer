@@ -2,7 +2,6 @@
 {
     using System;
     using System.Runtime.CompilerServices;
-    using Extensibility;
 
     /// <summary>
     /// Extension method for IoC container.

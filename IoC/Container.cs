@@ -10,7 +10,6 @@
     using System.Runtime.CompilerServices;
     using System.Threading;
     using Core;
-    using Extensibility;
     using Features;
     using static Key;
     using FullKey = Key;

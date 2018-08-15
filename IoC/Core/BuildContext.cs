@@ -6,7 +6,6 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
-    using Extensibility;
 
     /// <summary>
     /// Represents build context.
@@ -17,14 +16,12 @@
     {
         // Should be at least internal to be accessable from for compiled code from expressions
         private readonly ICollection<IDisposable> _resources;
-        private readonly IExpressionCompiler _compiler;
         private readonly List<ParameterExpression> _parameters = new List<ParameterExpression>();
         private readonly List<Expression> _statements = new List<Expression>();
         private int _curId;
 
-        internal BuildContext([NotNull] IExpressionCompiler compiler, Key key, [NotNull] IContainer container, [NotNull] ICollection<IDisposable> resources, int depth = 0)
+        internal BuildContext(Key key, [NotNull] IContainer container, [NotNull] ICollection<IDisposable> resources, int depth = 0)
         {
-            _compiler = compiler ?? throw new ArgumentNullException(nameof(compiler));
             Key = key;
             Container = container ?? throw new ArgumentNullException(nameof(container));
             _resources = resources ?? throw new ArgumentNullException(nameof(resources));
@@ -40,7 +37,7 @@
         public IBuildContext CreateChild(Key key, IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            var child = new BuildContext(_compiler, key, container, _resources, Depth + 1);
+            var child = new BuildContext(key, container, _resources, Depth + 1);
             child._parameters.AddRange(_parameters);
             child._statements.AddRange(_statements);
             return child;

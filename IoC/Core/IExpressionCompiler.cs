@@ -1,4 +1,4 @@
-﻿namespace IoC.Extensibility
+﻿namespace IoC.Core
 {
     using System;
     using System.Linq.Expressions;
@@ -7,7 +7,7 @@
     /// Represents a expression compiler.
     /// </summary>
     [PublicAPI]
-    public interface IExpressionCompiler
+    internal interface IExpressionCompiler
     {
         /// <summary>
         /// Compiles an expression to a delegate.

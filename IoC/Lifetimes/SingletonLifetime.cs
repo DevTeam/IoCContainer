@@ -5,46 +5,43 @@
     using System.Linq.Expressions;
     using System.Reflection;
     using Core;
-    using Extensibility;
     using static Core.TypeDescriptorExtensions;
 
     /// <summary>
     /// Represents singleton lifetime.
     /// </summary>
     [PublicAPI]
-    public sealed class SingletonLifetime : ILifetime, IDisposable
+    public sealed class SingletonLifetime : ILifetime
     {
-        private static readonly FieldInfo LockObjectFieldInfo = Descriptor<SingletonLifetime>().GetDeclaredFields().Single(i => i.Name == nameof(LockObject));
-        private static readonly FieldInfo InstanceFieldInfo = Descriptor<SingletonLifetime>().GetDeclaredFields().Single(i => i.Name == nameof(Instance));
+        private static readonly FieldInfo InstanceFieldInfo = Descriptor<SingletonLifetime>().GetDeclaredFields().Single(i => i.Name == nameof(_instance));
 
-        [NotNull] internal object LockObject = new object();
-        internal volatile object Instance;
+#pragma warning disable CS0649
+        [NotNull] private object _lockObject = new object();
+        private volatile object _instance;
+#pragma warning restore CS0649
 
         /// <inheritdoc />
-        public Expression Build(Expression expression, IBuildContext buildContext, object state)
+        public Expression Build(Expression expression, IBuildContext buildContext)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            var type = expression.Type;
-            var thisVar = buildContext.AppendValue(this);
-            var lockObjectField = Expression.Field(thisVar, LockObjectFieldInfo);
-            var instanceField = Expression.Field(thisVar, InstanceFieldInfo);
-            var typedInstance = instanceField.Convert(type);
+
+            var thisConst = buildContext.AppendValue(this);
+            var lockObjectConst = buildContext.AppendValue(_lockObject);
+            var instanceField = Expression.Field(thisConst, InstanceFieldInfo);
+            var typedInstance = instanceField.Convert(expression.Type);
             var isNullExpression = Expression.ReferenceEqual(instanceField, ExpressionBuilderExtensions.NullConst);
 
-            // if(this.Instance == null)
-            return Expression.Condition(
+            return Expression.Block(Expression.IfThen(
                 isNullExpression,
-                Expression.Block(
-                    // lock(this.LockObject)
-                    Expression.IfThen(
-                        // if(this.Instance != null)
-                        isNullExpression,
-                        // this.Instance = new T();
-                        Expression.Assign(instanceField, expression)).Lock(lockObjectField),
-                    // return (T)this.Instance;
-                    typedInstance),
-                // return (T)this.Instance;
+                // if (this._instance == null)
+                // lock (this._lockObject)
+                Expression.IfThen(
+                    // if (this._instance == null)
+                    isNullExpression,
+                    // this._instance = new T();
+                    Expression.Assign(instanceField, expression)).Lock(lockObjectConst)),
+                // return this._instance
                 typedInstance);
         }
 
@@ -52,9 +49,9 @@
         public void Dispose()
         {
             IDisposable disposable;
-            lock (LockObject)
+            lock (_lockObject)
             {
-                disposable = Instance as IDisposable;
+                disposable = _instance as IDisposable;
             }
 
             disposable?.Dispose();

@@ -1,4 +1,4 @@
-﻿namespace IoC.Extensibility
+﻿namespace IoC
 {
     using System;
     using System.Linq.Expressions;

@@ -5,8 +5,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Extensibility;
-    using static Extensibility.WellknownExpressions;
+    using static WellknownExpressions;
     using static TypeDescriptorExtensions;
 
     internal class DependencyInjectionExpressionVisitor: ExpressionVisitor

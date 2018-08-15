@@ -1,4 +1,4 @@
-﻿namespace IoC.Extensibility
+﻿namespace IoC.Core
 {
     using System.Linq.Expressions;
 
@@ -6,7 +6,7 @@
     /// Allows to build expresion for lifetimes.
     /// </summary>
     [PublicAPI]
-    public interface IExpressionBuilder<in TContext>
+    internal interface IExpressionBuilder<in TContext>
     {
         /// <summary>
         /// Builds the expression.

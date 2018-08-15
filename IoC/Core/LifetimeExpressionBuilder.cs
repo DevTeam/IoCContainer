@@ -2,7 +2,6 @@
 {
     using System;
     using System.Linq.Expressions;
-    using Extensibility;
 
     internal class LifetimeExpressionBuilder : IExpressionBuilder<ILifetime>
     {

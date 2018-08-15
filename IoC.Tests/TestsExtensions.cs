@@ -2,14 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Threading;
-    using System.Threading.Tasks;
     using Core;
     using Moq;
-    using Shouldly;
-    using static Extensibility.WellknownExpressions;
 
     internal static class TestsExtensions
     {
@@ -18,9 +14,9 @@
         {
             if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
             if (lambdaExpression == null) throw new ArgumentNullException(nameof(lambdaExpression));
-            var buildContext = new BuildContext(ExpressionCompiler.Shared, TypeDescriptor<T>.Key, Mock.Of<IContainer>(), new List<IDisposable>());
+            var buildContext = new BuildContext(TypeDescriptor<T>.Key, Mock.Of<IContainer>(), new List<IDisposable>());
             var lifetimeExpression = lifetime.Build(lambdaExpression.Body, buildContext);
-            var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), lifetimeExpression, false, ResolverParameters);
+            var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), lifetimeExpression, false, WellknownExpressions.ResolverParameters);
             return (Resolver<T>)ExpressionCompiler.Shared.Compile(resolverExpression);
         }
 

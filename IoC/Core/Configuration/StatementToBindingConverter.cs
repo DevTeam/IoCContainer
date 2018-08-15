@@ -4,7 +4,6 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
-    using Extensibility;
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal sealed class StatementToBindingConverter: IConverter<Statement, BindingContext, BindingContext>

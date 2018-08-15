@@ -4,7 +4,6 @@ namespace IoC.Tests.UsageScenarios
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Extensibility;
     using Moq;
     using Shouldly;
     using Xunit;
@@ -64,10 +63,10 @@ namespace IoC.Tests.UsageScenarios
                 _counter = counter;
             }
 
-            public Expression Build(Expression expression, IBuildContext buildContext, object state = default(object))
+            public Expression Build(Expression expression, IBuildContext buildContext)
             {
                 // Build expression using base lifetime
-                expression = _baseSingletonLifetime.Build(expression, buildContext, state);
+                expression = _baseSingletonLifetime.Build(expression, buildContext);
 
                 // Define `this` variable
                 var thisVar = buildContext.AppendValue(this);
@@ -79,6 +78,11 @@ namespace IoC.Tests.UsageScenarios
             }
 
             public ILifetime Create() => new MySingletonLifetime(_baseSingletonLifetime.Create(), _counter);
+
+            public void Dispose()
+            {
+                _baseSingletonLifetime.Dispose();
+            }
 
             // Just counting the number of calls
             internal void IncrementCounter() => _counter.Increment();

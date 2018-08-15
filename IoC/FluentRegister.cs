@@ -7,7 +7,6 @@
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
     using Core;
-    using Extensibility;
 
     /// <summary>
     /// Represents extensions to register a dependency in a container.

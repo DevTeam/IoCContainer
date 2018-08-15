@@ -476,29 +476,32 @@ namespace IoC.Comparison
 
         private static void CtorSingleton(long series, IPerformanceCounter performanceCounter)
         {
+            lock (LockObject)
+            {
+                _service2 = null;
+            }
+
             using (performanceCounter.Run())
             {
                 for (var i = 0; i < series; i++)
                 {
                     CreateSingletonService().DoSomething();
                 }
-
-                lock (LockObject)
-                {
-                    _service2 = null;
-                }
             }
         }
 
-        private static IService1 CreateSingletonService()
+        private static Service1 CreateSingletonService()
         {
             if (_service2 == null)
             {
-                lock (LockObject)
+                if (_service2 == null)
                 {
-                    if (_service2 == null)
+                    lock (LockObject)
                     {
-                        _service2 = new Service2(new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()));
+                        if (_service2 == null)
+                        {
+                            _service2 = new Service2(new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()));
+                        }
                     }
                 }
             }
@@ -517,7 +520,7 @@ namespace IoC.Comparison
             }
         }
 
-        private static IService1 CreateTransientService()
+        private static Service1 CreateTransientService()
         {
             return new Service1(new Service2(new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4())), new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service4());
         }

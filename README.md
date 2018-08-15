@@ -914,10 +914,12 @@ public void Run()
 
 public class MyTransientLifetime : ILifetime
 {
-    public Expression Build(Expression expression, IBuildContext buildContext, object state = default(object))
+    public Expression Build(Expression expression, IBuildContext buildContext)
         => expression;
 
     public ILifetime Create() => new MyTransientLifetime();
+
+    public void Dispose() { }
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomLifetime.cs)
@@ -972,10 +974,10 @@ public class MySingletonLifetime : ILifetime
         _counter = counter;
     }
 
-    public Expression Build(Expression expression, IBuildContext buildContext, object state = default(object))
+    public Expression Build(Expression expression, IBuildContext buildContext)
     {
         // Build expression using base lifetime
-        expression = _baseSingletonLifetime.Build(expression, buildContext, state);
+        expression = _baseSingletonLifetime.Build(expression, buildContext);
 
         // Define `this` variable
         var thisVar = buildContext.AppendValue(this);
@@ -987,6 +989,11 @@ public class MySingletonLifetime : ILifetime
     }
 
     public ILifetime Create() => new MySingletonLifetime(_baseSingletonLifetime.Create(), _counter);
+
+    public void Dispose()
+    {
+        _baseSingletonLifetime.Dispose();
+    }
 
     // Just counting the number of calls
     internal void IncrementCounter() => _counter.Increment();

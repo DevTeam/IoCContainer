@@ -1,7 +1,6 @@
 ﻿namespace IoC.Lifetimes
 {
     using System;
-    using Core;
 
     /// <summary>
     /// Represents singleton per container lifetime.

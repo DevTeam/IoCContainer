@@ -1134,7 +1134,6 @@ namespace IoC
     using System.Runtime.CompilerServices;
     using System.Threading;
     using Core;
-    using Extensibility;
     using Features;
     using static Key;
     using FullKey = Key;
@@ -1732,7 +1731,6 @@ namespace IoC
 {
     using System;
     using System.Runtime.CompilerServices;
-    using Extensibility;
 
     /// <summary>
     /// Extension method for IoC container.
@@ -2602,7 +2600,6 @@ namespace IoC
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
     using Core;
-    using Extensibility;
 
     /// <summary>
     /// Represents extensions to register a dependency in a container.
@@ -3220,6 +3217,92 @@ namespace IoC
 
 
 #endregion
+#region IBuildContext
+
+namespace IoC
+{
+    using System;
+    using System.Linq.Expressions;
+
+    /// <summary>
+    /// Represents the abstraction for build context.
+    /// </summary>
+    [PublicAPI]
+    public interface IBuildContext
+    {
+        /// <summary>
+        /// The target key.
+        /// </summary>
+        Key Key { get; }
+
+        /// <summary>
+        /// The depth of current context.
+        /// </summary>
+        int Depth { get; }
+
+        /// <summary>
+        /// The target container.
+        /// </summary>
+        [NotNull] IContainer Container { get; }
+
+        /// <summary>
+        /// Creates a child context.
+        /// </summary>
+        /// <param name="key">The key</param>
+        /// <param name="container">The container.</param>
+        /// <returns>The new build context.</returns>
+        [NotNull] IBuildContext CreateChild(Key key, [NotNull] IContainer container);
+
+        /// <summary>
+        /// Prepares an expression. Replace generic types' markers and injection statements. 
+        /// </summary>
+        /// <param name="baseExpression">The base expression.</param>
+        /// <param name="instanceExpression">The instance expression.</param>
+        /// <returns>The resulting expression.</returns>
+        [NotNull] Expression Prepare([NotNull] Expression baseExpression, [CanBeNull] ParameterExpression instanceExpression = null);
+
+        /// <summary>
+        /// Wraps by lifetime.
+        /// </summary>
+        /// <param name="baseExpression">The base expression.</param>
+        /// <param name="lifetime">The target lifitime.</param>
+        /// <returns></returns>
+        [NotNull] Expression AppendLifetime([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
+
+        /// <summary>
+        /// Appends value.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <param name="type">The value type.</param>
+        /// <returns>The parameter expression.</returns>
+        [NotNull] Expression AppendValue([CanBeNull] object value, [NotNull] Type type);
+
+        /// <summary>
+        /// Appends value.
+        /// </summary>
+        /// <typeparam name="T">The value type.</typeparam>
+        /// <param name="value">The value.</param>
+        /// <returns>The parameter expression.</returns>
+        [NotNull] Expression AppendValue<T>([CanBeNull] T value);
+
+        /// <summary>
+        /// Appends variable.
+        /// </summary>
+        /// <param name="expression">The value expression.</param>
+        /// <returns>The parameter expression.</returns>
+        [NotNull] ParameterExpression AppendVariable([NotNull] Expression expression);
+
+        /// <summary>
+        /// Closes block for specified variables.
+        /// </summary>
+        /// <param name="targetExpression">The target expression.</param>
+        /// <param name="variableExpressions">Variable expressions.</param>
+        /// <returns>The resulting block expression.</returns>
+        [NotNull] Expression CloseBlock([NotNull] Expression targetExpression, [NotNull][ItemNotNull] params ParameterExpression[] variableExpressions);
+    }
+}
+
+#endregion
 #region IConfiguration
 
 namespace IoC
@@ -3304,7 +3387,6 @@ namespace IoC
 {
     using System;
     using System.Linq.Expressions;
-    using Extensibility;
 
     /// <summary>
     /// Represents a IoC dependency.
@@ -3326,18 +3408,140 @@ namespace IoC
 
 
 #endregion
+#region IIssueResolver
+
+namespace IoC
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
+    using System.Reflection;
+
+    /// <summary>
+    /// Allows to specify behaviour for cases with issue.
+    /// </summary>
+    [PublicAPI]
+    public interface IIssueResolver
+    {
+        /// <summary>
+        /// Handles the scenario when binding cannot be registered.
+        /// </summary>
+        /// <param name="container">The target container.</param>
+        /// <param name="keys">The set of binding keys.</param>
+        /// <returns>The dependency token.</returns>
+        [NotNull] IDisposable CannotRegister([NotNull] IContainer container, [NotNull] Key[] keys);
+
+        /// <summary>
+        /// Handles the scenario when the dependency cannot be resolved.
+        /// </summary>
+        /// <param name="container">The resolving container.</param>
+        /// <param name="key">The resolving key.</param>
+        /// <returns>The pair of the dependency and of the lifetime.</returns>
+        [NotNull] Tuple<IDependency, ILifetime> CannotResolveDependency([NotNull] IContainer container, Key key);
+
+        /// <summary>
+        /// Handles the scenario when cannot get a resolver.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <param name="container">The resolving container.</param>
+        /// <param name="key">The resolving key.</param>
+        /// <param name="error">The error.</param>
+        /// <returns>The resolver.</returns>
+        [NotNull] Resolver<T> CannotGetResolver<T>([NotNull] IContainer container, Key key, [NotNull] Exception error);
+
+        /// <summary>
+        /// Handles the scenario when cannot extract generic type arguments.
+        /// </summary>
+        /// <param name="type">The instance type.</param>
+        /// <returns>The extracted generic type arguments.</returns>
+        [NotNull][ItemNotNull] Type[] CannotGetGenericTypeArguments([NotNull] Type type);
+
+        /// <summary>
+        /// Handles the scenario when a cyclic dependence was detected.
+        /// </summary>
+        /// <param name="key">The resolving key.</param>
+        /// <param name="reentrancy">The level of reentrancy.</param>
+        void CyclicDependenceDetected(Key key, int reentrancy);
+
+        /// <summary>
+        /// Handles the scenario when cannot parse a type from a text.
+        /// </summary>
+        /// <param name="statementText">The statement containing a type metadata.</param>
+        /// <param name="statementLineNumber">The line number in the source data.</param>
+        /// <param name="statementPosition">The position at the line of the source data.</param>
+        /// <param name="typeName">The text with a type metadata.</param>
+        /// <returns></returns>
+        [NotNull] Type CannotParseType([NotNull] string statementText, int statementLineNumber, int statementPosition, [NotNull] string typeName);
+
+        /// <summary>
+        /// Handles the scenario when cannot parse a lifetime from a text.
+        /// </summary>
+        /// <param name="statementText">The statement containing a lifetime metadata.</param>
+        /// <param name="statementLineNumber">The line number in the source data.</param>
+        /// <param name="statementPosition">The position at the line of the source data.</param>
+        /// <param name="lifetimeName">The text with a lifetime metadata.</param>
+        /// <returns></returns>
+        Lifetime CannotParseLifetime([NotNull] string statementText, int statementLineNumber, int statementPosition, [NotNull] string lifetimeName);
+
+        /// <summary>
+        /// Handles the scenario when cannot parse a tag from a text.
+        /// </summary>
+        /// <param name="statementText">The statement containing a tag metadata.</param>
+        /// <param name="statementLineNumber">The line number in the source data.</param>
+        /// <param name="statementPosition">The position at the line of the source data.</param>
+        /// <param name="tag">The text with a tag metadata.</param>
+        /// <returns></returns>
+        [CanBeNull] object CannotParseTag(string statementText, int statementLineNumber, int statementPosition, [NotNull] string tag);
+
+        /// <summary>
+        /// Handles the scenario when cannot build expression.
+        /// </summary>
+        /// <param name="buildContext">The build context.</param>
+        /// <param name="dependency">The dependeny.</param>
+        /// <param name="lifetime">The lifetime.</param>
+        /// <returns>The resulting expression.</returns>
+        [NotNull] Expression CannotBuildExpression([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, ILifetime lifetime = null);
+
+        /// <summary>
+        /// Handles the scenario when cannot resolve a constructor.
+        /// </summary>
+        /// <param name="constructors">Available constructors.</param>
+        /// <returns>The constructor.</returns>
+        [NotNull] IMethod<ConstructorInfo> CannotResolveConstructor([NotNull] IEnumerable<IMethod<ConstructorInfo>> constructors);
+
+        /// <summary>
+        /// Handles the scenario when cannot resolve the instance type.
+        /// </summary>
+        /// <param name="registeredType">Registered type.</param>
+        /// <param name="resolvingType">Resolving type.</param>
+        /// <returns>The type to create an instance.</returns>
+        Type CannotResolveType([NotNull] Type registeredType, [NotNull] Type resolvingType);
+    }
+}
+
+
+#endregion
 #region ILifetime
 
 namespace IoC
 {
-    using Extensibility;
+    using System;
+    using System.Linq.Expressions;
 
     /// <summary>
     /// Represents a lifetime for an instance.
     /// </summary>
     [PublicAPI]
-    public interface ILifetime: IExpressionBuilder<object>
+    public interface ILifetime: IDisposable
     {
+        /// <summary>
+        /// Builds the expression.
+        /// </summary>
+        /// <param name="bodyExpression">The expression body to get an instance.</param>
+        /// <param name="buildContext">The build context.</param>
+        /// <returns>The new expression.</returns>
+        [NotNull] Expression Build([NotNull] Expression bodyExpression, [NotNull] IBuildContext buildContext);
+
         /// <summary>
         /// Creates the similar lifetime to use with generic instances.
         /// </summary>
@@ -3736,6 +3940,42 @@ namespace IoC
         /// Creates new child container.
         /// </summary>
         NewChild = 2
+    }
+}
+
+
+#endregion
+#region WellknownExpressions
+
+namespace IoC
+{
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
+    using Core;
+
+    /// <summary>
+    /// The list of well-known expressions.
+    /// </summary>
+    [PublicAPI]
+    public static class WellknownExpressions
+    {
+        /// <summary>
+        /// The container parameter.
+        /// </summary>
+        [NotNull]
+        public static readonly ParameterExpression ContainerParameter = Expression.Parameter(TypeDescriptor<IContainer>.Type, nameof(Context.Container));
+
+        /// <summary>
+        /// The args parameters.
+        /// </summary>
+        [NotNull]
+        public static readonly ParameterExpression ArgsParameter = Expression.Parameter(TypeDescriptor<object[]>.Type, nameof(Context.Args));
+
+        /// <summary>
+        /// All resolver's parameters.
+        /// </summary>
+        [NotNull][ItemNotNull]
+        public static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression>{ ContainerParameter, ArgsParameter };
     }
 }
 
@@ -4346,7 +4586,6 @@ namespace IoC.Features
 namespace IoC.Lifetimes
 {
     using System;
-    using Core;
 
     /// <summary>
     /// Represents singleton per container lifetime.
@@ -4397,38 +4636,36 @@ namespace IoC.Lifetimes
     using System.Linq.Expressions;
     using System.Reflection;
     using Core;
-    using Extensibility;
     using static Core.TypeDescriptorExtensions;
-    using static Extensibility.WellknownExpressions;
+    using static WellknownExpressions;
 
     /// <summary>
     /// Represents the abstaction for singleton based lifetimes.
     /// </summary>
     /// <typeparam name="TKey">The key type.</typeparam>
     [PublicAPI]
-    public abstract class KeyBasedLifetime<TKey>: ILifetime, IDisposable
+    public abstract class KeyBasedLifetime<TKey>: ILifetime
     {
-        private static readonly FieldInfo LockObjectFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(LockObject));
-        private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(Instances));
+        private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
         private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
         private static readonly MethodInfo GetMethodInfo = typeof(CoreExtensions).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(CoreExtensions.GetByRef)).MakeGenericMethod(typeof(TKey), typeof(object));
         private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
         private static readonly ParameterExpression KeyVar = Expression.Variable(TypeDescriptor<TKey>.Type, "key");
 
-        [NotNull] internal object LockObject = new object();
-        internal volatile Table<TKey, object> Instances = Table<TKey, object>.Empty;
+        [NotNull] private object _lockObject = new object();
+        private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
 
         /// <inheritdoc />
-        public Expression Build(Expression bodyExpression, IBuildContext buildContext, object state)
+        public Expression Build(Expression bodyExpression, IBuildContext buildContext)
         {
             if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             var returnType = buildContext.Key.Type;
-            var thisVar = buildContext.AppendValue(this);
+            var thisConst = buildContext.AppendValue(this);
             var instanceVar = Expression.Variable(returnType, "val");
-            var instancesField = Expression.Field(thisVar, InstancesFieldInfo);
-            var lockObjectField = Expression.Field(thisVar, LockObjectFieldInfo);
+            var instancesField = Expression.Field(thisConst, InstancesFieldInfo);
+            var lockObjectConst = buildContext.AppendValue(_lockObject);
             var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
             var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(null, GetMethodInfo, instancesField, SingletonBasedLifetimeShared.HashCodeVar, KeyVar).Convert(returnType));
             var isNullExpression = Expression.ReferenceEqual(instanceVar, ExpressionBuilderExtensions.NullConst);
@@ -4439,32 +4676,32 @@ namespace IoC.Lifetimes
                 // T instance;
                 new[] { KeyVar, SingletonBasedLifetimeShared.HashCodeVar, instanceVar },
                 // var key = CreateKey(container, args);
-                Expression.Assign(KeyVar, Expression.Call(thisVar, CreateKeyMethodInfo, ContainerParameter, ArgsParameter)),
+                Expression.Assign(KeyVar, Expression.Call(thisConst, CreateKeyMethodInfo, ContainerParameter, ArgsParameter)),
                 // var hashCode = key.GetHashCode();
                 Expression.Assign(SingletonBasedLifetimeShared.HashCodeVar, Expression.Call(KeyVar, ExpressionBuilderExtensions.GetHashCodeMethodInfo)),
-                // var instance = (T)Instances.Get(hashCode, key);
+                // var instance = (T)_instances.Get(hashCode, key);
                 assignInstanceExpression,
-                // if(instance == null)
+                // if (instance == null)
                 Expression.Condition(
                     isNullExpression,
                     Expression.Block(
-                        // lock (this.LockObject)
+                        // lock (this._lockObject)
                         Expression.Block(
-                            // var instance = (T)Instances.Get(hashCode, key);
+                            // var instance = (T)_instances.Get(hashCode, key);
                             assignInstanceExpression,
-                            // if(instance == null)
+                            // if (instance == null)
                             Expression.IfThen(
                                 Expression.Equal(instanceVar, ExpressionBuilderExtensions.NullConst),
                                 Expression.Block(
                                     // instance = new T();
                                     Expression.Assign(instanceVar, bodyExpression),
-                                    // Instances = Instances.Set(hashCode, key, instance);
+                                    // Instances = _instances.Set(hashCode, key, instance);
                                     Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, SingletonBasedLifetimeShared.HashCodeVar, KeyVar, instanceVar))
                                 )
                             )
-                        ).Lock(lockObjectField),
+                        ).Lock(lockObjectConst),
                         // OnNewInstanceCreated(instance, key, container, args);
-                        Expression.Call(thisVar, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, ContainerParameter, ArgsParameter)),
+                        Expression.Call(thisConst, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, ContainerParameter, ArgsParameter)),
                         // else {
                         // return instance;
                         instanceVar
@@ -4477,10 +4714,10 @@ namespace IoC.Lifetimes
         public virtual void Dispose()
         {
             Table<TKey, object> instances;
-            lock (LockObject)
+            lock (_lockObject)
             {
-                instances = Instances;
-                Instances = Table<TKey, object>.Empty;
+                instances = _instances;
+                _instances = Table<TKey, object>.Empty;
             }
 
             foreach (var instance in instances)
@@ -4581,46 +4818,43 @@ namespace IoC.Lifetimes
     using System.Linq.Expressions;
     using System.Reflection;
     using Core;
-    using Extensibility;
     using static Core.TypeDescriptorExtensions;
 
     /// <summary>
     /// Represents singleton lifetime.
     /// </summary>
     [PublicAPI]
-    public sealed class SingletonLifetime : ILifetime, IDisposable
+    public sealed class SingletonLifetime : ILifetime
     {
-        private static readonly FieldInfo LockObjectFieldInfo = Descriptor<SingletonLifetime>().GetDeclaredFields().Single(i => i.Name == nameof(LockObject));
-        private static readonly FieldInfo InstanceFieldInfo = Descriptor<SingletonLifetime>().GetDeclaredFields().Single(i => i.Name == nameof(Instance));
+        private static readonly FieldInfo InstanceFieldInfo = Descriptor<SingletonLifetime>().GetDeclaredFields().Single(i => i.Name == nameof(_instance));
 
-        [NotNull] internal object LockObject = new object();
-        internal volatile object Instance;
+#pragma warning disable CS0649
+        [NotNull] private object _lockObject = new object();
+        private volatile object _instance;
+#pragma warning restore CS0649
 
         /// <inheritdoc />
-        public Expression Build(Expression expression, IBuildContext buildContext, object state)
+        public Expression Build(Expression expression, IBuildContext buildContext)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            var type = expression.Type;
-            var thisVar = buildContext.AppendValue(this);
-            var lockObjectField = Expression.Field(thisVar, LockObjectFieldInfo);
-            var instanceField = Expression.Field(thisVar, InstanceFieldInfo);
-            var typedInstance = instanceField.Convert(type);
+
+            var thisConst = buildContext.AppendValue(this);
+            var lockObjectConst = buildContext.AppendValue(_lockObject);
+            var instanceField = Expression.Field(thisConst, InstanceFieldInfo);
+            var typedInstance = instanceField.Convert(expression.Type);
             var isNullExpression = Expression.ReferenceEqual(instanceField, ExpressionBuilderExtensions.NullConst);
 
-            // if(this.Instance == null)
-            return Expression.Condition(
+            return Expression.Block(Expression.IfThen(
                 isNullExpression,
-                Expression.Block(
-                    // lock(this.LockObject)
-                    Expression.IfThen(
-                        // if(this.Instance != null)
-                        isNullExpression,
-                        // this.Instance = new T();
-                        Expression.Assign(instanceField, expression)).Lock(lockObjectField),
-                    // return (T)this.Instance;
-                    typedInstance),
-                // return (T)this.Instance;
+                // if (this._instance == null)
+                // lock (this._lockObject)
+                Expression.IfThen(
+                    // if (this._instance == null)
+                    isNullExpression,
+                    // this._instance = new T();
+                    Expression.Assign(instanceField, expression)).Lock(lockObjectConst)),
+                // return this._instance
                 typedInstance);
         }
 
@@ -4628,9 +4862,9 @@ namespace IoC.Lifetimes
         public void Dispose()
         {
             IDisposable disposable;
-            lock (LockObject)
+            lock (_lockObject)
             {
-                disposable = Instance as IDisposable;
+                disposable = _instance as IDisposable;
             }
 
             disposable?.Dispose();
@@ -4641,295 +4875,6 @@ namespace IoC.Lifetimes
 
         /// <inheritdoc />
         public override string ToString() => Lifetime.Singleton.ToString();
-    }
-}
-
-
-#endregion
-
-#endregion
-
-#region Extensibility
-
-#region IBuildContext
-
-namespace IoC.Extensibility
-{
-    using System;
-    using System.Linq.Expressions;
-
-    /// <summary>
-    /// Represents the abstraction for build context.
-    /// </summary>
-    [PublicAPI]
-    public interface IBuildContext
-    {
-        /// <summary>
-        /// The target key.
-        /// </summary>
-        Key Key { get; }
-
-        /// <summary>
-        /// The depth of current context.
-        /// </summary>
-        int Depth { get; }
-
-        /// <summary>
-        /// The target container.
-        /// </summary>
-        [NotNull] IContainer Container { get; }
-
-        /// <summary>
-        /// Creates a child context.
-        /// </summary>
-        /// <param name="key">The key</param>
-        /// <param name="container">The container.</param>
-        /// <returns>The new build context.</returns>
-        [NotNull] IBuildContext CreateChild(Key key, [NotNull] IContainer container);
-
-        /// <summary>
-        /// Prepares an expression. Replace generic types' markers and injection statements. 
-        /// </summary>
-        /// <param name="baseExpression">The base expression.</param>
-        /// <param name="instanceExpression">The instance expression.</param>
-        /// <returns>The resulting expression.</returns>
-        [NotNull] Expression Prepare([NotNull] Expression baseExpression, [CanBeNull] ParameterExpression instanceExpression = null);
-
-        /// <summary>
-        /// Wraps by lifetime.
-        /// </summary>
-        /// <param name="baseExpression">The base expression.</param>
-        /// <param name="lifetime">The target lifitime.</param>
-        /// <returns></returns>
-        [NotNull] Expression AppendLifetime([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
-
-        /// <summary>
-        /// Appends value.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <param name="type">The value type.</param>
-        /// <returns>The parameter expression.</returns>
-        [NotNull] Expression AppendValue([CanBeNull] object value, [NotNull] Type type);
-
-        /// <summary>
-        /// Appends value.
-        /// </summary>
-        /// <typeparam name="T">The value type.</typeparam>
-        /// <param name="value">The value.</param>
-        /// <returns>The parameter expression.</returns>
-        [NotNull] Expression AppendValue<T>([CanBeNull] T value);
-
-        /// <summary>
-        /// Appends variable.
-        /// </summary>
-        /// <param name="expression">The value expression.</param>
-        /// <returns>The parameter expression.</returns>
-        [NotNull] ParameterExpression AppendVariable([NotNull] Expression expression);
-
-        /// <summary>
-        /// Closes block for specified variables.
-        /// </summary>
-        /// <param name="targetExpression">The target expression.</param>
-        /// <param name="variableExpressions">Variable expressions.</param>
-        /// <returns>The resulting block expression.</returns>
-        [NotNull] Expression CloseBlock([NotNull] Expression targetExpression, [NotNull][ItemNotNull] params ParameterExpression[] variableExpressions);
-    }
-}
-
-#endregion
-#region IExpressionBuilder
-
-namespace IoC.Extensibility
-{
-    using System.Linq.Expressions;
-
-    /// <summary>
-    /// Allows to build expresion for lifetimes.
-    /// </summary>
-    [PublicAPI]
-    public interface IExpressionBuilder<in TContext>
-    {
-        /// <summary>
-        /// Builds the expression.
-        /// </summary>
-        /// <param name="bodyExpression">The expression body to get an instance.</param>
-        /// <param name="buildContext">The build context.</param>
-        /// <param name="context">The expression build context.</param>
-        /// <returns>The new expression.</returns>
-        [NotNull] Expression Build([NotNull] Expression bodyExpression, [NotNull] IBuildContext buildContext, [CanBeNull] TContext context = default(TContext));
-    }
-}
-
-
-#endregion
-#region IExpressionCompiler
-
-namespace IoC.Extensibility
-{
-    using System;
-    using System.Linq.Expressions;
-
-    /// <summary>
-    /// Represents a expression compiler.
-    /// </summary>
-    [PublicAPI]
-    public interface IExpressionCompiler
-    {
-        /// <summary>
-        /// Compiles an expression to a delegate.
-        /// </summary>
-        /// <param name="resolverExpression">The lambda expression.</param>
-        /// <returns>The resulting delegate.</returns>
-        [NotNull] Delegate Compile([NotNull] LambdaExpression resolverExpression);
-    }
-}
-
-
-#endregion
-#region IIssueResolver
-
-namespace IoC.Extensibility
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-    using System.Reflection;
-
-    /// <summary>
-    /// Allows to specify behaviour for cases with issue.
-    /// </summary>
-    [PublicAPI]
-    public interface IIssueResolver
-    {
-        /// <summary>
-        /// Handles the scenario when binding cannot be registered.
-        /// </summary>
-        /// <param name="container">The target container.</param>
-        /// <param name="keys">The set of binding keys.</param>
-        /// <returns>The dependency token.</returns>
-        [NotNull] IDisposable CannotRegister([NotNull] IContainer container, [NotNull] Key[] keys);
-
-        /// <summary>
-        /// Handles the scenario when the dependency cannot be resolved.
-        /// </summary>
-        /// <param name="container">The resolving container.</param>
-        /// <param name="key">The resolving key.</param>
-        /// <returns>The pair of the dependency and of the lifetime.</returns>
-        [NotNull] Tuple<IDependency, ILifetime> CannotResolveDependency([NotNull] IContainer container, Key key);
-
-        /// <summary>
-        /// Handles the scenario when cannot get a resolver.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <param name="container">The resolving container.</param>
-        /// <param name="key">The resolving key.</param>
-        /// <param name="error">The error.</param>
-        /// <returns>The resolver.</returns>
-        [NotNull] Resolver<T> CannotGetResolver<T>([NotNull] IContainer container, Key key, [NotNull] Exception error);
-
-        /// <summary>
-        /// Handles the scenario when cannot extract generic type arguments.
-        /// </summary>
-        /// <param name="type">The instance type.</param>
-        /// <returns>The extracted generic type arguments.</returns>
-        [NotNull][ItemNotNull] Type[] CannotGetGenericTypeArguments([NotNull] Type type);
-
-        /// <summary>
-        /// Handles the scenario when a cyclic dependence was detected.
-        /// </summary>
-        /// <param name="key">The resolving key.</param>
-        /// <param name="reentrancy">The level of reentrancy.</param>
-        void CyclicDependenceDetected(Key key, int reentrancy);
-
-        /// <summary>
-        /// Handles the scenario when cannot parse a type from a text.
-        /// </summary>
-        /// <param name="statementText">The statement containing a type metadata.</param>
-        /// <param name="statementLineNumber">The line number in the source data.</param>
-        /// <param name="statementPosition">The position at the line of the source data.</param>
-        /// <param name="typeName">The text with a type metadata.</param>
-        /// <returns></returns>
-        [NotNull] Type CannotParseType([NotNull] string statementText, int statementLineNumber, int statementPosition, [NotNull] string typeName);
-
-        /// <summary>
-        /// Handles the scenario when cannot parse a lifetime from a text.
-        /// </summary>
-        /// <param name="statementText">The statement containing a lifetime metadata.</param>
-        /// <param name="statementLineNumber">The line number in the source data.</param>
-        /// <param name="statementPosition">The position at the line of the source data.</param>
-        /// <param name="lifetimeName">The text with a lifetime metadata.</param>
-        /// <returns></returns>
-        Lifetime CannotParseLifetime([NotNull] string statementText, int statementLineNumber, int statementPosition, [NotNull] string lifetimeName);
-
-        /// <summary>
-        /// Handles the scenario when cannot parse a tag from a text.
-        /// </summary>
-        /// <param name="statementText">The statement containing a tag metadata.</param>
-        /// <param name="statementLineNumber">The line number in the source data.</param>
-        /// <param name="statementPosition">The position at the line of the source data.</param>
-        /// <param name="tag">The text with a tag metadata.</param>
-        /// <returns></returns>
-        [CanBeNull] object CannotParseTag(string statementText, int statementLineNumber, int statementPosition, [NotNull] string tag);
-
-        /// <summary>
-        /// Handles the scenario when cannot build expression.
-        /// </summary>
-        /// <param name="buildContext">The build context.</param>
-        /// <param name="dependency">The dependeny.</param>
-        /// <param name="lifetime">The lifetime.</param>
-        /// <returns>The resulting expression.</returns>
-        [NotNull] Expression CannotBuildExpression([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, ILifetime lifetime = null);
-
-        /// <summary>
-        /// Handles the scenario when cannot resolve a constructor.
-        /// </summary>
-        /// <param name="constructors">Available constructors.</param>
-        /// <returns>The constructor.</returns>
-        [NotNull] IMethod<ConstructorInfo> CannotResolveConstructor([NotNull] IEnumerable<IMethod<ConstructorInfo>> constructors);
-
-        /// <summary>
-        /// Handles the scenario when cannot resolve the instance type.
-        /// </summary>
-        /// <param name="registeredType">Registered type.</param>
-        /// <param name="resolvingType">Resolving type.</param>
-        /// <returns>The type to create an instance.</returns>
-        Type CannotResolveType([NotNull] Type registeredType, [NotNull] Type resolvingType);
-    }
-}
-
-
-#endregion
-#region WellknownExpressions
-
-namespace IoC.Extensibility
-{
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-    using Core;
-
-    /// <summary>
-    /// The list of well-known expressions.
-    /// </summary>
-    [PublicAPI]
-    public static class WellknownExpressions
-    {
-        /// <summary>
-        /// The container parameter.
-        /// </summary>
-        [NotNull]
-        public static readonly ParameterExpression ContainerParameter = Expression.Parameter(TypeDescriptor<IContainer>.Type, nameof(Context.Container));
-
-        /// <summary>
-        /// The args parameters.
-        /// </summary>
-        [NotNull]
-        public static readonly ParameterExpression ArgsParameter = Expression.Parameter(TypeDescriptor<object[]>.Type, nameof(Context.Args));
-
-        /// <summary>
-        /// All resolver's parameters.
-        /// </summary>
-        [NotNull][ItemNotNull]
-        public static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression>{ ContainerParameter, ArgsParameter };
     }
 }
 
@@ -4949,7 +4894,6 @@ namespace IoC.Core
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
-    using Extensibility;
 
     internal class AutowringDependency: IDependency
     {
@@ -5084,7 +5028,6 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
-    using Extensibility;
 
     /// <summary>
     /// Represents build context.
@@ -5095,14 +5038,12 @@ namespace IoC.Core
     {
         // Should be at least internal to be accessable from for compiled code from expressions
         private readonly ICollection<IDisposable> _resources;
-        private readonly IExpressionCompiler _compiler;
         private readonly List<ParameterExpression> _parameters = new List<ParameterExpression>();
         private readonly List<Expression> _statements = new List<Expression>();
         private int _curId;
 
-        internal BuildContext([NotNull] IExpressionCompiler compiler, Key key, [NotNull] IContainer container, [NotNull] ICollection<IDisposable> resources, int depth = 0)
+        internal BuildContext(Key key, [NotNull] IContainer container, [NotNull] ICollection<IDisposable> resources, int depth = 0)
         {
-            _compiler = compiler ?? throw new ArgumentNullException(nameof(compiler));
             Key = key;
             Container = container ?? throw new ArgumentNullException(nameof(container));
             _resources = resources ?? throw new ArgumentNullException(nameof(resources));
@@ -5118,7 +5059,7 @@ namespace IoC.Core
         public IBuildContext CreateChild(Key key, IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            var child = new BuildContext(_compiler, key, container, _resources, Depth + 1);
+            var child = new BuildContext(key, container, _resources, Depth + 1);
             child._parameters.AddRange(_parameters);
             child._statements.AddRange(_statements);
             return child;
@@ -5482,7 +5423,6 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
-    using Extensibility;
 
     internal sealed class DependencyEntry : IDisposable
     {
@@ -5513,8 +5453,7 @@ namespace IoC.Core
         public bool TryCreateResolver(Key key, [NotNull] IContainer container, out Delegate resolver, out Exception error)
         {
             var typeDescriptor = key.Type.Descriptor();
-            var compiler = container.GetExpressionCompiler();
-            var buildContext = new BuildContext(compiler, key, container, _resources);
+            var buildContext = new BuildContext(key, container, _resources);
             if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression, out error))
             {
                 resolver = default(Delegate);
@@ -5522,7 +5461,7 @@ namespace IoC.Core
             }
 
             var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, WellknownExpressions.ResolverParameters);
-            resolver = compiler.Compile(resolverExpression);
+            resolver = ExpressionCompiler.Shared.Compile(resolverExpression);
             error = default(Exception);
             return true;
         }
@@ -5581,10 +5520,7 @@ namespace IoC.Core
             
             foreach (var lifetime in _lifetimes.Values)
             {
-                if (lifetime is IDisposable disposableLifetime)
-                {
-                    disposableLifetime.Dispose();
-                }
+                lifetime.Dispose();
             }
         }
 
@@ -5614,7 +5550,6 @@ namespace IoC.Core
 {
     using System;
     using System.Linq.Expressions;
-    using Extensibility;
 
     internal class DependencyInjectionExpressionBuilder: IExpressionBuilder<Expression>
     {
@@ -5646,8 +5581,7 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Extensibility;
-    using static Extensibility.WellknownExpressions;
+    using static WellknownExpressions;
     using static TypeDescriptorExtensions;
 
     internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
@@ -6075,38 +6009,15 @@ namespace IoC.Core
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Threading;
-    using Extensibility;
     using static TypeDescriptorExtensions;
 
     internal static class ExpressionBuilderExtensions
     {
         private static readonly TypeDescriptor ResolverGenericTypeDescriptor = typeof(Resolver<>).Descriptor();
-        [ThreadStatic] private static int _getExpressionCompilerReentrancy;
         internal static readonly MethodInfo GetHashCodeMethodInfo = Descriptor<object>().GetDeclaredMethods().Single(i => i.Name == nameof(GetHashCode));
         internal static readonly Expression NullConst = Expression.Constant(null);
         private static readonly MethodInfo EnterMethodInfo = typeof(Monitor).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Monitor.Enter) && i.GetParameters().Length == 1);
         private static readonly MethodInfo ExitMethodInfo = typeof(Monitor).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Monitor.Exit));
-
-        public static IExpressionCompiler GetExpressionCompiler(this IContainer container)
-        {
-            _getExpressionCompilerReentrancy++;
-            try
-            {
-                if (_getExpressionCompilerReentrancy == 1)
-                {
-                    if (container.TryGetResolver<IExpressionCompiler>(TypeDescriptor<IExpressionCompiler>.Type, null, out var resolver, out _))
-                    {
-                        return resolver(container);
-                    }
-                }
-
-                return ExpressionCompiler.Shared;
-            }
-            finally
-            {
-                _getExpressionCompilerReentrancy--;
-            }
-        }
 
         [MethodImpl((MethodImplOptions)256)]
         public static Expression Convert(this Expression expression, Type type)
@@ -6125,7 +6036,7 @@ namespace IoC.Core
         public static Type ToResolverType(this Type type) => ResolverGenericTypeDescriptor.MakeGenericType(type);
 
         [MethodImpl((MethodImplOptions)256)]
-        public static Expression Lock(this Expression body, MemberExpression lockObject)
+        public static Expression Lock(this Expression body, Expression lockObject)
         {
             return Expression.TryFinally(
                 Expression.Block(
@@ -6143,7 +6054,6 @@ namespace IoC.Core
 {
     using System;
     using System.Linq.Expressions;
-    using Extensibility;
 
     internal class ExpressionCompiler : IExpressionCompiler
     {
@@ -6176,7 +6086,6 @@ namespace IoC.Core
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Runtime.CompilerServices;
-    using Extensibility;
 
     internal class FullAutowringDependency: IDependency
     {
@@ -6266,6 +6175,55 @@ namespace IoC.Core
 
 
 #endregion
+#region IExpressionBuilder
+
+namespace IoC.Core
+{
+    using System.Linq.Expressions;
+
+    /// <summary>
+    /// Allows to build expresion for lifetimes.
+    /// </summary>
+    [PublicAPI]
+    internal interface IExpressionBuilder<in TContext>
+    {
+        /// <summary>
+        /// Builds the expression.
+        /// </summary>
+        /// <param name="bodyExpression">The expression body to get an instance.</param>
+        /// <param name="buildContext">The build context.</param>
+        /// <param name="context">The expression build context.</param>
+        /// <returns>The new expression.</returns>
+        [NotNull] Expression Build([NotNull] Expression bodyExpression, [NotNull] IBuildContext buildContext, [CanBeNull] TContext context = default(TContext));
+    }
+}
+
+
+#endregion
+#region IExpressionCompiler
+
+namespace IoC.Core
+{
+    using System;
+    using System.Linq.Expressions;
+
+    /// <summary>
+    /// Represents a expression compiler.
+    /// </summary>
+    [PublicAPI]
+    internal interface IExpressionCompiler
+    {
+        /// <summary>
+        /// Compiles an expression to a delegate.
+        /// </summary>
+        /// <param name="resolverExpression">The lambda expression.</param>
+        /// <returns>The resulting delegate.</returns>
+        [NotNull] Delegate Compile([NotNull] LambdaExpression resolverExpression);
+    }
+}
+
+
+#endregion
 #region IssueResolver
 
 namespace IoC.Core
@@ -6275,7 +6233,6 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using Extensibility;
 
     internal sealed class IssueResolver : IIssueResolver
     {
@@ -6364,7 +6321,6 @@ namespace IoC.Core
 {
     using System;
     using System.Linq.Expressions;
-    using Extensibility;
 
     internal class LifetimeExpressionBuilder : IExpressionBuilder<ILifetime>
     {
@@ -7242,7 +7198,6 @@ namespace IoC.Core
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
-    using Extensibility;
 
     internal class TypeReplacerExpressionBuilder : IExpressionBuilder<IDictionary<Type, Type>>
     {
@@ -7708,7 +7663,6 @@ namespace IoC.Core.Configuration
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
-    using Extensibility;
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal sealed class StatementToBindingConverter: IConverter<Statement, BindingContext, BindingContext>
@@ -7864,7 +7818,6 @@ namespace IoC.Core.Configuration
 {
     using System;
     using System.Text.RegularExpressions;
-    using Extensibility;
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal sealed class StringToLifetimeConverter: IConverter<string, Statement, Lifetime>
