@@ -58,9 +58,10 @@
 ### Easy Integration
 
   - [ASP.NET Core](#aspnet-core)
-  - [Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/Samples/WpfApp/README.md)
-  - [Universal Windows Platform](https://github.com/DevTeam/IoCContainer/Samples/UwpApp/README.md)
-  - [Windows Communication Foundation](https://github.com/DevTeam/IoCContainer/Samples/WcfServiceLibrary/README.md)
+  - [Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfApp)
+  - [Universal Windows Platform](https://github.com/DevTeam/IoCContainer/blob/master/Samples/UwpApp)
+  - [Windows Communication Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WcfServiceLibrary)
+  - [Entity Framework Core](https://github.com/DevTeam/IoCContainer/tree/master/Samples/EntityFrameworkCore)
 
 ### Supported Platforms
 
