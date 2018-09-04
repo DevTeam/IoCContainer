@@ -13,6 +13,7 @@
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+    [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
     public class ComplexAutowiringTests
     {
         [Fact]
@@ -166,7 +167,7 @@
         }
 
         [Fact]
-        public void ContainerShouldResolveWhenGenericIntiMethodCall()
+        public void ContainerShouldResolveWhenGenericInitMethodCall()
         {
             // Given
             using (var container = Container.Create())
@@ -184,7 +185,7 @@
         }
 
         [Fact]
-        public void ContainerShouldResolveWhenGenericIntiMethodCallWithRef()
+        public void ContainerShouldResolveWhenGenericInitMethodCallWithRef()
         {
             // Given
             var val = "abc";

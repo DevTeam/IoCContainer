@@ -36,7 +36,7 @@ namespace IoC.Tests.UsageScenarios
             // Use the custom implementation of Singleton lifetime
             using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
             {
-                // Resolve one instance twice using the custom Singletine lifetime
+                // Resolve one instance twice using the custom Singleton lifetime
                 var instance1 = container.Resolve<IService>();
                 var instance2 = container.Resolve<IService>();
 

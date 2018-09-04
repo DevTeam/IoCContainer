@@ -44,7 +44,7 @@
         /// Wraps by lifetime.
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
-        /// <param name="lifetime">The target lifitime.</param>
+        /// <param name="lifetime">The target lifetime.</param>
         /// <returns></returns>
         [NotNull] Expression AppendLifetime([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
 

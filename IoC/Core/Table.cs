@@ -95,11 +95,11 @@
             var newBuckets = CoreExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
             var newBucketsArray = newBuckets;
             var bucketIndex = hashCode & _divisor;
-            for (var curBucketInex = 0; curBucketInex < _buckets.Length; curBucketInex++)
+            for (var curBucketIndex = 0; curBucketIndex < _buckets.Length; curBucketIndex++)
             {
-                if (curBucketInex != bucketIndex)
+                if (curBucketIndex != bucketIndex)
                 {
-                    newBucketsArray[curBucketInex] = _buckets[curBucketInex].Copy();
+                    newBucketsArray[curBucketIndex] = _buckets[curBucketIndex].Copy();
                     continue;
                 }
 

@@ -1,11 +1,14 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
     using System;
-    using Features;
+    using System.Diagnostics.CodeAnalysis;
     using Moq;
     using Shouldly;
     using Xunit;
 
+    [SuppressMessage("ReSharper", "RedundantTypeArgumentsOfMethod")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public class InjectionsTests
     {
         [Fact]

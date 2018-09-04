@@ -10,6 +10,8 @@
     using Xunit;
 
     [SuppressMessage("ReSharper", "AccessToDisposedClosure")]
+    [SuppressMessage("ReSharper", "RedundantTypeArgumentsOfMethod")]
+    [SuppressMessage("ReSharper", "UnusedTypeParameter")]
     public class AutowiringTests
     {
         [Fact]
@@ -195,7 +197,7 @@
         }
 
         [Fact]
-        public void ContainerShouldResolveWhenGenericAutowring()
+        public void ContainerShouldResolveWhenGenericAutowiring()
         {
             // Given
             using (var container = Container.Create())
@@ -211,7 +213,7 @@
         }
 
         [Fact]
-        public void ContainerShouldResolveWhenGenericAutowring_MT()
+        public void ContainerShouldResolveWhenGenericAutowiring_MT()
         {
             // Given
             using (var container = Container.Create())
@@ -230,7 +232,7 @@
         }
 
         [Fact]
-        public void ContainerShouldResolveWhenGenericWithConstraintAutowring()
+        public void ContainerShouldResolveWhenGenericWithConstraintAutowiring()
         {
             // Given
             using (var container = Container.Create())

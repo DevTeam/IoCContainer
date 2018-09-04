@@ -9,7 +9,7 @@
         </member>
         <member name="M:IoC.Features.AspNetCoreFeature.#ctor">
             <summary>
-            Defaut constructor.
+            Default constructor.
             </summary>
         </member>
         <member name="M:IoC.Features.AspNetCoreFeature.#ctor(System.Collections.Generic.IList{Microsoft.Extensions.DependencyInjection.ServiceDescriptor})">

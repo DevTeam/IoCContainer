@@ -36,10 +36,10 @@ namespace IoC.Tests
         [InlineData("IoC.Tests", "IoC.Tests", "IService<IService<string>>", true, typeof(IService<IService<string>>))]
         [InlineData("IoC.Tests", "IoC.Tests", "IService<IService<string, int, float>, double, IService<IService<IService<string, int, float>>>>", true, typeof(IService<IService<string, int, float>, double, IService<IService<IService<string, int, float>>>>))]
         [InlineData("IoC.Tests", "IoC.Tests", "SomeClass.NestedClass", true, typeof(SomeClass.NestedClass))]
-        [InlineData("IoC.Tests", "IoC.Tests", "SomeClass.NestedClass.NesteClass2", true, typeof(SomeClass.NestedClass.NesteClass2))]
-        [InlineData("IoC.Tests", "IoC", "Tests.SomeClass.NestedClass.NesteClass2", true, typeof(SomeClass.NestedClass.NesteClass2))]
-        [InlineData("IoC.Tests", "IoC.Tests", "SomeClass.NestedClass.NesteClass3<>", true, typeof(SomeClass.NestedClass.NesteClass3<>))]
-        [InlineData("IoC.Tests", "IoC.Tests", "SomeClass.NestedClass.NesteClass3<int>", true, typeof(SomeClass.NestedClass.NesteClass3<int>))]
+        [InlineData("IoC.Tests", "IoC.Tests", "SomeClass.NestedClass.NestedClass2", true, typeof(SomeClass.NestedClass.NestedClass2))]
+        [InlineData("IoC.Tests", "IoC", "Tests.SomeClass.NestedClass.NestedClass2", true, typeof(SomeClass.NestedClass.NestedClass2))]
+        [InlineData("IoC.Tests", "IoC.Tests", "SomeClass.NestedClass.NestedClass3<>", true, typeof(SomeClass.NestedClass.NestedClass3<>))]
+        [InlineData("IoC.Tests", "IoC.Tests", "SomeClass.NestedClass.NestedClass3<int>", true, typeof(SomeClass.NestedClass.NestedClass3<int>))]
         public void ShouldConvertStringToType(
             string assemblies,
             string namespaces,
@@ -49,14 +49,14 @@ namespace IoC.Tests
         {
             // Given
             var typeConverter = new StringToTypeConverter();
-            var bindigContext = new BindingContext(
+            var bindingContext = new BindingContext(
                     assemblies.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Select(assemblyName => Assembly.Load(new AssemblyName(assemblyName))),
                     namespaces.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries),
                     Enumerable.Empty<Binding>()
                 );
 
             // When
-            var actualResult = typeConverter.TryConvert(bindigContext, typeName, out var actualType);
+            var actualResult = typeConverter.TryConvert(bindingContext, typeName, out var actualType);
 
             // Then
             actualResult.ShouldBe(expectedResult);
@@ -72,12 +72,12 @@ namespace IoC.Tests
     {
         public class NestedClass
         {
-            public class NesteClass2
+            public class NestedClass2
             {
             }
 
             // ReSharper disable once UnusedTypeParameter
-            public class NesteClass3<T>
+            public class NestedClass3<T>
             {
             }
         }

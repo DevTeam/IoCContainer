@@ -106,7 +106,7 @@
         /// Creates key for singleton.
         /// </summary>
         /// <param name="container">The target container.</param>
-        /// <param name="args">The arfuments.</param>
+        /// <param name="args">The arguments.</param>
         /// <returns>The created key.</returns>
         protected abstract TKey CreateKey(IContainer container, object[] args);
 

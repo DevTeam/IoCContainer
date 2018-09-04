@@ -30,7 +30,7 @@ namespace IoC.Tests.UsageScenarios
             using (var baseContainer = Container.Create("base"))
             // Configure some child container
             using (var childContainer = baseContainer.CreateChild("child"))
-            // Configure the child container by custom aspect oriented autowring strategy
+            // Configure the child container by custom aspect oriented autowiring strategy
             using (childContainer.Bind<IAutowiringStrategy>().To<AspectOrientedAutowiringStrategy>())
             // Configure the container
             using (childContainer.Bind<IConsole>().To(ctx => console.Object))
@@ -88,11 +88,11 @@ namespace IoC.Tests.UsageScenarios
             {
                 constructor = (
                     from ctor in constructors
-                    let autowringAttribute = ctor.Info.GetCustomAttribute<AutowiringAttribute>()
+                    let autowiringAttribute = ctor.Info.GetCustomAttribute<AutowiringAttribute>()
                     // filters constructors containing the attribute Autowiring
-                    where autowringAttribute != null
-                    // sorts constructors by autowringAttribute.Order
-                    orderby autowringAttribute.Order
+                    where autowiringAttribute != null
+                    // sorts constructors by autowiringAttribute.Order
+                    orderby autowiringAttribute.Order
                     select ctor)
                     // Get a first appropriate constructor
                     .First();
@@ -104,18 +104,18 @@ namespace IoC.Tests.UsageScenarios
             {
                 initializers =
                     from method in methods
-                    let autowringAttribute = method.Info.GetCustomAttribute<AutowiringAttribute>()
+                    let autowiringAttribute = method.Info.GetCustomAttribute<AutowiringAttribute>()
                     // filters methods/property setters containing the attribute Autowiring
-                    where autowringAttribute != null
-                    // sorts methods/property setters by autowringAttribute.Order
-                    orderby autowringAttribute.Order
+                    where autowiringAttribute != null
+                    // sorts methods/property setters by autowiringAttribute.Order
+                    orderby autowiringAttribute.Order
                     where (
                             from parameter in method.Info.GetParameters()
                             let injectAttribute = parameter.GetCustomAttribute<TagAttribute>()
                             // filters parameters containing a custom tag value to make a dependency injection
-                            where injectAttribute?.Tag != null || autowringAttribute.DefaultTag != null
+                            where injectAttribute?.Tag != null || autowiringAttribute.DefaultTag != null
                             // redefines the default dependency
-                            select method.TryInjectDependency(parameter.Position, parameter.ParameterType, injectAttribute?.Tag ?? autowringAttribute.DefaultTag))
+                            select method.TryInjectDependency(parameter.Position, parameter.ParameterType, injectAttribute?.Tag ?? autowiringAttribute.DefaultTag))
                         // checks that all custom injection were successfully
                         .All(isInjected => isInjected)
                     select method;

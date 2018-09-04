@@ -3,7 +3,7 @@
     using System.Linq.Expressions;
 
     /// <summary>
-    /// Allows to build expresion for lifetimes.
+    /// Allows to build expression for lifetimes.
     /// </summary>
     [PublicAPI]
     internal interface IExpressionBuilder<in TContext>

@@ -7,7 +7,7 @@
     using Core;
 
     /// <summary>
-    /// Represents extensons to configure a container.
+    /// Represents extensions to configure a container.
     /// </summary>
     [PublicAPI]
     public static class FluentConfiguration

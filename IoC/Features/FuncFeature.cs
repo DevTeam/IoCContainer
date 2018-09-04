@@ -4,7 +4,7 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// Allows to resolve Funcs.
+    /// Allows to resolve Functions.
     /// </summary>
     [PublicAPI]
     public sealed  class FuncFeature : IConfiguration

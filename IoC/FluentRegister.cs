@@ -20,7 +20,7 @@
         /// <summary>
         /// Registers a binding.
         /// </summary>
-        /// <typeparam name="T">The autowring type.</typeparam>
+        /// <typeparam name="T">The autowiring type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
@@ -28,12 +28,12 @@
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
-            => container.Register(new[] { TypeDescriptor<T>.Type }, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
         /// </summary>
-        /// <typeparam name="T">The autowring type.</typeparam>
+        /// <typeparam name="T">The autowiring type.</typeparam>
         /// <typeparam name="T1">The additional contract type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <param name="lifetime">The target lifetime.</param>
@@ -43,12 +43,12 @@
         [NotNull]
         public static IDisposable Register<T, T1>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1 
-            => container.Register(new[] { TypeDescriptor<T1>.Type }, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
         /// </summary>
-        /// <typeparam name="T">The autowring type.</typeparam>
+        /// <typeparam name="T">The autowiring type.</typeparam>
         /// <typeparam name="T1">The additional contract type.</typeparam>
         /// <typeparam name="T2">The additional contract type.</typeparam>
         /// <param name="container">The target container.</param>
@@ -59,12 +59,12 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2 
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
         /// </summary>
-        /// <typeparam name="T">The autowring type.</typeparam>
+        /// <typeparam name="T">The autowiring type.</typeparam>
         /// <typeparam name="T1">The additional contract type.</typeparam>
         /// <typeparam name="T2">The additional contract type.</typeparam>
         /// <typeparam name="T3">The additional contract type.</typeparam>
@@ -76,12 +76,12 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3 
-            => container.Register(new[] {TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type}, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] {TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type}, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
         /// </summary>
-        /// <typeparam name="T">The autowring type.</typeparam>
+        /// <typeparam name="T">The autowiring type.</typeparam>
         /// <typeparam name="T1">The additional contract type.</typeparam>
         /// <typeparam name="T2">The additional contract type.</typeparam>
         /// <typeparam name="T3">The additional contract type.</typeparam>
@@ -94,12 +94,12 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type }, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
         /// </summary>
-        /// <typeparam name="T">The autowring type.</typeparam>
+        /// <typeparam name="T">The autowiring type.</typeparam>
         /// <typeparam name="T1">The additional contract type.</typeparam>
         /// <typeparam name="T2">The additional contract type.</typeparam>
         /// <typeparam name="T3">The additional contract type.</typeparam>
@@ -113,12 +113,12 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5 
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type }, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
         /// </summary>
-        /// <typeparam name="T">The autowring type.</typeparam>
+        /// <typeparam name="T">The autowiring type.</typeparam>
         /// <typeparam name="T1">The additional contract type.</typeparam>
         /// <typeparam name="T2">The additional contract type.</typeparam>
         /// <typeparam name="T3">The additional contract type.</typeparam>
@@ -132,12 +132,12 @@
         [MethodImpl((MethodImplOptions)256)]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type }, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
         /// </summary>
-        /// <typeparam name="T">The autowring type.</typeparam>
+        /// <typeparam name="T">The autowiring type.</typeparam>
         /// <typeparam name="T1">The additional contract type.</typeparam>
         /// <typeparam name="T2">The additional contract type.</typeparam>
         /// <typeparam name="T3">The additional contract type.</typeparam>
@@ -153,12 +153,12 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6, T7
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type }, new FullAutowringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
         /// </summary>
-        /// <typeparam name="T">The autowring type.</typeparam>
+        /// <typeparam name="T">The autowiring type.</typeparam>
         /// <typeparam name="T1">The additional contract type.</typeparam>
         /// <typeparam name="T2">The additional contract type.</typeparam>
         /// <typeparam name="T3">The additional contract type.</typeparam>
@@ -175,7 +175,7 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6, T7, T8
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8) }, new FullAutowringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8) }, new FullAutowiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -190,7 +190,7 @@
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            => container.Register(new[] { TypeDescriptor<T>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -207,7 +207,7 @@
         [NotNull]
         public static IDisposable Register<T, T1>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -225,7 +225,7 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -244,7 +244,7 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -264,7 +264,7 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -285,7 +285,7 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4, T5
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -307,7 +307,7 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4, T5, T6
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -330,7 +330,7 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4, T5, T6, T7
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -354,7 +354,7 @@
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4, T5, T6, T7, T8
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type }, new AutowringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.

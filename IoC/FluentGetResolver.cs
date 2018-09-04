@@ -109,7 +109,7 @@
         /// <summary>
         /// Creates tag.
         /// </summary>
-        /// <param name="tagValue">The tage value.</param>
+        /// <param name="tagValue">The tag value.</param>
         /// <returns>The tag.</returns>
         [MethodImpl((MethodImplOptions)256)]
         public static Tag AsTag([CanBeNull] this object tagValue) => new Tag(tagValue);

@@ -11,7 +11,7 @@
     public class AspNetCoreFeature: Collection<ServiceDescriptor>, IServiceCollection, IConfiguration
     {
         /// <summary>
-        /// Defaut constructor.
+        /// Default constructor.
         /// </summary>
         public AspNetCoreFeature()
         {

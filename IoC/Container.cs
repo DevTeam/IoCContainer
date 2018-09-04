@@ -26,7 +26,7 @@
     {
         private static long _containerId;
         [NotNull] private static readonly Lazy<Container> CoreRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.CoreSet), true);
-        [NotNull] private static readonly Lazy<Container> DefultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.DefaultSet), true);
+        [NotNull] private static readonly Lazy<Container> DefaultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.DefaultSet), true);
         [NotNull] private static readonly Lazy<Container> LightRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.LightSet), true);
 
         [NotNull] private readonly IContainer _parent;
@@ -42,19 +42,19 @@
         /// Creates a root container with default features.
         /// </summary>
         /// <param name="name">The optional name of the container.</param>
-        /// <returns>The roor container.</returns>
+        /// <returns>The root container.</returns>
         [NotNull]
         public static Container Create([NotNull] string name = "")
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return Create(name, DefultRootContainer.Value);
+            return Create(name, DefaultRootContainer.Value);
         }
 
         /// <summary>
         /// Creates a root container with minimal set of features.
         /// </summary>
         /// <param name="name">The optional name of the container.</param>
-        /// <returns>The roor container.</returns>
+        /// <returns>The root container.</returns>
         [NotNull]
         public static Container CreateCore([NotNull] string name = "")
         {
@@ -66,7 +66,7 @@
         /// Creates a root container with minimalist default features.
         /// </summary>
         /// <param name="name">The optional name of the container.</param>
-        /// <returns>The roor container.</returns>
+        /// <returns>The root container.</returns>
         [NotNull]
         public static Container CreateLight([NotNull] string name = "")
         {

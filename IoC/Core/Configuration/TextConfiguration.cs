@@ -16,7 +16,7 @@
             [NotNull] IConverter<IEnumerable<Statement>, BindingContext, BindingContext> bindingsConverter)
         {
             _bindingsConverter = bindingsConverter ?? throw new ArgumentNullException(nameof(bindingsConverter));
-            _statements = GetStetements(textReader ?? throw new ArgumentNullException(nameof(textReader)));
+            _statements = GetStatements(textReader ?? throw new ArgumentNullException(nameof(textReader)));
         }
 
         public IEnumerable<IDisposable> Apply(IContainer container)
@@ -35,7 +35,7 @@
             return Enumerable.Empty<IDisposable>();
         }
 
-        private static IEnumerable<Statement> GetStetements([NotNull] TextReader textReader)
+        private static IEnumerable<Statement> GetStatements([NotNull] TextReader textReader)
         {
             if (textReader == null) throw new ArgumentNullException(nameof(textReader));
             var lineNumber = 0;

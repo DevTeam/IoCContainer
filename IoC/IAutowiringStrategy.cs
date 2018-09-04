@@ -5,7 +5,7 @@
     using System.Reflection;
 
     /// <summary>
-    /// Represents an abstraction for an autowirin method.
+    /// Represents an abstraction for an autowiring method.
     /// </summary>
     [PublicAPI]
     public interface IAutowiringStrategy

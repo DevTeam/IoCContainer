@@ -605,21 +605,21 @@
             Creates a root container with default features.
             </summary>
             <param name="name">The optional name of the container.</param>
-            <returns>The roor container.</returns>
+            <returns>The root container.</returns>
         </member>
         <member name="M:IoC.Container.CreateCore(System.String)">
             <summary>
             Creates a root container with minimal set of features.
             </summary>
             <param name="name">The optional name of the container.</param>
-            <returns>The roor container.</returns>
+            <returns>The root container.</returns>
         </member>
         <member name="M:IoC.Container.CreateLight(System.String)">
             <summary>
             Creates a root container with minimalist default features.
             </summary>
             <param name="name">The optional name of the container.</param>
-            <returns>The roor container.</returns>
+            <returns>The root container.</returns>
         </member>
         <member name="P:IoC.Container.Parent">
             <inheritdoc />
@@ -668,7 +668,7 @@
         </member>
         <member name="F:IoC.ContainerEvent.Key">
             <summary>
-            The chenged binding key.
+            The changed binding key.
             </summary>
         </member>
         <member name="T:IoC.Context`1">
@@ -709,7 +709,7 @@
         </member>
         <member name="T:IoC.Core.IExpressionBuilder`1">
             <summary>
-            Allows to build expresion for lifetimes.
+            Allows to build expression for lifetimes.
             </summary>
         </member>
         <member name="M:IoC.Core.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext,`0)">
@@ -808,7 +808,7 @@
         </member>
         <member name="T:IoC.Features.FuncFeature">
             <summary>
-            Allows to resolve Funcs.
+            Allows to resolve Functions.
             </summary>
         </member>
         <member name="F:IoC.Features.FuncFeature.Default">
@@ -871,7 +871,7 @@
         </member>
         <member name="T:IoC.FluentAutowiring">
             <summary>
-            Represents extensions for autowring.
+            Represents extensions for autowiring.
             </summary>
         </member>
         <member name="M:IoC.FluentAutowiring.TryInjectDependency``1(IoC.IMethod{``0},System.Int32,System.Type,System.Object)">
@@ -1031,7 +1031,7 @@
             </summary>
             <param name="binding">The binding token.</param>
             <param name="type">The instance type.</param>
-            <param name="autowiringStrategy">The optional autowring strategy.</param>
+            <param name="autowiringStrategy">The optional autowiring strategy.</param>
             <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},IoC.IAutowiringStrategy)">
@@ -1040,7 +1040,7 @@
             </summary>
             <typeparam name="T">The instance type.</typeparam>
             <param name="binding">The binding token.</param>
-            <param name="autowiringStrategy">The optional autowring strategy.</param>
+            <param name="autowiringStrategy">The optional autowiring strategy.</param>
             <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
@@ -1055,13 +1055,13 @@
         </member>
         <member name="M:IoC.FluentBind.ToSelf(System.IDisposable)">
             <summary>
-            Puts the dependency token into the target contaier to manage it.
+            Puts the dependency token into the target container to manage it.
             </summary>
             <param name="dependencyToken"></param>
         </member>
         <member name="T:IoC.FluentConfiguration">
             <summary>
-            Represents extensons to configure a container.
+            Represents extensions to configure a container.
             </summary>
         </member>
         <member name="M:IoC.FluentConfiguration.Apply(IoC.IContainer,System.String[])">
@@ -1229,7 +1229,7 @@
             <summary>
             Creates tag.
             </summary>
-            <param name="tagValue">The tage value.</param>
+            <param name="tagValue">The tag value.</param>
             <returns>The tag.</returns>
         </member>
         <member name="T:IoC.FluentNativeResolve">
@@ -1322,7 +1322,7 @@
             <summary>
             Registers a binding.
             </summary>
-            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T">The autowiring type.</typeparam>
             <param name="container">The target container.</param>
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
@@ -1332,7 +1332,7 @@
             <summary>
             Registers a binding.
             </summary>
-            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T">The autowiring type.</typeparam>
             <typeparam name="T1">The additional contract type.</typeparam>
             <param name="container">The target container.</param>
             <param name="lifetime">The target lifetime.</param>
@@ -1343,7 +1343,7 @@
             <summary>
             Registers a binding.
             </summary>
-            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T">The autowiring type.</typeparam>
             <typeparam name="T1">The additional contract type.</typeparam>
             <typeparam name="T2">The additional contract type.</typeparam>
             <param name="container">The target container.</param>
@@ -1355,7 +1355,7 @@
             <summary>
             Registers a binding.
             </summary>
-            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T">The autowiring type.</typeparam>
             <typeparam name="T1">The additional contract type.</typeparam>
             <typeparam name="T2">The additional contract type.</typeparam>
             <typeparam name="T3">The additional contract type.</typeparam>
@@ -1368,7 +1368,7 @@
             <summary>
             Registers a binding.
             </summary>
-            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T">The autowiring type.</typeparam>
             <typeparam name="T1">The additional contract type.</typeparam>
             <typeparam name="T2">The additional contract type.</typeparam>
             <typeparam name="T3">The additional contract type.</typeparam>
@@ -1382,7 +1382,7 @@
             <summary>
             Registers a binding.
             </summary>
-            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T">The autowiring type.</typeparam>
             <typeparam name="T1">The additional contract type.</typeparam>
             <typeparam name="T2">The additional contract type.</typeparam>
             <typeparam name="T3">The additional contract type.</typeparam>
@@ -1397,7 +1397,7 @@
             <summary>
             Registers a binding.
             </summary>
-            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T">The autowiring type.</typeparam>
             <typeparam name="T1">The additional contract type.</typeparam>
             <typeparam name="T2">The additional contract type.</typeparam>
             <typeparam name="T3">The additional contract type.</typeparam>
@@ -1413,7 +1413,7 @@
             <summary>
             Registers a binding.
             </summary>
-            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T">The autowiring type.</typeparam>
             <typeparam name="T1">The additional contract type.</typeparam>
             <typeparam name="T2">The additional contract type.</typeparam>
             <typeparam name="T3">The additional contract type.</typeparam>
@@ -1430,7 +1430,7 @@
             <summary>
             Registers a binding.
             </summary>
-            <typeparam name="T">The autowring type.</typeparam>
+            <typeparam name="T">The autowiring type.</typeparam>
             <typeparam name="T1">The additional contract type.</typeparam>
             <typeparam name="T2">The additional contract type.</typeparam>
             <typeparam name="T3">The additional contract type.</typeparam>
@@ -1696,7 +1696,7 @@
         </member>
         <member name="T:IoC.IAutowiringStrategy">
             <summary>
-            Represents an abstraction for an autowirin method.
+            Represents an abstraction for an autowiring method.
             </summary>
         </member>
         <member name="M:IoC.IAutowiringStrategy.TryResolveType(System.Type,System.Type,System.Type@)">
@@ -1791,7 +1791,7 @@
             Wraps by lifetime.
             </summary>
             <param name="baseExpression">The base expression.</param>
-            <param name="lifetime">The target lifitime.</param>
+            <param name="lifetime">The target lifetime.</param>
             <returns></returns>
         </member>
         <member name="M:IoC.IBuildContext.AppendValue(System.Object,System.Type)">
@@ -1854,7 +1854,7 @@
             <param name="keys">The set of keys to register.</param>
             <param name="dependency">The dependency.</param>
             <param name="lifetime">The lifetime.</param>
-            <param name="dependencyToken">The deoendency token.</param>
+            <param name="dependencyToken">The dependency token.</param>
             <returns>True if successful.</returns>
         </member>
         <member name="M:IoC.IContainer.TryGetDependency(IoC.Key,IoC.IDependency@,IoC.ILifetime@)">
@@ -1973,7 +1973,7 @@
             Handles the scenario when cannot build expression.
             </summary>
             <param name="buildContext">The build context.</param>
-            <param name="dependency">The dependeny.</param>
+            <param name="dependency">The dependency.</param>
             <param name="lifetime">The lifetime.</param>
             <returns>The resulting expression.</returns>
         </member>
@@ -2021,7 +2021,7 @@
         </member>
         <member name="T:IoC.IMethod`1">
             <summary>
-            Represents an abstraction for an autowirin method.
+            Represents an abstraction for autowiring method.
             </summary>
             <typeparam name="TMethodInfo">The type of method info.</typeparam>
         </member>
@@ -2198,7 +2198,7 @@
             Creates key for singleton.
             </summary>
             <param name="container">The target container.</param>
-            <param name="args">The arfuments.</param>
+            <param name="args">The arguments.</param>
             <returns>The created key.</returns>
         </member>
         <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.OnNewInstanceCreated``1(``0,`0,IoC.IContainer,System.Object[])">
@@ -2338,7 +2338,7 @@
         </member>
         <member name="F:IoC.WellknownExpressions.ResolverParameters">
             <summary>
-            All resolver's parameters.
+            All resolvers parameters.
             </summary>
         </member>
     </members>

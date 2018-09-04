@@ -14,7 +14,7 @@
     [PublicAPI]
     internal class BuildContext : IBuildContext
     {
-        // Should be at least internal to be accessable from for compiled code from expressions
+        // Should be at least internal to be accessible from for compiled code from expressions
         private readonly ICollection<IDisposable> _resources;
         private readonly List<ParameterExpression> _parameters = new List<ParameterExpression>();
         private readonly List<Expression> _statements = new List<Expression>();

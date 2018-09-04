@@ -22,8 +22,8 @@ namespace IoC
             InjectMethodInfo = ((MethodCallExpression)injectExpression.Body).Method.GetGenericMethodDefinition();
             Expression<Func<object>> injectWithTagExpression = () => default(IContainer).Inject<object>(null);
             InjectWithTagMethodInfo = ((MethodCallExpression)injectWithTagExpression.Body).Method.GetGenericMethodDefinition();
-            Expression<Action<object, object>> assigmentCallExpression = (item1, item2) => default(IContainer).Inject<object>(null, null);
-            InjectingAssignmentMethodInfo = ((MethodCallExpression)assigmentCallExpression.Body).Method.GetGenericMethodDefinition();
+            Expression<Action<object, object>> assignmentCallExpression = (item1, item2) => default(IContainer).Inject<object>(null, null);
+            InjectingAssignmentMethodInfo = ((MethodCallExpression)assignmentCallExpression.Body).Method.GetGenericMethodDefinition();
         }
 
         /// <summary>

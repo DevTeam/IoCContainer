@@ -85,7 +85,7 @@
         /// Handles the scenario when cannot build expression.
         /// </summary>
         /// <param name="buildContext">The build context.</param>
-        /// <param name="dependency">The dependeny.</param>
+        /// <param name="dependency">The dependency.</param>
         /// <param name="lifetime">The lifetime.</param>
         /// <returns>The resulting expression.</returns>
         [NotNull] Expression CannotBuildExpression([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, ILifetime lifetime = null);

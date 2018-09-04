@@ -13,7 +13,7 @@ namespace IoC.Tests
     {
         [Theory]
         [ClassData(typeof(TestDataGenerator))]
-        public void ShouldConvertStatementToAssemblies(string text, bool expectedResult, Assembly[] expectedRefernces)
+        public void ShouldConvertStatementToAssemblies(string text, bool expectedResult, Assembly[] expectedReferences)
         {
             // Given
             var converter = new StatementToReferencesConverter();
@@ -23,7 +23,7 @@ namespace IoC.Tests
 
             // Then
             actualResult.ShouldBe(expectedResult);
-            actualContext.Assemblies.ShouldBe(expectedRefernces);
+            actualContext.Assemblies.ShouldBe(expectedReferences);
         }
 
         private class TestDataGenerator : IEnumerable<object[]>

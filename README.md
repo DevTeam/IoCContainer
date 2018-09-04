@@ -597,7 +597,7 @@ using (container.Bind<IDependency>().To<Dependency>())
 using (container.Bind<INamedService>().To<InitializingNamedService>(
     // Select the constructor and inject its parameters
     ctx => new InitializingNamedService(ctx.Container.Inject<IDependency>()),
-    // Configure the method to invoke after the inctance's creation
+    // Configure the method to invoke after the instances creation
     ctx => ctx.It.Initialize("some name", ctx.Container.Inject<IDependency>())))
 {
     // Resolve an instance
@@ -704,7 +704,7 @@ public void Run()
     using (var baseContainer = Container.Create("base"))
     // Configure some child container
     using (var childContainer = baseContainer.CreateChild("child"))
-    // Configure the child container by custom aspect oriented autowring strategy
+    // Configure the child container by custom aspect oriented autowiring strategy
     using (childContainer.Bind<IAutowiringStrategy>().To<AspectOrientedAutowiringStrategy>())
     // Configure the container
     using (childContainer.Bind<IConsole>().To(ctx => console.Object))
@@ -762,11 +762,11 @@ private class AspectOrientedAutowiringStrategy : IAutowiringStrategy
     {
         constructor = (
             from ctor in constructors
-            let autowringAttribute = ctor.Info.GetCustomAttribute<AutowiringAttribute>()
+            let autowiringAttribute = ctor.Info.GetCustomAttribute<AutowiringAttribute>()
             // filters constructors containing the attribute Autowiring
-            where autowringAttribute != null
-            // sorts constructors by autowringAttribute.Order
-            orderby autowringAttribute.Order
+            where autowiringAttribute != null
+            // sorts constructors by autowiringAttribute.Order
+            orderby autowiringAttribute.Order
             select ctor)
             // Get a first appropriate constructor
             .First();
@@ -778,18 +778,18 @@ private class AspectOrientedAutowiringStrategy : IAutowiringStrategy
     {
         initializers =
             from method in methods
-            let autowringAttribute = method.Info.GetCustomAttribute<AutowiringAttribute>()
+            let autowiringAttribute = method.Info.GetCustomAttribute<AutowiringAttribute>()
             // filters methods/property setters containing the attribute Autowiring
-            where autowringAttribute != null
-            // sorts methods/property setters by autowringAttribute.Order
-            orderby autowringAttribute.Order
+            where autowiringAttribute != null
+            // sorts methods/property setters by autowiringAttribute.Order
+            orderby autowiringAttribute.Order
             where (
                     from parameter in method.Info.GetParameters()
                     let injectAttribute = parameter.GetCustomAttribute<TagAttribute>()
                     // filters parameters containing a custom tag value to make a dependency injection
-                    where injectAttribute?.Tag != null || autowringAttribute.DefaultTag != null
+                    where injectAttribute?.Tag != null || autowiringAttribute.DefaultTag != null
                     // redefines the default dependency
-                    select method.TryInjectDependency(parameter.Position, parameter.ParameterType, injectAttribute?.Tag ?? autowringAttribute.DefaultTag))
+                    select method.TryInjectDependency(parameter.Position, parameter.ParameterType, injectAttribute?.Tag ?? autowiringAttribute.DefaultTag))
                 // checks that all custom injection were successfully
                 .All(isInjected => isInjected)
             select method;
@@ -951,7 +951,7 @@ public void Run()
     // Use the custom implementation of Singleton lifetime
     using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
     {
-        // Resolve one instance twice using the custom Singletine lifetime
+        // Resolve one instance twice using the custom Singleton lifetime
         var instance1 = container.Resolve<IService>();
         var instance2 = container.Resolve<IService>();
 

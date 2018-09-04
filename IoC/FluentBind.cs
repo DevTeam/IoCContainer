@@ -242,14 +242,14 @@
         /// </summary>
         /// <param name="binding">The binding token.</param>
         /// <param name="type">The instance type.</param>
-        /// <param name="autowiringStrategy">The optional autowring strategy.</param>
+        /// <param name="autowiringStrategy">The optional autowiring strategy.</param>
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable To([NotNull] this IBinding<object> binding, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowringDependency(type, autowiringStrategy)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(type, autowiringStrategy)));
         }
 
         /// <summary>
@@ -257,14 +257,14 @@
         /// </summary>
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="binding">The binding token.</param>
-        /// <param name="autowiringStrategy">The optional autowring strategy.</param>
+        /// <param name="autowiringStrategy">The optional autowiring strategy.</param>
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowringDependency(TypeDescriptor<T>.Type, autowiringStrategy)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(TypeDescriptor<T>.Type, autowiringStrategy)));
         }
 
         /// <summary>
@@ -284,11 +284,11 @@
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new AutowringDependency(factory, statements)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new AutowiringDependency(factory, statements)));
         }
 
         /// <summary>
-        /// Puts the dependency token into the target contaier to manage it.
+        /// Puts the dependency token into the target container to manage it.
         /// </summary>
         /// <param name="dependencyToken"></param>
         [MethodImpl((MethodImplOptions)256)]

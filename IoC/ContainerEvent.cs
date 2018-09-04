@@ -19,7 +19,7 @@
         public readonly EventType EventTypeType;
 
         /// <summary>
-        /// The chenged binding key.
+        /// The changed binding key.
         /// </summary>
         public readonly Key Key;
 

@@ -15,8 +15,8 @@
             if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             typesMap = typesMap ?? new Dictionary<Type, Type>();
-            var typeMapingExpressionVisitor = new TypeMapingExpressionVisitor(buildContext.Key.Type, typesMap);
-            typeMapingExpressionVisitor.Visit(bodyExpression);
+            var typeMappingExpressionVisitor = new TypeMappingExpressionVisitor(buildContext.Key.Type, typesMap);
+            typeMappingExpressionVisitor.Visit(bodyExpression);
             if (typesMap.Count > 0)
             {
                 var typeReplacingExpressionVisitor = new TypeReplacerExpressionVisitor(typesMap);

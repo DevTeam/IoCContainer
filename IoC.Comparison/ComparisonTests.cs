@@ -37,7 +37,7 @@ namespace IoC.Comparison
         private const string ThisIocName = "IoC.Container";
         private const string ReportFileName = "REPORT.html";
 
-        private static readonly List<TestInfo> IocsGraphOf3ObjectsWithSingleton = new List<TestInfo>
+        private static readonly List<TestInfo> IoCGraphOf3ObjectsWithSingleton = new List<TestInfo>
         {
             new TestInfo($"{ThisIocName} actual DI", ThisByFuncSingleton),
             new TestInfo(ThisIocName, ThisSingleton),
@@ -52,7 +52,7 @@ namespace IoC.Comparison
             new TestInfo("Autofac", AutofacSingleton) { PerformanceRate = 100 },
         };
 
-        private static readonly List<TestInfo> IocsGraphOf3Transient = new List<TestInfo>
+        private static readonly List<TestInfo> IoCGraphOf3Transient = new List<TestInfo>
         {
             new TestInfo($"{ThisIocName} actual DI", ThisByFuncTransient),
             new TestInfo(ThisIocName, ThisTransient),
@@ -98,7 +98,7 @@ namespace IoC.Comparison
             }
 
             var results = new List<TestResult>();
-            foreach (var ioc in IocsGraphOf3ObjectsWithSingleton)
+            foreach (var ioc in IoCGraphOf3ObjectsWithSingleton)
             {
                 // Warmup
                 ioc.Test(2, new TotalTimePerformanceCounter());
@@ -117,7 +117,7 @@ namespace IoC.Comparison
             SaveResults(results, $"20 instances and 1 singleton {series.ToShortString()} times");
             results.Clear();
 
-            foreach (var ioc in IocsGraphOf3Transient)
+            foreach (var ioc in IoCGraphOf3Transient)
             {
                 // Warmup
                 ioc.Test(2, new TotalTimePerformanceCounter());
@@ -151,7 +151,7 @@ namespace IoC.Comparison
             const long series = 10;
 
             var results = new List<TestResult>();
-            foreach (var ioc in IocsGraphOf3ObjectsWithSingleton)
+            foreach (var ioc in IoCGraphOf3ObjectsWithSingleton)
             {
                 GC.Collect();
                 GC.WaitForFullGCComplete();
@@ -165,7 +165,7 @@ namespace IoC.Comparison
             SaveResults(results, $"Memory usage 5 instances and 1 singleton {series} times");
             results.Clear();
 
-            foreach (var ioc in IocsGraphOf3Transient)
+            foreach (var ioc in IoCGraphOf3Transient)
             {
                 GC.Collect();
                 GC.WaitForFullGCComplete();

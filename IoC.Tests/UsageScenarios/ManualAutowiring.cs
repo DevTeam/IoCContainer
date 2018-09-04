@@ -22,7 +22,7 @@
             using (container.Bind<INamedService>().To<InitializingNamedService>(
                 // Select the constructor and inject its parameters
                 ctx => new InitializingNamedService(ctx.Container.Inject<IDependency>()),
-                // Configure the method to invoke after the inctance's creation
+                // Configure the method to invoke after the instances creation
                 ctx => ctx.It.Initialize("some name", ctx.Container.Inject<IDependency>())))
             {
                 // Resolve an instance

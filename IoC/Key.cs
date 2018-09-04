@@ -44,6 +44,7 @@
         [MethodImpl((MethodImplOptions)256)]
         public override bool Equals(object obj)
         {
+            // ReSharper disable once PossibleNullReferenceException
             return Equals((Key)obj);
         }
 

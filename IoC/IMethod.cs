@@ -5,7 +5,7 @@
     using System.Reflection;
 
     /// <summary>
-    /// Represents an abstraction for an autowirin method.
+    /// Represents an abstraction for autowiring method.
     /// </summary>
     /// <typeparam name="TMethodInfo">The type of method info.</typeparam>
     [PublicAPI]

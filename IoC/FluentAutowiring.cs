@@ -6,7 +6,7 @@
     using Core;
 
     /// <summary>
-    /// Represents extensions for autowring.
+    /// Represents extensions for autowiring.
     /// </summary>
     public static class FluentAutowiring
     {

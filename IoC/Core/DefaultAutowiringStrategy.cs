@@ -30,9 +30,9 @@
             var registeredGenericTypeParameters = registeredTypeDescriptor.GetGenericTypeParameters();
             var typesMap = registeredGenericTypeParameters.Distinct().Zip(GenericTypeArguments.Types, Tuple.Create).ToDictionary(i => i.Item1, i => i.Item2);
 
-            var resolvingTypeDefenitionDescriptor = resolvingTypeDescriptor.GetGenericTypeDefinition().Descriptor();
-            var resolvingTypeDefenitionGenericTypeParameters = resolvingTypeDefenitionDescriptor.GetGenericTypeParameters();
-            var constraintsMap = resolvingTypeDescriptor.GetGenericTypeArguments().Zip(resolvingTypeDefenitionGenericTypeParameters, (type, typeDefenition) => Tuple.Create(type, typeDefenition.Descriptor().GetGenericParameterConstraints())).ToArray();
+            var resolvingTypeDefinitionDescriptor = resolvingTypeDescriptor.GetGenericTypeDefinition().Descriptor();
+            var resolvingTypeDefinitionGenericTypeParameters = resolvingTypeDefinitionDescriptor.GetGenericTypeParameters();
+            var constraintsMap = resolvingTypeDescriptor.GetGenericTypeArguments().Zip(resolvingTypeDefinitionGenericTypeParameters, (type, typeDefenition) => Tuple.Create(type, typeDefenition.Descriptor().GetGenericParameterConstraints())).ToArray();
 
             for (var position = 0; position < registeredGenericTypeParameters.Length; position++)
             {
