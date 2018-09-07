@@ -5,6 +5,7 @@
     using System.Collections.Generic;
     // ReSharper disable once RedundantUsingDirective
     using System.Collections.ObjectModel;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using Core;
 
@@ -17,27 +18,17 @@
     {
         /// The default instance.
         public static readonly IConfiguration Default = new CollectionFeature();
-        /// The high-performance instance.
-        public static readonly IConfiguration Light = new CollectionFeature(true);
 
-        private readonly bool _light;
-
-        private CollectionFeature(bool light = false) => _light = light;
+        private CollectionFeature()
+        {
+        }
 
         /// <inheritdoc />
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var containerSingletonResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
-            if (_light)
-            {
-                yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx.Container, ctx.Args).ToArray(), containerSingletonResolver(container));
-            }
-            else
-            {
-                yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx.Container, ctx.Args), containerSingletonResolver(container));
-            }
-
+            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx.Container, ctx.Args), containerSingletonResolver(container));
             yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToList());
             yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => new HashSet<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
             yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Inject<IEnumerable<TT>>()), containerSingletonResolver(container));
@@ -69,7 +60,7 @@
             private readonly IContainer _container;
             [NotNull] [ItemCanBeNull] private readonly object[] _args;
             private readonly IDisposable _subscription;
-            private volatile Lazy<Resolver<T>[]> _currentResolvers;
+            private volatile Resolver<T>[] _resolvers;
 
             public Enumeration([NotNull] IContainer container, [NotNull][ItemCanBeNull] params object[] args)
             {
@@ -91,8 +82,29 @@
 
             public void Dispose() => _subscription.Dispose();
 
-            public IEnumerator<T> GetEnumerator() 
-                => _currentResolvers.Value.Select(resolver => resolver(_container, _args)).GetEnumerator();
+            [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
+            public IEnumerator<T> GetEnumerator()
+            {
+                var resolvers = _resolvers;
+                if (resolvers == null)
+                {
+                    lock (_subscription)
+                    {
+                        if (_resolvers == null)
+                        {
+                            _resolvers = GetResolvers(_container).ToArray();
+                        }
+
+                        resolvers = _resolvers;
+                    }
+                }
+
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < resolvers.Length; i++)
+                {
+                    yield return resolvers[i](_container, _args);
+                }
+            }
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
@@ -100,34 +112,61 @@
             {
                 lock (_subscription)
                 {
-                    _currentResolvers = new Lazy<Resolver<T>[]>(() => GetResolvers(_container).ToArray());
+                    _resolvers = null;
                 }
             }
 
             private static IEnumerable<Resolver<T>> GetResolvers(IContainer container)
             {
-                var typeDescriptor = TypeDescriptorExtensions.Descriptor<T>();
-                return from keyGroup in container
-                    let item = keyGroup.Select(key => new {type = CreateType(key.Type.Descriptor(), typeDescriptor), tag = key.Tag}).FirstOrDefault(i => i.type != null)
-                    where item != null
-                    select container.GetResolver<T>(item.type, item.tag.AsTag());
-            }
-
-            private static Type CreateType(TypeDescriptor registeredType, TypeDescriptor targetType)
-            {
-                if (registeredType.IsGenericTypeDefinition())
+                var targetType = TypeDescriptorExtensions.Descriptor<T>();
+                var isConstructedGenericType = targetType.IsConstructedGenericType();
+                TypeDescriptor genericTargetType = null;
+                Type[] genericTypeArguments = null;
+                if (isConstructedGenericType)
                 {
-                    if (targetType.IsConstructedGenericType())
-                    {
-                        var genericTargetType = targetType.GetGenericTypeDefinition().Descriptor();
-                        if (genericTargetType.IsAssignableFrom(registeredType))
-                        {
-                            return registeredType.MakeGenericType(targetType.GetGenericTypeArguments());
-                        }
-                    }
+                    genericTargetType = targetType.GetGenericTypeDefinition().Descriptor();
+                    genericTypeArguments = targetType.GetGenericTypeArguments();
                 }
 
-                return targetType.IsAssignableFrom(registeredType) ? registeredType.AsType() : null;
+                foreach (var keyGroup in container)
+                {
+                    foreach (var key in keyGroup)
+                    {
+                        Type typeToResolve = null;
+                        var registeredType = key.Type.Descriptor();
+                        if (registeredType.IsGenericTypeDefinition())
+                        {
+                            if (isConstructedGenericType && genericTargetType.IsAssignableFrom(registeredType))
+                            {
+                                typeToResolve = registeredType.MakeGenericType(genericTypeArguments);
+                            }
+                        }
+                        else
+                        {
+                            if (targetType.IsAssignableFrom(registeredType))
+                            {
+                                typeToResolve = key.Type;
+                            }
+                        }
+
+                        if (typeToResolve == null)
+                        {
+                            continue;
+                        }
+
+                        var tag = key.Tag;
+                        if (tag == null || ReferenceEquals(tag, Key.AnyTag))
+                        {
+                            yield return container.GetResolver<T>(typeToResolve);
+                        }
+                        else
+                        {
+                            yield return container.GetResolver<T>(typeToResolve, tag.AsTag());
+                        }
+
+                        break;
+                    }
+                }
             }
         }
     }

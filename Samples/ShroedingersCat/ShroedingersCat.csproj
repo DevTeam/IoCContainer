@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <PackageReference Include="IoC.Container" Version="1.1.7" />
+    <PackageReference Include="System.Reactive" Version="4.1.0" />
   </ItemGroup>
 
 </Project>

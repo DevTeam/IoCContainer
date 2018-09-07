@@ -26,7 +26,7 @@
 #endif
         }
 
-        internal static Task<T> StartTask<T>(Task<T> task, TaskScheduler taskScheduler)
+        private static Task<T> StartTask<T>(Task<T> task, TaskScheduler taskScheduler)
         {
             task.Start(taskScheduler);
             return task;

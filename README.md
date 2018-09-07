@@ -158,35 +158,43 @@ using (var container = Container.Create().Using<Glue>())
 
     // Func
     var func = container.Resolve<Func<IBox<ICat>>>();
-    Console.WriteLine(func());
+    Console.WriteLine("Func: " + func());
 
     // Async
     box = await container.Resolve<Task<IBox<ICat>>>();
-    Console.WriteLine(box);
+    Console.WriteLine("Task: " + box);
 
     // Async value
     box = await container.Resolve<ValueTask<IBox<ICat>>>();
-    Console.WriteLine(box);
+    Console.WriteLine("ValueTask: " + box);
 
-    // Tuple<,>
+    // Tuple
     var tuple = container.Resolve<Tuple<IBox<ICat>, ICat>>();
-    Console.WriteLine(tuple.Item1 + ", " + tuple.Item2);
+    Console.WriteLine("Tuple: " + tuple.Item1 + ", " + tuple.Item2);
 
-    // ValueTuple(,,)
+    // ValueTuple
     var valueTuple = container.Resolve<(IBox<ICat> box, ICat cat, IBox<ICat> anotherBox)>();
-    Console.WriteLine(valueTuple.box + ", " + valueTuple.cat + ", " + valueTuple.anotherBox);
+    Console.WriteLine("ValueTuple: " + valueTuple.box + ", " + valueTuple.cat + ", " + valueTuple.anotherBox);
 
     // Lazy
     var lazy = container.Resolve<Lazy<IBox<ICat>>>();
-    Console.WriteLine(lazy.Value);
+    Console.WriteLine("Lazy: " + lazy.Value);
 
     // Enumerable
     var enumerable = container.Resolve<IEnumerable<IBox<ICat>>>();
-    Console.WriteLine(enumerable.Single());
+    Console.WriteLine("IEnumerable: " + enumerable.Single());
 
     // List
     var list = container.Resolve<IList<IBox<ICat>>>();
-    Console.WriteLine(list[0]);
+    Console.WriteLine("IList: " + list[0]);
+
+    // Reactive
+    var source = container.Resolve<IObservable<IBox<ICat>>>();
+    using (source.Subscribe(value => Console.WriteLine("IObservable: " + value))) { }
+
+    // Complex
+    var complex = container.Resolve<Lazy<Func<Task<IEnumerable<IBox<ICat>>>>>>();
+    Console.WriteLine("Complex: " + (await complex.Value()).Single());
 }
 ```
 

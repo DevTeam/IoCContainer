@@ -756,9 +756,6 @@
         <member name="F:IoC.Features.CollectionFeature.Default">
             The default instance.
         </member>
-        <member name="F:IoC.Features.CollectionFeature.Light">
-            The high-performance instance.
-        </member>
         <member name="M:IoC.Features.CollectionFeature.Apply(IoC.IContainer)">
             <inheritdoc />
         </member>

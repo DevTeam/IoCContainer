@@ -1,7 +1,9 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     // ReSharper disable once RedundantUsingDirective
     using System.Threading.Tasks;
     using Moq;
@@ -415,5 +417,218 @@
                 }
             }
         }
+
+        [Fact]
+        public void ContainerShouldResolveGenericWhenFunc()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+                {
+                    var instance = container.Resolve<Func<IMyGenericService<string, int>>>()();
+
+                    // Then
+                    instance.ShouldBeOfType<MyGenericService<string, int>>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveGenericWhenTuple()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+                {
+                    var instance = container.Resolve<Tuple<IMyGenericService<string, int>, IMyGenericService<string, int>>>();
+
+                    // Then
+                    instance.Item1.ShouldBeOfType<MyGenericService<string, int>>();
+                    instance.Item2.ShouldBeOfType<MyGenericService<string, int>>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveGenericWhenLazy()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+                {
+                    var instance = container.Resolve<Lazy<IMyGenericService<string, int>>>();
+
+                    // Then
+                    instance.Value.ShouldBeOfType<MyGenericService<string, int>>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveGenericWhenEnumerable()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+                {
+                    var instance = container.Resolve<IEnumerable<IMyGenericService<string, int>>>();
+
+                    // Then
+                    instance.Single().ShouldBeOfType<MyGenericService<string, int>>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveGenericWhenList()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+                {
+                    var instance = container.Resolve<IList<IMyGenericService<string, int>>>();
+
+                    // Then
+                    instance[0].ShouldBeOfType<MyGenericService<string, int>>();
+                }
+            }
+        }
+
+#if !NET40
+        [Fact]
+        public void ContainerShouldResolveGenericWhenComplex()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+                {
+                    var instance = container.Resolve<Task<Func<IEnumerable<Lazy<Tuple<Func<IMyGenericService<string, int>>, IMyGenericService<string, int>>>>>>>();
+
+                    // Then
+                    instance.Result().Single().Value.Item1().ShouldBeOfType<MyGenericService<string, int>>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveGenericWhenComplex_MT()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+                {
+                    TestsExtensions.Parallelize(() =>
+                    {
+                        var instance = container.Resolve<Task<Func<IEnumerable<Lazy<Tuple<Func<IMyGenericService<string, int>>, IMyGenericService<string, int>>>>>>>();
+
+                        // Then
+                        instance.Result().Single().Value.Item1().ShouldBeOfType<MyGenericService<string, int>>();
+                    });
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveGenericWhenTask()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+                {
+                    var instance = container.Resolve<Task<IMyGenericService<string, int>>>().Result;
+
+                    // Then
+                    instance.ShouldBeOfType<MyGenericService<string, int>>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveGenericWhenReactive()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+                {
+                    var source = container.Resolve<IObservable<IMyGenericService<string, int>>>();
+
+                    // Then
+                    using(source.Subscribe(new Observer())) {}
+                }
+            }
+        }
+
+        private class Observer: IObserver<IMyGenericService<string, int>>
+        {
+            public void OnNext(IMyGenericService<string, int> value)
+            {
+                value.ShouldBeOfType<MyGenericService<string, int>>();
+            }
+
+            public void OnError(Exception error)
+            {
+                throw new NotImplementedException();
+            }
+
+            public void OnCompleted()
+            {
+            }
+        }
+#endif
+
+#if NETCOREAPP2_1
+        [Fact]
+        public void ContainerShouldResolveGenericWhenValueTuple()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+                {
+                    var instance = container.Resolve<(IMyGenericService<string, int> a, IMyGenericService<string, int> b)>();
+
+                    // Then
+                    instance.a.ShouldBeOfType<MyGenericService<string, int>>();
+                    instance.b.ShouldBeOfType<MyGenericService<string, int>>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveGenericWhenValueTask()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+                {
+                    var instance = container.Resolve<ValueTask<IMyGenericService<string, int>>>().Result;
+
+                    // Then
+                    instance.ShouldBeOfType<MyGenericService<string, int>>();
+                }
+            }
+        }
+#endif
     }
 }

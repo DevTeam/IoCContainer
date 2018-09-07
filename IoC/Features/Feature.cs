@@ -40,7 +40,7 @@
             CoreSet,
             new[]
             {
-                CollectionFeature.Light,
+                CollectionFeature.Default,
                 FuncFeature.Light,
                 TaskFeature.Default,
                 TupleFeature.Light,
