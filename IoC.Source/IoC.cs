@@ -1146,7 +1146,7 @@ namespace IoC
     [PublicAPI]
     [DebuggerDisplay("Name = {" + nameof(ToString) + "()}")]
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
-    public sealed class Container: IContainer, IObserver<ContainerEvent>
+    public sealed class Container: IContainer
     {
         private static long _containerId;
         [NotNull] private static readonly Lazy<Container> CoreRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.CoreSet), true);
@@ -1161,6 +1161,7 @@ namespace IoC
         [NotNull] private Table<ShortKey, DependencyEntry> _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
         [NotNull] internal volatile Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
         [NotNull] internal volatile Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
+        private RegistrationTracker _registrationTracker;
 
         /// <summary>
         /// Creates a root container with default features.
@@ -1203,29 +1204,33 @@ namespace IoC
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (parentContainer == null) throw new ArgumentNullException(nameof(parentContainer));
-            return new Container(CreateContainerName(name), parentContainer, true);
+            return new Container(CreateContainerName(name), parentContainer);
         }
 
         private static Container CreateRootContainer([NotNull][ItemNotNull] IEnumerable<IConfiguration> configurations)
         {
-            var container = new Container(string.Empty, NullContainer.Shared, true);
+            var container = new Container(string.Empty, NullContainer.Shared);
             container.ApplyConfigurations(configurations);
             return container;
         }
 
-        internal Container([NotNull] string name, [NotNull] IContainer parent, bool root)
+        internal Container([NotNull] string name, [NotNull] IContainer parent)
         {
             _name = $"{parent}/{name ?? throw new ArgumentNullException(nameof(name))}";
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            _registrationTracker = new RegistrationTracker(this);
 
             // Subscribe to events from the parent container
             RegisterResource(_parent.Subscribe(_eventSubject));
 
-            // Subscribe to reset resolvers
-            RegisterResource(_eventSubject.Subscribe(this));
+            // Creates a subscription to track infrastructure registrations
+            RegisterResource(_eventSubject.Subscribe(_registrationTracker));
 
-            // Register current container in the parent container.
+            // Register the current container in the parent container
             _parent.RegisterResource(this);
+
+            // Notifies about existing registrations in parent containers
+            _eventSubject.OnNext(new ContainerEvent(_parent, EventType.DependencyRegistration, _parent.SelectMany(i => i)));
         }
 
         /// <inheritdoc />
@@ -1264,6 +1269,8 @@ namespace IoC
                             TryUnregister(curKey, curKey, ref _dependencies);
                         }
                     }
+
+                    _eventSubject.OnNext(new ContainerEvent(this, EventType.DependencyUnregistration, registeredKeys));
                 }
             }
 
@@ -1285,7 +1292,7 @@ namespace IoC
                             isRegistered &= dependenciesForTagAny.GetByRef(hashCode, key.Type) == default(DependencyEntry);
                             if (isRegistered)
                             {
-                                Register(key, key.Type, hashCode, dependencyEntry, ref dependenciesForTagAny);
+                                dependenciesForTagAny = dependenciesForTagAny.Set(hashCode, key.Type, dependencyEntry);
                             }
                         }
                         else
@@ -1294,7 +1301,7 @@ namespace IoC
                             isRegistered &= dependencies.Get(hashCode, key) == default(DependencyEntry);
                             if (isRegistered)
                             {
-                                Register(key, key, hashCode, dependencyEntry, ref dependencies);
+                                dependencies = dependencies.Set(hashCode, key, dependencyEntry);
                             }
                         }
 
@@ -1310,6 +1317,7 @@ namespace IoC
                     {
                         _dependenciesForTagAny = dependenciesForTagAny;
                         _dependencies = dependencies;
+                        _eventSubject.OnNext(new ContainerEvent(this, EventType.DependencyRegistration, registeredKeys));
                     }
                 }
             }
@@ -1343,7 +1351,7 @@ namespace IoC
             if (tag == null)
             {
                 hashCode = type.GetHashCode();
-                resolver = (Resolver<T>) ResolversByType.GetByRef(hashCode, type);
+                resolver = (Resolver<T>)ResolversByType.GetByRef(hashCode, type);
                 if (resolver != default(Resolver<T>)) // found in resolvers by type
                 {
                     error = default(Exception);
@@ -1365,20 +1373,26 @@ namespace IoC
             }
 
             // tries finding in dependencies
-            if (TryGetDependency(key, hashCode, out var dependencyEntry))
+            bool hasDependency;
+            lock (_eventSubject)
             {
-                // tries creating resolver
-                resolvingContainer = resolvingContainer ?? this;
-                resolvingContainer = dependencyEntry.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
-                if (!dependencyEntry.TryCreateResolver(key, resolvingContainer, out var resolverDelegate, out error))
+                hasDependency = TryGetDependency(key, hashCode, out var dependencyEntry);
+                if (hasDependency)
                 {
-                    resolver = default(Resolver<T>);
-                    return false;
-                }
+                    // tries creating resolver
+                    resolvingContainer = resolvingContainer ?? this;
+                    resolvingContainer = dependencyEntry.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
+                    if (!dependencyEntry.TryCreateResolver(key, resolvingContainer, _registrationTracker.Builders, out var resolverDelegate, out error))
+                    {
+                        resolver = default(Resolver<T>);
+                        return false;
+                    }
 
-                resolver = (Resolver<T>)resolverDelegate;
+                    resolver = (Resolver<T>) resolverDelegate;
+                }
             }
-            else
+
+            if (!hasDependency)
             {
                 // tries finding in parent
                 if (!_parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer ?? this))
@@ -1431,8 +1445,7 @@ namespace IoC
                 entriesToDispose.AddRange(_resources);
                 _dependencies = Table<FullKey, DependencyEntry>.Empty;
                 _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
-                Resolvers = Table<FullKey, ResolverDelegate>.Empty;
-                ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
+                Reset();
                 _resources.Clear();
             }
 
@@ -1483,7 +1496,7 @@ namespace IoC
             return _eventSubject.Subscribe(observer);
         }
         
-        void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
+        internal void Reset()
         {
             lock (_eventSubject)
             {
@@ -1491,10 +1504,6 @@ namespace IoC
                 ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
             }
         }
-
-        void IObserver<ContainerEvent>.OnError(Exception error) { }
-
-        void IObserver<ContainerEvent>.OnCompleted() { }
 
         [MethodImpl((MethodImplOptions) 256)]
         private IEnumerable<IEnumerable<FullKey>> GetAllKeys()
@@ -1506,13 +1515,6 @@ namespace IoC
         }
 
         [MethodImpl((MethodImplOptions) 256)]
-        private void Register<TKey>(FullKey originalKey, TKey key, int hashCode, [NotNull] DependencyEntry dependencyEntry, [NotNull] ref Table<TKey, DependencyEntry> entries)
-        {
-            entries = entries.Set(hashCode, key, dependencyEntry);
-            _eventSubject.OnNext(new ContainerEvent(this, EventType.DependencyRegistration, originalKey));
-        }
-
-        [MethodImpl((MethodImplOptions) 256)]
         private bool TryUnregister<TKey>(FullKey originalKey, TKey key, [NotNull] ref Table<TKey, DependencyEntry> entries)
         {
             entries = entries.Remove(key.GetHashCode(), key, out var unregistered);
@@ -1521,7 +1523,6 @@ namespace IoC
                 return false;
             }
 
-            _eventSubject.OnNext(new ContainerEvent(this, EventType.DependencyUnregistration, originalKey));
             return true;
         }
 
@@ -1603,6 +1604,7 @@ namespace IoC
 namespace IoC
 {
     using System;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Provides information about changes in the container.
@@ -1621,15 +1623,15 @@ namespace IoC
         public readonly EventType EventTypeType;
 
         /// <summary>
-        /// The changed binding key.
+        /// The changed keys.
         /// </summary>
-        public readonly Key Key;
+        public readonly IEnumerable<Key> Keys;
 
-        internal ContainerEvent([NotNull] IContainer container, EventType eventTypeType, Key key)
+        internal ContainerEvent([NotNull] IContainer container, EventType eventTypeType, IEnumerable<Key> keys)
         {
             Container = container ?? throw new ArgumentNullException(nameof(container));
             EventTypeType = eventTypeType;
-            Key = key;
+            Keys = keys;
         }
     }
 }
@@ -3305,6 +3307,29 @@ namespace IoC
 }
 
 #endregion
+#region IBuilder
+
+namespace IoC
+{
+    using System.Linq.Expressions;
+
+    /// <summary>
+    /// Represents a builder for an instance.
+    /// </summary>
+    public interface IBuilder
+    {
+        /// <summary>
+        /// Builds the expression.
+        /// </summary>
+        /// <param name="bodyExpression">The expression body to get an instance.</param>
+        /// <param name="buildContext">The build context.</param>
+        /// <returns>The new expression.</returns>
+        [NotNull] Expression Build([NotNull] Expression bodyExpression, [NotNull] IBuildContext buildContext);
+    }
+}
+
+
+#endregion
 #region IConfiguration
 
 namespace IoC
@@ -3527,22 +3552,13 @@ namespace IoC
 namespace IoC
 {
     using System;
-    using System.Linq.Expressions;
 
     /// <summary>
     /// Represents a lifetime for an instance.
     /// </summary>
     [PublicAPI]
-    public interface ILifetime: IDisposable
+    public interface ILifetime: IBuilder, IDisposable
     {
-        /// <summary>
-        /// Builds the expression.
-        /// </summary>
-        /// <param name="bodyExpression">The expression body to get an instance.</param>
-        /// <param name="buildContext">The build context.</param>
-        /// <returns>The new expression.</returns>
-        [NotNull] Expression Build([NotNull] Expression bodyExpression, [NotNull] IBuildContext buildContext);
-
         /// <summary>
         /// Creates the similar lifetime to use with generic instances.
         /// </summary>
@@ -4292,7 +4308,7 @@ namespace IoC.Features
                 ctx => new Container(
                     ctx.Args.Length == 1
                         ? Container.CreateContainerName(ctx.Args[0] as string)
-                        : Container.CreateContainerName(string.Empty), ctx.Container, false),
+                        : Container.CreateContainerName(string.Empty), ctx.Container),
                 null,
                 new object[] { WellknownContainers.NewChild });
             // Parent
@@ -4390,17 +4406,17 @@ namespace IoC.Features
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register<Func<TT>>(ctx => (() => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container)), null, Feature.AnyTag);
-            yield return container.Register<Func<TT1, TT>>(ctx => (arg1 => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1)), null, Feature.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT>>(ctx => ((arg1, arg2) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2)), null, Feature.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT>>(ctx => ((arg1, arg2, arg3) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3)), null, Feature.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT>>(ctx => ((arg1, arg2, arg3, arg4) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4)), null, Feature.AnyTag);
+            yield return container.Register<Func<TT>>(ctx => () => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container), null, Feature.AnyTag);
+            yield return container.Register<Func<TT1, TT>>(ctx => arg1 => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1), null, Feature.AnyTag);
+            yield return container.Register<Func<TT1, TT2, TT>>(ctx => (arg1, arg2) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2), null, Feature.AnyTag);
+            yield return container.Register<Func<TT1, TT2, TT3, TT>>(ctx => (arg1, arg2, arg3) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3), null, Feature.AnyTag);
+            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT>>(ctx => (arg1, arg2, arg3, arg4) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4), null, Feature.AnyTag);
             if (!_light)
             {
-                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT>>(ctx => ((arg1, arg2, arg3, arg4, arg5) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5)), null, Feature.AnyTag);
-                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>>(ctx => ((arg1, arg2, arg3, arg4, arg5, arg6) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6)), null, Feature.AnyTag);
-                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>>(ctx => ((arg1, arg2, arg3, arg4, arg5, arg6, arg7) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7)), null, Feature.AnyTag);
-                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>>(ctx => ((arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8)), null, Feature.AnyTag);
+                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5), null, Feature.AnyTag);
+                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6), null, Feature.AnyTag);
+                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6, arg7) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7), null, Feature.AnyTag);
+                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8), null, Feature.AnyTag);
             }
         }
     }
@@ -4466,7 +4482,7 @@ namespace IoC.Features
 #endif
         }
 
-        internal static Task<T> StartTask<T>(Task<T> task, TaskScheduler taskScheduler)
+        private static Task<T> StartTask<T>(Task<T> task, TaskScheduler taskScheduler)
         {
             task.Start(taskScheduler);
             return task;
@@ -5093,17 +5109,20 @@ namespace IoC.Core
     [PublicAPI]
     internal class BuildContext : IBuildContext
     {
+        private static readonly ICollection<IBuilder> EmptyBuilders = new List<IBuilder>();
         // Should be at least internal to be accessible from for compiled code from expressions
         private readonly ICollection<IDisposable> _resources;
+        [NotNull] private readonly ICollection<IBuilder> _builders;
         private readonly List<ParameterExpression> _parameters = new List<ParameterExpression>();
         private readonly List<Expression> _statements = new List<Expression>();
         private int _curId;
 
-        internal BuildContext(Key key, [NotNull] IContainer resolvingContainer, [NotNull] ICollection<IDisposable> resources, int depth = 0)
+        internal BuildContext(Key key, [NotNull] IContainer resolvingContainer, [NotNull] ICollection<IDisposable> resources, [NotNull] ICollection<IBuilder> builders, int depth = 0)
         {
             Key = key;
             Container = resolvingContainer ?? throw new ArgumentNullException(nameof(resolvingContainer));
             _resources = resources ?? throw new ArgumentNullException(nameof(resources));
+            _builders = builders ?? throw new ArgumentNullException(nameof(builders));
             Depth = depth;
         }
 
@@ -5116,10 +5135,7 @@ namespace IoC.Core
         public IBuildContext CreateChild(Key key, IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            var child = new BuildContext(key, container, _resources, Depth + 1);
-            child._parameters.AddRange(_parameters);
-            child._statements.AddRange(_statements);
-            return child;
+            return CreateChildInternal(key, container);
         }
 
         public Expression AppendValue(object value, Type type)
@@ -5148,9 +5164,19 @@ namespace IoC.Core
 
         public Expression AppendLifetime(Expression baseExpression, ILifetime lifetime)
         {
-            var expression = baseExpression.Convert(Key.Type);
-            expression = LifetimeExpressionBuilder.Shared.Build(expression, this, lifetime);
-            return CloseBlock(expression);
+            if (_builders.Count > 0)
+            {
+                var buildContext = CreateChildInternal(Key, Container, forBuilders: true);
+                foreach (var builder in _builders)
+                {
+                    baseExpression = baseExpression.Convert(Key.Type);
+                    baseExpression = builder.Build(baseExpression, buildContext);
+                }
+            }
+
+            baseExpression = baseExpression.Convert(Key.Type);
+            baseExpression = LifetimeExpressionBuilder.Shared.Build(baseExpression, this, lifetime);
+            return CloseBlock(baseExpression);
         }
 
         public Expression CloseBlock(Expression targetExpression, params ParameterExpression[] variableExpressions)
@@ -5183,6 +5209,14 @@ namespace IoC.Core
 
             _statements.Add(targetExpression);
             return Expression.Block(_parameters, _statements);
+        }
+
+        public IBuildContext CreateChildInternal(Key key, IContainer container, bool forBuilders = false)
+        {
+            var child = new BuildContext(key, container, _resources, forBuilders ? EmptyBuilders : _builders, Depth + 1);
+            child._parameters.AddRange(_parameters);
+            child._statements.AddRange(_statements);
+            return child;
         }
 
         [MethodImpl((MethodImplOptions)256)]
@@ -5507,10 +5541,10 @@ namespace IoC.Core
             }
         }
 
-        public bool TryCreateResolver(Key key, [NotNull] IContainer resolvingContainer, out Delegate resolver, out Exception error)
+        public bool TryCreateResolver(Key key, [NotNull] IContainer resolvingContainer, [NotNull] ICollection<IBuilder> builders, out Delegate resolver, out Exception error)
         {
             var typeDescriptor = key.Type.Descriptor();
-            var buildContext = new BuildContext(key, resolvingContainer, _resources);
+            var buildContext = new BuildContext(key, resolvingContainer, _resources, builders);
             if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression, out error))
             {
                 resolver = default(Delegate);
@@ -6503,6 +6537,62 @@ namespace IoC.Core
         public override string ToString() => string.Empty;
     }
 }
+
+#endregion
+#region RegistrationTracker
+
+namespace IoC.Core
+{
+    using System;
+    using System.Collections.Generic;
+
+    internal class RegistrationTracker: IObserver<ContainerEvent>
+    {
+        private readonly Container _container;
+        private readonly Dictionary<Key, IBuilder> _builders = new Dictionary<Key, IBuilder>();
+
+        public RegistrationTracker(Container container)
+        {
+            _container = container;
+        }
+
+        public ICollection<IBuilder> Builders => _builders.Values;
+
+        public void OnNext(ContainerEvent value)
+        {
+            _container.Reset();
+            switch (value.EventTypeType)
+            {
+                case EventType.DependencyRegistration:
+                    foreach (var key in value.Keys)
+                    {
+                        if (key.Type == typeof(IBuilder))
+                        {
+                            if (value.Container.TryGetResolver<IBuilder>(key.Type, key.Tag, out var resolver, out _, value.Container))
+                            {
+                                _builders[key] = resolver(value.Container);
+                            }
+                        }
+                    }
+
+                    break;
+
+                case EventType.DependencyUnregistration:
+                    foreach (var key in value.Keys)
+                    {
+                        _builders.Remove(key);
+                    }
+
+                    break;
+            }
+        }
+
+        public void OnError(Exception error) { }
+
+        public void OnCompleted() { }
+    }
+}
+
 
 #endregion
 #region Subject

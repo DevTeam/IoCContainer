@@ -32,10 +32,10 @@
             }
         }
 
-        public bool TryCreateResolver(Key key, [NotNull] IContainer resolvingContainer, out Delegate resolver, out Exception error)
+        public bool TryCreateResolver(Key key, [NotNull] IContainer resolvingContainer, [NotNull] ICollection<IBuilder> builders, out Delegate resolver, out Exception error)
         {
             var typeDescriptor = key.Type.Descriptor();
-            var buildContext = new BuildContext(key, resolvingContainer, _resources);
+            var buildContext = new BuildContext(key, resolvingContainer, _resources, builders);
             if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression, out error))
             {
                 resolver = default(Delegate);

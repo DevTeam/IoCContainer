@@ -14,17 +14,20 @@
     [PublicAPI]
     internal class BuildContext : IBuildContext
     {
+        private static readonly ICollection<IBuilder> EmptyBuilders = new List<IBuilder>();
         // Should be at least internal to be accessible from for compiled code from expressions
         private readonly ICollection<IDisposable> _resources;
+        [NotNull] private readonly ICollection<IBuilder> _builders;
         private readonly List<ParameterExpression> _parameters = new List<ParameterExpression>();
         private readonly List<Expression> _statements = new List<Expression>();
         private int _curId;
 
-        internal BuildContext(Key key, [NotNull] IContainer resolvingContainer, [NotNull] ICollection<IDisposable> resources, int depth = 0)
+        internal BuildContext(Key key, [NotNull] IContainer resolvingContainer, [NotNull] ICollection<IDisposable> resources, [NotNull] ICollection<IBuilder> builders, int depth = 0)
         {
             Key = key;
             Container = resolvingContainer ?? throw new ArgumentNullException(nameof(resolvingContainer));
             _resources = resources ?? throw new ArgumentNullException(nameof(resources));
+            _builders = builders ?? throw new ArgumentNullException(nameof(builders));
             Depth = depth;
         }
 
@@ -37,10 +40,7 @@
         public IBuildContext CreateChild(Key key, IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            var child = new BuildContext(key, container, _resources, Depth + 1);
-            child._parameters.AddRange(_parameters);
-            child._statements.AddRange(_statements);
-            return child;
+            return CreateChildInternal(key, container);
         }
 
         public Expression AppendValue(object value, Type type)
@@ -69,9 +69,19 @@
 
         public Expression AppendLifetime(Expression baseExpression, ILifetime lifetime)
         {
-            var expression = baseExpression.Convert(Key.Type);
-            expression = LifetimeExpressionBuilder.Shared.Build(expression, this, lifetime);
-            return CloseBlock(expression);
+            if (_builders.Count > 0)
+            {
+                var buildContext = CreateChildInternal(Key, Container, forBuilders: true);
+                foreach (var builder in _builders)
+                {
+                    baseExpression = baseExpression.Convert(Key.Type);
+                    baseExpression = builder.Build(baseExpression, buildContext);
+                }
+            }
+
+            baseExpression = baseExpression.Convert(Key.Type);
+            baseExpression = LifetimeExpressionBuilder.Shared.Build(baseExpression, this, lifetime);
+            return CloseBlock(baseExpression);
         }
 
         public Expression CloseBlock(Expression targetExpression, params ParameterExpression[] variableExpressions)
@@ -104,6 +114,14 @@
 
             _statements.Add(targetExpression);
             return Expression.Block(_parameters, _statements);
+        }
+
+        public IBuildContext CreateChildInternal(Key key, IContainer container, bool forBuilders = false)
+        {
+            var child = new BuildContext(key, container, _resources, forBuilders ? EmptyBuilders : _builders, Depth + 1);
+            child._parameters.AddRange(_parameters);
+            child._statements.AddRange(_statements);
+            return child;
         }
 
         [MethodImpl((MethodImplOptions)256)]

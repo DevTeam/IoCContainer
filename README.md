@@ -310,6 +310,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Resolve Using Arguments](#resolve-using-arguments)
   - [Resolve all appropriate instances as ISet](#resolve-all-appropriate-instances-as-iset)
 - Fully Customizable
+  - [Custom Builder](#custom-builder)
   - [Custom Child Container](#custom-child-container)
   - [Custom Lifetime](#custom-lifetime)
   - [Replace Lifetime](#replace-lifetime)
@@ -848,6 +849,40 @@ public class Logger : ILogger
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AspectOrientedAutowiring.cs)
+
+### Custom Builder
+
+``` CSharp
+public void Run()
+{
+    // Create a container
+    using (var container = Container.Create())
+    // Configure the container
+    using (container.Bind<IDependency>().To<Dependency>())
+    using (container.Bind<IService>().To<Service>())
+    // Add custom builder
+    using (container.Bind<IBuilder>().To<MyBuilder>())
+    {
+        // Resolve an instance
+        var instance1 = container.Resolve<IService>();
+        var instance2 = container.Resolve<IService>();
+
+        instance1.ShouldBeOfType<Service>();
+        instance1.ShouldBe(instance2);
+    }
+}
+
+// This custom builder just add the Singleton lifetime for any instances
+// Also it can be used, for instance, to create proxies
+public class MyBuilder : IBuilder
+{
+    public Expression Build(Expression expression, IBuildContext buildContext)
+    {
+        return buildContext.AppendLifetime(expression, new Lifetimes.SingletonLifetime());
+    }
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomBuilder.cs)
 
 ### Custom Child Container
 

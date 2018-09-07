@@ -666,9 +666,9 @@
             The type of event.
             </summary>
         </member>
-        <member name="F:IoC.ContainerEvent.Key">
+        <member name="F:IoC.ContainerEvent.Keys">
             <summary>
-            The changed binding key.
+            The changed keys.
             </summary>
         </member>
         <member name="T:IoC.Context`1">
@@ -1822,6 +1822,19 @@
             <param name="variableExpressions">Variable expressions.</param>
             <returns>The resulting block expression.</returns>
         </member>
+        <member name="T:IoC.IBuilder">
+            <summary>
+            Represents a builder for an instance.
+            </summary>
+        </member>
+        <member name="M:IoC.IBuilder.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)">
+            <summary>
+            Builds the expression.
+            </summary>
+            <param name="bodyExpression">The expression body to get an instance.</param>
+            <param name="buildContext">The build context.</param>
+            <returns>The new expression.</returns>
+        </member>
         <member name="T:IoC.IConfiguration">
             <summary>
             The container's configuration.
@@ -1993,14 +2006,6 @@
             <summary>
             Represents a lifetime for an instance.
             </summary>
-        </member>
-        <member name="M:IoC.ILifetime.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)">
-            <summary>
-            Builds the expression.
-            </summary>
-            <param name="bodyExpression">The expression body to get an instance.</param>
-            <param name="buildContext">The build context.</param>
-            <returns>The new expression.</returns>
         </member>
         <member name="M:IoC.ILifetime.Create">
             <summary>

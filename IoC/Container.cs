@@ -22,7 +22,7 @@
     [PublicAPI]
     [DebuggerDisplay("Name = {" + nameof(ToString) + "()}")]
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
-    public sealed class Container: IContainer, IObserver<ContainerEvent>
+    public sealed class Container: IContainer
     {
         private static long _containerId;
         [NotNull] private static readonly Lazy<Container> CoreRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.CoreSet), true);
@@ -37,6 +37,7 @@
         [NotNull] private Table<ShortKey, DependencyEntry> _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
         [NotNull] internal volatile Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
         [NotNull] internal volatile Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
+        private RegistrationTracker _registrationTracker;
 
         /// <summary>
         /// Creates a root container with default features.
@@ -79,29 +80,33 @@
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (parentContainer == null) throw new ArgumentNullException(nameof(parentContainer));
-            return new Container(CreateContainerName(name), parentContainer, true);
+            return new Container(CreateContainerName(name), parentContainer);
         }
 
         private static Container CreateRootContainer([NotNull][ItemNotNull] IEnumerable<IConfiguration> configurations)
         {
-            var container = new Container(string.Empty, NullContainer.Shared, true);
+            var container = new Container(string.Empty, NullContainer.Shared);
             container.ApplyConfigurations(configurations);
             return container;
         }
 
-        internal Container([NotNull] string name, [NotNull] IContainer parent, bool root)
+        internal Container([NotNull] string name, [NotNull] IContainer parent)
         {
             _name = $"{parent}/{name ?? throw new ArgumentNullException(nameof(name))}";
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            _registrationTracker = new RegistrationTracker(this);
 
             // Subscribe to events from the parent container
             RegisterResource(_parent.Subscribe(_eventSubject));
 
-            // Subscribe to reset resolvers
-            RegisterResource(_eventSubject.Subscribe(this));
+            // Creates a subscription to track infrastructure registrations
+            RegisterResource(_eventSubject.Subscribe(_registrationTracker));
 
-            // Register current container in the parent container.
+            // Register the current container in the parent container
             _parent.RegisterResource(this);
+
+            // Notifies about existing registrations in parent containers
+            _eventSubject.OnNext(new ContainerEvent(_parent, EventType.DependencyRegistration, _parent.SelectMany(i => i)));
         }
 
         /// <inheritdoc />
@@ -140,6 +145,8 @@
                             TryUnregister(curKey, curKey, ref _dependencies);
                         }
                     }
+
+                    _eventSubject.OnNext(new ContainerEvent(this, EventType.DependencyUnregistration, registeredKeys));
                 }
             }
 
@@ -161,7 +168,7 @@
                             isRegistered &= dependenciesForTagAny.GetByRef(hashCode, key.Type) == default(DependencyEntry);
                             if (isRegistered)
                             {
-                                Register(key, key.Type, hashCode, dependencyEntry, ref dependenciesForTagAny);
+                                dependenciesForTagAny = dependenciesForTagAny.Set(hashCode, key.Type, dependencyEntry);
                             }
                         }
                         else
@@ -170,7 +177,7 @@
                             isRegistered &= dependencies.Get(hashCode, key) == default(DependencyEntry);
                             if (isRegistered)
                             {
-                                Register(key, key, hashCode, dependencyEntry, ref dependencies);
+                                dependencies = dependencies.Set(hashCode, key, dependencyEntry);
                             }
                         }
 
@@ -186,6 +193,7 @@
                     {
                         _dependenciesForTagAny = dependenciesForTagAny;
                         _dependencies = dependencies;
+                        _eventSubject.OnNext(new ContainerEvent(this, EventType.DependencyRegistration, registeredKeys));
                     }
                 }
             }
@@ -219,7 +227,7 @@
             if (tag == null)
             {
                 hashCode = type.GetHashCode();
-                resolver = (Resolver<T>) ResolversByType.GetByRef(hashCode, type);
+                resolver = (Resolver<T>)ResolversByType.GetByRef(hashCode, type);
                 if (resolver != default(Resolver<T>)) // found in resolvers by type
                 {
                     error = default(Exception);
@@ -241,20 +249,26 @@
             }
 
             // tries finding in dependencies
-            if (TryGetDependency(key, hashCode, out var dependencyEntry))
+            bool hasDependency;
+            lock (_eventSubject)
             {
-                // tries creating resolver
-                resolvingContainer = resolvingContainer ?? this;
-                resolvingContainer = dependencyEntry.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
-                if (!dependencyEntry.TryCreateResolver(key, resolvingContainer, out var resolverDelegate, out error))
+                hasDependency = TryGetDependency(key, hashCode, out var dependencyEntry);
+                if (hasDependency)
                 {
-                    resolver = default(Resolver<T>);
-                    return false;
-                }
+                    // tries creating resolver
+                    resolvingContainer = resolvingContainer ?? this;
+                    resolvingContainer = dependencyEntry.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
+                    if (!dependencyEntry.TryCreateResolver(key, resolvingContainer, _registrationTracker.Builders, out var resolverDelegate, out error))
+                    {
+                        resolver = default(Resolver<T>);
+                        return false;
+                    }
 
-                resolver = (Resolver<T>)resolverDelegate;
+                    resolver = (Resolver<T>) resolverDelegate;
+                }
             }
-            else
+
+            if (!hasDependency)
             {
                 // tries finding in parent
                 if (!_parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer ?? this))
@@ -307,8 +321,7 @@
                 entriesToDispose.AddRange(_resources);
                 _dependencies = Table<FullKey, DependencyEntry>.Empty;
                 _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
-                Resolvers = Table<FullKey, ResolverDelegate>.Empty;
-                ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
+                Reset();
                 _resources.Clear();
             }
 
@@ -359,7 +372,7 @@
             return _eventSubject.Subscribe(observer);
         }
         
-        void IObserver<ContainerEvent>.OnNext(ContainerEvent value)
+        internal void Reset()
         {
             lock (_eventSubject)
             {
@@ -367,10 +380,6 @@
                 ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
             }
         }
-
-        void IObserver<ContainerEvent>.OnError(Exception error) { }
-
-        void IObserver<ContainerEvent>.OnCompleted() { }
 
         [MethodImpl((MethodImplOptions) 256)]
         private IEnumerable<IEnumerable<FullKey>> GetAllKeys()
@@ -382,13 +391,6 @@
         }
 
         [MethodImpl((MethodImplOptions) 256)]
-        private void Register<TKey>(FullKey originalKey, TKey key, int hashCode, [NotNull] DependencyEntry dependencyEntry, [NotNull] ref Table<TKey, DependencyEntry> entries)
-        {
-            entries = entries.Set(hashCode, key, dependencyEntry);
-            _eventSubject.OnNext(new ContainerEvent(this, EventType.DependencyRegistration, originalKey));
-        }
-
-        [MethodImpl((MethodImplOptions) 256)]
         private bool TryUnregister<TKey>(FullKey originalKey, TKey key, [NotNull] ref Table<TKey, DependencyEntry> entries)
         {
             entries = entries.Remove(key.GetHashCode(), key, out var unregistered);
@@ -397,7 +399,6 @@
                 return false;
             }
 
-            _eventSubject.OnNext(new ContainerEvent(this, EventType.DependencyUnregistration, originalKey));
             return true;
         }
 

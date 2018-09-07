@@ -1,6 +1,7 @@
 ﻿namespace IoC
 {
     using System;
+    using System.Collections.Generic;
 
     /// <summary>
     /// Provides information about changes in the container.
@@ -19,15 +20,15 @@
         public readonly EventType EventTypeType;
 
         /// <summary>
-        /// The changed binding key.
+        /// The changed keys.
         /// </summary>
-        public readonly Key Key;
+        public readonly IEnumerable<Key> Keys;
 
-        internal ContainerEvent([NotNull] IContainer container, EventType eventTypeType, Key key)
+        internal ContainerEvent([NotNull] IContainer container, EventType eventTypeType, IEnumerable<Key> keys)
         {
             Container = container ?? throw new ArgumentNullException(nameof(container));
             EventTypeType = eventTypeType;
-            Key = key;
+            Keys = keys;
         }
     }
 }

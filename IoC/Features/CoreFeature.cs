@@ -43,7 +43,7 @@
                 ctx => new Container(
                     ctx.Args.Length == 1
                         ? Container.CreateContainerName(ctx.Args[0] as string)
-                        : Container.CreateContainerName(string.Empty), ctx.Container, false),
+                        : Container.CreateContainerName(string.Empty), ctx.Container),
                 null,
                 new object[] { WellknownContainers.NewChild });
             // Parent
