@@ -1382,7 +1382,7 @@ namespace IoC
                     // tries creating resolver
                     resolvingContainer = resolvingContainer ?? this;
                     resolvingContainer = dependencyEntry.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
-                    if (!dependencyEntry.TryCreateResolver(key, resolvingContainer, _registrationTracker.Builders, out var resolverDelegate, out error))
+                    if (!dependencyEntry.TryCreateResolver(key, resolvingContainer, _registrationTracker.Builders, _registrationTracker.AutowiringStrategy, out var resolverDelegate, out error))
                     {
                         resolver = default(Resolver<T>);
                         return false;
@@ -3248,6 +3248,11 @@ namespace IoC
         /// The target container.
         /// </summary>
         [NotNull] IContainer Container { get; }
+
+        /// <summary>
+        /// Autowiring strategy.
+        /// </summary>
+        [NotNull] IAutowiringStrategy AutowiringStrategy { get; }
 
         /// <summary>
         /// Creates a child context.
@@ -5117,18 +5122,27 @@ namespace IoC.Core
         private readonly List<Expression> _statements = new List<Expression>();
         private int _curId;
 
-        internal BuildContext(Key key, [NotNull] IContainer resolvingContainer, [NotNull] ICollection<IDisposable> resources, [NotNull] ICollection<IBuilder> builders, int depth = 0)
+        internal BuildContext(
+            Key key,
+            [NotNull] IContainer resolvingContainer,
+            [NotNull] ICollection<IDisposable> resources,
+            [NotNull] ICollection<IBuilder> builders,
+            [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
+            int depth = 0)
         {
             Key = key;
             Container = resolvingContainer ?? throw new ArgumentNullException(nameof(resolvingContainer));
             _resources = resources ?? throw new ArgumentNullException(nameof(resources));
             _builders = builders ?? throw new ArgumentNullException(nameof(builders));
+            AutowiringStrategy = defaultAutowiringStrategy ?? throw new ArgumentNullException(nameof(defaultAutowiringStrategy));
             Depth = depth;
         }
 
         public Key Key { get; }
 
         public IContainer Container { get; }
+
+        public IAutowiringStrategy AutowiringStrategy { get; }
 
         public int Depth { get; }
 
@@ -5213,7 +5227,7 @@ namespace IoC.Core
 
         public IBuildContext CreateChildInternal(Key key, IContainer container, bool forBuilders = false)
         {
-            var child = new BuildContext(key, container, _resources, forBuilders ? EmptyBuilders : _builders, Depth + 1);
+            var child = new BuildContext(key, container, _resources, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
             child._parameters.AddRange(_parameters);
             child._statements.AddRange(_statements);
             return child;
@@ -5541,10 +5555,16 @@ namespace IoC.Core
             }
         }
 
-        public bool TryCreateResolver(Key key, [NotNull] IContainer resolvingContainer, [NotNull] ICollection<IBuilder> builders, out Delegate resolver, out Exception error)
+        public bool TryCreateResolver(
+            Key key,
+            [NotNull] IContainer resolvingContainer,
+            [NotNull] ICollection<IBuilder> builders,
+            [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
+            out Delegate resolver,
+            out Exception error)
         {
             var typeDescriptor = key.Type.Descriptor();
-            var buildContext = new BuildContext(key, resolvingContainer, _resources, builders);
+            var buildContext = new BuildContext(key, resolvingContainer, _resources, builders, defaultAutowiringStrategy);
             if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression, out error))
             {
                 resolver = default(Delegate);
@@ -6196,47 +6216,34 @@ namespace IoC.Core
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            var autoWiringStrategy = _autowiringStrategy;
-            if (
-                autoWiringStrategy == null
-                && buildContext.Key.Type != TypeDescriptor<IAutowiringStrategy>.Type
-                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(TypeDescriptor<IAutowiringStrategy>.Type, null, out var autoWiringStrategyResolver, out error))
-            {
-                autoWiringStrategy = autoWiringStrategyResolver(buildContext.Container);
-            }
-
-            Type instanceType = null;
-            if (!(autoWiringStrategy?.TryResolveType(_type, buildContext.Key.Type, out instanceType) ?? false))
+            var autoWiringStrategy = _autowiringStrategy ?? buildContext.AutowiringStrategy;
+            if (!autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
             {
                 if (!DefaultAutowiringStrategy.Shared.TryResolveType(_type, buildContext.Key.Type, out instanceType))
                 {
-                    instanceType = null;
+                    instanceType = buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type);
                 }
             }
 
-            var typeDescriptor = (instanceType ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)).Descriptor();
+            var typeDescriptor = instanceType.Descriptor();
+
             var defaultConstructors = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredConstructors());
-            IMethod<ConstructorInfo> ctor = null;
-            if (!(autoWiringStrategy?.TryResolveConstructor(defaultConstructors, out ctor) ?? false))
+            if (!autoWiringStrategy.TryResolveConstructor(defaultConstructors, out var ctor))
             {
                 if (!DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
                 {
-                    ctor = null;
+                    ctor = buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
                 }
             }
 
-            ctor = ctor ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
             var defaultMethods = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredMethods());
-            IEnumerable<IMethod<MethodInfo>> initializers = null;
-            if (!(autoWiringStrategy?.TryResolveInitializers(defaultMethods, out initializers) ?? false))
+            if (!autoWiringStrategy.TryResolveInitializers(defaultMethods, out var initializers))
             {
                 if (!DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
                 {
-                    initializers = null;
+                    initializers = Enumerable.Empty<IMethod<MethodInfo>>();
                 }
             }
-
-            initializers = initializers ?? Enumerable.Empty<IMethod<MethodInfo>>();
 
             var newExpression = _constructors.GetOrCreate(ctor.Info, () => Expression.New(ctor.Info, ctor.GetParametersExpressions()));
             var thisExpression = _this.GetOrCreate(typeDescriptor.AsType(), () =>
@@ -6549,14 +6556,19 @@ namespace IoC.Core
     internal class RegistrationTracker: IObserver<ContainerEvent>
     {
         private readonly Container _container;
-        private readonly Dictionary<Key, IBuilder> _builders = new Dictionary<Key, IBuilder>();
+        private readonly Dictionary<Key, object> _instances = new Dictionary<Key, object>();
+        private readonly List<IBuilder> _builders = new List<IBuilder>();
+        private readonly List<IAutowiringStrategy> _autowiringStrategies = new List<IAutowiringStrategy> { DefaultAutowiringStrategy.Shared };
 
         public RegistrationTracker(Container container)
         {
             _container = container;
+            _autowiringStrategies.Add(DefaultAutowiringStrategy.Shared);
         }
 
-        public ICollection<IBuilder> Builders => _builders.Values;
+        public ICollection<IBuilder> Builders => _builders;
+
+        public IAutowiringStrategy AutowiringStrategy => _autowiringStrategies[0];
 
         public void OnNext(ContainerEvent value)
         {
@@ -6564,14 +6576,17 @@ namespace IoC.Core
             switch (value.EventTypeType)
             {
                 case EventType.DependencyRegistration:
+                    var container = value.Container;
                     foreach (var key in value.Keys)
                     {
-                        if (key.Type == typeof(IBuilder))
+                        if (Track<IBuilder>(key, container, i => _builders.Add(i)))
                         {
-                            if (value.Container.TryGetResolver<IBuilder>(key.Type, key.Tag, out var resolver, out _, value.Container))
-                            {
-                                _builders[key] = resolver(value.Container);
-                            }
+                            continue;
+                        }
+
+                        if (Track<IAutowiringStrategy>(key, container, i => _autowiringStrategies.Insert(0, i)))
+                        {
+                            continue;
                         }
                     }
 
@@ -6580,7 +6595,21 @@ namespace IoC.Core
                 case EventType.DependencyUnregistration:
                     foreach (var key in value.Keys)
                     {
-                        _builders.Remove(key);
+                        if (_builders.Count > 0)
+                        {
+                            if (Untrack<IBuilder>(key, i => _builders.Remove(i)))
+                            {
+                                continue;
+                            }
+                        }
+
+                        if (_autowiringStrategies.Count > 1)
+                        {
+                            if (Untrack<IAutowiringStrategy>(key, i => _autowiringStrategies.Remove(i)))
+                            {
+                                continue;
+                            }
+                        }
                     }
 
                     break;
@@ -6590,6 +6619,40 @@ namespace IoC.Core
         public void OnError(Exception error) { }
 
         public void OnCompleted() { }
+
+        private bool Track<T>(Key key, IContainer container, Action<T> trackAction)
+        {
+            if (key.Type != typeof(T))
+            {
+                return false;
+            }
+
+            if (!container.TryGetResolver<T>(key.Type, key.Tag, out var resolver, out _, container))
+            {
+                return false;
+            }
+
+            var instance = resolver(container);
+            _instances[key] = instance;
+            trackAction(instance);
+            return true;
+        }
+
+        private bool Untrack<T>(Key key, Action<T> untrackAction)
+        {
+            if (key.Type != typeof(T))
+            {
+                return false;
+            }
+
+            if (!_instances.TryGetValue(key, out var instance))
+            {
+                return true;
+            }
+
+            untrackAction((T)instance);
+            return true;
+        }
     }
 }
 

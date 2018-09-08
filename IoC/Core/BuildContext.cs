@@ -22,18 +22,27 @@
         private readonly List<Expression> _statements = new List<Expression>();
         private int _curId;
 
-        internal BuildContext(Key key, [NotNull] IContainer resolvingContainer, [NotNull] ICollection<IDisposable> resources, [NotNull] ICollection<IBuilder> builders, int depth = 0)
+        internal BuildContext(
+            Key key,
+            [NotNull] IContainer resolvingContainer,
+            [NotNull] ICollection<IDisposable> resources,
+            [NotNull] ICollection<IBuilder> builders,
+            [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
+            int depth = 0)
         {
             Key = key;
             Container = resolvingContainer ?? throw new ArgumentNullException(nameof(resolvingContainer));
             _resources = resources ?? throw new ArgumentNullException(nameof(resources));
             _builders = builders ?? throw new ArgumentNullException(nameof(builders));
+            AutowiringStrategy = defaultAutowiringStrategy ?? throw new ArgumentNullException(nameof(defaultAutowiringStrategy));
             Depth = depth;
         }
 
         public Key Key { get; }
 
         public IContainer Container { get; }
+
+        public IAutowiringStrategy AutowiringStrategy { get; }
 
         public int Depth { get; }
 
@@ -118,7 +127,7 @@
 
         public IBuildContext CreateChildInternal(Key key, IContainer container, bool forBuilders = false)
         {
-            var child = new BuildContext(key, container, _resources, forBuilders ? EmptyBuilders : _builders, Depth + 1);
+            var child = new BuildContext(key, container, _resources, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
             child._parameters.AddRange(_parameters);
             child._statements.AddRange(_statements);
             return child;

@@ -25,6 +25,11 @@
         [NotNull] IContainer Container { get; }
 
         /// <summary>
+        /// Autowiring strategy.
+        /// </summary>
+        [NotNull] IAutowiringStrategy AutowiringStrategy { get; }
+
+        /// <summary>
         /// Creates a child context.
         /// </summary>
         /// <param name="key">The key</param>

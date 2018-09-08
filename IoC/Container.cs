@@ -258,7 +258,7 @@
                     // tries creating resolver
                     resolvingContainer = resolvingContainer ?? this;
                     resolvingContainer = dependencyEntry.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
-                    if (!dependencyEntry.TryCreateResolver(key, resolvingContainer, _registrationTracker.Builders, out var resolverDelegate, out error))
+                    if (!dependencyEntry.TryCreateResolver(key, resolvingContainer, _registrationTracker.Builders, _registrationTracker.AutowiringStrategy, out var resolverDelegate, out error))
                     {
                         resolver = default(Resolver<T>);
                         return false;

@@ -1767,6 +1767,11 @@
             The target container.
             </summary>
         </member>
+        <member name="P:IoC.IBuildContext.DefaultAutowiringStrategy">
+            <summary>
+            Default autowiring strategy.
+            </summary>
+        </member>
         <member name="M:IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)">
             <summary>
             Creates a child context.

@@ -26,47 +26,34 @@
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            var autoWiringStrategy = _autowiringStrategy;
-            if (
-                autoWiringStrategy == null
-                && buildContext.Key.Type != TypeDescriptor<IAutowiringStrategy>.Type
-                && buildContext.Container.TryGetResolver<IAutowiringStrategy>(TypeDescriptor<IAutowiringStrategy>.Type, null, out var autoWiringStrategyResolver, out error))
-            {
-                autoWiringStrategy = autoWiringStrategyResolver(buildContext.Container);
-            }
-
-            Type instanceType = null;
-            if (!(autoWiringStrategy?.TryResolveType(_type, buildContext.Key.Type, out instanceType) ?? false))
+            var autoWiringStrategy = _autowiringStrategy ?? buildContext.AutowiringStrategy;
+            if (!autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
             {
                 if (!DefaultAutowiringStrategy.Shared.TryResolveType(_type, buildContext.Key.Type, out instanceType))
                 {
-                    instanceType = null;
+                    instanceType = buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type);
                 }
             }
 
-            var typeDescriptor = (instanceType ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)).Descriptor();
+            var typeDescriptor = instanceType.Descriptor();
+
             var defaultConstructors = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredConstructors());
-            IMethod<ConstructorInfo> ctor = null;
-            if (!(autoWiringStrategy?.TryResolveConstructor(defaultConstructors, out ctor) ?? false))
+            if (!autoWiringStrategy.TryResolveConstructor(defaultConstructors, out var ctor))
             {
                 if (!DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
                 {
-                    ctor = null;
+                    ctor = buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
                 }
             }
 
-            ctor = ctor ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
             var defaultMethods = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredMethods());
-            IEnumerable<IMethod<MethodInfo>> initializers = null;
-            if (!(autoWiringStrategy?.TryResolveInitializers(defaultMethods, out initializers) ?? false))
+            if (!autoWiringStrategy.TryResolveInitializers(defaultMethods, out var initializers))
             {
                 if (!DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
                 {
-                    initializers = null;
+                    initializers = Enumerable.Empty<IMethod<MethodInfo>>();
                 }
             }
-
-            initializers = initializers ?? Enumerable.Empty<IMethod<MethodInfo>>();
 
             var newExpression = _constructors.GetOrCreate(ctor.Info, () => Expression.New(ctor.Info, ctor.GetParametersExpressions()));
             var thisExpression = _this.GetOrCreate(typeDescriptor.AsType(), () =>
