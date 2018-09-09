@@ -8,7 +8,7 @@
     using Core;
 
     /// <summary>
-    /// Represents extensions to add bindings to a container.
+    /// Represents extensions to add bindings to the container.
     /// </summary>
     [PublicAPI]
     public static class FluentBind

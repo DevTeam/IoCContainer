@@ -884,7 +884,7 @@
         </member>
         <member name="T:IoC.FluentBind">
             <summary>
-            Represents extensions to add bindings to a container.
+            Represents extensions to add bindings to the container.
             </summary>
         </member>
         <member name="M:IoC.FluentBind.Bind(IoC.IContainer,System.Type[])">
@@ -1143,7 +1143,7 @@
         </member>
         <member name="T:IoC.FluentGetResolver">
             <summary>
-            Represents extensions to get a resolver from a container.
+            Represents extensions to get a resolver from the container.
             </summary>
         </member>
         <member name="M:IoC.FluentGetResolver.GetResolver``1(IoC.IContainer,System.Type,IoC.Tag)">
@@ -1231,7 +1231,7 @@
         </member>
         <member name="T:IoC.FluentNativeResolve">
             <summary>
-            Represents extensions to resolve from a native container.
+            Represents extensions to resolve from the native container.
             </summary>
         </member>
         <member name="M:IoC.FluentNativeResolve.Resolve``1(IoC.Container)">
@@ -1312,7 +1312,7 @@
         </member>
         <member name="T:IoC.FluentRegister">
             <summary>
-            Represents extensions to register a dependency in a container.
+            Represents extensions to register a dependency in the container.
             </summary>
         </member>
         <member name="M:IoC.FluentRegister.Register``1(IoC.IContainer,IoC.ILifetime,System.Object[])">
@@ -1598,7 +1598,7 @@
         </member>
         <member name="T:IoC.FluentResolve">
             <summary>
-            Represents extensions to resolve from a container.
+            Represents extensions to resolve from the container.
             </summary>
         </member>
         <member name="M:IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Object[])">
@@ -1767,9 +1767,9 @@
             The target container.
             </summary>
         </member>
-        <member name="P:IoC.IBuildContext.DefaultAutowiringStrategy">
+        <member name="P:IoC.IBuildContext.AutowiringStrategy">
             <summary>
-            Default autowiring strategy.
+            Autowiring strategy.
             </summary>
         </member>
         <member name="M:IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)">

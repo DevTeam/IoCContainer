@@ -9,7 +9,7 @@
     using Core;
 
     /// <summary>
-    /// Represents extensions to register a dependency in a container.
+    /// Represents extensions to register a dependency in the container.
     /// </summary>
     [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
     [PublicAPI]

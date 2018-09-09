@@ -666,9 +666,9 @@
             The type of event.
             </summary>
         </member>
-        <member name="F:IoC.ContainerEvent.Key">
+        <member name="F:IoC.ContainerEvent.Keys">
             <summary>
-            The changed binding key.
+            The changed keys.
             </summary>
         </member>
         <member name="T:IoC.Context`1">
@@ -755,9 +755,6 @@
         </member>
         <member name="F:IoC.Features.CollectionFeature.Default">
             The default instance.
-        </member>
-        <member name="F:IoC.Features.CollectionFeature.Light">
-            The high-performance instance.
         </member>
         <member name="M:IoC.Features.CollectionFeature.Apply(IoC.IContainer)">
             <inheritdoc />
@@ -887,7 +884,7 @@
         </member>
         <member name="T:IoC.FluentBind">
             <summary>
-            Represents extensions to add bindings to a container.
+            Represents extensions to add bindings to the container.
             </summary>
         </member>
         <member name="M:IoC.FluentBind.Bind(IoC.IContainer,System.Type[])">
@@ -1146,7 +1143,7 @@
         </member>
         <member name="T:IoC.FluentGetResolver">
             <summary>
-            Represents extensions to get a resolver from a container.
+            Represents extensions to get a resolver from the container.
             </summary>
         </member>
         <member name="M:IoC.FluentGetResolver.GetResolver``1(IoC.IContainer,System.Type,IoC.Tag)">
@@ -1234,7 +1231,7 @@
         </member>
         <member name="T:IoC.FluentNativeResolve">
             <summary>
-            Represents extensions to resolve from a native container.
+            Represents extensions to resolve from the native container.
             </summary>
         </member>
         <member name="M:IoC.FluentNativeResolve.Resolve``1(IoC.Container)">
@@ -1315,7 +1312,7 @@
         </member>
         <member name="T:IoC.FluentRegister">
             <summary>
-            Represents extensions to register a dependency in a container.
+            Represents extensions to register a dependency in the container.
             </summary>
         </member>
         <member name="M:IoC.FluentRegister.Register``1(IoC.IContainer,IoC.ILifetime,System.Object[])">
@@ -1601,7 +1598,7 @@
         </member>
         <member name="T:IoC.FluentResolve">
             <summary>
-            Represents extensions to resolve from a container.
+            Represents extensions to resolve from the container.
             </summary>
         </member>
         <member name="M:IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Object[])">
@@ -1770,6 +1767,11 @@
             The target container.
             </summary>
         </member>
+        <member name="P:IoC.IBuildContext.AutowiringStrategy">
+            <summary>
+            Autowiring strategy.
+            </summary>
+        </member>
         <member name="M:IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)">
             <summary>
             Creates a child context.
@@ -1824,6 +1826,19 @@
             <param name="targetExpression">The target expression.</param>
             <param name="variableExpressions">Variable expressions.</param>
             <returns>The resulting block expression.</returns>
+        </member>
+        <member name="T:IoC.IBuilder">
+            <summary>
+            Represents a builder for an instance.
+            </summary>
+        </member>
+        <member name="M:IoC.IBuilder.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)">
+            <summary>
+            Builds the expression.
+            </summary>
+            <param name="bodyExpression">The expression body to get an instance.</param>
+            <param name="buildContext">The build context.</param>
+            <returns>The new expression.</returns>
         </member>
         <member name="T:IoC.IConfiguration">
             <summary>
@@ -1996,14 +2011,6 @@
             <summary>
             Represents a lifetime for an instance.
             </summary>
-        </member>
-        <member name="M:IoC.ILifetime.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)">
-            <summary>
-            Builds the expression.
-            </summary>
-            <param name="bodyExpression">The expression body to get an instance.</param>
-            <param name="buildContext">The build context.</param>
-            <returns>The new expression.</returns>
         </member>
         <member name="M:IoC.ILifetime.Create">
             <summary>

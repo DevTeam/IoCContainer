@@ -1,0 +1,39 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <RootNamespace>IoC.Features</RootNamespace>
+    <TargetFrameworks>net40;netcoreapp1.0;netcoreapp2.1;net47</TargetFrameworks>
+    <SignAssembly>True</SignAssembly>
+    <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <PackageId>IoC.Interception</PackageId>
+    <Authors>NikolayP</Authors>
+    <Description>Interception feature for IoC container.</Description>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/DevTeam/IoCContainer/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/DevTeam/IoCContainer/</PackageProjectUrl>
+    <PackageIconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</PackageIconUrl>
+    <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>IoC Container Interception</PackageTags>
+    <Product>IoC Container Interception feature</Product>
+    <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
+    <DocumentationFile>..\Docs\IoC.Interception_$(TargetFramework).xml</DocumentationFile>
+    <WarningsAsErrors />    
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Release'">
+    <TargetFrameworks>netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;net40;net45;net46;net47;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;netcoreapp2.1</TargetFrameworks>
+    <Optimize>true</Optimize>
+    <DebugType>none</DebugType>
+    <DebugSymbols>false</DebugSymbols>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Castle.Core" Version="4.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IoC\IoC.csproj" />
+  </ItemGroup>
+
+</Project>

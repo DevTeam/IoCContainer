@@ -1821,7 +1821,7 @@ namespace IoC
     using Core;
 
     /// <summary>
-    /// Represents extensions to add bindings to a container.
+    /// Represents extensions to add bindings to the container.
     /// </summary>
     [PublicAPI]
     public static class FluentBind
@@ -2333,7 +2333,7 @@ namespace IoC
     using Core;
 
     /// <summary>
-    /// Represents extensions to get a resolver from a container.
+    /// Represents extensions to get a resolver from the container.
     /// </summary>
     [PublicAPI]
     public static class FluentGetResolver
@@ -2454,7 +2454,7 @@ namespace IoC
     using Core;
 
     /// <summary>
-    /// Represents extensions to resolve from a native container.
+    /// Represents extensions to resolve from the native container.
     /// </summary>
     [PublicAPI]
     public static class FluentNativeResolve
@@ -2606,7 +2606,7 @@ namespace IoC
     using Core;
 
     /// <summary>
-    /// Represents extensions to register a dependency in a container.
+    /// Represents extensions to register a dependency in the container.
     /// </summary>
     [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
     [PublicAPI]
@@ -2990,7 +2990,7 @@ namespace IoC
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// Represents extensions to resolve from a container.
+    /// Represents extensions to resolve from the container.
     /// </summary>
     [PublicAPI]
     public static class FluentResolve

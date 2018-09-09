@@ -5,7 +5,7 @@
     using Core;
 
     /// <summary>
-    /// Represents extensions to resolve from a native container.
+    /// Represents extensions to resolve from the native container.
     /// </summary>
     [PublicAPI]
     public static class FluentNativeResolve

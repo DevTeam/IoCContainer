@@ -4,7 +4,7 @@
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// Represents extensions to resolve from a container.
+    /// Represents extensions to resolve from the container.
     /// </summary>
     [PublicAPI]
     public static class FluentResolve

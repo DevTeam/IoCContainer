@@ -5,7 +5,7 @@
     using Core;
 
     /// <summary>
-    /// Represents extensions to get a resolver from a container.
+    /// Represents extensions to get a resolver from the container.
     /// </summary>
     [PublicAPI]
     public static class FluentGetResolver

@@ -9,6 +9,7 @@
     <NoWarn>1701;1702;1705;8002</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Castle.Core" Version="4.3.1" />
     <PackageReference Include="Shouldly" Version="3.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.0" />
@@ -31,6 +32,7 @@
     <ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\IoC.Interception\IoC.Interception.csproj" />
     <ProjectReference Include="..\IoC\IoC.csproj" />
   </ItemGroup>
   <ItemGroup>

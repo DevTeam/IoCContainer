@@ -31,7 +31,7 @@
             }
         }
 
-        // This custom builder just add the Singleton lifetime for any instances
+        // This custom builder just adds the Singleton lifetime for any instances
         // Also it can be used, for instance, to create proxies
         public class MyBuilder : IBuilder
         {
