@@ -11,73 +11,37 @@
     internal class InterceptorBuilder : IInterceptorRegistry, IBuilder
     {
         private static readonly ProxyGenerator ProxyGenerator = new ProxyGenerator();
-        private readonly Dictionary<Key, List<ProxyInfo>> _infos = new Dictionary<Key, List<ProxyInfo>>();
+        private readonly List<InterceptorsInfo> _interceptors = new List<InterceptorsInfo>();
 
-        public IDisposable Register<T>(IEnumerable<Key> keys, params IInterceptor[] interceptors)
+        public IDisposable Register(Predicate<IBuildContext> filter, params IInterceptor[] interceptors)
         {
-            if (keys == null) throw new ArgumentNullException(nameof(keys));
+            if (filter == null) throw new ArgumentNullException(nameof(filter));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
-
-            Type targetType = null;
-            var tokens = new List<IDisposable>();
-            lock (_infos)
+            var info = new InterceptorsInfo(filter, interceptors);
+            lock (_interceptors)
             {
-                var info = new ProxyInfo(interceptors, _infos);
-                foreach (var key in keys)
-                {
-                    if (!_infos.TryGetValue(key, out var infos))
-                    {
-                        infos = new List<ProxyInfo>();
-                        _infos.Add(key, infos);
-                    }
-
-                    infos.Add(info);
-                    tokens.Add(Disposable.Create(() =>
-                    {
-                        lock (_infos)
-                        {
-                            if (infos.Remove(info) && infos.Count == 0)
-                            {
-                                _infos.Remove(key);
-                            }
-                        }
-                    }));
-
-                    var type = key.Type;
-                    var isAssignableFrom = targetType == null || targetType.IsAssignableFrom(type);
-                    if (!isAssignableFrom)
-                    {
-                        continue;
-                    }
-
-                    targetType = type;
-                }
-
-                info.Type = targetType ?? throw new NotSupportedException();
-
-#if NET40 || UAP10
-                info.IsInterface = targetType.IsInterface;
-                info.Interfaces = targetType.GetInterfaces();
-#else
-                var typeInfo = targetType.GetTypeInfo();
-                info.IsInterface = typeInfo.IsInterface;
-                info.Interfaces = typeInfo.ImplementedInterfaces.ToArray();
-#endif
+                _interceptors.Add(info);
             }
 
-            return Disposable.Create(tokens);
+            return Disposable.Create(() =>
+            {
+                lock (_interceptors)
+                {
+                    _interceptors.Remove(info);
+                }
+            });
         }
 
         public Expression Build(Expression bodyExpression, IBuildContext buildContext)
         {
-            lock (_infos)
+            lock (_interceptors)
             {
-                if (_infos.TryGetValue(buildContext.Key, out var infos))
+                var proxyGeneratorExpression = buildContext.AppendValue(ProxyGenerator);
+                foreach (var interceptors in _interceptors)
                 {
-                    var proxyGeneratorExpression = buildContext.AppendValue(ProxyGenerator);
-                    foreach (var info in infos)
+                    if (interceptors.Accept(buildContext))
                     {
-                        bodyExpression = info.Build(bodyExpression, buildContext, proxyGeneratorExpression);
+                        bodyExpression = interceptors.Build(bodyExpression, buildContext, proxyGeneratorExpression);
                     }
                 }
 
@@ -85,7 +49,7 @@
             }
         }
 
-        private class ProxyInfo
+        private class InterceptorsInfo
         {
             private static readonly Type[] FuncTypes = {typeof(Type), typeof(Type[]), typeof(object), typeof(IInterceptor[])};
 #if NET40
@@ -97,33 +61,39 @@
             private static readonly MethodInfo CreateClassProxyWithTargetMethodInfo = ProxyGeneratorTypeInfo.GetDeclaredMethods(nameof(ProxyGenerator.CreateClassProxyWithTarget)).First(i => i.GetParameters().Select(j => j.ParameterType).SequenceEqual(FuncTypes));
 #endif
 
-            public bool IsInterface;
-            public Type Type;
-            public Type[] Interfaces;
+            private readonly Predicate<IBuildContext> _filter;
             private readonly IInterceptor[] _interceptors;
-            private readonly object _lockObject;
 
-            public ProxyInfo(IInterceptor[] interceptors, object lockObject)
+            public InterceptorsInfo(Predicate<IBuildContext> filter, IInterceptor[] interceptors)
             {
+                _filter = filter;
                 _interceptors = interceptors;
-                _lockObject = lockObject;
             }
+
+            public bool Accept(IBuildContext buildContext) => _filter(buildContext);
 
             public Expression Build(Expression bodyExpression, IBuildContext buildContext, Expression proxyGeneratorExpression)
             {
-                lock (_lockObject)
-                {
-                    var typeExpression = buildContext.AppendValue(Type);
-                    var interfacesExpression = buildContext.AppendValue(Interfaces);
-                    var interceptorsExpression = buildContext.AppendValue(_interceptors);
-                    var args = new[] {typeExpression, interfacesExpression, bodyExpression, interceptorsExpression};
-                    if (IsInterface)
-                    {
-                        return Expression.Call(proxyGeneratorExpression, CreateInterfaceProxyWithTargetMethodInfo, args);
-                    }
+                var type = buildContext.Key.Type;
+#if NET40
+                var isInterface = type.IsInterface;
+                var interfaces = type.GetInterfaces();
+#else
+                var typeInfo = type.GetTypeInfo();
+                var isInterface = typeInfo.IsInterface;
+                var interfaces = typeInfo.GetInterfaces();
+#endif
 
-                    return Expression.Call(proxyGeneratorExpression, CreateClassProxyWithTargetMethodInfo, args);
+                var typeExpression = buildContext.AppendValue(type);
+                var interfacesExpression = buildContext.AppendValue(interfaces);
+                var interceptorsExpression = buildContext.AppendValue(_interceptors);
+                var args = new[] {typeExpression, interfacesExpression, bodyExpression, interceptorsExpression};
+                if (isInterface)
+                {
+                    return Expression.Call(proxyGeneratorExpression, CreateInterfaceProxyWithTargetMethodInfo, args);
                 }
+
+                return Expression.Call(proxyGeneratorExpression, CreateClassProxyWithTargetMethodInfo, args);
             }
         }
     }

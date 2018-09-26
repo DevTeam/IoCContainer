@@ -313,6 +313,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Custom Builder](#custom-builder)
   - [Custom Child Container](#custom-child-container)
   - [Custom Lifetime](#custom-lifetime)
+  - [Interception](#interception)
   - [Replace Lifetime](#replace-lifetime)
 - Other Samples
   - [Cyclic Dependence](#cyclic-dependence)
@@ -872,7 +873,7 @@ public void Run()
     }
 }
 
-// This custom builder just add the Singleton lifetime for any instances
+// This custom builder just adds the Singleton lifetime for any instances
 // Also it can be used, for instance, to create proxies
 public class MyBuilder : IBuilder
 {
@@ -970,6 +971,41 @@ public class MyTransientLifetime : ILifetime
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomLifetime.cs)
+
+### Interception
+
+``` CSharp
+public void Run()
+{
+    var methods = new List<string>();
+    // Create a container
+    using (var container = Container.Create().Using<InterceptionFeature>())
+    // Configure the container
+    using (container.Bind<IDependency>().To<Dependency>())
+    using (container.Bind<IService>().To<Service>())
+    // Configure the interception
+    using (container.Intercept<IService>(new MyInterceptor(methods)))
+    {
+        // Resolve an instance
+        var instance = container.Resolve<IService>();
+
+        var state = instance.State;
+
+        methods.ShouldContain("get_State");
+    }
+}
+
+// This interceptor stores the name of called methods
+public class MyInterceptor : IInterceptor
+{
+    private readonly ICollection<string> _methods;
+
+    public MyInterceptor(ICollection<string> methods) => _methods = methods;
+
+    public void Intercept(IInvocation invocation) => _methods.Add(invocation.Method.Name);
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Interception.cs)
 
 ### Replace Lifetime
 

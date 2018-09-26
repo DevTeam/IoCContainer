@@ -12,7 +12,7 @@
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register<InterceptorBuilder, IInterceptorRegistry, IBuilder>(ctx => new InterceptorBuilder(), new SingletonLifetime(), new[] { Key.AnyTag });
+            yield return container.Register<InterceptorBuilder, IInterceptorRegistry, IBuilder>(ctx => new InterceptorBuilder(), new SingletonLifetime());
         }
     }
 }

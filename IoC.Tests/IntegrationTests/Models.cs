@@ -82,16 +82,18 @@ namespace IoC.Tests.IntegrationTests
         {
         }
 
-        public void Init(MySimpleClass mySimpleClass)
-        {
-            MySimpleClass = mySimpleClass;
-        }
+        public void Init(MySimpleClass mySimpleClass) => MySimpleClass = mySimpleClass;
 
         public MySimpleClass MySimpleClass { get; private set; }
+
+        public void Do()
+        {
+        }
     }
 
     public interface IMyGenericService<T1, T2> : IMyGenericService1<T1>
     {
+        void Do();
     }
 
     public interface IMyGenericService1<T1>
@@ -110,10 +112,7 @@ namespace IoC.Tests.IntegrationTests
 
     public class Wrapper : IMyWrapper
     {
-        public Wrapper(IMyWrapper wrapped)
-        {
-            Wrapped = wrapped;
-        }
+        public Wrapper(IMyWrapper wrapped) => Wrapped = wrapped;
 
         public IMyWrapper Wrapped { get; }
     }

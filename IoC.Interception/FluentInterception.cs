@@ -2,7 +2,9 @@
 {
     using System;
     using System.Linq;
+    using System.Reflection;
     using System.Runtime.CompilerServices;
+    using Castle.Core.Internal;
     using Castle.DynamicProxy;
 
     /// <summary>
@@ -11,103 +13,92 @@
     public static class FluentInterception
     {
         /// <summary>
-        /// Intercepts types.
+        /// Registers interceptors.
         /// </summary>
         /// <param name="container">The target container.</param>
-        /// <param name="types">The contract types to intercept.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IInterception<object> Intercept([NotNull] this IContainer container, [NotNull][ItemNotNull] params Type[] types)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Interception<object>(container, types);
-        }
-
-        /// <summary>
-        /// Intercepts the type.
-        /// </summary>
-        /// <typeparam name="T">The contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IInterception<T> Intercept<T>([NotNull] this IContainer container)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Interception<T>(container, typeof(T));
-        }
-
-        /// <summary>
-        /// Marks the binding by the tag. Is it possible to use multiple times.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <param name="interception"></param>
-        /// <param name="tagValue"></param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public static IInterception<T> Tag<T>([NotNull] this IInterception<T> interception, [CanBeNull] object tagValue = null)
-        {
-            if (interception == null) throw new ArgumentNullException(nameof(interception));
-            return new Interception<T>(interception, tagValue);
-        }
-
-        /// <summary>
-        /// Marks the interception to be used for any tags.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <param name="interception">The interception token.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public static IInterception<T> AnyTag<T>([NotNull] this IInterception<T> interception)
-        {
-            if (interception == null) throw new ArgumentNullException(nameof(interception));
-            return interception.Tag(Key.AnyTag);
-        }
-
-        /// <summary>
-        /// Apply the interceptor.
-        /// </summary>
-        /// <param name="interception">The interception token.</param>
-        /// <param name="interceptors">The list of interceptors.</param>
-        /// <returns>The interception token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public static IDisposable By([NotNull] this IInterception<object> interception, [NotNull][ItemNotNull] params IInterceptor[] interceptors)
-        {
-            if (interception == null) throw new ArgumentNullException(nameof(interception));
-            if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
-            return interception.ByInternal(interceptors);
-        }
-
-        /// <summary>
-        /// Apply the interceptor.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <param name="interception">The interception token.</param>
+        /// <param name="filter">The filter to intercept appropriate instances.</param>
         /// <param name="interceptors">The set of interceptors.</param>
-        /// <returns>The interception token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IDisposable By<T>([NotNull] this IInterception<T> interception, [NotNull][ItemNotNull] params IInterceptor[] interceptors)
+        public static IDisposable Intercept([NotNull] this IContainer container, [NotNull] Predicate<IBuildContext> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
-            if (interception == null) throw new ArgumentNullException(nameof(interception));
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (filter == null) throw new ArgumentNullException(nameof(filter));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
-            return interception.ByInternal(interceptors);
+            return container.Resolve<IInterceptorRegistry>().Register(filter, interceptors);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        /// <summary>
+        /// Registers interceptors.
+        /// </summary>
+        /// <param name="container">The target container.</param>
+        /// <param name="key">The key to intercept appropriate instance.</param>
+        /// <param name="interceptors">The set of interceptors.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        private static IDisposable ByInternal<T>([NotNull] this IInterception<T> interception, [NotNull][ItemNotNull] IInterceptor[] interceptors)
+        public static IDisposable Intercept([NotNull] this IContainer container, Key key, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
-            var keys =
-                from type in interception.Types
-                from tag in interception.Tags.DefaultIfEmpty(null)
-                select new Key(type, tag);
-            
-            return interception.Container.Resolve<IInterceptorRegistry>().Register<T>(keys, interceptors);
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
+            return container.Resolve<IInterceptorRegistry>().Register(ctx =>
+                {
+                    if (ctx.Key.Equals(key))
+                    {
+                        return true;
+                    }
+
+                    var type = ctx.Key.Type;
+                    var curType = key.Type;
+#if NET40
+                    var isGenericType = type.IsGenericType;
+                    if (!isGenericType) {
+                        return false;
+                    }
+
+                    var curIsGenericType = curType.IsGenericTypeDefinition || curType.GetGenericArguments().Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);;
+#else
+                    var typeInfo = type.GetTypeInfo();
+                    var isGenericType = typeInfo.IsGenericType;
+                    if (!isGenericType) {
+                        return false;
+                    }
+
+                    var curTypeInfo = curType.GetTypeInfo();
+                    var curIsGenericType = curTypeInfo.IsGenericTypeDefinition || curTypeInfo.GetGenericArguments().Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
+#endif
+
+                    if (curIsGenericType)
+                    {
+#if NET40
+                        var genericTypeDefinition = type.GetGenericTypeDefinition();
+                        var curGenericTypeDefinition = curType.GetGenericTypeDefinition();
+#else
+                        var genericTypeDefinition = typeInfo.GetGenericTypeDefinition();
+                        var curGenericTypeDefinition = curTypeInfo.GetGenericTypeDefinition();
+#endif
+                        return new Key(genericTypeDefinition, ctx.Key.Tag).Equals(new Key(curGenericTypeDefinition, key.Tag));
+                    }
+
+                    return false;
+                },
+                interceptors);
+        }
+
+        /// <summary>
+        /// Registers interceptors.
+        /// </summary>
+        /// <param name="container">The target container.</param>
+        /// <param name="interceptors">The set of interceptors.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IDisposable Intercept<T>([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
+            return container.Intercept(new Key(typeof(T)), interceptors);
         }
     }
 }

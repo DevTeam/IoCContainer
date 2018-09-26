@@ -1,7 +1,6 @@
 ﻿namespace IoC.Tests.UsageScenarios
 {
     using System.Collections.Generic;
-    using System.Linq.Expressions;
     using Castle.DynamicProxy;
     using Features;
     using Shouldly;
@@ -23,7 +22,8 @@
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
-            using (container.Intercept<IService>().By(new MyInterceptor(methods)))
+            // Configure the interception
+            using (container.Intercept<IService>(new MyInterceptor(methods)))
             {
                 // Resolve an instance
                 var instance = container.Resolve<IService>();
@@ -34,7 +34,7 @@
             }
         }
 
-        // This interceptor stores the name of the called method
+        // This interceptor stores the name of called methods
         public class MyInterceptor : IInterceptor
         {
             private readonly ICollection<string> _methods;
