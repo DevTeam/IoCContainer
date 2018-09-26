@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using Interception;
     using Lifetimes;
 
     /// <inheritdoc cref="IConfiguration" />

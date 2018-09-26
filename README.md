@@ -40,6 +40,7 @@
   - [Custom containers](#custom-child-container)
   - [Custom lifetimes](#custom-lifetime)
   - [Replacing predefined lifetimes](#replace-lifetime)
+  - [Interceptors](#interception)
 
 ### [Multithreading-Ready](#multithreading)
 
@@ -80,6 +81,10 @@
     - [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore)
   - IoC.AspNetCore.Source, embedded-in-code
     - [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source)
+  - IoC.Interception
+    - [![NuGet](https://buildstats.info/nuget/IoC.Interception)](https://www.nuget.org/packages/IoC.Interception)
+  - IoC.Interception.Source, embedded-in-code
+    - [![NuGet](https://buildstats.info/nuget/IoC.Interception.Source)](https://www.nuget.org/packages/IoC.Interception.Source)
 
 Embedding-in-code packages require C# 7.0 or higher
 

@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IoC.AspNetCore" Version="1.1.7" />
+    <PackageReference Include="IoC.AspNetCore" Version="1.1.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.1.1" />
   </ItemGroup>
 

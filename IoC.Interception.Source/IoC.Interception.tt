@@ -7,7 +7,7 @@
 <#@ output extension=".cs" #>
 
 /* 
-IoC Container APS.NET Core feature
+IoC Container Interception feature
 
 https://github.com/DevTeam/IoCContainer
 
@@ -39,9 +39,9 @@ SOFTWARE.
 
 // ReSharper disable All
 <#
-    var currentPath = this.Host.ResolvePath(".." + Path.DirectorySeparatorChar + "IoC.AspNetCore");
+    var currentPath = this.Host.ResolvePath(".." + Path.DirectorySeparatorChar + "IoC.Interception");
     var paths = new string[]{
-        "AspNetCore",
+        "Interception",
         "."};
 
     var infos = new List<Dictionary<string, string>>();
@@ -49,7 +49,7 @@ SOFTWARE.
     {
 #>
 
-#region <#=path.Replace(".", "IoC.AspNetCore")#>
+#region <#=path.Replace(".", "IoC.Interception")#>
 
 <#
         var dir = Path.Combine(currentPath, path);

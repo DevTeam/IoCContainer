@@ -1,4 +1,4 @@
-﻿namespace IoC.Features
+﻿namespace IoC.Features.AspNetCore
 {
     using System;
     using System.Diagnostics.CodeAnalysis;

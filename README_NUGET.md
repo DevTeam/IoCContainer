@@ -36,6 +36,7 @@
   - [Custom containers](https://github.com/DevTeam/IoCContainer#custom-child-container)
   - [Custom lifetimes](https://github.com/DevTeam/IoCContainer#custom-lifetime)
   - [Replacing predefined lifetimes](https://github.com/DevTeam/IoCContainer#replace-lifetime)
+  - [Interceptors](https://github.com/DevTeam/IoCContainer#interception)
 
 ### [Multithreading-Ready](https://github.com/DevTeam/IoCContainer#multithreading)
 

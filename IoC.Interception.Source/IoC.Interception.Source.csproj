@@ -1,29 +1,29 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <NuspecProperties>version=$(version)</NuspecProperties>
-    <TargetFrameworks>netstandard1.0</TargetFrameworks>
+    <TargetFrameworks>netstandard1.3</TargetFrameworks>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <IncludeBuildOutput>false</IncludeBuildOutput>
-    <NuspecFile>IoC.AspNetCore.Source.nuspec</NuspecFile>
+    <NuspecFile>IoC.Interception.Source.nuspec</NuspecFile>
     <WarningsAsErrors />
     <TransformOnBuild>True</TransformOnBuild>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="**/*.cs" />
-    <None Update="IoC.AspNetCore.tt">
+    <None Update="IoC.Interception.tt">
       <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>IoC.AspNetCore.cs</LastGenOutput>
+      <LastGenOutput>IoC.Interception.cs</LastGenOutput>
     </None>
-    <Content Include="IoC.AspNetCore.cs">
+    <Content Include="IoC.Interception.cs">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
-      <DependentUpon>IoC.AspNetCore.tt</DependentUpon>
+      <DependentUpon>IoC.Interception.tt</DependentUpon>
     </Content>
     <ProjectReference Include="..\IoC\IoC.csproj" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
+    <PackageReference Include="Castle.Core" Version="4.3.1" />
   </ItemGroup>
   <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82b}" />
   </ItemGroup>
 </Project>

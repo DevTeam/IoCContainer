@@ -32,6 +32,95 @@ SOFTWARE.
 
 // ReSharper disable All
 
+#region AspNetCore
+
+#region ServiceProvider
+
+namespace IoC.Features.AspNetCore
+{
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+    internal class ServiceProvider: IServiceProvider
+    {
+        private readonly IContainer _container;
+
+        public ServiceProvider([NotNull] IContainer container)
+        {
+            _container = container ?? throw new ArgumentNullException(nameof(container));
+        }
+
+        public object GetService(Type serviceType)
+        {
+            return _container.GetResolver<object>(serviceType)(_container);
+        }
+    }
+}
+
+
+#endregion
+#region ServiceScope
+
+namespace IoC.Features.AspNetCore
+{
+    using System;
+    using Microsoft.Extensions.DependencyInjection;
+
+    internal class ServiceScope : IServiceScope, IServiceProvider
+    {
+        [NotNull] private readonly Scope _scope;
+        [NotNull] private readonly IContainer _container;
+
+        public ServiceScope([NotNull] Scope scope, [NotNull] IContainer container)
+        {
+            _scope = scope ?? throw new ArgumentNullException(nameof(scope));
+            _container = container ?? throw new ArgumentNullException(nameof(container));
+        }
+
+        public IServiceProvider ServiceProvider => this;
+
+        public object GetService(Type serviceType)
+        {
+            using (_scope.Begin())
+            {
+                return _container.Resolve<object>(serviceType);
+            }
+        }
+
+        public void Dispose() => _scope.Dispose();
+    }
+}
+
+
+#endregion
+#region ServiceScopeFactory
+
+namespace IoC.Features.AspNetCore
+{
+    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using Microsoft.Extensions.DependencyInjection;
+
+    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
+    internal class ServiceScopeFactory : IServiceScopeFactory
+    {
+        [NotNull] private readonly Func<IServiceScope> _serviceScopeFactory;
+
+        public ServiceScopeFactory([NotNull] Func<IServiceScope> serviceScopeFactory)
+        {
+            _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
+        }
+
+        public IServiceScope CreateScope() => _serviceScopeFactory();
+    }
+}
+
+
+#endregion
+
+#endregion
+
 #region IoC.AspNetCore
 
 #region AspNetCoreFeature
@@ -42,6 +131,7 @@ namespace IoC.Features
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
     using System.Linq;
+    using AspNetCore;
     using Microsoft.Extensions.DependencyInjection;
 
     /// <inheritdoc cref="IConfiguration" />
@@ -125,90 +215,6 @@ namespace IoC.Features
             yield return container.Bind<IServiceScopeFactory>().Lifetime(singletonLifetimeResolver(container)).To<ServiceScopeFactory>();
             yield return container.Bind<IServiceScope>().To<ServiceScope>(ctx => new ServiceScope(ctx.Container.Inject<Scope>(), ctx.Container.Inject<IContainer>()));
         }
-    }
-}
-
-
-#endregion
-#region ServiceProvider
-
-namespace IoC.Features
-{
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-
-    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    internal class ServiceProvider: IServiceProvider
-    {
-        private readonly IContainer _container;
-
-        public ServiceProvider([NotNull] IContainer container)
-        {
-            _container = container ?? throw new ArgumentNullException(nameof(container));
-        }
-
-        public object GetService(Type serviceType)
-        {
-            return _container.GetResolver<object>(serviceType)(_container);
-        }
-    }
-}
-
-
-#endregion
-#region ServiceScope
-
-namespace IoC.Features
-{
-    using System;
-    using Microsoft.Extensions.DependencyInjection;
-
-    internal class ServiceScope : IServiceScope, IServiceProvider
-    {
-        [NotNull] private readonly Scope _scope;
-        [NotNull] private readonly IContainer _container;
-
-        public ServiceScope([NotNull] Scope scope, [NotNull] IContainer container)
-        {
-            _scope = scope ?? throw new ArgumentNullException(nameof(scope));
-            _container = container ?? throw new ArgumentNullException(nameof(container));
-        }
-
-        public IServiceProvider ServiceProvider => this;
-
-        public object GetService(Type serviceType)
-        {
-            using (_scope.Begin())
-            {
-                return _container.Resolve<object>(serviceType);
-            }
-        }
-
-        public void Dispose() => _scope.Dispose();
-    }
-}
-
-
-#endregion
-#region ServiceScopeFactory
-
-namespace IoC.Features
-{
-    using System;
-    using System.Diagnostics.CodeAnalysis;
-    using Microsoft.Extensions.DependencyInjection;
-
-    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    internal class ServiceScopeFactory : IServiceScopeFactory
-    {
-        [NotNull] private readonly Func<IServiceScope> _serviceScopeFactory;
-
-        public ServiceScopeFactory([NotNull] Func<IServiceScope> serviceScopeFactory)
-        {
-            _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
-        }
-
-        public IServiceScope CreateScope() => _serviceScopeFactory();
     }
 }
 

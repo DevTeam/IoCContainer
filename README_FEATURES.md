@@ -36,6 +36,7 @@
   - [Custom containers](#custom-child-container)
   - [Custom lifetimes](#custom-lifetime)
   - [Replacing predefined lifetimes](#replace-lifetime)
+  - [Interceptors](#interception)
 
 ### [Multithreading-Ready](#multithreading)
 

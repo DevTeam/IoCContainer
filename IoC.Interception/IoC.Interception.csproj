@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <RootNamespace>IoC.Features</RootNamespace>
-    <TargetFrameworks>net40;netcoreapp1.0;netcoreapp2.1;net47</TargetFrameworks>
+    <TargetFrameworks>net40;netstandard1.3;netcoreapp1.0;netcoreapp2.1;net47</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>

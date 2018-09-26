@@ -1,4 +1,4 @@
-﻿namespace IoC.Features
+﻿namespace IoC.Features.Interception
 {
     using System;
     using Castle.DynamicProxy;

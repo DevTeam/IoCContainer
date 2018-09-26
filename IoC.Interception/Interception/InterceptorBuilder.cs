@@ -1,12 +1,12 @@
-﻿namespace IoC.Features
+﻿namespace IoC.Features.Interception
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
-    // ReSharper disable once RedundantUsingDirective
     using System.Reflection;
     using Castle.DynamicProxy;
+// ReSharper disable once RedundantUsingDirective
 
     internal class InterceptorBuilder : IInterceptorRegistry, IBuilder
     {
@@ -81,7 +81,7 @@
 #else
                 var typeInfo = type.GetTypeInfo();
                 var isInterface = typeInfo.IsInterface;
-                var interfaces = typeInfo.GetInterfaces();
+                var interfaces = typeInfo.ImplementedInterfaces.ToArray();
 #endif
 
                 var typeExpression = buildContext.AppendValue(type);

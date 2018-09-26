@@ -6,6 +6,7 @@
     using System.Runtime.CompilerServices;
     using Castle.Core.Internal;
     using Castle.DynamicProxy;
+    using Interception;
 
     /// <summary>
     /// Represents extensions to add interceptions to the container.
@@ -66,7 +67,7 @@
                     }
 
                     var curTypeInfo = curType.GetTypeInfo();
-                    var curIsGenericType = curTypeInfo.IsGenericTypeDefinition || curTypeInfo.GetGenericArguments().Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
+                    var curIsGenericType = curTypeInfo.IsGenericTypeDefinition || curTypeInfo.GenericTypeArguments.Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
 #endif
 
                     if (curIsGenericType)
