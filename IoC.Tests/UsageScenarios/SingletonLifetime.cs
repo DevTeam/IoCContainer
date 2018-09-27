@@ -2,6 +2,7 @@
 {
     using Shouldly;
     using Xunit;
+    using static Lifetime;
 
     public class SingletonLifetime
     {
@@ -13,23 +14,31 @@
             // $priority=03
             // $description=Singleton lifetime
             // {
-            // Create a container
+            // Create and configure the container
             using (var container = Container.Create())
-            // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
+            // Use the Singleton lifetime
+            using (container.Bind<IService>().As(Singleton).To<Service>())
             {
-                // Resolve one instance twice
-                var instance1 = container.Resolve<IService>();
-                var instance2 = container.Resolve<IService>();
+                // Resolve the singleton twice
+                var parentInstance1 = container.Resolve<IService>();
+                var parentInstance2 = container.Resolve<IService>();
+
+                // Check that instances from the parent container are equal
+                parentInstance1.ShouldBe(parentInstance2);
 
                 // Create a child container
                 using (var childContainer = container.CreateChild())
                 {
-                    var instance3 = childContainer.Resolve<IService>();
+                    // Resolve the singleton twice
+                    var childInstance1 = childContainer.Resolve<IService>();
+                    var childInstance2 = childContainer.Resolve<IService>();
 
-                    instance1.ShouldBe(instance2);
-                    instance1.ShouldBe(instance3);
+                    // Check that instances from the child container are equal
+                    childInstance1.ShouldBe(childInstance2);
+
+                    // Check that instances from different containers are equal
+                    parentInstance1.ShouldBe(childInstance1);
                 }
             }
 

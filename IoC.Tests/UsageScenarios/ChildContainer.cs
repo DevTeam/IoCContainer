@@ -13,9 +13,9 @@
             // $priority=03
             // $description=Child Container
             // {
-            // Create a parent container
+            // Create the parent container
             using (var parentContainer = Container.Create())
-            // Create a child container
+            // Create the child container
             using (var childContainer = parentContainer.CreateChild())
             {
                 childContainer.Parent.ShouldBe(parentContainer);

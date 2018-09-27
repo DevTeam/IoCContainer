@@ -16,17 +16,18 @@
             // $priority=02
             // $description=Resolve Lazy
             // {
-            // Create a container
+            // Create and configure the container
             using (var container = Container.Create())
-            // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
             {
-                // Resolve Lazy
+                // Resolve the instance of Lazy<IService>
                 var lazy = container.Resolve<Lazy<IService>>();
+
                 // Get the instance via Lazy
                 var instance = lazy.Value;
 
+                // Check the instance's type
                 instance.ShouldBeOfType<Service>();
             }
             // }

@@ -14,31 +14,28 @@
         // {
         public void Run()
         {
-            // Create a container
+            // Create and configure the container
             using (var container = Container.Create())
-            // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
-            // Add custom builder
+            // Register the custom builder
             using (container.Bind<IBuilder>().To<MyBuilder>())
             {
-                // Resolve an instance
+                // Resolve instances
                 var instance1 = container.Resolve<IService>();
                 var instance2 = container.Resolve<IService>();
 
-                instance1.ShouldBeOfType<Service>();
+                // Check that instances are equal
                 instance1.ShouldBe(instance2);
             }
         }
 
         // This custom builder just adds the Singleton lifetime for any instances
-        // Also it can be used, for instance, to create proxies
         public class MyBuilder : IBuilder
         {
-            public Expression Build(Expression expression, IBuildContext buildContext)
-            {
-                return buildContext.AppendLifetime(expression, new Lifetimes.SingletonLifetime());
-            }
+            public Expression Build(Expression expression, IBuildContext buildContext) =>
+                // Add the Singleton lifetime for any instances
+                buildContext.AppendLifetime(expression, new Lifetimes.SingletonLifetime());
         }
         // }
     }

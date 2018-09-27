@@ -16,17 +16,17 @@
             // $priority=02
             // $description=Resolve Tuple
             // {
-            // Create a container
+            // Create and configure the container
             using (var container = Container.Create())
-            // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
             using (container.Bind<INamedService>().To<NamedService>(
                 ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name")))
             {
-                // Resolve Tuple
+                // Resolve an instance of type Tuple<IService, INamedService>
                 var tuple = container.Resolve<Tuple<IService, INamedService>>();
 
+                // Check the items types
                 tuple.Item1.ShouldBeOfType<Service>();
                 tuple.Item2.ShouldBeOfType<NamedService>();
             }

@@ -13,22 +13,23 @@
             // $priority=04
             // $description=Manual Auto-wiring
             // {
-            // Create a container
+            // Create and configure the container using full auto-wiring
             using (var container = Container.Create())
-            // Configure the container
-            // Use full auto-wiring
             using (container.Bind<IDependency>().To<Dependency>())
-            // Configure auto-wiring
+            // Bind 'INamedService' to the instance creation and initialization, actually represented as an expression tree
             using (container.Bind<INamedService>().To<InitializingNamedService>(
-                // Select the constructor and inject its parameters
+                // Select the constructor and inject the dependency
                 ctx => new InitializingNamedService(ctx.Container.Inject<IDependency>()),
-                // Configure the method to invoke after the instances creation
+                // Configure the initializing method to invoke after the instance creation and inject the dependencies
                 ctx => ctx.It.Initialize("some name", ctx.Container.Inject<IDependency>())))
             {
                 // Resolve an instance
                 var instance = container.Resolve<INamedService>();
 
+                // Check the instance's type
                 instance.ShouldBeOfType<InitializingNamedService>();
+
+                // Check the injected dependency
                 instance.Name.ShouldBe("some name");
             }
             // }

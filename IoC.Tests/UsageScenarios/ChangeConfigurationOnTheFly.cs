@@ -13,28 +13,29 @@
             // $priority=01
             // $description=Change configuration on-the-fly
             // {
-            // Create a container
+            // Create and configure the container
             using (var container = Container.Create())
-            // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
             {
-                // Configure the container using the Transient (default) lifetime
+                // Configure `IService` as Transient
                 using (container.Bind<IService>().To<Service>())
                 {
                     // Resolve instances
                     var instance1 = container.Resolve<IService>();
                     var instance2 = container.Resolve<IService>();
 
+                    // Check that instances are not equal
                     instance1.ShouldNotBe(instance2);
                 }
 
-                // Reconfigure the container using the Singleton lifetime
+                // Reconfigure `IService` as Singleton
                 using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
                 {
-                    // Resolve the instance twice
+                    // Resolve the singleton twice
                     var instance1 = container.Resolve<IService>();
                     var instance2 = container.Resolve<IService>();
 
+                    // Check that instances are equal
                     instance1.ShouldBe(instance2);
                 }
             }

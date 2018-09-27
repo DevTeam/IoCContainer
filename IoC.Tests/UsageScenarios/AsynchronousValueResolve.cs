@@ -27,6 +27,7 @@ namespace IoC.Tests.UsageScenarios
                 // Resolve an instance asynchronously via ValueTask
                 var instance = await container.Resolve<ValueTask<IService>>();
 
+                // Check the instance's type
                 instance.ShouldBeOfType<Service>();
             }
             // }

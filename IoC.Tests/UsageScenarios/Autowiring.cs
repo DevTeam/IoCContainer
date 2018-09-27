@@ -13,16 +13,15 @@
             // $priority=00
             // $description=Auto-wiring
             // {
-            // Create a container
+            // Create the container and configure it, using full auto-wiring
             using (var container = Container.Create())
-            // Configure the container
-            // Use full auto-wiring
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
             {
-                // Resolve an instance
+                // Resolve an instance of interface `IService`
                 var instance = container.Resolve<IService>();
 
+                // Check the instance's type
                 instance.ShouldBeOfType<Service>();
             }
             // }

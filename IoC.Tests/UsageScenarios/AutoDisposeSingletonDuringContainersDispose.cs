@@ -16,19 +16,19 @@
             // {
             var disposableService = new Mock<IDisposableService>();
 
-            // Create a container
-            using (var container = Container.Create())
+            // Create and configure the container
+            using (var container = Container.Create()
+                .Bind<IService>().As(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object).ToSelf())
             {
-                // Configure the container
-                container.Bind<IService>().As(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object).ToSelf();
-
-                // Resolve instances
+                // Resolve singleton instance twice
                 var instance1 = container.Resolve<IService>();
                 var instance2 = container.Resolve<IService>();
 
+                // Check that instances are equal
                 instance1.ShouldBe(instance2);
             }
 
+            // Check the singleton was disposed after the container was disposed
             disposableService.Verify(i => i.Dispose(), Times.Once);
             // }
         }

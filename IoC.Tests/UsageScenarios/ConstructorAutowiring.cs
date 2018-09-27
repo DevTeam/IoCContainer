@@ -13,20 +13,20 @@
             // $priority=04
             // $description=Constructor Auto-wiring
             // {
-            // Create the container
+            // Create and configure the container, using full auto-wiring
             using (var container = Container.Create())
-            // Configure a container
-            // Use full auto-wiring
             using (container.Bind<IDependency>().To<Dependency>())
-            // Configure via auto-wiring
+            // Configure via manual injection
             using (container.Bind<IService>().To<Service>(
-                // Select the constructor and specify its arguments
+                // Select the constructor and inject arguments
                 ctx => new Service(ctx.Container.Inject<IDependency>(), "some state")))
             {
                 // Resolve an instance
                 var instance = container.Resolve<IService>();
 
+                // Check the instance's type
                 instance.ShouldBeOfType<Service>();
+                // Check the injected constant
                 instance.State.ShouldBe("some state");
             }
             // }

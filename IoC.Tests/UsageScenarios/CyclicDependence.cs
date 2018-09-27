@@ -20,12 +20,14 @@ namespace IoC.Tests.UsageScenarios
         {
             var expectedException = new InvalidOperationException("error");
             var issueResolver = new Mock<IIssueResolver>();
+            // Throes the exception for reentrancy 128
             issueResolver.Setup(i => i.CyclicDependenceDetected(It.IsAny<Key>(), 128)).Throws(expectedException);
 
-            // Create a container
+            // Create the container
             using (var container = Container.Create())
-            // Configure the container: 1,2,3 are tags to produce cyclic dependencies
+            // Configure the own issue resolver to check cyclic dependencies detection
             using (container.Bind<IIssueResolver>().To(ctx => issueResolver.Object))
+            // Configure the container, where 1,2,3 are tags to produce cyclic dependencies during resolving
             using (container.Bind<ILink>().To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(1))))
             using (container.Bind<ILink>().Tag(1).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(2))))
             using (container.Bind<ILink>().Tag(2).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(3))))
@@ -33,16 +35,16 @@ namespace IoC.Tests.UsageScenarios
             {
                 try
                 {
-                    // Resolve the first link
+                    // Resolve the root instance
                     container.Resolve<ILink>();
                 }
+                // Catch the exception about cyclic dependencies at a depth of 128
                 catch (InvalidOperationException actualException)
                 {
+                    // Check the exception
                     actualException.ShouldBe(expectedException);
                 }
             }
-
-            issueResolver.Verify(i => i.CyclicDependenceDetected(It.IsAny<Key>(), 128));
         }
 
         public interface ILink

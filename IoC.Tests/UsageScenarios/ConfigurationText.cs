@@ -13,7 +13,7 @@
             // $priority=07
             // $description=Configuration via a text metadata
             // {
-            // Create a container and configure it from the metadata string
+            // Create and configure the container from a metadata string
             using (var container = Container.Create().Using(
                 "ref IoC.Tests;" +
                 "using IoC.Tests.UsageScenarios;" +
@@ -23,6 +23,7 @@
                 // Resolve an instance
                 var instance = container.Resolve<IService>();
 
+                // Check the instance's type
                 instance.ShouldBeOfType<Service>();
             }
             // }

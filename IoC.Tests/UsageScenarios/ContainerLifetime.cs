@@ -2,6 +2,7 @@
 {
     using Shouldly;
     using Xunit;
+    using static Lifetime;
 
     public class ContainerLifetime
     {
@@ -13,25 +14,31 @@
             // $priority=03
             // $description=Container Singleton lifetime
             // {
-            // Create a container
+            // Create and configure the container
             using (var container = Container.Create())
-            // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<IService>().As(Lifetime.ContainerSingleton).To<Service>())
+            // Use the Container Singleton lifetime
+            using (container.Bind<IService>().As(ContainerSingleton).To<Service>())
             {
-                // Resolve one instance twice
-                var instance1 = container.Resolve<IService>();
-                var instance2 = container.Resolve<IService>();
+                // Resolve the container singleton twice
+                var parentInstance1 = container.Resolve<IService>();
+                var parentInstance2 = container.Resolve<IService>();
+
+                // Check that instances from the parent container are equal
+                parentInstance1.ShouldBe(parentInstance2);
 
                 // Create a child container
                 using (var childContainer = container.CreateChild())
                 {
-                    var instance3 = childContainer.Resolve<IService>();
-                    var instance4 = childContainer.Resolve<IService>();
+                    // Resolve the container singleton twice
+                    var childInstance1 = childContainer.Resolve<IService>();
+                    var childInstance2 = childContainer.Resolve<IService>();
 
-                    instance1.ShouldBe(instance2);
-                    instance1.ShouldNotBe(instance3);
-                    instance3.ShouldBe(instance4);
+                    // Check that instances from the child container are equal
+                    childInstance1.ShouldBe(childInstance2);
+
+                    // Check that instances from different containers are not equal
+                    parentInstance1.ShouldNotBe(childInstance1);
                 }
             }
 

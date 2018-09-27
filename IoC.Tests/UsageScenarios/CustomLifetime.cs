@@ -14,30 +14,40 @@
         // {
         public void Run()
         {
-            // Create a container
+            // Create and configure the container
             using (var container = Container.Create())
-            // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
+            // Bind interface to implementation using the custom lifetime, based on the Singleton lifetime
             using (container.Bind<IService>().Lifetime(new MyTransientLifetime()).To<Service>())
             {
-                // Resolve an instance
-                var instance = container.Resolve<IService>();
+                // Resolve the singleton twice
+                var instance1 = container.Resolve<IService>();
+                var instance2 = container.Resolve<IService>();
 
-                instance.ShouldBeOfType<Service>();
+                // Check that instances from the parent container are equal
+                instance1.ShouldBe(instance2);
             }
         }
 
+        // Represents the custom lifetime based on the Singleton lifetime
         public class MyTransientLifetime : ILifetime
         {
-            public Expression Build(Expression expression, IBuildContext buildContext)
-                => expression;
+            // Creates the instance of the Singleton lifetime
+            private ILifetime _baseLifetime = new Lifetimes.SingletonLifetime();
 
+            // Wraps the expression by the Singleton lifetime expression
+            public Expression Build(Expression expression, IBuildContext buildContext)
+                => buildContext.AppendLifetime(expression, _baseLifetime);
+
+            // Creates the similar lifetime to use with generic instances
             public ILifetime Create() => new MyTransientLifetime();
 
+            // Select a container to resolve dependencies using the Singleton lifetime logic
             public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
-                resolvingContainer;
+                _baseLifetime.SelectResolvingContainer(registrationContainer, resolvingContainer);
 
-            public void Dispose() { }
+            // Disposes the instance of the Singleton lifetime
+            public void Dispose() => _baseLifetime.Dispose();
         }
         // }
     }

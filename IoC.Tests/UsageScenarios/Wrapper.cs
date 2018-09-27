@@ -19,23 +19,24 @@
         {
             var console = new Mock<IConsole>();
 
-            // Create a base container
-            using (var baseContainer = Container.Create("base"))
-            // Configure it for base logger
-            using (baseContainer.Bind<IConsole>().To(ctx => console.Object))
-            using (baseContainer.Bind<ILogger>().To<Logger>())
+            // Create and configure the root container
+            using (var rootContainer = Container.Create("root"))
+            using (rootContainer.Bind<IConsole>().To(ctx => console.Object))
+            using (rootContainer.Bind<ILogger>().To<Logger>())
             {
-                // Configure some child container
-                using (var childContainer = baseContainer.CreateChild("child"))
-                // Configure console
+                // Create and configure the child container
+                using (var childContainer = rootContainer.CreateChild("child"))
+                // Bind IConsole
                 using (childContainer.Bind<IConsole>().To(ctx => console.Object))
+                // Bind 'ILogger' to the instance creation, actually represented as an expression tree
                 using (childContainer.Bind<ILogger>().To<TimeLogger>(
-                    // Inject the logger from the parent container to our new logger
+                    // Inject the logger from the parent container to an instance of type TimeLogger
                     ctx => new TimeLogger(ctx.Container.Parent.Inject<ILogger>())))
                 {
+                    // Create a logger
                     var logger = childContainer.Resolve<ILogger>();
 
-                    // Log message
+                    // Log the message
                     logger.Log("Hello");
                 }
             }
@@ -46,11 +47,13 @@
 
         public interface IConsole
         {
-            void WriteLine(string test);
+            // Writes a text
+            void WriteLine(string text);
         }
 
         public interface ILogger
         {
+            // Logs a message
             void Log(string message);
         }
 
@@ -58,8 +61,10 @@
         {
             private readonly IConsole _console;
 
+            // Stores console to field
             public Logger(IConsole console) => _console = console;
 
+            // Logs a message to console
             public void Log(string message) => _console.WriteLine(message);
         }
 
@@ -69,7 +74,7 @@
 
             public TimeLogger(ILogger baseLogger) => _baseLogger = baseLogger;
 
-            // Adds current time before a message.
+            // Adds current time before a message and writes it to console
             public void Log(string message) => _baseLogger.Log(DateTimeOffset.Now + ": " + message);
         }
         // }

@@ -26,21 +26,22 @@ namespace IoC.Tests.UsageScenarios
         {
             var console = new Mock<IConsole>();
 
-            // Create a base container
-            using (var baseContainer = Container.Create("base"))
-            // Configure some child container
-            using (var childContainer = baseContainer.CreateChild("child"))
+            // Create the root container
+            using (var rootContainer = Container.Create("root"))
+            // Configure еру child container
+            using (var childContainer = rootContainer.CreateChild("child"))
             // Configure the child container by custom aspect oriented autowiring strategy
             using (childContainer.Bind<IAutowiringStrategy>().To<AspectOrientedAutowiringStrategy>())
-            // Configure the container
+            // Configure the child container
             using (childContainer.Bind<IConsole>().To(ctx => console.Object))
             using (childContainer.Bind<IClock>().Tag("MyClock").To<Clock>())
             using (childContainer.Bind<string>().Tag("Prefix").To(ctx => "info"))
             using (childContainer.Bind<ILogger>().To<Logger>())
             {
+                // Create a logger
                 var logger = childContainer.Resolve<ILogger>();
 
-                // Log message
+                // Log the message
                 logger.Log("Hello");
             }
 
@@ -48,9 +49,7 @@ namespace IoC.Tests.UsageScenarios
             console.Verify(i => i.WriteLine(It.IsRegex(".+ - info: Hello")));
         }
 
-        /// <summary>
-        /// Attribute for constructor or methods that is ready for autowiring
-        /// </summary>
+        // Represents the attribute to mark a constructor or a method that is ready for auto-wiring
         [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method)]
         public class AutowiringAttribute : Attribute
         {
@@ -60,77 +59,93 @@ namespace IoC.Tests.UsageScenarios
                 DefaultTag = defaultTag;
             }
 
+            // The order to be used to invoke a method
             public int Order { get; }
 
+            // The default tag
             public object DefaultTag { get; }
         }
 
-        /// <summary>
-        /// Parameters` attribute to define a tag value
-        /// </summary>
+        // Represents the attribute to mark a parameters by a tag, which will be used during an injection
         [AttributeUsage(AttributeTargets.Parameter)]
         public class TagAttribute: Attribute
         {
             public TagAttribute([CanBeNull] object tag) => Tag = tag;
 
+            // The tag, which will be used during an injection
             [CanBeNull] public object Tag { get; }
         }
 
+        // Represents a custom aspect oriented autowiring strategy
         private class AspectOrientedAutowiringStrategy : IAutowiringStrategy
         {
+            // Resolves type to create an instance
             public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
             {
                 instanceType = default(Type);
+                // Says that the default logic should be used
                 return false;
             }
 
+            // Resolves a constructor from a set of available constructors
             public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
             {
                 constructor = (
+                    // for each available constructor
                     from ctor in constructors
+                    // tries to get 'AutowiringAttribute'
                     let autowiringAttribute = ctor.Info.GetCustomAttribute<AutowiringAttribute>()
-                    // filters constructors containing the attribute Autowiring
+                    // filters the constructor containing the attribute 'AutowiringAttribute'
                     where autowiringAttribute != null
-                    // sorts constructors by autowiringAttribute.Order
+                    // sorts constructors by 'Order' property
                     orderby autowiringAttribute.Order
                     select ctor)
-                    // Get a first appropriate constructor
+                    // gets the first appropriate constructor
                     .First();
 
+                // Says that current logic should be used
                 return true;
             }
 
+            // Resolves initializing methods from a set of available methods/setters in the order which will be used to invoke them
             public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
             {
                 initializers =
+                    // for each available method
                     from method in methods
+                    // tries to get AutowiringAttribute
                     let autowiringAttribute = method.Info.GetCustomAttribute<AutowiringAttribute>()
-                    // filters methods/property setters containing the attribute Autowiring
+                    // filters methods/property setters containing the attribute 'AutowiringAttribute'
                     where autowiringAttribute != null
-                    // sorts methods/property setters by autowiringAttribute.Order
+                    // sorts methods/property setters by 'Order' property
                     orderby autowiringAttribute.Order
                     where (
+                            // for each parameter
                             from parameter in method.Info.GetParameters()
+                            // tries to get 'TagAttribute'
                             let injectAttribute = parameter.GetCustomAttribute<TagAttribute>()
                             // filters parameters containing a custom tag value to make a dependency injection
                             where injectAttribute?.Tag != null || autowiringAttribute.DefaultTag != null
-                            // redefines the default dependency
+                            // defines the dependency injection
                             select method.TryInjectDependency(parameter.Position, parameter.ParameterType, injectAttribute?.Tag ?? autowiringAttribute.DefaultTag))
-                        // checks that all custom injection were successfully
+                        // checks that each injection was successfull
                         .All(isInjected => isInjected)
                     select method;
 
+                // Says that current logic should be used
                 return true;
             }
         }
 
         public interface IConsole
         {
-            void WriteLine(string test);
+            // Writes a text
+            void WriteLine(string text);
         }
 
         public interface IClock
         {
+            // Returns current time
             DateTimeOffset Now { get; }
         }
 
@@ -143,6 +158,7 @@ namespace IoC.Tests.UsageScenarios
 
         public interface ILogger
         {
+            // Logs a message
             void Log(string message);
         }
 
@@ -162,6 +178,7 @@ namespace IoC.Tests.UsageScenarios
             // Property injection
             public string Prefix { get; [Autowiring(2, "Prefix")] set; }
 
+            // Adds current time and prefix before a message and writes it to console
             public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");
         }
         // }

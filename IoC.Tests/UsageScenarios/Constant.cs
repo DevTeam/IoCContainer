@@ -13,15 +13,15 @@
             // $priority=01
             // $description=Constant
             // {
-            // Create a container
+            // Create and configure the container
             using (var container = Container.Create())
-            // Configure the container
-            using (container.Bind<IService>().To(ctx => new Service(new Dependency())))
+            using (container.Bind<int>().To(ctx => 10))
             {
-                // Resolve an instance
-                var instance = container.Resolve<IService>();
+                // Resolve an integer
+                var val = container.Resolve<int>();
 
-                instance.ShouldBeOfType<Service>();
+                // Check the value
+                val.ShouldBe(10);
             }
             // }
         }

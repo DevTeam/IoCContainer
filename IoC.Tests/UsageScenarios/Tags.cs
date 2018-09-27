@@ -1,6 +1,7 @@
 ﻿namespace IoC.Tests.UsageScenarios
 {
     using System.Diagnostics.CodeAnalysis;
+    using Shouldly;
     using Xunit;
 
     [SuppressMessage("ReSharper", "UnusedVariable")]
@@ -14,10 +15,10 @@
             // $priority=01
             // $description=Tags
             // {
-            // Create a container
+            // Create and configure the container
             using (var container = Container.Create())
-            // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
+            // Bind using several tags
             using (container.Bind<IService>().Tag(10).Tag().Tag("abc").To<Service>())
             {
                 // Resolve instances using tags
@@ -26,6 +27,11 @@
 
                 // Resolve the instance using the empty tag
                 var instance3 = container.Resolve<IService>();
+
+                // Check the instances' types
+                instance1.ShouldBeOfType<Service>();
+                instance2.ShouldBeOfType<Service>();
+                instance3.ShouldBeOfType<Service>();
             }
             // }
         }

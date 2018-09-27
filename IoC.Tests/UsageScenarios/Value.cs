@@ -1,25 +1,21 @@
 ﻿namespace IoC.Tests.UsageScenarios
 {
-    using System;
     using Shouldly;
     using Xunit;
 
-    public class Func
+    public class Value
     {
         [Fact]
         public void Run()
         {
             // $visible=true
             // $tag=binding
-            // $priority=02
-            // $description=Func
+            // $priority=01
+            // $description=Value
             // {
-            Func<IService> func = () => new Service(new Dependency());
-
             // Create and configure the container
             using (var container = Container.Create())
-            // Bind to result of function invocation
-            using (container.Bind<IService>().To(ctx => func()))
+            using (container.Bind<IService>().To(ctx => new Service(new Dependency())))
             {
                 // Resolve an instance
                 var instance = container.Resolve<IService>();

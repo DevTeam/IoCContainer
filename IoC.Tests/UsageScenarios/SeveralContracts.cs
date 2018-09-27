@@ -15,9 +15,8 @@
             // $priority=01
             // $description=Several Contracts
             // {
-            // Create a container
+            // Create and configure the container, using full auto-wiring
             using (var container = Container.Create())
-            // Configure the container, using full auto-wiring
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<Service, IService, IAnotherService>().To<Service>())
             {
@@ -25,6 +24,7 @@
                 var instance1 = container.Resolve<IService>();
                 var instance2 = container.Resolve<IAnotherService>();
 
+                // Check the instances' types
                 instance1.ShouldBeOfType<Service>();
                 instance2.ShouldBeOfType<Service>();
             }

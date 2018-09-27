@@ -18,15 +18,15 @@ namespace IoC.Tests.UsageScenarios
             // $priority=02
             // $description=Asynchronous resolve
             // {
-            // Create a container
-            using (var container = Container.Create())
-            // Configure the container
-            using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<IService>().To<Service>())
+            // Create the container and configure it
+            using (var container = Container.Create()
+                .Bind<IDependency>().To<Dependency>().ToSelf()
+                .Bind<IService>().To<Service>().ToSelf())
             {
                 // Resolve an instance asynchronously
                 var instance = await container.Resolve<Task<IService>>();
 
+                // Check the instance's type
                 instance.ShouldBeOfType<Service>();
             }
             // }

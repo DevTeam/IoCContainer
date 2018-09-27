@@ -15,12 +15,13 @@
         // {
         public void Run()
         {
-            // Create a container and configure it
+            // Create and configure the container
             using (var container = Container.Create().Using<Glue>())
             {
                 // Resolve an instance
                 var instance = container.Resolve<IService>();
 
+                // Check the instance's type
                 instance.ShouldBeOfType<Service>();
             }
         }
@@ -29,7 +30,7 @@
         {
             public IEnumerable<IDisposable> Apply(IContainer container)
             {
-                // Use full auto-wiring
+                // Bind using full auto-wiring
                 yield return container.Bind<IDependency>().To<Dependency>();
                 yield return container.Bind<IService>().To<Service>();
             }

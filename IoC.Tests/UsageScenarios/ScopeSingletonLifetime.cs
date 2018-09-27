@@ -2,6 +2,7 @@
 {
     using Shouldly;
     using Xunit;
+    using static Lifetime;
 
     public class ScopeSingletonLifetime
     {
@@ -13,48 +14,62 @@
             // $priority=03
             // $description=Scope Singleton lifetime
             // {
-            // Create a container
+            // Create and configure the container
             using (var container = Container.Create())
-            // Configure the container
-            using (container.Bind<IDependency>().As(Lifetime.ScopeSingleton).To<Dependency>())
+            // Use the Scope Singleton lifetime for dependency
+            using (container.Bind<IDependency>().As(ScopeSingleton).To<Dependency>())
             {
-                using (container.Bind<IService>().As(Lifetime.ScopeSingleton).To<Service>())
+                // Use the Scope Singleton lifetime for instance
+                using (container.Bind<IService>().As(ScopeSingleton).To<Service>())
                 {
-                    // Default scope
-                    var instance1 = container.Resolve<IService>();
-                    var instance2 = container.Resolve<IService>();
-                    instance1.ShouldBe(instance2);
+                    // Resolve the default scope singleton twice
+                    var defaultScopeInstance1 = container.Resolve<IService>();
+                    var defaultScopeInstance2 = container.Resolve<IService>();
 
-                    // Scope "1"
-                    using (var scope = new Scope("1"))
-                    using (scope.Begin())
+                    // Check that instances from the default scope are equal
+                    defaultScopeInstance1.ShouldBe(defaultScopeInstance2);
+
+                    // Using the scope "a"
+                    using (new Scope("a").Begin())
                     {
-                        var instance3 = container.Resolve<IService>();
-                        var instance4 = container.Resolve<IService>();
+                        var scopeInstance1 = container.Resolve<IService>();
+                        var scopeInstance2 = container.Resolve<IService>();
 
-                        instance3.ShouldBe(instance4);
-                        instance3.ShouldNotBe(instance1);
+                        // Check that instances from the scope "a" are equal
+                        scopeInstance1.ShouldBe(scopeInstance2);
+
+                        // Check that instances from different scopes are not equal
+                        scopeInstance1.ShouldNotBe(defaultScopeInstance1);
                     }
 
                     // Default scope again
-                    var instance5 = container.Resolve<IService>();
-                    instance5.ShouldBe(instance1);
+                    var defaultScopeInstance3 = container.Resolve<IService>();
+
+                    // Check that instances from the default scope are equal
+                    defaultScopeInstance3.ShouldBe(defaultScopeInstance1);
                 }
 
-                // Reconfigure to check dependencies only
-                using (container.Bind<IService>().As(Lifetime.Transient).To<Service>())
+                // Reconfigure the container to check dependencies only
+                using (container.Bind<IService>().As(Transient).To<Service>())
                 {
-                    // Default scope
-                    var instance1 = container.Resolve<IService>();
-                    var instance2 = container.Resolve<IService>();
-                    instance1.Dependency.ShouldBe(instance2.Dependency);
+                    // Resolve transient instances
+                    var transientInstance1 = container.Resolve<IService>();
+                    var transientInstance2 = container.Resolve<IService>();
 
-                    // Scope "1"
-                    using (var scope = new Scope("1"))
-                    using (scope.Begin())
+                    // Check that transient instances are not equal
+                    transientInstance1.ShouldNotBe(transientInstance2);
+
+                    // Check that dependencies from the default scope are equal
+                    transientInstance1.Dependency.ShouldBe(transientInstance2.Dependency);
+
+                    // Using the scope "a"
+                    using (new Scope("a").Begin())
                     {
-                        var instance3 = container.Resolve<IService>();
-                        instance3.Dependency.ShouldNotBe(instance1.Dependency);
+                        // Resolve a transient instance in scope "a"
+                        var transientInstance3 = container.Resolve<IService>();
+
+                        // Check that dependencies from different scopes are not equal
+                        transientInstance3.Dependency.ShouldNotBe(transientInstance1.Dependency);
                     }
                 }
             }
