@@ -389,7 +389,6 @@ namespace IoC.Features
     using System;
     using System.Collections.Generic;
     using Interception;
-    using Lifetimes;
 
     /// <inheritdoc cref="IConfiguration" />
     [PublicAPI]
@@ -399,7 +398,7 @@ namespace IoC.Features
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register<InterceptorBuilder, IInterceptorRegistry, IBuilder>(ctx => new InterceptorBuilder(), new SingletonLifetime());
+            yield return container.Bind<InterceptorBuilder, IInterceptorRegistry, IBuilder>().As(Lifetime.Singleton).To();
         }
     }
 }

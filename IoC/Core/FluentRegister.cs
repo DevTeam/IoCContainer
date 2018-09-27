@@ -1,4 +1,4 @@
-﻿namespace IoC
+﻿namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
@@ -6,14 +6,13 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
-    using Core;
 
     /// <summary>
     /// Represents extensions to register a dependency in the container.
     /// </summary>
     [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
     [PublicAPI]
-    public static class FluentRegister
+    internal static class FluentRegister
     {
         private static readonly IEnumerable<object> DefaultTags = new object[] { null };
 
