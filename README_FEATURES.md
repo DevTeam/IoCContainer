@@ -28,29 +28,30 @@
 ### [Incredible Performance](#why-this-one)
 
   - One of the fastest, almost as fast as operator `new`
-  - Uses [expression trees](https://docs.microsoft.com/en-us/dotnet/csharp/expression-trees) to produce the effective injection code
-  - Makes minimum memory traffic
+  - Uses [expression trees](https://docs.microsoft.com/en-us/dotnet/csharp/expression-trees) to produce the [effective injection code](#struct) without any superfluous operations like a `boxing`, `unboxing` or `cast`
+  - Minimizes the memory traffic
 
 ### [Fully Customizable](#customization)
 
   - [Custom containers](#custom-child-container)
   - [Custom lifetimes](#custom-lifetime)
   - [Replacing predefined lifetimes](#replace-lifetime)
+  - [Custom builders](#custom-builder)
   - [Interceptors](#interception)
 
 ### [Multithreading-Ready](#multithreading)
 
   - Thread-safe
   - [Asynchronous resolving](#asynchronous-resolve)
-  - [Lightweight resolving](#asynchronous-lightweight-resolve)
+  - [Lightweight asynchronous resolving](#asynchronous-lightweight-resolve)
 
 ### [Design Aspects](#design)
 
   - Allows not to change the design of own code to follow [Inversion of Control](https://martinfowler.com/articles/injection.html) pattern
   - Aggregates features into dedicated [classes](#configuration-class)
   - [Modifiable on-the-fly](#change-configuration-on-the-fly)
-  - Has no additional packages dependencies
-  - Supports embedding directly to you code by [embedding-in-code packages](#nuget-packages)
+  - Has no any additional dependencies
+  - Supports the embedding directly to your code by [embedding-in-code packages](#nuget-packages)
 
 ### Easy Integration
 

@@ -28,29 +28,30 @@
 ### [Incredible Performance](https://github.com/DevTeam/IoCContainer#why-this-one)
 
   - One of the fastest, almost as fast as operator `new`
-  - Uses [expression trees](https://docs.microsoft.com/en-us/dotnet/csharp/expression-trees) to produce the effective injection code
-  - Makes minimum memory traffic
+  - Uses [expression trees](https://docs.microsoft.com/en-us/dotnet/csharp/expression-trees) to produce the [effective injection code](https://github.com/DevTeam/IoCContainer#struct) without any superfluous operations like a `boxing`, `unboxing` or `cast`
+  - Minimizes the memory traffic
 
 ### [Fully Customizable](https://github.com/DevTeam/IoCContainer#customization)
 
   - [Custom containers](https://github.com/DevTeam/IoCContainer#custom-child-container)
   - [Custom lifetimes](https://github.com/DevTeam/IoCContainer#custom-lifetime)
   - [Replacing predefined lifetimes](https://github.com/DevTeam/IoCContainer#replace-lifetime)
+  - [Custom builders](https://github.com/DevTeam/IoCContainer#custom-builder)
   - [Interceptors](https://github.com/DevTeam/IoCContainer#interception)
 
 ### [Multithreading-Ready](https://github.com/DevTeam/IoCContainer#multithreading)
 
   - Thread-safe
   - [Asynchronous resolving](https://github.com/DevTeam/IoCContainer#asynchronous-resolve)
-  - [Lightweight resolving](https://github.com/DevTeam/IoCContainer#asynchronous-lightweight-resolve)
+  - [Lightweight asynchronous resolving](https://github.com/DevTeam/IoCContainer#asynchronous-lightweight-resolve)
 
 ### [Design Aspects](https://github.com/DevTeam/IoCContainer#design)
 
   - Allows not to change the design of own code to follow [Inversion of Control](https://martinfowler.com/articles/injection.html) pattern
   - Aggregates features into dedicated [classes](https://github.com/DevTeam/IoCContainer#configuration-class)
   - [Modifiable on-the-fly](https://github.com/DevTeam/IoCContainer#change-configuration-on-the-fly)
-  - Has no additional packages dependencies
-  - Supports embedding directly to you code by [embedding-in-code packages](https://github.com/DevTeam/IoCContainer#nuget-packages)
+  - Has no any additional dependencies
+  - Supports the embedding directly to your code by [embedding-in-code packages](https://github.com/DevTeam/IoCContainer#nuget-packages)
 
 ### Easy Integration
 

@@ -1,5 +1,6 @@
 ﻿namespace IoC.Tests
 {
+    using System.Collections.Generic;
     using System.Linq;
     using Core;
     using Shouldly;
@@ -19,6 +20,23 @@
             
             // Then
             table.Count().ShouldBe(2);
+        }
+
+        [Fact]
+        public void ShouldEnumerate()
+        {
+            // Given
+            var table = Table<string, string>.Empty;
+
+            // When
+            table = table.Set("c".GetHashCode(), "c", "c");
+            table = table.Set("Z".GetHashCode(), "Z", "Z");
+            var dict = table.ToDictionary(i => i.Key, i => i.Value).ToList();
+
+            // Then
+            dict.Count.ShouldBe(2);
+            dict.Contains(new KeyValuePair<string, string>("c", "c")).ShouldBeTrue();
+            dict.Contains(new KeyValuePair<string, string>("Z", "Z")).ShouldBeTrue();
         }
 
         [Fact]

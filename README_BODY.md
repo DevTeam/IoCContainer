@@ -8,7 +8,7 @@
 
 Embedding-in-code packages require C# 7.0 or higher.
 
-## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works
+## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works [C#](https://dotnetfiddle.net/dRebQM)
 
 ### The reality is that
 

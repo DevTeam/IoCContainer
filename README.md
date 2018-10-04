@@ -32,29 +32,30 @@
 ### [Incredible Performance](#why-this-one)
 
   - One of the fastest, almost as fast as operator `new`
-  - Uses [expression trees](https://docs.microsoft.com/en-us/dotnet/csharp/expression-trees) to produce the effective injection code
-  - Makes minimum memory traffic
+  - Uses [expression trees](https://docs.microsoft.com/en-us/dotnet/csharp/expression-trees) to produce the [effective injection code](#struct) without any superfluous operations like a `boxing`, `unboxing` or `cast`
+  - Minimizes the memory traffic
 
 ### [Fully Customizable](#customization)
 
   - [Custom containers](#custom-child-container)
   - [Custom lifetimes](#custom-lifetime)
   - [Replacing predefined lifetimes](#replace-lifetime)
+  - [Custom builders](#custom-builder)
   - [Interceptors](#interception)
 
 ### [Multithreading-Ready](#multithreading)
 
   - Thread-safe
   - [Asynchronous resolving](#asynchronous-resolve)
-  - [Lightweight resolving](#asynchronous-lightweight-resolve)
+  - [Lightweight asynchronous resolving](#asynchronous-lightweight-resolve)
 
 ### [Design Aspects](#design)
 
   - Allows not to change the design of own code to follow [Inversion of Control](https://martinfowler.com/articles/injection.html) pattern
   - Aggregates features into dedicated [classes](#configuration-class)
   - [Modifiable on-the-fly](#change-configuration-on-the-fly)
-  - Has no additional packages dependencies
-  - Supports embedding directly to you code by [embedding-in-code packages](#nuget-packages)
+  - Has no any additional dependencies
+  - Supports the embedding directly to your code by [embedding-in-code packages](#nuget-packages)
 
 ### Easy Integration
 
@@ -81,7 +82,7 @@
 
 Embedding-in-code packages require C# 7.0 or higher.
 
-## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works
+## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works [C#](https://dotnetfiddle.net/dRebQM)
 
 ### The reality is that
 
@@ -284,6 +285,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Scope Singleton lifetime](#scope-singleton-lifetime)
   - [Singleton lifetime](#singleton-lifetime)
   - [Manual Auto-wiring](#manual-auto-wiring)
+  - [Struct](#struct)
   - [Func With Arguments](#func-with-arguments)
   - [Auto dispose singleton during container's dispose](#auto-dispose-singleton-during-containers-dispose)
   - [Configuration via a text metadata](#configuration-via-a-text-metadata)
@@ -676,6 +678,50 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ManualAutowiring.cs)
+
+### Struct
+
+``` CSharp
+public void Run()
+{
+    // Create and configure the container
+    using (var container = Container.Create())
+    using (container.Bind<IDependency>().To<Dependency>())
+    // Register the tracing builder
+    using (container.Bind<TracingBuilder, IBuilder>().As(Singleton).To<TracingBuilder>())
+    // Register a struct
+    using (container.Bind<MyStruct>().To<MyStruct>())
+    {
+        // Resolve an instance
+        var instance = container.Resolve<MyStruct>();
+
+        // Check the expression which was used to create an instances of MyStruct
+        var expressions = container.Resolve<TracingBuilder>().Expressions;
+        var structExpression = expressions[new Key(typeof(MyStruct))].ToString();
+        structExpression.ShouldBe("new MyStruct(new Dependency())");
+        // Obvious there are no any superfluous operations like a `boxing`, `unboxing` or `cast`,
+        // just only what is really necessary to create an instance
+    }
+}
+
+public struct MyStruct
+{
+    public MyStruct(IDependency dependency) { }
+}
+
+// This builder saves expressions that used to create resolvers into a map
+public class TracingBuilder : IBuilder
+{
+    public readonly IDictionary<Key, Expression> Expressions = new Dictionary<Key, Expression>();
+
+    public Expression Build(Expression expression, IBuildContext buildContext)
+    {
+        Expressions[buildContext.Key] = expression;
+        return expression;
+    }
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Struct.cs)
 
 ### Func With Arguments
 
