@@ -31,12 +31,21 @@
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
             var typeDescriptor = type.Descriptor();
+            if (typeDescriptor.IsArray())
+            {
+                var elementType = typeDescriptor.GetElementType();
+                if (elementType.Descriptor().IsGenericTypeArgument())
+                {
+                    return typeof(IArray);
+                }
+            }
+
             if (!typeDescriptor.IsConstructedGenericType())
             {
                 return type;
             }
 
-            if (typeDescriptor.GetGenericTypeArguments().Any(t => Descriptor(t).IsGenericTypeArgument()))
+            if (typeDescriptor.GetGenericTypeArguments().Any(t => t.Descriptor().IsGenericTypeArgument()))
             {
                 return typeDescriptor.GetGenericTypeDefinition();
             }

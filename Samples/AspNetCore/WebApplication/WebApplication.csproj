@@ -12,7 +12,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="IoC.AspNetCore" Version="1.1.8" />
     <PackageReference Include="Microsoft.AspNetCore.All" Version="2.0.6" />
   </ItemGroup>
 
@@ -21,6 +20,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\..\IoC\IoC.csproj" />
     <ProjectReference Include="..\..\ShroedingersCat\ShroedingersCat.csproj" />
   </ItemGroup>
 

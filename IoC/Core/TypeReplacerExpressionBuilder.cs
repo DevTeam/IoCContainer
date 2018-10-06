@@ -15,15 +15,17 @@
             if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             typesMap = typesMap ?? new Dictionary<Type, Type>();
-            var typeMappingExpressionVisitor = new TypeMappingExpressionVisitor(buildContext.Key.Type, typesMap);
-            typeMappingExpressionVisitor.Visit(bodyExpression);
-            if (typesMap.Count > 0)
+            if (bodyExpression.Type != buildContext.Key.Type)
             {
-                var typeReplacingExpressionVisitor = new TypeReplacerExpressionVisitor(typesMap);
-                var newExpression = typeReplacingExpressionVisitor.Visit(bodyExpression);
-                if (newExpression != null)
+                TypeMapper.Shared.Map(bodyExpression.Type, buildContext.Key.Type, typesMap);
+                if (typesMap.Count > 0)
                 {
-                    return newExpression;
+                    var typeReplacingExpressionVisitor = new TypeReplacerExpressionVisitor(typesMap);
+                    var newExpression = typeReplacingExpressionVisitor.Visit(bodyExpression);
+                    if (newExpression != null)
+                    {
+                        return newExpression;
+                    }
                 }
             }
 

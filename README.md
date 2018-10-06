@@ -26,7 +26,7 @@
 
   - [Сonstructors injection](#constructor-auto-wiring), [methods injection](#method-injection) and [properties injection](#property-injection)
   - Injection of [Func](#resolve-func), [Lazy](#resolve-lazy), [Tuple](#resolve-tuple) and [ValueTuple](#resolve-valuetuple)
-  - Injection of [IEnumerable](#resolve-all-appropriate-instances-as-ienumerable), [ICollection](#resolve-all-appropriate-instances-as-icollection), [ISet](#resolve-all-appropriate-instances-as-iset) or even via [IObservable](#resolve-all-appropriate-instances-as-iobservable-source)
+  - Injection of [IEnumerable](#resolve-all-appropriate-instances-as-ienumerable), [Array](#resolve-all-appropriate-instances-as-array), [ICollection](#resolve-all-appropriate-instances-as-icollection), [ISet](#resolve-all-appropriate-instances-as-iset) or even via [IObservable](#resolve-all-appropriate-instances-as-iobservable-source)
   - Detailed errors information
 
 ### [Incredible Performance](#why-this-one)
@@ -134,7 +134,7 @@ At first add the package reference to [IoC.Container](https://www.nuget.org/pack
   dotnet add package IoC.Container
   ```
 
-You could use a dedicated class(es) to declare dependencies.
+After that declare required dependencies in a dedicated class _Glue_.
 
 ```csharp
 class Glue : IConfiguration
@@ -149,55 +149,36 @@ class Glue : IConfiguration
 
 ### Time to open boxes!
 
+Build up _Program_ using _Glue_
+
 ```csharp
 using (var container = Container.Create().Using<Glue>())
 {
-    var box = container.Resolve<IBox<ICat>>();
-    Console.WriteLine(box);
-
-    // Func
-    var func = container.Resolve<Func<IBox<ICat>>>();
-    Console.WriteLine("Func: " + func());
-
-    // Async
-    box = await container.Resolve<Task<IBox<ICat>>>();
-    Console.WriteLine("Task: " + box);
-
-    // Async value
-    box = await container.Resolve<ValueTask<IBox<ICat>>>();
-    Console.WriteLine("ValueTask: " + box);
-
-    // Tuple
-    var tuple = container.Resolve<Tuple<IBox<ICat>, ICat>>();
-    Console.WriteLine("Tuple: " + tuple.Item1 + ", " + tuple.Item2);
-
-    // ValueTuple
-    var valueTuple = container.Resolve<(IBox<ICat> box, ICat cat, IBox<ICat> anotherBox)>();
-    Console.WriteLine("ValueTuple: " + valueTuple.box + ", " + valueTuple.cat + ", " + valueTuple.anotherBox);
-
-    // Lazy
-    var lazy = container.Resolve<Lazy<IBox<ICat>>>();
-    Console.WriteLine("Lazy: " + lazy.Value);
-
-    // Enumerable
-    var enumerable = container.Resolve<IEnumerable<IBox<ICat>>>();
-    Console.WriteLine("IEnumerable: " + enumerable.Single());
-
-    // List
-    var list = container.Resolve<IList<IBox<ICat>>>();
-    Console.WriteLine("IList: " + list[0]);
-
-    // Reactive
-    var source = container.Resolve<IObservable<IBox<ICat>>>();
-    using (source.Subscribe(value => Console.WriteLine("IObservable: " + value))) { }
-
-    // Complex
-    var complex = container.Resolve<Lazy<Func<Task<IEnumerable<IBox<ICat>>>>>>();
-    Console.WriteLine("Complex: " + (await complex.Value()).Single());
+  container.BuildUp<Program>();
 }
 ```
 
-Let's take a note that the real "Inversion of Control container" scenario is not supposing using any resolving methods, except a single root resolving (just imagine here that boxes equal to root instances in the sample above). It is better when all dependencies are injected automatically via constructors, initializing methods, properties or even fields.
+injecting a set of dependencies via _Program_ constructor (also it can be done via methods, properties or even fields)
+
+```csharp
+public Program(
+  IBox<ICat> box,
+  IBox<IBox<ICat>> nestedBox,
+  Func<IBox<ICat>> func,
+  Task<IBox<ICat>> task,
+  ValueTask<IBox<ICat>> valueTask,
+  Tuple<IBox<ICat>, ICat, IBox<IBox<ICat>>> tuple,
+  (IBox<ICat> box, ICat cat, IBox<IBox<ICat>> nestedBox) valueTuple,
+  Lazy<IBox<ICat>> lazy,
+  IEnumerable<IBox<ICat>> enumerable,
+  IBox<ICat>[] array,
+  IList<IBox<ICat>> list,
+  ISet<IBox<ICat>> set,
+  IObservable<IBox<ICat>> observable,
+  IBox<Lazy<Func<IEnumerable<IBox<ICat>>>>> complex)
+{
+}
+```
 
 ### Under the hood
 
@@ -270,6 +251,20 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
 
 ## Usage Scenarios
 
+- Powerful Injection
+  - [Resolve Func](#resolve-func)
+  - [Resolve Lazy](#resolve-lazy)
+  - [Resolve Tuple](#resolve-tuple)
+  - [Resolve ValueTuple](#resolve-valuetuple)
+  - [Method Injection](#method-injection)
+  - [Property Injection](#property-injection)
+  - [Constructor Auto-wiring](#constructor-auto-wiring)
+  - [Resolve all appropriate instances as Array](#resolve-all-appropriate-instances-as-array)
+  - [Resolve all appropriate instances as ICollection](#resolve-all-appropriate-instances-as-icollection)
+  - [Resolve all appropriate instances as IEnumerable](#resolve-all-appropriate-instances-as-ienumerable)
+  - [Resolve all appropriate instances as IObservable source](#resolve-all-appropriate-instances-as-iobservable-source)
+  - [Resolve Using Arguments](#resolve-using-arguments)
+  - [Resolve all appropriate instances as ISet](#resolve-all-appropriate-instances-as-iset)
 - Flexible Binding
   - [Auto-wiring](#auto-wiring)
   - [Generic Auto-wiring](#generic-auto-wiring)
@@ -297,19 +292,6 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
 - Design Aspects
   - [Configuration class](#configuration-class)
   - [Change configuration on-the-fly](#change-configuration-on-the-fly)
-- Powerful Injection
-  - [Resolve Func](#resolve-func)
-  - [Resolve Lazy](#resolve-lazy)
-  - [Resolve Tuple](#resolve-tuple)
-  - [Resolve ValueTuple](#resolve-valuetuple)
-  - [Method Injection](#method-injection)
-  - [Property Injection](#property-injection)
-  - [Constructor Auto-wiring](#constructor-auto-wiring)
-  - [Resolve all appropriate instances as ICollection](#resolve-all-appropriate-instances-as-icollection)
-  - [Resolve all appropriate instances as IEnumerable](#resolve-all-appropriate-instances-as-ienumerable)
-  - [Resolve all appropriate instances as IObservable source](#resolve-all-appropriate-instances-as-iobservable-source)
-  - [Resolve Using Arguments](#resolve-using-arguments)
-  - [Resolve all appropriate instances as ISet](#resolve-all-appropriate-instances-as-iset)
 - Fully Customizable
   - [Custom Builder](#custom-builder)
   - [Custom Child Container](#custom-child-container)
@@ -1478,6 +1460,34 @@ using (container.Bind<IService>().To<Service>(
 }
 ```
 [C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConstructorAutowiring.cs)
+
+### Resolve all appropriate instances as Array
+
+``` CSharp
+// Create and configure the container
+using (var container = Container.Create())
+using (container.Bind<IDependency>().To<Dependency>())
+// Bind to the implementation #1
+using (container.Bind<IService>().Tag(1).To<Service>())
+// Bind to the implementation #2
+using (container.Bind<IService>().Tag(2).Tag("abc").To<Service>())
+// Bind to the implementation #3
+using (container.Bind<IService>().Tag(3).To<Service>())
+{
+    // Resolve all appropriate instances
+    var instances = container.Resolve<IService[]>();
+
+    // Check the number of resolved instances
+    instances.Length.ShouldBe(3);
+
+    foreach (var instance in instances)
+    {
+        // Check the instance's type
+        instance.ShouldBeOfType<Service>();
+    }
+}
+```
+[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Array.cs)
 
 ### Resolve all appropriate instances as ICollection
 

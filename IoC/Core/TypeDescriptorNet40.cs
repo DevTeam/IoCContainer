@@ -111,6 +111,25 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
+
+        public override string ToString() => Type.ToString();
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is TypeDescriptor other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return Type.GetHashCode();
+        }
+
+        private bool Equals(TypeDescriptor other)
+        {
+            return Type == other.Type;
+        }
     }
 }
 #endif

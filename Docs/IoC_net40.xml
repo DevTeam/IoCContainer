@@ -993,6 +993,11 @@
             <param name="tags">The tags.</param>
             <returns></returns>
         </member>
+        <member name="T:IoC.Core.IArray">
+            <summary>
+            Marker interface for arrays.
+            </summary>
+        </member>
         <member name="T:IoC.Core.IExpressionBuilder`1">
             <summary>
             Allows to build expression for lifetimes.
@@ -1341,6 +1346,21 @@
             Puts the dependency token into the target container to manage it.
             </summary>
             <param name="dependencyToken"></param>
+        </member>
+        <member name="T:IoC.FluentBuildUp">
+            <summary>
+            Represents extensions to build up from the container.
+            </summary>
+        </member>
+        <member name="M:IoC.FluentBuildUp.BuildUp``1(IoC.IContainer,System.Object[])">
+            <summary>
+            Buildups an instance.
+            Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="args">The optional arguments.</param>
+            <returns>The instance.</returns>
         </member>
         <member name="T:IoC.FluentConfiguration">
             <summary>

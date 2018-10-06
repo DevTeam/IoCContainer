@@ -7,7 +7,7 @@ namespace IoC.Tests
     using Shouldly;
     using Xunit;
 
-    public class StringToTagsConverterTest
+    public class StringToTagsConverterTests
     {
         [Theory]
         [ClassData(typeof(TestDataGenerator))]

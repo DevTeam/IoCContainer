@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
 
     internal class TypeReplacerExpressionVisitor: ExpressionVisitor
     {
@@ -20,8 +21,7 @@
         {
             var newTypeDescriptor = ReplaceType(node.Type).Descriptor();
             var newConstructor = newTypeDescriptor.GetDeclaredConstructors().Single(i => !i.IsPrivate && Match(node.Constructor.GetParameters(), i.GetParameters()));
-            var newArgs = ReplaceAll(node.Arguments).ToList();
-            return Expression.New(newConstructor, newArgs);
+            return Expression.New(newConstructor, ReplaceAll(node.Arguments));
         }
 
         protected override Expression VisitUnary(UnaryExpression node)
@@ -57,8 +57,9 @@
                 newMethod = newMethod.MakeGenericMethod(ReplaceTypes(node.Method.GetGenericArguments()));
             }
 
-            var newArgs = ReplaceAll(node.Arguments).ToList();
-            return node.Object != null ? Expression.Call(Visit(node.Object), newMethod, newArgs) : Expression.Call(newMethod, newArgs);
+            return node.Object != null 
+                ? Expression.Call(Visit(node.Object), newMethod, ReplaceAll(node.Arguments))
+                : Expression.Call(newMethod, ReplaceAll(node.Arguments));
         }
 
         protected override Expression VisitMember(MemberExpression node)
@@ -145,6 +146,7 @@
                 case ExpressionType.Assign:
                     return Expression.Assign(Visit(node.Left) ?? throw new InvalidOperationException(), Visit(node.Right) ?? throw new InvalidOperationException());
             }
+
             return base.VisitBinary(node);
         }
 
@@ -162,8 +164,7 @@
                 newMethod = newMethod.MakeGenericMethod(ReplaceTypes(node.AddMethod.GetGenericArguments()));
             }
 
-            var newArgs = ReplaceAll(node.Arguments).ToList();
-            return Expression.ElementInit(newMethod, newArgs);
+            return Expression.ElementInit(newMethod, ReplaceAll(node.Arguments));
         }
 
         private bool Match(ParameterInfo[] baseParams, ParameterInfo[] newParams)
@@ -195,54 +196,47 @@
             return true;
         }
 
+        [MethodImpl((MethodImplOptions) 256)]
         private Type[] ReplaceTypes(Type[] types)
         {
-            return types.Select(ReplaceType).ToArray();
+            for (var i = 0; i < types.Length; i++)
+            {
+                types[i] = ReplaceType(types[i]);
+            }
+
+            return types;
         }
 
         private Type ReplaceType(Type type)
         {
-            var baseTypeDescriptor = type.Descriptor();
-            if (!baseTypeDescriptor.IsConstructedGenericType())
+            if (_typesMap.TryGetValue(type, out var newType))
             {
-                if (_typesMap.TryGetValue(type, out var newType))
-                {
-                    return newType;
-                }
+                return newType;
+            }
 
-                if (baseTypeDescriptor.IsArray())
+            var typeDescriptor = type.Descriptor();
+            if (typeDescriptor.IsArray())
+            {
+                var elementType = typeDescriptor.GetElementType();
+                var newElementType = ReplaceType(typeDescriptor.GetElementType());
+                if (elementType != newElementType)
                 {
-                    var elementType = baseTypeDescriptor.GetElementType();
-                    var newElementType = ReplaceType(baseTypeDescriptor.GetElementType());
-                    if (elementType != newElementType)
-                    {
-                        return newElementType.MakeArrayType();
-                    }
-
-                    return type;
+                    return newElementType.MakeArrayType();
                 }
 
                 return type;
             }
 
-            var newGenericTypes = new Type[baseTypeDescriptor.GetGenericTypeArguments().Length];
-            var genericTypes = ReplaceTypes(baseTypeDescriptor.GetGenericTypeArguments());
-            for (var i = 0; i < genericTypes.Length; i++)
+            if (typeDescriptor.IsConstructedGenericType())
             {
-                var genericType = genericTypes[i];
-                if (_typesMap.TryGetValue(genericType, out var newGenericType))
-                {
-                    newGenericTypes[i] = newGenericType;
-                }
-                else
-                {
-                    newGenericTypes[i] = ReplaceType(genericType);
-                }
+                var genericTypes = ReplaceTypes(typeDescriptor.GetGenericTypeArguments());
+                return typeDescriptor.GetGenericTypeDefinition().Descriptor().MakeGenericType(ReplaceTypes(genericTypes));
             }
 
-            return baseTypeDescriptor.GetGenericTypeDefinition().Descriptor().MakeGenericType(newGenericTypes);
+            return type;
         }
 
+        [MethodImpl((MethodImplOptions) 256)]
         private IEnumerable<Expression> ReplaceAll(IEnumerable<Expression> expressions)
         {
             return expressions.Select(Visit);

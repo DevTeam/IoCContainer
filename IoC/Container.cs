@@ -427,18 +427,28 @@
                     return true;
                 }
 
+                dependencyEntry = _dependencies.Get(hashCode, key);
+                if (dependencyEntry != default(DependencyEntry))
+                {
+                    return true;
+                }
+
                 var type = key.Type;
                 var typeDescriptor = type.Descriptor();
+
+                // Generic type
                 if (typeDescriptor.IsConstructedGenericType())
                 {
                     var genericType = typeDescriptor.GetGenericTypeDefinition();
                     var genericKey = new FullKey(genericType, key.Tag);
+                    // For generic type
                     dependencyEntry = _dependencies.Get(genericKey.GetHashCode(), genericKey);
                     if (dependencyEntry != default(DependencyEntry))
                     {
                         return true;
                     }
 
+                    // For generic type and Any tag
                     dependencyEntry = _dependenciesForTagAny.GetByRef(genericType.GetHashCode(), genericType);
                     if (dependencyEntry != default(DependencyEntry))
                     {
@@ -446,8 +456,34 @@
                     }
                 }
 
+                // For Any tag
                 dependencyEntry = _dependenciesForTagAny.GetByRef(type.GetHashCode(), type);
-                return dependencyEntry != default(DependencyEntry);
+                if (dependencyEntry != default(DependencyEntry))
+                {
+                    return true;
+                }
+
+                // For array
+                if (typeDescriptor.IsArray())
+                {
+                    var arrayType = typeof(IArray);
+                    var arrayKey = new FullKey(arrayType, key.Tag);
+                    // For generic type
+                    dependencyEntry = _dependencies.Get(arrayKey.GetHashCode(), arrayKey);
+                    if (dependencyEntry != default(DependencyEntry))
+                    {
+                        return true;
+                    }
+
+                    // For generic type and Any tag
+                    dependencyEntry = _dependenciesForTagAny.GetByRef(arrayType.GetHashCode(), arrayType);
+                    if (dependencyEntry != default(DependencyEntry))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
         }
 

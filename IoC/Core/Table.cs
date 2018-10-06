@@ -10,14 +10,14 @@
     {
         public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(4, Bucket.EmptyBucket), 3, 0);
         public readonly int Count;
-        private readonly int _divisor;
-        private readonly Bucket[] _buckets;
+        public readonly int Divisor;
+        public readonly Bucket[] Buckets;
 
         [MethodImpl((MethodImplOptions)256)]
         private Table(Bucket[] buckets, int divisor, int count)
         {
-            _buckets = buckets;
-            _divisor = divisor;
+            Buckets = buckets;
+            Divisor = divisor;
             Count = count;
         }
 
@@ -26,46 +26,39 @@
         {
             int newBucketIndex;
             Count = origin.Count + 1;
-            if (origin.Count > origin._divisor)
+            if (origin.Count > origin.Divisor)
             {
-                _divisor = (origin._divisor + 1) << 2 - 1;
-                _buckets = CoreExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
-                var originBuckets = origin._buckets;
+                Divisor = (origin.Divisor + 1) << 2 - 1;
+                Buckets = CoreExtensions.CreateArray(Divisor + 1, Bucket.EmptyBucket);
+                var originBuckets = origin.Buckets;
                 for (var originBucketIndex = 0; originBucketIndex < originBuckets.Length; originBucketIndex++)
                 {
                     var originKeyValues = originBuckets[originBucketIndex].KeyValues;
                     for (var index = 0; index < originKeyValues.Length; index++)
                     {
                         var keyValue = originKeyValues[index];
-                        newBucketIndex = keyValue.HashCode & _divisor;
-                        _buckets[newBucketIndex] = _buckets[newBucketIndex].Add(keyValue);
+                        newBucketIndex = keyValue.HashCode & Divisor;
+                        Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(keyValue);
                     }
                 }
             }
             else
             {
-                _divisor = origin._divisor;
-                _buckets = origin._buckets.Copy();
+                Divisor = origin.Divisor;
+                Buckets = origin.Buckets.Copy();
             }
 
-            newBucketIndex = hashCode & _divisor;
-            _buckets[newBucketIndex] = _buckets[newBucketIndex].Add(new KeyValue(hashCode, key, value));
-        }
-
-        [MethodImpl((MethodImplOptions) 256)]
-        [Pure]
-        public Bucket GetBucket(int hashCode)
-        {
-            return _buckets[hashCode & _divisor];
+            newBucketIndex = hashCode & Divisor;
+            Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(new KeyValue(hashCode, key, value));
         }
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
         public IEnumerator<KeyValue> GetEnumerator()
         {
-            for (var bucketIndex = 0; bucketIndex < _buckets.Length; bucketIndex++)
+            for (var bucketIndex = 0; bucketIndex < Buckets.Length; bucketIndex++)
             {
-                var keyValues = _buckets[bucketIndex].KeyValues;
+                var keyValues = Buckets[bucketIndex].KeyValues;
                 for (var index = 0; index < keyValues.Length; index++)
                 {
                     var keyValue = keyValues[index];
@@ -92,19 +85,19 @@
         public Table<TKey, TValue> Remove(int hashCode, TKey key, out bool removed)
         {
             removed = false;
-            var newBuckets = CoreExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
+            var newBuckets = CoreExtensions.CreateArray(Divisor + 1, Bucket.EmptyBucket);
             var newBucketsArray = newBuckets;
-            var bucketIndex = hashCode & _divisor;
-            for (var curBucketIndex = 0; curBucketIndex < _buckets.Length; curBucketIndex++)
+            var bucketIndex = hashCode & Divisor;
+            for (var curBucketIndex = 0; curBucketIndex < Buckets.Length; curBucketIndex++)
             {
                 if (curBucketIndex != bucketIndex)
                 {
-                    newBucketsArray[curBucketIndex] = _buckets[curBucketIndex].Copy();
+                    newBucketsArray[curBucketIndex] = Buckets[curBucketIndex].Copy();
                     continue;
                 }
 
                 // Bucket to remove an element
-                var bucket = _buckets[bucketIndex];
+                var bucket = Buckets[bucketIndex];
                 var keyValues = bucket.KeyValues;
                 for (var index = 0; index < keyValues.Length; index++)
                 {
@@ -118,7 +111,7 @@
                 }
             }
 
-            return new Table<TKey, TValue>(newBuckets, _divisor, removed ? Count - 1: Count);
+            return new Table<TKey, TValue>(newBuckets, Divisor, removed ? Count - 1: Count);
         }
 
         internal struct KeyValue

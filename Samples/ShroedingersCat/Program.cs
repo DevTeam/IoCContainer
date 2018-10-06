@@ -1,68 +1,68 @@
 ﻿// ReSharper disable UnusedMemberInSuper.Global
 // ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable ParameterTypeCanBeEnumerable.Local
+// ReSharper disable ArrangeTypeModifiers
+// ReSharper disable ArrangeTypeMemberModifiers
+#pragma warning disable 618
 namespace ShroedingersCat
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reactive.Linq;
     using System.Threading.Tasks;
     using IoC;
+    using static System.Console;
+    using static System.Threading.Tasks.Task;
 
-    public class Program
+    class Program
     {
-        public static async Task Main()
+        public Program(
+            IBox<ICat> box,
+            IBox<IBox<ICat>> nestedBox,
+            Func<IBox<ICat>> func,
+            Task<IBox<ICat>> task,
+            ValueTask<IBox<ICat>> valueTask,
+            Tuple<IBox<ICat>, ICat, IBox<IBox<ICat>>> tuple,
+            (IBox<ICat> box, ICat cat, IBox<IBox<ICat>> nestedBox) valueTuple,
+            Lazy<IBox<ICat>> lazy,
+            IEnumerable<IBox<ICat>> enumerable,
+            IBox<ICat>[] array,
+            IList<IBox<ICat>> list,
+            ISet<IBox<ICat>> set,
+            IObservable<IBox<ICat>> observable,
+            IBox<Lazy<Func<IEnumerable<IBox<ICat>>>>> complex)
+        {
+            WaitAll(task, valueTask.AsTask());
+
+            WriteLine("Box {0}", box);
+            WriteLine("Nested box {0}", nestedBox);
+            WriteLine("Func {0}", func());
+            WriteLine("Task {0}" , task.Result);
+            WriteLine("Value task {0}", valueTask.Result);
+            WriteLine("Tuple {0}", tuple);
+            WriteLine("Value tuple {0}", valueTuple);
+            WriteLine("Lazy {0}", lazy.Value);
+            WriteLine("Enumerable {0}", enumerable.Single());
+            WriteLine("Array {0}", array.Single());
+            WriteLine("List {0}", list.Single());
+            WriteLine("Set {0}", set.Single());
+            WriteLine("Observable {0}", observable.Single());
+            WriteLine("Complex {0}", complex.Content.Value().Single());
+        }
+
+        static void Main()
         {
             using (var container = Container.Create().Using<Glue>())
             {
-                var box = container.Resolve<IBox<ICat>>();
-                Console.WriteLine(box);
-
-                // Func
-                var func = container.Resolve<Func<IBox<ICat>>>();
-                Console.WriteLine("Func: " + func());
-
-                // Async
-                box = await container.Resolve<Task<IBox<ICat>>>();
-                Console.WriteLine("Task: " + box);
-
-                // Async value
-                box = await container.Resolve<ValueTask<IBox<ICat>>>();
-                Console.WriteLine("ValueTask: " + box);
-
-                // Tuple
-                var tuple = container.Resolve<Tuple<IBox<ICat>, ICat>>();
-                Console.WriteLine("Tuple: " + tuple.Item1 + ", " + tuple.Item2);
-
-                // ValueTuple
-                var valueTuple = container.Resolve<(IBox<ICat> box, ICat cat, IBox<ICat> anotherBox)>();
-                Console.WriteLine("ValueTuple: " + valueTuple.box + ", " + valueTuple.cat + ", " + valueTuple.anotherBox);
-
-                // Lazy
-                var lazy = container.Resolve<Lazy<IBox<ICat>>>();
-                Console.WriteLine("Lazy: " + lazy.Value);
-
-                // Enumerable
-                var enumerable = container.Resolve<IEnumerable<IBox<ICat>>>();
-                Console.WriteLine("IEnumerable: " + enumerable.Single());
-
-                // List
-                var list = container.Resolve<IList<IBox<ICat>>>();
-                Console.WriteLine("IList: " + list[0]);
-
-                // Reactive
-                var source = container.Resolve<IObservable<IBox<ICat>>>();
-                using (source.Subscribe(value => Console.WriteLine("IObservable: " + value))) { }
-
-                // Complex
-                var complex = container.Resolve<Lazy<Func<Task<IEnumerable<IBox<ICat>>>>>>();
-                Console.WriteLine("Complex: " + (await complex.Value()).Single());
+                container.BuildUp<Program>();
             }
         }
     }
 
-    public interface IBox<out T> { T Content { get; } }
+    interface IBox<out T> { T Content { get; } }
 
-    public interface ICat { bool IsAlive { get; } }
+    interface ICat { bool IsAlive { get; } }
 
     class CardboardBox<T> : IBox<T>
     {
@@ -80,7 +80,7 @@ namespace ShroedingersCat
         public override string ToString() => $"Is alive: {IsAlive}";
     }
 
-    public class Glue : IConfiguration
+    class Glue : IConfiguration
     {
         public IEnumerable<IDisposable> Apply(IContainer container)
         {

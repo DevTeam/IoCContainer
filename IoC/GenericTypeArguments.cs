@@ -9,55 +9,55 @@ namespace IoC
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT { }
+    public abstract class TT { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT1 { }
+    public abstract class TT1 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT2 { }
+    public abstract class TT2 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT3 { }
+    public abstract class TT3 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT4 { }
+    public abstract class TT4 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT5 { }
+    public abstract class TT5 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT6 { }
+    public abstract class TT6 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT7 { }
+    public abstract class TT7 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT8 { }
+    public abstract class TT8 { }
 
     internal static class GenericTypeArguments
     {

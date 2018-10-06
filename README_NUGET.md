@@ -22,7 +22,7 @@
 
   - [Сonstructors injection](https://github.com/DevTeam/IoCContainer#constructor-auto-wiring), [methods injection](https://github.com/DevTeam/IoCContainer#method-injection) and [properties injection](https://github.com/DevTeam/IoCContainer#property-injection)
   - Injection of [Func](https://github.com/DevTeam/IoCContainer#resolve-func), [Lazy](https://github.com/DevTeam/IoCContainer#resolve-lazy), [Tuple](https://github.com/DevTeam/IoCContainer#resolve-tuple) and [ValueTuple](https://github.com/DevTeam/IoCContainer#resolve-valuetuple)
-  - Injection of [IEnumerable](https://github.com/DevTeam/IoCContainer#resolve-all-appropriate-instances-as-ienumerable), [ICollection](https://github.com/DevTeam/IoCContainer#resolve-all-appropriate-instances-as-icollection), [ISet](https://github.com/DevTeam/IoCContainer#resolve-all-appropriate-instances-as-iset) or even via [IObservable](https://github.com/DevTeam/IoCContainer#resolve-all-appropriate-instances-as-iobservable-source)
+  - Injection of [IEnumerable](https://github.com/DevTeam/IoCContainer#resolve-all-appropriate-instances-as-ienumerable), [Array](https://github.com/DevTeam/IoCContainer#resolve-all-appropriate-instances-as-array), [ICollection](https://github.com/DevTeam/IoCContainer#resolve-all-appropriate-instances-as-icollection), [ISet](https://github.com/DevTeam/IoCContainer#resolve-all-appropriate-instances-as-iset) or even via [IObservable](https://github.com/DevTeam/IoCContainer#resolve-all-appropriate-instances-as-iobservable-source)
   - Detailed errors information
 
 ### [Incredible Performance](https://github.com/DevTeam/IoCContainer#why-this-one)

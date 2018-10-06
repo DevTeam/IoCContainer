@@ -22,7 +22,7 @@
 
   - [Сonstructors injection](#constructor-auto-wiring), [methods injection](#method-injection) and [properties injection](#property-injection)
   - Injection of [Func](#resolve-func), [Lazy](#resolve-lazy), [Tuple](#resolve-tuple) and [ValueTuple](#resolve-valuetuple)
-  - Injection of [IEnumerable](#resolve-all-appropriate-instances-as-ienumerable), [ICollection](#resolve-all-appropriate-instances-as-icollection), [ISet](#resolve-all-appropriate-instances-as-iset) or even via [IObservable](#resolve-all-appropriate-instances-as-iobservable-source)
+  - Injection of [IEnumerable](#resolve-all-appropriate-instances-as-ienumerable), [Array](#resolve-all-appropriate-instances-as-array), [ICollection](#resolve-all-appropriate-instances-as-icollection), [ISet](#resolve-all-appropriate-instances-as-iset) or even via [IObservable](#resolve-all-appropriate-instances-as-iobservable-source)
   - Detailed errors information
 
 ### [Incredible Performance](#why-this-one)

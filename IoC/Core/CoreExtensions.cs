@@ -80,7 +80,7 @@
         public static TValue Get<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
             where TKey: struct
         {
-            var items = table.GetBucket(hashCode).KeyValues;
+            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
@@ -99,7 +99,7 @@
         public static TValue GetByRef<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
             where TKey: class
         {
-            var items = table.GetBucket(hashCode).KeyValues;
+            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {

@@ -21,6 +21,7 @@
         private readonly List<ParameterExpression> _parameters = new List<ParameterExpression>();
         private readonly List<Expression> _statements = new List<Expression>();
         private int _curId;
+        private readonly Dictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
 
         internal BuildContext(
             Key key,
@@ -71,8 +72,7 @@
 
         public Expression Prepare(Expression baseExpression, ParameterExpression instanceExpression = null)
         {
-            var typesMap = new Dictionary<Type, Type>();
-            var expression = TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, typesMap);
+            var expression = TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, _typesMap);
             return DependencyInjectionExpressionBuilder.Shared.Build(expression, this, instanceExpression);
         }
 

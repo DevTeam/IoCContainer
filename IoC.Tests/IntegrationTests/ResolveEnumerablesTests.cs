@@ -73,5 +73,57 @@
                 }
             }
         }
+
+        [Fact]
+        public void ContainerShouldResolveArray()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                Func<IMyService> func = Mock.Of<IMyService>;
+                Func<IMyService1> func1 = Mock.Of<IMyService1>;
+                // When
+                using (container.Bind<IMyService, IMyService1>().As(Lifetime.Singleton).Tag(1).To(ctx => func()))
+                using (container.Bind<IMyService1>().Tag("abc").Tag(99).To(ctx => func1()))
+                using (container.Bind<IMyService, IMyService1>().As(Lifetime.Transient).Tag("xyz").To(ctx => func()))
+                {
+                    // Then
+                    var actualInstances = container.Resolve<IMyService1[]>();
+                    actualInstances.Length.ShouldBe(3);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveArrayWhenGeneric()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                Func<IMyService> func = Mock.Of<IMyService>;
+                Func<IMyService1> func1 = Mock.Of<IMyService1>;
+                // When
+                using (container.Bind<IBox<TT>>().To<Box<TT>>())
+                using (container.Bind<IMyService, IMyService1>().As(Lifetime.Singleton).Tag(1).To(ctx => func()))
+                using (container.Bind<IMyService1>().Tag("abc").Tag(99).To(ctx => func1()))
+                using (container.Bind<IMyService, IMyService1>().As(Lifetime.Transient).Tag("xyz").To(ctx => func()))
+                {
+                    // Then
+                    var box = container.Resolve<IBox<IMyService1[]>>();
+                    box.Content.Length.ShouldBe(3);
+                }
+            }
+        }
+
+        interface IBox<out T> { T Content { get; } }
+
+        class Box<T> : IBox<T>
+        {
+            public Box(T content) => Content = content;
+
+            public T Content { get; }
+
+            public override string ToString() => Content.ToString();
+        }
     }
 }

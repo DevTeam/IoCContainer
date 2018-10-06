@@ -1551,18 +1551,28 @@ namespace IoC
                     return true;
                 }
 
+                dependencyEntry = _dependencies.Get(hashCode, key);
+                if (dependencyEntry != default(DependencyEntry))
+                {
+                    return true;
+                }
+
                 var type = key.Type;
                 var typeDescriptor = type.Descriptor();
+
+                // Generic type
                 if (typeDescriptor.IsConstructedGenericType())
                 {
                     var genericType = typeDescriptor.GetGenericTypeDefinition();
                     var genericKey = new FullKey(genericType, key.Tag);
+                    // For generic type
                     dependencyEntry = _dependencies.Get(genericKey.GetHashCode(), genericKey);
                     if (dependencyEntry != default(DependencyEntry))
                     {
                         return true;
                     }
 
+                    // For generic type and Any tag
                     dependencyEntry = _dependenciesForTagAny.GetByRef(genericType.GetHashCode(), genericType);
                     if (dependencyEntry != default(DependencyEntry))
                     {
@@ -1570,8 +1580,34 @@ namespace IoC
                     }
                 }
 
+                // For Any tag
                 dependencyEntry = _dependenciesForTagAny.GetByRef(type.GetHashCode(), type);
-                return dependencyEntry != default(DependencyEntry);
+                if (dependencyEntry != default(DependencyEntry))
+                {
+                    return true;
+                }
+
+                // For array
+                if (typeDescriptor.IsArray())
+                {
+                    var arrayType = typeof(IArray);
+                    var arrayKey = new FullKey(arrayType, key.Tag);
+                    // For generic type
+                    dependencyEntry = _dependencies.Get(arrayKey.GetHashCode(), arrayKey);
+                    if (dependencyEntry != default(DependencyEntry))
+                    {
+                        return true;
+                    }
+
+                    // For generic type and Any tag
+                    dependencyEntry = _dependenciesForTagAny.GetByRef(arrayType.GetHashCode(), arrayType);
+                    if (dependencyEntry != default(DependencyEntry))
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             }
         }
 
@@ -2138,6 +2174,43 @@ namespace IoC
 }
 
 #endregion
+#region FluentBuildUp
+
+namespace IoC
+{
+    using System;
+
+    /// <summary>
+    /// Represents extensions to build up from the container.
+    /// </summary>
+    [PublicAPI]
+    public static class FluentBuildUp
+    {
+        /// <summary>
+        /// Buildups an instance.
+        /// Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <param name="args">The optional arguments.</param>
+        /// <returns>The instance.</returns>
+        public static T BuildUp<T>(this IContainer container, [NotNull] [ItemCanBeNull] params object[] args)
+        {
+            if (container.TryGetResolver<T>(typeof(T), null, out var resolver, out _, container))
+            {
+                return resolver(container, args);
+            }
+
+            var buildId = Guid.NewGuid();
+            using(container.Bind<T>().Tag(buildId).To())
+            {
+                return container.Resolve<T>(buildId.AsTag(), args);
+            }
+        }
+    }
+}
+
+#endregion
 #region FluentConfiguration
 
 namespace IoC
@@ -2692,55 +2765,55 @@ namespace IoC
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT { }
+    public abstract class TT { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT1 { }
+    public abstract class TT1 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT2 { }
+    public abstract class TT2 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT3 { }
+    public abstract class TT3 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT4 { }
+    public abstract class TT4 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT5 { }
+    public abstract class TT5 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT6 { }
+    public abstract class TT6 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT7 { }
+    public abstract class TT7 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT8 { }
+    public abstract class TT8 { }
 
     internal static class GenericTypeArguments
     {
@@ -2837,6 +2910,7 @@ namespace IoC
 namespace IoC
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq.Expressions;
 
     /// <summary>
@@ -3662,6 +3736,7 @@ namespace IoC.Features
             var containerSingletonResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
             yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx.Container, ctx.Args), containerSingletonResolver(container));
             yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToList());
+            yield return container.Register(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToArray());
             yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => new HashSet<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
             yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Inject<IEnumerable<TT>>()), containerSingletonResolver(container));
 #if !NET40
@@ -4737,6 +4812,7 @@ namespace IoC.Core
         private readonly List<ParameterExpression> _parameters = new List<ParameterExpression>();
         private readonly List<Expression> _statements = new List<Expression>();
         private int _curId;
+        private readonly Dictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
 
         internal BuildContext(
             Key key,
@@ -4787,8 +4863,7 @@ namespace IoC.Core
 
         public Expression Prepare(Expression baseExpression, ParameterExpression instanceExpression = null)
         {
-            var typesMap = new Dictionary<Type, Type>();
-            var expression = TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, typesMap);
+            var expression = TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, _typesMap);
             return DependencyInjectionExpressionBuilder.Shared.Build(expression, this, instanceExpression);
         }
 
@@ -4994,7 +5069,7 @@ namespace IoC.Core
         public static TValue Get<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
             where TKey: struct
         {
-            var items = table.GetBucket(hashCode).KeyValues;
+            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
@@ -5013,7 +5088,7 @@ namespace IoC.Core
         public static TValue GetByRef<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
             where TKey: class
         {
-            var items = table.GetBucket(hashCode).KeyValues;
+            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
@@ -5150,7 +5225,7 @@ namespace IoC.Core
         [NotNull] internal readonly IDependency Dependency;
         [CanBeNull] public readonly ILifetime Lifetime;
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
-        [NotNull] public readonly IEnumerable<Key> Keys;
+        [NotNull] public readonly IList<Key> Keys;
         private readonly object _lockObject = new object();
         private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
         private bool _disposed;
@@ -5159,7 +5234,7 @@ namespace IoC.Core
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource,
-            [NotNull] IEnumerable<Key> keys)
+            [NotNull] IList<Key> keys)
         {
             Dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
             Lifetime = lifetime;
@@ -5804,7 +5879,7 @@ namespace IoC.Core
 #endregion
 #region FluentRegister
 
-namespace IoC
+namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
@@ -5812,7 +5887,6 @@ namespace IoC
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
-    using Core;
 
     /// <summary>
     /// Represents extensions to register a dependency in the container.
@@ -6274,6 +6348,18 @@ namespace IoC.Core
                 .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
                 .Select(info => new Method<TMethodInfo>(info));
     }
+}
+
+
+#endregion
+#region IArray
+
+namespace IoC.Core
+{
+    /// <summary>
+    /// Marker interface for arrays.
+    /// </summary>
+    internal interface IArray { }
 }
 
 
@@ -6748,14 +6834,14 @@ namespace IoC.Core
     {
         public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(4, Bucket.EmptyBucket), 3, 0);
         public readonly int Count;
-        private readonly int _divisor;
-        private readonly Bucket[] _buckets;
+        public readonly int Divisor;
+        public readonly Bucket[] Buckets;
 
         [MethodImpl((MethodImplOptions)256)]
         private Table(Bucket[] buckets, int divisor, int count)
         {
-            _buckets = buckets;
-            _divisor = divisor;
+            Buckets = buckets;
+            Divisor = divisor;
             Count = count;
         }
 
@@ -6764,46 +6850,39 @@ namespace IoC.Core
         {
             int newBucketIndex;
             Count = origin.Count + 1;
-            if (origin.Count > origin._divisor)
+            if (origin.Count > origin.Divisor)
             {
-                _divisor = (origin._divisor + 1) << 2 - 1;
-                _buckets = CoreExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
-                var originBuckets = origin._buckets;
+                Divisor = (origin.Divisor + 1) << 2 - 1;
+                Buckets = CoreExtensions.CreateArray(Divisor + 1, Bucket.EmptyBucket);
+                var originBuckets = origin.Buckets;
                 for (var originBucketIndex = 0; originBucketIndex < originBuckets.Length; originBucketIndex++)
                 {
                     var originKeyValues = originBuckets[originBucketIndex].KeyValues;
                     for (var index = 0; index < originKeyValues.Length; index++)
                     {
                         var keyValue = originKeyValues[index];
-                        newBucketIndex = keyValue.HashCode & _divisor;
-                        _buckets[newBucketIndex] = _buckets[newBucketIndex].Add(keyValue);
+                        newBucketIndex = keyValue.HashCode & Divisor;
+                        Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(keyValue);
                     }
                 }
             }
             else
             {
-                _divisor = origin._divisor;
-                _buckets = origin._buckets.Copy();
+                Divisor = origin.Divisor;
+                Buckets = origin.Buckets.Copy();
             }
 
-            newBucketIndex = hashCode & _divisor;
-            _buckets[newBucketIndex] = _buckets[newBucketIndex].Add(new KeyValue(hashCode, key, value));
-        }
-
-        [MethodImpl((MethodImplOptions) 256)]
-        [Pure]
-        public Bucket GetBucket(int hashCode)
-        {
-            return _buckets[hashCode & _divisor];
+            newBucketIndex = hashCode & Divisor;
+            Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(new KeyValue(hashCode, key, value));
         }
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
         public IEnumerator<KeyValue> GetEnumerator()
         {
-            for (var bucketIndex = 0; bucketIndex < _buckets.Length; bucketIndex++)
+            for (var bucketIndex = 0; bucketIndex < Buckets.Length; bucketIndex++)
             {
-                var keyValues = _buckets[bucketIndex].KeyValues;
+                var keyValues = Buckets[bucketIndex].KeyValues;
                 for (var index = 0; index < keyValues.Length; index++)
                 {
                     var keyValue = keyValues[index];
@@ -6830,19 +6909,19 @@ namespace IoC.Core
         public Table<TKey, TValue> Remove(int hashCode, TKey key, out bool removed)
         {
             removed = false;
-            var newBuckets = CoreExtensions.CreateArray(_divisor + 1, Bucket.EmptyBucket);
+            var newBuckets = CoreExtensions.CreateArray(Divisor + 1, Bucket.EmptyBucket);
             var newBucketsArray = newBuckets;
-            var bucketIndex = hashCode & _divisor;
-            for (var curBucketIndex = 0; curBucketIndex < _buckets.Length; curBucketIndex++)
+            var bucketIndex = hashCode & Divisor;
+            for (var curBucketIndex = 0; curBucketIndex < Buckets.Length; curBucketIndex++)
             {
                 if (curBucketIndex != bucketIndex)
                 {
-                    newBucketsArray[curBucketIndex] = _buckets[curBucketIndex].Copy();
+                    newBucketsArray[curBucketIndex] = Buckets[curBucketIndex].Copy();
                     continue;
                 }
 
                 // Bucket to remove an element
-                var bucket = _buckets[bucketIndex];
+                var bucket = Buckets[bucketIndex];
                 var keyValues = bucket.KeyValues;
                 for (var index = 0; index < keyValues.Length; index++)
                 {
@@ -6856,7 +6935,7 @@ namespace IoC.Core
                 }
             }
 
-            return new Table<TKey, TValue>(newBuckets, _divisor, removed ? Count - 1: Count);
+            return new Table<TKey, TValue>(newBuckets, Divisor, removed ? Count - 1: Count);
         }
 
         internal struct KeyValue
@@ -6986,12 +7065,21 @@ namespace IoC.Core
         {
             if (type == null) throw new ArgumentNullException(nameof(type));
             var typeDescriptor = type.Descriptor();
+            if (typeDescriptor.IsArray())
+            {
+                var elementType = typeDescriptor.GetElementType();
+                if (elementType.Descriptor().IsGenericTypeArgument())
+                {
+                    return typeof(IArray);
+                }
+            }
+
             if (!typeDescriptor.IsConstructedGenericType())
             {
                 return type;
             }
 
-            if (typeDescriptor.GetGenericTypeArguments().Any(t => Descriptor(t).IsGenericTypeArgument()))
+            if (typeDescriptor.GetGenericTypeArguments().Any(t => t.Descriptor().IsGenericTypeArgument()))
             {
                 return typeDescriptor.GetGenericTypeDefinition();
             }
@@ -7118,6 +7206,25 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
+
+        public override string ToString() => Type.ToString();
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is TypeDescriptor other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return Type.GetHashCode();
+        }
+
+        private bool Equals(TypeDescriptor other)
+        {
+            return Type == other.Type;
+        }
     }
 }
 #endif
@@ -7246,161 +7353,116 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
+
+        public override string ToString() => Type.ToString();
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is TypeDescriptor other && Equals(other);
+        }
+
+        public override int GetHashCode()
+        {
+            return (Type != null ? Type.GetHashCode() : 0);
+        }
+
+        private bool Equals(TypeDescriptor other)
+        {
+            return Type == other.Type;
+        }
     }
 }
 #endif
 
 
 #endregion
-#region TypeMappingExpressionVisitor
+#region TypeMapper
 
 namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
 
-    internal class TypeMappingExpressionVisitor : ExpressionVisitor
+    internal class TypeMapper
     {
-        private readonly IDictionary<Type, Type> _typesMap;
-        private readonly TypeDescriptor _typeDescriptor;
+        public static readonly TypeMapper Shared = new TypeMapper();
 
-        public TypeMappingExpressionVisitor([NotNull] Type type, [NotNull] IDictionary<Type, Type> typesMap)
-        {
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            _typesMap = typesMap ?? throw new ArgumentNullException(nameof(typesMap));
-            _typeDescriptor = type.Descriptor();
-        }
+        private TypeMapper() { }
 
-        public override Expression Visit(Expression node)
+        public void Map(Type type, Type targetType, IDictionary<Type, Type> typesMap)
         {
-            if (node != null)
+            if (type == targetType)
             {
-                UpdateMap(node.Type);
+                return;
             }
 
-            return base.Visit(node);
-        }
-
-        protected override Expression VisitConstant(ConstantExpression node)
-        {
-            if (node.Value is Type type)
+            if (typesMap.ContainsKey(type))
             {
-                UpdateMap(type);
+                return;
             }
 
-            return base.VisitConstant(node);
-        }
-
-        protected override Expression VisitMethodCall(MethodCallExpression node)
-        {
-            foreach (var nodeArgument in node.Arguments)
+            // Generic type marker
+            var typeDescriptor = type.Descriptor();
+            if (typeDescriptor.IsGenericTypeArgument())
             {
-                Visit(nodeArgument);
+                typesMap[type] = targetType;
+                return;
             }
 
-            return base.VisitMethodCall(node);
-        }
+            var targetTypeDescriptor = targetType.Descriptor();
 
-        protected override Expression VisitLambda<T>(Expression<T> node)
-        {
-            UpdateMap(node.ReturnType);
-            return base.VisitLambda(node);
-        }
-
-        protected override Expression VisitUnary(UnaryExpression node)
-        {
-            Visit(node.Operand);
-            return base.VisitUnary(node);
-        }
-
-        private void UpdateMap(Type targetType)
-        {
-            UpdateMap(_typeDescriptor, targetType.Descriptor());
-        }
-
-        private void UpdateMap(TypeDescriptor typeDescriptor, TypeDescriptor targetTypeDescriptor)
-        {
-            var isConstructedGenericType = typeDescriptor.IsConstructedGenericType();
-            TypeDescriptor genTypeDescriptor;
-            if (isConstructedGenericType)
+            // Constructed generic
+            if (targetTypeDescriptor.IsConstructedGenericType())
             {
-                genTypeDescriptor = typeDescriptor.GetGenericTypeDefinition().Descriptor();
-            }
-            else
-            {
-                if (targetTypeDescriptor.IsConstructedGenericType())
+                if (typeDescriptor.GetId() == targetTypeDescriptor.GetId())
                 {
+                    typesMap[typeDescriptor.Type] = targetTypeDescriptor.Type;
+                    var typeArgs = typeDescriptor.GetGenericTypeArguments();
+                    var targetTypeArgs = targetTypeDescriptor.GetGenericTypeArguments();
+                    for (var i = 0; i < typeArgs.Length; i++)
+                    {
+                        Map(typeArgs[i], targetTypeArgs[i], typesMap);
+                    }
+
                     return;
                 }
 
-                if (targetTypeDescriptor.IsGenericTypeArgument())
+                foreach (var implementedInterface in targetTypeDescriptor.GetImplementedInterfaces())
                 {
-                    _typesMap[targetTypeDescriptor.AsType()] = typeDescriptor.AsType();
+                    Map(type, implementedInterface, typesMap);
                 }
+
+                /*
+                var targetBaseType = targetTypeDescriptor.GetBaseType();
+                if (targetBaseType != null && targetBaseType != typeof(object))
+                {
+                    Map(type, targetBaseType, typesMap);
+                }
+                */
+
+                foreach (var implementedInterface in typeDescriptor.GetImplementedInterfaces())
+                {
+                    Map(implementedInterface, targetType, typesMap);
+                }
+
+                /*
+                var baseType = typeDescriptor.GetBaseType();
+                if (baseType != null && baseType != typeof(object))
+                {
+                    Map(baseType, targetType, typesMap);
+                }
+                */
 
                 return;
             }
 
-            if (!targetTypeDescriptor.IsConstructedGenericType())
+            // Array
+            if (targetTypeDescriptor.IsArray())
             {
-                return;
-            }
-
-            TypeDescriptor realTargetTypeDescriptor = null;
-            if (genTypeDescriptor.IsInterface())
-            {
-                realTargetTypeDescriptor = targetTypeDescriptor.GetImplementedInterfaces().FirstOrDefault(t =>
-                {
-                    var curTypeDescriptor = t.Descriptor();
-                    return curTypeDescriptor.IsConstructedGenericType() && genTypeDescriptor.AsType() == curTypeDescriptor.GetGenericTypeDefinition();
-                })?.Descriptor();
-            }
-            else
-            {
-                var curType = targetTypeDescriptor;
-                while (curType != null)
-                {
-                    if (!curType.IsConstructedGenericType())
-                    {
-                        break;
-                    }
-
-                    if (curType.GetGenericTypeDefinition() == genTypeDescriptor.AsType())
-                    {
-                        realTargetTypeDescriptor = curType;
-                        break;
-                    }
-
-                    curType = curType.GetBaseType()?.Descriptor();
-                }
-            }
-
-            if (realTargetTypeDescriptor == null)
-            {
-                realTargetTypeDescriptor = targetTypeDescriptor;
-            }
-
-            var targetGenTypes = realTargetTypeDescriptor.GetGenericTypeArguments();
-            var genTypes = typeDescriptor.GetGenericTypeArguments();
-            if (targetGenTypes.Length != genTypes.Length)
-            {
-                return;
-            }
-
-            for (var i = 0; i < targetGenTypes.Length; i++)
-            {
-                var targetType = targetGenTypes[i];
-                var type = genTypes[i];
-                targetTypeDescriptor = targetType.Descriptor();
-                if (!targetTypeDescriptor.IsGenericTypeArgument())
-                {
-                    continue;
-                }
-                
-                _typesMap[targetType] = type;
-                UpdateMap(type.Descriptor(), targetTypeDescriptor);
+                Map(typeDescriptor.GetElementType(), targetTypeDescriptor.GetElementType(), typesMap);
+                typesMap[typeDescriptor.Type] = targetTypeDescriptor.Type;
             }
         }
     }
@@ -7427,15 +7489,17 @@ namespace IoC.Core
             if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             typesMap = typesMap ?? new Dictionary<Type, Type>();
-            var typeMappingExpressionVisitor = new TypeMappingExpressionVisitor(buildContext.Key.Type, typesMap);
-            typeMappingExpressionVisitor.Visit(bodyExpression);
-            if (typesMap.Count > 0)
+            if (bodyExpression.Type != buildContext.Key.Type)
             {
-                var typeReplacingExpressionVisitor = new TypeReplacerExpressionVisitor(typesMap);
-                var newExpression = typeReplacingExpressionVisitor.Visit(bodyExpression);
-                if (newExpression != null)
+                TypeMapper.Shared.Map(bodyExpression.Type, buildContext.Key.Type, typesMap);
+                if (typesMap.Count > 0)
                 {
-                    return newExpression;
+                    var typeReplacingExpressionVisitor = new TypeReplacerExpressionVisitor(typesMap);
+                    var newExpression = typeReplacingExpressionVisitor.Visit(bodyExpression);
+                    if (newExpression != null)
+                    {
+                        return newExpression;
+                    }
                 }
             }
 
@@ -7455,6 +7519,7 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using System.Runtime.CompilerServices;
 
     internal class TypeReplacerExpressionVisitor: ExpressionVisitor
     {
@@ -7470,8 +7535,7 @@ namespace IoC.Core
         {
             var newTypeDescriptor = ReplaceType(node.Type).Descriptor();
             var newConstructor = newTypeDescriptor.GetDeclaredConstructors().Single(i => !i.IsPrivate && Match(node.Constructor.GetParameters(), i.GetParameters()));
-            var newArgs = ReplaceAll(node.Arguments).ToList();
-            return Expression.New(newConstructor, newArgs);
+            return Expression.New(newConstructor, ReplaceAll(node.Arguments));
         }
 
         protected override Expression VisitUnary(UnaryExpression node)
@@ -7507,8 +7571,9 @@ namespace IoC.Core
                 newMethod = newMethod.MakeGenericMethod(ReplaceTypes(node.Method.GetGenericArguments()));
             }
 
-            var newArgs = ReplaceAll(node.Arguments).ToList();
-            return node.Object != null ? Expression.Call(Visit(node.Object), newMethod, newArgs) : Expression.Call(newMethod, newArgs);
+            return node.Object != null 
+                ? Expression.Call(Visit(node.Object), newMethod, ReplaceAll(node.Arguments))
+                : Expression.Call(newMethod, ReplaceAll(node.Arguments));
         }
 
         protected override Expression VisitMember(MemberExpression node)
@@ -7595,6 +7660,7 @@ namespace IoC.Core
                 case ExpressionType.Assign:
                     return Expression.Assign(Visit(node.Left) ?? throw new InvalidOperationException(), Visit(node.Right) ?? throw new InvalidOperationException());
             }
+
             return base.VisitBinary(node);
         }
 
@@ -7612,8 +7678,7 @@ namespace IoC.Core
                 newMethod = newMethod.MakeGenericMethod(ReplaceTypes(node.AddMethod.GetGenericArguments()));
             }
 
-            var newArgs = ReplaceAll(node.Arguments).ToList();
-            return Expression.ElementInit(newMethod, newArgs);
+            return Expression.ElementInit(newMethod, ReplaceAll(node.Arguments));
         }
 
         private bool Match(ParameterInfo[] baseParams, ParameterInfo[] newParams)
@@ -7645,54 +7710,47 @@ namespace IoC.Core
             return true;
         }
 
+        [MethodImpl((MethodImplOptions) 256)]
         private Type[] ReplaceTypes(Type[] types)
         {
-            return types.Select(ReplaceType).ToArray();
+            for (var i = 0; i < types.Length; i++)
+            {
+                types[i] = ReplaceType(types[i]);
+            }
+
+            return types;
         }
 
         private Type ReplaceType(Type type)
         {
-            var baseTypeDescriptor = type.Descriptor();
-            if (!baseTypeDescriptor.IsConstructedGenericType())
+            if (_typesMap.TryGetValue(type, out var newType))
             {
-                if (_typesMap.TryGetValue(type, out var newType))
-                {
-                    return newType;
-                }
+                return newType;
+            }
 
-                if (baseTypeDescriptor.IsArray())
+            var typeDescriptor = type.Descriptor();
+            if (typeDescriptor.IsArray())
+            {
+                var elementType = typeDescriptor.GetElementType();
+                var newElementType = ReplaceType(typeDescriptor.GetElementType());
+                if (elementType != newElementType)
                 {
-                    var elementType = baseTypeDescriptor.GetElementType();
-                    var newElementType = ReplaceType(baseTypeDescriptor.GetElementType());
-                    if (elementType != newElementType)
-                    {
-                        return newElementType.MakeArrayType();
-                    }
-
-                    return type;
+                    return newElementType.MakeArrayType();
                 }
 
                 return type;
             }
 
-            var newGenericTypes = new Type[baseTypeDescriptor.GetGenericTypeArguments().Length];
-            var genericTypes = ReplaceTypes(baseTypeDescriptor.GetGenericTypeArguments());
-            for (var i = 0; i < genericTypes.Length; i++)
+            if (typeDescriptor.IsConstructedGenericType())
             {
-                var genericType = genericTypes[i];
-                if (_typesMap.TryGetValue(genericType, out var newGenericType))
-                {
-                    newGenericTypes[i] = newGenericType;
-                }
-                else
-                {
-                    newGenericTypes[i] = ReplaceType(genericType);
-                }
+                var genericTypes = ReplaceTypes(typeDescriptor.GetGenericTypeArguments());
+                return typeDescriptor.GetGenericTypeDefinition().Descriptor().MakeGenericType(ReplaceTypes(genericTypes));
             }
 
-            return baseTypeDescriptor.GetGenericTypeDefinition().Descriptor().MakeGenericType(newGenericTypes);
+            return type;
         }
 
+        [MethodImpl((MethodImplOptions) 256)]
         private IEnumerable<Expression> ReplaceAll(IEnumerable<Expression> expressions)
         {
             return expressions.Select(Visit);

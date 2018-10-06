@@ -11,7 +11,7 @@
         [NotNull] internal readonly IDependency Dependency;
         [CanBeNull] public readonly ILifetime Lifetime;
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
-        [NotNull] public readonly IEnumerable<Key> Keys;
+        [NotNull] public readonly IList<Key> Keys;
         private readonly object _lockObject = new object();
         private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
         private bool _disposed;
@@ -20,7 +20,7 @@
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource,
-            [NotNull] IEnumerable<Key> keys)
+            [NotNull] IList<Key> keys)
         {
             Dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
             Lifetime = lifetime;
