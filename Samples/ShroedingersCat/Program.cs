@@ -60,9 +60,9 @@ namespace ShroedingersCat
         }
     }
 
-    interface IBox<out T> { T Content { get; } }
+    public interface IBox<out T> { T Content { get; } }
 
-    interface ICat { bool IsAlive { get; } }
+    public interface ICat { bool IsAlive { get; } }
 
     class CardboardBox<T> : IBox<T>
     {
@@ -80,7 +80,7 @@ namespace ShroedingersCat
         public override string ToString() => $"Is alive: {IsAlive}";
     }
 
-    class Glue : IConfiguration
+    public class Glue : IConfiguration
     {
         public IEnumerable<IDisposable> Apply(IContainer container)
         {

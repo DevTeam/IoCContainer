@@ -52,26 +52,10 @@
                     Map(type, implementedInterface, typesMap);
                 }
 
-                /*
-                var targetBaseType = targetTypeDescriptor.GetBaseType();
-                if (targetBaseType != null && targetBaseType != typeof(object))
-                {
-                    Map(type, targetBaseType, typesMap);
-                }
-                */
-
                 foreach (var implementedInterface in typeDescriptor.GetImplementedInterfaces())
                 {
                     Map(implementedInterface, targetType, typesMap);
                 }
-
-                /*
-                var baseType = typeDescriptor.GetBaseType();
-                if (baseType != null && baseType != typeof(object))
-                {
-                    Map(baseType, targetType, typesMap);
-                }
-                */
 
                 return;
             }

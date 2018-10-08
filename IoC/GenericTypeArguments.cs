@@ -2,65 +2,100 @@
 // ReSharper disable ClassNeverInstantiated.Global
 namespace IoC
 {
-    using System;
-    using Core;
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT { }
+    public class TT1 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT1 { }
+    public class TT2 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT2 { }
+    public class TT3 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT3 { }
+    public class TT4 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT4 { }
+    public class TT5 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT5 { }
+    public class TT6 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT6 { }
+    public class TT7 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT7 { }
+    public class TT8 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT8 { }
+    public class TT9 { }
 
-    internal static class GenericTypeArguments
-    {
-        public static readonly Type[] Types = {TypeDescriptor<TT>.Type, TypeDescriptor<TT1>.Type, TypeDescriptor<TT2>.Type, TypeDescriptor<TT3>.Type, TypeDescriptor<TT4>.Type, TypeDescriptor<TT5>.Type, TypeDescriptor<TT6>.Type, TypeDescriptor<TT7>.Type, TypeDescriptor<TT8>.Type};
-    }
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT10 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT11 { }
+
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT12 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT13 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT14 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT15 { }
 }

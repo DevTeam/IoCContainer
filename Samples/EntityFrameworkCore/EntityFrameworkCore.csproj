@@ -6,8 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IoC.AspNetCore" Version="1.1.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="2.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
+    <ProjectReference Include="..\..\IoC\IoC.csproj" />
   </ItemGroup>
 
 </Project>

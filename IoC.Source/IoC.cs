@@ -2758,67 +2758,102 @@ namespace IoC
 // ReSharper disable ClassNeverInstantiated.Global
 namespace IoC
 {
-    using System;
-    using Core;
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT { }
+    public class TT1 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT1 { }
+    public class TT2 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT2 { }
+    public class TT3 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT3 { }
+    public class TT4 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT4 { }
+    public class TT5 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT5 { }
+    public class TT6 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT6 { }
+    public class TT7 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT7 { }
+    public class TT8 { }
 
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT8 { }
+    public class TT9 { }
 
-    internal static class GenericTypeArguments
-    {
-        public static readonly Type[] Types = {TypeDescriptor<TT>.Type, TypeDescriptor<TT1>.Type, TypeDescriptor<TT2>.Type, TypeDescriptor<TT3>.Type, TypeDescriptor<TT4>.Type, TypeDescriptor<TT5>.Type, TypeDescriptor<TT6>.Type, TypeDescriptor<TT7>.Type, TypeDescriptor<TT8>.Type};
-    }
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT10 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT11 { }
+
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT12 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT13 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT14 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT15 { }
 }
 
 
@@ -5132,63 +5167,9 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
         {
-            if (registeredType == null) throw new ArgumentNullException(nameof(registeredType));
-            if (resolvingType == null) throw new ArgumentNullException(nameof(resolvingType));
-            var registeredTypeDescriptor = registeredType.Descriptor();
-            if (!registeredTypeDescriptor.IsGenericTypeDefinition())
-            {
-                instanceType = registeredTypeDescriptor.AsType();
-                return true;
-            }
-
-            var resolvingTypeDescriptor = resolvingType.Descriptor();
-            var registeredGenericTypeParameters = registeredTypeDescriptor.GetGenericTypeParameters();
-            var typesMap = registeredGenericTypeParameters.Distinct().Zip(GenericTypeArguments.Types, Tuple.Create).ToDictionary(i => i.Item1, i => i.Item2);
-
-            var resolvingTypeDefinitionDescriptor = resolvingTypeDescriptor.GetGenericTypeDefinition().Descriptor();
-            var resolvingTypeDefinitionGenericTypeParameters = resolvingTypeDefinitionDescriptor.GetGenericTypeParameters();
-            var constraintsMap = resolvingTypeDescriptor.GetGenericTypeArguments().Zip(resolvingTypeDefinitionGenericTypeParameters, (type, typeDefinition) => Tuple.Create(type, typeDefinition.Descriptor().GetGenericParameterConstraints())).ToArray();
-
-            for (var position = 0; position < registeredGenericTypeParameters.Length; position++)
-            {
-                var genericType = registeredGenericTypeParameters[position];
-                if (!genericType.IsGenericParameter)
-                {
-                    continue;
-                }
-
-                var descriptor =  genericType.Descriptor();
-                var constraints = descriptor.GetGenericParameterConstraints();
-                if (constraints.Length == 0)
-                {
-                    registeredGenericTypeParameters[position] = typesMap[genericType];
-                    continue;
-                }
-
-                var isDefined = false;
-                foreach (var constraintsEntry in constraintsMap)
-                {
-                    if (!CoreExtensions.SequenceEqual(constraints, constraintsEntry.Item2))
-                    {
-                        continue;
-                    }
-
-                    registeredGenericTypeParameters[position] = constraintsEntry.Item1;
-                    isDefined = true;
-                    break;
-                }
-
-                if (!isDefined)
-                {
-                    instanceType = default(Type);
-                    return false;
-                }
-            }
-
-            instanceType = registeredTypeDescriptor.MakeGenericType(registeredGenericTypeParameters);
-            return true;
+            instanceType = default(Type);
+            return false;
         }
-
 
         public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
             => (constructor = constructors.OrderBy(i => GetOrder(i.Info)).FirstOrDefault()) != null;
@@ -6279,16 +6260,89 @@ namespace IoC.Core
 
     internal class FullAutowiringDependency: IDependency
     {
+        private static readonly Type[] GenericTypeArguments =
+        {
+            TypeDescriptor<TT>.Type,
+            TypeDescriptor<TT1>.Type,
+            TypeDescriptor<TT2>.Type,
+            TypeDescriptor<TT3>.Type,
+            TypeDescriptor<TT4>.Type,
+            TypeDescriptor<TT5>.Type,
+            TypeDescriptor<TT6>.Type,
+            TypeDescriptor<TT7>.Type,
+            TypeDescriptor<TT8>.Type,
+            TypeDescriptor<TT9>.Type,
+            TypeDescriptor<TT10>.Type,
+            TypeDescriptor<TT11>.Type,
+            TypeDescriptor<TT12>.Type,
+            TypeDescriptor<TT13>.Type,
+            TypeDescriptor<TT14>.Type,
+            TypeDescriptor<TT15>.Type
+        };
+
         [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static Cache<ConstructorInfo, NewExpression> _constructors = new Cache<ConstructorInfo, NewExpression>();
         [NotNull] private static Cache<Type, Expression> _this = new Cache<Type, Expression>();
         [NotNull] private readonly Type _type;
         [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
+        private readonly bool _hasGenericParamsWithConstraints;
+        private readonly Dictionary<int, TypeDescriptor> _genericParamsWithConstraints = new Dictionary<int, TypeDescriptor>();
+        private readonly Type[] _registeredGenericTypeParameters;
+        private readonly TypeDescriptor _registeredTypeDescriptor;
 
         public FullAutowiringDependency([NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             _type = type ?? throw new ArgumentNullException(nameof(type));
             _autowiringStrategy = autowiringStrategy;
+            _registeredTypeDescriptor = type.Descriptor();
+            if (!_registeredTypeDescriptor.IsGenericTypeDefinition())
+            {
+                return;
+            }
+
+            _registeredGenericTypeParameters = _registeredTypeDescriptor.GetGenericTypeParameters();
+            var genericTypePos = 0;
+            var typesMap = new Dictionary<Type, Type>();
+            for (var position = 0; position < _registeredGenericTypeParameters.Length; position++)
+            {
+                var genericType = _registeredGenericTypeParameters[position];
+                if (!genericType.IsGenericParameter)
+                {
+                    continue;
+                }
+
+                var descriptor = genericType.Descriptor();
+                if (!descriptor.GetGenericParameterConstraints().Any())
+                {
+                    if (!typesMap.TryGetValue(genericType, out var curType))
+                    {
+                        try
+                        {
+                            curType = GenericTypeArguments[genericTypePos++];
+                            typesMap[genericType] = curType;
+                        }
+                        catch (IndexOutOfRangeException ex)
+                        {
+                            throw new BuildExpressionException("Too many generic arguments.", ex);
+                        }
+                    }
+
+                    _registeredGenericTypeParameters[position] = curType;
+                }
+                else
+                {
+                    _genericParamsWithConstraints[position] = descriptor;
+                }
+            }
+
+            if (_genericParamsWithConstraints.Count == 0)
+            {
+                _type = _registeredTypeDescriptor.MakeGenericType(_registeredGenericTypeParameters);
+            }
+            else
+            {
+                _hasGenericParamsWithConstraints = true;
+            }
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
@@ -6298,14 +6352,12 @@ namespace IoC.Core
             var autoWiringStrategy = _autowiringStrategy ?? buildContext.AutowiringStrategy;
             if (!autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
             {
-                if (!DefaultAutowiringStrategy.Shared.TryResolveType(_type, buildContext.Key.Type, out instanceType))
-                {
-                    instanceType = buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type);
-                }
+                instanceType = _hasGenericParamsWithConstraints
+                    ? GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)
+                    : _type;
             }
 
             var typeDescriptor = instanceType.Descriptor();
-
             var defaultConstructors = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredConstructors());
             if (!autoWiringStrategy.TryResolveConstructor(defaultConstructors, out var ctor))
             {
@@ -6338,6 +6390,49 @@ namespace IoC.Core
 
             var autowiringDependency = new AutowiringDependency(newExpression, methodCallExpressions);
             return autowiringDependency.TryBuildExpression(buildContext, lifetime, out baseExpression, out error);
+        }
+
+        [CanBeNull]
+        internal Type GetInstanceTypeBasedOnTargetGenericConstrains(Type targetType)
+        {
+            var registeredGenericTypeParameters = new Type[_registeredGenericTypeParameters.Length];
+            Array.Copy(_registeredGenericTypeParameters, registeredGenericTypeParameters, _registeredGenericTypeParameters.Length);
+            var resolvingTypeDescriptor = targetType.Descriptor();
+            var resolvingTypeDefinitionDescriptor = resolvingTypeDescriptor.GetGenericTypeDefinition().Descriptor();
+            var resolvingTypeDefinitionGenericTypeParameters = resolvingTypeDefinitionDescriptor.GetGenericTypeParameters();
+            var constraintsMap = resolvingTypeDescriptor
+                .GetGenericTypeArguments()
+                .Zip(resolvingTypeDefinitionGenericTypeParameters, (type, typeDefinition) => Tuple.Create(type, typeDefinition.Descriptor().GetGenericParameterConstraints()))
+                .ToArray();
+
+            var canBeResolved = true;
+            foreach (var item in _genericParamsWithConstraints)
+            {
+                var position = item.Key;
+                var descriptor = item.Value;
+                var constraints = descriptor.GetGenericParameterConstraints();
+
+                var isDefined = false;
+                foreach (var constraintsEntry in constraintsMap)
+                {
+                    if (!CoreExtensions.SequenceEqual(constraints, constraintsEntry.Item2))
+                    {
+                        continue;
+                    }
+
+                    registeredGenericTypeParameters[position] = constraintsEntry.Item1;
+                    isDefined = true;
+                    break;
+                }
+
+                if (!isDefined)
+                {
+                    canBeResolved = false;
+                    break;
+                }
+            }
+
+            return canBeResolved ? _registeredTypeDescriptor.MakeGenericType(registeredGenericTypeParameters) : null;
         }
 
         [NotNull]
@@ -7434,26 +7529,10 @@ namespace IoC.Core
                     Map(type, implementedInterface, typesMap);
                 }
 
-                /*
-                var targetBaseType = targetTypeDescriptor.GetBaseType();
-                if (targetBaseType != null && targetBaseType != typeof(object))
-                {
-                    Map(type, targetBaseType, typesMap);
-                }
-                */
-
                 foreach (var implementedInterface in typeDescriptor.GetImplementedInterfaces())
                 {
                     Map(implementedInterface, targetType, typesMap);
                 }
-
-                /*
-                var baseType = typeDescriptor.GetBaseType();
-                if (baseType != null && baseType != typeof(object))
-                {
-                    Map(baseType, targetType, typesMap);
-                }
-                */
 
                 return;
             }
