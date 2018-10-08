@@ -105,14 +105,14 @@ class CardboardBox<T> : IBox<T>
 
     public T Content { get; }
 
-    public override string ToString() => Content.ToString();
+    public override string ToString() { return $"Box[{Content}]"; }
 }
 
 class ShroedingersCat : ICat
 {
     public bool IsAlive => new Random().Next(2) == 1;
 
-    public override string ToString() => $"Is alive: {IsAlive}";
+    public override string ToString() { return $"{(IsAlive ? "Live" : "Dead")} cat"; }
 }
 ```
 
@@ -162,8 +162,9 @@ injecting a set of dependencies via _Program_ constructor (also it can be done v
 
 ```csharp
 public Program(
+  ICat cat,
   IBox<ICat> box,
-  IBox<IBox<ICat>> nestedBox,
+  IBox<IBox<ICat>> bigBox,
   Func<IBox<ICat>> func,
   Task<IBox<ICat>> task,
   ValueTask<IBox<ICat>> valueTask,
@@ -182,22 +183,13 @@ public Program(
 
 ### Under the hood
 
-Actually each instance is resolved by strongly-typed function which is represented just as a graph of operators `new` compiled from expression trees which allow to create (or to get) required instances with minimal performance and memory impact. Thus the code like
+Actually each dependency is resolving by a strongly-typed block of statements like a operator `new` which is compiled from the coresponding expression tree to create or to get a required dependency instance with minimal performance and memory impact. Thus the calling of constructor looks like:
 
 ```csharp
-var box = container.Resolve<IBox<ICat>>();
+new Program(new CardboardBox<ShroedingersCat>(new ShroedingersCat()), ...);
 ```
 
-will be compiled as invocation of the following strongly-typed function `Resolve()` excluding any boxing/unboxing statements:
-
-```csharp
-CardboardBox<ShroedingersCat> Resolve()
-{
-  new CardboardBox<ShroedingersCat>(new ShroedingersCat());
-}
-```
-
-This single function contains a full set of operators `new` related constructors of all dependencies. This is also true for any initializers like methods, properties or fields.
+This works the same way for any initializers like methods, properties or fields.
 
 ## [ASP.NET Core](https://github.com/aspnet/Home)
 
