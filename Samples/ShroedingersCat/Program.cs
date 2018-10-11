@@ -38,7 +38,7 @@ namespace ShroedingersCat
 
             WriteLine(cat);
             WriteLine(box);
-            WriteLine("Big {0}", bigBox);
+            WriteLine(bigBox);
             WriteLine("{0} from func", func());
             WriteLine("Tuple of {0}", tuple);
             WriteLine("Lazy of {0}", lazy.Value);
@@ -64,22 +64,26 @@ namespace ShroedingersCat
 
     public interface IBox<out T> { T Content { get; } }
 
-    public interface ICat { bool IsAlive { get; } }
+    public interface ICat { State State { get; } }
+
+    public enum State { Alive, Dead }
 
     class CardboardBox<T> : IBox<T>
     {
         public CardboardBox(T content) => Content = content;
 
-        public T Content { get; }
+        public T Content { get; private set; }
 
-        public override string ToString() { return $"Box[{Content}]"; }
+        public override string ToString() { return "[" + Content + "]"; }
     }
 
     class ShroedingersCat : ICat
     {
-        public bool IsAlive => new Random().Next(2) == 1;
+        public ShroedingersCat(State state) { State = state; }
 
-        public override string ToString() { return $"{(IsAlive ? "Live" : "Dead")} cat"; }
+        public State State { get; private set; }
+
+        public override string ToString() { return State + " cat"; }
     }
 
     public class Glue : IConfiguration
@@ -88,6 +92,7 @@ namespace ShroedingersCat
         {
             yield return container.Bind<IBox<TT>>().To<CardboardBox<TT>>();
             yield return container.Bind<ICat>().To<ShroedingersCat>();
+            yield return container.Bind<State>().To(_ => (State)new Random().Next(2));
         }
     }
 }

@@ -93,7 +93,9 @@ Embedding-in-code packages require C# 7.0 or higher.
 ```csharp
 interface IBox<out T> { T Content { get; } }
 
-interface ICat { bool IsAlive { get; } }
+interface ICat { State State { get; } }
+
+enum State { Alive, Dead }
 ```
 
 ### Here is our implementation
@@ -105,14 +107,16 @@ class CardboardBox<T> : IBox<T>
 
     public T Content { get; }
 
-    public override string ToString() { return $"Box[{Content}]"; }
+    public override string ToString() { return "[" + Content + "]"; }
 }
 
 class ShroedingersCat : ICat
 {
-    public bool IsAlive => new Random().Next(2) == 1;
+    public ShroedingersCat(State state) { State = state; }
 
-    public override string ToString() { return $"{(IsAlive ? "Live" : "Dead")} cat"; }
+    public State State { get; private set; }
+
+    public override string ToString() { return State + " cat"; }
 }
 ```
 
@@ -143,6 +147,7 @@ class Glue : IConfiguration
   {
     yield return container.Bind<IBox<TT>>().To<CardboardBox<TT>>();
     yield return container.Bind<ICat>().To<ShroedingersCat>();
+    yield return container.Bind<State>().To(_ => (State)new Random().Next(2));
   }
 }
 ```
@@ -176,9 +181,7 @@ public Program(
   IList<IBox<ICat>> list,
   ISet<IBox<ICat>> set,
   IObservable<IBox<ICat>> observable,
-  IBox<Lazy<Func<IEnumerable<IBox<ICat>>>>> complex)
-{
-}
+  IBox<Lazy<Func<IEnumerable<IBox<ICat>>>>> complex) { ... }
 ```
 
 ### Under the hood
@@ -186,7 +189,7 @@ public Program(
 Actually each dependency is resolving by a strongly-typed block of statements like a operator `new` which is compiled from the coresponding expression tree to create or to get a required dependency instance with minimal performance and memory impact. Thus the calling of constructor looks like:
 
 ```csharp
-new Program(new CardboardBox<ShroedingersCat>(new ShroedingersCat()), ...);
+new Program(new ShroedingersCat() , new CardboardBox<ShroedingersCat>(new ShroedingersCat()), ...);
 ```
 
 This works the same way for any initializers like methods, properties or fields.
