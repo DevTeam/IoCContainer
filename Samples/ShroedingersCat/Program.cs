@@ -10,6 +10,7 @@ namespace ShroedingersCat
     using System.Collections.Generic;
     using System.Linq;
     using System.Reactive.Linq;
+    using System.Threading;
     using System.Threading.Tasks;
     using IoC;
     using static System.Console;
@@ -31,8 +32,9 @@ namespace ShroedingersCat
             ISet<IBox<ICat>> set,
             IObservable<IBox<ICat>> observable,
             IBox<Lazy<Func<IEnumerable<IBox<ICat>>>>> complex,
+            ThreadLocal<IBox<ICat>> threadLocal,
             ValueTask<IBox<ICat>> valueTask,
-            (IBox<ICat> box, ICat cat, IBox<IBox<ICat>> nestedBox) valueTuple)
+            (IBox<ICat> box, ICat cat, IBox<IBox<ICat>> bigBox) valueTuple)
         {
             WaitAll(task, valueTask.AsTask());
 
@@ -48,6 +50,7 @@ namespace ShroedingersCat
             WriteLine("Set of {0}", set.Single());
             WriteLine("Observable of {0}", observable.Single());
             WriteLine("Complex {0}", complex.Content.Value().Single());
+            WriteLine("Thread local {0}", threadLocal.Value);
             WriteLine("{0} from task", task.Result);
             WriteLine("{0} from value task", valueTask.Result);
             WriteLine("Value tuple of {0}", valueTuple);
@@ -92,7 +95,9 @@ namespace ShroedingersCat
         {
             yield return container.Bind<IBox<TT>>().To<CardboardBox<TT>>();
             yield return container.Bind<ICat>().To<ShroedingersCat>();
-            yield return container.Bind<State>().To(_ => (State)new Random().Next(2));
+
+            var rnd = new Random();
+            yield return container.Bind<State>().To(_ => (State)rnd.Next(2));
         }
     }
 }

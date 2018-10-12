@@ -35,9 +35,13 @@
             Func<long> createScopeId = () => Interlocked.Increment(ref scopeId);
             yield return container.Register(ctx => new Scope(createScopeId()));
 
+            // ThreadLocal
+            yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Feature.AnyTag);
+
             // Containers
             // Current
             yield return container.Register<IContainer, IResourceRegistry, IObservable<ContainerEvent>>(ctx => ctx.Container);
+            
             // New child
             yield return container.Register<IContainer>(
                 ctx => new Container(
@@ -46,6 +50,7 @@
                         : Container.CreateContainerName(string.Empty), ctx.Container),
                 null,
                 new object[] { WellknownContainers.NewChild });
+            
             // Parent
             yield return container.Register(ctx => ctx.Container.Parent, null, new object[] { WellknownContainers.Parent });
         }

@@ -707,6 +707,297 @@
             Represents build context.
             </summary>
         </member>
+        <member name="T:IoC.Core.FluentRegister">
+            <summary>
+            Represents extensions to register a dependency in the container.
+            </summary>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``1(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowiring type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``2(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowiring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``3(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowiring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``4(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowiring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``5(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowiring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``6(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowiring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``7(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowiring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <typeparam name="T6">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``8(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowiring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <typeparam name="T6">The additional contract type.</typeparam>
+            <typeparam name="T7">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``9(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowiring type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <typeparam name="T6">The additional contract type.</typeparam>
+            <typeparam name="T7">The additional contract type.</typeparam>
+            <typeparam name="T8">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``1(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``2(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``3(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``4(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``5(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``6(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``7(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <typeparam name="T6">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``8(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <typeparam name="T6">The additional contract type.</typeparam>
+            <typeparam name="T7">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``9(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The additional contract type.</typeparam>
+            <typeparam name="T2">The additional contract type.</typeparam>
+            <typeparam name="T3">The additional contract type.</typeparam>
+            <typeparam name="T4">The additional contract type.</typeparam>
+            <typeparam name="T5">The additional contract type.</typeparam>
+            <typeparam name="T6">The additional contract type.</typeparam>
+            <typeparam name="T7">The additional contract type.</typeparam>
+            <typeparam name="T8">The additional contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register(IoC.IContainer,System.Collections.Generic.IEnumerable{System.Type},IoC.IDependency,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="types">The set of types.</param>
+            <param name="dependency">The dependency.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns></returns>
+        </member>
+        <member name="T:IoC.Core.IArray">
+            <summary>
+            Marker interface for arrays.
+            </summary>
+        </member>
         <member name="T:IoC.Core.IExpressionBuilder`1">
             <summary>
             Allows to build expression for lifetimes.
@@ -1056,6 +1347,21 @@
             </summary>
             <param name="dependencyToken"></param>
         </member>
+        <member name="T:IoC.FluentBuildUp">
+            <summary>
+            Represents extensions to build up from the container.
+            </summary>
+        </member>
+        <member name="M:IoC.FluentBuildUp.BuildUp``1(IoC.IContainer,System.Object[])">
+            <summary>
+            Buildups an instance.
+            Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="args">The optional arguments.</param>
+            <returns>The instance.</returns>
+        </member>
         <member name="T:IoC.FluentConfiguration">
             <summary>
             Represents extensions to configure a container.
@@ -1310,292 +1616,6 @@
             <param name="args">The optional arguments.</param>
             <returns>The instance.</returns>
         </member>
-        <member name="T:IoC.FluentRegister">
-            <summary>
-            Represents extensions to register a dependency in the container.
-            </summary>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``1(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``2(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``3(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``4(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``5(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``6(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``7(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <typeparam name="T6">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``8(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <typeparam name="T6">The additional contract type.</typeparam>
-            <typeparam name="T7">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``9(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <typeparam name="T6">The additional contract type.</typeparam>
-            <typeparam name="T7">The additional contract type.</typeparam>
-            <typeparam name="T8">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``1(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``2(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``3(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``4(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``5(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``6(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``7(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <typeparam name="T6">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``8(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <typeparam name="T6">The additional contract type.</typeparam>
-            <typeparam name="T7">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register``9(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <typeparam name="T6">The additional contract type.</typeparam>
-            <typeparam name="T7">The additional contract type.</typeparam>
-            <typeparam name="T8">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentRegister.Register(IoC.IContainer,System.Collections.Generic.IEnumerable{System.Type},IoC.IDependency,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <param name="container">The target container.</param>
-            <param name="types">The set of types.</param>
-            <param name="dependency">The dependency.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns></returns>
-        </member>
         <member name="T:IoC.FluentResolve">
             <summary>
             Represents extensions to resolve from the container.
@@ -1687,6 +1707,41 @@
             </summary>
         </member>
         <member name="T:IoC.TT8">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT9">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT10">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT11">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT12">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT13">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT14">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT15">
             <summary>
             Represents the generic type parameter marker.
             </summary>

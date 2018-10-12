@@ -1711,6 +1711,41 @@
             Represents the generic type parameter marker.
             </summary>
         </member>
+        <member name="T:IoC.TT9">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT10">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT11">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT12">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT13">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT14">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT15">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
         <member name="T:IoC.IAutowiringStrategy">
             <summary>
             Represents an abstraction for an autowiring method.
@@ -1775,11 +1810,6 @@
         <member name="P:IoC.IBuildContext.Key">
             <summary>
             The target key.
-            </summary>
-        </member>
-        <member name="P:IoC.IBuildContext.Keys">
-            <summary>
-            The set of related key.
             </summary>
         </member>
         <member name="P:IoC.IBuildContext.Depth">
