@@ -73,7 +73,9 @@ class Glue : IConfiguration
   {
     yield return container.Bind<IBox<TT>>().To<CardboardBox<TT>>();
     yield return container.Bind<ICat>().To<ShroedingersCat>();
-    yield return container.Bind<State>().To(_ => (State)new Random().Next(2));
+
+    var rnd = new Random();
+    yield return container.Bind<State>().To(_ => (State)rnd.Next(2));
   }
 }
 ```
@@ -98,16 +100,17 @@ public Program(
   IBox<IBox<ICat>> bigBox,
   Func<IBox<ICat>> func,
   Task<IBox<ICat>> task,
-  ValueTask<IBox<ICat>> valueTask,
   Tuple<IBox<ICat>, ICat, IBox<IBox<ICat>>> tuple,
-  (IBox<ICat> box, ICat cat, IBox<IBox<ICat>> nestedBox) valueTuple,
   Lazy<IBox<ICat>> lazy,
   IEnumerable<IBox<ICat>> enumerable,
   IBox<ICat>[] array,
   IList<IBox<ICat>> list,
   ISet<IBox<ICat>> set,
   IObservable<IBox<ICat>> observable,
-  IBox<Lazy<Func<IEnumerable<IBox<ICat>>>>> complex) { ... }
+  IBox<Lazy<Func<IEnumerable<IBox<ICat>>>>> complex,
+  ThreadLocal<IBox<ICat>> threadLocal,
+  ValueTask<IBox<ICat>> valueTask,
+  (IBox<ICat> box, ICat cat, IBox<IBox<ICat>> bigBox) valueTuple) { ... }
 ```
 
 ### Under the hood
