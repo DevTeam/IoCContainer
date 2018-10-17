@@ -1835,9 +1835,16 @@
             <param name="container">The container.</param>
             <returns>The new build context.</returns>
         </member>
-        <member name="M:IoC.IBuildContext.Prepare(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)">
+        <member name="M:IoC.IBuildContext.PrepareTypes(System.Linq.Expressions.Expression)">
             <summary>
-            Prepares an expression. Replace generic types' markers and injection statements. 
+            Prepares base expression, replacing generic types' markers.
+            </summary>
+            <param name="baseExpression">The base expression.</param>
+            <returns>The resulting expression.</returns>
+        </member>
+        <member name="M:IoC.IBuildContext.MakeInjections(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)">
+            <summary>
+            Prepares base expression, injecting dependencies. 
             </summary>
             <param name="baseExpression">The base expression.</param>
             <param name="instanceExpression">The instance expression.</param>

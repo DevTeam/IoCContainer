@@ -2983,12 +2983,19 @@ namespace IoC
         [NotNull] IBuildContext CreateChild(Key key, [NotNull] IContainer container);
 
         /// <summary>
-        /// Prepares an expression. Replace generic types' markers and injection statements. 
+        /// Prepares base expression, replacing generic types' markers.
+        /// </summary>
+        /// <param name="baseExpression">The base expression.</param>
+        /// <returns>The resulting expression.</returns>
+        [NotNull] Expression PrepareTypes([NotNull] Expression baseExpression);
+
+        /// <summary>
+        /// Prepares base expression, injecting dependencies. 
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
         /// <param name="instanceExpression">The instance expression.</param>
         /// <returns>The resulting expression.</returns>
-        [NotNull] Expression Prepare([NotNull] Expression baseExpression, [CanBeNull] ParameterExpression instanceExpression = null);
+        [NotNull] Expression MakeInjections([NotNull] Expression baseExpression, [CanBeNull] ParameterExpression instanceExpression = null);
 
         /// <summary>
         /// Wraps by lifetime.
@@ -4708,6 +4715,7 @@ namespace IoC.Core
     {
         private readonly Expression _expression;
         [NotNull] [ItemNotNull] private readonly Expression[] _statements;
+        private readonly bool _isComplexType;
 
         [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
         [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
@@ -4721,6 +4729,7 @@ namespace IoC.Core
         public AutowiringDependency([NotNull] Expression constructorExpression, [NotNull][ItemNotNull] params Expression[] statementExpressions)
         {
             _expression = constructorExpression ?? throw new ArgumentNullException(nameof(constructorExpression));
+            _isComplexType = IsComplexType(_expression.Type);
             _statements = (statementExpressions ?? throw new ArgumentNullException(nameof(statementExpressions))).ToArray();
         }
 
@@ -4731,7 +4740,13 @@ namespace IoC.Core
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             try
             {
-                baseExpression = buildContext.Prepare(_expression);
+                baseExpression = _expression;
+                if (_isComplexType)
+                {
+                    baseExpression = buildContext.PrepareTypes(baseExpression);
+                }
+
+                baseExpression = buildContext.MakeInjections(baseExpression);
                 if (_statements.Any())
                 {
                     baseExpression = Expression.Block(CreateAutowiringStatements(buildContext, baseExpression));
@@ -4759,10 +4774,23 @@ namespace IoC.Core
             var instanceExpression = buildContext.AppendVariable(newExpression);
             foreach (var statement in _statements)
             {
-                yield return buildContext.Prepare(statement, instanceExpression);
+                var baseExpression = statement;
+                if (_isComplexType)
+                {
+                    baseExpression = buildContext.PrepareTypes(baseExpression);
+                }
+
+                baseExpression = buildContext.MakeInjections(baseExpression, instanceExpression);
+                yield return baseExpression;
             }
 
             yield return instanceExpression;
+        }
+
+        private bool IsComplexType(Type type)
+        {
+            var typeDescriptor = type.Descriptor();
+            return typeDescriptor.IsConstructedGenericType() || typeDescriptor.IsGenericTypeDefinition() || typeDescriptor.IsArray();
         }
     }
 }
@@ -4851,8 +4879,8 @@ namespace IoC.Core
         [NotNull] private readonly ICollection<IBuilder> _builders;
         private readonly List<ParameterExpression> _parameters = new List<ParameterExpression>();
         private readonly List<Expression> _statements = new List<Expression>();
+        private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
         private int _curId;
-        private readonly Dictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
 
         internal BuildContext(
             Key key,
@@ -4901,11 +4929,11 @@ namespace IoC.Core
             return varExpression;
         }
 
-        public Expression Prepare(Expression baseExpression, ParameterExpression instanceExpression = null)
-        {
-            var expression = TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, _typesMap);
-            return DependencyInjectionExpressionBuilder.Shared.Build(expression, this, instanceExpression);
-        }
+        public Expression PrepareTypes(Expression baseExpression) =>
+            TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, _typesMap);
+
+        public Expression MakeInjections(Expression baseExpression, ParameterExpression instanceExpression = null) =>
+            DependencyInjectionExpressionBuilder.Shared.Build(baseExpression, this, instanceExpression);
 
         public Expression AppendLifetime(Expression baseExpression, ILifetime lifetime)
         {
@@ -6366,7 +6394,7 @@ namespace IoC.Core
             var defaultConstructors = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredConstructors());
             if (!autoWiringStrategy.TryResolveConstructor(defaultConstructors, out var ctor))
             {
-                if (!DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
+                if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
                 {
                     ctor = buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
                 }
@@ -6375,7 +6403,7 @@ namespace IoC.Core
             var defaultMethods = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredMethods());
             if (!autoWiringStrategy.TryResolveInitializers(defaultMethods, out var initializers))
             {
-                if (!DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
+                if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
                 {
                     initializers = Enumerable.Empty<IMethod<MethodInfo>>();
                 }

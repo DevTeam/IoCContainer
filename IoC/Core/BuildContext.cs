@@ -20,8 +20,8 @@
         [NotNull] private readonly ICollection<IBuilder> _builders;
         private readonly List<ParameterExpression> _parameters = new List<ParameterExpression>();
         private readonly List<Expression> _statements = new List<Expression>();
+        private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
         private int _curId;
-        private readonly Dictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
 
         internal BuildContext(
             Key key,
@@ -70,11 +70,11 @@
             return varExpression;
         }
 
-        public Expression Prepare(Expression baseExpression, ParameterExpression instanceExpression = null)
-        {
-            var expression = TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, _typesMap);
-            return DependencyInjectionExpressionBuilder.Shared.Build(expression, this, instanceExpression);
-        }
+        public Expression PrepareTypes(Expression baseExpression) =>
+            TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, _typesMap);
+
+        public Expression MakeInjections(Expression baseExpression, ParameterExpression instanceExpression = null) =>
+            DependencyInjectionExpressionBuilder.Shared.Build(baseExpression, this, instanceExpression);
 
         public Expression AppendLifetime(Expression baseExpression, ILifetime lifetime)
         {

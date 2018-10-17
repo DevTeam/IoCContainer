@@ -39,12 +39,19 @@
         [NotNull] IBuildContext CreateChild(Key key, [NotNull] IContainer container);
 
         /// <summary>
-        /// Prepares an expression. Replace generic types' markers and injection statements. 
+        /// Prepares base expression, replacing generic types' markers.
+        /// </summary>
+        /// <param name="baseExpression">The base expression.</param>
+        /// <returns>The resulting expression.</returns>
+        [NotNull] Expression PrepareTypes([NotNull] Expression baseExpression);
+
+        /// <summary>
+        /// Prepares base expression, injecting dependencies. 
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
         /// <param name="instanceExpression">The instance expression.</param>
         /// <returns>The resulting expression.</returns>
-        [NotNull] Expression Prepare([NotNull] Expression baseExpression, [CanBeNull] ParameterExpression instanceExpression = null);
+        [NotNull] Expression MakeInjections([NotNull] Expression baseExpression, [CanBeNull] ParameterExpression instanceExpression = null);
 
         /// <summary>
         /// Wraps by lifetime.

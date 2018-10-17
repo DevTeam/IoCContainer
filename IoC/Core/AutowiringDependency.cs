@@ -10,6 +10,7 @@
     {
         private readonly Expression _expression;
         [NotNull] [ItemNotNull] private readonly Expression[] _statements;
+        private readonly bool _isComplexType;
 
         [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
         [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
@@ -23,6 +24,7 @@
         public AutowiringDependency([NotNull] Expression constructorExpression, [NotNull][ItemNotNull] params Expression[] statementExpressions)
         {
             _expression = constructorExpression ?? throw new ArgumentNullException(nameof(constructorExpression));
+            _isComplexType = IsComplexType(_expression.Type);
             _statements = (statementExpressions ?? throw new ArgumentNullException(nameof(statementExpressions))).ToArray();
         }
 
@@ -33,7 +35,13 @@
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             try
             {
-                baseExpression = buildContext.Prepare(_expression);
+                baseExpression = _expression;
+                if (_isComplexType)
+                {
+                    baseExpression = buildContext.PrepareTypes(baseExpression);
+                }
+
+                baseExpression = buildContext.MakeInjections(baseExpression);
                 if (_statements.Any())
                 {
                     baseExpression = Expression.Block(CreateAutowiringStatements(buildContext, baseExpression));
@@ -61,10 +69,23 @@
             var instanceExpression = buildContext.AppendVariable(newExpression);
             foreach (var statement in _statements)
             {
-                yield return buildContext.Prepare(statement, instanceExpression);
+                var baseExpression = statement;
+                if (_isComplexType)
+                {
+                    baseExpression = buildContext.PrepareTypes(baseExpression);
+                }
+
+                baseExpression = buildContext.MakeInjections(baseExpression, instanceExpression);
+                yield return baseExpression;
             }
 
             yield return instanceExpression;
+        }
+
+        private bool IsComplexType(Type type)
+        {
+            var typeDescriptor = type.Descriptor();
+            return typeDescriptor.IsConstructedGenericType() || typeDescriptor.IsGenericTypeDefinition() || typeDescriptor.IsArray();
         }
     }
 }

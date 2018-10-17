@@ -576,6 +576,23 @@
             }
         }
 
+        [Fact]
+        public void ContainerShouldResolveGenericWhenGenericTypeMarkersWasNotReplaced()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyGenericService<TT1, TT2>, IMyGenericService1<TT1>>().To<MyGenericService<TT1, TT2>>())
+                {
+                    var instance = container.Resolve<Func<IMyGenericService1<string>>>()();
+
+                    // Then
+                    instance.ShouldBeOfType<MyGenericService<string, TT2>>();
+                }
+            }
+        }
+
         private class Observer: IObserver<IMyGenericService<string, int>>
         {
             public void OnNext(IMyGenericService<string, int> value)
