@@ -103,9 +103,9 @@
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (node.Type == TypeDescriptor<Type>.Type)
+            if (node.Value is Type type)
             {
-                return Expression.Constant(ReplaceType((Type)node.Value), node.Type);
+                return Expression.Constant(ReplaceType(type), node.Type);
             }
 
             return Expression.Constant(node.Value, ReplaceType(node.Type));

@@ -7,7 +7,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="DryIoc.dll" Version="3.0.2" />   
-    <PackageReference Include="JetBrains.dotMemoryUnit" Version="3.0.20171219.105559"/>
+    <PackageReference Include="JetBrains.dotMemoryUnit" Version="3.0.20171219.105559" />
     <PackageReference Include="Shouldly" Version="3.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="Unity" Version="5.8.6" />
@@ -18,7 +18,7 @@
     <PackageReference Include="Autofac" Version="4.8.1" />
     <PackageReference Include="LightInject" Version="5.1.8" />
     <PackageReference Include="Moq" Version="4.9.0" />
-    <PackageReference Include="Ninject" Version="3.3.4"/>
+    <PackageReference Include="Ninject" Version="3.3.4" />
     <PackageReference Include="Castle.Windsor" Version="4.1.0" />
     <PackageReference Include="xunit" Version="2.3.1" />
   </ItemGroup>
@@ -32,5 +32,10 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\IoC\IoC.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+    <PackageReference Include="System.Reflection.Emit">
+      <Version>4.3.0</Version>
+    </PackageReference>
   </ItemGroup>
 </Project>

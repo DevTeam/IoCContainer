@@ -1834,9 +1834,8 @@ namespace IoC
             if (method == null) throw new ArgumentNullException(nameof(method));
             if (dependencyType == null) throw new ArgumentNullException(nameof(dependencyType));
             if (parameterPosition < 0) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
-            var methodInfo = Injections.InjectWithTagMethodInfo.MakeGenericMethod(dependencyType);
             var containerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
-            var parameterExpression = Expression.Call(methodInfo, containerExpression, Expression.Constant(dependencyTag));
+            var parameterExpression = Expression.Call(Injections.InjectWithTagMethodInfo, containerExpression, Expression.Constant(dependencyType), Expression.Constant(dependencyTag)).Convert(dependencyType);
             method.SetParameterExpression(parameterPosition, parameterExpression);
             return true;
         }
@@ -3363,18 +3362,28 @@ namespace IoC
     public static class Injections
     {
         internal const string JustAMarkerError = "Just a marker. Should be used to configure dependency injection.";
+        [NotNull] internal static readonly MethodInfo InjectGenericMethodInfo;
+        [NotNull] internal static readonly MethodInfo InjectWithTagGenericMethodInfo;
+        [NotNull] internal static readonly MethodInfo InjectingAssignmentGenericMethodInfo;
         [NotNull] internal static readonly MethodInfo InjectMethodInfo;
         [NotNull] internal static readonly MethodInfo InjectWithTagMethodInfo;
-        [NotNull] internal static readonly MethodInfo InjectingAssignmentMethodInfo;
 
         static Injections()
         {
-            Expression<Func<object>> injectExpression = () => default(IContainer).Inject<object>();
-            InjectMethodInfo = ((MethodCallExpression)injectExpression.Body).Method.GetGenericMethodDefinition();
-            Expression<Func<object>> injectWithTagExpression = () => default(IContainer).Inject<object>(null);
-            InjectWithTagMethodInfo = ((MethodCallExpression)injectWithTagExpression.Body).Method.GetGenericMethodDefinition();
-            Expression<Action<object, object>> assignmentCallExpression = (item1, item2) => default(IContainer).Inject<object>(null, null);
-            InjectingAssignmentMethodInfo = ((MethodCallExpression)assignmentCallExpression.Body).Method.GetGenericMethodDefinition();
+            Expression<Func<object>> injectGenExpression = () => Inject<object>(default(IContainer));
+            InjectGenericMethodInfo = ((MethodCallExpression)injectGenExpression.Body).Method.GetGenericMethodDefinition();
+
+            Expression<Func<object>> injectWithTagGenExpression = () => Inject<object>(default(IContainer), null);
+            InjectWithTagGenericMethodInfo = ((MethodCallExpression)injectWithTagGenExpression.Body).Method.GetGenericMethodDefinition();
+
+            Expression<Action<object, object>> assignmentCallGenExpression = (item1, item2) => Inject<object>(default(IContainer), null, null);
+            InjectingAssignmentGenericMethodInfo = ((MethodCallExpression)assignmentCallGenExpression.Body).Method.GetGenericMethodDefinition();
+
+            Expression<Func<object>> injectExpression = () => Inject(default(IContainer), typeof(object));
+            InjectMethodInfo = ((MethodCallExpression)injectExpression.Body).Method;
+
+            Expression<Func<object>> injectWithTagExpression = () => Inject(default(IContainer), typeof(object), (object)null);
+            InjectWithTagMethodInfo = ((MethodCallExpression)injectWithTagExpression.Body).Method;
         }
 
         /// <summary>
@@ -3408,6 +3417,29 @@ namespace IoC
         /// <param name="destination">The destination member for injection.</param>
         /// <param name="source">The source of injection.</param>
         public static void Inject<T>(this IContainer container, [NotNull] T destination, [CanBeNull] T source)
+        {
+            throw new NotImplementedException(JustAMarkerError);
+        }
+
+        /// <summary>
+        /// Injects the dependency. Just a marker.
+        /// </summary>
+        /// <param name="container">The resolving container.</param>
+        /// <param name="type">The type of dependency.</param>
+        /// <returns>The injected instance.</returns>
+        public static object Inject(this IContainer container, Type type)
+        {
+            throw new NotImplementedException(JustAMarkerError);
+        }
+
+        /// <summary>
+        /// Injects the dependency. Just a marker.
+        /// </summary>
+        /// <param name="container">The resolving container.</param>
+        /// <param name="type">The type of dependency.</param>
+        /// <param name="tag">The tag of dependency.</param>
+        /// <returns>The injected instance.</returns>
+        public static object Inject(this IContainer container, Type type, [CanBeNull] object tag)
         {
             throw new NotImplementedException(JustAMarkerError);
         }
@@ -4747,7 +4779,7 @@ namespace IoC.Core
                 }
 
                 baseExpression = buildContext.MakeInjections(baseExpression);
-                if (_statements.Any())
+                if (_statements.Length > 0)
                 {
                     baseExpression = Expression.Block(CreateAutowiringStatements(buildContext, baseExpression));
                 }
@@ -5394,11 +5426,13 @@ namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using static WellknownExpressions;
     using static TypeDescriptorExtensions;
+    using IContainer = IoC.IContainer;
 
     internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
     {
@@ -5430,27 +5464,34 @@ namespace IoC.Core
             if (methodCall.Method.IsGenericMethod)
             {
                 // container.Inject<T>()
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectMethodInfo))
+                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectGenericMethodInfo))
                 {
-                    var type = methodCall.Method.GetGenericArguments()[0];
+                    // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
+                    // type
+                    var type = methodCall.Method.GetGenericArguments()[0];
+
                     var key = new Key(type);
                     return CreateDependencyExpression(key, containerExpression);
                 }
 
                 // container.Inject<T>(tag)
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectWithTagMethodInfo))
+                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectWithTagGenericMethodInfo))
                 {
-                    var type = methodCall.Method.GetGenericArguments()[0];
+                    // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
+                    // type
+                    var type = methodCall.Method.GetGenericArguments()[0];
+                    // tag
                     var tagExpression = methodCall.Arguments[1];
                     var tag = GetTag(tagExpression);
+
                     var key = new Key(type, tag);
                     return CreateDependencyExpression(key, containerExpression);
                 }
 
                 // container.Inject<T>(destination, source)
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectingAssignmentMethodInfo))
+                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectingAssignmentGenericMethodInfo))
                 {
                     var dstExpression = Visit(methodCall.Arguments[1]);
                     var srcExpression = Visit(methodCall.Arguments[2]);
@@ -5458,6 +5499,35 @@ namespace IoC.Core
                     {
                         return Expression.Assign(dstExpression, srcExpression);
                     }
+                }
+            }
+            else
+            {
+                // container.Inject(type)
+                if (Equals(methodCall.Method, Injections.InjectMethodInfo))
+                {
+                    // container
+                    var containerExpression = Visit(methodCall.Arguments[0]);
+                    // type
+                    var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw new BuildExpressionException("Invalid argument", new ArgumentException("Invalid argument", "type"))).Value;
+
+                    var key = new Key(type);
+                    return CreateDependencyExpression(key, containerExpression);
+                }
+
+                // container.Inject(type, tag)
+                if (Equals(methodCall.Method, Injections.InjectWithTagMethodInfo))
+                {
+                    // container
+                    var containerExpression = Visit(methodCall.Arguments[0]);
+                    // type
+                    var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw new BuildExpressionException("Invalid argument", new ArgumentException("Invalid argument", "type"))).Value;
+                    // tag
+                    var tagExpression = methodCall.Arguments[2];
+                    var tag = GetTag(tagExpression);
+
+                    var key = new Key(type, tag);
+                    return CreateDependencyExpression(key, containerExpression);
                 }
             }
 
@@ -5477,6 +5547,29 @@ namespace IoC.Core
             }
 
             return Expression.Call(Visit(methodCall.Object), methodCall.Method, InjectAll(methodCall.Arguments));
+        }
+
+        protected override Expression VisitUnary(UnaryExpression node)
+        {
+            var result = base.VisitUnary(node);
+
+            if (result is UnaryExpression unaryExpression)
+            {
+                switch (unaryExpression.NodeType)
+                {
+                    case ExpressionType.Convert:
+                        var baseType = unaryExpression.Type.Descriptor();
+                        var type = unaryExpression.Operand.Type.Descriptor();
+                        if (baseType.IsValueType() == type.IsValueType() && baseType.IsAssignableFrom(type))
+                        {
+                            return unaryExpression.Operand;
+                        }
+
+                        break;
+                }
+            }
+
+            return result;
         }
 
         protected override Expression VisitMember(MemberExpression node)
@@ -6668,7 +6761,7 @@ namespace IoC.Core
     internal class Method<TMethodInfo>: IMethod<TMethodInfo> where TMethodInfo: MethodBase
     {
         // ReSharper disable once StaticMemberInGenericType
-        [NotNull] private static Cache<Type, MethodCallExpression> _injections = new Cache<Type, MethodCallExpression>();
+        [NotNull] private static Cache<Type, Expression> _injections = new Cache<Type, Expression>();
         private readonly Expression[] _parametersExpressions;
         private readonly ParameterInfo[] _parameters;
 
@@ -6695,9 +6788,8 @@ namespace IoC.Core
                     var paramType = _parameters[parameterPosition].ParameterType;
                     yield return _injections.GetOrCreate(paramType, () =>
                     {
-                        var methodInfo = InjectMethodInfo.MakeGenericMethod(paramType);
                         var containerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
-                        return Expression.Call(methodInfo, containerExpression);
+                        return Expression.Call(InjectMethodInfo, containerExpression, Expression.Constant(paramType)).Convert(paramType);
                     });
                 }
             }
@@ -7729,9 +7821,9 @@ namespace IoC.Core
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
-            if (node.Type == TypeDescriptor<Type>.Type)
+            if (node.Value is Type type)
             {
-                return Expression.Constant(ReplaceType((Type)node.Value), node.Type);
+                return Expression.Constant(ReplaceType(type), node.Type);
             }
 
             return Expression.Constant(node.Value, ReplaceType(node.Type));

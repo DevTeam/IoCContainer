@@ -37,6 +37,8 @@ namespace IoC.Comparison
         private const string ThisIocName = "IoC.Container";
         private const string ReportFileName = "REPORT.html";
 
+        private static readonly TestTypeBuilder TestTypeBuilder = new TestTypeBuilder(5, 4);
+
         private static readonly List<TestInfo> IoCGraphOf3ObjectsWithSingleton = new List<TestInfo>
         {
             new TestInfo($"{ThisIocName} actual DI", ThisByFuncSingleton),
@@ -65,6 +67,19 @@ namespace IoC.Comparison
             new TestInfo("Ninject", NinjectTransient) { PerformanceRate = 1000 },
 #endif
             new TestInfo("Autofac", AutofacTransient) { PerformanceRate = 100 },
+        };
+
+        private static readonly List<TestInfo> IoCComplexGraphOf3Transient = new List<TestInfo>
+        {
+            new TestInfo(ThisIocName, ThisComplex),
+            new TestInfo("LightInject", LightInjectComplex),
+            new TestInfo("DryIoc", DryIocComplex),
+            new TestInfo("Castle Windsor", CastleWindsorComplex) { PerformanceRate = 5 },
+            new TestInfo("Unity", UnityComplex) { PerformanceRate = 800 },
+#if !NETCOREAPP1_1
+            new TestInfo("Ninject", NinjectComplex) { PerformanceRate = 1000 },
+#endif
+            new TestInfo("Autofac", AutofacComplex) { PerformanceRate = 100 },
         };
 
 #if !NET40 && !NET47 && !NETCOREAPP1_1
@@ -135,6 +150,41 @@ namespace IoC.Comparison
 
             SaveResults(results, $"27 instances {series.ToShortString()} times");
             results.Clear();
+
+            series = 1000;
+            foreach (var ioc in IoCComplexGraphOf3Transient)
+            {
+                // Warmup
+                ioc.Test(2, new TotalTimePerformanceCounter());
+                GC.Collect();
+#if !NETCOREAPP1_1
+                GC.WaitForFullGCComplete();
+#endif
+
+                var performanceCounter = new TotalTimePerformanceCounter(ioc.PerformanceRate);
+                ioc.Test(series, performanceCounter);
+
+                var result = new TestResult(ioc.Name, performanceCounter.Result);
+                results.Add(result);
+            }
+
+            SaveResults(results, $"{TestTypeBuilder.Count} unique instances {series.ToShortString()} times");
+            results.Clear();
+        }
+
+        [Fact]
+        [Trait("Category", "Performance")]
+        public void PerformanceTest2()
+        {
+            using (var container = ThisContainer.CreateCore())
+            {
+                foreach (var type in TestTypeBuilder.Types)
+                {
+                    container.Bind(type).To(type);
+                }
+
+                container.Resolve<object>(TestTypeBuilder.RootType);
+            }
         }
 
 #if !NETCOREAPP1_1
@@ -217,6 +267,25 @@ namespace IoC.Comparison
             }
         }
 
+        private static void ThisComplex(long series, IPerformanceCounter performanceCounter)
+        {
+            using (var container = ThisContainer.CreateCore())
+            {
+                foreach (var type in TestTypeBuilder.Types)
+                {
+                    container.Bind(type).To(type);
+                }
+                
+                using (performanceCounter.Run())
+                {
+                    for (var i = 0; i < series; i++)
+                    {
+                        container.Resolve<object>(TestTypeBuilder.RootType);
+                    }
+                }
+            }
+        }
+
         private static void ThisByFuncSingleton(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = ThisContainer.CreateCore())
@@ -291,6 +360,25 @@ namespace IoC.Comparison
             }
         }
 
+        private static void UnityComplex(long series, IPerformanceCounter performanceCounter)
+        {
+            using (var container = new UnityContainer())
+            {
+                foreach (var type in TestTypeBuilder.Types)
+                {
+                    container.RegisterType(type, type);
+                }
+                
+                using (performanceCounter.Run())
+                {
+                    for (var i = 0; i < series; i++)
+                    {
+                        container.Resolve(TestTypeBuilder.RootType);
+                    }
+                }
+            }
+        }
+
 #if !NETCOREAPP1_1
         private static void NinjectSingleton(long series, IPerformanceCounter performanceCounter)
         {
@@ -323,6 +411,25 @@ namespace IoC.Comparison
                     for (var i = 0; i < series; i++)
                     {
                         kernel.Get<IService1>().DoSomething();
+                    }
+                }
+            }
+        }
+
+        private static void NinjectComplex(long series, IPerformanceCounter performanceCounter)
+        {
+            using (var kernel = new StandardKernel())
+            {
+                foreach (var type in TestTypeBuilder.Types)
+                {
+                    kernel.Bind(type).To(type);
+                }
+
+                using (performanceCounter.Run())
+                {
+                    for (var i = 0; i < series; i++)
+                    {
+                        kernel.Get(TestTypeBuilder.RootType);
                     }
                 }
             }
@@ -363,6 +470,24 @@ namespace IoC.Comparison
             }
         }
 
+        private static void AutofacComplex(long series, IPerformanceCounter performanceCounter)
+        {
+            var builder = new ContainerBuilder();
+            foreach (var type in TestTypeBuilder.Types)
+            {
+                builder.RegisterType(type).As(type);
+            }
+            
+            using (var container = builder.Build())
+            using (performanceCounter.Run())
+            {
+                for (var i = 0; i < series; i++)
+                {
+                    container.Resolve(TestTypeBuilder.RootType);
+                }
+            }
+        }
+
         private static void CastleWindsorSingleton(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = new WindsorContainer())
@@ -394,6 +519,25 @@ namespace IoC.Comparison
                     for (var i = 0; i < series; i++)
                     {
                         container.Resolve<IService1>().DoSomething();
+                    }
+                }
+            }
+        }
+
+        private static void CastleWindsorComplex(long series, IPerformanceCounter performanceCounter)
+        {
+            using (var container = new WindsorContainer())
+            {
+                foreach (var type in TestTypeBuilder.Types)
+                {
+                    container.Register(Component.For(type).ImplementedBy(type));
+                }
+                
+                using (performanceCounter.Run())
+                {
+                    for (var i = 0; i < series; i++)
+                    {
+                        container.Resolve(TestTypeBuilder.RootType);
                     }
                 }
             }
@@ -435,6 +579,25 @@ namespace IoC.Comparison
             }
         }
 
+        private static void LightInjectComplex(long series, IPerformanceCounter performanceCounter)
+        {
+            using (var container = new ServiceContainer())
+            {
+                foreach (var type in TestTypeBuilder.Types)
+                {
+                    container.Register(type);
+                }
+                
+                using (performanceCounter.Run())
+                {
+                    for (var i = 0; i < series; i++)
+                    {
+                        container.GetInstance(TestTypeBuilder.RootType);
+                    }
+                }
+            }
+        }
+
         private static void DryIocSingleton(long series, IPerformanceCounter performanceCounter)
         {
             using (var container = new Container())
@@ -466,6 +629,25 @@ namespace IoC.Comparison
                     for (var i = 0; i < series; i++)
                     {
                         container.Resolve<IService1>().DoSomething();
+                    }
+                }
+            }
+        }
+
+        private static void DryIocComplex(long series, IPerformanceCounter performanceCounter)
+        {
+            using (var container = new Container())
+            {
+                foreach (var type in TestTypeBuilder.Types)
+                {
+                    container.Register(type);
+                }
+                
+                using (performanceCounter.Run())
+                {
+                    for (var i = 0; i < series; i++)
+                    {
+                        container.Resolve(TestTypeBuilder.RootType);
                     }
                 }
             }

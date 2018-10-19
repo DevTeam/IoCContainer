@@ -42,7 +42,7 @@
                 }
 
                 baseExpression = buildContext.MakeInjections(baseExpression);
-                if (_statements.Any())
+                if (_statements.Length > 0)
                 {
                     baseExpression = Expression.Block(CreateAutowiringStatements(buildContext, baseExpression));
                 }

@@ -9,7 +9,7 @@
     internal class Method<TMethodInfo>: IMethod<TMethodInfo> where TMethodInfo: MethodBase
     {
         // ReSharper disable once StaticMemberInGenericType
-        [NotNull] private static Cache<Type, MethodCallExpression> _injections = new Cache<Type, MethodCallExpression>();
+        [NotNull] private static Cache<Type, Expression> _injections = new Cache<Type, Expression>();
         private readonly Expression[] _parametersExpressions;
         private readonly ParameterInfo[] _parameters;
 
@@ -36,9 +36,8 @@
                     var paramType = _parameters[parameterPosition].ParameterType;
                     yield return _injections.GetOrCreate(paramType, () =>
                     {
-                        var methodInfo = InjectMethodInfo.MakeGenericMethod(paramType);
                         var containerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
-                        return Expression.Call(methodInfo, containerExpression);
+                        return Expression.Call(InjectMethodInfo, containerExpression, Expression.Constant(paramType)).Convert(paramType);
                     });
                 }
             }

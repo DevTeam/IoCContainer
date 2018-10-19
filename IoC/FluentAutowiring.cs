@@ -25,9 +25,8 @@
             if (method == null) throw new ArgumentNullException(nameof(method));
             if (dependencyType == null) throw new ArgumentNullException(nameof(dependencyType));
             if (parameterPosition < 0) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
-            var methodInfo = Injections.InjectWithTagMethodInfo.MakeGenericMethod(dependencyType);
             var containerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
-            var parameterExpression = Expression.Call(methodInfo, containerExpression, Expression.Constant(dependencyTag));
+            var parameterExpression = Expression.Call(Injections.InjectWithTagMethodInfo, containerExpression, Expression.Constant(dependencyType), Expression.Constant(dependencyTag)).Convert(dependencyType);
             method.SetParameterExpression(parameterPosition, parameterExpression);
             return true;
         }

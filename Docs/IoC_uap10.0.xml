@@ -2143,6 +2143,23 @@
             <param name="destination">The destination member for injection.</param>
             <param name="source">The source of injection.</param>
         </member>
+        <member name="M:IoC.Injections.Inject(IoC.IContainer,System.Type)">
+            <summary>
+            Injects the dependency. Just a marker.
+            </summary>
+            <param name="container">The resolving container.</param>
+            <param name="type">The type of dependency.</param>
+            <returns>The injected instance.</returns>
+        </member>
+        <member name="M:IoC.Injections.Inject(IoC.IContainer,System.Type,System.Object)">
+            <summary>
+            Injects the dependency. Just a marker.
+            </summary>
+            <param name="container">The resolving container.</param>
+            <param name="type">The type of dependency.</param>
+            <param name="tag">The tag of dependency.</param>
+            <returns>The injected instance.</returns>
+        </member>
         <member name="T:IoC.IResourceRegistry">
             <summary>
             Represents the resource's registry.

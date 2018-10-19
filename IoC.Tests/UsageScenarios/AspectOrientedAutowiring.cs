@@ -128,7 +128,7 @@ namespace IoC.Tests.UsageScenarios
                             where injectAttribute?.Tag != null || autowiringAttribute.DefaultTag != null
                             // defines the dependency injection
                             select method.TryInjectDependency(parameter.Position, parameter.ParameterType, injectAttribute?.Tag ?? autowiringAttribute.DefaultTag))
-                        // checks that each injection was successfull
+                        // checks that each injection was successful
                         .All(isInjected => isInjected)
                     select method;
 

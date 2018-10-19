@@ -2,11 +2,13 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using static WellknownExpressions;
     using static TypeDescriptorExtensions;
+    using IContainer = IoC.IContainer;
 
     internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
     {
@@ -38,27 +40,34 @@
             if (methodCall.Method.IsGenericMethod)
             {
                 // container.Inject<T>()
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectMethodInfo))
+                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectGenericMethodInfo))
                 {
-                    var type = methodCall.Method.GetGenericArguments()[0];
+                    // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
+                    // type
+                    var type = methodCall.Method.GetGenericArguments()[0];
+
                     var key = new Key(type);
                     return CreateDependencyExpression(key, containerExpression);
                 }
 
                 // container.Inject<T>(tag)
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectWithTagMethodInfo))
+                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectWithTagGenericMethodInfo))
                 {
-                    var type = methodCall.Method.GetGenericArguments()[0];
+                    // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
+                    // type
+                    var type = methodCall.Method.GetGenericArguments()[0];
+                    // tag
                     var tagExpression = methodCall.Arguments[1];
                     var tag = GetTag(tagExpression);
+
                     var key = new Key(type, tag);
                     return CreateDependencyExpression(key, containerExpression);
                 }
 
                 // container.Inject<T>(destination, source)
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectingAssignmentMethodInfo))
+                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectingAssignmentGenericMethodInfo))
                 {
                     var dstExpression = Visit(methodCall.Arguments[1]);
                     var srcExpression = Visit(methodCall.Arguments[2]);
@@ -66,6 +75,35 @@
                     {
                         return Expression.Assign(dstExpression, srcExpression);
                     }
+                }
+            }
+            else
+            {
+                // container.Inject(type)
+                if (Equals(methodCall.Method, Injections.InjectMethodInfo))
+                {
+                    // container
+                    var containerExpression = Visit(methodCall.Arguments[0]);
+                    // type
+                    var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw new BuildExpressionException("Invalid argument", new ArgumentException("Invalid argument", "type"))).Value;
+
+                    var key = new Key(type);
+                    return CreateDependencyExpression(key, containerExpression);
+                }
+
+                // container.Inject(type, tag)
+                if (Equals(methodCall.Method, Injections.InjectWithTagMethodInfo))
+                {
+                    // container
+                    var containerExpression = Visit(methodCall.Arguments[0]);
+                    // type
+                    var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw new BuildExpressionException("Invalid argument", new ArgumentException("Invalid argument", "type"))).Value;
+                    // tag
+                    var tagExpression = methodCall.Arguments[2];
+                    var tag = GetTag(tagExpression);
+
+                    var key = new Key(type, tag);
+                    return CreateDependencyExpression(key, containerExpression);
                 }
             }
 
@@ -85,6 +123,29 @@
             }
 
             return Expression.Call(Visit(methodCall.Object), methodCall.Method, InjectAll(methodCall.Arguments));
+        }
+
+        protected override Expression VisitUnary(UnaryExpression node)
+        {
+            var result = base.VisitUnary(node);
+
+            if (result is UnaryExpression unaryExpression)
+            {
+                switch (unaryExpression.NodeType)
+                {
+                    case ExpressionType.Convert:
+                        var baseType = unaryExpression.Type.Descriptor();
+                        var type = unaryExpression.Operand.Type.Descriptor();
+                        if (baseType.IsValueType() == type.IsValueType() && baseType.IsAssignableFrom(type))
+                        {
+                            return unaryExpression.Operand;
+                        }
+
+                        break;
+                }
+            }
+
+            return result;
         }
 
         protected override Expression VisitMember(MemberExpression node)
