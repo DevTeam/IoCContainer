@@ -1,28 +1,27 @@
 ﻿namespace IoC.Core
 {
     using System;
+    using System.Collections.Generic;
     using System.Runtime.CompilerServices;
 
     internal class Cache<TKey, TValue>
         where TKey: class
     {
-        [NotNull] private readonly object _lockObject = new object();
-        [NotNull] private Table<TKey, TValue> _table = Table<TKey, TValue>.Empty;
+        [NotNull] private readonly Dictionary<TKey, TValue> _dict = new Dictionary<TKey, TValue>();
 
         [MethodImpl((MethodImplOptions)256)]
         public TValue GetOrCreate(TKey key, Func<TValue> factory)
         {
-            var hashCode = key.GetHashCode();
-            lock (_lockObject)
+            lock (_dict)
             {
-                var value = _table.GetByRef(hashCode, key);
-                if (Equals(value, default(TValue)))
+                if (_dict.TryGetValue(key, out var val))
                 {
-                    value = factory();
-                    _table = _table.Set(hashCode, key, value);
+                    return val;
                 }
 
-                return value;
+                val = factory();
+                _dict.Add(key, val);
+                return val;
             }
         }
     }
