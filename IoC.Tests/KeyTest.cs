@@ -1,6 +1,8 @@
 ﻿namespace IoC.Tests
 {
+    // ReSharper disable once RedundantUsingDirective
     using System.Collections;
+    // ReSharper disable once RedundantUsingDirective
     using System.Collections.Generic;
     using Shouldly;
     using Xunit;

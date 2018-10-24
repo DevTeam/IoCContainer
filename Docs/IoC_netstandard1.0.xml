@@ -2045,13 +2045,14 @@
             <param name="tag">The text with a tag metadata.</param>
             <returns></returns>
         </member>
-        <member name="M:IoC.IIssueResolver.CannotBuildExpression(IoC.IBuildContext,IoC.IDependency,IoC.ILifetime)">
+        <member name="M:IoC.IIssueResolver.CannotBuildExpression(IoC.IBuildContext,IoC.IDependency,IoC.ILifetime,System.Exception)">
             <summary>
             Handles the scenario when cannot build expression.
             </summary>
             <param name="buildContext">The build context.</param>
             <param name="dependency">The dependency.</param>
             <param name="lifetime">The lifetime.</param>
+            <param name="error">The error.</param>
             <returns>The resulting expression.</returns>
         </member>
         <member name="M:IoC.IIssueResolver.CannotResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})">

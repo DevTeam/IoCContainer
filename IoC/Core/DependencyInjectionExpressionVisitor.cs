@@ -2,19 +2,19 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using static WellknownExpressions;
     using static TypeDescriptorExtensions;
+    // ReSharper disable once RedundantNameQualifier
     using IContainer = IoC.IContainer;
 
     internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
     {
         private static readonly Key ContextKey = TypeDescriptor<Context>.Key;
-        [NotNull] private static readonly TypeDescriptor ContextTypeDescriptor = TypeDescriptor<Context>.Descriptor;
-        [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
+        private static readonly TypeDescriptor ContextTypeDescriptor = TypeDescriptor<Context>.Descriptor;
+        private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static readonly ConstructorInfo ContextConstructor;
         [NotNull] private readonly Stack<Key> _keys = new Stack<Key>();
         [NotNull] private readonly IContainer _container;
@@ -85,6 +85,7 @@
                     // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
                     // type
+                    // ReSharper disable once NotResolvedInText
                     var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw new BuildExpressionException("Invalid argument", new ArgumentException("Invalid argument", "type"))).Value;
 
                     var key = new Key(type);
@@ -97,6 +98,7 @@
                     // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
                     // type
+                    // ReSharper disable once NotResolvedInText
                     var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw new BuildExpressionException("Invalid argument", new ArgumentException("Invalid argument", "type"))).Value;
                     // tag
                     var tagExpression = methodCall.Arguments[2];
@@ -276,7 +278,7 @@
                 {
                     try
                     {
-                        return _container.Resolve<IIssueResolver>().CannotBuildExpression(childBuildContext, dependency, lifetime);
+                        return _container.Resolve<IIssueResolver>().CannotBuildExpression(childBuildContext, dependency, lifetime, error);
                     }
                     catch (Exception)
                     {

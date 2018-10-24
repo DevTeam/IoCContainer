@@ -10,7 +10,7 @@
         public static readonly int HashCode = Type.GetHashCode();
 
         // ReSharper disable once StaticMemberInGenericType
-        [NotNull] public static readonly TypeDescriptor Descriptor = Type.Descriptor();
+        public static readonly TypeDescriptor Descriptor = Type.Descriptor();
 
         public static readonly Key Key = new Key(typeof(T));
     }

@@ -2944,7 +2944,6 @@ namespace IoC
 namespace IoC
 {
     using System;
-    using System.Collections.Generic;
     using System.Linq.Expressions;
 
     /// <summary>
@@ -3901,7 +3900,7 @@ namespace IoC.Features
             {
                 var targetType = TypeDescriptorExtensions.Descriptor<T>();
                 var isConstructedGenericType = targetType.IsConstructedGenericType();
-                TypeDescriptor genericTargetType = null;
+                TypeDescriptor genericTargetType = default(TypeDescriptor);
                 Type[] genericTypeArguments = null;
                 if (isConstructedGenericType)
                 {
@@ -5056,28 +5055,27 @@ namespace IoC.Core
 namespace IoC.Core
 {
     using System;
+    using System.Collections.Generic;
     using System.Runtime.CompilerServices;
 
     internal class Cache<TKey, TValue>
         where TKey: class
     {
-        [NotNull] private readonly object _lockObject = new object();
-        [NotNull] private Table<TKey, TValue> _table = Table<TKey, TValue>.Empty;
+        [NotNull] private readonly Dictionary<TKey, TValue> _dict = new Dictionary<TKey, TValue>();
 
         [MethodImpl((MethodImplOptions)256)]
         public TValue GetOrCreate(TKey key, Func<TValue> factory)
         {
-            var hashCode = key.GetHashCode();
-            lock (_lockObject)
+            lock (_dict)
             {
-                var value = _table.GetByRef(hashCode, key);
-                if (Equals(value, default(TValue)))
+                if (_dict.TryGetValue(key, out var val))
                 {
-                    value = factory();
-                    _table = _table.Set(hashCode, key, value);
+                    return val;
                 }
 
-                return value;
+                val = factory();
+                _dict.Add(key, val);
+                return val;
             }
         }
     }
@@ -5426,19 +5424,19 @@ namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using static WellknownExpressions;
     using static TypeDescriptorExtensions;
+    // ReSharper disable once RedundantNameQualifier
     using IContainer = IoC.IContainer;
 
     internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
     {
         private static readonly Key ContextKey = TypeDescriptor<Context>.Key;
-        [NotNull] private static readonly TypeDescriptor ContextTypeDescriptor = TypeDescriptor<Context>.Descriptor;
-        [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
+        private static readonly TypeDescriptor ContextTypeDescriptor = TypeDescriptor<Context>.Descriptor;
+        private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static readonly ConstructorInfo ContextConstructor;
         [NotNull] private readonly Stack<Key> _keys = new Stack<Key>();
         [NotNull] private readonly IContainer _container;
@@ -5509,6 +5507,7 @@ namespace IoC.Core
                     // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
                     // type
+                    // ReSharper disable once NotResolvedInText
                     var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw new BuildExpressionException("Invalid argument", new ArgumentException("Invalid argument", "type"))).Value;
 
                     var key = new Key(type);
@@ -5521,6 +5520,7 @@ namespace IoC.Core
                     // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
                     // type
+                    // ReSharper disable once NotResolvedInText
                     var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw new BuildExpressionException("Invalid argument", new ArgumentException("Invalid argument", "type"))).Value;
                     // tag
                     var tagExpression = methodCall.Arguments[2];
@@ -6406,9 +6406,8 @@ namespace IoC.Core
             TypeDescriptor<TT15>.Type
         };
 
-        [NotNull] private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
+        private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static Cache<ConstructorInfo, NewExpression> _constructors = new Cache<ConstructorInfo, NewExpression>();
-        [NotNull] private static Cache<Type, Expression> _this = new Cache<Type, Expression>();
         [NotNull] private readonly Type _type;
         [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
         private readonly bool _hasGenericParamsWithConstraints;
@@ -6475,47 +6474,63 @@ namespace IoC.Core
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            var autoWiringStrategy = _autowiringStrategy ?? buildContext.AutowiringStrategy;
-            if (!autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
+            try
             {
-                instanceType = _hasGenericParamsWithConstraints
-                    ? GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)
-                    : _type;
-            }
-
-            var typeDescriptor = instanceType.Descriptor();
-            var defaultConstructors = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredConstructors());
-            if (!autoWiringStrategy.TryResolveConstructor(defaultConstructors, out var ctor))
-            {
-                if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
+                var autoWiringStrategy = _autowiringStrategy ?? buildContext.AutowiringStrategy;
+                if (!autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
                 {
-                    ctor = buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
+                    instanceType = _hasGenericParamsWithConstraints
+                        ? GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)
+                        : _type;
                 }
-            }
 
-            var defaultMethods = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredMethods());
-            if (!autoWiringStrategy.TryResolveInitializers(defaultMethods, out var initializers))
-            {
-                if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
+                var typeDescriptor = instanceType.Descriptor();
+                var defaultConstructors = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredConstructors());
+                if (!autoWiringStrategy.TryResolveConstructor(defaultConstructors, out var ctor))
                 {
-                    initializers = Enumerable.Empty<IMethod<MethodInfo>>();
+                    if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
+                    {
+                        ctor = buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
+                    }
                 }
+
+                var defaultMethods = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredMethods());
+                if (!autoWiringStrategy.TryResolveInitializers(defaultMethods, out var initializers))
+                {
+                    if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
+                    {
+                        initializers = Enumerable.Empty<IMethod<MethodInfo>>();
+                    }
+                }
+
+                baseExpression = _constructors.GetOrCreate(ctor.Info, () => Expression.New(ctor.Info, ctor.GetParametersExpressions()));
+                var curInitializers = initializers.ToArray();
+                if (curInitializers.Length > 0)
+                {
+                    var thisVar = Expression.Variable(baseExpression.Type, "this");
+                    baseExpression = Expression.Block(
+                        new[] {thisVar},
+                        Expression.Assign(thisVar, baseExpression),
+                        Expression.Block(
+                            from initializer in initializers
+                            select Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions())
+                        ),
+                        thisVar
+                    );
+                }
+
+                baseExpression = buildContext.PrepareTypes(baseExpression);
+                baseExpression = buildContext.MakeInjections(baseExpression);
+                baseExpression = buildContext.AppendLifetime(baseExpression, lifetime);
+                error = default(Exception);
+                return true;
             }
-
-            var newExpression = _constructors.GetOrCreate(ctor.Info, () => Expression.New(ctor.Info, ctor.GetParametersExpressions()));
-            var thisExpression = _this.GetOrCreate(typeDescriptor.AsType(), () =>
+            catch (BuildExpressionException ex)
             {
-                var contextType = GenericContextTypeDescriptor.MakeGenericType(typeDescriptor.AsType());
-                var itFieldInfo = contextType.Descriptor().GetDeclaredFields().Single(i => i.Name == nameof(Context<object>.It));
-                return Expression.Field(Expression.Parameter(contextType, "context"), itFieldInfo);
-            });
-
-            var methodCallExpressions = (
-                from initializer in initializers
-                select (Expression) Expression.Call(thisExpression, initializer.Info, initializer.GetParametersExpressions())).ToArray();
-
-            var autowiringDependency = new AutowiringDependency(newExpression, methodCallExpressions);
-            return autowiringDependency.TryBuildExpression(buildContext, lifetime, out baseExpression, out error);
+                error = ex;
+                baseExpression = default(Expression);
+                return false;
+            }
         }
 
         [CanBeNull]
@@ -6897,6 +6912,7 @@ namespace IoC.Core
 
                         if (Track<IAutowiringStrategy>(key, container, i => _autowiringStrategies.Insert(0, i)))
                         {
+                            // ReSharper disable once RedundantJumpStatement
                             continue;
                         }
                     }
@@ -6918,6 +6934,7 @@ namespace IoC.Core
                         {
                             if (Untrack<IAutowiringStrategy>(key, i => _autowiringStrategies.Remove(i)))
                             {
+                                // ReSharper disable once RedundantJumpStatement
                                 continue;
                             }
                         }
@@ -7242,7 +7259,7 @@ namespace IoC.Core
         public static readonly int HashCode = Type.GetHashCode();
 
         // ReSharper disable once StaticMemberInGenericType
-        [NotNull] public static readonly TypeDescriptor Descriptor = Type.Descriptor();
+        public static readonly TypeDescriptor Descriptor = Type.Descriptor();
 
         public static readonly Key Key = new Key(typeof(T));
     }
@@ -7262,11 +7279,17 @@ namespace IoC.Core
 
     internal static class TypeDescriptorExtensions
     {
+#if !NET40
         private static readonly Cache<Type, TypeDescriptor> TypeDescriptors =new Cache<Type, TypeDescriptor>();
+#endif
 
         [MethodImpl((MethodImplOptions) 256)]
         public static TypeDescriptor Descriptor(this Type type) =>
+#if !NET40
             TypeDescriptors.GetOrCreate(type, () => new TypeDescriptor(type));
+#else
+            new TypeDescriptor(type);
+#endif
 
         [MethodImpl((MethodImplOptions) 256)]
         public static TypeDescriptor Descriptor<T>() =>
@@ -7322,7 +7345,7 @@ namespace IoC.Core
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
-    internal sealed class TypeDescriptor
+    internal struct TypeDescriptor
     {
         private const BindingFlags DefaultBindingFlags = BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance | BindingFlags.SetProperty | BindingFlags.GetProperty | BindingFlags.Static;
         // ReSharper disable once MemberCanBePrivate.Global
@@ -7336,87 +7359,108 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public Type AsType() => Type;
 
         [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public Guid GetId() => Type.GUID;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public Assembly GetAssembly() => Type.Assembly;
 
         [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public bool IsValueType() => Type.IsValueType;
 
         [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public bool IsArray() => Type.IsArray;
 
         [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public bool IsPublic() => Type.IsPublic;
 
         [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
+        [Pure]
         public Type GetElementType() => Type.GetElementType();
 
         [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public bool IsInterface() => Type.IsInterface;
 
         [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public bool IsGenericParameter() => Type.IsGenericParameter;
 
         [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public bool IsConstructedGenericType() => Type.IsGenericType;
 
         [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public bool IsGenericTypeDefinition() => Type.IsGenericTypeDefinition;
 
         public bool IsGenericTypeArgument() => Type.GetCustomAttributes(TypeDescriptor<GenericTypeArgumentAttribute>.Type, true).Any();
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public Type[] GetGenericTypeArguments() => Type.GetGenericArguments();
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public Type[] GetGenericParameterConstraints() => Type.GetGenericParameterConstraints();
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public Type[] GetGenericTypeParameters() => Type.GetGenericArguments();
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public IEnumerable<ConstructorInfo> GetDeclaredConstructors() => Type.GetConstructors(DefaultBindingFlags);
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public IEnumerable<MethodInfo> GetDeclaredMethods() => Type.GetMethods(DefaultBindingFlags);
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public IEnumerable<MemberInfo> GetDeclaredMembers() => Type.GetMembers(DefaultBindingFlags);
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public IEnumerable<FieldInfo> GetDeclaredFields() => Type.GetFields(DefaultBindingFlags);
 
         [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
+        [Pure]
         public Type GetBaseType() => Type.BaseType;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public IEnumerable<Type> GetImplementedInterfaces() => Type.GetInterfaces();
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsAssignableFrom([NotNull] TypeDescriptor typeDescriptor)
+        [Pure]
+        public bool IsAssignableFrom(TypeDescriptor typeDescriptor)
         {
-            if (typeDescriptor == null) throw new ArgumentNullException(nameof(typeDescriptor));
             return Type.IsAssignableFrom(typeDescriptor.Type);
         }
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public Type MakeGenericType([NotNull] params Type[] typeArguments)
         {
             if (typeArguments == null) throw new ArgumentNullException(nameof(typeArguments));
@@ -7425,14 +7469,13 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
 
         public override string ToString() => Type.ToString();
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
             return obj is TypeDescriptor other && Equals(other);
         }
 
@@ -7458,112 +7501,134 @@ namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
-    internal sealed class TypeDescriptor
+    internal struct TypeDescriptor
     {
         internal readonly Type Type;
-        internal readonly Lazy<TypeInfo> TypeInfo;
+        private readonly TypeInfo _typeInfo;
 
         [MethodImpl((MethodImplOptions)256)]
         public TypeDescriptor([NotNull] Type type)
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
-            TypeInfo = new Lazy<TypeInfo>(type.GetTypeInfo);
+            _typeInfo = type.GetTypeInfo();
         }
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public Type AsType() => Type;
 
         [MethodImpl((MethodImplOptions)256)]
-        public Guid GetId() => TypeInfo.Value.GUID;
+        [Pure]
+        public Guid GetId() => _typeInfo.GUID;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public Assembly GetAssembly() => TypeInfo.Value.Assembly;
+        [Pure]
+        public Assembly GetAssembly() => _typeInfo.Assembly;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsValueType() => TypeInfo.Value.IsValueType;
+        [Pure]
+        public bool IsValueType() => _typeInfo.IsValueType;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsInterface() => TypeInfo.Value.IsInterface;
+        [Pure]
+        public bool IsInterface() => _typeInfo.IsInterface;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsGenericParameter() => TypeInfo.Value.IsGenericParameter;
+        [Pure]
+        public bool IsGenericParameter() => _typeInfo.IsGenericParameter;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsArray() => TypeInfo.Value.IsArray;
+        [Pure]
+        public bool IsArray() => _typeInfo.IsArray;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsPublic() => TypeInfo.Value.IsPublic;
+        [Pure]
+        public bool IsPublic() => _typeInfo.IsPublic;
 
         [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
-        public Type GetElementType() => TypeInfo.Value.GetElementType();
+        [Pure]
+        public Type GetElementType() => _typeInfo.GetElementType();
 
         [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public bool IsConstructedGenericType() => Type.IsConstructedGenericType;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsGenericTypeDefinition() => TypeInfo.Value.IsGenericTypeDefinition;
+        [Pure]
+        public bool IsGenericTypeDefinition() => _typeInfo.IsGenericTypeDefinition;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public Type[] GetGenericTypeArguments() => TypeInfo.Value.GenericTypeArguments;
+        [Pure]
+        public Type[] GetGenericTypeArguments() => _typeInfo.GenericTypeArguments;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public Type[] GetGenericParameterConstraints() => TypeInfo.Value.GetGenericParameterConstraints();
+        [Pure]
+        public Type[] GetGenericParameterConstraints() => _typeInfo.GetGenericParameterConstraints();
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public Type[] GetGenericTypeParameters() => TypeInfo.Value.GenericTypeParameters;
+        [Pure]
+        public Type[] GetGenericTypeParameters() => _typeInfo.GenericTypeParameters;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsGenericTypeArgument() => TypeInfo.Value.GetCustomAttribute<GenericTypeArgumentAttribute>(true) != null;
+        [Pure]
+        public bool IsGenericTypeArgument() => _typeInfo.GetCustomAttribute<GenericTypeArgumentAttribute>(true) != null;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public IEnumerable<T> GetCustomAttributes<T>(bool inherit)
             where T : Attribute
-            => TypeInfo.Value.GetCustomAttributes<T>(inherit);
+            => _typeInfo.GetCustomAttributes<T>(inherit);
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public IEnumerable<ConstructorInfo> GetDeclaredConstructors() => TypeInfo.Value.DeclaredConstructors;
+        [Pure]
+        public IEnumerable<ConstructorInfo> GetDeclaredConstructors() => _typeInfo.DeclaredConstructors;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public IEnumerable<MethodInfo> GetDeclaredMethods() => TypeInfo.Value.DeclaredMethods;
+        [Pure]
+        public IEnumerable<MethodInfo> GetDeclaredMethods() => _typeInfo.DeclaredMethods;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public IEnumerable<MemberInfo> GetDeclaredMembers() => TypeInfo.Value.DeclaredMembers;
+        [Pure]
+        public IEnumerable<MemberInfo> GetDeclaredMembers() => _typeInfo.DeclaredMembers;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public IEnumerable<FieldInfo> GetDeclaredFields() => TypeInfo.Value.DeclaredFields;
+        [Pure]
+        public IEnumerable<FieldInfo> GetDeclaredFields() => _typeInfo.DeclaredFields;
 
         [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
-        public Type GetBaseType() => TypeInfo.Value.BaseType;
+        [Pure]
+        public Type GetBaseType() => _typeInfo.BaseType;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public IEnumerable<Type> GetImplementedInterfaces() => TypeInfo.Value.ImplementedInterfaces;
+        [Pure]
+        public IEnumerable<Type> GetImplementedInterfaces() => _typeInfo.ImplementedInterfaces;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsAssignableFrom([NotNull] TypeDescriptor typeDescriptor)
+        [Pure]
+        public bool IsAssignableFrom(TypeDescriptor typeDescriptor)
         {
-            if (typeDescriptor == null) throw new ArgumentNullException(nameof(typeDescriptor));
-            return TypeInfo.Value.IsAssignableFrom(typeDescriptor.TypeInfo.Value);
+            return _typeInfo.IsAssignableFrom(typeDescriptor._typeInfo);
         }
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public Type MakeGenericType([NotNull] params Type[] typeArguments)
         {
             if (typeArguments == null) throw new ArgumentNullException(nameof(typeArguments));
@@ -7572,20 +7637,19 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
 
         public override string ToString() => Type.ToString();
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
             return obj is TypeDescriptor other && Equals(other);
         }
 
         public override int GetHashCode()
         {
-            return (Type != null ? Type.GetHashCode() : 0);
+            return Type != null ? Type.GetHashCode() : 0;
         }
 
         private bool Equals(TypeDescriptor other)

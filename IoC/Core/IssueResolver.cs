@@ -62,11 +62,11 @@
             throw new InvalidOperationException($"Cannot parse the tag {tag} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
         }
 
-        public Expression CannotBuildExpression(IBuildContext buildContext, IDependency dependency, ILifetime lifetime)
+        public Expression CannotBuildExpression(IBuildContext buildContext, IDependency dependency, ILifetime lifetime, Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
-            throw new InvalidOperationException($"Cannot build expression for the key {buildContext.Key} in the container {buildContext.Container}.");
+            throw new InvalidOperationException($"Cannot build expression for the key {buildContext.Key} in the container {buildContext.Container}.", error);
         }
 
         public IMethod<ConstructorInfo> CannotResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors)

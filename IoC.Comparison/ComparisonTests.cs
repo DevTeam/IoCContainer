@@ -71,10 +71,11 @@ namespace IoC.Comparison
 
         private static readonly List<TestInfo> IoCComplexGraphOf3Transient = new List<TestInfo>
         {
+            new TestInfo($"{ThisIocName} actual DI", ThisByFuncComplex),
             new TestInfo(ThisIocName, ThisComplex),
             new TestInfo("LightInject", LightInjectComplex),
             new TestInfo("DryIoc", DryIocComplex),
-            new TestInfo("Castle Windsor", CastleWindsorComplex) { PerformanceRate = 5 },
+            new TestInfo("Castle Windsor", CastleWindsorComplex),
             new TestInfo("Unity", UnityComplex) { PerformanceRate = 800 },
 #if !NETCOREAPP1_1
             new TestInfo("Ninject", NinjectComplex) { PerformanceRate = 1000 },
@@ -151,7 +152,7 @@ namespace IoC.Comparison
             SaveResults(results, $"27 instances {series.ToShortString()} times");
             results.Clear();
 
-            series = 1000;
+            series /= 100;
             foreach (var ioc in IoCComplexGraphOf3Transient)
             {
                 // Warmup
@@ -162,7 +163,7 @@ namespace IoC.Comparison
 #endif
 
                 var performanceCounter = new TotalTimePerformanceCounter(ioc.PerformanceRate);
-                ioc.Test(series, performanceCounter);
+                ioc.Test((int)(series / ioc.PerformanceRate), performanceCounter);
 
                 var result = new TestResult(ioc.Name, performanceCounter.Result);
                 results.Add(result);
@@ -288,6 +289,7 @@ namespace IoC.Comparison
 
         private static void ThisByFuncSingleton(long series, IPerformanceCounter performanceCounter)
         {
+            var emptyArgs = new object[0];
             using (var container = ThisContainer.CreateCore())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().As(Singleton).To<Service2>())
@@ -299,7 +301,7 @@ namespace IoC.Comparison
                     container.TryGetResolver<IService1>(typeof(IService1), null, out var resolver, out _);
                     for (var i = 0; i < series; i++)
                     {
-                        resolver(container).DoSomething();
+                        resolver(container, emptyArgs).DoSomething();
                     }
                 }
             }
@@ -307,6 +309,7 @@ namespace IoC.Comparison
 
         private static void ThisByFuncTransient(long series, IPerformanceCounter performanceCounter)
         {
+            var emptyArgs = new object[0];
             using (var container = ThisContainer.CreateCore())
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().To<Service2>())
@@ -318,7 +321,28 @@ namespace IoC.Comparison
                     container.TryGetResolver<IService1>(typeof(IService1), null, out var resolver, out _);
                     for (var i = 0; i < series; i++)
                     {
-                        resolver(container).DoSomething();
+                        resolver(container, emptyArgs).DoSomething();
+                    }
+                }
+            }
+        }
+
+        private static void ThisByFuncComplex(long series, IPerformanceCounter performanceCounter)
+        {
+            var emptyArgs = new object[0];
+            using (var container = ThisContainer.CreateCore())
+            {
+                foreach (var type in TestTypeBuilder.Types)
+                {
+                    container.Bind(type).To(type);
+                }
+                
+                using (performanceCounter.Run())
+                {
+                    container.TryGetResolver<object>(TestTypeBuilder.RootType, null, out var resolver, out _);
+                    for (var i = 0; i < series; i++)
+                    {
+                        resolver(container, emptyArgs);
                     }
                 }
             }

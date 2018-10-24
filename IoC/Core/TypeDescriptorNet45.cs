@@ -3,112 +3,134 @@ namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
-    internal sealed class TypeDescriptor
+    internal struct TypeDescriptor
     {
         internal readonly Type Type;
-        internal readonly Lazy<TypeInfo> TypeInfo;
+        private readonly TypeInfo _typeInfo;
 
         [MethodImpl((MethodImplOptions)256)]
         public TypeDescriptor([NotNull] Type type)
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
-            TypeInfo = new Lazy<TypeInfo>(type.GetTypeInfo);
+            _typeInfo = type.GetTypeInfo();
         }
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public Type AsType() => Type;
 
         [MethodImpl((MethodImplOptions)256)]
-        public Guid GetId() => TypeInfo.Value.GUID;
+        [Pure]
+        public Guid GetId() => _typeInfo.GUID;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public Assembly GetAssembly() => TypeInfo.Value.Assembly;
+        [Pure]
+        public Assembly GetAssembly() => _typeInfo.Assembly;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsValueType() => TypeInfo.Value.IsValueType;
+        [Pure]
+        public bool IsValueType() => _typeInfo.IsValueType;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsInterface() => TypeInfo.Value.IsInterface;
+        [Pure]
+        public bool IsInterface() => _typeInfo.IsInterface;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsGenericParameter() => TypeInfo.Value.IsGenericParameter;
+        [Pure]
+        public bool IsGenericParameter() => _typeInfo.IsGenericParameter;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsArray() => TypeInfo.Value.IsArray;
+        [Pure]
+        public bool IsArray() => _typeInfo.IsArray;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsPublic() => TypeInfo.Value.IsPublic;
+        [Pure]
+        public bool IsPublic() => _typeInfo.IsPublic;
 
         [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
-        public Type GetElementType() => TypeInfo.Value.GetElementType();
+        [Pure]
+        public Type GetElementType() => _typeInfo.GetElementType();
 
         [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public bool IsConstructedGenericType() => Type.IsConstructedGenericType;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsGenericTypeDefinition() => TypeInfo.Value.IsGenericTypeDefinition;
+        [Pure]
+        public bool IsGenericTypeDefinition() => _typeInfo.IsGenericTypeDefinition;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public Type[] GetGenericTypeArguments() => TypeInfo.Value.GenericTypeArguments;
+        [Pure]
+        public Type[] GetGenericTypeArguments() => _typeInfo.GenericTypeArguments;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public Type[] GetGenericParameterConstraints() => TypeInfo.Value.GetGenericParameterConstraints();
+        [Pure]
+        public Type[] GetGenericParameterConstraints() => _typeInfo.GetGenericParameterConstraints();
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public Type[] GetGenericTypeParameters() => TypeInfo.Value.GenericTypeParameters;
+        [Pure]
+        public Type[] GetGenericTypeParameters() => _typeInfo.GenericTypeParameters;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsGenericTypeArgument() => TypeInfo.Value.GetCustomAttribute<GenericTypeArgumentAttribute>(true) != null;
+        [Pure]
+        public bool IsGenericTypeArgument() => _typeInfo.GetCustomAttribute<GenericTypeArgumentAttribute>(true) != null;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public IEnumerable<T> GetCustomAttributes<T>(bool inherit)
             where T : Attribute
-            => TypeInfo.Value.GetCustomAttributes<T>(inherit);
+            => _typeInfo.GetCustomAttributes<T>(inherit);
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public IEnumerable<ConstructorInfo> GetDeclaredConstructors() => TypeInfo.Value.DeclaredConstructors;
+        [Pure]
+        public IEnumerable<ConstructorInfo> GetDeclaredConstructors() => _typeInfo.DeclaredConstructors;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public IEnumerable<MethodInfo> GetDeclaredMethods() => TypeInfo.Value.DeclaredMethods;
+        [Pure]
+        public IEnumerable<MethodInfo> GetDeclaredMethods() => _typeInfo.DeclaredMethods;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public IEnumerable<MemberInfo> GetDeclaredMembers() => TypeInfo.Value.DeclaredMembers;
+        [Pure]
+        public IEnumerable<MemberInfo> GetDeclaredMembers() => _typeInfo.DeclaredMembers;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public IEnumerable<FieldInfo> GetDeclaredFields() => TypeInfo.Value.DeclaredFields;
+        [Pure]
+        public IEnumerable<FieldInfo> GetDeclaredFields() => _typeInfo.DeclaredFields;
 
         [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
-        public Type GetBaseType() => TypeInfo.Value.BaseType;
+        [Pure]
+        public Type GetBaseType() => _typeInfo.BaseType;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public IEnumerable<Type> GetImplementedInterfaces() => TypeInfo.Value.ImplementedInterfaces;
+        [Pure]
+        public IEnumerable<Type> GetImplementedInterfaces() => _typeInfo.ImplementedInterfaces;
 
         [MethodImpl((MethodImplOptions)256)]
-        public bool IsAssignableFrom([NotNull] TypeDescriptor typeDescriptor)
+        [Pure]
+        public bool IsAssignableFrom(TypeDescriptor typeDescriptor)
         {
-            if (typeDescriptor == null) throw new ArgumentNullException(nameof(typeDescriptor));
-            return TypeInfo.Value.IsAssignableFrom(typeDescriptor.TypeInfo.Value);
+            return _typeInfo.IsAssignableFrom(typeDescriptor._typeInfo);
         }
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public Type MakeGenericType([NotNull] params Type[] typeArguments)
         {
             if (typeArguments == null) throw new ArgumentNullException(nameof(typeArguments));
@@ -117,20 +139,19 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
+        [Pure]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
 
         public override string ToString() => Type.ToString();
 
         public override bool Equals(object obj)
         {
-            if (ReferenceEquals(null, obj)) return false;
-            if (ReferenceEquals(this, obj)) return true;
             return obj is TypeDescriptor other && Equals(other);
         }
 
         public override int GetHashCode()
         {
-            return (Type != null ? Type.GetHashCode() : 0);
+            return Type != null ? Type.GetHashCode() : 0;
         }
 
         private bool Equals(TypeDescriptor other)

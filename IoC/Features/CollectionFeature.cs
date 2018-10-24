@@ -121,7 +121,7 @@
             {
                 var targetType = TypeDescriptorExtensions.Descriptor<T>();
                 var isConstructedGenericType = targetType.IsConstructedGenericType();
-                TypeDescriptor genericTargetType = null;
+                TypeDescriptor genericTargetType = default(TypeDescriptor);
                 Type[] genericTypeArguments = null;
                 if (isConstructedGenericType)
                 {

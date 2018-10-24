@@ -1,6 +1,5 @@
 ﻿namespace IoC.Tests.UsageScenarios
 {
-    using System.Collections.Generic;
     using Shouldly;
     using Xunit;
 

@@ -36,6 +36,7 @@
 
                         if (Track<IAutowiringStrategy>(key, container, i => _autowiringStrategies.Insert(0, i)))
                         {
+                            // ReSharper disable once RedundantJumpStatement
                             continue;
                         }
                     }
@@ -57,6 +58,7 @@
                         {
                             if (Untrack<IAutowiringStrategy>(key, i => _autowiringStrategies.Remove(i)))
                             {
+                                // ReSharper disable once RedundantJumpStatement
                                 continue;
                             }
                         }

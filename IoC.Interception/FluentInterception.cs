@@ -2,6 +2,7 @@
 {
     using System;
     using System.Linq;
+    // ReSharper disable once RedundantUsingDirective
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using Castle.Core.Internal;
@@ -58,7 +59,7 @@
                         return false;
                     }
 
-                    var curIsGenericType = curType.IsGenericTypeDefinition || curType.GetGenericArguments().Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);;
+                    var curIsGenericType = curType.IsGenericTypeDefinition || curType.GetGenericArguments().Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
 #else
                     var typeInfo = type.GetTypeInfo();
                     var isGenericType = typeInfo.IsGenericType;

@@ -87,8 +87,9 @@
         /// <param name="buildContext">The build context.</param>
         /// <param name="dependency">The dependency.</param>
         /// <param name="lifetime">The lifetime.</param>
+        /// <param name="error">The error.</param>
         /// <returns>The resulting expression.</returns>
-        [NotNull] Expression CannotBuildExpression([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, ILifetime lifetime = null);
+        [NotNull] Expression CannotBuildExpression([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, ILifetime lifetime, Exception error);
 
         /// <summary>
         /// Handles the scenario when cannot resolve a constructor.

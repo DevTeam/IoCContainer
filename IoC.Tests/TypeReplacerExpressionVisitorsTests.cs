@@ -19,7 +19,7 @@
         public void ShouldReplaceWhenArrayExpressionAndConvertExpression()
         {
             // Given
-            Expression<Func<TTT[]>> expression = () => new TTT[] { new TTT() };
+            Expression<Func<TTT[]>> expression = () => new[] { new TTT() };
             var typesMap = CreateTypesMap(expression.ReturnType, typeof(MyClass[]));
             var replacingVisitor = new TypeReplacerExpressionVisitor(typesMap);
             
@@ -270,6 +270,7 @@
         }
 
         [GenericTypeArgument]
+        // ReSharper disable once InconsistentNaming
         public class TTT { }
     }
 }
