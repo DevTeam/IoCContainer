@@ -21,7 +21,7 @@
         /// Provides parameters' expressions.
         /// </summary>
         /// <returns>Parameters' expressions</returns>
-        [NotNull][ItemNotNull] IEnumerable<Expression> GetParametersExpressions();
+        [NotNull][ItemNotNull] IEnumerable<Expression> GetParametersExpressions([NotNull] IBuildContext buildContext);
 
         /// <summary>
         /// Sets the parameter expression at the position.

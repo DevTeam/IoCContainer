@@ -155,7 +155,7 @@
             var myService1 = new Mock<IMyService1>();
             var myService12 = new Mock<IMyService1>();
             var myService13 = new Mock<IMyService1>();
-            using (var container = Container.Create())
+            using (var container = Container.Create("root"))
             {
                 // When
                 using (container.Bind<IMyService>().As(Lifetime.ContainerSingleton).To<MyService>())
@@ -163,7 +163,7 @@
                 using (container.Bind<string>().To(ctx => "abc"))
                 {
                     // Then
-                    using (var childContainer = container.CreateChild())
+                    using (var childContainer = container.CreateChild("child#1"))
                     using (childContainer.Bind<IMyService1>().To(ctx => myService12.Object))
                     using (childContainer.Bind<string>().To(ctx => "xyz"))
                     {
@@ -175,7 +175,7 @@
                     }
 
                     // Then
-                    using (var childContainer = container.CreateChild())
+                    using (var childContainer = container.CreateChild("child#2"))
                     using (childContainer.Bind<IMyService1>().To(ctx => myService13.Object))
                     using (childContainer.Bind<string>().To(ctx => "123"))
                     {

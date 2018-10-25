@@ -31,7 +31,6 @@
         };
 
         private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
-        [NotNull] private static Cache<ConstructorInfo, NewExpression> _constructors = new Cache<ConstructorInfo, NewExpression>();
         [NotNull] private readonly Type _type;
         [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
         private readonly bool _hasGenericParamsWithConstraints;
@@ -101,6 +100,7 @@
             try
             {
                 var autoWiringStrategy = _autowiringStrategy ?? buildContext.AutowiringStrategy;
+                var isDefaultAutowiringStrategy = DefaultAutowiringStrategy.Shared == autoWiringStrategy;
                 if (!autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
                 {
                     instanceType = _hasGenericParamsWithConstraints
@@ -109,10 +109,30 @@
                 }
 
                 var typeDescriptor = instanceType.Descriptor();
+                if (typeDescriptor.IsConstructedGenericType())
+                {
+                    buildContext.MapTypes(instanceType, buildContext.Key.Type);
+                    var genericArgs = typeDescriptor.GetGenericTypeArguments();
+                    var isReplaced = false;
+                    for (var position = 0; position < genericArgs.Length; position++)
+                    {
+                        if (buildContext.TryReplaceType(genericArgs[position], out var type))
+                        {
+                            genericArgs[position] = type;
+                            isReplaced = true;
+                        }
+                    }
+
+                    if (isReplaced)
+                    {
+                        typeDescriptor = typeDescriptor.GetGenericTypeDefinition().MakeGenericType(genericArgs).Descriptor();
+                    }
+                }
+
                 var defaultConstructors = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredConstructors());
                 if (!autoWiringStrategy.TryResolveConstructor(defaultConstructors, out var ctor))
                 {
-                    if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
+                    if (isDefaultAutowiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
                     {
                         ctor = buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
                     }
@@ -121,13 +141,13 @@
                 var defaultMethods = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredMethods());
                 if (!autoWiringStrategy.TryResolveInitializers(defaultMethods, out var initializers))
                 {
-                    if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
+                    if (isDefaultAutowiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
                     {
                         initializers = Enumerable.Empty<IMethod<MethodInfo>>();
                     }
                 }
 
-                baseExpression = _constructors.GetOrCreate(ctor.Info, () => Expression.New(ctor.Info, ctor.GetParametersExpressions()));
+                baseExpression = Expression.New(ctor.Info, ctor.GetParametersExpressions(buildContext));
                 var curInitializers = initializers.ToArray();
                 if (curInitializers.Length > 0)
                 {
@@ -137,14 +157,17 @@
                         Expression.Assign(thisVar, baseExpression),
                         Expression.Block(
                             from initializer in initializers
-                            select Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions())
+                            select Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext))
                         ),
                         thisVar
                     );
                 }
 
-                baseExpression = buildContext.PrepareTypes(baseExpression);
-                baseExpression = buildContext.MakeInjections(baseExpression);
+                if (!isDefaultAutowiringStrategy)
+                {
+                    baseExpression = buildContext.MakeInjections(baseExpression);
+                }
+                
                 baseExpression = buildContext.AppendLifetime(baseExpression, lifetime);
                 error = default(Exception);
                 return true;

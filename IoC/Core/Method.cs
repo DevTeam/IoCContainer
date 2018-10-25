@@ -4,12 +4,9 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
-    using static Injections;
 
     internal class Method<TMethodInfo>: IMethod<TMethodInfo> where TMethodInfo: MethodBase
     {
-        // ReSharper disable once StaticMemberInGenericType
-        [NotNull] private static Cache<Type, Expression> _injections = new Cache<Type, Expression>();
         private readonly Expression[] _parametersExpressions;
         private readonly ParameterInfo[] _parameters;
 
@@ -22,7 +19,7 @@
 
         public TMethodInfo Info { get; }
 
-        public IEnumerable<Expression> GetParametersExpressions()
+        public IEnumerable<Expression> GetParametersExpressions(IBuildContext buildContext)
         {
             for (var parameterPosition = 0; parameterPosition < _parametersExpressions.Length; parameterPosition++)
             {
@@ -33,12 +30,9 @@
                 }
                 else
                 {
-                    var paramType = _parameters[parameterPosition].ParameterType;
-                    yield return _injections.GetOrCreate(paramType, () =>
-                    {
-                        var containerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
-                        return Expression.Call(InjectMethodInfo, containerExpression, Expression.Constant(paramType)).Convert(paramType);
-                    });
+                    var key = new Key(_parameters[parameterPosition].ParameterType);
+                    var childBuildContext = buildContext.CreateChild(key, buildContext.Container);
+                    yield return childBuildContext.CreateDependencyExpression();
                 }
             }
         }

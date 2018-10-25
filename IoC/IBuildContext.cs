@@ -45,6 +45,21 @@
         [NotNull] Expression PrepareTypes([NotNull] Expression baseExpression);
 
         /// <summary>
+        /// Add element for replacing generic types' markers.
+        /// </summary>
+        /// <param name="type">The target raw type.</param>
+        /// <param name="targetType">The replacing type.</param>
+        void MapTypes([NotNull] Type type, [NotNull]Type targetType);
+
+        /// <summary>
+        /// Add replacing generic types' markers.
+        /// </summary>
+        /// <param name="type">The target raw type.</param>
+        /// <param name="targetType">The replacing type.</param>
+        /// <returns></returns>
+        bool TryReplaceType([NotNull] Type type, out Type targetType);
+
+        /// <summary>
         /// Prepares base expression, injecting dependencies. 
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
@@ -90,5 +105,11 @@
         /// <param name="variableExpressions">Variable expressions.</param>
         /// <returns>The resulting block expression.</returns>
         [NotNull] Expression CloseBlock([NotNull] Expression targetExpression, [NotNull][ItemNotNull] params ParameterExpression[] variableExpressions);
+
+        /// <summary>
+        /// Creates an expression for dependency based on Key.
+        /// </summary>
+        /// <returns>The dependency expression.</returns>
+        [NotNull] Expression CreateDependencyExpression();
     }
 }

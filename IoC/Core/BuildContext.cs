@@ -73,6 +73,12 @@
         public Expression PrepareTypes(Expression baseExpression) =>
             TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, _typesMap);
 
+        public void MapTypes(Type type, Type targetType) =>
+            TypeMapper.Shared.Map(type, targetType, _typesMap);
+
+        public bool TryReplaceType(Type type, out Type targetType) =>
+            _typesMap.TryGetValue(type, out targetType);
+
         public Expression MakeInjections(Expression baseExpression, ParameterExpression instanceExpression = null) =>
             DependencyInjectionExpressionBuilder.Shared.Build(baseExpression, this, instanceExpression);
 
@@ -127,10 +133,52 @@
 
         public IBuildContext CreateChildInternal(Key key, IContainer container, bool forBuilders = false)
         {
+            if (_typesMap.TryGetValue(key.Type, out var type))
+            {
+                key = new Key(type, key.Tag);
+            }
+
             var child = new BuildContext(key, container, _resources, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
             child._parameters.AddRange(_parameters);
             child._statements.AddRange(_statements);
             return child;
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        public Expression CreateDependencyExpression()
+        {
+            if (!Container.TryGetDependency(Key, out var dependency, out var lifetime))
+            {
+                try
+                {
+                    var dependencyInfo = Container.Resolve<IIssueResolver>().CannotResolveDependency(Container, Key);
+                    dependency = dependencyInfo.Item1;
+                    lifetime = dependencyInfo.Item2;
+                }
+                catch (Exception ex)
+                {
+                    throw new BuildExpressionException(ex.Message, ex.InnerException);
+                }
+            }
+
+            if (Depth >= 64)
+            {
+                Container.Resolve<IIssueResolver>().CyclicDependenceDetected(Key, Depth);
+            }
+
+            if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
+            {
+                return expression;
+            }
+
+            try
+            {
+                return Container.Resolve<IIssueResolver>().CannotBuildExpression(this, dependency, lifetime, error);
+            }
+            catch (Exception)
+            {
+                throw error;
+            }
         }
 
         [MethodImpl((MethodImplOptions)256)]

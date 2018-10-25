@@ -1842,6 +1842,21 @@
             <param name="baseExpression">The base expression.</param>
             <returns>The resulting expression.</returns>
         </member>
+        <member name="M:IoC.IBuildContext.MapTypes(System.Type,System.Type)">
+            <summary>
+            Add element for replacing generic types' markers.
+            </summary>
+            <param name="type">The target raw type.</param>
+            <param name="targetType">The replacing type.</param>
+        </member>
+        <member name="M:IoC.IBuildContext.TryReplaceType(System.Type,System.Type@)">
+            <summary>
+            Add replacing generic types' markers.
+            </summary>
+            <param name="type">The target raw type.</param>
+            <param name="targetType">The replacing type.</param>
+            <returns></returns>
+        </member>
         <member name="M:IoC.IBuildContext.MakeInjections(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)">
             <summary>
             Prepares base expression, injecting dependencies. 
@@ -1888,6 +1903,12 @@
             <param name="targetExpression">The target expression.</param>
             <param name="variableExpressions">Variable expressions.</param>
             <returns>The resulting block expression.</returns>
+        </member>
+        <member name="M:IoC.IBuildContext.CreateDependencyExpression">
+            <summary>
+            Creates an expression for dependency based on Key.
+            </summary>
+            <returns>The dependency expression.</returns>
         </member>
         <member name="T:IoC.IBuilder">
             <summary>
@@ -2100,7 +2121,7 @@
             The method's information.
             </summary>
         </member>
-        <member name="M:IoC.IMethod`1.GetParametersExpressions">
+        <member name="M:IoC.IMethod`1.GetParametersExpressions(IoC.IBuildContext)">
             <summary>
             Provides parameters' expressions.
             </summary>
