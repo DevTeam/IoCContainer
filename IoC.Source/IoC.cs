@@ -2973,6 +2973,11 @@ namespace IoC
         [NotNull] IAutowiringStrategy AutowiringStrategy { get; }
 
         /// <summary>
+        /// The dependency expression.
+        /// </summary>
+        [NotNull] Expression DependencyExpression { get; }
+
+        /// <summary>
         /// Creates a child context.
         /// </summary>
         /// <param name="key">The key</param>
@@ -2985,54 +2990,38 @@ namespace IoC
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
         /// <returns>The resulting expression.</returns>
-        [NotNull] Expression PrepareTypes([NotNull] Expression baseExpression);
+        [NotNull] Expression ReplaceTypes([NotNull] Expression baseExpression);
 
         /// <summary>
-        /// Prepares base expression, injecting dependencies. 
+        /// Bind a raw type to a target type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <param name="targetType">The target type.</param>
+        void BindTypes([NotNull] Type type, [NotNull]Type targetType);
+
+        /// <summary>
+        /// Try replacing generic types' markers.
+        /// </summary>
+        /// <param name="type">The target raw type.</param>
+        /// <param name="targetType">The replacing type.</param>
+        /// <returns></returns>
+        bool TryReplaceType([NotNull] Type type, out Type targetType);
+
+        /// <summary>
+        /// Prepares base expression, injecting dependencies.
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
         /// <param name="instanceExpression">The instance expression.</param>
         /// <returns>The resulting expression.</returns>
-        [NotNull] Expression MakeInjections([NotNull] Expression baseExpression, [CanBeNull] ParameterExpression instanceExpression = null);
+        [NotNull] Expression InjectDependencies([NotNull] Expression baseExpression, [CanBeNull] ParameterExpression instanceExpression = null);
 
         /// <summary>
-        /// Wraps by lifetime.
+        /// Prepares base expression, adding a lifetime.
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <returns></returns>
-        [NotNull] Expression AppendLifetime([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
-
-        /// <summary>
-        /// Appends value.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <param name="type">The value type.</param>
-        /// <returns>The parameter expression.</returns>
-        [NotNull] Expression AppendValue([CanBeNull] object value, [NotNull] Type type);
-
-        /// <summary>
-        /// Appends value.
-        /// </summary>
-        /// <typeparam name="T">The value type.</typeparam>
-        /// <param name="value">The value.</param>
-        /// <returns>The parameter expression.</returns>
-        [NotNull] Expression AppendValue<T>([CanBeNull] T value);
-
-        /// <summary>
-        /// Appends variable.
-        /// </summary>
-        /// <param name="expression">The value expression.</param>
-        /// <returns>The parameter expression.</returns>
-        [NotNull] ParameterExpression AppendVariable([NotNull] Expression expression);
-
-        /// <summary>
-        /// Closes block for specified variables.
-        /// </summary>
-        /// <param name="targetExpression">The target expression.</param>
-        /// <param name="variableExpressions">Variable expressions.</param>
-        /// <returns>The resulting block expression.</returns>
-        [NotNull] Expression CloseBlock([NotNull] Expression targetExpression, [NotNull][ItemNotNull] params ParameterExpression[] variableExpressions);
+        [NotNull] Expression AddLifetime([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
     }
 }
 
@@ -3255,8 +3244,9 @@ namespace IoC
         /// <param name="buildContext">The build context.</param>
         /// <param name="dependency">The dependency.</param>
         /// <param name="lifetime">The lifetime.</param>
+        /// <param name="error">The error.</param>
         /// <returns>The resulting expression.</returns>
-        [NotNull] Expression CannotBuildExpression([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, ILifetime lifetime = null);
+        [NotNull] Expression CannotBuildExpression([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, ILifetime lifetime, Exception error);
 
         /// <summary>
         /// Handles the scenario when cannot resolve a constructor.
@@ -3332,7 +3322,7 @@ namespace IoC
         /// Provides parameters' expressions.
         /// </summary>
         /// <returns>Parameters' expressions</returns>
-        [NotNull][ItemNotNull] IEnumerable<Expression> GetParametersExpressions();
+        [NotNull][ItemNotNull] IEnumerable<Expression> GetParametersExpressions([NotNull] IBuildContext buildContext);
 
         /// <summary>
         /// Sets the parameter expression at the position.
@@ -4492,7 +4482,7 @@ namespace IoC.Lifetimes
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
         private static readonly ParameterExpression KeyVar = Expression.Variable(TypeDescriptor<TKey>.Type, "key");
 
-        [NotNull] private object _lockObject = new object();
+        [NotNull] private readonly object _lockObject = new object();
         private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
 
         /// <inheritdoc />
@@ -4501,10 +4491,10 @@ namespace IoC.Lifetimes
             if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             var returnType = buildContext.Key.Type;
-            var thisConst = buildContext.AppendValue(this);
+            var thisConst = Expression.Constant(this);
             var instanceVar = Expression.Variable(returnType, "val");
             var instancesField = Expression.Field(thisConst, InstancesFieldInfo);
-            var lockObjectConst = buildContext.AppendValue(_lockObject);
+            var lockObjectConst = Expression.Constant(_lockObject);
             var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
             var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(null, GetMethodInfo, instancesField, SingletonBasedLifetimeShared.HashCodeVar, KeyVar).Convert(returnType));
             var isNullExpression = Expression.ReferenceEqual(instanceVar, ExpressionBuilderExtensions.NullConst);
@@ -4671,10 +4661,10 @@ namespace IoC.Lifetimes
     {
         private static readonly FieldInfo InstanceFieldInfo = Descriptor<SingletonLifetime>().GetDeclaredFields().Single(i => i.Name == nameof(_instance));
 
-#pragma warning disable CS0649
-        [NotNull] private object _lockObject = new object();
+        [NotNull] private readonly object _lockObject = new object();
+#pragma warning disable CS0649, IDE0044
         private volatile object _instance;
-#pragma warning restore CS0649
+#pragma warning restore CS0649, IDE0044
 
         /// <inheritdoc />
         public Expression Build(Expression expression, IBuildContext buildContext)
@@ -4682,8 +4672,8 @@ namespace IoC.Lifetimes
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
 
-            var thisConst = buildContext.AppendValue(this);
-            var lockObjectConst = buildContext.AppendValue(_lockObject);
+            var thisConst = Expression.Constant(this);
+            var lockObjectConst = Expression.Constant(_lockObject);
             var instanceField = Expression.Field(thisConst, InstanceFieldInfo);
             var typedInstance = instanceField.Convert(expression.Type);
             var isNullExpression = Expression.ReferenceEqual(instanceField, ExpressionBuilderExtensions.NullConst);
@@ -4737,7 +4727,6 @@ namespace IoC.Lifetimes
 namespace IoC.Core
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
@@ -4772,18 +4761,34 @@ namespace IoC.Core
             try
             {
                 baseExpression = _expression;
-                if (_isComplexType)
-                {
-                    baseExpression = buildContext.PrepareTypes(baseExpression);
-                }
-
-                baseExpression = buildContext.MakeInjections(baseExpression);
                 if (_statements.Length > 0)
                 {
-                    baseExpression = Expression.Block(CreateAutowiringStatements(buildContext, baseExpression));
+                    var thisVar = Expression.Variable(baseExpression.Type, "this");
+                    baseExpression = Expression.Block(
+                        new[] {thisVar},
+                        Expression.Assign(thisVar, baseExpression),
+                        Expression.Block(_statements),
+                        thisVar
+                    );
+
+                    if (_isComplexType)
+                    {
+                        baseExpression = buildContext.ReplaceTypes(baseExpression);
+                    }
+
+                    baseExpression = buildContext.InjectDependencies(baseExpression, thisVar);
+                }
+                else
+                {
+                    if (_isComplexType)
+                    {
+                        baseExpression = buildContext.ReplaceTypes(baseExpression);
+                    }
+
+                    baseExpression = buildContext.InjectDependencies(baseExpression);
                 }
 
-                baseExpression = buildContext.AppendLifetime(baseExpression, lifetime);
+                baseExpression = buildContext.AddLifetime(baseExpression, lifetime);
                 error = default(Exception);
                 return true;
             }
@@ -4793,29 +4798,6 @@ namespace IoC.Core
                 baseExpression = default(Expression);
                 return false;
             }
-        }
-
-        private IEnumerable<Expression> CreateAutowiringStatements(
-            [NotNull] IBuildContext buildContext,
-            [NotNull] Expression newExpression)
-        {
-            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            if (newExpression == null) throw new ArgumentNullException(nameof(newExpression));
-
-            var instanceExpression = buildContext.AppendVariable(newExpression);
-            foreach (var statement in _statements)
-            {
-                var baseExpression = statement;
-                if (_isComplexType)
-                {
-                    baseExpression = buildContext.PrepareTypes(baseExpression);
-                }
-
-                baseExpression = buildContext.MakeInjections(baseExpression, instanceExpression);
-                yield return baseExpression;
-            }
-
-            yield return instanceExpression;
         }
 
         private bool IsComplexType(Type type)
@@ -4893,9 +4875,7 @@ namespace IoC.Core
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Linq.Expressions;
-    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Represents build context.
@@ -4905,13 +4885,9 @@ namespace IoC.Core
     internal class BuildContext : IBuildContext
     {
         private static readonly ICollection<IBuilder> EmptyBuilders = new List<IBuilder>();
-        // Should be at least internal to be accessible from for compiled code from expressions
         private readonly ICollection<IDisposable> _resources;
         [NotNull] private readonly ICollection<IBuilder> _builders;
-        private readonly List<ParameterExpression> _parameters = new List<ParameterExpression>();
-        private readonly List<Expression> _statements = new List<Expression>();
         private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
-        private int _curId;
 
         internal BuildContext(
             Key key,
@@ -4943,30 +4919,19 @@ namespace IoC.Core
             return CreateChildInternal(key, container);
         }
 
-        public Expression AppendValue(object value, Type type)
-        {
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            return Expression.Constant(value, type);
-        }
-
-        public Expression AppendValue<T>(T value) => AppendValue(value, TypeDescriptor<T>.Type);
-
-        public ParameterExpression AppendVariable(Expression expression)
-        {
-            if (expression == null) throw new ArgumentNullException(nameof(expression));
-            var varExpression = Expression.Variable(expression.Type, "var" + GenerateId());
-            _parameters.Add(varExpression);
-            _statements.Add(Expression.Assign(varExpression, expression));
-            return varExpression;
-        }
-
-        public Expression PrepareTypes(Expression baseExpression) =>
+        public Expression ReplaceTypes(Expression baseExpression) =>
             TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, _typesMap);
 
-        public Expression MakeInjections(Expression baseExpression, ParameterExpression instanceExpression = null) =>
+        public void BindTypes(Type type, Type targetType) =>
+            TypeMapper.Shared.Map(type, targetType, _typesMap);
+
+        public bool TryReplaceType(Type type, out Type targetType) =>
+            _typesMap.TryGetValue(type, out targetType);
+
+        public Expression InjectDependencies(Expression baseExpression, ParameterExpression instanceExpression = null) =>
             DependencyInjectionExpressionBuilder.Shared.Build(baseExpression, this, instanceExpression);
 
-        public Expression AppendLifetime(Expression baseExpression, ILifetime lifetime)
+        public Expression AddLifetime(Expression baseExpression, ILifetime lifetime)
         {
             if (_builders.Count > 0)
             {
@@ -4979,52 +4944,57 @@ namespace IoC.Core
             }
 
             baseExpression = baseExpression.Convert(Key.Type);
-            baseExpression = LifetimeExpressionBuilder.Shared.Build(baseExpression, this, lifetime);
-            return CloseBlock(baseExpression);
-        }
-
-        public Expression CloseBlock(Expression targetExpression, params ParameterExpression[] variableExpressions)
-        {
-            if (targetExpression == null) throw new ArgumentNullException(nameof(targetExpression));
-            if (variableExpressions == null) throw new ArgumentNullException(nameof(variableExpressions));
-            var statements = (
-                from binaryExpression in _statements.OfType<BinaryExpression>()
-                join parameterExpression in variableExpressions on binaryExpression.Left equals parameterExpression
-                select (Expression)binaryExpression).ToList();
-
-            var parameterExpressions = variableExpressions.OfType<ParameterExpression>();
-            if (!statements.Any() && !parameterExpressions.Any())
-            {
-                return targetExpression;
-            }
-
-            statements.Add(targetExpression);
-            return Expression.Block(variableExpressions, statements);
-        }
-
-        [NotNull]
-        private Expression CloseBlock([NotNull] Expression targetExpression)
-        {
-            if (targetExpression == null) throw new ArgumentNullException(nameof(targetExpression));
-            if (!_parameters.Any() && !_statements.Any())
-            {
-                return targetExpression;
-            }
-
-            _statements.Add(targetExpression);
-            return Expression.Block(_parameters, _statements);
+            return LifetimeExpressionBuilder.Shared.Build(baseExpression, this, lifetime);
         }
 
         public IBuildContext CreateChildInternal(Key key, IContainer container, bool forBuilders = false)
         {
-            var child = new BuildContext(key, container, _resources, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
-            child._parameters.AddRange(_parameters);
-            child._statements.AddRange(_statements);
-            return child;
+            if (_typesMap.TryGetValue(key.Type, out var type))
+            {
+                key = new Key(type, key.Tag);
+            }
+
+            return new BuildContext(key, container, _resources, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
-        private int GenerateId() => System.Threading.Interlocked.Increment(ref _curId);
+        public Expression DependencyExpression
+        {
+            get
+            {
+                if (!Container.TryGetDependency(Key, out var dependency, out var lifetime))
+                {
+                    try
+                    {
+                        var dependencyInfo = Container.Resolve<IIssueResolver>().CannotResolveDependency(Container, Key);
+                        dependency = dependencyInfo.Item1;
+                        lifetime = dependencyInfo.Item2;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new BuildExpressionException(ex.Message, ex.InnerException);
+                    }
+                }
+
+                if (Depth >= 64)
+                {
+                    Container.Resolve<IIssueResolver>().CyclicDependenceDetected(Key, Depth);
+                }
+
+                if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
+                {
+                    return expression;
+                }
+
+                try
+                {
+                    return Container.Resolve<IIssueResolver>().CannotBuildExpression(this, dependency, lifetime, error);
+                }
+                catch (Exception)
+                {
+                    throw error;
+                }
+            }
+        }
     }
 }
 
@@ -5438,7 +5408,6 @@ namespace IoC.Core
         private static readonly TypeDescriptor ContextTypeDescriptor = TypeDescriptor<Context>.Descriptor;
         private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static readonly ConstructorInfo ContextConstructor;
-        [NotNull] private readonly Stack<Key> _keys = new Stack<Key>();
         [NotNull] private readonly IContainer _container;
         [NotNull] private readonly IBuildContext _buildContext;
         [CanBeNull] private readonly Expression _thisExpression;
@@ -5451,7 +5420,6 @@ namespace IoC.Core
         public DependencyInjectionExpressionVisitor([NotNull] IBuildContext buildContext, [CanBeNull] Expression thisExpression)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            _keys.Push(buildContext.Key);
             _container = buildContext.Container;
             _buildContext = buildContext;
             _thisExpression = thisExpression;
@@ -5597,7 +5565,7 @@ namespace IoC.Core
                 return Expression.New(
                     ctor,
                     _thisExpression,
-                    Expression.Constant(_keys.Peek()),
+                    Expression.Constant(_buildContext.Key),
                     ContainerParameter,
                     ArgsParameter);
             }
@@ -5610,7 +5578,7 @@ namespace IoC.Core
         {
             return Expression.New(
                 ContextConstructor,
-                Expression.Constant(_keys.Peek()),
+                Expression.Constant(_buildContext.Key),
                 ContainerParameter,
                 ArgsParameter);
         }
@@ -5643,21 +5611,16 @@ namespace IoC.Core
         }
 
         [NotNull]
-        private IContainer SelectedContainer([CanBeNull] Expression containerExpression)
+        private IContainer SelectedContainer([NotNull] Expression containerExpression)
         {
-            if (containerExpression != null)
+            if (containerExpression is ParameterExpression parameterExpression && parameterExpression.Type == TypeDescriptor<IContainer>.Type)
             {
-                if (containerExpression is ParameterExpression parameterExpression && parameterExpression.Type == TypeDescriptor<IContainer>.Type)
-                {
-                    return _container;
-                }
-
-                var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, ContainerParameter);
-                var selectContainer = containerSelectorExpression.Compile();
-                return selectContainer(_container);
+                return _container;
             }
 
-            return _container;
+            var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, ContainerParameter);
+            var selectContainer = containerSelectorExpression.Compile();
+            return selectContainer(_container);
         }
 
         [NotNull]
@@ -5668,50 +5631,8 @@ namespace IoC.Core
                 return CreateNewContextExpression();
             }
 
-            var selectedContainer = SelectedContainer(containerExpression);
-            if (!selectedContainer.TryGetDependency(key, out var dependency, out var lifetime))
-            {
-                try
-                {
-                    var dependencyInfo = _container.Resolve<IIssueResolver>().CannotResolveDependency(selectedContainer, key);
-                    dependency = dependencyInfo.Item1;
-                    lifetime = dependencyInfo.Item2;
-                }
-                catch (Exception ex)
-                {
-                    throw new BuildExpressionException(ex.Message, ex.InnerException);
-                }
-            }
-
-            _keys.Push(key);
-            try
-            {
-                var childBuildContext = _buildContext.CreateChild(key, selectedContainer);
-                if (childBuildContext.Depth >= 64)
-                {
-                    _container.Resolve<IIssueResolver>().CyclicDependenceDetected(key, childBuildContext.Depth);
-                }
-
-                if (dependency.TryBuildExpression(childBuildContext, lifetime, out var expression, out var error))
-                {
-                    return expression;
-                }
-                else
-                {
-                    try
-                    {
-                        return _container.Resolve<IIssueResolver>().CannotBuildExpression(childBuildContext, dependency, lifetime);
-                    }
-                    catch (Exception)
-                    {
-                        throw error;
-                    }
-                }
-            }
-            finally
-            {
-                _keys.Pop();
-            }
+            var selectedContainer = containerExpression != null ? SelectedContainer(containerExpression) : _container;
+            return _buildContext.CreateChild(key, selectedContainer).DependencyExpression;
         }
 
         private bool TryReplaceContextFields([CanBeNull] Type type, string name, out Expression expression)
@@ -5728,7 +5649,7 @@ namespace IoC.Core
                 // ctx.Key
                 if (name == nameof(Context.Key))
                 {
-                    expression = Expression.Constant(_keys.Peek());
+                    expression = Expression.Constant(_buildContext.Key);
                     return true;
                 }
 
@@ -6407,7 +6328,6 @@ namespace IoC.Core
         };
 
         private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
-        [NotNull] private static Cache<ConstructorInfo, NewExpression> _constructors = new Cache<ConstructorInfo, NewExpression>();
         [NotNull] private readonly Type _type;
         [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
         private readonly bool _hasGenericParamsWithConstraints;
@@ -6477,6 +6397,7 @@ namespace IoC.Core
             try
             {
                 var autoWiringStrategy = _autowiringStrategy ?? buildContext.AutowiringStrategy;
+                var isDefaultAutowiringStrategy = DefaultAutowiringStrategy.Shared == autoWiringStrategy;
                 if (!autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
                 {
                     instanceType = _hasGenericParamsWithConstraints
@@ -6485,10 +6406,30 @@ namespace IoC.Core
                 }
 
                 var typeDescriptor = instanceType.Descriptor();
+                if (typeDescriptor.IsConstructedGenericType())
+                {
+                    buildContext.BindTypes(instanceType, buildContext.Key.Type);
+                    var genericArgs = typeDescriptor.GetGenericTypeArguments();
+                    var isReplaced = false;
+                    for (var position = 0; position < genericArgs.Length; position++)
+                    {
+                        if (buildContext.TryReplaceType(genericArgs[position], out var type))
+                        {
+                            genericArgs[position] = type;
+                            isReplaced = true;
+                        }
+                    }
+
+                    if (isReplaced)
+                    {
+                        typeDescriptor = typeDescriptor.GetGenericTypeDefinition().MakeGenericType(genericArgs).Descriptor();
+                    }
+                }
+
                 var defaultConstructors = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredConstructors());
                 if (!autoWiringStrategy.TryResolveConstructor(defaultConstructors, out var ctor))
                 {
-                    if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
+                    if (isDefaultAutowiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
                     {
                         ctor = buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
                     }
@@ -6497,13 +6438,13 @@ namespace IoC.Core
                 var defaultMethods = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredMethods());
                 if (!autoWiringStrategy.TryResolveInitializers(defaultMethods, out var initializers))
                 {
-                    if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
+                    if (isDefaultAutowiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
                     {
                         initializers = Enumerable.Empty<IMethod<MethodInfo>>();
                     }
                 }
 
-                baseExpression = _constructors.GetOrCreate(ctor.Info, () => Expression.New(ctor.Info, ctor.GetParametersExpressions()));
+                baseExpression = Expression.New(ctor.Info, ctor.GetParametersExpressions(buildContext));
                 var curInitializers = initializers.ToArray();
                 if (curInitializers.Length > 0)
                 {
@@ -6513,15 +6454,18 @@ namespace IoC.Core
                         Expression.Assign(thisVar, baseExpression),
                         Expression.Block(
                             from initializer in initializers
-                            select Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions())
+                            select Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext))
                         ),
                         thisVar
                     );
                 }
 
-                baseExpression = buildContext.PrepareTypes(baseExpression);
-                baseExpression = buildContext.MakeInjections(baseExpression);
-                baseExpression = buildContext.AppendLifetime(baseExpression, lifetime);
+                if (!isDefaultAutowiringStrategy)
+                {
+                    baseExpression = buildContext.InjectDependencies(baseExpression);
+                }
+                
+                baseExpression = buildContext.AddLifetime(baseExpression, lifetime);
                 error = default(Exception);
                 return true;
             }
@@ -6715,11 +6659,11 @@ namespace IoC.Core
             throw new InvalidOperationException($"Cannot parse the tag {tag} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
         }
 
-        public Expression CannotBuildExpression(IBuildContext buildContext, IDependency dependency, ILifetime lifetime)
+        public Expression CannotBuildExpression(IBuildContext buildContext, IDependency dependency, ILifetime lifetime, Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
-            throw new InvalidOperationException($"Cannot build expression for the key {buildContext.Key} in the container {buildContext.Container}.");
+            throw new InvalidOperationException($"Cannot build expression for the key {buildContext.Key} in the container {buildContext.Container}.", error);
         }
 
         public IMethod<ConstructorInfo> CannotResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors)
@@ -6771,12 +6715,9 @@ namespace IoC.Core
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
-    using static Injections;
 
     internal class Method<TMethodInfo>: IMethod<TMethodInfo> where TMethodInfo: MethodBase
     {
-        // ReSharper disable once StaticMemberInGenericType
-        [NotNull] private static Cache<Type, Expression> _injections = new Cache<Type, Expression>();
         private readonly Expression[] _parametersExpressions;
         private readonly ParameterInfo[] _parameters;
 
@@ -6789,7 +6730,7 @@ namespace IoC.Core
 
         public TMethodInfo Info { get; }
 
-        public IEnumerable<Expression> GetParametersExpressions()
+        public IEnumerable<Expression> GetParametersExpressions(IBuildContext buildContext)
         {
             for (var parameterPosition = 0; parameterPosition < _parametersExpressions.Length; parameterPosition++)
             {
@@ -6800,12 +6741,8 @@ namespace IoC.Core
                 }
                 else
                 {
-                    var paramType = _parameters[parameterPosition].ParameterType;
-                    yield return _injections.GetOrCreate(paramType, () =>
-                    {
-                        var containerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
-                        return Expression.Call(InjectMethodInfo, containerExpression, Expression.Constant(paramType)).Convert(paramType);
-                    });
+                    var key = new Key(_parameters[parameterPosition].ParameterType);
+                    yield return buildContext.CreateChild(key, buildContext.Container).DependencyExpression;
                 }
             }
         }

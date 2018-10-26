@@ -111,7 +111,7 @@
                 var typeDescriptor = instanceType.Descriptor();
                 if (typeDescriptor.IsConstructedGenericType())
                 {
-                    buildContext.MapTypes(instanceType, buildContext.Key.Type);
+                    buildContext.BindTypes(instanceType, buildContext.Key.Type);
                     var genericArgs = typeDescriptor.GetGenericTypeArguments();
                     var isReplaced = false;
                     for (var position = 0; position < genericArgs.Length; position++)
@@ -165,10 +165,10 @@
 
                 if (!isDefaultAutowiringStrategy)
                 {
-                    baseExpression = buildContext.MakeInjections(baseExpression);
+                    baseExpression = buildContext.InjectDependencies(baseExpression);
                 }
                 
-                baseExpression = buildContext.AppendLifetime(baseExpression, lifetime);
+                baseExpression = buildContext.AddLifetime(baseExpression, lifetime);
                 error = default(Exception);
                 return true;
             }

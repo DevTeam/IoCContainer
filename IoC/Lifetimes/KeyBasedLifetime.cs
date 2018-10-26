@@ -22,7 +22,7 @@
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
         private static readonly ParameterExpression KeyVar = Expression.Variable(TypeDescriptor<TKey>.Type, "key");
 
-        [NotNull] private object _lockObject = new object();
+        [NotNull] private readonly object _lockObject = new object();
         private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
 
         /// <inheritdoc />
@@ -31,10 +31,10 @@
             if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             var returnType = buildContext.Key.Type;
-            var thisConst = buildContext.AppendValue(this);
+            var thisConst = Expression.Constant(this);
             var instanceVar = Expression.Variable(returnType, "val");
             var instancesField = Expression.Field(thisConst, InstancesFieldInfo);
-            var lockObjectConst = buildContext.AppendValue(_lockObject);
+            var lockObjectConst = Expression.Constant(_lockObject);
             var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
             var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(null, GetMethodInfo, instancesField, SingletonBasedLifetimeShared.HashCodeVar, KeyVar).Convert(returnType));
             var isNullExpression = Expression.ReferenceEqual(instanceVar, ExpressionBuilderExtensions.NullConst);

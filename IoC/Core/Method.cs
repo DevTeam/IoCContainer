@@ -31,8 +31,7 @@
                 else
                 {
                     var key = new Key(_parameters[parameterPosition].ParameterType);
-                    var childBuildContext = buildContext.CreateChild(key, buildContext.Container);
-                    yield return childBuildContext.CreateDependencyExpression();
+                    yield return buildContext.CreateChild(key, buildContext.Container).DependencyExpression;
                 }
             }
         }

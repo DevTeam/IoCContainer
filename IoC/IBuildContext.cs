@@ -30,6 +30,11 @@
         [NotNull] IAutowiringStrategy AutowiringStrategy { get; }
 
         /// <summary>
+        /// The dependency expression.
+        /// </summary>
+        [NotNull] Expression DependencyExpression { get; }
+
+        /// <summary>
         /// Creates a child context.
         /// </summary>
         /// <param name="key">The key</param>
@@ -42,17 +47,17 @@
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
         /// <returns>The resulting expression.</returns>
-        [NotNull] Expression PrepareTypes([NotNull] Expression baseExpression);
+        [NotNull] Expression ReplaceTypes([NotNull] Expression baseExpression);
 
         /// <summary>
-        /// Add element for replacing generic types' markers.
+        /// Bind a raw type to a target type.
         /// </summary>
-        /// <param name="type">The target raw type.</param>
-        /// <param name="targetType">The replacing type.</param>
-        void MapTypes([NotNull] Type type, [NotNull]Type targetType);
+        /// <param name="type">The type.</param>
+        /// <param name="targetType">The target type.</param>
+        void BindTypes([NotNull] Type type, [NotNull]Type targetType);
 
         /// <summary>
-        /// Add replacing generic types' markers.
+        /// Try replacing generic types' markers.
         /// </summary>
         /// <param name="type">The target raw type.</param>
         /// <param name="targetType">The replacing type.</param>
@@ -60,56 +65,19 @@
         bool TryReplaceType([NotNull] Type type, out Type targetType);
 
         /// <summary>
-        /// Prepares base expression, injecting dependencies. 
+        /// Prepares base expression, injecting dependencies.
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
         /// <param name="instanceExpression">The instance expression.</param>
         /// <returns>The resulting expression.</returns>
-        [NotNull] Expression MakeInjections([NotNull] Expression baseExpression, [CanBeNull] ParameterExpression instanceExpression = null);
+        [NotNull] Expression InjectDependencies([NotNull] Expression baseExpression, [CanBeNull] ParameterExpression instanceExpression = null);
 
         /// <summary>
-        /// Wraps by lifetime.
+        /// Prepares base expression, adding a lifetime.
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <returns></returns>
-        [NotNull] Expression AppendLifetime([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
-
-        /// <summary>
-        /// Appends value.
-        /// </summary>
-        /// <param name="value">The value.</param>
-        /// <param name="type">The value type.</param>
-        /// <returns>The parameter expression.</returns>
-        [NotNull] Expression AppendValue([CanBeNull] object value, [NotNull] Type type);
-
-        /// <summary>
-        /// Appends value.
-        /// </summary>
-        /// <typeparam name="T">The value type.</typeparam>
-        /// <param name="value">The value.</param>
-        /// <returns>The parameter expression.</returns>
-        [NotNull] Expression AppendValue<T>([CanBeNull] T value);
-
-        /// <summary>
-        /// Appends variable.
-        /// </summary>
-        /// <param name="expression">The value expression.</param>
-        /// <returns>The parameter expression.</returns>
-        [NotNull] ParameterExpression AppendVariable([NotNull] Expression expression);
-
-        /// <summary>
-        /// Closes block for specified variables.
-        /// </summary>
-        /// <param name="targetExpression">The target expression.</param>
-        /// <param name="variableExpressions">Variable expressions.</param>
-        /// <returns>The resulting block expression.</returns>
-        [NotNull] Expression CloseBlock([NotNull] Expression targetExpression, [NotNull][ItemNotNull] params ParameterExpression[] variableExpressions);
-
-        /// <summary>
-        /// Creates an expression for dependency based on Key.
-        /// </summary>
-        /// <returns>The dependency expression.</returns>
-        [NotNull] Expression CreateDependencyExpression();
+        [NotNull] Expression AddLifetime([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
     }
 }

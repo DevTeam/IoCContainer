@@ -15,10 +15,10 @@
     {
         private static readonly FieldInfo InstanceFieldInfo = Descriptor<SingletonLifetime>().GetDeclaredFields().Single(i => i.Name == nameof(_instance));
 
-#pragma warning disable CS0649
-        [NotNull] private object _lockObject = new object();
+        [NotNull] private readonly object _lockObject = new object();
+#pragma warning disable CS0649, IDE0044
         private volatile object _instance;
-#pragma warning restore CS0649
+#pragma warning restore CS0649, IDE0044
 
         /// <inheritdoc />
         public Expression Build(Expression expression, IBuildContext buildContext)
@@ -26,8 +26,8 @@
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
 
-            var thisConst = buildContext.AppendValue(this);
-            var lockObjectConst = buildContext.AppendValue(_lockObject);
+            var thisConst = Expression.Constant(this);
+            var lockObjectConst = Expression.Constant(_lockObject);
             var instanceField = Expression.Field(thisConst, InstanceFieldInfo);
             var typedInstance = instanceField.Convert(expression.Type);
             var isNullExpression = Expression.ReferenceEqual(instanceField, ExpressionBuilderExtensions.NullConst);

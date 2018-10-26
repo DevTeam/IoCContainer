@@ -75,7 +75,7 @@ namespace IoC.Tests.UsageScenarios
                 expression = _baseSingletonLifetime.Build(expression, buildContext);
 
                 // Defines `this` variable to store the reference to the current lifetime instance to call internal method 'IncrementCounter'
-                var thisVar = buildContext.AppendValue(this);
+                var thisVar = Expression.Constant(this);
 
                 // Creates the code block
                 return Expression.Block(

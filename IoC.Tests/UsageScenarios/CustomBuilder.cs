@@ -35,7 +35,7 @@
         {
             public Expression Build(Expression expression, IBuildContext buildContext) =>
                 // Add the Singleton lifetime for any instances
-                buildContext.AppendLifetime(expression, new Lifetimes.SingletonLifetime());
+                buildContext.AddLifetime(expression, new Lifetimes.SingletonLifetime());
         }
         // }
     }

@@ -46,8 +46,8 @@ namespace IoC.Comparison
             new TestInfo("operators 'new'", CtorSingleton),
             new TestInfo("LightInject", LightInjectSingleton),
             new TestInfo("DryIoc", DryIocSingleton),
-            new TestInfo("Castle Windsor", CastleWindsorSingleton){ PerformanceRate = 5 },
-            new TestInfo("Unity", UnitySingleton){ PerformanceRate = 800 },
+            new TestInfo("Castle Windsor", CastleWindsorSingleton) { PerformanceRate = 800 },
+            new TestInfo("Unity", UnitySingleton) { PerformanceRate = 800 },
 #if !NETCOREAPP1_1
             new TestInfo("Ninject", NinjectSingleton) { PerformanceRate = 1000 },
 #endif
@@ -61,7 +61,7 @@ namespace IoC.Comparison
             new TestInfo("operators 'new'", CtorTransient),
             new TestInfo("LightInject", LightInjectTransient),
             new TestInfo("DryIoc", DryIocTransient),
-            new TestInfo("Castle Windsor", CastleWindsorTransient) { PerformanceRate = 5 },
+            new TestInfo("Castle Windsor", CastleWindsorTransient) { PerformanceRate = 800 },
             new TestInfo("Unity", UnityTransient) { PerformanceRate = 800 },
 #if !NETCOREAPP1_1
             new TestInfo("Ninject", NinjectTransient) { PerformanceRate = 1000 },
@@ -75,7 +75,7 @@ namespace IoC.Comparison
             new TestInfo(ThisIocName, ThisComplex),
             new TestInfo("LightInject", LightInjectComplex),
             new TestInfo("DryIoc", DryIocComplex),
-            new TestInfo("Castle Windsor", CastleWindsorComplex),
+            new TestInfo("Castle Windsor", CastleWindsorComplex) { PerformanceRate = 800 },
             new TestInfo("Unity", UnityComplex) { PerformanceRate = 800 },
 #if !NETCOREAPP1_1
             new TestInfo("Ninject", NinjectComplex) { PerformanceRate = 1000 },
@@ -152,7 +152,7 @@ namespace IoC.Comparison
             SaveResults(results, $"27 instances {series.ToShortString()} times");
             results.Clear();
 
-            series /= 100;
+            series /= 1000;
             foreach (var ioc in IoCComplexGraphOf3Transient)
             {
                 // Warmup
@@ -175,7 +175,7 @@ namespace IoC.Comparison
 
         [Fact]
         [Trait("Category", "Performance")]
-        public void PerformanceTest2()
+        public void ComplexGraphPerformanceTest()
         {
             using (var container = ThisContainer.CreateCore())
             {
@@ -516,10 +516,10 @@ namespace IoC.Comparison
         {
             using (var container = new WindsorContainer())
             {
-                container.Register(Component.For<IService1>().ImplementedBy<Service1>());
+                container.Register(Component.For<IService1>().ImplementedBy<Service1>().LifestyleTransient());
                 container.Register(Component.For<IService2>().ImplementedBy<Service2>().LifestyleSingleton());
-                container.Register(Component.For<IService3>().ImplementedBy<Service3>());
-                container.Register(Component.For<IService4>().ImplementedBy<Service4>());
+                container.Register(Component.For<IService3>().ImplementedBy<Service3>().LifestyleTransient());
+                container.Register(Component.For<IService4>().ImplementedBy<Service4>().LifestyleTransient());
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -534,10 +534,10 @@ namespace IoC.Comparison
         {
             using (var container = new WindsorContainer())
             {
-                container.Register(Component.For<IService1>().ImplementedBy<Service1>());
-                container.Register(Component.For<IService2>().ImplementedBy<Service2>());
-                container.Register(Component.For<IService3>().ImplementedBy<Service3>());
-                container.Register(Component.For<IService4>().ImplementedBy<Service4>());
+                container.Register(Component.For<IService1>().ImplementedBy<Service1>().LifestyleTransient());
+                container.Register(Component.For<IService2>().ImplementedBy<Service2>().LifestyleTransient());
+                container.Register(Component.For<IService3>().ImplementedBy<Service3>().LifestyleTransient());
+                container.Register(Component.For<IService4>().ImplementedBy<Service4>().LifestyleTransient());
                 using (performanceCounter.Run())
                 {
                     for (var i = 0; i < series; i++)
@@ -554,7 +554,7 @@ namespace IoC.Comparison
             {
                 foreach (var type in TestTypeBuilder.Types)
                 {
-                    container.Register(Component.For(type).ImplementedBy(type));
+                    container.Register(Component.For(type).ImplementedBy(type).LifestyleTransient());
                 }
                 
                 using (performanceCounter.Run())

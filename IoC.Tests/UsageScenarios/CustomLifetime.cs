@@ -37,7 +37,7 @@
 
             // Wraps the expression by the Singleton lifetime expression
             public Expression Build(Expression expression, IBuildContext buildContext)
-                => buildContext.AppendLifetime(expression, _baseLifetime);
+                => buildContext.AddLifetime(expression, _baseLifetime);
 
             // Creates the similar lifetime to use with generic instances
             public ILifetime Create() => new MyTransientLifetime();

@@ -3,9 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Linq.Expressions;
-    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Represents build context.
@@ -15,13 +13,9 @@
     internal class BuildContext : IBuildContext
     {
         private static readonly ICollection<IBuilder> EmptyBuilders = new List<IBuilder>();
-        // Should be at least internal to be accessible from for compiled code from expressions
         private readonly ICollection<IDisposable> _resources;
         [NotNull] private readonly ICollection<IBuilder> _builders;
-        private readonly List<ParameterExpression> _parameters = new List<ParameterExpression>();
-        private readonly List<Expression> _statements = new List<Expression>();
         private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
-        private int _curId;
 
         internal BuildContext(
             Key key,
@@ -53,36 +47,19 @@
             return CreateChildInternal(key, container);
         }
 
-        public Expression AppendValue(object value, Type type)
-        {
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            return Expression.Constant(value, type);
-        }
-
-        public Expression AppendValue<T>(T value) => AppendValue(value, TypeDescriptor<T>.Type);
-
-        public ParameterExpression AppendVariable(Expression expression)
-        {
-            if (expression == null) throw new ArgumentNullException(nameof(expression));
-            var varExpression = Expression.Variable(expression.Type, "var" + GenerateId());
-            _parameters.Add(varExpression);
-            _statements.Add(Expression.Assign(varExpression, expression));
-            return varExpression;
-        }
-
-        public Expression PrepareTypes(Expression baseExpression) =>
+        public Expression ReplaceTypes(Expression baseExpression) =>
             TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, _typesMap);
 
-        public void MapTypes(Type type, Type targetType) =>
+        public void BindTypes(Type type, Type targetType) =>
             TypeMapper.Shared.Map(type, targetType, _typesMap);
 
         public bool TryReplaceType(Type type, out Type targetType) =>
             _typesMap.TryGetValue(type, out targetType);
 
-        public Expression MakeInjections(Expression baseExpression, ParameterExpression instanceExpression = null) =>
+        public Expression InjectDependencies(Expression baseExpression, ParameterExpression instanceExpression = null) =>
             DependencyInjectionExpressionBuilder.Shared.Build(baseExpression, this, instanceExpression);
 
-        public Expression AppendLifetime(Expression baseExpression, ILifetime lifetime)
+        public Expression AddLifetime(Expression baseExpression, ILifetime lifetime)
         {
             if (_builders.Count > 0)
             {
@@ -95,40 +72,7 @@
             }
 
             baseExpression = baseExpression.Convert(Key.Type);
-            baseExpression = LifetimeExpressionBuilder.Shared.Build(baseExpression, this, lifetime);
-            return CloseBlock(baseExpression);
-        }
-
-        public Expression CloseBlock(Expression targetExpression, params ParameterExpression[] variableExpressions)
-        {
-            if (targetExpression == null) throw new ArgumentNullException(nameof(targetExpression));
-            if (variableExpressions == null) throw new ArgumentNullException(nameof(variableExpressions));
-            var statements = (
-                from binaryExpression in _statements.OfType<BinaryExpression>()
-                join parameterExpression in variableExpressions on binaryExpression.Left equals parameterExpression
-                select (Expression)binaryExpression).ToList();
-
-            var parameterExpressions = variableExpressions.OfType<ParameterExpression>();
-            if (!statements.Any() && !parameterExpressions.Any())
-            {
-                return targetExpression;
-            }
-
-            statements.Add(targetExpression);
-            return Expression.Block(variableExpressions, statements);
-        }
-
-        [NotNull]
-        private Expression CloseBlock([NotNull] Expression targetExpression)
-        {
-            if (targetExpression == null) throw new ArgumentNullException(nameof(targetExpression));
-            if (!_parameters.Any() && !_statements.Any())
-            {
-                return targetExpression;
-            }
-
-            _statements.Add(targetExpression);
-            return Expression.Block(_parameters, _statements);
+            return LifetimeExpressionBuilder.Shared.Build(baseExpression, this, lifetime);
         }
 
         public IBuildContext CreateChildInternal(Key key, IContainer container, bool forBuilders = false)
@@ -138,50 +82,46 @@
                 key = new Key(type, key.Tag);
             }
 
-            var child = new BuildContext(key, container, _resources, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
-            child._parameters.AddRange(_parameters);
-            child._statements.AddRange(_statements);
-            return child;
+            return new BuildContext(key, container, _resources, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
-        public Expression CreateDependencyExpression()
+        public Expression DependencyExpression
         {
-            if (!Container.TryGetDependency(Key, out var dependency, out var lifetime))
+            get
             {
+                if (!Container.TryGetDependency(Key, out var dependency, out var lifetime))
+                {
+                    try
+                    {
+                        var dependencyInfo = Container.Resolve<IIssueResolver>().CannotResolveDependency(Container, Key);
+                        dependency = dependencyInfo.Item1;
+                        lifetime = dependencyInfo.Item2;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new BuildExpressionException(ex.Message, ex.InnerException);
+                    }
+                }
+
+                if (Depth >= 64)
+                {
+                    Container.Resolve<IIssueResolver>().CyclicDependenceDetected(Key, Depth);
+                }
+
+                if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
+                {
+                    return expression;
+                }
+
                 try
                 {
-                    var dependencyInfo = Container.Resolve<IIssueResolver>().CannotResolveDependency(Container, Key);
-                    dependency = dependencyInfo.Item1;
-                    lifetime = dependencyInfo.Item2;
+                    return Container.Resolve<IIssueResolver>().CannotBuildExpression(this, dependency, lifetime, error);
                 }
-                catch (Exception ex)
+                catch (Exception)
                 {
-                    throw new BuildExpressionException(ex.Message, ex.InnerException);
+                    throw error;
                 }
-            }
-
-            if (Depth >= 64)
-            {
-                Container.Resolve<IIssueResolver>().CyclicDependenceDetected(Key, Depth);
-            }
-
-            if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
-            {
-                return expression;
-            }
-
-            try
-            {
-                return Container.Resolve<IIssueResolver>().CannotBuildExpression(this, dependency, lifetime, error);
-            }
-            catch (Exception)
-            {
-                throw error;
             }
         }
-
-        [MethodImpl((MethodImplOptions)256)]
-        private int GenerateId() => System.Threading.Interlocked.Increment(ref _curId);
     }
 }

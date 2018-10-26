@@ -240,8 +240,7 @@
             }
 
             var selectedContainer = containerExpression != null ? SelectedContainer(containerExpression) : _container;
-            var childBuildContext = _buildContext.CreateChild(key, selectedContainer);
-            return childBuildContext.CreateDependencyExpression();
+            return _buildContext.CreateChild(key, selectedContainer).DependencyExpression;
         }
 
         private bool TryReplaceContextFields([CanBeNull] Type type, string name, out Expression expression)

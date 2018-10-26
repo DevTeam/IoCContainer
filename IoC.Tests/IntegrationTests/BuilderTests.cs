@@ -73,7 +73,7 @@
         {
             public Expression Build(Expression expression, IBuildContext buildContext)
             {
-                return buildContext.AppendLifetime(expression, new Lifetimes.SingletonLifetime());
+                return buildContext.AddLifetime(expression, new Lifetimes.SingletonLifetime());
             }
         }
     }

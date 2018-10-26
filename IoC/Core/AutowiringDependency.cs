@@ -1,7 +1,6 @@
 ﻿namespace IoC.Core
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
@@ -36,18 +35,34 @@
             try
             {
                 baseExpression = _expression;
-                if (_isComplexType)
-                {
-                    baseExpression = buildContext.PrepareTypes(baseExpression);
-                }
-
-                baseExpression = buildContext.MakeInjections(baseExpression);
                 if (_statements.Length > 0)
                 {
-                    baseExpression = Expression.Block(CreateAutowiringStatements(buildContext, baseExpression));
+                    var thisVar = Expression.Variable(baseExpression.Type, "this");
+                    baseExpression = Expression.Block(
+                        new[] {thisVar},
+                        Expression.Assign(thisVar, baseExpression),
+                        Expression.Block(_statements),
+                        thisVar
+                    );
+
+                    if (_isComplexType)
+                    {
+                        baseExpression = buildContext.ReplaceTypes(baseExpression);
+                    }
+
+                    baseExpression = buildContext.InjectDependencies(baseExpression, thisVar);
+                }
+                else
+                {
+                    if (_isComplexType)
+                    {
+                        baseExpression = buildContext.ReplaceTypes(baseExpression);
+                    }
+
+                    baseExpression = buildContext.InjectDependencies(baseExpression);
                 }
 
-                baseExpression = buildContext.AppendLifetime(baseExpression, lifetime);
+                baseExpression = buildContext.AddLifetime(baseExpression, lifetime);
                 error = default(Exception);
                 return true;
             }
@@ -57,29 +72,6 @@
                 baseExpression = default(Expression);
                 return false;
             }
-        }
-
-        private IEnumerable<Expression> CreateAutowiringStatements(
-            [NotNull] IBuildContext buildContext,
-            [NotNull] Expression newExpression)
-        {
-            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            if (newExpression == null) throw new ArgumentNullException(nameof(newExpression));
-
-            var instanceExpression = buildContext.AppendVariable(newExpression);
-            foreach (var statement in _statements)
-            {
-                var baseExpression = statement;
-                if (_isComplexType)
-                {
-                    baseExpression = buildContext.PrepareTypes(baseExpression);
-                }
-
-                baseExpression = buildContext.MakeInjections(baseExpression, instanceExpression);
-                yield return baseExpression;
-            }
-
-            yield return instanceExpression;
         }
 
         private bool IsComplexType(Type type)

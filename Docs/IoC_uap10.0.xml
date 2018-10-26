@@ -1827,6 +1827,11 @@
             Autowiring strategy.
             </summary>
         </member>
+        <member name="P:IoC.IBuildContext.DependencyExpression">
+            <summary>
+            The dependency expression.
+            </summary>
+        </member>
         <member name="M:IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)">
             <summary>
             Creates a child context.
@@ -1835,80 +1840,43 @@
             <param name="container">The container.</param>
             <returns>The new build context.</returns>
         </member>
-        <member name="M:IoC.IBuildContext.PrepareTypes(System.Linq.Expressions.Expression)">
+        <member name="M:IoC.IBuildContext.ReplaceTypes(System.Linq.Expressions.Expression)">
             <summary>
             Prepares base expression, replacing generic types' markers.
             </summary>
             <param name="baseExpression">The base expression.</param>
             <returns>The resulting expression.</returns>
         </member>
-        <member name="M:IoC.IBuildContext.MapTypes(System.Type,System.Type)">
+        <member name="M:IoC.IBuildContext.BindTypes(System.Type,System.Type)">
             <summary>
-            Add element for replacing generic types' markers.
+            Bind a raw type to a target type.
             </summary>
-            <param name="type">The target raw type.</param>
-            <param name="targetType">The replacing type.</param>
+            <param name="type">The type.</param>
+            <param name="targetType">The target type.</param>
         </member>
         <member name="M:IoC.IBuildContext.TryReplaceType(System.Type,System.Type@)">
             <summary>
-            Add replacing generic types' markers.
+            Try replacing generic types' markers.
             </summary>
             <param name="type">The target raw type.</param>
             <param name="targetType">The replacing type.</param>
             <returns></returns>
         </member>
-        <member name="M:IoC.IBuildContext.MakeInjections(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)">
+        <member name="M:IoC.IBuildContext.InjectDependencies(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)">
             <summary>
-            Prepares base expression, injecting dependencies. 
+            Prepares base expression, injecting dependencies.
             </summary>
             <param name="baseExpression">The base expression.</param>
             <param name="instanceExpression">The instance expression.</param>
             <returns>The resulting expression.</returns>
         </member>
-        <member name="M:IoC.IBuildContext.AppendLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)">
+        <member name="M:IoC.IBuildContext.AddLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)">
             <summary>
-            Wraps by lifetime.
+            Prepares base expression, adding a lifetime.
             </summary>
             <param name="baseExpression">The base expression.</param>
             <param name="lifetime">The target lifetime.</param>
             <returns></returns>
-        </member>
-        <member name="M:IoC.IBuildContext.AppendValue(System.Object,System.Type)">
-            <summary>
-            Appends value.
-            </summary>
-            <param name="value">The value.</param>
-            <param name="type">The value type.</param>
-            <returns>The parameter expression.</returns>
-        </member>
-        <member name="M:IoC.IBuildContext.AppendValue``1(``0)">
-            <summary>
-            Appends value.
-            </summary>
-            <typeparam name="T">The value type.</typeparam>
-            <param name="value">The value.</param>
-            <returns>The parameter expression.</returns>
-        </member>
-        <member name="M:IoC.IBuildContext.AppendVariable(System.Linq.Expressions.Expression)">
-            <summary>
-            Appends variable.
-            </summary>
-            <param name="expression">The value expression.</param>
-            <returns>The parameter expression.</returns>
-        </member>
-        <member name="M:IoC.IBuildContext.CloseBlock(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression[])">
-            <summary>
-            Closes block for specified variables.
-            </summary>
-            <param name="targetExpression">The target expression.</param>
-            <param name="variableExpressions">Variable expressions.</param>
-            <returns>The resulting block expression.</returns>
-        </member>
-        <member name="M:IoC.IBuildContext.CreateDependencyExpression">
-            <summary>
-            Creates an expression for dependency based on Key.
-            </summary>
-            <returns>The dependency expression.</returns>
         </member>
         <member name="T:IoC.IBuilder">
             <summary>

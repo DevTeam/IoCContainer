@@ -37,7 +37,7 @@
         {
             lock (_interceptors)
             {
-                var proxyGeneratorExpression = buildContext.AppendValue(ProxyGenerator);
+                var proxyGeneratorExpression = Expression.Constant(ProxyGenerator);
                 foreach (var interceptors in _interceptors)
                 {
                     if (interceptors.Accept(buildContext))
@@ -85,9 +85,9 @@
                 var interfaces = typeInfo.ImplementedInterfaces.ToArray();
 #endif
 
-                var typeExpression = buildContext.AppendValue(type);
-                var interfacesExpression = buildContext.AppendValue(interfaces);
-                var interceptorsExpression = buildContext.AppendValue(_interceptors);
+                var typeExpression = Expression.Constant(type);
+                var interfacesExpression = Expression.Constant(interfaces);
+                var interceptorsExpression = Expression.Constant(_interceptors);
                 var args = new[] {typeExpression, interfacesExpression, bodyExpression, interceptorsExpression};
                 if (isInterface)
                 {
