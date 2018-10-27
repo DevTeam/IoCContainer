@@ -1827,6 +1827,11 @@
             Autowiring strategy.
             </summary>
         </member>
+        <member name="P:IoC.IBuildContext.DependencyExpression">
+            <summary>
+            The dependency expression.
+            </summary>
+        </member>
         <member name="M:IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)">
             <summary>
             Creates a child context.
@@ -1835,52 +1840,43 @@
             <param name="container">The container.</param>
             <returns>The new build context.</returns>
         </member>
-        <member name="M:IoC.IBuildContext.Prepare(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)">
+        <member name="M:IoC.IBuildContext.ReplaceTypes(System.Linq.Expressions.Expression)">
             <summary>
-            Prepares an expression. Replace generic types' markers and injection statements. 
+            Prepares base expression, replacing generic types' markers.
+            </summary>
+            <param name="baseExpression">The base expression.</param>
+            <returns>The resulting expression.</returns>
+        </member>
+        <member name="M:IoC.IBuildContext.BindTypes(System.Type,System.Type)">
+            <summary>
+            Bind a raw type to a target type.
+            </summary>
+            <param name="type">The type.</param>
+            <param name="targetType">The target type.</param>
+        </member>
+        <member name="M:IoC.IBuildContext.TryReplaceType(System.Type,System.Type@)">
+            <summary>
+            Try replacing generic types' markers.
+            </summary>
+            <param name="type">The target raw type.</param>
+            <param name="targetType">The replacing type.</param>
+            <returns></returns>
+        </member>
+        <member name="M:IoC.IBuildContext.InjectDependencies(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)">
+            <summary>
+            Prepares base expression, injecting dependencies.
             </summary>
             <param name="baseExpression">The base expression.</param>
             <param name="instanceExpression">The instance expression.</param>
             <returns>The resulting expression.</returns>
         </member>
-        <member name="M:IoC.IBuildContext.AppendLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)">
+        <member name="M:IoC.IBuildContext.AddLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)">
             <summary>
-            Wraps by lifetime.
+            Prepares base expression, adding a lifetime.
             </summary>
             <param name="baseExpression">The base expression.</param>
             <param name="lifetime">The target lifetime.</param>
             <returns></returns>
-        </member>
-        <member name="M:IoC.IBuildContext.AppendValue(System.Object,System.Type)">
-            <summary>
-            Appends value.
-            </summary>
-            <param name="value">The value.</param>
-            <param name="type">The value type.</param>
-            <returns>The parameter expression.</returns>
-        </member>
-        <member name="M:IoC.IBuildContext.AppendValue``1(``0)">
-            <summary>
-            Appends value.
-            </summary>
-            <typeparam name="T">The value type.</typeparam>
-            <param name="value">The value.</param>
-            <returns>The parameter expression.</returns>
-        </member>
-        <member name="M:IoC.IBuildContext.AppendVariable(System.Linq.Expressions.Expression)">
-            <summary>
-            Appends variable.
-            </summary>
-            <param name="expression">The value expression.</param>
-            <returns>The parameter expression.</returns>
-        </member>
-        <member name="M:IoC.IBuildContext.CloseBlock(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression[])">
-            <summary>
-            Closes block for specified variables.
-            </summary>
-            <param name="targetExpression">The target expression.</param>
-            <param name="variableExpressions">Variable expressions.</param>
-            <returns>The resulting block expression.</returns>
         </member>
         <member name="T:IoC.IBuilder">
             <summary>
@@ -2038,13 +2034,14 @@
             <param name="tag">The text with a tag metadata.</param>
             <returns></returns>
         </member>
-        <member name="M:IoC.IIssueResolver.CannotBuildExpression(IoC.IBuildContext,IoC.IDependency,IoC.ILifetime)">
+        <member name="M:IoC.IIssueResolver.CannotBuildExpression(IoC.IBuildContext,IoC.IDependency,IoC.ILifetime,System.Exception)">
             <summary>
             Handles the scenario when cannot build expression.
             </summary>
             <param name="buildContext">The build context.</param>
             <param name="dependency">The dependency.</param>
             <param name="lifetime">The lifetime.</param>
+            <param name="error">The error.</param>
             <returns>The resulting expression.</returns>
         </member>
         <member name="M:IoC.IIssueResolver.CannotResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})">
@@ -2092,7 +2089,7 @@
             The method's information.
             </summary>
         </member>
-        <member name="M:IoC.IMethod`1.GetParametersExpressions">
+        <member name="M:IoC.IMethod`1.GetParametersExpressions(IoC.IBuildContext)">
             <summary>
             Provides parameters' expressions.
             </summary>
@@ -2135,6 +2132,23 @@
             <param name="container">The resolving container.</param>
             <param name="destination">The destination member for injection.</param>
             <param name="source">The source of injection.</param>
+        </member>
+        <member name="M:IoC.Injections.Inject(IoC.IContainer,System.Type)">
+            <summary>
+            Injects the dependency. Just a marker.
+            </summary>
+            <param name="container">The resolving container.</param>
+            <param name="type">The type of dependency.</param>
+            <returns>The injected instance.</returns>
+        </member>
+        <member name="M:IoC.Injections.Inject(IoC.IContainer,System.Type,System.Object)">
+            <summary>
+            Injects the dependency. Just a marker.
+            </summary>
+            <param name="container">The resolving container.</param>
+            <param name="type">The type of dependency.</param>
+            <param name="tag">The tag of dependency.</param>
+            <returns>The injected instance.</returns>
         </member>
         <member name="T:IoC.IResourceRegistry">
             <summary>

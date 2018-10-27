@@ -88,7 +88,7 @@
         foreach(var info in group.OrderBy(i => i["priority"]))
         {
             var description = info["description"];
-            var reference = "#" + description.Replace(" ", "-").Replace("'", string.Empty).ToLowerInvariant();
+            var reference = "#" + description.Replace(" ", "-").Replace("'", string.Empty).ToLowerInvariant() + "-";
 #>  - [<#=description#>](<#=reference#>)
 <#
         }
