@@ -1,14 +1,14 @@
-## NuGet Packages
+### NuGet Packages
 
-| Purpose | Package | Embedding-in-code package |
-|--- | --- | ---|
-| IoC container | [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) | [![NuGet](https://buildstats.info/nuget/IoC.Container.Source)](https://www.nuget.org/packages/IoC.Container.Source) |
-| ASP.NET Core | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source) |
-| Interception | [![NuGet](https://buildstats.info/nuget/IoC.Interception)](https://www.nuget.org/packages/IoC.Interception) | [![NuGet](https://buildstats.info/nuget/IoC.Interception.Source)](https://www.nuget.org/packages/IoC.Interception.Source) |
+|     | binary packages | embedding packages |
+| --- | --- | ---|
+| ![IoC container](https://img.shields.io/badge/core-IoC%20container-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) | [![NuGet](https://buildstats.info/nuget/IoC.Container.Source)](https://www.nuget.org/packages/IoC.Container.Source) |
+| ![ASP.NET Core](https://img.shields.io/badge/feature-ASP.NET%20Core-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source) |
+| ![Interception](https://img.shields.io/badge/feature-Interception-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.Interception)](https://www.nuget.org/packages/IoC.Interception) | [![NuGet](https://buildstats.info/nuget/IoC.Interception.Source)](https://www.nuget.org/packages/IoC.Interception.Source) |
 
-Embedding-in-code packages require C# 7.0 or higher.
+_Embedding packages_ require C# 7.0 or higher.
 
-## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works [C#](https://dotnetfiddle.net/dRebQM)
+## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://dotnetfiddle.net/dRebQM)
 
 ### The reality is that
 
@@ -123,9 +123,9 @@ new Program(new ShroedingersCat() , new CardboardBox<ShroedingersCat>(new Shroed
 
 This works the same way for any initializers like methods, properties or fields.
 
-## [ASP.NET Core](https://github.com/aspnet/Home)
+## ![ASP.NET Core](https://img.shields.io/badge/feature-ASP.NET%20Core-orange.svg)
 
-### Add the [package reference](IoC.AspNetCore)
+### Add the [_NuGet_ package](https://www.nuget.org/packages/IoC.AspNetCore) reference
 
 - Package Manager
 
@@ -139,7 +139,7 @@ This works the same way for any initializers like methods, properties or fields.
   dotnet add package IoC.AspNetCore
   ```
 
-### Change IoC container and configure it at [Startup](Samples/AspNetCore/WebApplication/Startup.cs)
+### Create the _IoC container_ with feature _AspNetCoreFeature_ and configure it at [Startup](Samples/AspNetCore/WebApplication/Startup.cs)
 
 ```csharp
 public IServiceProvider ConfigureServices(IServiceCollection services)
@@ -158,6 +158,31 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
 ```
 
 For more information see [this sample](Samples/AspNetCore).
+
+## ![Interception](https://img.shields.io/badge/feature-Interception-orange.svg)
+
+### Add the [_NuGet_ package](https://www.nuget.org/packages/IoC.Interception) reference
+
+- Package Manager
+
+  ```
+  Install-Package IoC.Interception
+  ```
+  
+- .NET CLI
+  
+  ```
+  dotnet add package IoC.Interception
+  ```
+
+### Create the _IoC container_ using _InterceptionFeature_ and intercept all invocations to _Service_ by your _MyInterceptor_
+
+```csharp
+using (var container = Container.Create().Using<InterceptionFeature>())
+using (container.Bind<IService>().To<Service>())
+using (container.Intercept<IService>(new MyInterceptor()))
+{ }
+```
 
 ## Class References
 

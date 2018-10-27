@@ -6,6 +6,6 @@
     internal interface IInterceptorRegistry
     {
         [NotNull]
-        IDisposable Register([NotNull] Predicate<IBuildContext> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors);
+        IDisposable Register([NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors);
     }
 }

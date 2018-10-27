@@ -1,61 +1,61 @@
 # Simple, powerful and fast IoC container
 
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) [<img src="http://tcavs2015.cloudapp.net/app/rest/builds/buildType:(id:DevTeam_IoCContainer_Build)/statusIcon"/>](http://tcavs2015.cloudapp.net/viewType.html?buildTypeId=DevTeam_IoCContainer_Build&guest=1)
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) [![IoC container](https://img.shields.io/badge/core-IoC%20container-orange.svg)](#nuget-packages) ![ASP.NET Core](https://img.shields.io/badge/feature-ASP.NET%20Core-orange.svg) ![Interception](https://img.shields.io/badge/feature-Interception-orange.svg) [<img src="http://tcavs2015.cloudapp.net/app/rest/builds/buildType:(id:DevTeam_IoCContainer_Build)/statusIcon"/>](http://tcavs2015.cloudapp.net/viewType.html?buildTypeId=DevTeam_IoCContainer_Build&guest=1)
 
 ## IoC.Container provides the following benefits and features
 
 ### [Flexible Binding](#binding)
 
-  - [Auto-wiring](#auto-wiring)
-  - [Compile-time verification](#manual-auto-wiring)
-  - [Generic types bindings](#generics) with [simple types mapping](#generic-auto-wiring)
-  - [Named/tagged dependencies](#tags)
-  - [Containers hierarchy](#child-container)
-  - [Bindings via text metadata](#configuration-via-a-text-metadata)
-  - [Customizable aspect oriented autowiring](#aspect-oriented-autowiring)
+  - [Auto-wiring](#auto-wiring-)
+  - [Compile-time verification](#manual-auto-wiring-)
+  - [Generic types bindings](#generics-) with [simple types mapping-](#generic-auto-wiring-)
+  - [Named/tagged dependencies](#tags-)
+  - [Containers hierarchy](#child-container-)
+  - [Bindings via text metadata](#configuration-via-a-text-metadata-)
+  - [Customizable aspect oriented autowiring](#aspect-oriented-autowiring-)
   - Easy expandable set of lifetimes
-    - [Singleton](#singleton-lifetime) with [auto-disposing](#auto-dispose-singleton-during-containers-dispose)
-    - [Singleton per container](#container-singleton-lifetime)
-    - [Singleton per scope](#scope-singleton-lifetime)
+    - [Singleton](#singleton-lifetime-) with [auto-disposing](#auto-dispose-singleton-during-containers-dispose-)
+    - [Singleton per container](#container-singleton-lifetime-)
+    - [Singleton per scope](#scope-singleton-lifetime-)
   - Binding to
-    - [Several Contracts](#several-contracts)
-    - [Constant](#constant), [factory](#func), [factory with arguments](#func-with-arguments)
+    - [Several Contracts](#several-contracts-)
+    - [Constant](#constant-), [factory](#func-), [factory with arguments](#func-with-arguments-)
   - Supports [validation](#validation)
 
 ### [Powerful Injection](#injection)
 
-  - [Сonstructors injection](#constructor-auto-wiring), [methods injection](#method-injection) and [properties injection](#property-injection)
-  - Injection of [Func](#resolve-func), [Lazy](#resolve-lazy), [ThreadLocal](#resolve-threadlocal), [Tuple](#resolve-tuple) and [ValueTuple](#resolve-valuetuple)
-  - Injection of [IEnumerable](#resolve-all-appropriate-instances-as-ienumerable), [Array](#resolve-all-appropriate-instances-as-array), [ICollection](#resolve-all-appropriate-instances-as-icollection), [ISet](#resolve-all-appropriate-instances-as-iset) or even via [IObservable](#resolve-all-appropriate-instances-as-iobservable-source)
+  - [Сonstructors injection](#constructor-auto-wiring-), [methods injection](#method-injection-) and [properties injection-](#property-injection)
+  - Injection of [Func](#resolve-func-), [Lazy](#resolve-lazy-), [ThreadLocal](#resolve-threadlocal-), [Tuple](#resolve-tuple-) and [ValueTuple](#resolve-valuetuple-)
+  - Injection of [IEnumerable](#resolve-all-appropriate-instances-as-ienumerable-), [Array](#resolve-all-appropriate-instances-as-array-), [ICollection](#resolve-all-appropriate-instances-as-icollection-), [ISet](#resolve-all-appropriate-instances-as-iset-) or even via [IObservable](#resolve-all-appropriate-instances-as-iobservable-source-)
   - Detailed errors information
 
 ### [Incredible Performance](#why-this-one)
 
   - One of the fastest, almost as fast as operator `new`
-  - Uses [expression trees](https://docs.microsoft.com/en-us/dotnet/csharp/expression-trees) to produce the [effective injection code](#struct) without any superfluous operations like a `boxing`, `unboxing` or `cast`
+  - Uses [expression trees](https://docs.microsoft.com/en-us/dotnet/csharp/expression-trees) to produce the [effective injection code](#struct-) without any superfluous operations like a `boxing`, `unboxing` or `cast`
   - Minimizes the memory traffic
 
 ### [Fully Customizable](#customization)
 
-  - [Custom containers](#custom-child-container)
-  - [Custom lifetimes](#custom-lifetime)
-  - [Replacing predefined lifetimes](#replace-lifetime)
-  - [Custom builders](#custom-builder)
-  - [Interceptors](#interception)
+  - [Custom containers](#custom-child-container-)
+  - [Custom lifetimes](#custom-lifetime-)
+  - [Replacing predefined lifetimes](#replace-lifetime-)
+  - [Custom builders](#custom-builder-)
+  - [Interceptors](#interception-)
 
 ### [Multithreading-Ready](#multithreading)
 
   - Thread-safe
-  - [Asynchronous resolving](#asynchronous-resolve)
-  - [Lightweight asynchronous resolving](#asynchronous-lightweight-resolve)
+  - [Asynchronous resolving](#asynchronous-resolve-)
+  - [Lightweight asynchronous resolving](#asynchronous-lightweight-resolve-)
 
 ### [Design Aspects](#design)
 
   - Allows not to change the design of own code to follow [Inversion of Control](https://martinfowler.com/articles/injection.html) pattern
-  - Aggregates features into dedicated [classes](#configuration-class)
-  - [Modifiable on-the-fly](#change-configuration-on-the-fly)
+  - Aggregates features into dedicated [classes](#configuration-class-)
+  - [Modifiable on-the-fly](#change-configuration-on-the-fly-)
   - Has no any additional dependencies
-  - Supports the embedding directly to your code by [embedding-in-code packages](#nuget-packages)
+  - [Embedding packages](#nuget-packages)
 
 ### Easy Integration
 
@@ -72,17 +72,17 @@
   - [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) 1.0+
   - [UWP](https://docs.microsoft.com/en-us/windows/uwp/index) 10+
 
-## NuGet Packages
+### NuGet Packages
 
-| Purpose | Package | Embedding-in-code package |
-|--- | --- | ---|
-| IoC container | [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) | [![NuGet](https://buildstats.info/nuget/IoC.Container.Source)](https://www.nuget.org/packages/IoC.Container.Source) |
-| ASP.NET Core | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source) |
-| Interception | [![NuGet](https://buildstats.info/nuget/IoC.Interception)](https://www.nuget.org/packages/IoC.Interception) | [![NuGet](https://buildstats.info/nuget/IoC.Interception.Source)](https://www.nuget.org/packages/IoC.Interception.Source) |
+|     | binary packages | embedding packages |
+| --- | --- | ---|
+| ![IoC container](https://img.shields.io/badge/core-IoC%20container-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) | [![NuGet](https://buildstats.info/nuget/IoC.Container.Source)](https://www.nuget.org/packages/IoC.Container.Source) |
+| ![ASP.NET Core](https://img.shields.io/badge/feature-ASP.NET%20Core-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source) |
+| ![Interception](https://img.shields.io/badge/feature-Interception-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.Interception)](https://www.nuget.org/packages/IoC.Interception) | [![NuGet](https://buildstats.info/nuget/IoC.Interception.Source)](https://www.nuget.org/packages/IoC.Interception.Source) |
 
-Embedding-in-code packages require C# 7.0 or higher.
+_Embedding packages_ require C# 7.0 or higher.
 
-## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works [C#](https://dotnetfiddle.net/dRebQM)
+## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://dotnetfiddle.net/dRebQM)
 
 ### The reality is that
 
@@ -197,9 +197,9 @@ new Program(new ShroedingersCat() , new CardboardBox<ShroedingersCat>(new Shroed
 
 This works the same way for any initializers like methods, properties or fields.
 
-## [ASP.NET Core](https://github.com/aspnet/Home)
+## ![ASP.NET Core](https://img.shields.io/badge/feature-ASP.NET%20Core-orange.svg)
 
-### Add the [package reference](IoC.AspNetCore)
+### Add the [_NuGet_ package](https://www.nuget.org/packages/IoC.AspNetCore) reference
 
 - Package Manager
 
@@ -213,7 +213,7 @@ This works the same way for any initializers like methods, properties or fields.
   dotnet add package IoC.AspNetCore
   ```
 
-### Change IoC container and configure it at [Startup](Samples/AspNetCore/WebApplication/Startup.cs)
+### Create the _IoC container_ with feature _AspNetCoreFeature_ and configure it at [Startup](Samples/AspNetCore/WebApplication/Startup.cs)
 
 ```csharp
 public IServiceProvider ConfigureServices(IServiceCollection services)
@@ -232,6 +232,31 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
 ```
 
 For more information see [this sample](Samples/AspNetCore).
+
+## ![Interception](https://img.shields.io/badge/feature-Interception-orange.svg)
+
+### Add the [_NuGet_ package](https://www.nuget.org/packages/IoC.Interception) reference
+
+- Package Manager
+
+  ```
+  Install-Package IoC.Interception
+  ```
+  
+- .NET CLI
+  
+  ```
+  dotnet add package IoC.Interception
+  ```
+
+### Create the _IoC container_ using _InterceptionFeature_ and intercept all invocations to _Service_ by your _MyInterceptor_
+
+```csharp
+using (var container = Container.Create().Using<InterceptionFeature>())
+using (container.Bind<IService>().To<Service>())
+using (container.Intercept<IService>(new MyInterceptor()))
+{ }
+```
 
 ## Class References
 
@@ -304,7 +329,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Instant Messenger](#instant-messenger)
   - [Wrapper](#wrapper)
 
-### Auto-wiring
+### Auto-wiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Autowiring.cs)
 
 ``` CSharp
 // Create the container and configure it, using full auto-wiring
@@ -319,9 +344,8 @@ using (container.Bind<IService>().To<Service>())
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Autowiring.cs)
 
-### Generic Auto-wiring
+### Generic Auto-wiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GenericAutowiring.cs)
 
 ``` CSharp
 // Create and configure the container using auto-wiring
@@ -339,9 +363,8 @@ using (container.Bind<IService<TT>>().To<Service<TT>>(
     instance.ShouldBeOfType<Service<int>>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GenericAutowiring.cs)
 
-### Constant
+### Constant [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Constant.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -355,9 +378,8 @@ using (container.Bind<int>().To(ctx => 10))
     val.ShouldBe(10);
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Constant.cs)
 
-### Generics
+### Generics [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Generics.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -379,9 +401,8 @@ using (container.Bind<IService<TT>>().Tag("just generic").To<Service<TT>>())
     instance2.ShouldBeOfType<Service<string>>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Generics.cs)
 
-### Several Contracts
+### Several Contracts [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SeveralContracts.cs)
 
 ``` CSharp
 // Create and configure the container, using full auto-wiring
@@ -398,9 +419,8 @@ using (container.Bind<Service, IService, IAnotherService>().To<Service>())
     instance2.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SeveralContracts.cs)
 
-### Tags
+### Tags [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Tags.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -422,9 +442,8 @@ using (container.Bind<IService>().Tag(10).Tag().Tag("abc").To<Service>())
     instance3.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Tags.cs)
 
-### Value
+### Value [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Value.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -438,9 +457,8 @@ using (container.Bind<IService>().To(ctx => new Service(new Dependency())))
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Value.cs)
 
-### Dependency Tag
+### Dependency Tag [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/DependencyTag.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -458,9 +476,8 @@ using (container.Bind<IService>().To<Service>(
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/DependencyTag.cs)
 
-### Func
+### Func [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Func.cs)
 
 ``` CSharp
 Func<IService> func = () => new Service(new Dependency());
@@ -477,9 +494,8 @@ using (container.Bind<IService>().To(ctx => func()))
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Func.cs)
 
-### Child Container
+### Child Container [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ChildContainer.cs)
 
 ``` CSharp
 // Create the parent container
@@ -490,9 +506,8 @@ using (var childContainer = parentContainer.CreateChild())
     childContainer.Parent.ShouldBe(parentContainer);
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ChildContainer.cs)
 
-### Container Singleton lifetime
+### Container Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ContainerLifetime.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -529,9 +544,8 @@ using (container.Bind<IService>().As(ContainerSingleton).To<Service>())
 // ContainerSingleton - Singleton per container
 // ScopeSingleton - Singleton per scope
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ContainerLifetime.cs)
 
-### Scope Singleton lifetime
+### Scope Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ScopeSingletonLifetime.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -594,9 +608,8 @@ using (container.Bind<IDependency>().As(ScopeSingleton).To<Dependency>())
     }
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ScopeSingletonLifetime.cs)
 
-### Singleton lifetime
+### Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SingletonLifetime.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -633,9 +646,8 @@ using (container.Bind<IService>().As(Singleton).To<Service>())
 // ContainerSingleton - Singleton per container
 // ScopeSingleton - Singleton per scope
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SingletonLifetime.cs)
 
-### Manual Auto-wiring
+### Manual Auto-wiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ManualAutowiring.cs)
 
 ``` CSharp
 // Create and configure the container using full auto-wiring
@@ -658,9 +670,8 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(
     instance.Name.ShouldBe("some name");
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ManualAutowiring.cs)
 
-### Struct
+### Struct [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Struct.cs)
 
 ``` CSharp
 public void Run()
@@ -702,9 +713,8 @@ public class TracingBuilder : IBuilder
     }
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Struct.cs)
 
-### Func With Arguments
+### Func With Arguments [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FuncWithArguments.cs)
 
 ``` CSharp
 Func<IDependency, string, INamedService> func = 
@@ -736,9 +746,8 @@ using (container.Bind<INamedService>().To(
     otherInstance.Name.ShouldBe("beta");
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FuncWithArguments.cs)
 
-### Auto dispose singleton during container's dispose
+### Auto dispose singleton during container's dispose [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoDisposeSingletonDuringContainersDispose.cs)
 
 ``` CSharp
 var disposableService = new Mock<IDisposableService>();
@@ -758,9 +767,8 @@ using (var container = Container.Create()
 // Check the singleton was disposed after the container was disposed
 disposableService.Verify(i => i.Dispose(), Times.Once);
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoDisposeSingletonDuringContainersDispose.cs)
 
-### Configuration via a text metadata
+### Configuration via a text metadata [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConfigurationText.cs)
 
 ``` CSharp
 // Create and configure the container from a metadata string
@@ -777,9 +785,8 @@ using (var container = Container.Create().Using(
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConfigurationText.cs)
 
-### Validation
+### Validation [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Validation.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -794,9 +801,8 @@ using (container.Bind<IService>().To<Service>())
     canBeResolved.ShouldBeFalse();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Validation.cs)
 
-### Aspect Oriented Autowiring
+### Aspect Oriented Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AspectOrientedAutowiring.cs)
 
 ``` CSharp
 public void Run()
@@ -905,7 +911,7 @@ private class AspectOrientedAutowiringStrategy : IAutowiringStrategy
                     where injectAttribute?.Tag != null || autowiringAttribute.DefaultTag != null
                     // defines the dependency injection
                     select method.TryInjectDependency(parameter.Position, parameter.ParameterType, injectAttribute?.Tag ?? autowiringAttribute.DefaultTag))
-                // checks that each injection was successfull
+                // checks that each injection was successful
                 .All(isInjected => isInjected)
             select method;
 
@@ -959,9 +965,8 @@ public class Logger : ILogger
     public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AspectOrientedAutowiring.cs)
 
-### Custom Builder
+### Custom Builder [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomBuilder.cs)
 
 ``` CSharp
 public void Run()
@@ -987,12 +992,11 @@ public class MyBuilder : IBuilder
 {
     public Expression Build(Expression expression, IBuildContext buildContext) =>
         // Add the Singleton lifetime for any instances
-        buildContext.AppendLifetime(expression, new Lifetimes.SingletonLifetime());
+        buildContext.AddLifetime(expression, new Lifetimes.SingletonLifetime());
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomBuilder.cs)
 
-### Custom Child Container
+### Custom Child Container [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomChildContainer.cs)
 
 ``` CSharp
 public void Run()
@@ -1055,9 +1059,8 @@ public class MyContainer: IContainer
     public IDisposable Subscribe(IObserver<ContainerEvent> observer) => Parent.Subscribe(observer);
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomChildContainer.cs)
 
-### Custom Lifetime
+### Custom Lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomLifetime.cs)
 
 ``` CSharp
 public void Run()
@@ -1085,7 +1088,7 @@ public class MyTransientLifetime : ILifetime
 
     // Wraps the expression by the Singleton lifetime expression
     public Expression Build(Expression expression, IBuildContext buildContext)
-        => buildContext.AppendLifetime(expression, _baseLifetime);
+        => buildContext.AddLifetime(expression, _baseLifetime);
 
     // Creates the similar lifetime to use with generic instances
     public ILifetime Create() => new MyTransientLifetime();
@@ -1098,9 +1101,8 @@ public class MyTransientLifetime : ILifetime
     public void Dispose() => _baseLifetime.Dispose();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomLifetime.cs)
 
-### Interception
+### Interception [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Interception.cs)
 
 ``` CSharp
 // To use this feature just add the NuGet package https://www.nuget.org/packages/IoC.Interception
@@ -1138,9 +1140,8 @@ public class MyInterceptor : IInterceptor
     public void Intercept(IInvocation invocation) => _methods.Add(invocation.Method.Name);
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Interception.cs)
 
-### Replace Lifetime
+### Replace Lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ReplaceLifetime.cs)
 
 ``` CSharp
 public void Run()
@@ -1202,7 +1203,7 @@ public class MySingletonLifetime : ILifetime
         expression = _baseSingletonLifetime.Build(expression, buildContext);
 
         // Defines `this` variable to store the reference to the current lifetime instance to call internal method 'IncrementCounter'
-        var thisVar = buildContext.AppendValue(this);
+        var thisVar = Expression.Constant(this);
 
         // Creates the code block
         return Expression.Block(
@@ -1226,9 +1227,8 @@ public class MySingletonLifetime : ILifetime
     internal void IncrementCounter() => _counter.Increment();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ReplaceLifetime.cs)
 
-### Configuration class
+### Configuration class [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConfigurationClass.cs)
 
 ``` CSharp
 public void Run()
@@ -1254,9 +1254,8 @@ public class Glue : IConfiguration
     }
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConfigurationClass.cs)
 
-### Change configuration on-the-fly
+### Change configuration on-the-fly [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ChangeConfigurationOnTheFly.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -1286,9 +1285,8 @@ using (container.Bind<IDependency>().To<Dependency>())
     }
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ChangeConfigurationOnTheFly.cs)
 
-### Resolve Func
+### Resolve Func [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveFunc.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -1306,9 +1304,8 @@ using (container.Bind<IService>().To<Service>())
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveFunc.cs)
 
-### Resolve Lazy
+### Resolve Lazy [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveLazy.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -1326,9 +1323,8 @@ using (container.Bind<IService>().To<Service>())
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveLazy.cs)
 
-### Resolve ThreadLocal
+### Resolve ThreadLocal [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveThreadLocal.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -1346,9 +1342,8 @@ using (container.Bind<IService>().To<Service>())
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveThreadLocal.cs)
 
-### Resolve Tuple
+### Resolve Tuple [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveTuple.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -1366,9 +1361,8 @@ using (container.Bind<INamedService>().To<NamedService>(
     tuple.Item2.ShouldBeOfType<NamedService>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveTuple.cs)
 
-### Resolve ValueTuple
+### Resolve ValueTuple [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveValueTuple.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -1386,9 +1380,8 @@ using (container.Bind<INamedService>().To<NamedService>(
     valueTuple.namedService.ShouldBeOfType<NamedService>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveValueTuple.cs)
 
-### Method Injection
+### Method Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/MethodInjection.cs)
 
 ``` CSharp
 // Create and configure the container using full auto-wiring
@@ -1422,9 +1415,8 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(
     otherInstance.Name.ShouldBe("beta");
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/MethodInjection.cs)
 
-### Property Injection
+### Property Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/PropertyInjection.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -1456,9 +1448,8 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(
     otherInstance.Name.ShouldBe("beta");
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/PropertyInjection.cs)
 
-### Constructor Auto-wiring
+### Constructor Auto-wiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConstructorAutowiring.cs)
 
 ``` CSharp
 // Create and configure the container, using full auto-wiring
@@ -1478,9 +1469,8 @@ using (container.Bind<IService>().To<Service>(
     instance.State.ShouldBe("some state");
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConstructorAutowiring.cs)
 
-### Resolve all appropriate instances as Array
+### Resolve all appropriate instances as Array [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Array.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -1506,9 +1496,8 @@ using (container.Bind<IService>().Tag(3).To<Service>())
     }
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Array.cs)
 
-### Resolve all appropriate instances as ICollection
+### Resolve all appropriate instances as ICollection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Collection.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -1534,9 +1523,8 @@ using (container.Bind<IService>().Tag(3).To<Service>())
     }
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Collection.cs)
 
-### Resolve all appropriate instances as IEnumerable
+### Resolve all appropriate instances as IEnumerable [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Enumerables.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -1559,9 +1547,8 @@ using (container.Bind<IService>().Tag(3).To<Service>())
     instances.ForEach(instance => instance.ShouldBeOfType<Service>());
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Enumerables.cs)
 
-### Resolve all appropriate instances as IObservable source
+### Resolve all appropriate instances as IObservable source [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Observable.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -1589,9 +1576,8 @@ using (container.Bind<IService>().Tag(3).To<Service>())
     }
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Observable.cs)
 
-### Resolve Using Arguments
+### Resolve Using Arguments [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveWithArgs.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -1621,9 +1607,8 @@ using (container.Bind<INamedService>().To<NamedService>(
     otherInstance.Name.ShouldBe("beta");
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveWithArgs.cs)
 
-### Resolve all appropriate instances as ISet
+### Resolve all appropriate instances as ISet [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Set.cs)
 
 ``` CSharp
 // Create and configure the container
@@ -1648,9 +1633,8 @@ using (container.Bind<IService>().Tag(3).To<Service>())
     }
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Set.cs)
 
-### Asynchronous resolve
+### Asynchronous resolve [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousResolve.cs)
 
 ``` CSharp
 // Create the container and configure it
@@ -1665,9 +1649,8 @@ using (var container = Container.Create()
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousResolve.cs)
 
-### Asynchronous lightweight resolve
+### Asynchronous lightweight resolve [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousValueResolve.cs)
 
 ``` CSharp
 // Create a container
@@ -1683,9 +1666,8 @@ using (container.Bind<IService>().To<Service>())
     instance.ShouldBeOfType<Service>();
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousValueResolve.cs)
 
-### Cyclic Dependence
+### Cyclic Dependence [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CyclicDependence.cs)
 
 ``` CSharp
 public void Run()
@@ -1728,9 +1710,8 @@ public class Link : ILink
     public Link(ILink link) { }
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CyclicDependence.cs)
 
-### Generator
+### Generator [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Generator.cs)
 
 ``` CSharp
 public void Run()
@@ -1791,9 +1772,8 @@ public class Generators: IConfiguration
     }
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Generator.cs)
 
-### Samples Model
+### Samples Model [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Models.cs)
 
 ``` CSharp
 public interface IDependency { }
@@ -1865,9 +1845,8 @@ public class InitializingNamedService : INamedService
     public void Initialize(string name, IDependency otherDependency) => Name = name;
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Models.cs)
 
-### Instant Messenger
+### Instant Messenger [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SimpleInstantMessenger.cs)
 
 ``` CSharp
 public void Run()
@@ -1945,9 +1924,8 @@ public class InstantMessenger<T> : IInstantMessenger<T>
         => _observers.ForEach(observer => observer.OnNext(_createMessage(address, text)));
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SimpleInstantMessenger.cs)
 
-### Wrapper
+### Wrapper [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Wrapper.cs)
 
 ``` CSharp
 public void Run()
@@ -2013,5 +1991,4 @@ public class TimeLogger: ILogger
     public void Log(string message) => _baseLogger.Log(DateTimeOffset.Now + ": " + message);
 }
 ```
-[C#](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Wrapper.cs)
 

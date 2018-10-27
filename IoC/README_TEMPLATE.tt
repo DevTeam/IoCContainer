@@ -98,11 +98,10 @@
 <#
     foreach(var info in infos.OrderBy(i => i["tag"] + i["priority"]).Where(info => info["visible"] == "true"))
     {
-#>### <#=info["description"]#>
+#>### <#=info["description"]#> [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](<#=info["url"]#>)
 
 ``` CSharp
 <#=info["body"]#>```
-[C#](<#=info["url"]#>)
 
 <#
     }

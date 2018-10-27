@@ -23,69 +23,12 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IDisposable Intercept([NotNull] this IContainer container, [NotNull] Predicate<IBuildContext> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        public static IDisposable Intercept([NotNull] this IContainer container, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (filter == null) throw new ArgumentNullException(nameof(filter));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
             return container.Resolve<IInterceptorRegistry>().Register(filter, interceptors);
-        }
-
-        /// <summary>
-        /// Registers interceptors.
-        /// </summary>
-        /// <param name="container">The target container.</param>
-        /// <param name="key">The key to intercept appropriate instance.</param>
-        /// <param name="interceptors">The set of interceptors.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IDisposable Intercept([NotNull] this IContainer container, Key key, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
-            return container.Resolve<IInterceptorRegistry>().Register(ctx =>
-                {
-                    if (ctx.Key.Equals(key))
-                    {
-                        return true;
-                    }
-
-                    var type = ctx.Key.Type;
-                    var curType = key.Type;
-#if NET40
-                    var isGenericType = type.IsGenericType;
-                    if (!isGenericType) {
-                        return false;
-                    }
-
-                    var curIsGenericType = curType.IsGenericTypeDefinition || curType.GetGenericArguments().Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
-#else
-                    var typeInfo = type.GetTypeInfo();
-                    var isGenericType = typeInfo.IsGenericType;
-                    if (!isGenericType) {
-                        return false;
-                    }
-
-                    var curTypeInfo = curType.GetTypeInfo();
-                    var curIsGenericType = curTypeInfo.IsGenericTypeDefinition || curTypeInfo.GenericTypeArguments.Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
-#endif
-
-                    if (curIsGenericType)
-                    {
-#if NET40
-                        var genericTypeDefinition = type.GetGenericTypeDefinition();
-                        var curGenericTypeDefinition = curType.GetGenericTypeDefinition();
-#else
-                        var genericTypeDefinition = typeInfo.GetGenericTypeDefinition();
-                        var curGenericTypeDefinition = curTypeInfo.GetGenericTypeDefinition();
-#endif
-                        return new Key(genericTypeDefinition, ctx.Key.Tag).Equals(new Key(curGenericTypeDefinition, key.Tag));
-                    }
-
-                    return false;
-                },
-                interceptors);
         }
 
         /// <summary>
@@ -101,6 +44,64 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
             return container.Intercept(new Key(typeof(T)), interceptors);
+        }
+
+        /// <summary>
+        /// Registers interceptors.
+        /// </summary>
+        /// <param name="container">The target container.</param>
+        /// <param name="key">The key to intercept appropriate instance.</param>
+        /// <param name="interceptors">The set of interceptors.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IDisposable Intercept([NotNull] this IContainer container, Key key, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
+            return container.Resolve<IInterceptorRegistry>().Register(targetKey =>
+                {
+                    if (targetKey.Equals(key))
+                    {
+                        return true;
+                    }
+
+                    var targetType = targetKey.Type;
+                    var interceptedType = key.Type;
+#if NET40
+                    var isGenericTargetType = targetType.IsGenericType;
+                    if (!isGenericTargetType)
+                    {
+                        return false;
+                    }
+
+                    var interceptedIsGenericType = interceptedType.IsGenericTypeDefinition || interceptedType.GetGenericArguments().Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
+#else
+                    var targetTypeInfo = targetType.GetTypeInfo();
+                    var isGenericTargetType = targetTypeInfo.IsGenericType;
+                    if (!isGenericTargetType) {
+                        return false;
+                    }
+
+                    var interceptedTypeInfo = interceptedType.GetTypeInfo();
+                    var interceptedIsGenericType = interceptedTypeInfo.IsGenericTypeDefinition || interceptedTypeInfo.GenericTypeArguments.Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
+#endif
+
+                    if (!interceptedIsGenericType)
+                    {
+                        return false;
+                    }
+
+#if NET40
+                    var genericTypeDefinition = targetType.GetGenericTypeDefinition();
+                    var curGenericTypeDefinition = interceptedType.GetGenericTypeDefinition();
+#else
+                    var genericTypeDefinition = targetTypeInfo.GetGenericTypeDefinition();
+                    var curGenericTypeDefinition = interceptedTypeInfo.GetGenericTypeDefinition();
+#endif
+                    return new Key(genericTypeDefinition, targetKey.Tag).Equals(new Key(curGenericTypeDefinition, key.Tag));
+                },
+                interceptors);
         }
     }
 }

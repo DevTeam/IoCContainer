@@ -9,12 +9,20 @@
             Represents extensions to add interceptions to the container.
             </summary>
         </member>
-        <member name="M:IoC.Features.FluentInterception.Intercept(IoC.IContainer,System.Predicate{IoC.IBuildContext},Castle.DynamicProxy.IInterceptor[])">
+        <member name="M:IoC.Features.FluentInterception.Intercept(IoC.IContainer,System.Predicate{IoC.Key},Castle.DynamicProxy.IInterceptor[])">
             <summary>
             Registers interceptors.
             </summary>
             <param name="container">The target container.</param>
             <param name="filter">The filter to intercept appropriate instances.</param>
+            <param name="interceptors">The set of interceptors.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.Features.FluentInterception.Intercept``1(IoC.IContainer,Castle.DynamicProxy.IInterceptor[])">
+            <summary>
+            Registers interceptors.
+            </summary>
+            <param name="container">The target container.</param>
             <param name="interceptors">The set of interceptors.</param>
             <returns>The binding token.</returns>
         </member>
@@ -24,14 +32,6 @@
             </summary>
             <param name="container">The target container.</param>
             <param name="key">The key to intercept appropriate instance.</param>
-            <param name="interceptors">The set of interceptors.</param>
-            <returns>The binding token.</returns>
-        </member>
-        <member name="M:IoC.Features.FluentInterception.Intercept``1(IoC.IContainer,Castle.DynamicProxy.IInterceptor[])">
-            <summary>
-            Registers interceptors.
-            </summary>
-            <param name="container">The target container.</param>
             <param name="interceptors">The set of interceptors.</param>
             <returns>The binding token.</returns>
         </member>

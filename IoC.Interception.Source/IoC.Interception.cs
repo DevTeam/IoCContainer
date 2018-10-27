@@ -157,7 +157,7 @@ namespace IoC.Features.Interception
     internal interface IInterceptorRegistry
     {
         [NotNull]
-        IDisposable Register([NotNull] Predicate<IBuildContext> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors);
+        IDisposable Register([NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors);
     }
 }
 
@@ -168,18 +168,20 @@ namespace IoC.Features.Interception
 {
     using System;
     using System.Collections.Generic;
+    // ReSharper disable once RedundantUsingDirective
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using Castle.DynamicProxy;
 // ReSharper disable once RedundantUsingDirective
 
+    // ReSharper disable once ClassNeverInstantiated.Global
     internal class InterceptorBuilder : IInterceptorRegistry, IBuilder
     {
         private static readonly ProxyGenerator ProxyGenerator = new ProxyGenerator();
         private readonly List<InterceptorsInfo> _interceptors = new List<InterceptorsInfo>();
 
-        public IDisposable Register(Predicate<IBuildContext> filter, params IInterceptor[] interceptors)
+        public IDisposable Register(Predicate<Key> filter, params IInterceptor[] interceptors)
         {
             if (filter == null) throw new ArgumentNullException(nameof(filter));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
@@ -202,10 +204,10 @@ namespace IoC.Features.Interception
         {
             lock (_interceptors)
             {
-                var proxyGeneratorExpression = buildContext.AppendValue(ProxyGenerator);
+                var proxyGeneratorExpression = Expression.Constant(ProxyGenerator);
                 foreach (var interceptors in _interceptors)
                 {
-                    if (interceptors.Accept(buildContext))
+                    if (interceptors.Accept(buildContext.Key))
                     {
                         bodyExpression = interceptors.Build(bodyExpression, buildContext, proxyGeneratorExpression);
                     }
@@ -227,16 +229,16 @@ namespace IoC.Features.Interception
             private static readonly MethodInfo CreateClassProxyWithTargetMethodInfo = ProxyGeneratorTypeInfo.GetDeclaredMethods(nameof(ProxyGenerator.CreateClassProxyWithTarget)).First(i => i.GetParameters().Select(j => j.ParameterType).SequenceEqual(FuncTypes));
 #endif
 
-            private readonly Predicate<IBuildContext> _filter;
+            private readonly Predicate<Key> _filter;
             private readonly IInterceptor[] _interceptors;
 
-            public InterceptorsInfo(Predicate<IBuildContext> filter, IInterceptor[] interceptors)
+            public InterceptorsInfo(Predicate<Key> filter, IInterceptor[] interceptors)
             {
                 _filter = filter;
                 _interceptors = interceptors;
             }
 
-            public bool Accept(IBuildContext buildContext) => _filter(buildContext);
+            public bool Accept(Key key) => _filter(key);
 
             public Expression Build(Expression bodyExpression, IBuildContext buildContext, Expression proxyGeneratorExpression)
             {
@@ -250,9 +252,9 @@ namespace IoC.Features.Interception
                 var interfaces = typeInfo.ImplementedInterfaces.ToArray();
 #endif
 
-                var typeExpression = buildContext.AppendValue(type);
-                var interfacesExpression = buildContext.AppendValue(interfaces);
-                var interceptorsExpression = buildContext.AppendValue(_interceptors);
+                var typeExpression = Expression.Constant(type);
+                var interfacesExpression = Expression.Constant(interfaces);
+                var interceptorsExpression = Expression.Constant(_interceptors);
                 var args = new[] {typeExpression, interfacesExpression, bodyExpression, interceptorsExpression};
                 if (isInterface)
                 {
@@ -278,6 +280,7 @@ namespace IoC.Features
 {
     using System;
     using System.Linq;
+    // ReSharper disable once RedundantUsingDirective
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using Castle.Core.Internal;
@@ -298,69 +301,12 @@ namespace IoC.Features
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IDisposable Intercept([NotNull] this IContainer container, [NotNull] Predicate<IBuildContext> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        public static IDisposable Intercept([NotNull] this IContainer container, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (filter == null) throw new ArgumentNullException(nameof(filter));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
             return container.Resolve<IInterceptorRegistry>().Register(filter, interceptors);
-        }
-
-        /// <summary>
-        /// Registers interceptors.
-        /// </summary>
-        /// <param name="container">The target container.</param>
-        /// <param name="key">The key to intercept appropriate instance.</param>
-        /// <param name="interceptors">The set of interceptors.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IDisposable Intercept([NotNull] this IContainer container, Key key, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
-            return container.Resolve<IInterceptorRegistry>().Register(ctx =>
-                {
-                    if (ctx.Key.Equals(key))
-                    {
-                        return true;
-                    }
-
-                    var type = ctx.Key.Type;
-                    var curType = key.Type;
-#if NET40
-                    var isGenericType = type.IsGenericType;
-                    if (!isGenericType) {
-                        return false;
-                    }
-
-                    var curIsGenericType = curType.IsGenericTypeDefinition || curType.GetGenericArguments().Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);;
-#else
-                    var typeInfo = type.GetTypeInfo();
-                    var isGenericType = typeInfo.IsGenericType;
-                    if (!isGenericType) {
-                        return false;
-                    }
-
-                    var curTypeInfo = curType.GetTypeInfo();
-                    var curIsGenericType = curTypeInfo.IsGenericTypeDefinition || curTypeInfo.GenericTypeArguments.Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
-#endif
-
-                    if (curIsGenericType)
-                    {
-#if NET40
-                        var genericTypeDefinition = type.GetGenericTypeDefinition();
-                        var curGenericTypeDefinition = curType.GetGenericTypeDefinition();
-#else
-                        var genericTypeDefinition = typeInfo.GetGenericTypeDefinition();
-                        var curGenericTypeDefinition = curTypeInfo.GetGenericTypeDefinition();
-#endif
-                        return new Key(genericTypeDefinition, ctx.Key.Tag).Equals(new Key(curGenericTypeDefinition, key.Tag));
-                    }
-
-                    return false;
-                },
-                interceptors);
         }
 
         /// <summary>
@@ -376,6 +322,64 @@ namespace IoC.Features
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
             return container.Intercept(new Key(typeof(T)), interceptors);
+        }
+
+        /// <summary>
+        /// Registers interceptors.
+        /// </summary>
+        /// <param name="container">The target container.</param>
+        /// <param name="key">The key to intercept appropriate instance.</param>
+        /// <param name="interceptors">The set of interceptors.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IDisposable Intercept([NotNull] this IContainer container, Key key, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
+            return container.Resolve<IInterceptorRegistry>().Register(targetKey =>
+                {
+                    if (targetKey.Equals(key))
+                    {
+                        return true;
+                    }
+
+                    var targetType = targetKey.Type;
+                    var interceptedType = key.Type;
+#if NET40
+                    var isGenericTargetType = targetType.IsGenericType;
+                    if (!isGenericTargetType)
+                    {
+                        return false;
+                    }
+
+                    var interceptedIsGenericType = interceptedType.IsGenericTypeDefinition || interceptedType.GetGenericArguments().Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
+#else
+                    var targetTypeInfo = targetType.GetTypeInfo();
+                    var isGenericTargetType = targetTypeInfo.IsGenericType;
+                    if (!isGenericTargetType) {
+                        return false;
+                    }
+
+                    var interceptedTypeInfo = interceptedType.GetTypeInfo();
+                    var interceptedIsGenericType = interceptedTypeInfo.IsGenericTypeDefinition || interceptedTypeInfo.GenericTypeArguments.Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
+#endif
+
+                    if (!interceptedIsGenericType)
+                    {
+                        return false;
+                    }
+
+#if NET40
+                    var genericTypeDefinition = targetType.GetGenericTypeDefinition();
+                    var curGenericTypeDefinition = interceptedType.GetGenericTypeDefinition();
+#else
+                    var genericTypeDefinition = targetTypeInfo.GetGenericTypeDefinition();
+                    var curGenericTypeDefinition = interceptedTypeInfo.GetGenericTypeDefinition();
+#endif
+                    return new Key(genericTypeDefinition, targetKey.Tag).Equals(new Key(curGenericTypeDefinition, key.Tag));
+                },
+                interceptors);
         }
     }
 }

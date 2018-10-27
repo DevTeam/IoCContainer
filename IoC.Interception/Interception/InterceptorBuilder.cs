@@ -9,12 +9,13 @@
     using Castle.DynamicProxy;
 // ReSharper disable once RedundantUsingDirective
 
+    // ReSharper disable once ClassNeverInstantiated.Global
     internal class InterceptorBuilder : IInterceptorRegistry, IBuilder
     {
         private static readonly ProxyGenerator ProxyGenerator = new ProxyGenerator();
         private readonly List<InterceptorsInfo> _interceptors = new List<InterceptorsInfo>();
 
-        public IDisposable Register(Predicate<IBuildContext> filter, params IInterceptor[] interceptors)
+        public IDisposable Register(Predicate<Key> filter, params IInterceptor[] interceptors)
         {
             if (filter == null) throw new ArgumentNullException(nameof(filter));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
@@ -40,7 +41,7 @@
                 var proxyGeneratorExpression = Expression.Constant(ProxyGenerator);
                 foreach (var interceptors in _interceptors)
                 {
-                    if (interceptors.Accept(buildContext))
+                    if (interceptors.Accept(buildContext.Key))
                     {
                         bodyExpression = interceptors.Build(bodyExpression, buildContext, proxyGeneratorExpression);
                     }
@@ -62,16 +63,16 @@
             private static readonly MethodInfo CreateClassProxyWithTargetMethodInfo = ProxyGeneratorTypeInfo.GetDeclaredMethods(nameof(ProxyGenerator.CreateClassProxyWithTarget)).First(i => i.GetParameters().Select(j => j.ParameterType).SequenceEqual(FuncTypes));
 #endif
 
-            private readonly Predicate<IBuildContext> _filter;
+            private readonly Predicate<Key> _filter;
             private readonly IInterceptor[] _interceptors;
 
-            public InterceptorsInfo(Predicate<IBuildContext> filter, IInterceptor[] interceptors)
+            public InterceptorsInfo(Predicate<Key> filter, IInterceptor[] interceptors)
             {
                 _filter = filter;
                 _interceptors = interceptors;
             }
 
-            public bool Accept(IBuildContext buildContext) => _filter(buildContext);
+            public bool Accept(Key key) => _filter(key);
 
             public Expression Build(Expression bodyExpression, IBuildContext buildContext, Expression proxyGeneratorExpression)
             {
