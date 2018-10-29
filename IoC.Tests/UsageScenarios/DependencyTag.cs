@@ -18,6 +18,7 @@
             // Create and configure the container
             using (var container = Container.Create())
             // Mark binding by tag "MyDep"
+            // Bind some dependency
             using (container.Bind<IDependency>().Tag("MyDep").To<Dependency>())
             // Configure auto-wiring and inject dependency tagged by "MyDep"
             using (container.Bind<IService>().To<Service>(

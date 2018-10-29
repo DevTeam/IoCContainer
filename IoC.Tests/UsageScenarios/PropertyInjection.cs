@@ -16,6 +16,7 @@
             // {
             // Create and configure the container
             using (var container = Container.Create())
+            // Bind some dependency
             using (container.Bind<IDependency>().To<Dependency>())
             // Bind 'INamedService' to the instance creation and initialization, actually represented as an expression tree
             using (container.Bind<INamedService>().To<InitializingNamedService>(

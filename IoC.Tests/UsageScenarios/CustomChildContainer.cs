@@ -24,6 +24,7 @@ namespace IoC.Tests.UsageScenarios
             using (container.Bind<IContainer>().Tag(WellknownContainers.NewChild).To<MyContainer>())
             // Create and configure the custom child container
             using (var childContainer = container.CreateChild())
+            // Bind some dependency
             using (childContainer.Bind<IDependency>().To<Dependency>())
             {
                 // Resolve an instance

@@ -15,6 +15,7 @@
             // {
             // Create and configure the container
             using (var container = Container.Create())
+            // Bind some dependency
             using (container.Bind<IDependency>().To<Dependency>())
             // Bind open generic interface to open generic implementation
             using (container.Bind(typeof(IService<>)).To(typeof(Service<>)))

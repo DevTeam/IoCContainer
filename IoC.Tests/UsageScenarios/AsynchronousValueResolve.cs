@@ -22,6 +22,7 @@ namespace IoC.Tests.UsageScenarios
             using (var container = Container.Create())
             // Configure the container
             using (container.Bind<IDependency>().To<Dependency>())
+            // Bind Service
             using (container.Bind<IService>().To<Service>())
             {
                 // Resolve an instance asynchronously via ValueTask

@@ -17,6 +17,7 @@
             // {
             // Create and configure the container, using full auto-wiring
             using (var container = Container.Create())
+            // Bind some dependency
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<Service, IService, IAnotherService>().To<Service>())
             {

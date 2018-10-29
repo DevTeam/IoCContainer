@@ -22,6 +22,7 @@ namespace IoC.Tests.UsageScenarios
             var methods = new List<string>();
             // Create and configure the container
             using (var container = Container.Create().Using<InterceptionFeature>())
+            // Bind some dependency
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
             // Configure the interception by 'MyInterceptor'

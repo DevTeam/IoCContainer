@@ -20,6 +20,7 @@ namespace IoC.Tests.UsageScenarios
             // {
             // Create the container and configure it
             using (var container = Container.Create()
+                // Bind some dependency
                 .Bind<IDependency>().To<Dependency>().ToSelf()
                 .Bind<IService>().To<Service>().ToSelf())
             {

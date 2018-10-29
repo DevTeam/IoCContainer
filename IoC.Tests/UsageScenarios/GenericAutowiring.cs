@@ -15,11 +15,11 @@
             // {
             // Create and configure the container using auto-wiring
             using (var container = Container.Create())
+            // Bind some dependency
             using (container.Bind<IDependency>().To<Dependency>())
             // Bind to the instance creation, actually represented as an expression tree
-            using (container.Bind<IService<TT>>().To<Service<TT>>(
-                // Select the constructor and inject the dependency
-                ctx => new Service<TT>(ctx.Container.Inject<IDependency>())))
+            using (container.Bind<IService<TT>>().To<Service<TT>>())
+            // or the same: using (container.Bind(typeof(IService<>)).To(typeof(Service<>)))
             {
                 // Resolve a generic instance
                 var instance = container.Resolve<IService<int>>();

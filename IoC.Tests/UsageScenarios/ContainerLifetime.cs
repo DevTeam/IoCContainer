@@ -16,6 +16,7 @@
             // {
             // Create and configure the container
             using (var container = Container.Create())
+            // Bind some dependency
             using (container.Bind<IDependency>().To<Dependency>())
             // Use the Container Singleton lifetime
             using (container.Bind<IService>().As(ContainerSingleton).To<Service>())

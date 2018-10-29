@@ -16,6 +16,7 @@
         {
             // Create and configure the container
             using (var container = Container.Create())
+            // Bind some dependency
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
             // Register the custom builder
