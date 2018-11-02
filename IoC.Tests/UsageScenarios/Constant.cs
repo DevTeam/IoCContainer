@@ -12,6 +12,7 @@
             // $tag=binding
             // $priority=01
             // $description=Constant
+            // $header=It's obvious here.
             // {
             // Create and configure the container
             using (var container = Container.Create())

@@ -42,12 +42,6 @@
                     parentInstance1.ShouldNotBe(childInstance1);
                 }
             }
-
-            // Lifetimes:
-            // Transient - A new instance each time (default)
-            // Singleton - Single instance per dependency
-            // ContainerSingleton - Singleton per container
-            // ScopeSingleton - Singleton per scope
             // }
         }
     }

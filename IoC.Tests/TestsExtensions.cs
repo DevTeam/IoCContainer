@@ -6,6 +6,7 @@
     using System.Threading;
     using Core;
     using Moq;
+    using ExpressionCompiler = Core.ExpressionCompiler;
 
     internal static class TestsExtensions
     {

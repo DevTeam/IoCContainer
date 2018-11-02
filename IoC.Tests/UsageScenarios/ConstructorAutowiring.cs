@@ -3,7 +3,7 @@
     using Shouldly;
     using Xunit;
 
-    public class ConstructorAutowiring
+    public class ConstructorAutoWiring
     {
         [Fact]
         public void Run()
@@ -24,9 +24,10 @@
             {
                 // Resolve an instance
                 var instance = container.Resolve<IService>();
-
+                // }
                 // Check the instance's type
                 instance.ShouldBeOfType<Service>();
+                // {
                 // Check the injected constant
                 instance.State.ShouldBe("some state");
             }

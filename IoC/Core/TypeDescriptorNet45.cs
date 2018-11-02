@@ -42,6 +42,10 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
+        public bool IsAbstract() => _typeInfo.IsAbstract;
+
+        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public bool IsGenericParameter() => _typeInfo.IsGenericParameter;
 
         [MethodImpl((MethodImplOptions)256)]

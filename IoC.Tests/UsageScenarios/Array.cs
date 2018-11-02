@@ -26,7 +26,7 @@
             {
                 // Resolve all appropriate instances
                 var instances = container.Resolve<IService[]>();
-
+                // }
                 // Check the number of resolved instances
                 instances.Length.ShouldBe(3);
 
@@ -35,6 +35,7 @@
                     // Check the instance's type
                     instance.ShouldBeOfType<Service>();
                 }
+                // {
             }
             // }
         }

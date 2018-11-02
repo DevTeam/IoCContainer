@@ -13,6 +13,7 @@
             // $tag=binding
             // $priority=02
             // $description=Func
+            // $header=_Func_ dependency helps when a logic requires to inject some number of type's instances on demand.
             // {
             Func<IService> func = () => new Service(new Dependency());
 
@@ -23,9 +24,10 @@
             {
                 // Resolve an instance
                 var instance = container.Resolve<IService>();
-
+                // }
                 // Check the instance's type
                 instance.ShouldBeOfType<Service>();
+                // {
             }
             // }
         }

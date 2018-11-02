@@ -3,21 +3,21 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27428.2015
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShroedingersCat", "ShroedingersCat\ShroedingersCat.csproj", "{FEFE5A9D-F61D-4C34-A445-E253FD6F732A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ShroedingersCat", "Samples\ShroedingersCat\ShroedingersCat.csproj", "{FEFE5A9D-F61D-4C34-A445-E253FD6F732A}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication", "AspNetCore\WebApplication\WebApplication.csproj", "{370969B5-B73F-4E5C-AC05-8C44FC928B88}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication", "Samples\AspNetCore\WebApplication\WebApplication.csproj", "{370969B5-B73F-4E5C-AC05-8C44FC928B88}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp", "WpfApp\WpfApp.csproj", "{C2286800-5AE9-4B83-8F32-E2AFED2D9A79}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WpfApp", "Samples\WpfApp\WpfApp.csproj", "{C2286800-5AE9-4B83-8F32-E2AFED2D9A79}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UwpApp", "UwpApp\UwpApp.csproj", "{6A3D1F6F-3296-4263-849C-2AEECFCE2513}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UwpApp", "Samples\UwpApp\UwpApp.csproj", "{6A3D1F6F-3296-4263-849C-2AEECFCE2513}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WcfServiceLibrary", "WcfServiceLibrary\WcfServiceLibrary.csproj", "{EDA02956-FEB7-4856-9B0A-A97B00FE106E}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WcfServiceLibrary", "Samples\WcfServiceLibrary\WcfServiceLibrary.csproj", "{EDA02956-FEB7-4856-9B0A-A97B00FE106E}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityFrameworkCore", "EntityFrameworkCore\EntityFrameworkCore.csproj", "{1AB5FD94-ECCC-4E37-A4DD-AB3C7E332F2D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EntityFrameworkCore", "Samples\EntityFrameworkCore\EntityFrameworkCore.csproj", "{1AB5FD94-ECCC-4E37-A4DD-AB3C7E332F2D}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC", "..\IoC\IoC.csproj", "{C7A8334E-C162-429F-9445-809060E39748}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC", "IoC\IoC.csproj", "{C7A8334E-C162-429F-9445-809060E39748}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC.AspNetCore", "..\IoC.AspNetCore\IoC.AspNetCore.csproj", "{3B0AC909-EE8F-45DF-8415-BC57A36D457D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC.AspNetCore", "IoC.AspNetCore\IoC.AspNetCore.csproj", "{3B0AC909-EE8F-45DF-8415-BC57A36D457D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

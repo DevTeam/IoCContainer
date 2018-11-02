@@ -8,7 +8,7 @@
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
-    internal class FullAutowiringDependency: IDependency
+    internal class FullAutoWiringDependency: IDependency
     {
         private static readonly Type[] GenericTypeArguments =
         {
@@ -32,17 +32,27 @@
 
         private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private readonly Type _type;
-        [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
+        [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;
         private readonly bool _hasGenericParamsWithConstraints;
         private readonly Dictionary<int, TypeDescriptor> _genericParamsWithConstraints = new Dictionary<int, TypeDescriptor>();
         private readonly Type[] _registeredGenericTypeParameters;
         private readonly TypeDescriptor _registeredTypeDescriptor;
 
-        public FullAutowiringDependency([NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
+        public FullAutoWiringDependency([NotNull] Type type, [CanBeNull] IAutowiringStrategy autoWiringStrategy = null)
         {
             _type = type ?? throw new ArgumentNullException(nameof(type));
-            _autowiringStrategy = autowiringStrategy;
+            _autoWiringStrategy = autoWiringStrategy;
             _registeredTypeDescriptor = type.Descriptor();
+            if (_registeredTypeDescriptor.IsInterface())
+            {
+                throw new ArgumentException($"Type \"{type}\" should not be an interface.", nameof(type));
+            }
+
+            if (_registeredTypeDescriptor.IsAbstract())
+            {
+                throw new ArgumentException($"Type \"{type}\" should not be an abstract class.", nameof(type));
+            }
+
             if (!_registeredTypeDescriptor.IsGenericTypeDefinition())
             {
                 return;
@@ -99,8 +109,8 @@
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             try
             {
-                var autoWiringStrategy = _autowiringStrategy ?? buildContext.AutowiringStrategy;
-                var isDefaultAutowiringStrategy = DefaultAutowiringStrategy.Shared == autoWiringStrategy;
+                var autoWiringStrategy = _autoWiringStrategy ?? buildContext.AutowiringStrategy;
+                var isDefaultAutoWiringStrategy = DefaultAutowiringStrategy.Shared == autoWiringStrategy;
                 if (!autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
                 {
                     instanceType = _hasGenericParamsWithConstraints
@@ -132,7 +142,7 @@
                 var defaultConstructors = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredConstructors());
                 if (!autoWiringStrategy.TryResolveConstructor(defaultConstructors, out var ctor))
                 {
-                    if (isDefaultAutowiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
+                    if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
                     {
                         ctor = buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
                     }
@@ -141,7 +151,7 @@
                 var defaultMethods = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredMethods());
                 if (!autoWiringStrategy.TryResolveInitializers(defaultMethods, out var initializers))
                 {
-                    if (isDefaultAutowiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
+                    if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
                     {
                         initializers = Enumerable.Empty<IMethod<MethodInfo>>();
                     }
@@ -163,7 +173,7 @@
                     );
                 }
 
-                if (!isDefaultAutowiringStrategy)
+                if (!isDefaultAutoWiringStrategy)
                 {
                     baseExpression = buildContext.InjectDependencies(baseExpression);
                 }

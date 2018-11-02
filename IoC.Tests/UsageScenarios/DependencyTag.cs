@@ -14,6 +14,7 @@
             // $tag=binding
             // $priority=02
             // $description=Dependency Tag
+            // $header=Use a _tag_ to inject specific dependency from several bindings of the same types.
             // {
             // Create and configure the container
             using (var container = Container.Create())
@@ -26,9 +27,10 @@
             {
                 // Resolve an instance
                 var instance = container.Resolve<IService>();
-
+                // }
                 // Check the instance's type
                 instance.ShouldBeOfType<Service>();
+                // {
             }
             // }
         }

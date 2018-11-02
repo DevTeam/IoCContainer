@@ -2,6 +2,9 @@
 // ReSharper disable UnusedParameter.Local
 // ReSharper disable UnusedVariable
 // ReSharper disable RedundantTypeArgumentsOfMethod
+// ReSharper disable UnusedMember.Global
+// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable MemberCanBePrivate.Global
 namespace IoC.Tests.UsageScenarios
 {
     using System.Collections.Generic;

@@ -56,6 +56,10 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
+        public bool IsAbstract() => Type.IsAbstract;
+
+        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public bool IsGenericParameter() => Type.IsGenericParameter;
 
         [MethodImpl((MethodImplOptions)256)]

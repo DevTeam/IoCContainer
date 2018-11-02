@@ -20,9 +20,10 @@
             {
                 // Resolve an instance
                 var instance = container.Resolve<IService>();
-
+                // }
                 // Check the instance's type
                 instance.ShouldBeOfType<Service>();
+                // {
             }
         }
 

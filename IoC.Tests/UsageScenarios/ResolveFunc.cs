@@ -27,9 +27,10 @@
                 
                 // Get an instance
                 var instance = func();
-
+                // }
                 // Check the instance's type
                 instance.ShouldBeOfType<Service>();
+                // {
             }
             // }
         }

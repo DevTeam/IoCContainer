@@ -32,15 +32,18 @@ namespace IoC.Tests.UsageScenarios
 
                 // Check the child container's type
                 childContainer.ShouldBeOfType<MyContainer>();
-
+                // }
                 // Check the instance's type
                 instance.ShouldBeOfType<Service>();
+                // {
             }
         }
 
         // Sample of transparent container implementation
         public class MyContainer: IContainer
         {
+            // some implementation here
+            // }
             // Stores the parent container to delegate all logic
             public MyContainer(IContainer currentContainer) => Parent = currentContainer;
 
@@ -74,6 +77,7 @@ namespace IoC.Tests.UsageScenarios
 
             // Subscribes an observer to receive container events
             public IDisposable Subscribe(IObserver<ContainerEvent> observer) => Parent.Subscribe(observer);
+            // {
         }
         // }
     }

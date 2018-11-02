@@ -30,11 +30,13 @@
 
                 // Check the number of resolved instances
                 instances.Count.ShouldBe(3);
+                // }
                 foreach (var instance in instances)
                 {
                     // Check the instance's type
                     instance.ShouldBeOfType<Service>();
                 }
+                // {
             }
             // }
         }

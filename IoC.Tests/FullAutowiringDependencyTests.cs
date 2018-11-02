@@ -16,7 +16,7 @@ namespace IoC.Tests
         public void ShouldGetInstanceTypeWithConstrains(Type type, Type targetType, Type expectedType)
         {
             // Given
-            var dependency = new FullAutowiringDependency(type);
+            var dependency = new FullAutoWiringDependency(type);
 
             // When
             var actualType = dependency.GetInstanceTypeBasedOnTargetGenericConstrains(targetType);

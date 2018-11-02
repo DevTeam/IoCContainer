@@ -53,13 +53,14 @@
     <Compile Include="Service.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="IoC.Container">
-      <Version>1.1.9</Version>
-    </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="App.config" />
     <None Include="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\IoC\IoC.csproj">
+      <Project>{c7a8334e-c162-429f-9445-809060e39748}</Project>
+      <Name>IoC</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

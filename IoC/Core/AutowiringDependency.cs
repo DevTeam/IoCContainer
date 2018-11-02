@@ -5,7 +5,7 @@
     using System.Linq;
     using System.Linq.Expressions;
 
-    internal class AutowiringDependency: IDependency
+    internal class AutoWiringDependency: IDependency
     {
         private readonly Expression _expression;
         [NotNull] [ItemNotNull] private readonly Expression[] _statements;
@@ -13,14 +13,14 @@
 
         [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
         [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
-        public AutowiringDependency([NotNull] LambdaExpression constructor, [NotNull][ItemNotNull] params LambdaExpression[] statements)
+        public AutoWiringDependency([NotNull] LambdaExpression constructor, [NotNull][ItemNotNull] params LambdaExpression[] statements)
             :this(
                 constructor?.Body ?? throw new ArgumentNullException(nameof(constructor)),
                 statements?.Select(i => i.Body)?.ToArray() ?? throw new ArgumentNullException(nameof(statements)))
         {
         }
 
-        public AutowiringDependency([NotNull] Expression constructorExpression, [NotNull][ItemNotNull] params Expression[] statementExpressions)
+        public AutoWiringDependency([NotNull] Expression constructorExpression, [NotNull][ItemNotNull] params Expression[] statementExpressions)
         {
             _expression = constructorExpression ?? throw new ArgumentNullException(nameof(constructorExpression));
             _isComplexType = IsComplexType(_expression.Type);

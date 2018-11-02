@@ -27,9 +27,10 @@
 
                 // Get the instance via ThreadLocal
                 var instance = lazy.Value;
-
+                // }
                 // Check the instance's type
                 instance.ShouldBeOfType<Service>();
+                // {
             }
             // }
         }

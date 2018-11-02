@@ -26,10 +26,11 @@ namespace IoC.Tests.UsageScenarios
             {
                 // Resolve an instance of type (IService service, INamedService namedService)
                 var valueTuple = container.Resolve<(IService service, INamedService namedService)>();
-
+                // }
                 // Check the items types
                 valueTuple.service.ShouldBeOfType<Service>();
                 valueTuple.namedService.ShouldBeOfType<NamedService>();
+                // {
             }
             // }
         }

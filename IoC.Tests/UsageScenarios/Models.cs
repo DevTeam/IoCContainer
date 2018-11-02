@@ -3,11 +3,6 @@ namespace IoC.Tests.UsageScenarios
 {
     using System;
 
-    // $visible=true
-    // $tag=samples
-    // $priority=00
-    // $description=Samples Model
-    // {
     public interface IDependency { }
 
     public class Dependency : IDependency { }
@@ -76,5 +71,4 @@ namespace IoC.Tests.UsageScenarios
 
         public void Initialize(string name, IDependency otherDependency) => Name = name;
     }
-    // }
 }

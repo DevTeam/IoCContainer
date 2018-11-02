@@ -3,7 +3,7 @@
     using Shouldly;
     using Xunit;
 
-    public class Autowiring
+    public class AutoWiring
     {
         [Fact]
         public void Run()
@@ -12,6 +12,7 @@
             // $tag=binding
             // $priority=00
             // $description=Auto-wiring
+            // $header=Auto-writing is most natural way to use containers. At first step we should create a container. At the second step we bind interfaces to their implementations. After that the container is ready to resolve dependencies.
             // {
             // Create the container and configure it, using full auto-wiring
             using (var container = Container.Create())
@@ -21,9 +22,10 @@
             {
                 // Resolve an instance of interface `IService`
                 var instance = container.Resolve<IService>();
-
+                // }
                 // Check the instance's type
                 instance.ShouldBeOfType<Service>();
+                // {
             }
             // }
         }

@@ -20,12 +20,14 @@
         var bodyOffset = -1;
         foreach(var line in File.ReadAllLines(file))
         {
-            if(vars.Count == 0)
+            if (vars.Count == 0)
             {
                 vars["visible"] = "false";
                 vars["tag"] = string.Empty;
                 vars["priority"] = string.Empty;
-                vars["description"] = Path.GetFileNameWithoutExtension(file);
+                vars["description"] = string.Empty;
+                vars["header"] = string.Empty;
+                vars["footer"] = string.Empty;
                 vars["file"] = file;
                 vars["url"] = "https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/" + Path.GetFileName(file);
                 infos.Add(vars);
@@ -50,7 +52,21 @@
                 var parts = str.Substring(4, str.Length - 4).Split('=');
                 if (parts.Length == 2)
                 {
-                    vars[parts[0]] = parts[1];
+                    var key = parts[0];
+                    if (key == "header" || key == "footer")
+                    {
+                        var curVar = vars[key];
+                        if (curVar != String.Empty)
+                        {
+                            curVar += "\n";
+                        }
+
+                        vars[key] = curVar + parts[1];
+                    }
+                    else
+                    {
+                        vars[key] = parts[1];
+                    }
                 }
 
                 continue;
@@ -100,8 +116,12 @@
     {
 #>### <#=info["description"]#> [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](<#=info["url"]#>)
 
+<#=info["header"]#>
+
 ``` CSharp
 <#=info["body"]#>```
+
+<#=info["footer"]#>
 
 <#
     }

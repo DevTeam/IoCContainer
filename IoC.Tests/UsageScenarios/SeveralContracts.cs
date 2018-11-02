@@ -14,6 +14,7 @@
             // $tag=binding
             // $priority=01
             // $description=Several Contracts
+            // $header=It is possible to bind several types to single implementation.
             // {
             // Create and configure the container, using full auto-wiring
             using (var container = Container.Create())
@@ -24,10 +25,11 @@
                 // Resolve instances
                 var instance1 = container.Resolve<IService>();
                 var instance2 = container.Resolve<IAnotherService>();
-
+                // }
                 // Check the instances' types
                 instance1.ShouldBeOfType<Service>();
                 instance2.ShouldBeOfType<Service>();
+                // {
             }
             // }
         }

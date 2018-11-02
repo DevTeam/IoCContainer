@@ -26,10 +26,11 @@
             {
                 // Resolve an instance of type Tuple<IService, INamedService>
                 var tuple = container.Resolve<Tuple<IService, INamedService>>();
-
+                // }
                 // Check the items types
                 tuple.Item1.ShouldBeOfType<Service>();
                 tuple.Item2.ShouldBeOfType<NamedService>();
+                // {
             }
             // }
         }

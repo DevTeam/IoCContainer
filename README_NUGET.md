@@ -8,8 +8,8 @@
   - [Named/tagged dependencies](https://github.com/DevTeam/IoCContainer#tags-)
   - [Containers hierarchy](https://github.com/DevTeam/IoCContainer#child-container-)
   - [Bindings via text metadata](https://github.com/DevTeam/IoCContainer#configuration-via-a-text-metadata-)
-  - [Customizable aspect oriented autowiring](https://github.com/DevTeam/IoCContainer#aspect-oriented-autowiring-)
-  - Easy expandable set of lifetimes
+  - [Customizable aspect oriented autowiring](https://github.com/DevTeam/IoCContainer#aspect-oriented-auto-wiring-)
+  - Easy extensible set of lifetimes
     - [Singleton](https://github.com/DevTeam/IoCContainer#singleton-lifetime-) with [auto-disposing](https://github.com/DevTeam/IoCContainer#auto-dispose-singleton-during-containers-dispose-)
     - [Singleton per container](https://github.com/DevTeam/IoCContainer#container-singleton-lifetime-)
     - [Singleton per scope](https://github.com/DevTeam/IoCContainer#scope-singleton-lifetime-)

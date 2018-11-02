@@ -27,7 +27,7 @@
             {
                 // Resolve the source for all appropriate instances
                 var instancesSource = container.Resolve<IObservable<IService>>();
-
+                // }
                 // Create mock of observer to check
                 var observer = new Mock<IObserver<IService>>();
                 using (instancesSource.Subscribe(observer.Object))
@@ -38,6 +38,7 @@
                     // Check that the finishing event was received
                     observer.Verify(o => o.OnCompleted(), Times.Once);
                 }
+                // {
             }
             // }
         }

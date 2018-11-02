@@ -8,8 +8,8 @@
   - [Named/tagged dependencies](#tags-)
   - [Containers hierarchy](#child-container-)
   - [Bindings via text metadata](#configuration-via-a-text-metadata-)
-  - [Customizable aspect oriented autowiring](#aspect-oriented-autowiring-)
-  - Easy expandable set of lifetimes
+  - [Customizable aspect oriented autowiring](#aspect-oriented-auto-wiring-)
+  - Easy extensible set of lifetimes
     - [Singleton](#singleton-lifetime-) with [auto-disposing](#auto-dispose-singleton-during-containers-dispose-)
     - [Singleton per container](#container-singleton-lifetime-)
     - [Singleton per scope](#scope-singleton-lifetime-)

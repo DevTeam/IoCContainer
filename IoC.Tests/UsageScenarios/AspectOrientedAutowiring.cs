@@ -14,13 +14,15 @@ namespace IoC.Tests.UsageScenarios
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
     [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-    public class AspectOrientedAutowiring
+    public class AspectOrientedAutoWiring
     {
         [Fact]
         // $visible=true
         // $tag=binding
         // $priority=10
-        // $description=Aspect Oriented Autowiring
+        // $description=Aspect Oriented Auto-wiring
+        // $header=You can specify your own aspect oriented auto-wiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
+        // #footer=Where the [_Autowiring_] and [_Tag_] attributes are used to highlight and configure injecting points.
         // {
         public void Run()
         {
