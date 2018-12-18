@@ -42,7 +42,7 @@
             }
 
             var array = new T[size];
-#if NETCOREAPP2_0 || NETCOREAPP2_1
+#if NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2
             Array.Fill(array, value);
 #else
             for (var i = 0; i < size; i++)

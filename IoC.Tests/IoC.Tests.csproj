@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp1.0;netcoreapp2.1;net40;net47</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp2.2;net40;net47</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
     <IsPackable>false</IsPackable>
@@ -25,6 +25,10 @@
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.0' or '$(TargetFramework)'=='netcoreapp2.1'">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.1" />
+    <ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.2'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
     <ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp2.0' and '$(TargetFramework)'!='netcoreapp2.1' and '$(TargetFramework)'!='net40'">

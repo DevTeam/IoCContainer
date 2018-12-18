@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp2.1;net40</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.2;net40</TargetFrameworks>
     <IsPackable>false</IsPackable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <WarningsAsErrors />
@@ -33,7 +33,7 @@
   <ItemGroup>
     <ProjectReference Include="..\IoC\IoC.csproj" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.1'">
+  <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp2.2'">
     <PackageReference Include="System.Reflection.Emit">
       <Version>4.3.0</Version>
     </PackageReference>

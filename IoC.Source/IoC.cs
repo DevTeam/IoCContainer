@@ -2090,14 +2090,14 @@ namespace IoC
         /// </summary>
         /// <param name="binding">The binding token.</param>
         /// <param name="type">The instance type.</param>
-        /// <param name="autowiringStrategy">The optional autowiring strategy.</param>
+        /// <param name="autoWiringStrategy">The optional auto-wiring strategy.</param>
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable To([NotNull] this IBinding<object> binding, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
+        public static IDisposable To([NotNull] this IBinding<object> binding, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autoWiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(type, autowiringStrategy)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutoWiringDependency(type, autoWiringStrategy)));
         }
 
         /// <summary>
@@ -2105,14 +2105,14 @@ namespace IoC
         /// </summary>
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="binding">The binding token.</param>
-        /// <param name="autowiringStrategy">The optional autowiring strategy.</param>
+        /// <param name="autoWiringStrategy">The optional auto-wiring strategy.</param>
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
+        public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] IAutowiringStrategy autoWiringStrategy = null)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(TypeDescriptor<T>.Type, autowiringStrategy)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutoWiringDependency(TypeDescriptor<T>.Type, autoWiringStrategy)));
         }
 
         /// <summary>
@@ -2132,7 +2132,7 @@ namespace IoC
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new AutowiringDependency(factory, statements)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new AutoWiringDependency(factory, statements)));
         }
 
         /// <summary>
@@ -4240,7 +4240,7 @@ namespace IoC.Features
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => TaskScheduler.Current);
             yield return container.Register(ctx => StartTask(new Task<TT>(ctx.Container.Inject<Func<TT>>(ctx.Key.Tag)), ctx.Container.Inject<TaskScheduler>()), null, Feature.AnyTag);
-#if NETCOREAPP2_0 || NETCOREAPP2_1
+#if NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2
             yield return container.Register(ctx => new ValueTask<TT>(ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Feature.AnyTag);
 #endif
         }
@@ -4731,7 +4731,7 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
 
-    internal class AutowiringDependency: IDependency
+    internal class AutoWiringDependency: IDependency
     {
         private readonly Expression _expression;
         [NotNull] [ItemNotNull] private readonly Expression[] _statements;
@@ -4739,14 +4739,14 @@ namespace IoC.Core
 
         [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
         [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
-        public AutowiringDependency([NotNull] LambdaExpression constructor, [NotNull][ItemNotNull] params LambdaExpression[] statements)
+        public AutoWiringDependency([NotNull] LambdaExpression constructor, [NotNull][ItemNotNull] params LambdaExpression[] statements)
             :this(
                 constructor?.Body ?? throw new ArgumentNullException(nameof(constructor)),
                 statements?.Select(i => i.Body)?.ToArray() ?? throw new ArgumentNullException(nameof(statements)))
         {
         }
 
-        public AutowiringDependency([NotNull] Expression constructorExpression, [NotNull][ItemNotNull] params Expression[] statementExpressions)
+        public AutoWiringDependency([NotNull] Expression constructorExpression, [NotNull][ItemNotNull] params Expression[] statementExpressions)
         {
             _expression = constructorExpression ?? throw new ArgumentNullException(nameof(constructorExpression));
             _isComplexType = IsComplexType(_expression.Type);
@@ -5099,7 +5099,7 @@ namespace IoC.Core
             }
 
             var array = new T[size];
-#if NETCOREAPP2_0 || NETCOREAPP2_1
+#if NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2
             Array.Fill(array, value);
 #else
             for (var i = 0; i < size; i++)
@@ -5936,7 +5936,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
-            => container.Register(new[] { TypeDescriptor<T>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type }, new FullAutoWiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -5951,7 +5951,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1 
-            => container.Register(new[] { TypeDescriptor<T1>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type }, new FullAutoWiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -5967,7 +5967,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1, T2>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2 
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new FullAutoWiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -5984,7 +5984,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3 
-            => container.Register(new[] {TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type}, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] {TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type}, new FullAutoWiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6002,7 +6002,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type }, new FullAutoWiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6021,7 +6021,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5 
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type }, new FullAutoWiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6040,7 +6040,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type }, new FullAutoWiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6061,7 +6061,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6, T7
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type }, new FullAutoWiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6083,7 +6083,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T : T1, T2, T3, T4, T5, T6, T7, T8
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8) }, new FullAutowiringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8) }, new FullAutoWiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6098,7 +6098,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IDisposable Register<T>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            => container.Register(new[] { TypeDescriptor<T>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type }, new AutoWiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6115,7 +6115,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type }, new AutoWiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6133,7 +6133,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1, T2>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new AutoWiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6152,7 +6152,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type }, new AutoWiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6172,7 +6172,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type }, new AutoWiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6193,7 +6193,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4, T5
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type }, new AutoWiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6215,7 +6215,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4, T5, T6
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type }, new AutoWiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6238,7 +6238,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4, T5, T6, T7
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type }, new AutoWiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6262,7 +6262,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T : T1, T2, T3, T4, T5, T6, T7, T8
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type }, new AutowiringDependency(factory, statements), lifetime, tags);
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type }, new AutoWiringDependency(factory, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -6305,7 +6305,7 @@ namespace IoC.Core
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
-    internal class FullAutowiringDependency: IDependency
+    internal class FullAutoWiringDependency: IDependency
     {
         private static readonly Type[] GenericTypeArguments =
         {
@@ -6329,17 +6329,27 @@ namespace IoC.Core
 
         private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private readonly Type _type;
-        [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
+        [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;
         private readonly bool _hasGenericParamsWithConstraints;
         private readonly Dictionary<int, TypeDescriptor> _genericParamsWithConstraints = new Dictionary<int, TypeDescriptor>();
         private readonly Type[] _registeredGenericTypeParameters;
         private readonly TypeDescriptor _registeredTypeDescriptor;
 
-        public FullAutowiringDependency([NotNull] Type type, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
+        public FullAutoWiringDependency([NotNull] Type type, [CanBeNull] IAutowiringStrategy autoWiringStrategy = null)
         {
             _type = type ?? throw new ArgumentNullException(nameof(type));
-            _autowiringStrategy = autowiringStrategy;
+            _autoWiringStrategy = autoWiringStrategy;
             _registeredTypeDescriptor = type.Descriptor();
+            if (_registeredTypeDescriptor.IsInterface())
+            {
+                throw new ArgumentException($"Type \"{type}\" should not be an interface.", nameof(type));
+            }
+
+            if (_registeredTypeDescriptor.IsAbstract())
+            {
+                throw new ArgumentException($"Type \"{type}\" should not be an abstract class.", nameof(type));
+            }
+
             if (!_registeredTypeDescriptor.IsGenericTypeDefinition())
             {
                 return;
@@ -6396,8 +6406,8 @@ namespace IoC.Core
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             try
             {
-                var autoWiringStrategy = _autowiringStrategy ?? buildContext.AutowiringStrategy;
-                var isDefaultAutowiringStrategy = DefaultAutowiringStrategy.Shared == autoWiringStrategy;
+                var autoWiringStrategy = _autoWiringStrategy ?? buildContext.AutowiringStrategy;
+                var isDefaultAutoWiringStrategy = DefaultAutowiringStrategy.Shared == autoWiringStrategy;
                 if (!autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
                 {
                     instanceType = _hasGenericParamsWithConstraints
@@ -6429,7 +6439,7 @@ namespace IoC.Core
                 var defaultConstructors = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredConstructors());
                 if (!autoWiringStrategy.TryResolveConstructor(defaultConstructors, out var ctor))
                 {
-                    if (isDefaultAutowiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
+                    if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
                     {
                         ctor = buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
                     }
@@ -6438,7 +6448,7 @@ namespace IoC.Core
                 var defaultMethods = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredMethods());
                 if (!autoWiringStrategy.TryResolveInitializers(defaultMethods, out var initializers))
                 {
-                    if (isDefaultAutowiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
+                    if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
                     {
                         initializers = Enumerable.Empty<IMethod<MethodInfo>>();
                     }
@@ -6460,7 +6470,7 @@ namespace IoC.Core
                     );
                 }
 
-                if (!isDefaultAutowiringStrategy)
+                if (!isDefaultAutoWiringStrategy)
                 {
                     baseExpression = buildContext.InjectDependencies(baseExpression);
                 }
@@ -7331,6 +7341,10 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
+        public bool IsAbstract() => Type.IsAbstract;
+
+        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
         public bool IsGenericParameter() => Type.IsGenericParameter;
 
         [MethodImpl((MethodImplOptions)256)]
@@ -7474,6 +7488,10 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
         public bool IsInterface() => _typeInfo.IsInterface;
+
+        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
+        public bool IsAbstract() => _typeInfo.IsAbstract;
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
