@@ -9,7 +9,6 @@
     <PackageId>IoC.AspNetCore</PackageId>
     <Authors>NikolayP</Authors>
     <Description>AspNetCore feature for IoC container.</Description>
-    <PackageLicenseUrl>https://raw.githubusercontent.com/DevTeam/IoCContainer/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/DevTeam/IoCContainer/</PackageProjectUrl>
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</PackageIconUrl>
     <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
