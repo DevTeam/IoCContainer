@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
+  <PropertyGroup>   
     <TargetFrameworks>netcoreapp1.0;netcoreapp2.2;net40;net47</TargetFrameworks>
+    <IsTestProject>true</IsTestProject>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
     <IsPackable>false</IsPackable>
