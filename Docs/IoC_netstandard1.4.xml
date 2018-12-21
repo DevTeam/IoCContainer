@@ -1319,7 +1319,7 @@
             </summary>
             <param name="binding">The binding token.</param>
             <param name="type">The instance type.</param>
-            <param name="autowiringStrategy">The optional autowiring strategy.</param>
+            <param name="autoWiringStrategy">The optional auto-wiring strategy.</param>
             <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},IoC.IAutowiringStrategy)">
@@ -1328,7 +1328,7 @@
             </summary>
             <typeparam name="T">The instance type.</typeparam>
             <param name="binding">The binding token.</param>
-            <param name="autowiringStrategy">The optional autowiring strategy.</param>
+            <param name="autoWiringStrategy">The optional auto-wiring strategy.</param>
             <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
