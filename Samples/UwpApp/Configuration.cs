@@ -14,7 +14,7 @@
     {
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
-            // Viwes
+            // Views
             yield return container.Bind<MainPage>().As(Lifetime.Singleton).To<MainPage>();
 
             // View Models

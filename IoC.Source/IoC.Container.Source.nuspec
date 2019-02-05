@@ -8,7 +8,7 @@
     <iconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</iconUrl>
     <projectUrl>https://github.com/DevTeam/IoCContainer/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>Simple, powerful and fast IoC container as embedding-in-code package.</description>
+    <description>Simple, powerful and fast expressions based Inversion of Control container for .NET as embedding-in-code package.</description>
     <tags>IoC inversionofcontrol Container DI dependencyinjection</tags>
     <contentFiles>
       <files include="cs/any/*.cs" buildAction="Compile" />

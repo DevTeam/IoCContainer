@@ -7,12 +7,12 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackageId>IoC.Container</PackageId>
     <Authors>NikolayP</Authors>
-    <Description>Simple, powerful and fast IoC container.</Description>
+    <Description>Simple, powerful and fast expressions based Inversion of Control container for .NET.</Description>
     <PackageProjectUrl>https://github.com/DevTeam/IoCContainer/</PackageProjectUrl>
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</PackageIconUrl>
     <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>IoC inversionofcontrol Container DI dependencyinjection</PackageTags>
+    <PackageTags>IoC inversionofcontrol Container DI dependencyinjection expression</PackageTags>
     <Product>IoC Container</Product>
     <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
     <DocumentationFile>..\Docs\IoC_$(TargetFramework).xml</DocumentationFile>

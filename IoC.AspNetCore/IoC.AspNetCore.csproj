@@ -8,7 +8,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackageId>IoC.AspNetCore</PackageId>
     <Authors>NikolayP</Authors>
-    <Description>AspNetCore feature for IoC container.</Description>
+    <Description>AspNetCore feature for expressions based Inversion of Control container for .NET.</Description>
     <PackageProjectUrl>https://github.com/DevTeam/IoCContainer/</PackageProjectUrl>
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</PackageIconUrl>
     <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
@@ -36,7 +36,7 @@
   </ItemGroup>  
 
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp2.2'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />    
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2" />    
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'!='netcoreapp2.0' and '$(TargetFramework)'!='netcoreapp2.1'">

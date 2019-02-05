@@ -140,8 +140,11 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="IoC.Container">
+      <Version>1.1.11</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
-      <Version>6.1.5</Version>
+      <Version>6.1.9</Version>
     </PackageReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">

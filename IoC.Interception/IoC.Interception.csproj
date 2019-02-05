@@ -8,7 +8,7 @@
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackageId>IoC.Interception</PackageId>
     <Authors>NikolayP</Authors>
-    <Description>Interception feature for IoC container.</Description>
+    <Description>Interception feature for expressions based Inversion of Control container for .NET.</Description>
     <PackageProjectUrl>https://github.com/DevTeam/IoCContainer/</PackageProjectUrl>
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</PackageIconUrl>
     <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
