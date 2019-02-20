@@ -75,18 +75,18 @@ namespace ShroedingersCat
     {
         public CardboardBox(T content) => Content = content;
 
-        public T Content { get; private set; }
+        public T Content { get; }
 
-        public override string ToString() { return "[" + Content + "]"; }
+        public override string ToString() => $"[{Content}]";
     }
 
     class ShroedingersCat : ICat
     {
-        public ShroedingersCat(State state) { State = state; }
+        public ShroedingersCat(State state) => State = state;
 
-        public State State { get; private set; }
+        public State State { get; }
 
-        public override string ToString() { return State + " cat"; }
+        public override string ToString() => $"{State} cat";
     }
 
     public class Glue : IConfiguration
@@ -96,8 +96,8 @@ namespace ShroedingersCat
             yield return container.Bind<IBox<TT>>().To<CardboardBox<TT>>();
             yield return container.Bind<ICat>().To<ShroedingersCat>();
 
-            var rnd = new Random();
-            yield return container.Bind<State>().To(_ => (State)rnd.Next(2));
+            yield return container.Bind<Random>().As(Lifetime.Singleton).To<Random>();
+            yield return container.Bind<State>().To(ctx => (State)ctx.Container.Resolve<Random>().Next(2));
         }
     }
 }
