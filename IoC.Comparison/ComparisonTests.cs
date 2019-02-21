@@ -14,6 +14,7 @@ namespace IoC.Comparison
     using Castle.Windsor;
     using DryIoc;
     using LightInject;
+    using Model;
 #if !NETCOREAPP1_1
     using JetBrains.dotMemoryUnit;
     using JetBrains.dotMemoryUnit.Kernel;
@@ -771,58 +772,5 @@ namespace IoC.Comparison
             body.AppendLine("</table>");
             File.AppendAllText(GetReportFilePath(), body.ToString());
         }
-    }
-
-    public interface IService1
-    {
-        void DoSomething();
-    }
-
-    // ReSharper disable once ClassNeverInstantiated.Global
-    [SuppressMessage("ReSharper", "UnusedParameter.Local")]
-    public sealed class Service1 : IService1
-    {
-        public Service1(IService2 service2, IService3 service31, IService3 service32, IService3 service33, IService4 service4)
-        {
-        }
-
-        public void DoSomething()
-        {
-        }
-    }
-
-    public interface IService2
-    {
-    }
-
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public sealed class Service2 : IService2
-    {
-        // ReSharper disable once UnusedParameter.Local
-        public Service2(IService3 service3)
-        {
-        }
-    }
-
-    public interface IService3
-    {
-    }
-
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public sealed class Service3 : IService3
-    {
-        [SuppressMessage("ReSharper", "UnusedParameter.Local")]
-        public Service3(IService4 service41, IService4 service42, IService4 service43, IService4 service44, IService4 service45)
-        {
-        }
-    }
-
-    public interface IService4
-    {
-    }
-
-    // ReSharper disable once ClassNeverInstantiated.Global
-    public sealed class Service4 : IService4
-    {
     }
 }
