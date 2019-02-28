@@ -1,6 +1,7 @@
 ﻿namespace IoC.Lifetimes
 {
     using System;
+    using Core;
 
     /// <summary>
     /// Represents singleton per scope lifetime.
@@ -24,6 +25,13 @@
             {
                 scope.AddResource(disposable);
             }
+
+#if NETCOREAPP3_0
+            if (newInstance is IAsyncDisposable asyncDisposable)
+            {
+                scope.AddResource(asyncDisposable.ToDisposable());
+            }
+#endif
 
             return newInstance;
         }

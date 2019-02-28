@@ -30,7 +30,12 @@
 
             // Check the singleton was disposed after the container was disposed
             disposableService.Verify(i => i.Dispose(), Times.Once);
+            // }            
+#if NETCOREAPP3_0
+            // {
+            disposableService.Verify(i => i.DisposeAsync(), Times.Once);
             // }
+#endif            
         }
     }
 }

@@ -51,7 +51,7 @@ namespace IoC.Performance.Tests
         }
 
         [Test]
-        public void ResolveCore()
+        public void TestResolveCore()
         {          
             for (var i = 0; i < _series; i++)
             {
@@ -60,7 +60,7 @@ namespace IoC.Performance.Tests
         }
 
         [Test]
-        public void Resolve()
+        public void TestResolve()
         {          
             for (var i = 0; i < _series; i++)
             {
@@ -69,7 +69,7 @@ namespace IoC.Performance.Tests
         }
 
         [Test]
-        public void ResolveComplex()
+        public void TestResolveComplex()
         {          
             for (var i = 0; i < _series / 1000; i++)
             {

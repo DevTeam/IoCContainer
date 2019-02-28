@@ -3778,6 +3778,10 @@ namespace IoC.Features
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    // ReSharper disable once RedundantUsingDirective
+    using System.Threading;
+    // ReSharper disable once RedundantUsingDirective
+    using System.Threading.Tasks;
     using Core;
 
 
@@ -3799,13 +3803,16 @@ namespace IoC.Features
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var containerSingletonResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
-            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx.Container, ctx.Args), containerSingletonResolver(container));
+            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx), containerSingletonResolver(container));
             yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToList());
             yield return container.Register(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToArray());
             yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => new HashSet<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
             yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Inject<IEnumerable<TT>>()), containerSingletonResolver(container));
 #if !NET40
             yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<List<TT>>()));
+#endif
+#if NETCOREAPP3_0
+            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx), containerSingletonResolver(container));
 #endif
         }
 
@@ -3827,58 +3834,123 @@ namespace IoC.Features
             }
         }
 
-        internal class Enumeration<T>: IObserver<ContainerEvent>, IDisposable, IEnumerable<T>
+        private class Enumeration<T> : EnumerationBase<T>, IEnumerable<T>
         {
-            private readonly IContainer _container;
-            [NotNull] [ItemCanBeNull] private readonly object[] _args;
+            public Enumeration([NotNull] Context context)
+            : base(context)
+            {
+            }
+
+            [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
+            public IEnumerator<T> GetEnumerator()
+            {
+                var resolvers = GetResolvers();
+
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var i = 0; i < resolvers.Length; i++)
+                {
+                    yield return resolvers[i](Context.Container, Context.Args);
+                }
+            }
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
+
+#if NETCOREAPP3_0
+        private class AsyncEnumeration<T> : EnumerationBase<T>, IAsyncEnumerable<T>
+        {
+            public AsyncEnumeration([NotNull] Context context)
+                : base(context)
+            {
+            }
+
+            public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken()) => 
+                new AsyncEnumerator<T>(this, cancellationToken);
+        }
+
+        private class AsyncEnumerator<T> : IAsyncEnumerator<T>
+        {
+            private readonly AsyncEnumeration<T> _enumeration;
+            private readonly CancellationToken _cancellationToken;
+            private readonly TaskScheduler _taskScheduler;
+            private int _index = -1;
+
+            public AsyncEnumerator(AsyncEnumeration<T> enumeration, CancellationToken cancellationToken)
+            {
+                _enumeration = enumeration;
+                _cancellationToken = cancellationToken;
+                var container = enumeration.Context.Container;
+                _taskScheduler = container.TryGetResolver(out Resolver<TaskScheduler> taskSchedulerResolver) ? taskSchedulerResolver(container) : TaskScheduler.Current;
+            }
+
+            public async ValueTask<bool> MoveNextAsync() =>
+                await new ValueTask<bool>(
+                    StartTask(
+                        new Task<bool>(
+                            () =>
+                            {
+                                var resolvers = _enumeration.GetResolvers();
+                                var index = Interlocked.Increment(ref _index);
+                                if (index >= resolvers.Length)
+                                {
+                                    return false;
+                                }
+
+                                Current = resolvers[index](_enumeration.Context.Container, _enumeration.Context.Args);
+                                return true;
+                            },
+                            _cancellationToken)));
+
+            public T Current { get; private set; }
+
+            public ValueTask DisposeAsync() => new ValueTask();
+
+            private Task<bool> StartTask(Task<bool> task)
+            {                
+                task.Start(_taskScheduler);
+                return task;
+            }
+        }
+#endif
+
+        private class EnumerationBase<T>: IObserver<ContainerEvent>, IDisposable
+        {
+            [NotNull] public readonly Context Context;
             private readonly IDisposable _subscription;
             private volatile Resolver<T>[] _resolvers;
 
-            public Enumeration([NotNull] IContainer container, [NotNull][ItemCanBeNull] params object[] args)
+            public EnumerationBase([NotNull] Context context)
             {
-                _container = container;
-                _args = args;
-                _subscription = container.Subscribe(this);
+                Context = context;
+                _subscription = context.Container.Subscribe(this);
                 Reset();
             }
 
             public void OnNext(ContainerEvent value) => Reset();
 
-            public void OnError(Exception error)
-            {
-            }
+            public void OnError(Exception error) { }
 
-            public void OnCompleted()
-            {
-            }
+            public void OnCompleted() { }
 
-            public void Dispose() => _subscription.Dispose();
+            public void Dispose() => _subscription.Dispose();            
 
-            [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
-            public IEnumerator<T> GetEnumerator()
+            public Resolver<T>[] GetResolvers()
             {
-                var resolvers = _resolvers;
-                if (resolvers == null)
+                if (_resolvers != null)
                 {
-                    lock (_subscription)
-                    {
-                        if (_resolvers == null)
-                        {
-                            _resolvers = GetResolvers(_container).ToArray();
-                        }
+                    return _resolvers;
+                }
 
-                        resolvers = _resolvers;
+                lock (_subscription)
+                {
+                    if (_resolvers == null)
+                    {
+                        _resolvers = GetResolvers(Context.Container).ToArray();
                     }
                 }
 
-                // ReSharper disable once ForCanBeConvertedToForeach
-                for (var i = 0; i < resolvers.Length; i++)
-                {
-                    yield return resolvers[i](_container, _args);
-                }
+                return _resolvers;
             }
-
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             private void Reset()
             {
@@ -3892,7 +3964,7 @@ namespace IoC.Features
             {
                 var targetType = TypeDescriptorExtensions.Descriptor<T>();
                 var isConstructedGenericType = targetType.IsConstructedGenericType();
-                TypeDescriptor genericTargetType = default(TypeDescriptor);
+                var genericTargetType = default(TypeDescriptor);
                 Type[] genericTypeArguments = null;
                 if (isConstructedGenericType)
                 {
@@ -4243,7 +4315,7 @@ namespace IoC.Features
             yield return container.Register(ctx => TaskScheduler.Current);
             yield return container.Register(ctx => StartTask(new Task<TT>(ctx.Container.Inject<Func<TT>>(ctx.Key.Tag)), ctx.Container.Inject<TaskScheduler>()), null, Feature.AnyTag);
 #if NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
-            yield return container.Register(ctx => new ValueTask<TT>(ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Feature.AnyTag);
+            yield return container.Register(ctx => new ValueTask<TT>(StartTask(new Task<TT>(ctx.Container.Inject<Func<TT>>(ctx.Key.Tag)), ctx.Container.Inject<TaskScheduler>())), null, Feature.AnyTag);
 #endif
         }
 
@@ -4417,6 +4489,7 @@ namespace IoC.Features
 namespace IoC.Lifetimes
 {
     using System;
+    using Core;
 
     /// <summary>
     /// Represents singleton per container lifetime.
@@ -4440,6 +4513,13 @@ namespace IoC.Lifetimes
             {
                 targetContainer.RegisterResource(disposable);
             }
+
+#if NETCOREAPP3_0
+            if (newInstance is IAsyncDisposable asyncDisposable)
+            {
+                targetContainer.RegisterResource(asyncDisposable.ToDisposable());
+            }
+#endif
 
             return newInstance;
         }
@@ -4603,6 +4683,7 @@ namespace IoC.Lifetimes
 namespace IoC.Lifetimes
 {
     using System;
+    using Core;
 
     /// <summary>
     /// Represents singleton per scope lifetime.
@@ -4626,6 +4707,13 @@ namespace IoC.Lifetimes
             {
                 scope.AddResource(disposable);
             }
+
+#if NETCOREAPP3_0
+            if (newInstance is IAsyncDisposable asyncDisposable)
+            {
+                scope.AddResource(asyncDisposable.ToDisposable());
+            }
+#endif
 
             return newInstance;
         }
@@ -4707,6 +4795,16 @@ namespace IoC.Lifetimes
             }
 
             disposable?.Dispose();
+
+#if NETCOREAPP3_0
+            IAsyncDisposable asyncDisposable;
+            lock (_lockObject)
+            {
+                asyncDisposable = _instance as IAsyncDisposable;
+            }
+
+            asyncDisposable?.ToDisposable().Dispose();
+#endif
         }
 
         /// <inheritdoc />
@@ -5752,6 +5850,15 @@ namespace IoC.Core
             return new CompositeDisposable(disposables);
         }
 
+#if NETCOREAPP3_0
+        public static IDisposable ToDisposable([NotNull] this IAsyncDisposable asyncDisposable)
+        {
+#if DEBUG
+            if (asyncDisposable == null) throw new ArgumentNullException(nameof(asyncDisposable));
+#endif
+            return Create(() => { asyncDisposable.DisposeAsync().AsTask().Wait(); });
+        }
+#endif
         private sealed class DisposableAction : IDisposable
         {
             [NotNull] private readonly Action _action;

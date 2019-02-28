@@ -104,6 +104,9 @@
 
                 // Then
                 mock.Verify(i => i.Dispose(), Times.Once);
+#if NETCOREAPP3_0
+                mock.Verify(i => i.DisposeAsync(), Times.Once);
+#endif
             }
         }
 

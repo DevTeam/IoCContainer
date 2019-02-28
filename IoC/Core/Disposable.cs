@@ -30,6 +30,15 @@
             return new CompositeDisposable(disposables);
         }
 
+#if NETCOREAPP3_0
+        public static IDisposable ToDisposable([NotNull] this IAsyncDisposable asyncDisposable)
+        {
+#if DEBUG
+            if (asyncDisposable == null) throw new ArgumentNullException(nameof(asyncDisposable));
+#endif
+            return Create(() => { asyncDisposable.DisposeAsync().AsTask().Wait(); });
+        }
+#endif
         private sealed class DisposableAction : IDisposable
         {
             [NotNull] private readonly Action _action;

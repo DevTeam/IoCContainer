@@ -1,6 +1,7 @@
 ﻿namespace IoC.Lifetimes
 {
     using System;
+    using Core;
 
     /// <summary>
     /// Represents singleton per container lifetime.
@@ -24,6 +25,13 @@
             {
                 targetContainer.RegisterResource(disposable);
             }
+
+#if NETCOREAPP3_0
+            if (newInstance is IAsyncDisposable asyncDisposable)
+            {
+                targetContainer.RegisterResource(asyncDisposable.ToDisposable());
+            }
+#endif
 
             return newInstance;
         }

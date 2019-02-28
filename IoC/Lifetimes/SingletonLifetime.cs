@@ -59,6 +59,16 @@
             }
 
             disposable?.Dispose();
+
+#if NETCOREAPP3_0
+            IAsyncDisposable asyncDisposable;
+            lock (_lockObject)
+            {
+                asyncDisposable = _instance as IAsyncDisposable;
+            }
+
+            asyncDisposable?.ToDisposable().Dispose();
+#endif
         }
 
         /// <inheritdoc />

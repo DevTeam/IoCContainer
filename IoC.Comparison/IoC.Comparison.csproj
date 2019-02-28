@@ -11,12 +11,12 @@
     <PackageReference Include="JetBrains.dotMemoryUnit" Version="3.0.20171219.105559" />
     <PackageReference Include="Shouldly" Version="3.0.2" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="Unity" Version="5.9.3" />
+    <PackageReference Include="Unity" Version="5.9.5" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0' or '$(TargetFramework)'=='net47'">
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.0" />
-    <PackageReference Include="Autofac" Version="4.8.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.0" />
+    <PackageReference Include="Autofac" Version="4.9.1" />
     <PackageReference Include="LightInject" Version="5.4.0" />
     <PackageReference Include="Moq" Version="4.10.1" />
     <PackageReference Include="Ninject" Version="3.3.4" />

@@ -19,7 +19,7 @@ namespace IoC.Performance.Tests
         }
 
         [Test]
-        public void Bind()
+        public void TestBind()
         {          
             foreach (var type in TestTypeBuilder.Default.Types)
             {

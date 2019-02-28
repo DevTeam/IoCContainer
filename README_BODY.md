@@ -103,6 +103,7 @@ public Program(
   Tuple<IBox<ICat>, ICat, IBox<IBox<ICat>>> tuple,
   Lazy<IBox<ICat>> lazy,
   IEnumerable<IBox<ICat>> enumerable,
+  IAsyncEnumerable<IBox<ICat>> asyncEnumerable,
   IBox<ICat>[] array,
   IList<IBox<ICat>> list,
   ISet<IBox<ICat>> set,

@@ -22,6 +22,9 @@ namespace IoC.Tests.IntegrationTests
     }
 
     public interface IMyDisposableService: IDisposable
+#if NETCOREAPP3_0
+    , IAsyncDisposable
+#endif
     {
     }
 

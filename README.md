@@ -24,9 +24,23 @@
 
 ### [Powerful Injection](#injection)
 
-  - [Сonstructors injection](#constructor-auto-wiring-), [methods injection](#method-injection-) and [properties injection-](#property-injection)
-  - Injection of [Func](#resolve-func-), [Lazy](#resolve-lazy-), [ThreadLocal](#resolve-threadlocal-), [Tuple](#resolve-tuple-) and [ValueTuple](#resolve-valuetuple-)
-  - Injection of [IEnumerable](#resolve-all-appropriate-instances-as-ienumerable-), [Array](#resolve-all-appropriate-instances-as-array-), [ICollection](#resolve-all-appropriate-instances-as-icollection-), [ISet](#resolve-all-appropriate-instances-as-iset-) or even via [IObservable](#resolve-all-appropriate-instances-as-iobservable-source-)
+  - Injection via
+    - [Сonstructors](#constructor-auto-wiring-)
+	- [Methods](#method-injection-)
+	- [Properties](#property-injection)
+	- Fields
+  - Injection of
+    - [Func](#resolve-func-)
+	- [Lazy](#resolve-lazy-)
+	- [ThreadLocal](#resolve-threadlocal-)
+	- [Tuple](#resolve-tuple-)
+	- [ValueTuple](#resolve-valuetuple-)
+    - [IAsyncEnumerable](#resolve-all-appropriate-instances-as-iasyncenumerable-)
+	- [IEnumerable](#resolve-all-appropriate-instances-as-ienumerable-)
+	- [Array](#resolve-all-appropriate-instances-as-array-)
+	- [ICollection](#resolve-all-appropriate-instances-as-icollection-)
+	- [ISet](#resolve-all-appropriate-instances-as-iset-)
+	- [IObservable](#resolve-all-appropriate-instances-as-iobservable-source-)
   - Detailed errors information
 
 ### [Incredible Performance](#why-this-one)
@@ -177,6 +191,7 @@ public Program(
   Tuple<IBox<ICat>, ICat, IBox<IBox<ICat>>> tuple,
   Lazy<IBox<ICat>> lazy,
   IEnumerable<IBox<ICat>> enumerable,
+  IAsyncEnumerable<IBox<ICat>> asyncEnumerable,
   IBox<ICat>[] array,
   IList<IBox<ICat>> list,
   ISet<IBox<ICat>> set,
@@ -284,6 +299,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Property Injection](#property-injection-)
   - [Constructor Auto-wiring](#constructor-auto-wiring-)
   - [Resolve all appropriate instances as Array](#resolve-all-appropriate-instances-as-array-)
+  - [Resolve all appropriate instances as IAsyncEnumerable](#resolve-all-appropriate-instances-as-iasyncenumerable-)
   - [Resolve all appropriate instances as ICollection](#resolve-all-appropriate-instances-as-icollection-)
   - [Resolve all appropriate instances as IEnumerable](#resolve-all-appropriate-instances-as-ienumerable-)
   - [Resolve all appropriate instances as IObservable source](#resolve-all-appropriate-instances-as-iobservable-source-)
@@ -806,6 +822,7 @@ using (var container = Container.Create()
 
 // Check the singleton was disposed after the container was disposed
 disposableService.Verify(i => i.Dispose(), Times.Once);
+disposableService.Verify(i => i.DisposeAsync(), Times.Once);
 ```
 
 
@@ -1553,6 +1570,35 @@ using (container.Bind<IService>().Tag(3).To<Service>())
 {
     // Resolve all appropriate instances
     var instances = container.Resolve<IService[]>();
+}
+```
+
+
+
+### Resolve all appropriate instances as IAsyncEnumerable [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsyncEnumerables.cs)
+
+
+
+``` CSharp
+// Create and configure the container
+using (var container = Container.CreateCore().Using(CollectionFeature.Default))
+// Bind some dependency
+using (container.Bind<IDependency>().To<Dependency>())
+// Bind to the implementation #1
+using (container.Bind<IService>().Tag(1).To<Service>())
+// Bind to the implementation #2
+using (container.Bind<IService>().Tag(2).Tag("abc").To<Service>())
+// Bind to the implementation #3
+using (container.Bind<IService>().Tag(3).To<Service>())
+{
+    // Resolve all appropriate instances
+    var instances = container.Resolve<IAsyncEnumerable<IService>>();
+    var items = new List<IService>();
+    await foreach (var instance in instances) { items.Add(instance); }
+    
+    // Check the number of resolved instances
+    items.Count.ShouldBe(3);
+
 }
 ```
 
