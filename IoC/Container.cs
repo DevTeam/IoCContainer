@@ -37,7 +37,7 @@
         [NotNull] private Table<ShortKey, DependencyEntry> _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
         [NotNull] internal volatile Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
         [NotNull] internal volatile Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
-        private RegistrationTracker _registrationTracker;
+        private readonly RegistrationTracker _registrationTracker;
 
         /// <summary>
         /// Creates a root container with default features.
@@ -112,8 +112,6 @@
         /// <inheritdoc />
         public IContainer Parent => _parent;
 
-        private IIssueResolver IssueResolver => this.Resolve<IIssueResolver>();
-
         /// <inheritdoc />
         public override string ToString()
         {
@@ -138,11 +136,11 @@
                     {
                         if (curKey.Tag == AnyTag)
                         {
-                            TryUnregister(curKey, curKey.Type, ref _dependenciesForTagAny);
+                            TryUnregister(curKey.Type, ref _dependenciesForTagAny);
                         }
                         else
                         {
-                            TryUnregister(curKey, curKey, ref _dependencies);
+                            TryUnregister(curKey, ref _dependencies);
                         }
                     }
 
@@ -391,7 +389,7 @@
         }
 
         [MethodImpl((MethodImplOptions) 256)]
-        private bool TryUnregister<TKey>(FullKey originalKey, TKey key, [NotNull] ref Table<TKey, DependencyEntry> entries)
+        private bool TryUnregister<TKey>(TKey key, [NotNull] ref Table<TKey, DependencyEntry> entries)
         {
             entries = entries.Remove(key.GetHashCode(), key, out var unregistered);
             if (!unregistered)

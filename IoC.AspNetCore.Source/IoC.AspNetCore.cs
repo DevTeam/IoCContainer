@@ -30,6 +30,10 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#pragma warning disable CS1658 // Warning is overriding an error
+#pragma warning disable nullable
+#pragma warning restore CS1658 // Warning is overriding an error
+
 // ReSharper disable All
 
 #region AspNetCore
@@ -222,4 +226,9 @@ namespace IoC.Features
 #endregion
 
 #endregion
+
+#pragma warning disable CS1658 // Warning is overriding an error
+#pragma warning restore nullable
+#pragma warning restore CS1658 // Warning is overriding an error
+
 // ReSharper restore All

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TieredCompilation>false</TieredCompilation>
     <TargetFrameworks>net40;net47;netstandard1.0;netcoreapp2.2;uap10.0</TargetFrameworks>
@@ -22,6 +22,8 @@
     <XamlTargets>$(MSBuildNative)\Microsoft\WindowsXaml\v15.0\8.21\Microsoft.Windows.UI.Xaml.CSharp.Targets</XamlTargets>
     <TransformOnBuild>True</TransformOnBuild>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
+    <LangVersion>7</LangVersion>
+    <!--NullableContextOptions>enable</NullableContextOptions-->
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;net40;net45;net46;net47;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;netcoreapp2.1;netcoreapp2.2;uap10.0</TargetFrameworks>

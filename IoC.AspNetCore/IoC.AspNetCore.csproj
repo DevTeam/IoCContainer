@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <RootNamespace>IoC.Features</RootNamespace>
@@ -17,7 +17,9 @@
     <Product>IoC Container AspNetCore feature</Product>
     <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
     <DocumentationFile>..\Docs\IoC.AspNetCore_$(TargetFramework).xml</DocumentationFile>
-    <WarningsAsErrors />    
+    <WarningsAsErrors />
+    <LangVersion>7</LangVersion>
+    <!--NullableContextOptions>enable</NullableContextOptions-->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
