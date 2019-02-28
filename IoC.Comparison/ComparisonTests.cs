@@ -15,15 +15,13 @@ namespace IoC.Comparison
     using DryIoc;
     using LightInject;
     using Model;
-#if !NETCOREAPP1_1
     using JetBrains.dotMemoryUnit;
     using JetBrains.dotMemoryUnit.Kernel;
     using Ninject;
-#endif
     using Unity;
     using Unity.Lifetime;
     using Xunit;
-#if !NET40 && !NET47 && !NETCOREAPP1_1
+#if NETCOREAPP3_0
     using Xunit.Abstractions;
 #endif
 
@@ -49,9 +47,7 @@ namespace IoC.Comparison
             new TestInfo("DryIoc", DryIocSingleton),
             new TestInfo("Castle Windsor", CastleWindsorSingleton) { PerformanceRate = 800 },
             new TestInfo("Unity", UnitySingleton) { PerformanceRate = 800 },
-#if !NETCOREAPP1_1
             new TestInfo("Ninject", NinjectSingleton) { PerformanceRate = 1000 },
-#endif
             new TestInfo("Autofac", AutofacSingleton) { PerformanceRate = 100 },
         };
 
@@ -64,9 +60,7 @@ namespace IoC.Comparison
             new TestInfo("DryIoc", DryIocTransient),
             new TestInfo("Castle Windsor", CastleWindsorTransient) { PerformanceRate = 800 },
             new TestInfo("Unity", UnityTransient) { PerformanceRate = 800 },
-#if !NETCOREAPP1_1
             new TestInfo("Ninject", NinjectTransient) { PerformanceRate = 1000 },
-#endif
             new TestInfo("Autofac", AutofacTransient) { PerformanceRate = 100 },
         };
 
@@ -78,13 +72,11 @@ namespace IoC.Comparison
             new TestInfo("DryIoc", DryIocComplex),
             new TestInfo("Castle Windsor", CastleWindsorComplex) { PerformanceRate = 800 },
             new TestInfo("Unity", UnityComplex) { PerformanceRate = 800 },
-#if !NETCOREAPP1_1
             new TestInfo("Ninject", NinjectComplex) { PerformanceRate = 1000 },
-#endif
             new TestInfo("Autofac", AutofacComplex) { PerformanceRate = 100 },
         };
 
-#if !NET40 && !NET47 && !NETCOREAPP1_1
+#if NETCOREAPP3_0
         public ComparisonTests(ITestOutputHelper output)
         {
             DotMemoryUnitTestOutput.SetOutputMethod(output.WriteLine);
@@ -120,9 +112,7 @@ namespace IoC.Comparison
                 // Warmup
                 ioc.Test(2, new TotalTimePerformanceCounter());
                 GC.Collect();
-#if !NETCOREAPP1_1
                 GC.WaitForFullGCComplete();
-#endif
 
                 var performanceCounter = new TotalTimePerformanceCounter(ioc.PerformanceRate);
                 ioc.Test((int)(series/ioc.PerformanceRate), performanceCounter);
@@ -139,9 +129,7 @@ namespace IoC.Comparison
                 // Warmup
                 ioc.Test(2, new TotalTimePerformanceCounter());
                 GC.Collect();
-#if !NETCOREAPP1_1
                 GC.WaitForFullGCComplete();
-#endif
 
                 var performanceCounter = new TotalTimePerformanceCounter(ioc.PerformanceRate);
                 ioc.Test((int)(series / ioc.PerformanceRate), performanceCounter);
@@ -159,9 +147,7 @@ namespace IoC.Comparison
                 // Warmup
                 ioc.Test(2, new TotalTimePerformanceCounter());
                 GC.Collect();
-#if !NETCOREAPP1_1
                 GC.WaitForFullGCComplete();
-#endif
 
                 var performanceCounter = new TotalTimePerformanceCounter(ioc.PerformanceRate);
                 ioc.Test((int)(series / ioc.PerformanceRate), performanceCounter);
@@ -189,7 +175,6 @@ namespace IoC.Comparison
             }
         }
 
-#if !NETCOREAPP1_1
         [Fact]
         [Trait("Category", "Memory")]
         [DotMemoryUnit(CollectAllocations = true)]
@@ -231,7 +216,6 @@ namespace IoC.Comparison
             SaveResults(results, $"Memory usage 6 instances {series} times");
             results.Clear();
         }
-#endif
 
         private static void ThisSingleton(long series, IPerformanceCounter performanceCounter)
         {
@@ -404,7 +388,6 @@ namespace IoC.Comparison
             }
         }
 
-#if !NETCOREAPP1_1
         private static void NinjectSingleton(long series, IPerformanceCounter performanceCounter)
         {
             using (var kernel = new StandardKernel())
@@ -459,7 +442,6 @@ namespace IoC.Comparison
                 }
             }
         }
- #endif
 
         private static void AutofacSingleton(long series, IPerformanceCounter performanceCounter)
         {
@@ -734,11 +716,7 @@ namespace IoC.Comparison
 
         private static string GetBinDirectory()
         {
-#if !NETCOREAPP1_1
             return Environment.CurrentDirectory;
-#else
-            return Directory.GetCurrentDirectory();
-#endif
         }
 
         private static string GetFramework()

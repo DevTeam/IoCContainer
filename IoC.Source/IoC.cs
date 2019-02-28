@@ -4242,7 +4242,7 @@ namespace IoC.Features
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => TaskScheduler.Current);
             yield return container.Register(ctx => StartTask(new Task<TT>(ctx.Container.Inject<Func<TT>>(ctx.Key.Tag)), ctx.Container.Inject<TaskScheduler>()), null, Feature.AnyTag);
-#if NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
             yield return container.Register(ctx => new ValueTask<TT>(ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Feature.AnyTag);
 #endif
         }
@@ -5101,7 +5101,7 @@ namespace IoC.Core
             }
 
             var array = new T[size];
-#if NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2
+#if NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
             Array.Fill(array, value);
 #else
             for (var i = 0; i < size; i++)
