@@ -1296,6 +1296,15 @@
             <param name="lifetime"></param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Autowiring``1(IoC.IBinding{``0},IoC.IAutowiringStrategy)">
+            <summary>
+            Assigns the autowiring strategy to the binding.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="binding"></param>
+            <param name="autowiringStrategy"></param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Tag``1(IoC.IBinding{``0},System.Object)">
             <summary>
             Marks the binding by the tag. Is it possible to use multiple times.
@@ -1313,58 +1322,27 @@
             <param name="binding">The binding token.</param>
             <returns>The binding token.</returns>
         </member>
-        <member name="M:IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,IoC.IAutowiringStrategy,System.Linq.Expressions.Expression{System.Action{IoC.Context{System.Object}}}[])">
-            <summary>
-            Creates full auto-wiring.
-            </summary>
-            <param name="binding">The binding token.</param>
-            <param name="type">The instance type.</param>
-            <param name="autoWiringStrategy">The auto-wiring strategy.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
         <member name="M:IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,System.Linq.Expressions.Expression{System.Action{IoC.Context{System.Object}}}[])">
             <summary>
-            Creates full auto-wiring.
+            Aautowires binding.
             </summary>
             <param name="binding">The binding token.</param>
             <param name="type">The instance type.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},IoC.IAutowiringStrategy,System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Creates full auto-wiring.
-            </summary>
-            <typeparam name="T">The instance type.</typeparam>
-            <param name="binding">The binding token.</param>
-            <param name="autoWiringStrategy">The auto-wiring strategy.</param>
             <param name="statements">The set of expressions to initialize an instance.</param>
             <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
             <summary>
-            Creates full auto-wiring.
+            Aautowires binding.
             </summary>
             <typeparam name="T">The instance type.</typeparam>
             <param name="binding">The binding token.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.IAutowiringStrategy,System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Creates manual auto-wiring.
-            </summary>
-            <typeparam name="T">The instance type.</typeparam>
-            <param name="binding">The binding token.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="autoWiringStrategy">The auto-wiring strategy.</param>
             <param name="statements">The set of expressions to initialize an instance.</param>
             <returns>The dependency token.</returns>
         </member>
         <member name="M:IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
             <summary>
-            Creates manual auto-wiring.
+            Aautowires binding.
             </summary>
             <typeparam name="T">The instance type.</typeparam>
             <param name="binding">The binding token.</param>
@@ -1831,6 +1809,11 @@
         <member name="P:IoC.IBinding`1.Lifetime">
             <summary>
             The specified lifetime instance or null.
+            </summary>
+        </member>
+        <member name="P:IoC.IBinding`1.AutowiringStrategy">
+            <summary>
+            The specified autowiring strategy or null.
             </summary>
         </member>
         <member name="T:IoC.IBuildContext">

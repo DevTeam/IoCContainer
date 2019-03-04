@@ -13,6 +13,7 @@
             Types = types ?? throw new ArgumentNullException(nameof(types));
             Lifetime = null;
             Tags = Enumerable.Empty<object>();
+            AutowiringStrategy = null;
         }
 
         public Binding([NotNull] IBinding<T> binding, Lifetime lifetime)
@@ -22,6 +23,7 @@
             Types = binding.Types;
             Tags = binding.Tags;
             Lifetime = lifetime != IoC.Lifetime.Transient ? binding.Container.Resolve<ILifetime>(lifetime.AsTag(), binding.Container) : null;
+            AutowiringStrategy = binding.AutowiringStrategy;
         }
 
         public Binding([NotNull] IBinding<T> binding, [NotNull] ILifetime lifetime)
@@ -31,6 +33,7 @@
             Types = binding.Types;
             Lifetime = lifetime ?? throw new ArgumentNullException(nameof(lifetime));
             Tags = binding.Tags;
+            AutowiringStrategy = binding.AutowiringStrategy;
         }
 
         public Binding([NotNull] IBinding<T> binding, [CanBeNull] object tagValue)
@@ -40,6 +43,17 @@
             Types = binding.Types;
             Lifetime = binding.Lifetime;
             Tags = binding.Tags.Concat(Enumerable.Repeat(tagValue, 1));
+            AutowiringStrategy = binding.AutowiringStrategy;
+        }
+
+        public Binding([NotNull] IBinding<T> binding, [NotNull] IAutowiringStrategy autowiringStrategy)
+        {
+            if (binding == null) throw new ArgumentNullException(nameof(binding));
+            Container = binding.Container;
+            Types = binding.Types;
+            Lifetime = binding.Lifetime;
+            Tags = binding.Tags;
+            AutowiringStrategy = autowiringStrategy;
         }
 
         public IContainer Container { get; }
@@ -49,5 +63,7 @@
         public IEnumerable<object> Tags { get; }
 
         public ILifetime Lifetime { get; }
+
+        public IAutowiringStrategy AutowiringStrategy { get; }
     }
 }

@@ -255,7 +255,7 @@
             {
                 // When
                 using (container.Bind<MySimpleClass>().To<MySimpleClass>())
-                using (container.Bind(typeof(IMyGenericService<,>)).As(Lifetime.Transient).To(typeof(MyGenericService<,>), new AutowiringStrategy()))
+                using (container.Bind(typeof(IMyGenericService<,>)).As(Lifetime.Transient).Autowiring(new AutowiringStrategy()).To(typeof(MyGenericService<,>)))
                 {
                     // Then
                     var actualInstance = container.Resolve<IMyGenericService<int, string>>();

@@ -30,5 +30,10 @@
         /// The specified lifetime instance or null.
         /// </summary>
         [CanBeNull] ILifetime Lifetime { get; }
+
+        /// <summary>
+        /// The specified autowiring strategy or null.
+        /// </summary>
+        [CanBeNull] IAutowiringStrategy AutowiringStrategy { get; }
     }
 }

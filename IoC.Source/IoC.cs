@@ -9,7 +9,7 @@ because it may be changed even in minor updates of package.
 
 MIT License
 
-Copyright (c) 2018 Nikolay Pianikov
+Copyright (c) 2019 Nikolay Pianikov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -2059,6 +2059,22 @@ namespace IoC
         }
 
         /// <summary>
+        /// Assigns the autowiring strategy to the binding.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <param name="binding"></param>
+        /// <param name="autowiringStrategy"></param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Autowiring<T>([NotNull] this IBinding<T> binding, [NotNull] IAutowiringStrategy autowiringStrategy)
+        {
+            if (binding == null) throw new ArgumentNullException(nameof(binding));
+            if (autowiringStrategy == null) throw new ArgumentNullException(nameof(autowiringStrategy));
+            return new Binding<T>(binding, autowiringStrategy);
+        }
+
+        /// <summary>
         /// Marks the binding by the tag. Is it possible to use multiple times.
         /// </summary>
         /// <typeparam name="T">The instance type.</typeparam>
@@ -2086,30 +2102,9 @@ namespace IoC
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             return binding.Tag(Key.AnyTag);
         }
-
+        
         /// <summary>
-        /// Creates full auto-wiring.
-        /// </summary>
-        /// <param name="binding">The binding token.</param>
-        /// <param name="type">The instance type.</param>
-        /// <param name="autoWiringStrategy">The auto-wiring strategy.</param>
-        /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public static IDisposable To(
-            [NotNull] this IBinding<object> binding,
-            [NotNull] Type type,
-            [NotNull] IAutowiringStrategy autoWiringStrategy,
-            [NotNull][ItemNotNull] params Expression<Action<Context<object>>>[] statements)
-        {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
-            // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(type, autoWiringStrategy, statements)));
-        }
-
-        /// <summary>
-        /// Creates full auto-wiring.
+        /// Aautowires binding.
         /// </summary>
         /// <param name="binding">The binding token.</param>
         /// <param name="type">The instance type.</param>
@@ -2124,31 +2119,11 @@ namespace IoC
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(type, null, statements)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(type, binding.AutowiringStrategy, statements)));
         }
 
         /// <summary>
-        /// Creates full auto-wiring.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <param name="binding">The binding token.</param>
-        /// <param name="autoWiringStrategy">The auto-wiring strategy.</param>
-        /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public static IDisposable To<T>(
-            [NotNull] this IBinding<T> binding,
-            [NotNull] IAutowiringStrategy autoWiringStrategy,
-            [NotNull][ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-        {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
-            // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(TypeDescriptor<T>.Type, autoWiringStrategy, statements)));
-        }
-
-        /// <summary>
-        /// Creates full auto-wiring.
+        /// Aautowires binding.
         /// </summary>
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="binding">The binding token.</param>
@@ -2162,33 +2137,11 @@ namespace IoC
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(TypeDescriptor<T>.Type, null, statements)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(TypeDescriptor<T>.Type, binding.AutowiringStrategy, statements)));
         }
 
         /// <summary>
-        /// Creates manual auto-wiring.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <param name="binding">The binding token.</param>
-        /// <param name="factory">The expression to create an instance.</param>
-        /// <param name="autoWiringStrategy">The auto-wiring strategy.</param>
-        /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public static IDisposable To<T>(
-            [NotNull] this IBinding<T> binding,
-            [NotNull] Expression<Func<Context, T>> factory,
-            [NotNull] IAutowiringStrategy autoWiringStrategy,
-            [NotNull][ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-        {
-            if (binding == null) throw new ArgumentNullException(nameof(binding));
-            // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new AutowiringDependency(factory, autoWiringStrategy, statements)));
-        }
-
-        /// <summary>
-        /// Creates manual auto-wiring.
+        /// Aautowires binding.
         /// </summary>
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="binding">The binding token.</param>
@@ -2204,7 +2157,7 @@ namespace IoC
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new AutowiringDependency(factory, null, statements)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new AutowiringDependency(factory, binding.AutowiringStrategy, statements)));
         }
 
         /// <summary>
@@ -3006,6 +2959,11 @@ namespace IoC
         /// The specified lifetime instance or null.
         /// </summary>
         [CanBeNull] ILifetime Lifetime { get; }
+
+        /// <summary>
+        /// The specified autowiring strategy or null.
+        /// </summary>
+        [CanBeNull] IAutowiringStrategy AutowiringStrategy { get; }
     }
 }
 
@@ -5079,6 +5037,7 @@ namespace IoC.Core
             Types = types ?? throw new ArgumentNullException(nameof(types));
             Lifetime = null;
             Tags = Enumerable.Empty<object>();
+            AutowiringStrategy = null;
         }
 
         public Binding([NotNull] IBinding<T> binding, Lifetime lifetime)
@@ -5088,6 +5047,7 @@ namespace IoC.Core
             Types = binding.Types;
             Tags = binding.Tags;
             Lifetime = lifetime != IoC.Lifetime.Transient ? binding.Container.Resolve<ILifetime>(lifetime.AsTag(), binding.Container) : null;
+            AutowiringStrategy = binding.AutowiringStrategy;
         }
 
         public Binding([NotNull] IBinding<T> binding, [NotNull] ILifetime lifetime)
@@ -5097,6 +5057,7 @@ namespace IoC.Core
             Types = binding.Types;
             Lifetime = lifetime ?? throw new ArgumentNullException(nameof(lifetime));
             Tags = binding.Tags;
+            AutowiringStrategy = binding.AutowiringStrategy;
         }
 
         public Binding([NotNull] IBinding<T> binding, [CanBeNull] object tagValue)
@@ -5106,6 +5067,17 @@ namespace IoC.Core
             Types = binding.Types;
             Lifetime = binding.Lifetime;
             Tags = binding.Tags.Concat(Enumerable.Repeat(tagValue, 1));
+            AutowiringStrategy = binding.AutowiringStrategy;
+        }
+
+        public Binding([NotNull] IBinding<T> binding, [NotNull] IAutowiringStrategy autowiringStrategy)
+        {
+            if (binding == null) throw new ArgumentNullException(nameof(binding));
+            Container = binding.Container;
+            Types = binding.Types;
+            Lifetime = binding.Lifetime;
+            Tags = binding.Tags;
+            AutowiringStrategy = autowiringStrategy;
         }
 
         public IContainer Container { get; }
@@ -5115,6 +5087,8 @@ namespace IoC.Core
         public IEnumerable<object> Tags { get; }
 
         public ILifetime Lifetime { get; }
+
+        public IAutowiringStrategy AutowiringStrategy { get; }
     }
 }
 
