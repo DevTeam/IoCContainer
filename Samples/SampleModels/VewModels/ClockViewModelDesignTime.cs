@@ -1,10 +1,10 @@
-﻿namespace UwpApp.VewModels
+﻿namespace SampleModels.VewModels
 {
     /// <summary>
     /// Design time view model.
     /// </summary>
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class ClockViewModelDesignTime: IClockViewModel
+    internal class ClockViewModelDesignTime: IClockViewModel
     {
         public string Time { get; } = "00:00:00";
 

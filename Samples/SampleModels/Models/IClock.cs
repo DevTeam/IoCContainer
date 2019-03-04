@@ -1,4 +1,4 @@
-﻿namespace UwpApp.Models
+﻿namespace SampleModels.Models
 {
     using System;
 

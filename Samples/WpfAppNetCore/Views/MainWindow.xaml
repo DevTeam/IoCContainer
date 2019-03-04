@@ -1,7 +1,7 @@
-﻿<Window x:Class="WpfApp.Views.MainWindow" x:ClassModifier="internal"
+﻿<Window x:Class="WpfAppNetCore.Views.MainWindow" x:ClassModifier="internal"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:WpfApp"
+        xmlns:local="clr-namespace:WpfAppNetCore"
         xmlns:vewModels="clr-namespace:SampleModels.VewModels;assembly=SampleModels">
     <Window.Resources>
         <local:DataProvider x:Key="ClockViewModel" ObjectType="{x:Type vewModels:IClockViewModel}" />

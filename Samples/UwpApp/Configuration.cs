@@ -3,8 +3,9 @@
     using System;
     using System.Collections.Generic;
     using IoC;
-    using Models;
-    using VewModels;
+    using SampleModels;
+    using SampleModels.Models;
+    using SampleModels.VewModels;
     using Views;
 
     /// <summary>
@@ -14,15 +15,9 @@
     {
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
-            // Views
-            yield return container.Bind<MainPage>().As(Lifetime.Singleton).To<MainPage>();
-
-            // View Models
-            yield return container.Bind<IClockViewModel>().As(Lifetime.Singleton).To<ClockViewModel>();
-
-            // Models
-            yield return container.Bind<ITimer>().As(Lifetime.Singleton).To(ctx => new Timer(TimeSpan.FromSeconds(1)));
-            yield return container.Bind<IClock>().As(Lifetime.Singleton).To<Clock>();
+            yield return container.Apply(Clock.Shared);
+            yield return container.Bind<IUIDispatcher>().To<UIDispatcher>();
+            yield return container.Bind<MainPage>().As(Lifetime.Singleton).To<MainPage>();           
         }
     }
 }

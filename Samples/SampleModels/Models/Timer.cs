@@ -1,4 +1,4 @@
-﻿namespace WpfApp.Models
+﻿namespace SampleModels.Models
 {
     using System;
     using System.Collections.Generic;
@@ -18,7 +18,13 @@
 
         public void Dispose() => _timer.Dispose();
 
-        private void Tick(object state) => _observers.ForEach(i => i.OnNext(Models.Tick.Shared));
+        private void Tick(object state)
+        {
+            foreach (var observer in _observers)
+            {
+                observer.OnNext(Models.Tick.Shared);
+            }            
+        }
 
         private class Token: IDisposable
         {

@@ -1,4 +1,4 @@
-﻿namespace WpfApp.Models
+﻿namespace SampleModels.Models
 {
     using System;
 

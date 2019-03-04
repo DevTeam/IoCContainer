@@ -54,17 +54,12 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Models\Clock.cs" />
-    <Compile Include="VewModels\ClockViewModelDesignTime.cs" />
-    <Compile Include="ConfigurationDesignTime.cs" />
     <Compile Include="DataProvider.cs" />
+    <Compile Include="UIDispatcher.cs" />
     <Compile Include="Views\IMainWindowView.cs" />
-    <Compile Include="VewModels\ViewModel.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\Tick.cs" />
-    <Compile Include="Models\Timer.cs" />
     <Page Include="Views\MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -73,11 +68,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="VewModels\ClockViewModel.cs" />
     <Compile Include="Configuration.cs" />
-    <Compile Include="Models\IClock.cs" />
-    <Compile Include="VewModels\IClockViewModel.cs" />
-    <Compile Include="Models\ITimer.cs" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs">
@@ -110,6 +101,10 @@
     <ProjectReference Include="..\..\IoC\IoC.csproj">
       <Project>{c7a8334e-c162-429f-9445-809060e39748}</Project>
       <Name>IoC</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SampleModels\SampleModels.csproj">
+      <Project>{13cf9611-a4d7-47be-b2a9-58cc1061b4b5}</Project>
+      <Name>SampleModels</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

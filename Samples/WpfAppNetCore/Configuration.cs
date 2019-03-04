@@ -1,11 +1,9 @@
-﻿namespace WpfApp
+﻿namespace WpfAppNetCore
 {
     using System;
     using System.Collections.Generic;
     using IoC;
     using SampleModels;
-    using SampleModels.Models;
-    using SampleModels.VewModels;
     using Views;
 
     /// <summary>

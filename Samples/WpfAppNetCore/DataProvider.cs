@@ -1,4 +1,4 @@
-﻿namespace WpfApp
+﻿namespace WpfAppNetCore
 {
     using System;
     using System.Diagnostics.CodeAnalysis;

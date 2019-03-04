@@ -1,6 +1,6 @@
-﻿namespace UwpApp.VewModels
+﻿namespace SampleModels.VewModels
 {
-    internal interface IClockViewModel
+    public interface IClockViewModel
     {
         string Time { get; }
 

@@ -96,21 +96,12 @@
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
     <Compile Include="Configuration.cs" />
-    <Compile Include="ConfigurationDesignTime.cs" />
     <Compile Include="DataProvider.cs" />
+    <Compile Include="UIDispatcher.cs" />
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Models\Clock.cs" />
-    <Compile Include="Models\IClock.cs" />
-    <Compile Include="Models\ITimer.cs" />
-    <Compile Include="Models\Tick.cs" />
-    <Compile Include="Models\Timer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="VewModels\ClockViewModel.cs" />
-    <Compile Include="VewModels\ClockViewModelDesignTime.cs" />
-    <Compile Include="VewModels\IClockViewModel.cs" />
-    <Compile Include="VewModels\ViewModel.cs" />
   </ItemGroup>
   <ItemGroup>
     <AppxManifest Include="Package.appxmanifest">
@@ -146,6 +137,12 @@
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.1.9</Version>
     </PackageReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SampleModels\SampleModels.csproj">
+      <Project>{13cf9611-a4d7-47be-b2a9-58cc1061b4b5}</Project>
+      <Name>SampleModels</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
     <VisualStudioVersion>14.0</VisualStudioVersion>

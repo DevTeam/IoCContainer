@@ -1,4 +1,4 @@
-﻿namespace WpfApp.VewModels
+﻿namespace SampleModels.VewModels
 {
     using System;
     using Models;
@@ -8,7 +8,8 @@
         private readonly IClock _clock;
         private readonly IDisposable _timerToken;
 
-        public ClockViewModel(IClock clock, ITimer timer)
+        public ClockViewModel(IUIDispatcher uiDispatcher, IClock clock, ITimer timer)
+            :base(uiDispatcher)
         {
             if (timer == null) throw new ArgumentNullException(nameof(timer));
             _clock = clock ?? throw new ArgumentNullException(nameof(clock));

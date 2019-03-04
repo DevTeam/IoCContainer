@@ -1,4 +1,4 @@
-﻿namespace UwpApp
+﻿namespace SampleModels
 {
     using System;
     using System.Collections.Generic;
@@ -8,8 +8,12 @@
     /// <summary>
     /// Design time IoC configuration.
     /// </summary>
-    internal class ConfigurationDesignTime: IConfiguration
+    public class ClockDesignTime: IConfiguration
     {
+        public static readonly IConfiguration Shared = new ClockDesignTime();
+
+        private ClockDesignTime() { }
+
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             // Design time View Models

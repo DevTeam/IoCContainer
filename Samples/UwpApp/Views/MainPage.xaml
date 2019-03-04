@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:uwpApp="using:UwpApp">
     <Page.Resources>
-        <uwpApp:DataProvider x:Key="ClockViewModel" ObjectType="IClockViewModel"/>
+        <uwpApp:DataProvider x:Key="ClockViewModel" ObjectType="SampleModels.VewModels.IClockViewModel, SampleModels"/>
     </Page.Resources>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" DataContext="{StaticResource ClockViewModel}">
