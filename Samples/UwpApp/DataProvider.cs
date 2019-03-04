@@ -9,7 +9,7 @@
     {
         // Design Time Container
         private static readonly Lazy<IContainer> ContainerDesignTime 
-            = new Lazy<IContainer>(() => Container.Create().Using(ClockDesignTime.Shared));
+            = new Lazy<IContainer>(() => Container.Create().Using(ClockDesignTimeConfiguration.Shared));
 
         private Type _type;
 

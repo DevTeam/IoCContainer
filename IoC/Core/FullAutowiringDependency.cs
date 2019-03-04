@@ -6,9 +6,8 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Runtime.CompilerServices;
 
-    internal class FullAutoWiringDependency: IDependency
+    internal class FullAutowiringDependency: IDependency
     {
         private static readonly Type[] GenericTypeArguments =
         {
@@ -30,19 +29,27 @@
             TypeDescriptor<TT15>.Type
         };
 
-        private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private readonly Type _type;
         [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;
         private readonly bool _hasGenericParamsWithConstraints;
         private readonly Dictionary<int, TypeDescriptor> _genericParamsWithConstraints = new Dictionary<int, TypeDescriptor>();
         private readonly Type[] _registeredGenericTypeParameters;
         private readonly TypeDescriptor _registeredTypeDescriptor;
+        [NotNull] [ItemNotNull] private readonly Expression[] _statements;
+        private readonly bool _isComplexType;
 
-        public FullAutoWiringDependency([NotNull] Type type, [CanBeNull] IAutowiringStrategy autoWiringStrategy = null)
+        public FullAutowiringDependency(
+            [NotNull] Type type,
+            [CanBeNull] IAutowiringStrategy autoWiringStrategy = null,
+            [NotNull][ItemNotNull] params LambdaExpression[] statements)
         {
+            if (statements == null) throw new ArgumentNullException(nameof(statements));
             _type = type ?? throw new ArgumentNullException(nameof(type));
             _autoWiringStrategy = autoWiringStrategy;
+            _statements = statements.Select(i => i.Body).ToArray();
             _registeredTypeDescriptor = type.Descriptor();
+            _isComplexType = Autowiring.IsComplexType(_registeredTypeDescriptor);
+
             if (_registeredTypeDescriptor.IsInterface())
             {
                 throw new ArgumentException($"Type \"{type}\" should not be an interface.", nameof(type));
@@ -139,7 +146,7 @@
                     }
                 }
 
-                var defaultConstructors = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredConstructors());
+                var defaultConstructors = Autowiring.GetMethods(typeDescriptor.GetDeclaredConstructors());
                 if (!autoWiringStrategy.TryResolveConstructor(defaultConstructors, out var ctor))
                 {
                     if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
@@ -148,36 +155,14 @@
                     }
                 }
 
-                var defaultMethods = CreateMethods(buildContext.Container, typeDescriptor.GetDeclaredMethods());
-                if (!autoWiringStrategy.TryResolveInitializers(defaultMethods, out var initializers))
-                {
-                    if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
-                    {
-                        initializers = Enumerable.Empty<IMethod<MethodInfo>>();
-                    }
-                }
+                baseExpression = Autowiring.ApplyInitializers(
+                    buildContext,
+                    autoWiringStrategy,
+                    typeDescriptor,
+                    _isComplexType,
+                    Expression.New(ctor.Info, ctor.GetParametersExpressions(buildContext)),
+                    _statements);
 
-                baseExpression = Expression.New(ctor.Info, ctor.GetParametersExpressions(buildContext));
-                var curInitializers = initializers.ToArray();
-                if (curInitializers.Length > 0)
-                {
-                    var thisVar = Expression.Variable(baseExpression.Type, "this");
-                    baseExpression = Expression.Block(
-                        new[] {thisVar},
-                        Expression.Assign(thisVar, baseExpression),
-                        Expression.Block(
-                            from initializer in initializers
-                            select Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext))
-                        ),
-                        thisVar
-                    );
-                }
-
-                if (!isDefaultAutoWiringStrategy)
-                {
-                    baseExpression = buildContext.InjectDependencies(baseExpression);
-                }
-                
                 baseExpression = buildContext.AddLifetime(baseExpression, lifetime);
                 error = default(Exception);
                 return true;
@@ -188,7 +173,7 @@
                 baseExpression = default(Expression);
                 return false;
             }
-        }
+        }        
 
         [CanBeNull]
         internal Type GetInstanceTypeBasedOnTargetGenericConstrains(Type targetType)
@@ -231,14 +216,6 @@
             }
 
             return canBeResolved ? _registeredTypeDescriptor.MakeGenericType(registeredGenericTypeParameters) : null;
-        }
-
-        [NotNull]
-        [MethodImpl((MethodImplOptions) 256)]
-        private static IEnumerable<IMethod<TMethodInfo>> CreateMethods<TMethodInfo>(IContainer container, [NotNull] IEnumerable<TMethodInfo> methodInfos)
-            where TMethodInfo: MethodBase
-            => methodInfos
-                .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
-                .Select(info => new Method<TMethodInfo>(info));
+        }        
     }
 }

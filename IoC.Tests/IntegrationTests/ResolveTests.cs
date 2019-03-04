@@ -322,11 +322,29 @@
                 var expectedInstance = Mock.Of<IMyGenericService<int, string>>();
 
                 // When
-                using (container.Bind(typeof(IMyGenericService<,>)).As(Lifetime.Transient).To(ctx => expectedInstance))
+                using (container.Bind<IMyGenericService<TT1, TT2>>().As(Lifetime.Transient).To(ctx => new MyGenericService<TT1, TT2>(), ctx => ctx.It.Do(), ctx => ctx.It.Do()))
                 {
                     // Then
                     var actualInstance = container.Resolve<IMyGenericService<int, string>>();
-                    actualInstance.ShouldBe(expectedInstance);
+                    actualInstance.ShouldBeOfType<MyGenericService<int, string>>();
+                    ((MyGenericService<int, string>)actualInstance).Counter.ShouldBe(2);
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldFullAutoWiringResolveWhenGenericAndHasStatements()
+        {
+            // Given
+            using (var container = Container.Create())
+            {
+                // When
+                using (container.Bind<IMyGenericService<TT1, TT2>>().As(Lifetime.Transient).To<MyGenericService<TT1, TT2>>(ctx => ctx.It.Do(), ctx => ctx.It.Do()))
+                {
+                    // Then
+                    var actualInstance = container.Resolve<IMyGenericService<int, string>>();
+                    actualInstance.ShouldBeOfType<MyGenericService<int, string>>();
+                    ((MyGenericService<int, string>)actualInstance).Counter.ShouldBe(2);
                 }
             }
         }
@@ -611,7 +629,7 @@
         }
 #endif
 
-#if NETCOREAPP2_1
+#if NETCOREAPP2_1 || NETCOREAPP3_0
         [Fact]
         public void ContainerShouldResolveGenericWhenValueTuple()
         {

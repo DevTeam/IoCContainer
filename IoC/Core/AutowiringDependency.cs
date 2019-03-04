@@ -5,54 +5,55 @@
     using System.Linq;
     using System.Linq.Expressions;
 
-    internal class AutoWiringDependency: IDependency
+    internal class AutowiringDependency: IDependency
     {
         private readonly Expression _expression;
+        [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;
         [NotNull] [ItemNotNull] private readonly Expression[] _statements;
         private readonly bool _isComplexType;
 
         [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
         [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
-        public AutoWiringDependency([NotNull] LambdaExpression constructor, [NotNull][ItemNotNull] params LambdaExpression[] statements)
+        public AutowiringDependency(
+            [NotNull] LambdaExpression constructor,
+            [CanBeNull] IAutowiringStrategy autoWiringStrategy = null,
+            [NotNull][ItemNotNull] params LambdaExpression[] statements)
             :this(
                 constructor?.Body ?? throw new ArgumentNullException(nameof(constructor)),
+                autoWiringStrategy,
                 statements?.Select(i => i.Body)?.ToArray() ?? throw new ArgumentNullException(nameof(statements)))
         {
         }
 
-        public AutoWiringDependency([NotNull] Expression constructorExpression, [NotNull][ItemNotNull] params Expression[] statementExpressions)
+        public AutowiringDependency(
+            [NotNull] Expression constructorExpression,
+            [CanBeNull] IAutowiringStrategy autoWiringStrategy = null,
+            [NotNull][ItemNotNull] params Expression[] statementExpressions)
         {
             _expression = constructorExpression ?? throw new ArgumentNullException(nameof(constructorExpression));
-            _isComplexType = IsComplexType(_expression.Type);
+            _autoWiringStrategy = autoWiringStrategy;
+            _isComplexType = Autowiring.IsComplexType(_expression.Type.Descriptor());
             _statements = (statementExpressions ?? throw new ArgumentNullException(nameof(statementExpressions))).ToArray();
         }
 
         public Expression Expression { get; }
 
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             try
             {
-                baseExpression = _expression;
-                if (_statements.Length > 0)
-                {
-                    var thisVar = Expression.Variable(baseExpression.Type, "this");
-                    baseExpression = Expression.Block(
-                        new[] {thisVar},
-                        Expression.Assign(thisVar, baseExpression),
-                        Expression.Block(_statements),
-                        thisVar
-                    );
+                baseExpression = Autowiring.ReplaceTypes(buildContext, _isComplexType, _expression);
+                baseExpression = Autowiring.ApplyInitializers(
+                    buildContext,
+                    _autoWiringStrategy ?? buildContext.AutowiringStrategy,
+                    baseExpression.Type.Descriptor(),
+                    _isComplexType,
+                    baseExpression,
+                    _statements);
 
-                    if (_isComplexType)
-                    {
-                        baseExpression = buildContext.ReplaceTypes(baseExpression);
-                    }
-
-                    baseExpression = buildContext.InjectDependencies(baseExpression, thisVar);
-                }
-                else
+                if (_statements.Length == 0)                
                 {
                     if (_isComplexType)
                     {
@@ -72,12 +73,6 @@
                 baseExpression = default(Expression);
                 return false;
             }
-        }
-
-        private bool IsComplexType(Type type)
-        {
-            var typeDescriptor = type.Descriptor();
-            return typeDescriptor.IsConstructedGenericType() || typeDescriptor.IsGenericTypeDefinition() || typeDescriptor.IsArray();
-        }
+        }        
     }
 }

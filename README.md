@@ -307,6 +307,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Resolve all appropriate instances as ISet](#resolve-all-appropriate-instances-as-iset-)
 - Flexible Binding
   - [Auto-wiring](#auto-wiring-)
+  - [Auto-wiring with initialization](#auto-wiring-with-initialization-)
   - [Generic Auto-wiring](#generic-auto-wiring-)
   - [Constant](#constant-)
   - [Generics](#generics-)
@@ -357,6 +358,24 @@ using (container.Bind<IService>().To<Service>())
 {
     // Resolve an instance of interface `IService`
     var instance = container.Resolve<IService>();
+}
+```
+
+
+
+### Auto-wiring with initialization [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoWiringWithInitialization.cs)
+
+Auto-writing allows to perform some initializations.
+
+``` CSharp
+// Create the container and configure it, using full auto-wiring
+using (var container = Container.Create())
+// Bind some dependency
+using (container.Bind<IDependency>().To<Dependency>())
+using (container.Bind<INamedService>().To<InitializingNamedService>(ctx => ctx.It.Initialize("text", ctx.Container.Resolve<IDependency>())))
+{
+    // Resolve an instance of interface `IService`
+    var instance = container.Resolve<INamedService>();
 }
 ```
 

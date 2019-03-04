@@ -8,11 +8,11 @@
     /// <summary>
     /// Design time IoC configuration.
     /// </summary>
-    public class ClockDesignTime: IConfiguration
+    public class ClockDesignTimeConfiguration: IConfiguration
     {
-        public static readonly IConfiguration Shared = new ClockDesignTime();
+        public static readonly IConfiguration Shared = new ClockDesignTimeConfiguration();
 
-        private ClockDesignTime() { }
+        private ClockDesignTimeConfiguration() { }
 
         public IEnumerable<IDisposable> Apply(IContainer container)
         {

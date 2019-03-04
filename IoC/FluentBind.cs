@@ -242,14 +242,39 @@
         /// </summary>
         /// <param name="binding">The binding token.</param>
         /// <param name="type">The instance type.</param>
-        /// <param name="autoWiringStrategy">The optional auto-wiring strategy.</param>
+        /// <param name="autoWiringStrategy">The auto-wiring strategy.</param>
+        /// <param name="statements">The set of expressions to initialize an instance.</param>
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable To([NotNull] this IBinding<object> binding, [NotNull] Type type, [CanBeNull] IAutowiringStrategy autoWiringStrategy = null)
+        public static IDisposable To(
+            [NotNull] this IBinding<object> binding,
+            [NotNull] Type type,
+            [NotNull] IAutowiringStrategy autoWiringStrategy,
+            [NotNull][ItemNotNull] params Expression<Action<Context<object>>>[] statements)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutoWiringDependency(type, autoWiringStrategy)));
+            // ReSharper disable once CoVariantArrayConversion
+            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(type, autoWiringStrategy, statements)));
+        }
+
+        /// <summary>
+        /// Creates full auto-wiring.
+        /// </summary>
+        /// <param name="binding">The binding token.</param>
+        /// <param name="type">The instance type.</param>
+        /// <param name="statements">The set of expressions to initialize an instance.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IDisposable To(
+            [NotNull] this IBinding<object> binding,
+            [NotNull] Type type,
+            [NotNull][ItemNotNull] params Expression<Action<Context<object>>>[] statements)
+        {
+            if (binding == null) throw new ArgumentNullException(nameof(binding));
+            // ReSharper disable once CoVariantArrayConversion
+            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(type, null, statements)));
         }
 
         /// <summary>
@@ -257,14 +282,59 @@
         /// </summary>
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="binding">The binding token.</param>
-        /// <param name="autoWiringStrategy">The optional auto-wiring strategy.</param>
+        /// <param name="autoWiringStrategy">The auto-wiring strategy.</param>
+        /// <param name="statements">The set of expressions to initialize an instance.</param>
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable To<T>([NotNull] this IBinding<T> binding, [CanBeNull] IAutowiringStrategy autoWiringStrategy = null)
+        public static IDisposable To<T>(
+            [NotNull] this IBinding<T> binding,
+            [NotNull] IAutowiringStrategy autoWiringStrategy,
+            [NotNull][ItemNotNull] params Expression<Action<Context<T>>>[] statements)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutoWiringDependency(TypeDescriptor<T>.Type, autoWiringStrategy)));
+            // ReSharper disable once CoVariantArrayConversion
+            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(TypeDescriptor<T>.Type, autoWiringStrategy, statements)));
+        }
+
+        /// <summary>
+        /// Creates full auto-wiring.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <param name="binding">The binding token.</param>
+        /// <param name="statements">The set of expressions to initialize an instance.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IDisposable To<T>(
+            [NotNull] this IBinding<T> binding,
+            [NotNull][ItemNotNull] params Expression<Action<Context<T>>>[] statements)
+        {
+            if (binding == null) throw new ArgumentNullException(nameof(binding));
+            // ReSharper disable once CoVariantArrayConversion
+            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(TypeDescriptor<T>.Type, null, statements)));
+        }
+
+        /// <summary>
+        /// Creates manual auto-wiring.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <param name="binding">The binding token.</param>
+        /// <param name="factory">The expression to create an instance.</param>
+        /// <param name="autoWiringStrategy">The auto-wiring strategy.</param>
+        /// <param name="statements">The set of expressions to initialize an instance.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IDisposable To<T>(
+            [NotNull] this IBinding<T> binding,
+            [NotNull] Expression<Func<Context, T>> factory,
+            [NotNull] IAutowiringStrategy autoWiringStrategy,
+            [NotNull][ItemNotNull] params Expression<Action<Context<T>>>[] statements)
+        {
+            if (binding == null) throw new ArgumentNullException(nameof(binding));
+            // ReSharper disable once CoVariantArrayConversion
+            return new DependencyToken(binding.Container, CreateDependency(binding, new AutowiringDependency(factory, autoWiringStrategy, statements)));
         }
 
         /// <summary>
@@ -284,7 +354,7 @@
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new AutoWiringDependency(factory, statements)));
+            return new DependencyToken(binding.Container, CreateDependency(binding, new AutowiringDependency(factory, null, statements)));
         }
 
         /// <summary>

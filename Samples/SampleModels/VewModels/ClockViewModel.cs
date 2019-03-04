@@ -3,12 +3,16 @@
     using System;
     using Models;
 
+    // ReSharper disable once ClassNeverInstantiated.Global
     internal class ClockViewModel : ViewModel, IClockViewModel, IDisposable, IObserver<Tick>
     {
         private readonly IClock _clock;
         private readonly IDisposable _timerToken;
 
-        public ClockViewModel(IUIDispatcher uiDispatcher, IClock clock, ITimer timer)
+        public ClockViewModel(
+            IUIDispatcher uiDispatcher,
+            IClock clock,
+            ITimer timer)
             :base(uiDispatcher)
         {
             if (timer == null) throw new ArgumentNullException(nameof(timer));

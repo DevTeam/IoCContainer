@@ -77,6 +77,8 @@ namespace IoC.Tests.IntegrationTests
     [SuppressMessage("ReSharper", "UnusedParameter.Local")]
     public class MyGenericService<T1, T2> : IMyGenericService<T1, T2>
     {
+        private int _counter;
+
         public MyGenericService()
         {
         }
@@ -89,8 +91,11 @@ namespace IoC.Tests.IntegrationTests
 
         public MySimpleClass MySimpleClass { get; private set; }
 
+        public int Counter => _counter;
+
         public void Do()
         {
+            _counter++;
         }
     }
 

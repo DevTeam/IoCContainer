@@ -4,9 +4,9 @@
     using System.Collections.Generic;
     using IoC;
     using SampleModels;
-    using SampleModels.Models;
     using SampleModels.VewModels;
     using Views;
+    using static IoC.Lifetime;
 
     /// <summary>
     /// IoC Configuration.
@@ -15,9 +15,9 @@
     {
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
-            yield return container.Apply(Clock.Shared);
-            yield return container.Bind<IUIDispatcher>().To<UIDispatcher>();
-            yield return container.Bind<MainPage>().As(Lifetime.Singleton).To<MainPage>();           
+            yield return container.Apply(ClockConfiguration.Shared);
+            yield return container.Bind<IUIDispatcher>().As(Singleton).To<UIDispatcher>();
+            yield return container.Bind<MainPage>().As(Singleton).To<MainPage>();           
         }
     }
 }
