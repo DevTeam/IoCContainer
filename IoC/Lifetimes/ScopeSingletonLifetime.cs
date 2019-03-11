@@ -23,13 +23,13 @@
         {
             if (newInstance is IDisposable disposable)
             {
-                scope.AddResource(disposable);
+                scope.RegisterResource(disposable);
             }
 
 #if NETCOREAPP3_0
             if (newInstance is IAsyncDisposable asyncDisposable)
             {
-                scope.AddResource(asyncDisposable.ToDisposable());
+                scope.RegisterResource(asyncDisposable.ToDisposable());
             }
 #endif
 
@@ -41,9 +41,18 @@
         {
             if (releasedInstance is IDisposable disposable)
             {
-                scope.RemoveResource(disposable);
+                scope.UnregisterResource(disposable);
                 disposable.Dispose();
             }
+
+#if NETCOREAPP3_0
+            if (releasedInstance is IAsyncDisposable asyncDisposable)
+            {
+                disposable = asyncDisposable.ToDisposable();
+                scope.UnregisterResource(disposable);
+                disposable.Dispose();
+            }
+#endif
         }
     }
 }

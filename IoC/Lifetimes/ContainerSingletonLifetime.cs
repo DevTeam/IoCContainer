@@ -44,6 +44,15 @@
                 targetContainer.UnregisterResource(disposable);
                 disposable.Dispose();
             }
+
+#if NETCOREAPP3_0
+            if (releasedInstance is IAsyncDisposable asyncDisposable)
+            {
+                disposable = asyncDisposable.ToDisposable();
+                targetContainer.UnregisterResource(disposable);
+                disposable.Dispose();
+            }
+#endif
         }
     }
 }

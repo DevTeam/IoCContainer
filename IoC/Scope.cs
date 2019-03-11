@@ -47,6 +47,8 @@
             {
                 resource.Dispose();
             }
+
+            _resources.Clear();
         }
 
         /// <inheritdoc />
@@ -61,9 +63,11 @@
         /// <inheritdoc />
         public override int GetHashCode() => ScopeKey.GetHashCode();
 
-        internal void AddResource(IDisposable resource) => _resources.Add(resource);
+        internal int ResourceCount => _resources.Count;
 
-        internal void RemoveResource(IDisposable resource) => _resources.Remove(resource);
+        internal void RegisterResource(IDisposable resource) => _resources.Add(resource);
+
+        internal void UnregisterResource(IDisposable resource) => _resources.Remove(resource);
 
         private class DefaultScopeKey
         {

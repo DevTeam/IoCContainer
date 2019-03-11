@@ -95,18 +95,50 @@
             using (var container = Container.Create())
             using (container.Bind<IMyDisposableService>().As(Lifetime.ScopeSingleton).To(ctx => mock.Object))
             {
-                // When
-                using (var scope = new Scope(99))
+                var scope = new Scope(99);
                 using (scope.Begin())
                 {
                     var instance = container.Resolve<IMyDisposableService>();
                 }
 
+                // When                
+                scope.Dispose();
+
                 // Then
+                scope.ResourceCount.ShouldBe(0);
+
                 mock.Verify(i => i.Dispose(), Times.Once);
 #if NETCOREAPP3_0
                 mock.Verify(i => i.DisposeAsync(), Times.Once);
-#endif
+#endif                
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldDisposeWhenSubscriptionDisposed()
+        {
+            // Given
+            var mock = new Mock<IMyDisposableService>();
+            using (var container = Container.Create())                
+            {
+                var subscriptionToken = container.Bind<IMyDisposableService>().As(Lifetime.ScopeSingleton).To(ctx => mock.Object);
+                var scope = new Scope(99);
+                using (scope.Begin())
+                {
+                    var instance = container.Resolve<IMyDisposableService>();
+                }
+
+                // When
+                subscriptionToken.Dispose();
+
+                // Then
+                scope.ResourceCount.ShouldBe(0);
+
+                mock.Verify(i => i.Dispose(), Times.Once);
+#if NETCOREAPP3_0
+                mock.Verify(i => i.DisposeAsync(), Times.Once);
+#endif                
+                scope.Dispose();
             }
         }
 

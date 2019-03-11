@@ -3675,6 +3675,8 @@ namespace IoC
             {
                 resource.Dispose();
             }
+
+            _resources.Clear();
         }
 
         /// <inheritdoc />
@@ -3689,9 +3691,11 @@ namespace IoC
         /// <inheritdoc />
         public override int GetHashCode() => ScopeKey.GetHashCode();
 
-        internal void AddResource(IDisposable resource) => _resources.Add(resource);
+        internal int ResourceCount => _resources.Count;
 
-        internal void RemoveResource(IDisposable resource) => _resources.Remove(resource);
+        internal void RegisterResource(IDisposable resource) => _resources.Add(resource);
+
+        internal void UnregisterResource(IDisposable resource) => _resources.Remove(resource);
 
         private class DefaultScopeKey
         {
@@ -4560,6 +4564,15 @@ namespace IoC.Lifetimes
                 targetContainer.UnregisterResource(disposable);
                 disposable.Dispose();
             }
+
+#if NETCOREAPP3_0
+            if (releasedInstance is IAsyncDisposable asyncDisposable)
+            {
+                disposable = asyncDisposable.ToDisposable();
+                targetContainer.UnregisterResource(disposable);
+                disposable.Dispose();
+            }
+#endif
         }
     }
 }
@@ -4733,13 +4746,13 @@ namespace IoC.Lifetimes
         {
             if (newInstance is IDisposable disposable)
             {
-                scope.AddResource(disposable);
+                scope.RegisterResource(disposable);
             }
 
 #if NETCOREAPP3_0
             if (newInstance is IAsyncDisposable asyncDisposable)
             {
-                scope.AddResource(asyncDisposable.ToDisposable());
+                scope.RegisterResource(asyncDisposable.ToDisposable());
             }
 #endif
 
@@ -4751,9 +4764,18 @@ namespace IoC.Lifetimes
         {
             if (releasedInstance is IDisposable disposable)
             {
-                scope.RemoveResource(disposable);
+                scope.UnregisterResource(disposable);
                 disposable.Dispose();
             }
+
+#if NETCOREAPP3_0
+            if (releasedInstance is IAsyncDisposable asyncDisposable)
+            {
+                disposable = asyncDisposable.ToDisposable();
+                scope.UnregisterResource(disposable);
+                disposable.Dispose();
+            }
+#endif
         }
     }
 }
@@ -5982,38 +6004,35 @@ namespace IoC.Core
 #if DEBUG
             if (asyncDisposable == null) throw new ArgumentNullException(nameof(asyncDisposable));
 #endif
-            return Create(() => { asyncDisposable.DisposeAsync().AsTask().Wait(); });
+            return new DisposableAction(() => { asyncDisposable.DisposeAsync().AsTask().Wait(); }, asyncDisposable);            
         }
 #endif
         private sealed class DisposableAction : IDisposable
         {
             [NotNull] private readonly Action _action;
-            private volatile object _lockObject = new object();
-
-            public DisposableAction([NotNull] Action action)
+            [CanBeNull] private readonly object _key;
+            
+            public DisposableAction([NotNull] Action action, [CanBeNull] object key = null)
             {
                 _action = action;
+                _key = key ?? action;
             }
 
             public void Dispose()
             {
-                var lockObject = _lockObject;
-                if (lockObject == null)
-                {
-                    return;
-                }
-                
-                lock (lockObject)
-                {
-                    if (_lockObject == null)
-                    {
-                        return;
-                    }
-
-                    _lockObject = null;
-                }
-
                 _action();
+            }
+
+            public override bool Equals(object obj)
+            {
+                if (ReferenceEquals(null, obj)) return false;
+                if (ReferenceEquals(this, obj)) return true;
+                return obj is DisposableAction other && Equals(_key, other._key);
+            }
+
+            public override int GetHashCode()
+            {
+                return _key != null ? _key.GetHashCode() : 0;
             }
         }
 

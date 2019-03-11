@@ -137,17 +137,40 @@
             using (var container = Container.Create())
             using (container.Bind<IMyDisposableService>().As(Lifetime.ContainerSingleton).To(ctx => mock.Object))
             {
+                var childContainer = (Container)container.CreateChild();
+                var instance = childContainer.Resolve<IMyDisposableService>();
+
                 // When
-                using (var childContainer = container.CreateChild())
-                {
-                    var instance = childContainer.Resolve<IMyDisposableService>();
-                }
+                childContainer.Dispose();
 
                 // Then
                 mock.Verify(i => i.Dispose(), Times.Once);
 #if NETCOREAPP3_0
                 mock.Verify(i => i.DisposeAsync(), Times.Once);
 #endif
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldDisposeWhenWhenSubscriptionDisposed()
+        {
+            // Given
+            var mock = new Mock<IMyDisposableService>();
+            using (var container = Container.Create())
+            {
+                var subscriptionToken = container.Bind<IMyDisposableService>().As(Lifetime.ContainerSingleton).To(ctx => mock.Object);
+                var childContainer = (Container)container.CreateChild();
+                var instance = childContainer.Resolve<IMyDisposableService>();
+
+                // When
+                subscriptionToken.Dispose();
+
+                // Then
+                mock.Verify(i => i.Dispose(), Times.Once);
+#if NETCOREAPP3_0
+                mock.Verify(i => i.DisposeAsync(), Times.Once);
+#endif
+                childContainer.Dispose();
             }
         }
 
