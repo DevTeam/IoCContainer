@@ -21,7 +21,7 @@
             // Mark binding by tag "MyDep"
             // Bind some dependency
             using (container.Bind<IDependency>().Tag("MyDep").To<Dependency>())
-            // Configure auto-wiring and inject dependency tagged by "MyDep"
+            // Configure autowiring and inject dependency tagged by "MyDep"
             using (container.Bind<IService>().To<Service>(
                 ctx => new Service(ctx.Container.Inject<IDependency>("MyDep"))))
             {

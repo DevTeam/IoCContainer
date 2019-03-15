@@ -5,7 +5,6 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
 
     internal class FullAutowiringDependency: IDependency
     {

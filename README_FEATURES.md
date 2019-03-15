@@ -1,14 +1,14 @@
 ## IoC.Container provides the following benefits and features
 
-### [Flexible Binding](#binding)
+### [Flexible Bindings](#binding)
 
-  - [Auto-wiring](#auto-wiring-)
-  - [Compile-time verification](#manual-auto-wiring-)
-  - [Generic types bindings](#generics-) with [simple types mapping-](#generic-auto-wiring-)
+  - [Autowiring](#autowiring-)
+  - [Aspect oriented autowiring](#aspect-oriented-autowiring-)
+  - [Generic types bindings](#generics-) and [easy generic types mapping](#generic-autowiring-)
   - [Named/tagged dependencies](#tags-)
   - [Containers hierarchy](#child-container-)
-  - [Bindings via text metadata](#configuration-via-a-text-metadata-)
-  - [Customizable aspect oriented autowiring](#aspect-oriented-auto-wiring-)
+  - [Compile-time verification](#manual-autowiring-)
+  - [Bindings via text metadata](#configuration-via-a-text-metadata-)  
   - Easy extensible set of lifetimes
     - [Singleton](#singleton-lifetime-) with [auto-disposing](#auto-dispose-singleton-during-containers-dispose-)
     - [Singleton per container](#container-singleton-lifetime-)
@@ -18,14 +18,14 @@
     - [Constant](#constant-), [factory](#func-), [factory with arguments](#func-with-arguments-)
   - Supports [validation](#validation)
 
-### [Powerful Injection](#injection)
+### [Powerful dependency injection](#injection)
 
-  - Injection via
-    - [Сonstructors](#constructor-auto-wiring-)
+  - Through
+    - [Сonstructors](#constructor-autowiring-)
 	- [Methods](#method-injection-)
 	- [Properties](#property-injection)
 	- Fields
-  - Injection of
+  - Injection of composed dependencies
     - [Func](#resolve-func-)
 	- [Lazy](#resolve-lazy-)
 	- [ThreadLocal](#resolve-threadlocal-)
@@ -37,13 +37,13 @@
 	- [ICollection](#resolve-all-appropriate-instances-as-icollection-)
 	- [ISet](#resolve-all-appropriate-instances-as-iset-)
 	- [IObservable](#resolve-all-appropriate-instances-as-iobservable-source-)
-  - Detailed errors information
+  - Detailed diagnostics information
 
 ### [Incredible Performance](#why-this-one)
 
   - One of the fastest, almost as fast as operator `new`
   - Uses [expression trees](https://docs.microsoft.com/en-us/dotnet/csharp/expression-trees) to produce the [effective injection code](#struct-) without any superfluous operations like a `boxing`, `unboxing` or `cast`
-  - Minimizes the memory traffic
+  - Minimizes memory traffic
 
 ### [Fully Customizable](#customization)
 
@@ -51,29 +51,30 @@
   - [Custom lifetimes](#custom-lifetime-)
   - [Replacing predefined lifetimes](#replace-lifetime-)
   - [Custom builders](#custom-builder-)
-  - [Interceptors](#interception-)
+  - [Invocations' interceptors](#interception-)
 
-### [Multithreading-Ready](#multithreading)
-
-  - Thread-safe
+### [Asynchronous](#multithreading)
+  
   - [Asynchronous resolving](#asynchronous-resolve-)
   - [Lightweight asynchronous resolving](#asynchronous-lightweight-resolve-)
+  - [Asynchronous enumerations](#resolve-all-appropriate-instances-as-iasyncenumerable-)	
 
 ### [Design Aspects](#design)
 
-  - Allows not to change the design of own code to follow [Inversion of Control](https://martinfowler.com/articles/injection.html) pattern
-  - Aggregates features into dedicated [classes](#configuration-class-)
+  - Allows to preserve an original design of code and to minimize the impact of the [Inversion of Control](https://martinfowler.com/articles/injection.html) approach
+  - Aggregates features into dedicated [configuration classes](#configuration-class-)
   - [Modifiable on-the-fly](#change-configuration-on-the-fly-)
-  - Has no any additional dependencies
-  - [Embedding packages](#nuget-packages)
+  - Free from external dependencies like other frameworks or assemblies
+  - [Embedding packages](#nuget-packages) allow to use all these features without referencing on additional assemblies
 
 ### Easy Integration
 
   - [ASP.NET Core](#aspnet-core)
   - [Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfApp)
+  - [.NET core Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfAppNetCore) 
   - [Universal Windows Platform](https://github.com/DevTeam/IoCContainer/blob/master/Samples/UwpApp)
   - [Windows Communication Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WcfServiceLibrary)
-  - [Entity Framework Core](https://github.com/DevTeam/IoCContainer/tree/master/Samples/EntityFrameworkCore)
+  - [Entity Framework](https://github.com/DevTeam/IoCContainer/tree/master/Samples/EntityFrameworkCore)
 
 ### Supported Platforms
 

@@ -1,24 +1,17 @@
 namespace IoC.Performance.Tests
 {
-    using NUnit.Framework;
+    using Xunit;
 
     public class BindTests
     {
-        private Container _containerComplex;
-        
-        [SetUp]
-        public void SetUp()
+        private readonly Container _containerComplex;
+
+        public BindTests()
         {
             _containerComplex = Container.CreateCore();
-        }
+        }       
 
-        [TearDown]
-        public void TearDown()
-        {
-            _containerComplex.Dispose();
-        }
-
-        [Test]
+        [Fact]
         public void TestBind()
         {          
             foreach (var type in TestTypeBuilder.Default.Types)

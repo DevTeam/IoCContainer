@@ -4,15 +4,15 @@
 
 ## IoC.Container provides the following benefits and features
 
-### [Flexible Binding](#binding)
+### [Flexible Bindings](#binding)
 
-  - [Auto-wiring](#auto-wiring-)
-  - [Compile-time verification](#manual-auto-wiring-)
-  - [Generic types bindings](#generics-) with [simple types mapping-](#generic-auto-wiring-)
+  - [Autowiring](#autowiring-)
+  - [Aspect oriented autowiring](#aspect-oriented-autowiring-)
+  - [Generic types bindings](#generics-) and [easy generic types mapping](#generic-autowiring-)
   - [Named/tagged dependencies](#tags-)
   - [Containers hierarchy](#child-container-)
-  - [Bindings via text metadata](#configuration-via-a-text-metadata-)
-  - [Customizable aspect oriented autowiring](#aspect-oriented-auto-wiring-)
+  - [Compile-time verification](#manual-autowiring-)
+  - [Bindings via text metadata](#configuration-via-a-text-metadata-)  
   - Easy extensible set of lifetimes
     - [Singleton](#singleton-lifetime-) with [auto-disposing](#auto-dispose-singleton-during-containers-dispose-)
     - [Singleton per container](#container-singleton-lifetime-)
@@ -22,14 +22,14 @@
     - [Constant](#constant-), [factory](#func-), [factory with arguments](#func-with-arguments-)
   - Supports [validation](#validation)
 
-### [Powerful Injection](#injection)
+### [Powerful dependency injection](#injection)
 
-  - Injection via
-    - [Сonstructors](#constructor-auto-wiring-)
+  - Through
+    - [Сonstructors](#constructor-autowiring-)
 	- [Methods](#method-injection-)
 	- [Properties](#property-injection)
 	- Fields
-  - Injection of
+  - Injection of composed dependencies
     - [Func](#resolve-func-)
 	- [Lazy](#resolve-lazy-)
 	- [ThreadLocal](#resolve-threadlocal-)
@@ -41,13 +41,13 @@
 	- [ICollection](#resolve-all-appropriate-instances-as-icollection-)
 	- [ISet](#resolve-all-appropriate-instances-as-iset-)
 	- [IObservable](#resolve-all-appropriate-instances-as-iobservable-source-)
-  - Detailed errors information
+  - Detailed diagnostics information
 
 ### [Incredible Performance](#why-this-one)
 
   - One of the fastest, almost as fast as operator `new`
   - Uses [expression trees](https://docs.microsoft.com/en-us/dotnet/csharp/expression-trees) to produce the [effective injection code](#struct-) without any superfluous operations like a `boxing`, `unboxing` or `cast`
-  - Minimizes the memory traffic
+  - Minimizes memory traffic
 
 ### [Fully Customizable](#customization)
 
@@ -55,29 +55,30 @@
   - [Custom lifetimes](#custom-lifetime-)
   - [Replacing predefined lifetimes](#replace-lifetime-)
   - [Custom builders](#custom-builder-)
-  - [Interceptors](#interception-)
+  - [Invocations' interceptors](#interception-)
 
-### [Multithreading-Ready](#multithreading)
-
-  - Thread-safe
+### [Asynchronous](#multithreading)
+  
   - [Asynchronous resolving](#asynchronous-resolve-)
   - [Lightweight asynchronous resolving](#asynchronous-lightweight-resolve-)
+  - [Asynchronous enumerations](#resolve-all-appropriate-instances-as-iasyncenumerable-)	
 
 ### [Design Aspects](#design)
 
-  - Allows not to change the design of own code to follow [Inversion of Control](https://martinfowler.com/articles/injection.html) pattern
-  - Aggregates features into dedicated [classes](#configuration-class-)
+  - Allows to preserve an original design of code and to minimize the impact of the [Inversion of Control](https://martinfowler.com/articles/injection.html) approach
+  - Aggregates features into dedicated [configuration classes](#configuration-class-)
   - [Modifiable on-the-fly](#change-configuration-on-the-fly-)
-  - Has no any additional dependencies
-  - [Embedding packages](#nuget-packages)
+  - Free from external dependencies like other frameworks or assemblies
+  - [Embedding packages](#nuget-packages) allow to use all these features without referencing on additional assemblies
 
 ### Easy Integration
 
   - [ASP.NET Core](#aspnet-core)
   - [Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfApp)
+  - [.NET core Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfAppNetCore) 
   - [Universal Windows Platform](https://github.com/DevTeam/IoCContainer/blob/master/Samples/UwpApp)
   - [Windows Communication Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WcfServiceLibrary)
-  - [Entity Framework Core](https://github.com/DevTeam/IoCContainer/tree/master/Samples/EntityFrameworkCore)
+  - [Entity Framework](https://github.com/DevTeam/IoCContainer/tree/master/Samples/EntityFrameworkCore)
 
 ### Supported Platforms
 
@@ -162,7 +163,7 @@ class Glue : IConfiguration
         yield return container.Bind<IBox<TT>>().To<CardboardBox<TT>>();
         yield return container.Bind<ICat>().To<ShroedingersCat>();
 
-        yield return container.Bind<Random>().As(Lifetime.Singleton).To<Random>();
+        yield return container.Bind<Random>().As(Singleton).To<Random>();
         yield return container.Bind<State>().To(ctx => (State)ctx.Container.Resolve<Random>().Next(2));
     }
 }
@@ -297,7 +298,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Resolve ValueTuple](#resolve-valuetuple-)
   - [Method Injection](#method-injection-)
   - [Property Injection](#property-injection-)
-  - [Constructor Auto-wiring](#constructor-auto-wiring-)
+  - [Constructor Autowiring](#constructor-autowiring-)
   - [Resolve all appropriate instances as Array](#resolve-all-appropriate-instances-as-array-)
   - [Resolve all appropriate instances as IAsyncEnumerable](#resolve-all-appropriate-instances-as-iasyncenumerable-)
   - [Resolve all appropriate instances as ICollection](#resolve-all-appropriate-instances-as-icollection-)
@@ -306,9 +307,9 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Resolve Using Arguments](#resolve-using-arguments-)
   - [Resolve all appropriate instances as ISet](#resolve-all-appropriate-instances-as-iset-)
 - Flexible Binding
-  - [Auto-wiring](#auto-wiring-)
-  - [Auto-wiring with initialization](#auto-wiring-with-initialization-)
-  - [Generic Auto-wiring](#generic-auto-wiring-)
+  - [Autowiring](#autowiring-)
+  - [Autowiring with initialization](#autowiring-with-initialization-)
+  - [Generic Autowiring](#generic-autowiring-)
   - [Constant](#constant-)
   - [Generics](#generics-)
   - [Several Contracts](#several-contracts-)
@@ -320,13 +321,13 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Child Container](#child-container-)
   - [Container Singleton lifetime](#container-singleton-lifetime-)
   - [Scope Singleton lifetime](#scope-singleton-lifetime-)
-  - [Manual Auto-wiring](#manual-auto-wiring-)
+  - [Manual Autowiring](#manual-autowiring-)
   - [Struct](#struct-)
   - [Func With Arguments](#func-with-arguments-)
   - [Auto dispose singleton during container's dispose](#auto-dispose-singleton-during-containers-dispose-)
   - [Configuration via a text metadata](#configuration-via-a-text-metadata-)
   - [Validation](#validation-)
-  - [Aspect Oriented Auto-wiring](#aspect-oriented-auto-wiring-)
+  - [Aspect Oriented Autowiring](#aspect-oriented-autowiring-)
 - Multithreading-Ready
   - [Asynchronous resolve](#asynchronous-resolve-)
   - [Asynchronous lightweight resolve](#asynchronous-lightweight-resolve-)
@@ -345,12 +346,12 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Instant Messenger](#instant-messenger-)
   - [Wrapper](#wrapper-)
 
-### Auto-wiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Autowiring.cs)
+### Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Autowiring.cs)
 
 Auto-writing is most natural way to use containers. At first step we should create a container. At the second step we bind interfaces to their implementations. After that the container is ready to resolve dependencies.
 
 ``` CSharp
-// Create the container and configure it, using full auto-wiring
+// Create the container and configure it, using full autowiring
 using (var container = Container.Create())
 // Bind some dependency
 using (container.Bind<IDependency>().To<Dependency>())
@@ -363,12 +364,12 @@ using (container.Bind<IService>().To<Service>())
 
 
 
-### Auto-wiring with initialization [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoWiringWithInitialization.cs)
+### Autowiring with initialization [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoWiringWithInitialization.cs)
 
 Auto-writing allows to perform some initializations.
 
 ``` CSharp
-// Create the container and configure it, using full auto-wiring
+// Create the container and configure it, using full autowiring
 using (var container = Container.Create())
 // Bind some dependency
 using (container.Bind<IDependency>().To<Dependency>())
@@ -381,12 +382,12 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(ctx => ctx.I
 
 
 
-### Generic Auto-wiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GenericAutowiring.cs)
+### Generic Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GenericAutowiring.cs)
 
 Auto-writing of generic types as simple as auto-writing of other types. Just use a generic parameters markers like _TT_, _TT1_ and etc. or bind open generic types.
 
 ``` CSharp
-// Create and configure the container using auto-wiring
+// Create and configure the container using autowiring
 using (var container = Container.Create())
 // Bind some dependency
 using (container.Bind<IDependency>().To<Dependency>())
@@ -449,7 +450,7 @@ using (container.Bind<IService<TT>>().Tag("just generic").To<Service<TT>>())
 It is possible to bind several types to single implementation.
 
 ``` CSharp
-// Create and configure the container, using full auto-wiring
+// Create and configure the container, using full autowiring
 using (var container = Container.Create())
 // Bind some dependency
 using (container.Bind<IDependency>().To<Dependency>())
@@ -512,7 +513,7 @@ using (var container = Container.Create())
 // Mark binding by tag "MyDep"
 // Bind some dependency
 using (container.Bind<IDependency>().Tag("MyDep").To<Dependency>())
-// Configure auto-wiring and inject dependency tagged by "MyDep"
+// Configure autowiring and inject dependency tagged by "MyDep"
 using (container.Bind<IService>().To<Service>(
     ctx => new Service(ctx.Container.Inject<IDependency>("MyDep"))))
 {
@@ -705,12 +706,12 @@ using (container.Bind<IDependency>().As(ScopeSingleton).To<Dependency>())
 
 
 
-### Manual Auto-wiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ManualAutowiring.cs)
+### Manual Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ManualAutowiring.cs)
 
 
 
 ``` CSharp
-// Create and configure the container using full auto-wiring
+// Create and configure the container using full autowiring
 using (var container = Container.Create())
 // Bind some dependency
 using (container.Bind<IDependency>().To<Dependency>())
@@ -790,7 +791,7 @@ public class TracingBuilder : IBuilder
 Func<IDependency, string, INamedService> func = 
     (dependency, name) => new NamedService(dependency, name);
 
-// Create and configure the container, using full auto-wiring
+// Create and configure the container, using full autowiring
 using (var container = Container.Create())
 // Bind some dependency
 using (container.Bind<IDependency>().To<Dependency>())
@@ -885,24 +886,31 @@ using (container.Bind<IService>().To<Service>())
 
 
 
-### Aspect Oriented Auto-wiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AspectOrientedAutowiring.cs)
+### Aspect Oriented Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AspectOrientedAutowiring.cs)
 
-You can specify your own aspect oriented auto-wiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
+You can specify your own aspect oriented autowiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
 
 ``` CSharp
 public void Run()
 {
     var console = new Mock<IConsole>();
 
+    // Creates an aspect oriented autowiring strategy specifying which attributes should be used
+    // and which properties should be used to configure DI
+    var autowiringStrategy = AutowiringStrategies.AspectOriented()
+        .Type<TypeAttribute>(attribute => attribute.Type)
+        .Order<OrderAttribute>(attribute => attribute.Order)
+        .Tag<TagAttribute>(attribute => attribute.Tag);
+
     // Create the root container
     using (var rootContainer = Container.Create("root"))
-    // Configure еру child container
-    using (var childContainer = rootContainer.CreateChild("child"))
-    // Configure the child container by custom aspect oriented autowiring strategy
-    using (childContainer.Bind<IAutowiringStrategy>().To<AspectOrientedAutowiringStrategy>())
     // Configure the child container
-    using (childContainer.Bind<IConsole>().To(ctx => console.Object))
-    using (childContainer.Bind<IClock>().Tag("MyClock").To<Clock>())
+    using (var childContainer = rootContainer.CreateChild("child"))
+    // Configure the child container by the custom aspect oriented autowiring strategy            
+    using (childContainer.Bind<IAutowiringStrategy>().To(ctx => autowiringStrategy))
+    // Configure the child container
+    using (childContainer.Bind<IConsole>().Tag("MyConsole").To(ctx => console.Object))
+    using (childContainer.Bind<Clock>().To<Clock>())
     using (childContainer.Bind<string>().Tag("Prefix").To(ctx => "info"))
     using (childContainer.Bind<ILogger>().To<Logger>())
     {
@@ -917,92 +925,34 @@ public void Run()
     console.Verify(i => i.WriteLine(It.IsRegex(".+ - info: Hello")));
 }
 
-// Represents the attribute to mark a constructor or a method that is ready for auto-wiring
-[AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method)]
-public class AutowiringAttribute : Attribute
+// Represents the tag attribute to specify `tag` for injection.
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Method)]
+public class TypeAttribute : Attribute
 {
-    public AutowiringAttribute(int order = 0, object defaultTag = null)
-    {
-        Order = order;
-        DefaultTag = defaultTag;
-    }
+    // The tag, which will be used during an injection
+    [CanBeNull] public readonly Type Type;
 
-    // The order to be used to invoke a method
-    public int Order { get; }
-
-    // The default tag
-    public object DefaultTag { get; }
+    public TypeAttribute([CanBeNull] Type type) => Type = type;
 }
 
-// Represents the attribute to mark a parameters by a tag, which will be used during an injection
-[AttributeUsage(AttributeTargets.Parameter)]
+// Represents the order attribute and defines the sequence of calls to initialization methods.
+[AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method)]
+public class OrderAttribute : Attribute
+{
+    // The order to be used to invoke a method
+    public readonly int Order;
+
+    public OrderAttribute(int order = 0) => Order = order;            
+}
+
+// Represents the tag attribute to specify `tag` for injection.
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Method)]        
 public class TagAttribute: Attribute
 {
-    public TagAttribute([CanBeNull] object tag) => Tag = tag;
-
     // The tag, which will be used during an injection
-    [CanBeNull] public object Tag { get; }
-}
+    [CanBeNull] public readonly object Tag;
 
-// Represents a custom aspect oriented autowiring strategy
-private class AspectOrientedAutowiringStrategy : IAutowiringStrategy
-{
-    // Resolves type to create an instance
-    public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
-    {
-        instanceType = default(Type);
-        // Says that the default logic should be used
-        return false;
-    }
-
-    // Resolves a constructor from a set of available constructors
-    public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
-    {
-        constructor = (
-            // for each available constructor
-            from ctor in constructors
-            // tries to get 'AutowiringAttribute'
-            let autowiringAttribute = ctor.Info.GetCustomAttribute<AutowiringAttribute>()
-            // filters the constructor containing the attribute 'AutowiringAttribute'
-            where autowiringAttribute != null
-            // sorts constructors by 'Order' property
-            orderby autowiringAttribute.Order
-            select ctor)
-            // gets the first appropriate constructor
-            .First();
-
-        // Says that current logic should be used
-        return true;
-    }
-
-    // Resolves initializing methods from a set of available methods/setters in the order which will be used to invoke them
-    public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
-    {
-        initializers =
-            // for each available method
-            from method in methods
-            // tries to get AutowiringAttribute
-            let autowiringAttribute = method.Info.GetCustomAttribute<AutowiringAttribute>()
-            // filters methods/property setters containing the attribute 'AutowiringAttribute'
-            where autowiringAttribute != null
-            // sorts methods/property setters by 'Order' property
-            orderby autowiringAttribute.Order
-            where (
-                    // for each parameter
-                    from parameter in method.Info.GetParameters()
-                    // tries to get 'TagAttribute'
-                    let injectAttribute = parameter.GetCustomAttribute<TagAttribute>()
-                    // filters parameters containing a custom tag value to make a dependency injection
-                    where injectAttribute?.Tag != null || autowiringAttribute.DefaultTag != null
-                    // defines the dependency injection
-                    select method.TryInjectDependency(parameter.Position, parameter.ParameterType, injectAttribute?.Tag ?? autowiringAttribute.DefaultTag))
-                // checks that each injection was successful
-                .All(isInjected => isInjected)
-            select method;
-
-        // Says that current logic should be used
-        return true;
-    }
+    public TagAttribute([CanBeNull] object tag) => Tag = tag;            
 }
 
 public interface IConsole
@@ -1018,9 +968,7 @@ public interface IClock
 }
 
 public class Clock : IClock
-{
-    [Autowiring] public Clock() { }
-
+{            
     public DateTimeOffset Now => DateTimeOffset.Now;
 }
 
@@ -1035,16 +983,14 @@ public class Logger : ILogger
     private readonly IConsole _console;
     private IClock _clock;
 
-    // Constructor injection
-    [Autowiring]
-    public Logger(IConsole console) => _console = console;
+    public Logger([Tag("MyConsole")] IConsole console) => _console = console;
 
     // Method injection
-    [Autowiring(1)]
-    public void Initialize([Tag("MyClock")] IClock clock) => _clock = clock;
+    [Order(1)]
+    public void Initialize([Type(typeof(Clock))] IClock clock) => _clock = clock;
 
     // Property injection
-    public string Prefix { get; [Autowiring(2, "Prefix")] set; }
+    public string Prefix { get; [Order(2), Tag("Prefix")] set; }
 
     // Adds current time and prefix before a message and writes it to console
     public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");
@@ -1323,7 +1269,7 @@ lass Glue : IConfiguration
 {
 ic IEnumerable<IDisposable> Apply(IContainer container)
 {
-// Bind using full auto-wiring
+// Bind using full autowiring
 yield return container.Bind<IDependency>().To<Dependency>();
 yield return container.Bind<IService>().To<Service>();
 }
@@ -1475,7 +1421,7 @@ using (container.Bind<INamedService>().To<NamedService>(
 
 
 ``` CSharp
-// Create and configure the container using full auto-wiring
+// Create and configure the container using full autowiring
 using (var container = Container.Create())
 // Bind some dependency
 using (container.Bind<IDependency>().To<Dependency>())
@@ -1548,12 +1494,12 @@ using (container.Bind<INamedService>().To<InitializingNamedService>(
 
 
 
-### Constructor Auto-wiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConstructorAutowiring.cs)
+### Constructor Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConstructorAutowiring.cs)
 
 
 
 ``` CSharp
-// Create and configure the container, using full auto-wiring
+// Create and configure the container, using full autowiring
 using (var container = Container.Create())
 // Bind some dependency
 using (container.Bind<IDependency>().To<Dependency>())

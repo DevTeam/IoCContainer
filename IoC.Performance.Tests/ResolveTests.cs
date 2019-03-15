@@ -2,27 +2,23 @@ namespace IoC.Performance.Tests
 {
     using System;
     using Model;
-    using NUnit.Framework;
+    using Xunit;
     using static Lifetime;
 
     public class ResolveTests
     {
         private readonly long _series;
-        private Container _containerComplex;
-        private Container _containerCore;
-        private Container _container;
+        private readonly Container _containerComplex;
+        private readonly Container _containerCore;
+        private readonly Container _container;
 
         public ResolveTests()
         {
             if (!long.TryParse(Environment.GetEnvironmentVariable("SERIES"), out _series))
             {
                 _series = 10000000;
-            }       
-        }
+            }
 
-        [SetUp]
-        public void SetUp()
-        {
             _containerComplex = Container.CreateCore();
             foreach (var type in TestTypeBuilder.Default.Types)
             {
@@ -39,18 +35,10 @@ namespace IoC.Performance.Tests
             _container.Bind<IService1>().To<Service1>().ToSelf();
             _container.Bind<IService2>().As(Singleton).To<Service2>().ToSelf();
             _container.Bind<IService3>().To<Service3>().ToSelf();
-            _container.Bind<IService4>().To<Service4>().ToSelf();           
-        }
+            _container.Bind<IService4>().To<Service4>().ToSelf();
+        }           
 
-        [TearDown]
-        public void TearDown()
-        {
-            _containerComplex.Dispose();
-            _containerCore.Dispose();
-            _container.Dispose();
-        }
-
-        [Test]
+        [Fact]
         public void TestResolveCore()
         {          
             for (var i = 0; i < _series; i++)
@@ -59,7 +47,7 @@ namespace IoC.Performance.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void TestResolve()
         {          
             for (var i = 0; i < _series; i++)
@@ -68,7 +56,7 @@ namespace IoC.Performance.Tests
             }
         }
 
-        [Test]
+        [Fact]
         public void TestResolveComplex()
         {          
             for (var i = 0; i < _series / 1000; i++)

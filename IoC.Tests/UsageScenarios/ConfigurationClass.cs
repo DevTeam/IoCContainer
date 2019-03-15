@@ -31,7 +31,7 @@
         {
             public IEnumerable<IDisposable> Apply(IContainer container)
             {
-                // Bind using full auto-wiring
+                // Bind using full autowiring
                 yield return container.Bind<IDependency>().To<Dependency>();
                 yield return container.Bind<IService>().To<Service>();
             }

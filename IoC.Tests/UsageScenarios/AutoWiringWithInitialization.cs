@@ -11,10 +11,10 @@
             // $visible=true
             // $tag=binding
             // $priority=00
-            // $description=Auto-wiring with initialization
+            // $description=Autowiring with initialization
             // $header=Auto-writing allows to perform some initializations.
             // {
-            // Create the container and configure it, using full auto-wiring
+            // Create the container and configure it, using full autowiring
             using (var container = Container.Create())
             // Bind some dependency
             using (container.Bind<IDependency>().To<Dependency>())

@@ -17,7 +17,7 @@
             Func<IDependency, string, INamedService> func = 
                 (dependency, name) => new NamedService(dependency, name);
 
-            // Create and configure the container, using full auto-wiring
+            // Create and configure the container, using full autowiring
             using (var container = Container.Create())
             // Bind some dependency
             using (container.Bind<IDependency>().To<Dependency>())

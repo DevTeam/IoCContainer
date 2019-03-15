@@ -1,14 +1,14 @@
 ## IoC.Container provides the following benefits and features
 
-### [Flexible Binding](https://github.com/DevTeam/IoCContainer#binding)
+### [Flexible Bindings](https://github.com/DevTeam/IoCContainer#binding)
 
-  - [Auto-wiring](https://github.com/DevTeam/IoCContainer#auto-wiring-)
-  - [Compile-time verification](https://github.com/DevTeam/IoCContainer#manual-auto-wiring-)
-  - [Generic types bindings](https://github.com/DevTeam/IoCContainer#generics-) with [simple types mapping-](https://github.com/DevTeam/IoCContainer#generic-auto-wiring-)
+  - [Autowiring](https://github.com/DevTeam/IoCContainer#autowiring-)
+  - [Aspect oriented autowiring](https://github.com/DevTeam/IoCContainer#aspect-oriented-autowiring-)
+  - [Generic types bindings](https://github.com/DevTeam/IoCContainer#generics-) and [easy generic types mapping](https://github.com/DevTeam/IoCContainer#generic-autowiring-)
   - [Named/tagged dependencies](https://github.com/DevTeam/IoCContainer#tags-)
   - [Containers hierarchy](https://github.com/DevTeam/IoCContainer#child-container-)
-  - [Bindings via text metadata](https://github.com/DevTeam/IoCContainer#configuration-via-a-text-metadata-)
-  - [Customizable aspect oriented autowiring](https://github.com/DevTeam/IoCContainer#aspect-oriented-auto-wiring-)
+  - [Compile-time verification](https://github.com/DevTeam/IoCContainer#manual-autowiring-)
+  - [Bindings via text metadata](https://github.com/DevTeam/IoCContainer#configuration-via-a-text-metadata-)  
   - Easy extensible set of lifetimes
     - [Singleton](https://github.com/DevTeam/IoCContainer#singleton-lifetime-) with [auto-disposing](https://github.com/DevTeam/IoCContainer#auto-dispose-singleton-during-containers-dispose-)
     - [Singleton per container](https://github.com/DevTeam/IoCContainer#container-singleton-lifetime-)
@@ -18,14 +18,14 @@
     - [Constant](https://github.com/DevTeam/IoCContainer#constant-), [factory](https://github.com/DevTeam/IoCContainer#func-), [factory with arguments](https://github.com/DevTeam/IoCContainer#func-with-arguments-)
   - Supports [validation](https://github.com/DevTeam/IoCContainer#validation)
 
-### [Powerful Injection](https://github.com/DevTeam/IoCContainer#injection)
+### [Powerful dependency injection](https://github.com/DevTeam/IoCContainer#injection)
 
-  - Injection via
-    - [Сonstructors](https://github.com/DevTeam/IoCContainer#constructor-auto-wiring-)
+  - Through
+    - [Сonstructors](https://github.com/DevTeam/IoCContainer#constructor-autowiring-)
 	- [Methods](https://github.com/DevTeam/IoCContainer#method-injection-)
 	- [Properties](https://github.com/DevTeam/IoCContainer#property-injection)
 	- Fields
-  - Injection of
+  - Injection of composed dependencies
     - [Func](https://github.com/DevTeam/IoCContainer#resolve-func-)
 	- [Lazy](https://github.com/DevTeam/IoCContainer#resolve-lazy-)
 	- [ThreadLocal](https://github.com/DevTeam/IoCContainer#resolve-threadlocal-)
@@ -37,13 +37,13 @@
 	- [ICollection](https://github.com/DevTeam/IoCContainer#resolve-all-appropriate-instances-as-icollection-)
 	- [ISet](https://github.com/DevTeam/IoCContainer#resolve-all-appropriate-instances-as-iset-)
 	- [IObservable](https://github.com/DevTeam/IoCContainer#resolve-all-appropriate-instances-as-iobservable-source-)
-  - Detailed errors information
+  - Detailed diagnostics information
 
 ### [Incredible Performance](https://github.com/DevTeam/IoCContainer#why-this-one)
 
   - One of the fastest, almost as fast as operator `new`
   - Uses [expression trees](https://docs.microsoft.com/en-us/dotnet/csharp/expression-trees) to produce the [effective injection code](https://github.com/DevTeam/IoCContainer#struct-) without any superfluous operations like a `boxing`, `unboxing` or `cast`
-  - Minimizes the memory traffic
+  - Minimizes memory traffic
 
 ### [Fully Customizable](https://github.com/DevTeam/IoCContainer#customization)
 
@@ -51,29 +51,30 @@
   - [Custom lifetimes](https://github.com/DevTeam/IoCContainer#custom-lifetime-)
   - [Replacing predefined lifetimes](https://github.com/DevTeam/IoCContainer#replace-lifetime-)
   - [Custom builders](https://github.com/DevTeam/IoCContainer#custom-builder-)
-  - [Interceptors](https://github.com/DevTeam/IoCContainer#interception-)
+  - [Invocations' interceptors](https://github.com/DevTeam/IoCContainer#interception-)
 
-### [Multithreading-Ready](https://github.com/DevTeam/IoCContainer#multithreading)
-
-  - Thread-safe
+### [Asynchronous](https://github.com/DevTeam/IoCContainer#multithreading)
+  
   - [Asynchronous resolving](https://github.com/DevTeam/IoCContainer#asynchronous-resolve-)
   - [Lightweight asynchronous resolving](https://github.com/DevTeam/IoCContainer#asynchronous-lightweight-resolve-)
+  - [Asynchronous enumerations](https://github.com/DevTeam/IoCContainer#resolve-all-appropriate-instances-as-iasyncenumerable-)	
 
 ### [Design Aspects](https://github.com/DevTeam/IoCContainer#design)
 
-  - Allows not to change the design of own code to follow [Inversion of Control](https://martinfowler.com/articles/injection.html) pattern
-  - Aggregates features into dedicated [classes](https://github.com/DevTeam/IoCContainer#configuration-class-)
+  - Allows to preserve an original design of code and to minimize the impact of the [Inversion of Control](https://martinfowler.com/articles/injection.html) approach
+  - Aggregates features into dedicated [configuration classes](https://github.com/DevTeam/IoCContainer#configuration-class-)
   - [Modifiable on-the-fly](https://github.com/DevTeam/IoCContainer#change-configuration-on-the-fly-)
-  - Has no any additional dependencies
-  - [Embedding packages](https://github.com/DevTeam/IoCContainer#nuget-packages)
+  - Free from external dependencies like other frameworks or assemblies
+  - [Embedding packages](https://github.com/DevTeam/IoCContainer#nuget-packages) allow to use all these features without referencing on additional assemblies
 
 ### Easy Integration
 
   - [ASP.NET Core](https://github.com/DevTeam/IoCContainer#aspnet-core)
   - [Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfApp)
+  - [.NET core Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfAppNetCore) 
   - [Universal Windows Platform](https://github.com/DevTeam/IoCContainer/blob/master/Samples/UwpApp)
   - [Windows Communication Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WcfServiceLibrary)
-  - [Entity Framework Core](https://github.com/DevTeam/IoCContainer/tree/master/Samples/EntityFrameworkCore)
+  - [Entity Framework](https://github.com/DevTeam/IoCContainer/tree/master/Samples/EntityFrameworkCore)
 
 ### Supported Platforms
 

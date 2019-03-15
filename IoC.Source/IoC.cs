@@ -1124,6 +1124,77 @@ namespace IoC
 
 
 #endregion
+#region AutowiringStrategies
+
+namespace IoC
+{
+    using System;
+    using Core;
+
+    /// <summary>
+    /// Provides autowiring strategies.
+    /// </summary>
+    public static class AutowiringStrategies
+    {
+        /// <summary>
+        /// Creates aspect oriented autowiring strategy.
+        /// </summary>
+        /// <returns>The instance of aspect oriented autowiring strategy.</returns>
+        public static IAutowiringStrategy AspectOriented() => AspectOrientedMetadata.Empty;
+
+        /// <summary>
+        /// Specifies type selector for aspect oriented autowiring strategy.
+        /// </summary>
+        /// <typeparam name="TTypeAttribute">The type metadata attribute.</typeparam>
+        /// <param name="strategy">The base aspect oriented autowiring strategy.</param>
+        /// <param name="typeSelector">The type selector.</param>
+        /// <returns>The instance of aspect oriented autowiring strategy.</returns>
+        public static IAutowiringStrategy Type<TTypeAttribute>(this IAutowiringStrategy strategy, [NotNull] Func<TTypeAttribute, Type> typeSelector)
+            where TTypeAttribute : Attribute =>
+            AspectOrientedMetadata.Type(
+                GuardAspectOrientedMetadata(strategy ?? throw new ArgumentNullException(nameof(strategy))),
+                typeSelector ?? throw new ArgumentNullException(nameof(typeSelector)));
+
+        /// <summary>
+        /// Specifies order selector for aspect oriented autowiring strategy.
+        /// </summary>
+        /// <typeparam name="TOrderAttribute">The order metadata attribute.</typeparam>
+        /// <param name="strategy">The base aspect oriented autowiring strategy.</param>
+        /// <param name="orderSelector">The type selector.</param>
+        /// <returns>The instance of aspect oriented autowiring strategy.</returns>
+        public static IAutowiringStrategy Order<TOrderAttribute>(this IAutowiringStrategy strategy, [NotNull] Func<TOrderAttribute, IComparable> orderSelector)
+            where TOrderAttribute : Attribute =>
+            AspectOrientedMetadata.Order(
+                GuardAspectOrientedMetadata(strategy ?? throw new ArgumentNullException(nameof(strategy))),
+                orderSelector ?? throw new ArgumentNullException(nameof(orderSelector)));
+
+        /// <summary>
+        /// Specifies tag selector for aspect oriented autowiring strategy.
+        /// </summary>
+        /// <typeparam name="TTagAttribute">The tag metadata attribute.</typeparam>
+        /// <param name="strategy">The base aspect oriented autowiring strategy.</param>
+        /// <param name="tagSelector">The tag selector.</param>
+        /// <returns>The instance of aspect oriented autowiring strategy.</returns>
+        public static IAutowiringStrategy Tag<TTagAttribute>(this IAutowiringStrategy strategy, [NotNull] Func<TTagAttribute, object> tagSelector)
+            where TTagAttribute : Attribute =>
+            AspectOrientedMetadata.Tag(
+                GuardAspectOrientedMetadata(strategy ?? throw new ArgumentNullException(nameof(strategy))),
+                tagSelector ?? throw new ArgumentNullException(nameof(tagSelector)));
+
+        private static AspectOrientedMetadata GuardAspectOrientedMetadata([NotNull] IAutowiringStrategy strategy)
+        {
+            switch (strategy)
+            {
+                case AspectOrientedMetadata aspectOrientedMetadata:
+                    return aspectOrientedMetadata;
+                default:
+                    throw new ArgumentException($"{nameof(strategy)} should be an aspect oriented autowiring strategy.", nameof(strategy));
+            }
+        }
+    }
+}
+
+#endregion
 #region Container
 
 namespace IoC
@@ -4872,6 +4943,248 @@ namespace IoC.Lifetimes
 
 #region Core
 
+#region AspectOrientedAutowiringStrategy
+
+namespace IoC.Core
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using System.Reflection;
+
+    internal class AspectOrientedAutowiringStrategy: IAutowiringStrategy        
+    {
+        [NotNull] private readonly IAspectOrientedMetadata _metadata;
+
+        public AspectOrientedAutowiringStrategy([NotNull] IAspectOrientedMetadata metadata)
+        {
+            _metadata = metadata ?? throw new ArgumentNullException(nameof(metadata));
+        }
+
+        /// <inheritdoc />
+        public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
+        {
+            instanceType = default(Type);
+            // Says that the default logic should be used
+            return false;
+        }
+
+        /// <inheritdoc />
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+        public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
+        {
+            constructor = PrepareMethods(constructors).FirstOrDefault();
+            if (constructor == null && DefaultAutowiringStrategy.Shared.TryResolveConstructor(constructors, out var defaultConstructor))
+            {
+                // Initialize default ctor
+                constructor = PrepareMethods(new[] { defaultConstructor }, true).FirstOrDefault();
+            }
+
+            // Says that current logic should be used
+            return constructor != null;
+        }
+
+        /// <inheritdoc />
+        public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
+        {
+            initializers = PrepareMethods(methods);
+            // Says that current logic should be used
+            return true;
+        }
+
+        private IEnumerable<IMethod<TMethodInfo>> PrepareMethods<TMethodInfo>(IEnumerable<IMethod<TMethodInfo>> methods, bool enforceSelection = false)
+            where TMethodInfo : MethodBase =>
+            from method in methods
+            let methodMetadata = new Metadata(_metadata, method.Info.GetCustomAttributes(true))
+            where enforceSelection || !methodMetadata.IsEmpty
+            orderby methodMetadata.Order
+            where (
+                    from parameter in method.Info.GetParameters()
+                    let parameterMetadata = new Metadata(_metadata, parameter.GetCustomAttributes(true))
+                    select method.TryInjectDependency(parameter.Position, parameterMetadata.Type ?? parameter.ParameterType, parameterMetadata.Tag ?? methodMetadata.Tag))
+                .All(isInjected => isInjected)
+            select method;
+        
+
+        private class Metadata
+        {
+            [CanBeNull] public readonly Type Type;
+            [CanBeNull] public readonly IComparable Order;
+            [CanBeNull] public readonly object Tag;
+
+            public Metadata(IAspectOrientedMetadata metadata, IEnumerable<object> attributes)
+            {
+                foreach (var attribute in attributes)
+                {
+                    if (!(attribute is Attribute attributeValue))
+                    {
+                        continue;
+                    }
+
+                    if (Type == null && metadata.TryGetType(attributeValue, out var curType))
+                    {
+                        Type = curType;
+                    }
+
+                    if (Order == null && metadata.TryGetOrder(attributeValue, out var curOrder))
+                    {
+                        Order = curOrder;
+                    }
+
+                    if (Tag == null && metadata.TryGetTag(attributeValue, out var curTag))
+                    {
+                        Tag = curTag;
+                    }
+
+                    if (Type != null && Order != null && Tag != null)
+                    {
+                        break;
+                    }
+                }
+            }
+
+            public bool IsEmpty => Type == null && Order == null && Tag == null;
+        }
+    }
+}
+
+
+#endregion
+#region AspectOrientedMetadata
+
+namespace IoC.Core
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Reflection;
+
+    /// <summary>
+    /// Metadata for aspect oriented autowiring strategy.
+    /// </summary>
+    [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
+    internal struct AspectOrientedMetadata: IAspectOrientedMetadata, IAutowiringStrategy
+    {
+        internal static readonly AspectOrientedMetadata Empty = new AspectOrientedMetadata(new Dictionary<Type, Func<Attribute, Type>>(), new Dictionary<Type, Func<Attribute, IComparable>>(), new Dictionary<Type, Func<Attribute, object>>());
+        private readonly IDictionary<Type, Func<Attribute, Type>> _typeSelectors; 
+        private readonly IDictionary<Type, Func<Attribute, IComparable>> _orderSelectors;
+        private readonly IDictionary<Type, Func<Attribute, object>> _tagSelectors;
+        private readonly object _lockObject;
+        private volatile IAutowiringStrategy _autowiringStrategy;
+
+        public static AspectOrientedMetadata Type<TTypeAttribute>(AspectOrientedMetadata metadata, Func<TTypeAttribute, Type> typeSelector)
+            where TTypeAttribute : Attribute =>
+            new AspectOrientedMetadata(
+                new Dictionary<Type, Func<Attribute, Type>>(metadata._typeSelectors) { [typeof(TTypeAttribute)] = attribute => typeSelector((TTypeAttribute)attribute) },
+                new Dictionary<Type, Func<Attribute, IComparable>>(metadata._orderSelectors),
+                new Dictionary<Type, Func<Attribute, object>>(metadata._tagSelectors));
+
+        public static AspectOrientedMetadata Order<TOrderAttribute>(AspectOrientedMetadata metadata, Func<TOrderAttribute, IComparable> orderSelector)
+            where TOrderAttribute : Attribute =>
+            new AspectOrientedMetadata(
+                new Dictionary<Type, Func<Attribute, Type>>(metadata._typeSelectors),
+                new Dictionary<Type, Func<Attribute, IComparable>>(metadata._orderSelectors) { [typeof(TOrderAttribute)] = attribute => orderSelector((TOrderAttribute)attribute) },
+                new Dictionary<Type, Func<Attribute, object>>(metadata._tagSelectors));
+
+        public static AspectOrientedMetadata Tag<TTagAttribute>(AspectOrientedMetadata metadata, Func<TTagAttribute, object> tagSelector)
+            where TTagAttribute : Attribute =>
+            new AspectOrientedMetadata(
+                new Dictionary<Type, Func<Attribute, Type>>(metadata._typeSelectors),
+                new Dictionary<Type, Func<Attribute, IComparable>>(metadata._orderSelectors),
+                new Dictionary<Type, Func<Attribute, object>>(metadata._tagSelectors) { [typeof(TTagAttribute)] = attribute => tagSelector((TTagAttribute)attribute) });
+
+        private AspectOrientedMetadata(
+            [NotNull] IDictionary<Type, Func<Attribute, Type>> typeSelectors,
+            [NotNull] IDictionary<Type, Func<Attribute, IComparable>> orderSelectors,
+            [NotNull] IDictionary<Type, Func<Attribute, object>> tagSelectors)
+        {
+            _lockObject = new object();
+            _typeSelectors = typeSelectors;
+            _orderSelectors = orderSelectors;
+            _tagSelectors = tagSelectors;
+            _autowiringStrategy = null;
+        }
+
+        bool IAspectOrientedMetadata.TryGetType(Attribute attribute, out Type type)
+        {
+            if (attribute == null) throw new ArgumentNullException(nameof(attribute));
+            if (_typeSelectors.TryGetValue(attribute.GetType(), out var selector))
+            {
+                type = selector(attribute);
+                return true;
+            }
+
+            type = default(Type);
+            return false;
+        }
+
+        bool IAspectOrientedMetadata.TryGetOrder(Attribute attribute, out IComparable comparable)
+        {
+            if (attribute == null) throw new ArgumentNullException(nameof(attribute));
+            if (_orderSelectors.TryGetValue(attribute.GetType(), out var selector))
+            {
+                comparable = selector(attribute);
+                return true;
+            }
+
+            comparable = default(IComparable);
+            return false;
+        }
+
+        bool IAspectOrientedMetadata.TryGetTag(Attribute attribute, out object tag)
+        {
+            if (attribute == null) throw new ArgumentNullException(nameof(attribute));
+            if (_tagSelectors.TryGetValue(attribute.GetType(), out var selector))
+            {
+                tag = selector(attribute);
+                return true;
+            }
+
+            tag = default(object);
+            return false;
+        }
+
+        /// <inheritdoc />
+        public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType) =>
+            GetAutowiringStrategy().TryResolveType(
+                registeredType ?? throw new ArgumentNullException(nameof(registeredType)),
+                resolvingType ?? throw new ArgumentNullException(nameof(resolvingType)),
+                out instanceType);
+
+        /// <inheritdoc />
+        public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor) =>
+            GetAutowiringStrategy().TryResolveConstructor(
+                constructors ?? throw new ArgumentNullException(nameof(constructors)),
+                out constructor);
+
+        /// <inheritdoc />
+        public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers) =>
+            GetAutowiringStrategy().TryResolveInitializers(
+                methods ?? throw new ArgumentNullException(nameof(methods)),
+                out initializers);
+
+        private IAutowiringStrategy GetAutowiringStrategy()
+        {
+            if (_autowiringStrategy != null)
+            {
+                return _autowiringStrategy;
+            }
+
+            lock (_lockObject)
+            {
+                if (_autowiringStrategy == null)
+                {
+                    _autowiringStrategy = new AspectOrientedAutowiringStrategy(this);
+                }
+            }
+
+            return _autowiringStrategy;
+        }
+    }
+}
+
+#endregion
 #region Autowiring
 
 namespace IoC.Core
@@ -4912,7 +5225,7 @@ namespace IoC.Core
                     new[] { thisVar },
                     Expression.Assign(thisVar, baseExpression),
                     Expression.Block(
-                        from initializer in initializers
+                        from initializer in curInitializers
                         select Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext))
                     ),
                     thisVar
@@ -5001,7 +5314,6 @@ namespace IoC.Core
 
         public Expression Expression { get; }
 
-        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
@@ -6556,7 +6868,6 @@ namespace IoC.Core
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
 
     internal class FullAutowiringDependency: IDependency
     {
@@ -6783,6 +7094,23 @@ namespace IoC.Core
     internal interface IArray { }
 }
 
+
+#endregion
+#region IAspectOrientedMetadata
+
+namespace IoC.Core
+{
+    using System;
+
+    internal interface IAspectOrientedMetadata
+    {
+        bool TryGetType([NotNull] Attribute attribute, out Type type);
+
+        bool TryGetOrder([NotNull] Attribute attribute, out IComparable comparable);
+
+        bool TryGetTag([NotNull] Attribute attribute, out object tag);
+    }
+}
 
 #endregion
 #region IExpressionBuilder

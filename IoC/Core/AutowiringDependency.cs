@@ -38,7 +38,6 @@
 
         public Expression Expression { get; }
 
-        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));

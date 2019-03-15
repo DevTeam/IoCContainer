@@ -36,7 +36,7 @@
                     new[] { thisVar },
                     Expression.Assign(thisVar, baseExpression),
                     Expression.Block(
-                        from initializer in initializers
+                        from initializer in curInitializers
                         select Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext))
                     ),
                     thisVar

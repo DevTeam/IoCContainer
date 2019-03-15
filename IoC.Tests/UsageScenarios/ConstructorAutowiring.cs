@@ -11,9 +11,9 @@
             // $visible=true
             // $tag=injection
             // $priority=04
-            // $description=Constructor Auto-wiring
+            // $description=Constructor Autowiring
             // {
-            // Create and configure the container, using full auto-wiring
+            // Create and configure the container, using full autowiring
             using (var container = Container.Create())
             // Bind some dependency
             using (container.Bind<IDependency>().To<Dependency>())

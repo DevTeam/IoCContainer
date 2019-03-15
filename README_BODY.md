@@ -74,7 +74,7 @@ class Glue : IConfiguration
         yield return container.Bind<IBox<TT>>().To<CardboardBox<TT>>();
         yield return container.Bind<ICat>().To<ShroedingersCat>();
 
-        yield return container.Bind<Random>().As(Lifetime.Singleton).To<Random>();
+        yield return container.Bind<Random>().As(Singleton).To<Random>();
         yield return container.Bind<State>().To(ctx => (State)ctx.Container.Resolve<Random>().Next(2));
     }
 }
