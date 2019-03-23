@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:XamarinXaml"
+             x:Class="XamarinXaml.Views.MainPage">
+    <ContentPage.Resources>
+        <local:DataProvider x:Key="ClockViewModel" ObjectType="SampleModels.VewModels.IClockViewModel, SampleModels"/>
+    </ContentPage.Resources>
+    <StackLayout HorizontalOptions="Center" VerticalOptions="Center" BindingContext="{StaticResource ClockViewModel}">
+        <Label Text="{Binding It.Date}" />
+        <Label Text="{Binding It.Time}" />
+    </StackLayout>
+</ContentPage>

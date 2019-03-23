@@ -1,8 +1,8 @@
 ﻿namespace WpfAppNetCore
 {
-    using System.Configuration;
     using System.Windows;
     using IoC;
+    using Views;
 
     /// <summary>
     /// Interaction logic for App.xaml

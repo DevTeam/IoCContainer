@@ -70,6 +70,7 @@
 ### Easy Integration
 
   - [ASP.NET Core](https://github.com/DevTeam/IoCContainer#aspnet-core)
+  - [Xamarin](https://github.com/DevTeam/IoCContainer/blob/master/Samples/XamarinXaml)
   - [Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfApp)
   - [.NET core Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfAppNetCore) 
   - [Universal Windows Platform](https://github.com/DevTeam/IoCContainer/blob/master/Samples/UwpApp)
