@@ -889,19 +889,18 @@ using (container.Bind<IService>().To<Service>())
 
 ### Aspect Oriented Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AspectOrientedAutowiring.cs)
 
-You can specify your own aspect oriented autowiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
+
 
 ``` CSharp
 public void Run()
 {
     var console = new Mock<IConsole>();
 
-    // Creates an aspect oriented autowiring strategy specifying which attributes should be used
-    // and which properties should be used to configure DI
+    // Creates an aspect oriented autowiring strategy base on a custom `DependencyAttribute`
     var autowiringStrategy = AutowiringStrategies.AspectOriented()
-        .Type<TypeAttribute>(attribute => attribute.Type)
-        .Order<OrderAttribute>(attribute => attribute.Order)
-        .Tag<TagAttribute>(attribute => attribute.Tag);
+        .Type<DependencyAttribute>(attribute => attribute.Type)
+        .Order<DependencyAttribute>(attribute => attribute.Order)
+        .Tag<DependencyAttribute>(attribute => attribute.Tag);
 
     // Create the root container
     using (var rootContainer = Container.Create("root"))
@@ -926,35 +925,26 @@ public void Run()
     console.Verify(i => i.WriteLine(It.IsRegex(".+ - info: Hello")));
 }
 
-// Represents the tag attribute to specify `tag` for injection.
+// Represents the dependency attribute to specify `tag`, 'order' or `type` for injection.
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Method)]
-public class TypeAttribute : Attribute
-{
-    // The tag, which will be used during an injection
-    [CanBeNull] public readonly Type Type;
-
-    public TypeAttribute([CanBeNull] Type type) => Type = type;
-}
-
-// Represents the order attribute and defines the sequence of calls to initialization methods.
-[AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method)]
-public class OrderAttribute : Attribute
-{
-    // The order to be used to invoke a method
-    public readonly int Order;
-
-    public OrderAttribute(int order = 0) => Order = order;            
-}
-
-// Represents the tag attribute to specify `tag` for injection.
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Method)]        
-public class TagAttribute: Attribute
+public class DependencyAttribute : Attribute
 {
     // The tag, which will be used during an injection
     [CanBeNull] public readonly object Tag;
 
-    public TagAttribute([CanBeNull] object tag) => Tag = tag;            
-}
+    // The order to be used to invoke a method
+    public readonly int Order;
+
+    // The tag, which will be used during an injection
+    [CanBeNull] public readonly Type Type;
+
+    public DependencyAttribute([CanBeNull] object tag = null, int order = 0, [CanBeNull] Type type = null)
+    {
+        Tag = tag;
+        Order = order;
+        Type = type;
+    }            
+}               
 
 public interface IConsole
 {
@@ -984,21 +974,21 @@ public class Logger : ILogger
     private readonly IConsole _console;
     private IClock _clock;
 
-    public Logger([Tag("MyConsole")] IConsole console) => _console = console;
+    public Logger([Dependency(tag: "MyConsole")] IConsole console) => _console = console;
 
     // Method injection
-    [Order(1)]
-    public void Initialize([Type(typeof(Clock))] IClock clock) => _clock = clock;
+    [Dependency(order: 1)]
+    public void Initialize([Dependency(type: typeof(Clock))] IClock clock) => _clock = clock;
 
     // Property injection
-    public string Prefix { get; [Order(2), Tag("Prefix")] set; }
+    public string Prefix { get; [Dependency(tag: "Prefix", order: 2)] set; }
 
     // Adds current time and prefix before a message and writes it to console
     public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");
 }
 ```
 
-
+Also you can specify your own aspect oriented autowiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
 
 ### Custom Builder [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomBuilder.cs)
 

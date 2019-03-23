@@ -1,4 +1,4 @@
-﻿namespace IoC.Tests.UsageScenarios
+﻿namespace IoC.Tests.IntegrationTests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
@@ -10,24 +10,19 @@
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
     [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-    public class AspectOrientedAutowiring
+    public class AspectOrientedAutowiringTests
     {
         [Fact]
-        // $visible=true
-        // $tag=binding
-        // $priority=10
-        // $description=Aspect Oriented Autowiring
-        // $footer=Also you can specify your own aspect oriented autowiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
-        // {
-        public void Run()
+        public void ShouldUseAspectOrientedAutowiringStrategy()
         {
             var console = new Mock<IConsole>();
 
-            // Creates an aspect oriented autowiring strategy base on a custom `DependencyAttribute`
+            // Creates an aspect oriented autowiring strategy specifying which attributes should be used
+            // and which properties should be used to configure DI
             var autowiringStrategy = AutowiringStrategies.AspectOriented()
-                .Type<DependencyAttribute>(attribute => attribute.Type)
-                .Order<DependencyAttribute>(attribute => attribute.Order)
-                .Tag<DependencyAttribute>(attribute => attribute.Tag);
+                .Type<TypeAttribute>(attribute => attribute.Type)
+                .Order<OrderAttribute>(attribute => attribute.Order)
+                .Tag<TagAttribute>(attribute => attribute.Tag);
 
             // Create the root container
             using (var rootContainer = Container.Create("root"))
@@ -52,26 +47,35 @@
             console.Verify(i => i.WriteLine(It.IsRegex(".+ - info: Hello")));
         }
 
-        // Represents the dependency attribute to specify `tag`, 'order' or `type` for injection.
+        // Represents the tag attribute to specify `tag` for injection.
         [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Method)]
-        public class DependencyAttribute : Attribute
+        public class TypeAttribute : Attribute
+        {
+            // The tag, which will be used during an injection
+            [CanBeNull] public readonly Type Type;
+
+            public TypeAttribute([CanBeNull] Type type) => Type = type;
+        }
+
+        // Represents the order attribute and defines the sequence of calls to initialization methods.
+        [AttributeUsage(AttributeTargets.Constructor | AttributeTargets.Method)]
+        public class OrderAttribute : Attribute
+        {
+            // The order to be used to invoke a method
+            public readonly int Order;
+
+            public OrderAttribute(int order = 0) => Order = order;            
+        }
+
+        // Represents the tag attribute to specify `tag` for injection.
+        [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Method)]        
+        public class TagAttribute: Attribute
         {
             // The tag, which will be used during an injection
             [CanBeNull] public readonly object Tag;
 
-            // The order to be used to invoke a method
-            public readonly int Order;
-
-            // The tag, which will be used during an injection
-            [CanBeNull] public readonly Type Type;
-
-            public DependencyAttribute([CanBeNull] object tag = null, int order = 0, [CanBeNull] Type type = null)
-            {
-                Tag = tag;
-                Order = order;
-                Type = type;
-            }            
-        }               
+            public TagAttribute([CanBeNull] object tag) => Tag = tag;            
+        }
         
         public interface IConsole
         {
@@ -101,18 +105,17 @@
             private readonly IConsole _console;
             private IClock _clock;
 
-            public Logger([Dependency(tag: "MyConsole")] IConsole console) => _console = console;
+            public Logger([Tag("MyConsole")] IConsole console) => _console = console;
 
             // Method injection
-            [Dependency(order: 1)]
-            public void Initialize([Dependency(type: typeof(Clock))] IClock clock) => _clock = clock;
+            [Order(1)]
+            public void Initialize([Type(typeof(Clock))] IClock clock) => _clock = clock;
 
             // Property injection
-            public string Prefix { get; [Dependency(tag: "Prefix", order: 2)] set; }
+            public string Prefix { get; [Order(2), Tag("Prefix")] set; }
 
             // Adds current time and prefix before a message and writes it to console
             public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");
         }
-        // }
     }
 }
