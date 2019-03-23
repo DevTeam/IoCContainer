@@ -12,7 +12,7 @@
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</PackageIconUrl>
     <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>IoC inversionofcontrol Container DI dependencyinjection expression</PackageTags>
+    <PackageTags>ioc di</PackageTags>
     <Product>IoC Container</Product>
     <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
     <DocumentationFile>..\Docs\IoC_$(TargetFramework).xml</DocumentationFile>
@@ -45,7 +45,7 @@
     <LanguageTargets Condition="Exists('$(XamlTargets)')">$(XamlTargets)</LanguageTargets>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='uap10.0'">
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform " Version="6.1.9" />
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform " Version="6.2.8" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="IoC.tt" />

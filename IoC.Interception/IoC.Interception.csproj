@@ -13,7 +13,7 @@
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</PackageIconUrl>
     <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>IoC Container Interception</PackageTags>
+    <PackageTags>ioc di interception proxy</PackageTags>
     <Product>IoC Container Interception feature</Product>
     <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
     <DocumentationFile>..\Docs\IoC.Interception_$(TargetFramework).xml</DocumentationFile>

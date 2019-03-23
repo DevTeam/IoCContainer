@@ -13,7 +13,7 @@
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</PackageIconUrl>
     <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
-    <PackageTags>ASP net core IoC inversionofcontrol Container DI dependencyinjection</PackageTags>
+    <PackageTags>ioc di asp core</PackageTags>
     <Product>IoC Container AspNetCore feature</Product>
     <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
     <DocumentationFile>..\Docs\IoC.AspNetCore_$(TargetFramework).xml</DocumentationFile>
