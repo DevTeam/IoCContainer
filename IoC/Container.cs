@@ -150,11 +150,11 @@
 
             try
             {
-                var dependenciesForTagAny = _dependenciesForTagAny;
-                var dependencies = _dependencies;
-
                 lock (_eventSubject)
                 {
+                    var dependenciesForTagAny = _dependenciesForTagAny;
+                    var dependencies = _dependencies;
+
                     foreach (var curKey in keys)
                     {
                         var type = curKey.Type.ToGenericType();
@@ -311,9 +311,10 @@
         public void Dispose()
         {
             _parent.UnregisterResource(this);
-            var entriesToDispose = new List<IDisposable>(_dependencies.Count + _dependenciesForTagAny.Count + _resources.Count);
+            List<IDisposable> entriesToDispose;
             lock (_eventSubject)
             {
+                entriesToDispose = new List<IDisposable>(_dependencies.Count + _dependenciesForTagAny.Count + _resources.Count);
                 entriesToDispose.AddRange(_dependencies.Select(i => i.Value));
                 entriesToDispose.AddRange(_dependenciesForTagAny.Select(i => i.Value));
                 entriesToDispose.AddRange(_resources);

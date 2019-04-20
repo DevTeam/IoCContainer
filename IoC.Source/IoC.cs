@@ -1349,11 +1349,11 @@ namespace IoC
 
             try
             {
-                var dependenciesForTagAny = _dependenciesForTagAny;
-                var dependencies = _dependencies;
-
                 lock (_eventSubject)
                 {
+                    var dependenciesForTagAny = _dependenciesForTagAny;
+                    var dependencies = _dependencies;
+
                     foreach (var curKey in keys)
                     {
                         var type = curKey.Type.ToGenericType();
@@ -1510,9 +1510,10 @@ namespace IoC
         public void Dispose()
         {
             _parent.UnregisterResource(this);
-            var entriesToDispose = new List<IDisposable>(_dependencies.Count + _dependenciesForTagAny.Count + _resources.Count);
+            List<IDisposable> entriesToDispose;
             lock (_eventSubject)
             {
+                entriesToDispose = new List<IDisposable>(_dependencies.Count + _dependenciesForTagAny.Count + _resources.Count);
                 entriesToDispose.AddRange(_dependencies.Select(i => i.Value));
                 entriesToDispose.AddRange(_dependenciesForTagAny.Select(i => i.Value));
                 entriesToDispose.AddRange(_resources);
@@ -5435,6 +5436,7 @@ namespace IoC.Core
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Linq.Expressions;
 
     /// <summary>
@@ -5445,15 +5447,15 @@ namespace IoC.Core
     internal class BuildContext : IBuildContext
     {
         private static readonly ICollection<IBuilder> EmptyBuilders = new List<IBuilder>();
-        private readonly ICollection<IDisposable> _resources;
-        [NotNull] private readonly ICollection<IBuilder> _builders;
+        private readonly IEnumerable<IDisposable> _resources;
+        [NotNull] private readonly IEnumerable<IBuilder> _builders;
         private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
 
         internal BuildContext(
             Key key,
             [NotNull] IContainer resolvingContainer,
-            [NotNull] ICollection<IDisposable> resources,
-            [NotNull] ICollection<IBuilder> builders,
+            [NotNull] IEnumerable<IDisposable> resources,
+            [NotNull] IEnumerable<IBuilder> builders,
             [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
             int depth = 0)
         {
@@ -5493,7 +5495,7 @@ namespace IoC.Core
 
         public Expression AddLifetime(Expression baseExpression, ILifetime lifetime)
         {
-            if (_builders.Count > 0)
+            if (_builders.Any())
             {
                 var buildContext = CreateChildInternal(Key, Container, forBuilders: true);
                 foreach (var builder in _builders)
@@ -5796,38 +5798,50 @@ namespace IoC.Core
 
     internal sealed class DependencyEntry : IDisposable
     {
+        [CanBeNull] internal readonly ILifetime Lifetime;
+        [NotNull] internal readonly IEnumerable<Key> Keys;
         [NotNull] internal readonly IDependency Dependency;
-        [CanBeNull] public readonly ILifetime Lifetime;
-        [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
-        [NotNull] public readonly IList<Key> Keys;
+
+        [NotNull] private readonly IEnumerable<IDisposable> _resources;
         private readonly object _lockObject = new object();
-        private readonly Dictionary<LifetimeKey, ILifetime> _lifetimes = new Dictionary<LifetimeKey, ILifetime>();
+        private volatile Table<LifetimeKey, ILifetime> _lifetimes = Table<LifetimeKey, ILifetime>.Empty;
         private bool _disposed;
 
         public DependencyEntry(
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource,
-            [NotNull] IList<Key> keys)
+            [NotNull] IEnumerable<Key> keys)
         {
-            Dependency = dependency ?? throw new ArgumentNullException(nameof(dependency));
+            Dependency = dependency;
             Lifetime = lifetime;
-            _resources.Add(resource ?? throw new ArgumentNullException(nameof(resource)));
-            Keys = keys ?? throw new ArgumentNullException(nameof(keys));
+            Keys = keys;
             if (lifetime is IDisposable disposableLifetime)
             {
-                _resources.Add(disposableLifetime);
+                _resources = new[] { resource, disposableLifetime };                
+            }
+            else
+            {
+                _resources = new[] { resource };
             }
         }
 
         public bool TryCreateResolver(
             Key key,
             [NotNull] IContainer resolvingContainer,
-            [NotNull] ICollection<IBuilder> builders,
+            [NotNull] IEnumerable<IBuilder> builders,
             [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
             out Delegate resolver,
             out Exception error)
         {
+            lock (_lockObject)
+            {
+                if (_disposed)
+                {
+                    throw new ObjectDisposedException(nameof(DependencyEntry));
+                }
+            }
+
             var typeDescriptor = key.Type.Descriptor();
             var buildContext = new BuildContext(key, resolvingContainer, _resources, builders, defaultAutowiringStrategy);
             if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression, out error))
@@ -5844,10 +5858,7 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
-        public ILifetime GetLifetime([NotNull] Type type)
-        {
-            return GetLifetime(type.Descriptor());
-        }
+        public ILifetime GetLifetime([NotNull] Type type) => GetLifetime(type.Descriptor());
 
         [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
@@ -5864,22 +5875,23 @@ namespace IoC.Core
             }
 
             var lifetimeKey = new LifetimeKey(typeDescriptor.GetGenericTypeArguments());
-            ILifetime lifetime;
-            lock (_lockObject)
+            var lifetimeHashCode = lifetimeKey.GetHashCode();
+            var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
+            if (lifetime == null)
             {
-                if (!_lifetimes.TryGetValue(lifetimeKey, out lifetime))
+                lifetime = Lifetime.Create();
+                lock (_lockObject)
                 {
-                    lifetime = Lifetime.Create();
-                    _lifetimes.Add(lifetimeKey, lifetime);
+                    _lifetimes = _lifetimes.Set(lifetimeHashCode, lifetimeKey, lifetime);
                 }
             }
-
+            
             return lifetime;
         }
 
         public void Dispose()
         {
-            lock(_lockObject)
+            lock (_lockObject)
             {
                 if (_disposed)
                 {
@@ -5894,14 +5906,13 @@ namespace IoC.Core
                 resource.Dispose();
             }
             
-            foreach (var lifetime in _lifetimes.Values)
+            foreach (var lifetime in _lifetimes)
             {
-                lifetime.Dispose();
+                lifetime.Value.Dispose();
             }
         }
 
-        public override string ToString()
-            => $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
+        public override string ToString() => $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
 
         private struct LifetimeKey
         {
@@ -7398,7 +7409,7 @@ namespace IoC.Core
             _autowiringStrategies.Add(DefaultAutowiringStrategy.Shared);
         }
 
-        public ICollection<IBuilder> Builders => _builders;
+        public IEnumerable<IBuilder> Builders => _builders;
 
         public IAutowiringStrategy AutowiringStrategy => _autowiringStrategies[0];
 

@@ -16,7 +16,7 @@
             _autowiringStrategies.Add(DefaultAutowiringStrategy.Shared);
         }
 
-        public ICollection<IBuilder> Builders => _builders;
+        public IEnumerable<IBuilder> Builders => _builders;
 
         public IAutowiringStrategy AutowiringStrategy => _autowiringStrategies[0];
 
