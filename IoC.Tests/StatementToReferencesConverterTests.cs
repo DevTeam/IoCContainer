@@ -30,15 +30,17 @@ namespace IoC.Tests
         {
             private readonly List<object[]> _data = new List<object[]>
             {
-                new object[] {"ref IoC", true, new[] {typeof(IContainer).Descriptor().GetAssembly()}},
-                new object[] {"ref IoC, IoC", true, new[] {typeof(IContainer).Descriptor().GetAssembly()}},
-                new object[] {"ref IoC, IoC.Tests", true, new[] {typeof(IContainer).Descriptor().GetAssembly(), typeof(TestDataGenerator).Descriptor().GetAssembly() } },
-                new object[] {"ref IoC  ,IoC.Tests", true, new[] {typeof(IContainer).Descriptor().GetAssembly(), typeof(TestDataGenerator).Descriptor().GetAssembly() } },
+                new object[] {$"ref {ImpAssemblyName}", true, new[] {typeof(IContainer).Descriptor().GetAssembly()}},
+                new object[] {$"ref {ImpAssemblyName}, {ImpAssemblyName}", true, new[] {typeof(IContainer).Descriptor().GetAssembly()}},
+                new object[] {$"ref {ImpAssemblyName}, IoC.Tests", true, new[] {typeof(IContainer).Descriptor().GetAssembly(), typeof(TestDataGenerator).Descriptor().GetAssembly() } },
+                new object[] {$"ref {ImpAssemblyName}  ,IoC.Tests", true, new[] {typeof(IContainer).Descriptor().GetAssembly(), typeof(TestDataGenerator).Descriptor().GetAssembly() } },
             };
 
             public IEnumerator<object[]> GetEnumerator() => _data.GetEnumerator();
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+            private static string ImpAssemblyName => typeof(IContainer).Descriptor().GetAssembly().GetName().Name;
         }
     }
 }

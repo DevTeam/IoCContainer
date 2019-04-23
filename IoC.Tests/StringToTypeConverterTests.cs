@@ -7,7 +7,6 @@ namespace IoC.Tests
     using System.Linq;
     using System.Reflection;
     using Core.Configuration;
-    using IoC;
     using Shouldly;
     using Xunit;
 
@@ -24,15 +23,14 @@ namespace IoC.Tests
         [InlineData("", "", "System.Func<>", true, typeof(Func<>))]
         [InlineData("", "System", "Func<int, string>", true, typeof(Func<int,string>))]
         [InlineData("", "", "System.Func<int, string>", true, typeof(Func<int, string>))]
-        [InlineData("IoC", "IoC, System", "Func<IContainer, string>", true, typeof(Func<IContainer, string>))]
-        [InlineData("IoC", "IoC", "IContainer", true, typeof(IContainer))]
-        [InlineData("IoC", "", "IoC.IContainer", true, typeof(IContainer))]
+        [InlineData("IoC.Tests", "IoC.Tests, System", "Func<IService<string>, string>", true, typeof(Func<IService<string>, string>))]
+        [InlineData("IoC.Tests", "IoC.Tests", "IService<string>", true, typeof(IService<string>))]
+        [InlineData("IoC.Tests", "", "IoC.Tests.IService<string>", true, typeof(IService<string>))]
         [InlineData("IoC.Tests", "IoC.Tests", "IService<>", true, typeof(IService<>))]
         [InlineData("IoC.Tests", "", "IoC.Tests.IService<>", true, typeof(IService<>))]
         [InlineData("IoC.Tests", "IoC.Tests", "IService<int,string>", true, typeof(IService<int, string>))]
         [InlineData("IoC.Tests", "IoC.Tests", "IService<,>", true, typeof(IService<,>))]
         [InlineData("IoC.Tests", "", "IoC.Tests.IService<,,>", true, typeof(IService<,,>))]
-        [InlineData("IoC.Tests", "IoC.Tests", "IService<string>", true, typeof(IService<string>))]
         [InlineData("IoC.Tests", "IoC.Tests", "IService<IService<string>>", true, typeof(IService<IService<string>>))]
         [InlineData("IoC.Tests", "IoC.Tests", "IService<IService<string, int, float>, double, IService<IService<IService<string, int, float>>>>", true, typeof(IService<IService<string, int, float>, double, IService<IService<IService<string, int, float>>>>))]
         [InlineData("IoC.Tests", "IoC.Tests", "SomeClass.NestedClass", true, typeof(SomeClass.NestedClass))]
