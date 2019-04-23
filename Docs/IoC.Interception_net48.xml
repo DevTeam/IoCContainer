@@ -1,0 +1,45 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>IoC.Interception</name>
+    </assembly>
+    <members>
+        <member name="T:IoC.Features.FluentInterception">
+            <summary>
+            Represents extensions to add interceptions to the container.
+            </summary>
+        </member>
+        <member name="M:IoC.Features.FluentInterception.Intercept(IoC.IContainer,System.Predicate{IoC.Key},Castle.DynamicProxy.IInterceptor[])">
+            <summary>
+            Registers interceptors.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="filter">The filter to intercept appropriate instances.</param>
+            <param name="interceptors">The set of interceptors.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.Features.FluentInterception.Intercept``1(IoC.IContainer,Castle.DynamicProxy.IInterceptor[])">
+            <summary>
+            Registers interceptors.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="interceptors">The set of interceptors.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.Features.FluentInterception.Intercept(IoC.IContainer,IoC.Key,Castle.DynamicProxy.IInterceptor[])">
+            <summary>
+            Registers interceptors.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="key">The key to intercept appropriate instance.</param>
+            <param name="interceptors">The set of interceptors.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="T:IoC.Features.InterceptionFeature">
+            <inheritdoc cref="T:IoC.IConfiguration" />
+        </member>
+        <member name="M:IoC.Features.InterceptionFeature.Apply(IoC.IContainer)">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>

@@ -1,6 +1,6 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>   
-    <TargetFrameworks>netcoreapp1.0;netcoreapp3.0;net40;net47</TargetFrameworks>
+    <TargetFrameworks>netcoreapp1.0;netcoreapp3.0;net40;net48</TargetFrameworks>
     <IsTestProject>true</IsTestProject>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
@@ -11,7 +11,7 @@
     <LangVersion>8.0</LangVersion>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Castle.Core" Version="4.3.1" />
+    <PackageReference Include="Castle.Core" Version="4.4.0" />
     <PackageReference Include="Shouldly" Version="3.0.2" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
@@ -33,7 +33,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
     <ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net47'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net48'">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
     <ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
   </ItemGroup>

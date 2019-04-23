@@ -595,6 +595,44 @@
             The attribute must be mentioned in your member reordering patterns
             </remarks>
         </member>
+        <member name="T:IoC.AutowiringStrategies">
+            <summary>
+            Provides autowiring strategies.
+            </summary>
+        </member>
+        <member name="M:IoC.AutowiringStrategies.AspectOriented">
+            <summary>
+            Creates aspect oriented autowiring strategy.
+            </summary>
+            <returns>The instance of aspect oriented autowiring strategy.</returns>
+        </member>
+        <member name="M:IoC.AutowiringStrategies.Type``1(IoC.IAutowiringStrategy,System.Func{``0,System.Type})">
+            <summary>
+            Specifies type selector for aspect oriented autowiring strategy.
+            </summary>
+            <typeparam name="TTypeAttribute">The type metadata attribute.</typeparam>
+            <param name="strategy">The base aspect oriented autowiring strategy.</param>
+            <param name="typeSelector">The type selector.</param>
+            <returns>The instance of aspect oriented autowiring strategy.</returns>
+        </member>
+        <member name="M:IoC.AutowiringStrategies.Order``1(IoC.IAutowiringStrategy,System.Func{``0,System.IComparable})">
+            <summary>
+            Specifies order selector for aspect oriented autowiring strategy.
+            </summary>
+            <typeparam name="TOrderAttribute">The order metadata attribute.</typeparam>
+            <param name="strategy">The base aspect oriented autowiring strategy.</param>
+            <param name="orderSelector">The type selector.</param>
+            <returns>The instance of aspect oriented autowiring strategy.</returns>
+        </member>
+        <member name="M:IoC.AutowiringStrategies.Tag``1(IoC.IAutowiringStrategy,System.Func{``0,System.Object})">
+            <summary>
+            Specifies tag selector for aspect oriented autowiring strategy.
+            </summary>
+            <typeparam name="TTagAttribute">The tag metadata attribute.</typeparam>
+            <param name="strategy">The base aspect oriented autowiring strategy.</param>
+            <param name="tagSelector">The tag selector.</param>
+            <returns>The instance of aspect oriented autowiring strategy.</returns>
+        </member>
         <member name="T:IoC.Container">
             <summary>
             The IoC container implementation.
@@ -701,6 +739,29 @@
             <summary>
             The optional resolving arguments.
             </summary>
+        </member>
+        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveType(System.Type,System.Type,System.Type@)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Core.AspectOrientedMetadata">
+            <summary>
+            Metadata for aspect oriented autowiring strategy.
+            </summary>
+        </member>
+        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveType(System.Type,System.Type,System.Type@)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
+            <inheritdoc />
         </member>
         <member name="T:IoC.Core.BuildContext">
             <summary>

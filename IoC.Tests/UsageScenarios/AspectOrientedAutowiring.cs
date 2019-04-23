@@ -23,7 +23,7 @@
         {
             var console = new Mock<IConsole>();
 
-            // Creates an aspect oriented autowiring strategy base on a custom `DependencyAttribute`
+            // Creates an aspect oriented autowiring strategy based on some custom `DependencyAttribute`
             var autowiringStrategy = AutowiringStrategies.AspectOriented()
                 .Type<DependencyAttribute>(attribute => attribute.Type)
                 .Order<DependencyAttribute>(attribute => attribute.Order)

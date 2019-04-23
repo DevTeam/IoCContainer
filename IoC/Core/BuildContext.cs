@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Linq.Expressions;
 
     /// <summary>
@@ -13,15 +14,15 @@
     internal class BuildContext : IBuildContext
     {
         private static readonly ICollection<IBuilder> EmptyBuilders = new List<IBuilder>();
-        private readonly ICollection<IDisposable> _resources;
-        [NotNull] private readonly ICollection<IBuilder> _builders;
+        private readonly IEnumerable<IDisposable> _resources;
+        [NotNull] private readonly IEnumerable<IBuilder> _builders;
         private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
 
         internal BuildContext(
             Key key,
             [NotNull] IContainer resolvingContainer,
-            [NotNull] ICollection<IDisposable> resources,
-            [NotNull] ICollection<IBuilder> builders,
+            [NotNull] IEnumerable<IDisposable> resources,
+            [NotNull] IEnumerable<IBuilder> builders,
             [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
             int depth = 0)
         {
@@ -61,7 +62,7 @@
 
         public Expression AddLifetime(Expression baseExpression, ILifetime lifetime)
         {
-            if (_builders.Count > 0)
+            if (_builders.Any())
             {
                 var buildContext = CreateChildInternal(Key, Container, forBuilders: true);
                 foreach (var builder in _builders)
