@@ -122,8 +122,6 @@ class CardboardBox<T> : IBox<T>
     public CardboardBox(T content) => Content = content;
 
     public T Content { get; }
-
-    public override string ToString() => $"[{Content}]";
 }
 
 class ShroedingersCat : ICat
@@ -131,8 +129,6 @@ class ShroedingersCat : ICat
     public ShroedingersCat(State state) => State = state;
 
     public State State { get; }
-
-    public override string ToString() => $"{State} cat";
 }
 ```
 
@@ -277,17 +273,16 @@ using (container.Intercept<IService>(new MyInterceptor()))
 
 ## Class References
 
-- [.NET 4.0](Docs/IoC_net40.md)
-- [.NET 4.5](Docs/IoC_net45.md)
-- [.NET Standard 1.0](Docs/IoC_netstandard1.0.md)
-- [.NET Core 2.0](Docs/IoC_netcoreapp2.0.md)
+- [.NET 4.8](Docs/IoC_net48.md)
+- [.NET Standard 2.0](Docs/IoC_netstandard2.0.md)
+- [.NET Core 3.0](Docs/IoC_netcoreapp3.0.md)
 - [UWP 10.0](Docs/IoC_uap10.0.md)
 
 ## Why this one?
 
 The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for some popular IoC containers like Castle Windsor, Autofac, Unity, Ninject ...
 
-![Cat](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,status:SUCCESS/artifacts/content/REPORT.jpg)
+![Cat](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/REPORT.jpg)
 
 ## Usage Scenarios
 
