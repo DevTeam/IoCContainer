@@ -70,11 +70,8 @@ namespace ShroedingersCat
         }
 
         static void Main()
-        {
-            using (var container = Container.Create().Using<Glue>())
-            {
-                container.BuildUp<Program>();
-            }
+        {            
+            using (new Glue().BuildUp<Program>()) { }
         }
     }
 

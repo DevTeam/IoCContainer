@@ -171,10 +171,7 @@ class Glue : IConfiguration
 Build up _Program_ using _Glue_
 
 ```csharp
-using (var container = Container.Create().Using<Glue>())
-{
-  container.BuildUp<Program>();
-}
+using (new Glue().BuildUp<Program>()) { }
 ```
 
 injecting a set of dependencies via _Program_ constructor (also it can be done via methods, properties or even fields)
