@@ -26,6 +26,8 @@
         /// </summary>
         [CanBeNull] public readonly object Tag;
 
+        private readonly int _hashCode;
+
         /// <summary>
         /// Creates the instance of Key.
         /// </summary>
@@ -35,6 +37,10 @@
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
             Tag = tag;
+            unchecked
+            {
+                _hashCode = (tag?.GetHashCode() * 397 ?? 0) ^ type.GetHashCode();
+            }
         }
 
         /// <inheritdoc />
@@ -42,28 +48,16 @@
 
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]
-        public override bool Equals(object obj)
-        {
-            // ReSharper disable once PossibleNullReferenceException
-            return Equals((Key)obj);
-        }
+        // ReSharper disable once PossibleNullReferenceException
+        public override bool Equals(object obj) => Equals((Key)obj);
 
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]
-        public bool Equals(Key other)
-        {
-            return ReferenceEquals(Type, other.Type) && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
-        }
+        public bool Equals(Key other) => ReferenceEquals(Type, other.Type) && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
 
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (Tag != null ? Tag.GetHashCode() * 397 : 0) ^ Type.GetHashCode();
-            }
-        }
+        public override int GetHashCode() => _hashCode;
 
         private struct AnyTagObject
         {

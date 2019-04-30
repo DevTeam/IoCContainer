@@ -86,17 +86,18 @@
 
             var lifetimeKey = new LifetimeKey(typeDescriptor.GetGenericTypeArguments());
             var lifetimeHashCode = lifetimeKey.GetHashCode();
-            var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
-            if (lifetime == null)
+            lock (_lockObject)
             {
-                lifetime = Lifetime.Create();
-                lock (_lockObject)
+                var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
+                if (lifetime == null)
                 {
+
+                    lifetime = Lifetime.Create();
                     _lifetimes = _lifetimes.Set(lifetimeHashCode, lifetimeKey, lifetime);
                 }
-            }
-            
-            return lifetime;
+
+                return lifetime;
+            }            
         }
 
         public void Dispose()
@@ -127,12 +128,18 @@
         private struct LifetimeKey
         {
             private readonly Type[] _genericTypes;
+            private readonly int _hashCode;
 
-            public LifetimeKey(Type[] genericTypes) => _genericTypes = genericTypes;
+            public LifetimeKey(Type[] genericTypes)
+            {
+                _genericTypes = genericTypes;
+                _hashCode = genericTypes.GetHash();                
+            }
 
-            public override bool Equals(object obj) => obj is LifetimeKey key && Equals(key);
+            // ReSharper disable once PossibleNullReferenceException
+            public override bool Equals(object obj) => Equals((LifetimeKey)obj);
 
-            public override int GetHashCode() => _genericTypes != null ? _genericTypes.GetHash() : 0;
+            public override int GetHashCode() => _hashCode;
 
             private bool Equals(LifetimeKey other) => CoreExtensions.SequenceEqual(_genericTypes, other._genericTypes);
         }

@@ -18,6 +18,7 @@
             {
                 var code = 0;
                 // ReSharper disable once ForCanBeConvertedToForeach
+                // ReSharper disable once LoopCanBeConvertedToQuery
                 for (var i = 0; i < items.Length; i++)
                 {
                     code = (code * 397) ^ items[i].GetHashCode();
