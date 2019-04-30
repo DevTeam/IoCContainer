@@ -1713,7 +1713,6 @@ namespace IoC
 
 namespace IoC
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -1735,11 +1734,11 @@ namespace IoC
         /// <summary>
         /// The changed keys.
         /// </summary>
-        public readonly IEnumerable<Key> Keys;
+        [NotNull] public readonly IEnumerable<Key> Keys;
 
         internal ContainerEvent([NotNull] IContainer container, EventType eventTypeType, IEnumerable<Key> keys)
         {
-            Container = container ?? throw new ArgumentNullException(nameof(container));
+            Container = container;
             EventTypeType = eventTypeType;
             Keys = keys;
         }

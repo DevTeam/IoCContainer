@@ -199,13 +199,13 @@ public Program(
 
 ### Under the hood
 
-Actually each dependency is resolving by a strongly-typed block of statements like a operator `new` which is compiled from the coresponding expression tree to create or to get a required dependency instance with minimal performance and memory impact. Thus the calling of constructor looks like:
+Actually each dependency is resolved by a strongly-typed block of statements like the operator `new` which is compiled from the coresponding expression tree to create or to get a required dependency instance with minimal impact on performance or memory consumtion. For instance, the calling of constructor `Program` looks like:
 
 ```csharp
 new Program(new ShroedingersCat() , new CardboardBox<ShroedingersCat>(new ShroedingersCat()), ...);
 ```
 
-This works the same way for any initializers like methods, properties or fields.
+This works the same way for any initializing methods, to define properties or fields. Incredible performance and minimal memory traffic make it possible to use the dependency injection pattern at practically no cost and enjoy all its benefits without any compromises.
 
 ## ![ASP.NET Core](https://img.shields.io/badge/feature-ASP.NET%20Core-orange.svg)
 
