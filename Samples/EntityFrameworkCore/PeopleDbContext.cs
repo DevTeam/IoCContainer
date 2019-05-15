@@ -1,4 +1,6 @@
-﻿namespace EntityFrameworkCore
+﻿// ReSharper disable UnusedAutoPropertyAccessor.Local
+// ReSharper disable ClassNeverInstantiated.Global
+namespace EntityFrameworkCore
 {
     using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +10,6 @@
             :base(options)
         { }
 
-        public DbSet<Person> People { get; set; }
+        public DbSet<Person> People { get; private set; }
     }
 }

@@ -1,22 +1,40 @@
-﻿namespace EntityFrameworkCore
+﻿// ReSharper disable ClassNeverInstantiated.Global
+namespace EntityFrameworkCore
 {
     using System;
     using IoC;
-    using Microsoft.EntityFrameworkCore;
 
-    public static class Program
+    public class Program
     {
         public static void Main()
         {
-            // Create and configure a container by ASP .NET core feature
-            using var container = Container.Create().Using<Configuration>();
+            using var program =
+                // Create a container
+                Container.Create()
+                // And configure it
+                .Using<Configuration>()
+                // Build up program
+                .BuildUp<Program>();
+        }
 
-            // Resolve DB context
-            using var ctx = container.Resolve<PeopleDbContext>();
+        internal Program(
+            // DB context factory
+            Func<PeopleDbContext> newCtx,
+            // Person factory
+            Func<Person> newPerson)
+        {
+            // Create DB context
+            using var ctx = newCtx();
 
             // Fill DB by people
-            ctx.People.Add(new Person {Id = 1, Name = "Nik"});
-            ctx.People.Add(new Person {Id = 2, Name = "John"});
+            var nik = newPerson();
+            nik.Name = "Nik";
+            ctx.People.Add(nik);
+
+            var john = newPerson();
+            john.Name = "John";
+            ctx.People.Add(john);
+
             ctx.SaveChanges();
 
             // Fetch people

@@ -1,8 +1,14 @@
-﻿namespace EntityFrameworkCore
+﻿// ReSharper disable AutoPropertyCanBeMadeGetOnly.Local
+namespace EntityFrameworkCore
 {
     internal class Person
     {
-        public int Id { get; set; }
+        public Person(int id)
+        {
+            Id = id;
+        }
+
+        public int Id { get; private set; }
 
         public string Name { get; set; }
     }
