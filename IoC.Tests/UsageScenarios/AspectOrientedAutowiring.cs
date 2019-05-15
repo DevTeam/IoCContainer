@@ -1,4 +1,5 @@
-﻿namespace IoC.Tests.UsageScenarios
+﻿// ReSharper disable RedundantTypeArgumentsOfMethod
+namespace IoC.Tests.UsageScenarios
 {
     using System;
     using System.Diagnostics.CodeAnalysis;

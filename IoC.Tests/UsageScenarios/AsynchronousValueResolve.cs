@@ -19,10 +19,9 @@ namespace IoC.Tests.UsageScenarios
             // $description=Asynchronous lightweight resolve
             // {
             // Create a container
-            using (var container = Container.Create())
-            // Configure the container
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
-            // Bind Service
+                // Bind Service
             using (container.Bind<IService>().To<Service>())
             {
                 // Resolve an instance asynchronously via ValueTask
@@ -32,6 +31,7 @@ namespace IoC.Tests.UsageScenarios
                 instance.ShouldBeOfType<Service>();
                 // {
             }
+
             // }
         }
     }

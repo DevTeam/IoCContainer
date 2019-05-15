@@ -10,17 +10,15 @@
         public void ContainerShouldResolveFromInstanceWhenPureContainer()
         {
             // Given
-            using (var container = Container.CreateCore())
-            {
-                var expectedInstance = Mock.Of<IMyService>();
+            using var container = Container.CreateCore();
+            var expectedInstance = Mock.Of<IMyService>();
 
-                // When
-                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<IMyService>();
-                    actualInstance.ShouldBe(expectedInstance);
-                }
+            // When
+            using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
+            {
+                // Then
+                var actualInstance = container.Resolve<IMyService>();
+                actualInstance.ShouldBe(expectedInstance);
             }
         }
 
@@ -28,15 +26,14 @@
         public void ContainerShouldResolveAutowiringWhenPureContainer()
         {
             // Given
-            using (var container = Container.CreateCore())
+            using var container = Container.CreateCore();
+
+            // When
+            using (container.Bind<MySimpleClass>().To())
             {
-                // When
-                using (container.Bind<MySimpleClass>().To())
-                {
-                    // Then
-                    var actualInstance = container.Resolve<MySimpleClass>();
-                    actualInstance.ShouldBeOfType<MySimpleClass>();
-                }
+                // Then
+                var actualInstance = container.Resolve<MySimpleClass>();
+                actualInstance.ShouldBeOfType<MySimpleClass>();
             }
         }
 
@@ -44,18 +41,17 @@
         public void ContainerShouldResolveAutowiringSingletonWhenPureContainer()
         {
             // Given
-            using (var container = Container.CreateCore())
-            {
-                // When
-                using (container.Bind<MySimpleClass>().As(Lifetime.Singleton).To())
-                {
-                    // Then
-                    var actualInstance1 = container.Resolve<MySimpleClass>();
-                    var actualInstance2 = container.Resolve<MySimpleClass>();
+            using var container = Container.CreateCore();
 
-                    actualInstance1.ShouldBeOfType<MySimpleClass>();
-                    actualInstance1.ShouldBe(actualInstance2);
-                }
+            // When
+            using (container.Bind<MySimpleClass>().As(Lifetime.Singleton).To())
+            {
+                // Then
+                var actualInstance1 = container.Resolve<MySimpleClass>();
+                var actualInstance2 = container.Resolve<MySimpleClass>();
+
+                actualInstance1.ShouldBeOfType<MySimpleClass>();
+                actualInstance1.ShouldBe(actualInstance2);
             }
         }
     }

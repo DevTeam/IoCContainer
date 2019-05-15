@@ -10,14 +10,33 @@
         public void ContainerShouldUseBuilder()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+            using (container.Bind<IBuilder>().To<MyBuilder>())
             {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+                var instance1 = container.Resolve<IMyGenericService<string, int>>();
+                var instance2 = container.Resolve<IMyGenericService<string, int>>();
+
+                // Then
+                instance1.ShouldBe(instance2);
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldUseBuilderInChildContainer()
+        {
+            // Given
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+            {
+                using var childContainer = container.CreateChild();
                 using (container.Bind<IBuilder>().To<MyBuilder>())
                 {
-                    var instance1 = container.Resolve<IMyGenericService<string, int>>();
-                    var instance2 = container.Resolve<IMyGenericService<string, int>>();
+                    var instance1 = childContainer.Resolve<IMyGenericService<string, int>>();
+                    var instance2 = childContainer.Resolve<IMyGenericService<string, int>>();
 
                     // Then
                     instance1.ShouldBe(instance2);
@@ -26,45 +45,21 @@
         }
 
         [Fact]
-        public void ContainerShouldUseBuilderInChildContainer()
-        {
-            // Given
-            using (var container = Container.Create())
-            {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
-                {
-                    using (var childContainer = container.CreateChild())
-                    using (container.Bind<IBuilder>().To<MyBuilder>())
-                    {
-                        var instance1 = childContainer.Resolve<IMyGenericService<string, int>>();
-                        var instance2 = childContainer.Resolve<IMyGenericService<string, int>>();
-
-                        // Then
-                        instance1.ShouldBe(instance2);
-                    }
-                }
-            }
-        }
-
-        [Fact]
         public void ContainerShouldUseBuilderAfterChildCreated()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IBuilder>().To<MyBuilder>())
             {
-                // When
-                using (container.Bind<IBuilder>().To<MyBuilder>())
+                using var childContainer = container.CreateChild();
+                using (childContainer.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
                 {
-                    using (var childContainer = container.CreateChild())
-                    using (childContainer.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
-                    {
-                        var instance1 = childContainer.Resolve<IMyGenericService<string, int>>();
-                        var instance2 = childContainer.Resolve<IMyGenericService<string, int>>();
+                    var instance1 = childContainer.Resolve<IMyGenericService<string, int>>();
+                    var instance2 = childContainer.Resolve<IMyGenericService<string, int>>();
 
-                        // Then
-                        instance1.ShouldBe(instance2);
-                    }
+                    // Then
+                    instance1.ShouldBe(instance2);
                 }
             }
         }

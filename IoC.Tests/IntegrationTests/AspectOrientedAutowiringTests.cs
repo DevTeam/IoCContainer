@@ -1,4 +1,5 @@
-﻿namespace IoC.Tests.IntegrationTests
+﻿// ReSharper disable RedundantTypeArgumentsOfMethod
+namespace IoC.Tests.IntegrationTests
 {
     using System;
     using System.Diagnostics.CodeAnalysis;

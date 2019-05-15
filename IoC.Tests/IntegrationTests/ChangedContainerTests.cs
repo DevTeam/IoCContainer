@@ -14,29 +14,27 @@
         public void ContainerShouldResolveWithReferencesAfterChangeBindings()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            var firstRef = Mock.Of<IMyService>();
+            var expectedRef = Mock.Of<IMyService>();
+
+            // When
+            using (container.Bind<IMyService>().As(Lifetime.Transient).To(
+                ctx => new MyService((string)ctx.Args[0], ctx.Container.Inject<IMyService1>())))
             {
-                var firstRef = Mock.Of<IMyService>();
-                var expectedRef = Mock.Of<IMyService>();
-
-                // When
-                using (container.Bind<IMyService>().As(Lifetime.Transient).To(
-                    ctx => new MyService((string)ctx.Args[0], ctx.Container.Inject<IMyService1>())))
+                using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => firstRef))
                 {
-                    using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => firstRef))
-                    {
-                        var actualInstance = container.Resolve<IMyService>("xyz");
-                        ((MyService) actualInstance).Name.ShouldBe("xyz");
-                        ((MyService) actualInstance).SomeRef.ShouldBe(firstRef);
-                    }
+                    var actualInstance = container.Resolve<IMyService>("xyz");
+                    ((MyService) actualInstance).Name.ShouldBe("xyz");
+                    ((MyService) actualInstance).SomeRef.ShouldBe(firstRef);
+                }
 
-                    using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => expectedRef))
-                    {
-                        // Then
-                        var actualInstance = container.Resolve<IMyService>("abc");
-                        ((MyService)actualInstance).Name.ShouldBe("abc");
-                        ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
-                    }
+                using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => expectedRef))
+                {
+                    // Then
+                    var actualInstance = container.Resolve<IMyService>("abc");
+                    ((MyService)actualInstance).Name.ShouldBe("abc");
+                    ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
                 }
             }
         }

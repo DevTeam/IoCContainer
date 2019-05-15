@@ -18,8 +18,7 @@
             Func<IService> func = () => new Service(new Dependency());
 
             // Create and configure the container
-            using (var container = Container.Create())
-            // Bind to result of function invocation
+            using var container = Container.Create();
             using (container.Bind<IService>().To(ctx => func()))
             {
                 // Resolve an instance

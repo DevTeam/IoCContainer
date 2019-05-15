@@ -15,10 +15,9 @@
             // $description=Method Injection
             // {
             // Create and configure the container using full autowiring
-            using (var container = Container.Create())
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
-            // Bind 'INamedService' to the instance creation and initialization, actually represented as an expression tree
+                // Bind 'INamedService' to the instance creation and initialization, actually represented as an expression tree
             using (container.Bind<INamedService>().To<InitializingNamedService>(
                 // Select the constructor and inject the dependency
                 ctx => new InitializingNamedService(ctx.Container.Inject<IDependency>()),
@@ -45,6 +44,7 @@
                 // Check the injected dependency
                 otherInstance.Name.ShouldBe("beta");
             }
+
             // }
         }
     }

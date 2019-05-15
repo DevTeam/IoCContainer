@@ -17,10 +17,32 @@
         public void ContainerShouldResolveWhenRef()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+
+            // When
+            using (container.Bind<MySimpleClass>().To(ctx => new MySimpleClass()))
             {
-                // When
-                using (container.Bind<MySimpleClass>().To(ctx => new MySimpleClass()))
+                var instance = container.Resolve<object>(typeof(MySimpleClass));
+                var instance1 = container.Resolve<MySimpleClass>();
+                var instance2 = container.Resolve<MySimpleClass>();
+
+                // Then
+                instance.ShouldNotBe(instance1);
+                instance.ShouldNotBe(instance2);
+                instance1.ShouldNotBe(instance2);
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenRef_MT()
+        {
+            // Given
+            using var container = Container.Create();
+
+            // When
+            using (container.Bind<MySimpleClass>().To(ctx => new MySimpleClass()))
+            {
+                TestsExtensions.Parallelize(() =>
                 {
                     var instance = container.Resolve<object>(typeof(MySimpleClass));
                     var instance1 = container.Resolve<MySimpleClass>();
@@ -30,31 +52,7 @@
                     instance.ShouldNotBe(instance1);
                     instance.ShouldNotBe(instance2);
                     instance1.ShouldNotBe(instance2);
-                }
-            }
-        }
-
-        [Fact]
-        public void ContainerShouldResolveWhenRef_MT()
-        {
-            // Given
-            using (var container = Container.Create())
-            {
-                // When
-                using (container.Bind<MySimpleClass>().To(ctx => new MySimpleClass()))
-                {
-                    TestsExtensions.Parallelize(() =>
-                    {
-                        var instance = container.Resolve<object>(typeof(MySimpleClass));
-                        var instance1 = container.Resolve<MySimpleClass>();
-                        var instance2 = container.Resolve<MySimpleClass>();
-
-                        // Then
-                        instance.ShouldNotBe(instance1);
-                        instance.ShouldNotBe(instance2);
-                        instance1.ShouldNotBe(instance2);
-                    });
-                }
+                });
             }
         }
 
@@ -62,17 +60,16 @@
         public void ContainerShouldResolveWhenTransientLifetime()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+
+            Func<IMyService> func = Mock.Of<IMyService>;
+            // When
+            using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => func()))
             {
-                Func<IMyService> func = Mock.Of<IMyService>;
-                // When
-                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => func()))
-                {
-                    // Then
-                    var instance1 = container.Resolve<IMyService>();
-                    var instance2 = container.Resolve<IMyService>();
-                    instance1.ShouldNotBe(instance2);
-                }
+                // Then
+                var instance1 = container.Resolve<IMyService>();
+                var instance2 = container.Resolve<IMyService>();
+                instance1.ShouldNotBe(instance2);
             }
         }
 
@@ -80,20 +77,19 @@
         public void ContainerShouldResolveWhenInherited()
         {
             // Given
-            using (var container = Container.CreateCore())
-            {
-                // When
-                using (container.Bind<MyService, IMyService>().To(ctx => new MyService("abc", null)))
-                {
-                    // Then
-                    var instance1 = container.GetResolver<MyService>(typeof(MyService))(container);
-                    var instance2 = container.GetResolver<object>(typeof(MyService))(container);
-                    var instance3 = container.GetResolver<IMyService>(typeof(IMyService))(container);
+            using var container = Container.CreateCore();
 
-                    instance3.ShouldBeOfType<MyService>();
-                    instance1.ShouldBeOfType<MyService>();
-                    instance2.ShouldBeOfType<MyService>();
-                }
+            // When
+            using (container.Bind<MyService, IMyService>().To(ctx => new MyService("abc", null)))
+            {
+                // Then
+                var instance1 = container.GetResolver<MyService>(typeof(MyService))(container);
+                var instance2 = container.GetResolver<object>(typeof(MyService))(container);
+                var instance3 = container.GetResolver<IMyService>(typeof(IMyService))(container);
+
+                instance3.ShouldBeOfType<MyService>();
+                instance1.ShouldBeOfType<MyService>();
+                instance2.ShouldBeOfType<MyService>();
             }
         }
 
@@ -101,17 +97,15 @@
         public void ContainerShouldResolveFunc()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedInstance = Mock.Of<IMyService>();
+            using var container = Container.Create();
+            var expectedInstance = Mock.Of<IMyService>();
 
-                // When
-                using (container.Bind<IMyService>().Tag(99).To(ctx => expectedInstance))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<Func<IMyService>>(99.AsTag());
-                    actualInstance().ShouldBe(expectedInstance);
-                }
+            // When
+            using (container.Bind<IMyService>().Tag(99).To(ctx => expectedInstance))
+            {
+                // Then
+                var actualInstance = container.Resolve<Func<IMyService>>(99.AsTag());
+                actualInstance().ShouldBe(expectedInstance);
             }
         }
 
@@ -119,17 +113,15 @@
         public void ContainerShouldResolveLazy()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedInstance = Mock.Of<IMyService>();
+            using var container = Container.Create();
+            var expectedInstance = Mock.Of<IMyService>();
 
-                // When
-                using (container.Bind<IMyService>().Tag(99).To(ctx => expectedInstance))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<Lazy<IMyService>>(99.AsTag());
-                    actualInstance.Value.ShouldBe(expectedInstance);
-                }
+            // When
+            using (container.Bind<IMyService>().Tag(99).To(ctx => expectedInstance))
+            {
+                // Then
+                var actualInstance = container.Resolve<Lazy<IMyService>>(99.AsTag());
+                actualInstance.Value.ShouldBe(expectedInstance);
             }
         }
 
@@ -137,19 +129,17 @@
         public void ContainerShouldResolve()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedInstance = Mock.Of<IMyService>();
+            using var container = Container.Create();
+            var expectedInstance = Mock.Of<IMyService>();
 
-                // When
-                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<IMyService>();
-                    var actualInstance2 = ((IContainer)container).Resolve<IMyService>();
-                    actualInstance.ShouldBe(expectedInstance);
-                    actualInstance2.ShouldBe(expectedInstance);
-                }
+            // When
+            using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
+            {
+                // Then
+                var actualInstance = container.Resolve<IMyService>();
+                var actualInstance2 = ((IContainer)container).Resolve<IMyService>();
+                actualInstance.ShouldBe(expectedInstance);
+                actualInstance2.ShouldBe(expectedInstance);
             }
         }
 
@@ -157,19 +147,17 @@
         public void ContainerShouldResolveWithArgs()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedInstance = Mock.Of<IMyService>();
+            using var container = Container.Create();
+            var expectedInstance = Mock.Of<IMyService>();
 
-                // When
-                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<IMyService>("abc");
-                    var actualInstance2 = ((IContainer)container).Resolve<IMyService>("abc");
-                    actualInstance.ShouldBe(expectedInstance);
-                    actualInstance2.ShouldBe(expectedInstance);
-                }
+            // When
+            using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
+            {
+                // Then
+                var actualInstance = container.Resolve<IMyService>("abc");
+                var actualInstance2 = ((IContainer)container).Resolve<IMyService>("abc");
+                actualInstance.ShouldBe(expectedInstance);
+                actualInstance2.ShouldBe(expectedInstance);
             }
         }
 
@@ -177,19 +165,17 @@
         public void ContainerShouldResolveWithTag()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedInstance = Mock.Of<IMyService>();
+            using var container = Container.Create();
+            var expectedInstance = Mock.Of<IMyService>();
 
-                // When
-                using (container.Bind<IMyService>().Tag(10).To(ctx => expectedInstance))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<IMyService>(10.AsTag());
-                    var actualInstance2 = ((IContainer)container).Resolve<IMyService>(10.AsTag());
-                    actualInstance.ShouldBe(expectedInstance);
-                    actualInstance2.ShouldBe(expectedInstance);
-                }
+            // When
+            using (container.Bind<IMyService>().Tag(10).To(ctx => expectedInstance))
+            {
+                // Then
+                var actualInstance = container.Resolve<IMyService>(10.AsTag());
+                var actualInstance2 = ((IContainer)container).Resolve<IMyService>(10.AsTag());
+                actualInstance.ShouldBe(expectedInstance);
+                actualInstance2.ShouldBe(expectedInstance);
             }
         }
 
@@ -197,19 +183,17 @@
         public void ContainerShouldResolveWithTagAndArgs()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedInstance = Mock.Of<IMyService>();
+            using var container = Container.Create();
+            var expectedInstance = Mock.Of<IMyService>();
 
-                // When
-                using (container.Bind<IMyService>().Tag(10).To(ctx => expectedInstance))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<IMyService>(10.AsTag(), "abc");
-                    var actualInstance2 = ((IContainer)container).Resolve<IMyService>(10.AsTag(), "abc");
-                    actualInstance.ShouldBe(expectedInstance);
-                    actualInstance2.ShouldBe(expectedInstance);
-                }
+            // When
+            using (container.Bind<IMyService>().Tag(10).To(ctx => expectedInstance))
+            {
+                // Then
+                var actualInstance = container.Resolve<IMyService>(10.AsTag(), "abc");
+                var actualInstance2 = ((IContainer)container).Resolve<IMyService>(10.AsTag(), "abc");
+                actualInstance.ShouldBe(expectedInstance);
+                actualInstance2.ShouldBe(expectedInstance);
             }
         }
 
@@ -217,19 +201,17 @@
         public void ContainerShouldResolveWithType()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedInstance = Mock.Of<IMyService>();
+            using var container = Container.Create();
+            var expectedInstance = Mock.Of<IMyService>();
 
-                // When
-                using (container.Bind<IMyService>().To(ctx => expectedInstance))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<object>(typeof(IMyService));
-                    var actualInstance2 = ((IContainer)container).Resolve<object>(typeof(IMyService));
-                    actualInstance.ShouldBe(expectedInstance);
-                    actualInstance2.ShouldBe(expectedInstance);
-                }
+            // When
+            using (container.Bind<IMyService>().To(ctx => expectedInstance))
+            {
+                // Then
+                var actualInstance = container.Resolve<object>(typeof(IMyService));
+                var actualInstance2 = ((IContainer)container).Resolve<object>(typeof(IMyService));
+                actualInstance.ShouldBe(expectedInstance);
+                actualInstance2.ShouldBe(expectedInstance);
             }
         }
 
@@ -237,19 +219,17 @@
         public void ContainerShouldResolveWithTypeAndArgs()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedInstance = Mock.Of<IMyService>();
+            using var container = Container.Create();
+            var expectedInstance = Mock.Of<IMyService>();
 
-                // When
-                using (container.Bind<IMyService>().To(ctx => expectedInstance))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<object>(typeof(IMyService), "abc");
-                    var actualInstance2 = ((IContainer)container).Resolve<object>(typeof(IMyService), "abc");
-                    actualInstance.ShouldBe(expectedInstance);
-                    actualInstance2.ShouldBe(expectedInstance);
-                }
+            // When
+            using (container.Bind<IMyService>().To(ctx => expectedInstance))
+            {
+                // Then
+                var actualInstance = container.Resolve<object>(typeof(IMyService), "abc");
+                var actualInstance2 = ((IContainer)container).Resolve<object>(typeof(IMyService), "abc");
+                actualInstance.ShouldBe(expectedInstance);
+                actualInstance2.ShouldBe(expectedInstance);
             }
         }
 
@@ -257,19 +237,17 @@
         public void ContainerShouldResolveWithTypeAndTag()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedInstance = Mock.Of<IMyService>();
+            using var container = Container.Create();
+            var expectedInstance = Mock.Of<IMyService>();
 
-                // When
-                using (container.Bind<IMyService>().Tag(9).To(ctx => expectedInstance))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<object>(typeof(IMyService), 9.AsTag());
-                    var actualInstance2 = ((IContainer)container).Resolve<object>(typeof(IMyService), 9.AsTag());
-                    actualInstance.ShouldBe(expectedInstance);
-                    actualInstance2.ShouldBe(expectedInstance);
-                }
+            // When
+            using (container.Bind<IMyService>().Tag(9).To(ctx => expectedInstance))
+            {
+                // Then
+                var actualInstance = container.Resolve<object>(typeof(IMyService), 9.AsTag());
+                var actualInstance2 = ((IContainer)container).Resolve<object>(typeof(IMyService), 9.AsTag());
+                actualInstance.ShouldBe(expectedInstance);
+                actualInstance2.ShouldBe(expectedInstance);
             }
         }
 
@@ -277,19 +255,17 @@
         public void ContainerShouldResolveWithTypeAndTagAndArgs()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedInstance = Mock.Of<IMyService>();
+            using var container = Container.Create();
+            var expectedInstance = Mock.Of<IMyService>();
 
-                // When
-                using (container.Bind<IMyService>().Tag(9).To(ctx => expectedInstance))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<object>(typeof(IMyService), 9.AsTag(), "abc");
-                    var actualInstance2 = ((IContainer)container).Resolve<object>(typeof(IMyService), 9.AsTag(), "abc");
-                    actualInstance.ShouldBe(expectedInstance);
-                    actualInstance2.ShouldBe(expectedInstance);
-                }
+            // When
+            using (container.Bind<IMyService>().Tag(9).To(ctx => expectedInstance))
+            {
+                // Then
+                var actualInstance = container.Resolve<object>(typeof(IMyService), 9.AsTag(), "abc");
+                var actualInstance2 = ((IContainer)container).Resolve<object>(typeof(IMyService), 9.AsTag(), "abc");
+                actualInstance.ShouldBe(expectedInstance);
+                actualInstance2.ShouldBe(expectedInstance);
             }
         }
 
@@ -297,19 +273,17 @@
         public void ContainerShouldResolveWhenSeveralContracts()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedInstance = Mock.Of<IMyService>();
+            using var container = Container.Create();
+            var expectedInstance = Mock.Of<IMyService>();
 
-                // When
-                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<IMyService>();
-                    var actualInstance1 = container.Resolve<IMyService>();
-                    actualInstance.ShouldBe(expectedInstance);
-                    actualInstance1.ShouldBe(expectedInstance);
-                }
+            // When
+            using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
+            {
+                // Then
+                var actualInstance = container.Resolve<IMyService>();
+                var actualInstance1 = container.Resolve<IMyService>();
+                actualInstance.ShouldBe(expectedInstance);
+                actualInstance1.ShouldBe(expectedInstance);
             }
         }
 
@@ -317,18 +291,15 @@
         public void ContainerShouldResolveWhenGeneric()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().As(Lifetime.Transient).To(ctx => new MyGenericService<TT1, TT2>(), ctx => ctx.It.Do(), ctx => ctx.It.Do()))
             {
-                var expectedInstance = Mock.Of<IMyGenericService<int, string>>();
-
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().As(Lifetime.Transient).To(ctx => new MyGenericService<TT1, TT2>(), ctx => ctx.It.Do(), ctx => ctx.It.Do()))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<IMyGenericService<int, string>>();
-                    actualInstance.ShouldBeOfType<MyGenericService<int, string>>();
-                    ((MyGenericService<int, string>)actualInstance).Counter.ShouldBe(2);
-                }
+                // Then
+                var actualInstance = container.Resolve<IMyGenericService<int, string>>();
+                actualInstance.ShouldBeOfType<MyGenericService<int, string>>();
+                ((MyGenericService<int, string>)actualInstance).Counter.ShouldBe(2);
             }
         }
 
@@ -336,16 +307,14 @@
         public void ContainerShouldFullAutoWiringResolveWhenGenericAndHasStatements()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().As(Lifetime.Transient).To<MyGenericService<TT1, TT2>>(ctx => ctx.It.Do(), ctx => ctx.It.Do()))
             {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().As(Lifetime.Transient).To<MyGenericService<TT1, TT2>>(ctx => ctx.It.Do(), ctx => ctx.It.Do()))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<IMyGenericService<int, string>>();
-                    actualInstance.ShouldBeOfType<MyGenericService<int, string>>();
-                    ((MyGenericService<int, string>)actualInstance).Counter.ShouldBe(2);
-                }
+                // Then
+                var actualInstance = container.Resolve<IMyGenericService<int, string>>();
+                actualInstance.ShouldBeOfType<MyGenericService<int, string>>();
+                ((MyGenericService<int, string>)actualInstance).Counter.ShouldBe(2);
             }
         }
 
@@ -353,19 +322,17 @@
         public void ContainerShouldResolveWhenFunc()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedInstance = Mock.Of<IMyService>();
-                Func<IMyService> func = () => expectedInstance;
+            using var container = Container.Create();
+            var expectedInstance = Mock.Of<IMyService>();
+            Func<IMyService> func = () => expectedInstance;
 
-                // When
-                using (container.Bind<IMyService>().To(ctx => func()))
-                {
-                    // Then
-                    var getter = container.Resolve<Func<IMyService>>();
-                    var actualInstance = getter();
-                    actualInstance.ShouldBe(expectedInstance);
-                }
+            // When
+            using (container.Bind<IMyService>().To(ctx => func()))
+            {
+                // Then
+                var getter = container.Resolve<Func<IMyService>>();
+                var actualInstance = getter();
+                actualInstance.ShouldBe(expectedInstance);
             }
         }
 
@@ -374,18 +341,16 @@
         public async Task ContainerShouldResolveTask()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedInstance = Mock.Of<IMyService>();
-                Func<IMyService> func = () => expectedInstance;
+            using var container = Container.Create();
+            var expectedInstance = Mock.Of<IMyService>();
+            Func<IMyService> func = () => expectedInstance;
 
-                // When
-                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => func()))
-                {
-                    // Then
-                    var actualInstance = await container.Resolve<Task<IMyService>>();
-                    actualInstance.ShouldBe(expectedInstance);
-                }
+            // When
+            using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => func()))
+            {
+                // Then
+                var actualInstance = await container.Resolve<Task<IMyService>>();
+                actualInstance.ShouldBe(expectedInstance);
             }
         }
 #endif
@@ -394,21 +359,19 @@
         public void ContainerShouldResolveWhenFuncWithArg()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedRef = Mock.Of<IMyService>();
+            using var container = Container.Create();
+            var expectedRef = Mock.Of<IMyService>();
 
-                // When
-                using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => expectedRef))
-                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => new MyService((string)ctx.Args[0], ctx.Container.Inject<IMyService1>())))
-                {
-                    // Then
-                    var func = container.Resolve<Func<string, IMyService>>();
-                    var actualInstance = func("abc");
-                    actualInstance.ShouldBeOfType<MyService>();
-                    ((MyService)actualInstance).Name.ShouldBe("abc");
-                    ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
-                }
+            // When
+            using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => expectedRef))
+            using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => new MyService((string)ctx.Args[0], ctx.Container.Inject<IMyService1>())))
+            {
+                // Then
+                var func = container.Resolve<Func<string, IMyService>>();
+                var actualInstance = func("abc");
+                actualInstance.ShouldBeOfType<MyService>();
+                ((MyService)actualInstance).Name.ShouldBe("abc");
+                ((MyService)actualInstance).SomeRef.ShouldBe(expectedRef);
             }
         }
 
@@ -416,22 +379,20 @@
         public void ContainerShouldThrowDetailedExceptionWhenResolvingWasFailed()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            using (container.Bind<IMyService>().To(ctx => new MyService("abc", ctx.Container.Inject<IMyService1>())))
             {
-                using (container.Bind<IMyService>().To(ctx => new MyService("abc", ctx.Container.Inject<IMyService1>())))
+                // When
+                try
                 {
-                    // When
-                    try
-                    {
-                        container.Resolve<IMyService>();
-                    }
-                    catch (Exception ex)
-                    {
-                        // Then
-                        ex.InnerException.ShouldNotBeNull();
-                        ex.InnerException.Message.ShouldContain("Cannot find the dependency for the key");
-                        ex.InnerException.Message.ShouldContain("IoC.Tests.IntegrationTests.IMyService1");
-                    }
+                    container.Resolve<IMyService>();
+                }
+                catch (Exception ex)
+                {
+                    // Then
+                    ex.InnerException.ShouldNotBeNull();
+                    ex.InnerException.Message.ShouldContain("Cannot find the dependency for the key");
+                    ex.InnerException.Message.ShouldContain("IoC.Tests.IntegrationTests.IMyService1");
                 }
             }
         }
@@ -440,16 +401,14 @@
         public void ContainerShouldResolveGenericWhenFunc()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
-                {
-                    var instance = container.Resolve<Func<IMyGenericService<string, int>>>()();
+                var instance = container.Resolve<Func<IMyGenericService<string, int>>>()();
 
-                    // Then
-                    instance.ShouldBeOfType<MyGenericService<string, int>>();
-                }
+                // Then
+                instance.ShouldBeOfType<MyGenericService<string, int>>();
             }
         }
 
@@ -457,17 +416,15 @@
         public void ContainerShouldResolveGenericWhenTuple()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
-                {
-                    var instance = container.Resolve<Tuple<IMyGenericService<string, int>, IMyGenericService<string, int>>>();
+                var instance = container.Resolve<Tuple<IMyGenericService<string, int>, IMyGenericService<string, int>>>();
 
-                    // Then
-                    instance.Item1.ShouldBeOfType<MyGenericService<string, int>>();
-                    instance.Item2.ShouldBeOfType<MyGenericService<string, int>>();
-                }
+                // Then
+                instance.Item1.ShouldBeOfType<MyGenericService<string, int>>();
+                instance.Item2.ShouldBeOfType<MyGenericService<string, int>>();
             }
         }
 
@@ -475,16 +432,14 @@
         public void ContainerShouldResolveGenericWhenLazy()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
-                {
-                    var instance = container.Resolve<Lazy<IMyGenericService<string, int>>>();
+                var instance = container.Resolve<Lazy<IMyGenericService<string, int>>>();
 
-                    // Then
-                    instance.Value.ShouldBeOfType<MyGenericService<string, int>>();
-                }
+                // Then
+                instance.Value.ShouldBeOfType<MyGenericService<string, int>>();
             }
         }
 
@@ -492,16 +447,14 @@
         public void ContainerShouldResolveGenericWhenEnumerable()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
-                {
-                    var instance = container.Resolve<IEnumerable<IMyGenericService<string, int>>>();
+                var instance = container.Resolve<IEnumerable<IMyGenericService<string, int>>>();
 
-                    // Then
-                    instance.Single().ShouldBeOfType<MyGenericService<string, int>>();
-                }
+                // Then
+                instance.Single().ShouldBeOfType<MyGenericService<string, int>>();
             }
         }
 
@@ -509,16 +462,14 @@
         public void ContainerShouldResolveGenericWhenList()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
-                {
-                    var instance = container.Resolve<IList<IMyGenericService<string, int>>>();
+                var instance = container.Resolve<IList<IMyGenericService<string, int>>>();
 
-                    // Then
-                    instance[0].ShouldBeOfType<MyGenericService<string, int>>();
-                }
+                // Then
+                instance[0].ShouldBeOfType<MyGenericService<string, int>>();
             }
         }
 
@@ -527,16 +478,14 @@
         public void ContainerShouldResolveGenericWhenComplex()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
-                {
-                    var instance = container.Resolve<Task<Func<IEnumerable<Lazy<Tuple<Func<IMyGenericService<string, int>>, IMyGenericService<string, int>>>>>>>();
+                var instance = container.Resolve<Task<Func<IEnumerable<Lazy<Tuple<Func<IMyGenericService<string, int>>, IMyGenericService<string, int>>>>>>>();
 
-                    // Then
-                    instance.Result().Single().Value.Item1().ShouldBeOfType<MyGenericService<string, int>>();
-                }
+                // Then
+                instance.Result().Single().Value.Item1().ShouldBeOfType<MyGenericService<string, int>>();
             }
         }
 
@@ -544,19 +493,17 @@
         public void ContainerShouldResolveGenericWhenComplex_MT()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+                TestsExtensions.Parallelize(() =>
                 {
-                    TestsExtensions.Parallelize(() =>
-                    {
-                        var instance = container.Resolve<Task<Func<IEnumerable<Lazy<Tuple<Func<IMyGenericService<string, int>>, IMyGenericService<string, int>>>>>>>();
+                    var instance = container.Resolve<Task<Func<IEnumerable<Lazy<Tuple<Func<IMyGenericService<string, int>>, IMyGenericService<string, int>>>>>>>();
 
-                        // Then
-                        instance.Result().Single().Value.Item1().ShouldBeOfType<MyGenericService<string, int>>();
-                    });
-                }
+                    // Then
+                    instance.Result().Single().Value.Item1().ShouldBeOfType<MyGenericService<string, int>>();
+                });
             }
         }
 
@@ -564,16 +511,14 @@
         public void ContainerShouldResolveGenericWhenTask()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
-                {
-                    var instance = container.Resolve<Task<IMyGenericService<string, int>>>().Result;
+                var instance = container.Resolve<Task<IMyGenericService<string, int>>>().Result;
 
-                    // Then
-                    instance.ShouldBeOfType<MyGenericService<string, int>>();
-                }
+                // Then
+                instance.ShouldBeOfType<MyGenericService<string, int>>();
             }
         }
 
@@ -581,16 +526,14 @@
         public void ContainerShouldResolveGenericWhenReactive()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
-                {
-                    var source = container.Resolve<IObservable<IMyGenericService<string, int>>>();
+                var source = container.Resolve<IObservable<IMyGenericService<string, int>>>();
 
-                    // Then
-                    using(source.Subscribe(new Observer())) {}
-                }
+                // Then
+                using(source.Subscribe(new Observer())) {}
             }
         }
 
@@ -598,16 +541,14 @@
         public void ContainerShouldResolveGenericWhenGenericTypeMarkersWasNotReplaced()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>, IMyGenericService1<TT1>>().To<MyGenericService<TT1, TT2>>())
             {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>, IMyGenericService1<TT1>>().To<MyGenericService<TT1, TT2>>())
-                {
-                    var instance = container.Resolve<Func<IMyGenericService1<string>>>()();
+                var instance = container.Resolve<Func<IMyGenericService1<string>>>()();
 
-                    // Then
-                    instance.ShouldBeOfType<MyGenericService<string, TT2>>();
-                }
+                // Then
+                instance.ShouldBeOfType<MyGenericService<string, TT2>>();
             }
         }
 
@@ -634,17 +575,15 @@
         public void ContainerShouldResolveGenericWhenValueTuple()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
-                {
-                    var instance = container.Resolve<(IMyGenericService<string, int> a, IMyGenericService<string, int> b)>();
+                var instance = container.Resolve<(IMyGenericService<string, int> a, IMyGenericService<string, int> b)>();
 
-                    // Then
-                    instance.a.ShouldBeOfType<MyGenericService<string, int>>();
-                    instance.b.ShouldBeOfType<MyGenericService<string, int>>();
-                }
+                // Then
+                instance.a.ShouldBeOfType<MyGenericService<string, int>>();
+                instance.b.ShouldBeOfType<MyGenericService<string, int>>();
             }
         }
 
@@ -652,16 +591,14 @@
         public void ContainerShouldResolveGenericWhenValueTask()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
-                {
-                    var instance = container.Resolve<ValueTask<IMyGenericService<string, int>>>().Result;
+                var instance = container.Resolve<ValueTask<IMyGenericService<string, int>>>().Result;
 
-                    // Then
-                    instance.ShouldBeOfType<MyGenericService<string, int>>();
-                }
+                // Then
+                instance.ShouldBeOfType<MyGenericService<string, int>>();
             }
         }
 #endif

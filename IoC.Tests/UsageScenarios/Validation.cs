@@ -14,7 +14,7 @@
             // $description=Validation
             // {
             // Create and configure the container
-            using (var container = Container.Create())
+            using var container = Container.Create();
             using (container.Bind<IService>().To<Service>())
             {
                 // Try getting a resolver of the interface `IService`
@@ -24,6 +24,7 @@
                 // which was not registered and cannot be resolved
                 canBeResolved.ShouldBeFalse();
             }
+
             // }
         }
     }

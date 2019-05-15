@@ -24,12 +24,11 @@ namespace IoC.Tests.UsageScenarios
         public void Run()
         {
             // Create and configure the container
-            using (var container = Container.Create())
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
-            // Register the tracing builder
+                // Register the tracing builder
             using (container.Bind<TracingBuilder, IBuilder>().As(Singleton).To<TracingBuilder>())
-            // Register a struct
+                // Register a struct
             using (container.Bind<MyStruct>().To<MyStruct>())
             {
                 // Resolve an instance

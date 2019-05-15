@@ -17,8 +17,7 @@
             // $description=Resolve Func
             // {
             // Create and configure the container
-            using (var container = Container.Create())
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
             {
@@ -32,6 +31,7 @@
                 instance.ShouldBeOfType<Service>();
                 // {
             }
+
             // }
         }
     }

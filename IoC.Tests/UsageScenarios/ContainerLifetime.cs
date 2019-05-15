@@ -15,10 +15,9 @@
             // $description=Container Singleton lifetime
             // {
             // Create and configure the container
-            using (var container = Container.Create())
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
-            // Use the Container Singleton lifetime
+                // Use the Container Singleton lifetime
             using (container.Bind<IService>().As(ContainerSingleton).To<Service>())
             {
                 // Resolve the container singleton twice
@@ -29,19 +28,18 @@
                 parentInstance1.ShouldBe(parentInstance2);
 
                 // Create a child container
-                using (var childContainer = container.CreateChild())
-                {
-                    // Resolve the container singleton twice
-                    var childInstance1 = childContainer.Resolve<IService>();
-                    var childInstance2 = childContainer.Resolve<IService>();
+                using var childContainer = container.CreateChild();
+                // Resolve the container singleton twice
+                var childInstance1 = childContainer.Resolve<IService>();
+                var childInstance2 = childContainer.Resolve<IService>();
 
-                    // Check that instances from the child container are equal
-                    childInstance1.ShouldBe(childInstance2);
+                // Check that instances from the child container are equal
+                childInstance1.ShouldBe(childInstance2);
 
-                    // Check that instances from different containers are not equal
-                    parentInstance1.ShouldNotBe(childInstance1);
-                }
+                // Check that instances from different containers are not equal
+                parentInstance1.ShouldNotBe(childInstance1);
             }
+
             // }
         }
     }

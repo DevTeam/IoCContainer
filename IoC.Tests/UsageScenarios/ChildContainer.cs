@@ -14,12 +14,10 @@
             // $description=Child Container
             // {
             // Create the parent container
-            using (var parentContainer = Container.Create())
-            // Create the child container
-            using (var childContainer = parentContainer.CreateChild())
-            {
-                childContainer.Parent.ShouldBe(parentContainer);
-            }
+            using var parentContainer = Container.Create();
+            using var childContainer = parentContainer.CreateChild();
+            childContainer.Parent.ShouldBe(parentContainer);
+
             // }
         }
     }

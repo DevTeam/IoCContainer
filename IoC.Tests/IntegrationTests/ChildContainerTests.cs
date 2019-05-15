@@ -13,7 +13,23 @@
         public void ShouldResolveChildContainer()
         {
             // Given
-            using (var parentContainer = Container.Create("parent"))
+            using var parentContainer = Container.Create("parent");
+            // When
+            var childContainer1 = parentContainer.CreateChild("child_1");
+            var childContainer2 = parentContainer.CreateChild("child_2");
+
+            // Then
+            childContainer1.Parent.ShouldBe(parentContainer);
+            childContainer2.Parent.ShouldBe(parentContainer);
+            childContainer1.ShouldNotBeSameAs(childContainer2);
+        }
+
+        [Fact]
+        public void ShouldResolveChildContainer_MT()
+        {
+            // Given
+            using var parentContainer = Container.Create("parent");
+            TestsExtensions.Parallelize(() =>
             {
                 // When
                 var childContainer1 = parentContainer.CreateChild("child_1");
@@ -23,27 +39,7 @@
                 childContainer1.Parent.ShouldBe(parentContainer);
                 childContainer2.Parent.ShouldBe(parentContainer);
                 childContainer1.ShouldNotBeSameAs(childContainer2);
-            }
-        }
-
-        [Fact]
-        public void ShouldResolveChildContainer_MT()
-        {
-            // Given
-            using (var parentContainer = Container.Create("parent"))
-            {
-                TestsExtensions.Parallelize(() =>
-                {
-                    // When
-                    var childContainer1 = parentContainer.CreateChild("child_1");
-                    var childContainer2 = parentContainer.CreateChild("child_2");
-
-                    // Then
-                    childContainer1.Parent.ShouldBe(parentContainer);
-                    childContainer2.Parent.ShouldBe(parentContainer);
-                    childContainer1.ShouldNotBeSameAs(childContainer2);
-                });
-            }
+            });
         }
 
         [Fact]
@@ -52,18 +48,16 @@
             // Given
             var childContainer = new Mock<IContainer>();
             Func<IContainer> containerGetter = () => childContainer.Object;
-            using (var container = Container.Create("my"))
+            using var container = Container.Create("my");
+            // When
+            IContainer actualChildContainer;
+            using (container.Bind<IContainer>().To(ctx => containerGetter()))
             {
-                // When
-                IContainer actualChildContainer;
-                using (container.Bind<IContainer>().To(ctx => containerGetter()))
-                {
-                    actualChildContainer = container.Resolve<IContainer>();
-                }
-
-                // Then
-                actualChildContainer.ShouldBe(childContainer.Object);
+                actualChildContainer = container.Resolve<IContainer>();
             }
+
+            // Then
+            actualChildContainer.ShouldBe(childContainer.Object);
         }
 
         [Fact]
@@ -92,20 +86,16 @@
         public void ContainerShouldResolveFromChild()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            var expectedInstance = Mock.Of<IMyService>();
+            Func<IMyService> func = () => expectedInstance;
+            // When
+            using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => func()))
             {
-                var expectedInstance = Mock.Of<IMyService>();
-                Func<IMyService> func = () => expectedInstance;
-                // When
-                using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => func()))
-                {
-                    using (var childContainer = container.CreateChild())
-                    {
-                        // Then
-                        var actualInstance = childContainer.Resolve<IMyService>();
-                        actualInstance.ShouldBe(expectedInstance);
-                    }
-                }
+                using var childContainer = container.CreateChild();
+                // Then
+                var actualInstance = childContainer.Resolve<IMyService>();
+                actualInstance.ShouldBe(expectedInstance);
             }
         }
     }

@@ -14,19 +14,17 @@
             // $description=Configuration via a text metadata
             // {
             // Create and configure the container from a metadata string
-            using (var container = Container.Create().Using(
+            using var container = Container.Create().Using(
                 "ref IoC.Tests;" +
                 "using IoC.Tests.UsageScenarios;" +
                 "Bind<IDependency>().As(Singleton).To<Dependency>();" +
-                "Bind<IService>().To<Service>();"))
-            {
-                // Resolve an instance
-                var instance = container.Resolve<IService>();
-                // }
-                // Check the instance's type
-                instance.ShouldBeOfType<Service>();
-                // {
-            }
+                "Bind<IService>().To<Service>();");
+            // Resolve an instance
+            var instance = container.Resolve<IService>();
+            // }
+            // Check the instance's type
+            instance.ShouldBeOfType<Service>();
+            // {
             // }
         }
     }

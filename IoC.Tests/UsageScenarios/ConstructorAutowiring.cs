@@ -14,10 +14,9 @@
             // $description=Constructor Autowiring
             // {
             // Create and configure the container, using full autowiring
-            using (var container = Container.Create())
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
-            // Configure via manual injection
+                // Configure via manual injection
             using (container.Bind<IService>().To<Service>(
                 // Select the constructor and inject arguments
                 ctx => new Service(ctx.Container.Inject<IDependency>(), "some state")))
@@ -31,6 +30,7 @@
                 // Check the injected constant
                 instance.State.ShouldBe("some state");
             }
+
             // }
         }
     }

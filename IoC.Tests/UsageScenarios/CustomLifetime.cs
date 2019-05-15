@@ -15,10 +15,9 @@
         public void Run()
         {
             // Create and configure the container
-            using (var container = Container.Create())
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
-            // Bind interface to implementation using the custom lifetime, based on the Singleton lifetime
+                // Bind interface to implementation using the custom lifetime, based on the Singleton lifetime
             using (container.Bind<IService>().Lifetime(new MyTransientLifetime()).To<Service>())
             {
                 // Resolve the singleton twice

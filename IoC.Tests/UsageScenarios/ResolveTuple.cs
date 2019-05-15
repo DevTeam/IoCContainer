@@ -17,8 +17,7 @@
             // $description=Resolve Tuple
             // {
             // Create and configure the container
-            using (var container = Container.Create())
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
             using (container.Bind<INamedService>().To<NamedService>(
@@ -32,6 +31,7 @@
                 tuple.Item2.ShouldBeOfType<NamedService>();
                 // {
             }
+
             // }
         }
     }

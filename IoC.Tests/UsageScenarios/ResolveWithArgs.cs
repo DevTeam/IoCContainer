@@ -15,10 +15,9 @@
             // $description=Resolve Using Arguments
             // {
             // Create and configure the container
-            using (var container = Container.Create())
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
-            // Bind 'INamedService' to the instance creation and initialization, actually represented as an expression tree
+                // Bind 'INamedService' to the instance creation and initialization, actually represented as an expression tree
             using (container.Bind<INamedService>().To<NamedService>(
                 // Select the constructor and inject and inject the value from arguments at index 0
                 ctx => new NamedService(ctx.Container.Inject<IDependency>(), (string)ctx.Args[0])))
@@ -41,6 +40,7 @@
                 // Check the injected dependency
                 otherInstance.Name.ShouldBe("beta");
             }
+
             // }
         }
     }

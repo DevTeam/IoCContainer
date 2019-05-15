@@ -24,10 +24,9 @@ namespace IoC.Tests.UsageScenarios
             issueResolver.Setup(i => i.CyclicDependenceDetected(It.IsAny<Key>(), 128)).Throws(expectedException);
 
             // Create the container
-            using (var container = Container.Create())
-            // Configure the own issue resolver to check cyclic dependencies detection
+            using var container = Container.Create();
             using (container.Bind<IIssueResolver>().To(ctx => issueResolver.Object))
-            // Configure the container, where 1,2,3 are tags to produce cyclic dependencies during a resolving
+                // Configure the container, where 1,2,3 are tags to produce cyclic dependencies during a resolving
             using (container.Bind<ILink>().To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(1))))
             using (container.Bind<ILink>().Tag(1).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(2))))
             using (container.Bind<ILink>().Tag(2).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(3))))

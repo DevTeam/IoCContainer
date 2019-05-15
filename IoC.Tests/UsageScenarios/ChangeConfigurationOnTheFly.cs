@@ -14,7 +14,7 @@
             // $description=Change configuration on-the-fly
             // {
             // Create and configure the container
-            using (var container = Container.Create())
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
             {
                 // Configure `IService` as Transient
@@ -39,6 +39,7 @@
                     instance1.ShouldBe(instance2);
                 }
             }
+
             // }
         }
     }

@@ -15,7 +15,7 @@
             // $header=It's obvious here.
             // {
             // Create and configure the container
-            using (var container = Container.Create())
+            using var container = Container.Create();
             using (container.Bind<int>().To(ctx => 10))
             {
                 // Resolve an integer
@@ -24,6 +24,7 @@
                 // Check the value
                 val.ShouldBe(10);
             }
+
             // }
         }
     }

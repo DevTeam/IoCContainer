@@ -17,8 +17,7 @@
             // $header=It is possible to bind several types to single implementation.
             // {
             // Create and configure the container, using full autowiring
-            using (var container = Container.Create())
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<Service, IService, IAnotherService>().To<Service>())
             {
@@ -31,6 +30,7 @@
                 instance2.ShouldBeOfType<Service>();
                 // {
             }
+
             // }
         }
     }

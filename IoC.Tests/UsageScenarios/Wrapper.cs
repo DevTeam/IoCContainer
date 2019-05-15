@@ -25,10 +25,9 @@
             using (rootContainer.Bind<ILogger>().To<Logger>())
             {
                 // Create and configure the child container
-                using (var childContainer = rootContainer.CreateChild("child"))
-                // Bind IConsole
+                using var childContainer = rootContainer.CreateChild("child");
                 using (childContainer.Bind<IConsole>().To(ctx => console.Object))
-                // Bind 'ILogger' to the instance creation, actually represented as an expression tree
+                    // Bind 'ILogger' to the instance creation, actually represented as an expression tree
                 using (childContainer.Bind<ILogger>().To<TimeLogger>(
                     // Inject the logger from the parent container to an instance of type TimeLogger
                     ctx => new TimeLogger(ctx.Container.Parent.Inject<ILogger>())))

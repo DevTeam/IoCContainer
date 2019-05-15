@@ -15,11 +15,10 @@
         public void Run()
         {
             // Create and configure the container
-            using (var container = Container.Create())
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<IService>().To<Service>())
-            // Register the custom builder
+                // Register the custom builder
             using (container.Bind<IBuilder>().To<MyBuilder>())
             {
                 // Resolve instances

@@ -14,21 +14,20 @@
             // Given
             var interceptor = new Mock<IInterceptor>();
             interceptor.Setup(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "get_Name")));
-            using (var container = Container.Create().Using<InterceptionFeature>())
-            {
-                // When
-                using (container.Bind<string>().To(ctx => "SomeRef"))
-                using (container.Bind<IMyService1>().To(ctx => Mock.Of<IMyService1>()))
-                using (container.Bind<IMyService>().To<MyService>())
-                using (container.Intercept<IMyService>(interceptor.Object))
-                {
-                    var instance = container.Resolve<IMyService>();
-                    // ReSharper disable once UnusedVariable
-                    var val = instance.Name;
+            using var container = Container.Create().Using<InterceptionFeature>();
 
-                    // Then
-                    interceptor.Verify(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "get_Name")));
-                }
+            // When
+            using (container.Bind<string>().To(ctx => "SomeRef"))
+            using (container.Bind<IMyService1>().To(ctx => Mock.Of<IMyService1>()))
+            using (container.Bind<IMyService>().To<MyService>())
+            using (container.Intercept<IMyService>(interceptor.Object))
+            {
+                var instance = container.Resolve<IMyService>();
+                // ReSharper disable once UnusedVariable
+                var val = instance.Name;
+
+                // Then
+                interceptor.Verify(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "get_Name")));
             }
         }
 
@@ -38,18 +37,17 @@
             // Given
             var interceptor = new Mock<IInterceptor>();
             interceptor.Setup(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "Do")));
-            using (var container = Container.Create().Using<InterceptionFeature>())
-            {
-                // When
-                using (container.Bind<IMyGenericService<string, int>>().To<MyGenericService<string, int>>())
-                using (container.Intercept<IMyGenericService<string, int>>(interceptor.Object))
-                {
-                    var instance = container.Resolve<IMyGenericService<string, int>>();
-                    instance.Do();
+            using var container = Container.Create().Using<InterceptionFeature>();
 
-                    // Then
-                    interceptor.Verify(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "Do")));
-                }
+            // When
+            using (container.Bind<IMyGenericService<string, int>>().To<MyGenericService<string, int>>())
+            using (container.Intercept<IMyGenericService<string, int>>(interceptor.Object))
+            {
+                var instance = container.Resolve<IMyGenericService<string, int>>();
+                instance.Do();
+
+                // Then
+                interceptor.Verify(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "Do")));
             }
         }
 
@@ -59,18 +57,17 @@
             // Given
             var interceptor = new Mock<IInterceptor>();
             interceptor.Setup(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "Do")));
-            using (var container = Container.Create().Using<InterceptionFeature>())
-            {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
-                using (container.Intercept(new Key(typeof(IMyGenericService<,>)), interceptor.Object))
-                {
-                    var instance = container.Resolve<IMyGenericService<string, int>>();
-                    instance.Do();
+            using var container = Container.Create().Using<InterceptionFeature>();
 
-                    // Then
-                    interceptor.Verify(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "Do")));
-                }
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+            using (container.Intercept(new Key(typeof(IMyGenericService<,>)), interceptor.Object))
+            {
+                var instance = container.Resolve<IMyGenericService<string, int>>();
+                instance.Do();
+
+                // Then
+                interceptor.Verify(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "Do")));
             }
         }
 
@@ -80,18 +77,17 @@
             // Given
             var interceptor = new Mock<IInterceptor>();
             interceptor.Setup(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "Do")));
-            using (var container = Container.Create().Using<InterceptionFeature>())
-            {
-                // When
-                using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
-                using (container.Intercept<IMyGenericService<TT1, TT2>>(interceptor.Object))
-                {
-                    var instance = container.Resolve<IMyGenericService<string, int>>();
-                    instance.Do();
+            using var container = Container.Create().Using<InterceptionFeature>();
 
-                    // Then
-                    interceptor.Verify(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "Do")));
-                }
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
+            using (container.Intercept<IMyGenericService<TT1, TT2>>(interceptor.Object))
+            {
+                var instance = container.Resolve<IMyGenericService<string, int>>();
+                instance.Do();
+
+                // Then
+                interceptor.Verify(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "Do")));
             }
         }
     }

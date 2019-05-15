@@ -3652,6 +3652,8 @@ namespace IoC
         /// </summary>
         [CanBeNull] public readonly object Tag;
 
+        private readonly int _hashCode;
+
         /// <summary>
         /// Creates the instance of Key.
         /// </summary>
@@ -3661,6 +3663,10 @@ namespace IoC
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
             Tag = tag;
+            unchecked
+            {
+                _hashCode = (tag?.GetHashCode() * 397 ?? 0) ^ type.GetHashCode();
+            }
         }
 
         /// <inheritdoc />
@@ -3668,28 +3674,16 @@ namespace IoC
 
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]
-        public override bool Equals(object obj)
-        {
-            // ReSharper disable once PossibleNullReferenceException
-            return Equals((Key)obj);
-        }
+        // ReSharper disable once PossibleNullReferenceException
+        public override bool Equals(object obj) => Equals((Key)obj);
 
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]
-        public bool Equals(Key other)
-        {
-            return ReferenceEquals(Type, other.Type) && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
-        }
+        public bool Equals(Key other) => ReferenceEquals(Type, other.Type) && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
 
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)256)]
-        public override int GetHashCode()
-        {
-            unchecked
-            {
-                return (Tag != null ? Tag.GetHashCode() * 397 : 0) ^ Type.GetHashCode();
-            }
-        }
+        public override int GetHashCode() => _hashCode;
 
         private struct AnyTagObject
         {
@@ -4648,6 +4642,7 @@ namespace IoC.Features
 namespace IoC.Lifetimes
 {
     using System;
+    // ReSharper disable once RedundantUsingDirective
     using Core;
 
     /// <summary>
@@ -4851,6 +4846,7 @@ namespace IoC.Lifetimes
 namespace IoC.Lifetimes
 {
     using System;
+    // ReSharper disable once RedundantUsingDirective
     using Core;
 
     /// <summary>
@@ -5692,6 +5688,7 @@ namespace IoC.Core
             {
                 var code = 0;
                 // ReSharper disable once ForCanBeConvertedToForeach
+                // ReSharper disable once LoopCanBeConvertedToQuery
                 for (var i = 0; i < items.Length; i++)
                 {
                     code = (code * 397) ^ items[i].GetHashCode();
@@ -5931,17 +5928,18 @@ namespace IoC.Core
 
             var lifetimeKey = new LifetimeKey(typeDescriptor.GetGenericTypeArguments());
             var lifetimeHashCode = lifetimeKey.GetHashCode();
-            var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
-            if (lifetime == null)
+            lock (_lockObject)
             {
-                lifetime = Lifetime.Create();
-                lock (_lockObject)
+                var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
+                if (lifetime == null)
                 {
+
+                    lifetime = Lifetime.Create();
                     _lifetimes = _lifetimes.Set(lifetimeHashCode, lifetimeKey, lifetime);
                 }
-            }
-            
-            return lifetime;
+
+                return lifetime;
+            }            
         }
 
         public void Dispose()
@@ -5972,12 +5970,18 @@ namespace IoC.Core
         private struct LifetimeKey
         {
             private readonly Type[] _genericTypes;
+            private readonly int _hashCode;
 
-            public LifetimeKey(Type[] genericTypes) => _genericTypes = genericTypes;
+            public LifetimeKey(Type[] genericTypes)
+            {
+                _genericTypes = genericTypes;
+                _hashCode = genericTypes.GetHash();                
+            }
 
-            public override bool Equals(object obj) => obj is LifetimeKey key && Equals(key);
+            // ReSharper disable once PossibleNullReferenceException
+            public override bool Equals(object obj) => Equals((LifetimeKey)obj);
 
-            public override int GetHashCode() => _genericTypes != null ? _genericTypes.GetHash() : 0;
+            public override int GetHashCode() => _hashCode;
 
             private bool Equals(LifetimeKey other) => CoreExtensions.SequenceEqual(_genericTypes, other._genericTypes);
         }

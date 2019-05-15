@@ -17,10 +17,9 @@
             // $header=Tags are useful while binding to several implementations.
             // {
             // Create and configure the container
-            using (var container = Container.Create())
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
-            // Bind using several tags
+                // Bind using several tags
             using (container.Bind<IService>().Tag(10).Tag().Tag("abc").To<Service>())
             {
                 // Resolve instances using tags
@@ -36,6 +35,7 @@
                 instance3.ShouldBeOfType<Service>();
                 // {
             }
+
             // }
         }
     }

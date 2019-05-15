@@ -17,11 +17,9 @@
             // $header=Use a _tag_ to inject specific dependency from several bindings of the same types.
             // {
             // Create and configure the container
-            using (var container = Container.Create())
-            // Mark binding by tag "MyDep"
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().Tag("MyDep").To<Dependency>())
-            // Configure autowiring and inject dependency tagged by "MyDep"
+                // Configure autowiring and inject dependency tagged by "MyDep"
             using (container.Bind<IService>().To<Service>(
                 ctx => new Service(ctx.Container.Inject<IDependency>("MyDep"))))
             {
@@ -32,6 +30,7 @@
                 instance.ShouldBeOfType<Service>();
                 // {
             }
+
             // }
         }
     }

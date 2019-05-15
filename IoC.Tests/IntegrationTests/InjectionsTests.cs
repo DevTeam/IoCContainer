@@ -15,24 +15,22 @@
         public void ContainerShouldResolveWhenHasInitializerMethod()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            var expectedRef = Mock.Of<IMyService1>();
+            Func<IMyService1> func = () => expectedRef;
+
+            // When
+            using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
+            using (container.Bind<IMyService>().As(Lifetime.Transient).To(
+                ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>()),
+                ctx => ctx.It.Init(ctx.Container.Inject<IMyService1>(), ctx.Container.Inject<IMyService1>(), (string) ctx.Args[1])))
             {
-                var expectedRef = Mock.Of<IMyService1>();
-                Func<IMyService1> func = () => expectedRef;
+                // Then
+                var actualInstance = container.Resolve<IMyService>("abc", "xyz");
 
-                // When
-                using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
-                using (container.Bind<IMyService>().As(Lifetime.Transient).To(
-                    ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>()),
-                    ctx => ctx.It.Init(ctx.Container.Inject<IMyService1>(), ctx.Container.Inject<IMyService1>(), (string) ctx.Args[1])))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<IMyService>("abc", "xyz");
-
-                    actualInstance.ShouldBeOfType<MyService>();
-                    ((MyService) actualInstance).Name.ShouldBe("xyz");
-                    ((MyService) actualInstance).SomeRef.ShouldBe(expectedRef);
-                }
+                actualInstance.ShouldBeOfType<MyService>();
+                ((MyService) actualInstance).Name.ShouldBe("xyz");
+                ((MyService) actualInstance).SomeRef.ShouldBe(expectedRef);
             }
         }
 
@@ -40,25 +38,23 @@
         public void ContainerShouldInjectWhenHasInitializerMethod()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            var expectedRef = Mock.Of<IMyService1>();
+            Func<IMyService1> func = () => expectedRef;
+
+            // When
+            using (container.Bind<MyHolder>().To<MyHolder>())
+            using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
+            using (container.Bind<IMyService>().As(Lifetime.Transient).To(
+                ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>()),
+                ctx => ctx.It.Init(ctx.Container.Inject<IMyService1>(), ctx.Container.Inject<IMyService1>(), (string) ctx.Args[1])))
             {
-                var expectedRef = Mock.Of<IMyService1>();
-                Func<IMyService1> func = () => expectedRef;
+                // Then
+                var actualInstance = container.Resolve<MyHolder>("abc", "xyz");
 
-                // When
-                using (container.Bind<MyHolder>().To<MyHolder>())
-                using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
-                using (container.Bind<IMyService>().As(Lifetime.Transient).To(
-                    ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>()),
-                    ctx => ctx.It.Init(ctx.Container.Inject<IMyService1>(), ctx.Container.Inject<IMyService1>(), (string) ctx.Args[1])))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<MyHolder>("abc", "xyz");
-
-                    actualInstance.MyService.ShouldBeOfType<MyService>();
-                    ((MyService) actualInstance.MyService).Name.ShouldBe("xyz");
-                    ((MyService) actualInstance.MyService).SomeRef.ShouldBe(expectedRef);
-                }
+                actualInstance.MyService.ShouldBeOfType<MyService>();
+                ((MyService) actualInstance.MyService).Name.ShouldBe("xyz");
+                ((MyService) actualInstance.MyService).SomeRef.ShouldBe(expectedRef);
             }
         }
 
@@ -66,24 +62,22 @@
         public void ContainerShouldResolveWhenHasInitializerSetter()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
+            var expectedRef = Mock.Of<IMyService1>();
+            Func<IMyService1> func = () => expectedRef;
+
+            // When
+            using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
+            using (container.Bind<IMyService>().As(Lifetime.Transient).To(
+                ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>()),
+                ctx => ctx.Container.Inject(ctx.It.Name, (string) ctx.Args[1])))
             {
-                var expectedRef = Mock.Of<IMyService1>();
-                Func<IMyService1> func = () => expectedRef;
+                // Then
+                var actualInstance = container.Resolve<IMyService>("abc", "xyz");
 
-                // When
-                using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
-                using (container.Bind<IMyService>().As(Lifetime.Transient).To(
-                    ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>()),
-                    ctx => ctx.Container.Inject(ctx.It.Name, (string) ctx.Args[1])))
-                {
-                    // Then
-                    var actualInstance = container.Resolve<IMyService>("abc", "xyz");
-
-                    actualInstance.ShouldBeOfType<MyService>();
-                    ((MyService) actualInstance).Name.ShouldBe("xyz");
-                    ((MyService) actualInstance).SomeRef.ShouldBe(expectedRef);
-                }
+                actualInstance.ShouldBeOfType<MyService>();
+                ((MyService) actualInstance).Name.ShouldBe("xyz");
+                ((MyService) actualInstance).SomeRef.ShouldBe(expectedRef);
             }
         }
 
@@ -91,20 +85,18 @@
         public void ContainerShouldGetResolver()
         {
             // Given
-            using (var container = Container.CreateCore())
-            {
-                var expectedRef = Mock.Of<IMyService1>();
-                Func<IMyService1> func = () => expectedRef;
+            using var container = Container.CreateCore();
+            var expectedRef = Mock.Of<IMyService1>();
+            Func<IMyService1> func = () => expectedRef;
 
-                // When
-                using (container.Bind<IMyService1>().To(ctx => func()))
-                {
-                    // Then
-                    var resolver = container.Resolve<Resolver<IMyService1>>();
-                    resolver.ShouldBeOfType<Resolver<IMyService1>>();
-                    var actualInstance = resolver(container);
-                    actualInstance.ShouldBe(expectedRef);
-                }
+            // When
+            using (container.Bind<IMyService1>().To(ctx => func()))
+            {
+                // Then
+                var resolver = container.Resolve<Resolver<IMyService1>>();
+                resolver.ShouldBeOfType<Resolver<IMyService1>>();
+                var actualInstance = resolver(container);
+                actualInstance.ShouldBe(expectedRef);
             }
         }
 
@@ -112,21 +104,19 @@
         public void ContainerShouldInjectResolver()
         {
             // Given
-            using (var container = Container.Create())
-            {
-                var expectedRef = Mock.Of<IMyService1>();
-                Func<IMyService1> func = () => expectedRef;
+            using var container = Container.Create();
+            var expectedRef = Mock.Of<IMyService1>();
+            Func<IMyService1> func = () => expectedRef;
 
-                // When
-                using (container.Bind<IMyService1>().To(ctx => func()))
-                using (container.Bind<Func<IMyService1>>().To(ctx => (() => ctx.Container.Inject<Resolver<IMyService1>>()(ctx.Container))))
-                {
-                    // Then
-                    var funcInstance = container.Resolve<Func<IMyService1>>();
-                    funcInstance.ShouldBeOfType<Func<IMyService1>>();
-                    var actualInstance = funcInstance();
-                    actualInstance.ShouldBe(expectedRef);
-                }
+            // When
+            using (container.Bind<IMyService1>().To(ctx => func()))
+            using (container.Bind<Func<IMyService1>>().To(ctx => (() => ctx.Container.Inject<Resolver<IMyService1>>()(ctx.Container))))
+            {
+                // Then
+                var funcInstance = container.Resolve<Func<IMyService1>>();
+                funcInstance.ShouldBeOfType<Func<IMyService1>>();
+                var actualInstance = funcInstance();
+                actualInstance.ShouldBe(expectedRef);
             }
         }
 

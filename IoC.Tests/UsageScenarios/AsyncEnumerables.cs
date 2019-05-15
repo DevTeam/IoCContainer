@@ -2,12 +2,10 @@
 namespace IoC.Tests.UsageScenarios
 {
     using System.Collections.Generic;
-    using System.Linq;
     using Shouldly;
     using Xunit;
-    using System.Threading;
     using System.Threading.Tasks;
-    using IoC.Features;
+    using Features;
 
     public class AsyncEnumerables
     {
@@ -20,14 +18,13 @@ namespace IoC.Tests.UsageScenarios
             // $description=Resolve all appropriate instances as IAsyncEnumerable
             // {
             // Create and configure the container
-            using (var container = Container.CreateCore().Using(CollectionFeature.Default))
-            // Bind some dependency
+            using var container = Container.CreateCore().Using(CollectionFeature.Default);
             using (container.Bind<IDependency>().To<Dependency>())
-            // Bind to the implementation #1
+                // Bind to the implementation #1
             using (container.Bind<IService>().Tag(1).To<Service>())
-            // Bind to the implementation #2
+                // Bind to the implementation #2
             using (container.Bind<IService>().Tag(2).Tag("abc").To<Service>())
-            // Bind to the implementation #3
+                // Bind to the implementation #3
             using (container.Bind<IService>().Tag(3).To<Service>())
             {
                 // Resolve all appropriate instances
@@ -43,6 +40,7 @@ namespace IoC.Tests.UsageScenarios
                 items.ForEach(instance => instance.ShouldBeOfType<Service>());
                 // {
             }
+
             // }
         }
     }

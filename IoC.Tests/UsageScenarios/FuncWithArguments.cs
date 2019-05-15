@@ -18,10 +18,9 @@
                 (dependency, name) => new NamedService(dependency, name);
 
             // Create and configure the container, using full autowiring
-            using (var container = Container.Create())
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
-            // Bind, selecting the constructor and inject argument[0] as the second parameter of type 'string'
+                // Bind, selecting the constructor and inject argument[0] as the second parameter of type 'string'
             using (container.Bind<INamedService>().To(
                 ctx => func(ctx.Container.Inject<IDependency>(), (string)ctx.Args[0])))
             {

@@ -20,7 +20,7 @@
         public void ContainerShouldResolveWhenMethodCallForInjectedInstance()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
             using (container.Bind<MyClass3>().To())
             {
                 // When
@@ -36,7 +36,7 @@
         public void ContainerShouldResolveWhenArrayForInjectedInstance()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
             using (container.Bind<MyClass3>().To())
             {
                 // When
@@ -52,7 +52,7 @@
         public void ContainerShouldResolveWhenArrayOfFuncForInjectedInstance()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
             using (container.Bind<MyClass3>().To())
             {
                 // When
@@ -68,7 +68,7 @@
         public void ContainerShouldResolveWhenArrayOfTaskForInjectedInstance()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
             using (container.Bind<MyClass3>().To())
             {
                 // When
@@ -87,14 +87,14 @@
             var expectedRef = Mock.Of<IMyService1>();
             Func<IMyService1> func = () => expectedRef;
 
-            using (var container = Container.Create())
+            using var container = Container.Create();
             using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
             {
                 var childRef = Mock.Of<IMyService>();
                 Func<IMyService1> childFunc = () => childRef;
 
                 // When
-                using (var childContainer = container.CreateChild())
+                using var childContainer = container.CreateChild();
                 using (childContainer.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => childFunc()))
                 using (childContainer.Bind<IMyService>().As(Lifetime.Transient).To(
                     ctx => new MyService((string)ctx.Args[0], ctx.Container.Parent.Inject<IMyService1>())))
@@ -114,15 +114,15 @@
             var expectedRef = Mock.Of<IMyService1>();
             Func<IMyService1> func = () => expectedRef;
 
-            using (var container = Container.Create())
+            using var container = Container.Create();
             using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
             {
                 var childRef = Mock.Of<IMyService>();
                 Func<IMyService1> childFunc = () => childRef;
 
                 // When
-                using (var childContainer1 = container.CreateChild())
-                using (var childContainer2 = childContainer1.CreateChild())
+                using var childContainer1 = container.CreateChild();
+                using var childContainer2 = childContainer1.CreateChild();
                 using (childContainer2.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => childFunc()))
                 using (childContainer2.Bind<IMyService>().As(Lifetime.Transient).To(
                     ctx => new MyService((string)ctx.Args[0], ctx.Container.Parent.Parent.Inject<IMyService1>())))
@@ -142,7 +142,7 @@
             var expectedRef = Mock.Of<IMyService1>();
             Func<IMyService1> func = () => expectedRef;
 
-            using (var container = Container.Create())
+            using var container = Container.Create();
             using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
             {
                 var childRef = Mock.Of<IMyService>();
@@ -151,8 +151,8 @@
                 TestsExtensions.Parallelize(() =>
                 {
                     // When
-                    using (var childContainer1 = container.CreateChild())
-                    using (var childContainer2 = childContainer1.CreateChild())
+                    using var childContainer1 = container.CreateChild();
+                    using var childContainer2 = childContainer1.CreateChild();
                     using (childContainer2.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => childFunc()))
                     using (childContainer2.Bind<IMyService>().As(Lifetime.Transient).To(
                         ctx => new MyService((string) ctx.Args[0], ctx.Container.Parent.Parent.Inject<IMyService1>())))
@@ -170,7 +170,7 @@
         public void ContainerShouldResolveWhenGenericInitMethodCall()
         {
             // Given
-            using (var container = Container.Create())
+            using var container = Container.Create();
             using (container.Bind<MyClass3>().To())
             {
                 // When
@@ -189,7 +189,7 @@
         {
             // Given
             var val = "abc";
-            using (var container = Container.Create())
+            using var container = Container.Create();
             using (container.Bind<MyClass3>().To())
             {
                 // When

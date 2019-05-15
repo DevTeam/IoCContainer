@@ -16,15 +16,13 @@
         public void Run()
         {
             // Create and configure the container
-            using (var container = Container.Create().Using<Glue>())
-            {
-                // Resolve an instance
-                var instance = container.Resolve<IService>();
-                // }
-                // Check the instance's type
-                instance.ShouldBeOfType<Service>();
-                // {
-            }
+            using var container = Container.Create().Using<Glue>();
+            // Resolve an instance
+            var instance = container.Resolve<IService>();
+            // }
+            // Check the instance's type
+            instance.ShouldBeOfType<Service>();
+            // {
         }
 
         public class Glue : IConfiguration

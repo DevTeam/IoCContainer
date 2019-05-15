@@ -15,14 +15,13 @@
             // $description=Resolve all appropriate instances as IObservable source
             // {
             // Create and configure the container
-            using (var container = Container.Create())
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
-            // Bind to the implementation #1
+                // Bind to the implementation #1
             using (container.Bind<IService>().Tag(1).To<Service>())
-            // Bind to the implementation #2
+                // Bind to the implementation #2
             using (container.Bind<IService>().Tag(2).Tag("abc").To<Service>())
-            // Bind to the implementation #3
+                // Bind to the implementation #3
             using (container.Bind<IService>().Tag(3).To<Service>())
             {
                 // Resolve the source for all appropriate instances
@@ -40,6 +39,7 @@
                 }
                 // {
             }
+
             // }
         }
     }

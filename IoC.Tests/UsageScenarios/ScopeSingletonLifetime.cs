@@ -15,8 +15,7 @@
             // $description=Scope Singleton lifetime
             // {
             // Create and configure the container
-            using (var container = Container.Create())
-            // Use the Scope Singleton lifetime for dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().As(ScopeSingleton).To<Dependency>())
             {
                 // Use the Scope Singleton lifetime for instance
@@ -73,6 +72,7 @@
                     }
                 }
             }
+
             // }
         }
     }

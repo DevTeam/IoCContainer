@@ -15,8 +15,7 @@
             // $header=Auto-writing allows to perform some initializations.
             // {
             // Create the container and configure it, using full autowiring
-            using (var container = Container.Create())
-            // Bind some dependency
+            using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
             using (container.Bind<INamedService>().To<InitializingNamedService>(ctx => ctx.It.Initialize("text", ctx.Container.Resolve<IDependency>())))
             {
@@ -29,6 +28,7 @@
                 instance.Name.ShouldBe("text");
                 // {
             }
+
             // }
         }
     }
