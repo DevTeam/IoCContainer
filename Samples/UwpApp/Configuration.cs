@@ -1,4 +1,5 @@
-﻿namespace UwpApp
+﻿// ReSharper disable RedundantTypeArgumentsOfMethod
+namespace UwpApp
 {
     using System;
     using System.Collections.Generic;

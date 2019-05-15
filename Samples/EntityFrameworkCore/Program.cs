@@ -1,4 +1,5 @@
 ﻿// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable UnusedVariable
 namespace EntityFrameworkCore
 {
     using System;

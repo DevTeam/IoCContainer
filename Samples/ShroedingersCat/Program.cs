@@ -3,6 +3,7 @@
 // ReSharper disable ParameterTypeCanBeEnumerable.Local
 // ReSharper disable ArrangeTypeModifiers
 // ReSharper disable ArrangeTypeMemberModifiers
+// ReSharper disable RedundantTypeArgumentsOfMethod
 #pragma warning disable 618
 namespace ShroedingersCat
 {

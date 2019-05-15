@@ -8,7 +8,9 @@
     </Page.Resources>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" DataContext="{StaticResource ClockViewModel}">
+            <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
             <TextBlock Text="{Binding It.Date}" FontSize="64" />
+            <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
             <TextBlock Text="{Binding It.Time}" FontSize="64" />
         </StackPanel>
     </Grid>

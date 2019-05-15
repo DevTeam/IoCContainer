@@ -7,7 +7,9 @@
         <local:DataProvider x:Key="ClockViewModel" ObjectType="SampleModels.VewModels.IClockViewModel, SampleModels"/>
     </ContentPage.Resources>
     <StackLayout HorizontalOptions="Center" VerticalOptions="Center" BindingContext="{StaticResource ClockViewModel}">
+        <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
         <Label Text="{Binding It.Date}" />
+        <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
         <Label Text="{Binding It.Time}" />
     </StackLayout>
 </ContentPage>
