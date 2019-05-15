@@ -1,4 +1,5 @@
-﻿namespace WcfServiceLibrary
+﻿// ReSharper disable RedundantTypeArgumentsOfMethod
+namespace WcfServiceLibrary
 {
     using System;
     using System.Collections.Generic;

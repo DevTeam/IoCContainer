@@ -28,11 +28,12 @@
         {
             services.AddMvc().AddControllersAsServices();
 
-            // Create container
-            var container = Container.Create().Using(new AspNetCoreFeature(services));
-
-            // Configure container
-            container.Using<Glue>();
+            // Create IoC container
+            var container = Container.Create()
+                // using .NET ASP Feature
+                .Using(new AspNetCoreFeature(services))
+                // using Glue
+                .Using<Glue>();
 
             // Resolve IServiceProvider
             return container.Resolve<IServiceProvider>();

@@ -1,4 +1,5 @@
-﻿namespace WcfServiceLibrary
+﻿// ReSharper disable IdentifierTypo
+namespace WcfServiceLibrary
 {
     using System;
     using System.Collections.ObjectModel;

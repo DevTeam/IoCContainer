@@ -18,6 +18,7 @@
             set => _type = value != null ? Type.GetType(value, true) : typeof(object);
         }
 
+        // ReSharper disable once UnusedAutoPropertyAccessor.Global
         public object Tag { get; set; }
 
         public object It =>
