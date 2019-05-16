@@ -140,11 +140,12 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
 {
   services.AddMvc().AddControllersAsServices();
 
-  // Create container
-  var container = Container.Create().Using(new AspNetCoreFeature(services));
-
-  // Configure container
-  container.Using<Glue>();
+  // Create IoC container
+  var container = Container.Create()
+    // using .NET ASP Feature
+    .Using(new AspNetCoreFeature(services))
+    // using Glue
+    .Using<Glue>();
 
   // Resolve IServiceProvider
   return container.Resolve<IServiceProvider>();
@@ -172,7 +173,7 @@ For more information see [this sample](Samples/AspNetCore).
 ### Create the _IoC container_ using _InterceptionFeature_ and intercept all invocations to _Service_ by your _MyInterceptor_
 
 ```csharp
-using (var container = Container.Create().Using<InterceptionFeature>())
+using var container = Container.Create().Using<InterceptionFeature>();
 using (container.Bind<IService>().To<Service>())
 using (container.Intercept<IService>(new MyInterceptor()))
 { }
