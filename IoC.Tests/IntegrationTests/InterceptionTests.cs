@@ -1,5 +1,6 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
+    using System.Reflection;
     using Castle.DynamicProxy;
     using Features;
     using Moq;
@@ -23,6 +24,53 @@
             using (container.Intercept<IMyService>(interceptor.Object))
             {
                 var instance = container.Resolve<IMyService>();
+                // ReSharper disable once UnusedVariable
+                var val = instance.Name;
+
+                // Then
+                interceptor.Verify(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "get_Name")));
+            }
+        }
+
+        [Fact]
+        public void InterceptorShouldInterceptWhenClass()
+        {
+            // Given
+            var interceptor = new Mock<IInterceptor>();
+            interceptor.Setup(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "get_Name")));
+            using var container = Container.Create().Using<InterceptionFeature>();
+
+            // When
+            using (container.Bind<string>().To(ctx => "SomeRef"))
+            using (container.Bind<IMyService1>().To(ctx => Mock.Of<IMyService1>()))
+            using (container.Bind<MyServiceWithDefaultCtor>().To<MyServiceWithDefaultCtor>())
+            using (container.Intercept<MyServiceWithDefaultCtor>(interceptor.Object))
+            {
+                var instance = (IMyService)container.Resolve<MyServiceWithDefaultCtor>();
+                // ReSharper disable once UnusedVariable
+                var val = instance.Name;
+
+                // Then
+                interceptor.Verify(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "get_Name")));
+            }
+        }
+
+        [Fact]
+        public void InterceptorShouldInterceptWhenRegistrationInChildContainer()
+        {
+            // Given
+            var interceptor = new Mock<IInterceptor>();
+            interceptor.Setup(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "get_Name")));
+            using var container = Container.Create().Using<InterceptionFeature>();
+            using var childContainer = container.CreateChild();
+
+            // When
+            using (childContainer.Bind<string>().To(ctx => "SomeRef"))
+            using (childContainer.Bind<IMyService1>().To(ctx => Mock.Of<IMyService1>()))
+            using (childContainer.Bind<IMyService>().To<MyService>())
+            using (container.Intercept<IMyService>(interceptor.Object))
+            {
+                var instance = childContainer.Resolve<IMyService>();
                 // ReSharper disable once UnusedVariable
                 var val = instance.Name;
 

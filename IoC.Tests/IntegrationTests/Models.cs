@@ -74,6 +74,23 @@ namespace IoC.Tests.IntegrationTests
         }
     }
 
+    [SuppressMessage("ReSharper", "UnusedMember.Global")]
+    public class MyServiceWithDefaultCtor : IMyService
+    {
+        public string Name { get; set; }
+
+        public IMyService1 SomeRef { get; }
+
+        public IMyService1 SomeRef2 { get; set; }
+
+        public IMyService1 SomeRef3 { get; set; }
+
+        public void Init(IMyService1 someRef2, IMyService1 someRef3, string intiValue)
+        {
+            throw new NotImplementedException();
+        }
+    }
+
     [SuppressMessage("ReSharper", "UnusedParameter.Local")]
     public class MyGenericService<T1, T2> : IMyGenericService<T1, T2>
     {
