@@ -71,9 +71,9 @@
             where T : Expression =>
             isComplexType ? (T)buildContext.ReplaceTypes(expression) : expression;
 
-        [NotNull]
+        [IoC.NotNull]
         [MethodImpl((MethodImplOptions)256)]
-        public static IEnumerable<IMethod<TMethodInfo>> GetMethods<TMethodInfo>([NotNull] IEnumerable<TMethodInfo> methodInfos)
+        public static IEnumerable<IMethod<TMethodInfo>> GetMethods<TMethodInfo>([IoC.NotNull] IEnumerable<TMethodInfo> methodInfos)
             where TMethodInfo : MethodBase
             => methodInfos
                 .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
