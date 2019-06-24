@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/DevTeam/IoCContainer/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Simple, powerful and fast expressions based Inversion of Control container for .NET as embedding-in-code package.</description>
-    <tags>IoC inversionofcontrol Container DI dependencyinjection</tags>
+    <tags>ioc container di</tags>
     <contentFiles>
       <files include="cs/any/*.cs" buildAction="Compile" />
     </contentFiles>

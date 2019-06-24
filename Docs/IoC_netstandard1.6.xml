@@ -1417,20 +1417,40 @@
             </summary>
             <param name="dependencyToken"></param>
         </member>
-        <member name="T:IoC.FluentBuildUp">
+        <member name="T:IoC.FluentBuild">
             <summary>
             Represents extensions to build up from the container.
             </summary>
         </member>
-        <member name="M:IoC.FluentBuildUp.BuildUp``1(IoC.IContainer,System.Object[])">
+        <member name="M:IoC.FluentBuild.BuildUp``1(IoC.IConfiguration,System.Object[])">
+            <summary>
+            Buildups an instance.
+            </summary>
+            <param name="configuration">The configurations.</param>
+            <param name="args">The optional arguments.</param>
+            <typeparam name="TInstance">The instance type.</typeparam>
+            <returns>The disposable instance holder.</returns>
+        </member>
+        <member name="M:IoC.FluentBuild.BuildUp``1(IoC.IContainer,System.Object[])">
             <summary>
             Buildups an instance.
             Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
             </summary>
-            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="TInstance">The instance type.</typeparam>
             <param name="container">The target container.</param>
             <param name="args">The optional arguments.</param>
-            <returns>The instance.</returns>
+            <returns>The disposable instance holder.</returns>
+        </member>
+        <member name="T:IoC.FluentBuild.IHolder`1">
+            <summary>
+            Represents a holder for a created instance.
+            </summary>
+            <typeparam name="TInstance"></typeparam>
+        </member>
+        <member name="P:IoC.FluentBuild.IHolder`1.Instance">
+            <summary>
+            The created instance.
+            </summary>
         </member>
         <member name="T:IoC.FluentConfiguration">
             <summary>

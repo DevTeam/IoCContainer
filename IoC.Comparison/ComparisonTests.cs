@@ -109,7 +109,7 @@ namespace IoC.Comparison
             var results = new List<TestResult>();
             foreach (var ioc in IoCGraphOf3ObjectsWithSingleton)
             {
-                // Warmup
+                // Warm up
                 ioc.Test(2, new TotalTimePerformanceCounter());
                 GC.Collect();
                 GC.WaitForFullGCComplete();
@@ -126,7 +126,7 @@ namespace IoC.Comparison
 
             foreach (var ioc in IoCGraphOf3Transient)
             {
-                // Warmup
+                // Warm up
                 ioc.Test(2, new TotalTimePerformanceCounter());
                 GC.Collect();
                 GC.WaitForFullGCComplete();
@@ -144,7 +144,7 @@ namespace IoC.Comparison
             series /= 1000;
             foreach (var ioc in IoCComplexGraphOf3Transient)
             {
-                // Warmup
+                // Warm up
                 ioc.Test(2, new TotalTimePerformanceCounter());
                 GC.Collect();
                 GC.WaitForFullGCComplete();

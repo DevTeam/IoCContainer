@@ -9,7 +9,7 @@
     <projectUrl>https://github.com/DevTeam/IoCContainer/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Interception feature for expressions based Inversion of Control container for .NET as embedding-in-code package.</description>
-    <tags>ioc di container interception proxy</tags>
+    <tags>ioc container di interception proxy</tags>
     <contentFiles>
       <files include="cs/any/*.cs" buildAction="Compile" />
     </contentFiles>

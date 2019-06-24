@@ -8,21 +8,11 @@
 
     internal static class TypeDescriptorExtensions
     {
-#if !NET40
-        private static readonly Cache<Type, TypeDescriptor> TypeDescriptors =new Cache<Type, TypeDescriptor>();
-#endif
+        [MethodImpl((MethodImplOptions) 256)]
+        public static TypeDescriptor Descriptor(this Type type) => new TypeDescriptor(type);
 
         [MethodImpl((MethodImplOptions) 256)]
-        public static TypeDescriptor Descriptor(this Type type) =>
-#if !NET40
-            TypeDescriptors.GetOrCreate(type, () => new TypeDescriptor(type));
-#else
-            new TypeDescriptor(type);
-#endif
-
-        [MethodImpl((MethodImplOptions) 256)]
-        public static TypeDescriptor Descriptor<T>() =>
-            TypeDescriptor<T>.Descriptor;
+        public static TypeDescriptor Descriptor<T>() => TypeDescriptor<T>.Descriptor;
 
         [MethodImpl((MethodImplOptions)256)]
         public static Assembly LoadAssembly(string assemblyName)

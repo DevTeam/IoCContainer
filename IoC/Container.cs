@@ -426,12 +426,6 @@
                     return true;
                 }
 
-                dependencyEntry = _dependencies.Get(hashCode, key);
-                if (dependencyEntry != default(DependencyEntry))
-                {
-                    return true;
-                }
-
                 var type = key.Type;
                 var typeDescriptor = type.Descriptor();
 
