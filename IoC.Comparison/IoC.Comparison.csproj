@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFrameworks>netcoreapp3.0;net40;net48</TargetFrameworks>
+    <TargetFrameworks>netcoreapp2.2;netcoreapp3.0;net40;net48</TargetFrameworks>
     <IsTestProject>true</IsTestProject>
     <IsPackable>false</IsPackable>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -13,25 +13,31 @@
     <PackageReference Include="Unity" Version="5.10.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
   </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0' or '$(TargetFramework)'=='net48'">
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
-    <PackageReference Include="Autofac" Version="4.9.1" />
-    <PackageReference Include="LightInject" Version="5.4.0" />
-    <PackageReference Include="Moq" Version="4.10.1" />
-    <PackageReference Include="Ninject" Version="3.3.4" />
-    <PackageReference Include="Castle.Windsor" Version="5.0.0" />
-    <PackageReference Include="xunit" Version="2.4.1" />
-    <PackageReference Include="DryIoc.dll" Version="4.0.3" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net40'">    
-    <PackageReference Include="Autofac" Version="3.5.2" />
-    <PackageReference Include="LightInject" Version="3.0.2.7" />
-    <PackageReference Include="Moq" Version="4.2.1510.2205" />
-    <PackageReference Include="Ninject" Version="3.2.2.0" />
-    <PackageReference Include="Castle.Windsor" Version="3.4.0" />
-    <PackageReference Include="xunit" Version="1.9.2" />
-    <PackageReference Include="DryIoc.dll" Version="4.0.0" />
-  </ItemGroup>
+  <Choose>
+    <When Condition="'$(TargetFramework)'=='net40'">
+      <ItemGroup>
+        <PackageReference Include="Autofac" Version="3.5.2" />
+        <PackageReference Include="LightInject" Version="3.0.2.7" />
+        <PackageReference Include="Moq" Version="4.2.1510.2205" />
+        <PackageReference Include="Ninject" Version="3.2.2.0" />
+        <PackageReference Include="Castle.Windsor" Version="3.4.0" />
+        <PackageReference Include="xunit" Version="1.9.2" />
+        <PackageReference Include="DryIoc.dll" Version="4.0.0" />
+      </ItemGroup>      
+    </When>
+    <Otherwise>
+      <ItemGroup>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
+        <PackageReference Include="Autofac" Version="4.9.1" />
+        <PackageReference Include="LightInject" Version="5.4.0" />
+        <PackageReference Include="Moq" Version="4.10.1" />
+        <PackageReference Include="Ninject" Version="3.3.4" />
+        <PackageReference Include="Castle.Windsor" Version="5.0.0" />
+        <PackageReference Include="xunit" Version="2.4.1" />
+        <PackageReference Include="DryIoc.dll" Version="4.0.3" />
+      </ItemGroup>
+    </Otherwise>
+  </Choose>
   <ItemGroup>
     <ProjectReference Include="..\IoC\IoC.csproj" />
   </ItemGroup>

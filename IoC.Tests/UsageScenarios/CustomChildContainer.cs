@@ -20,11 +20,11 @@ namespace IoC.Tests.UsageScenarios
             // Create and configure the root container
             using var container = Container.Create();
             using (container.Bind<IService>().To<Service>())
-                // Configure the root container to use a custom container during creating a child container
-            using (container.Bind<IContainer>().Tag(WellknownContainers.NewChild).To<MyContainer>())
-                // Create and configure the custom child container
+            // Configure the root container to use a custom container during creating a child container
+            using (container.Bind<IContainer>().Tag(WellknownContainers.NewChild).To<MyContainer>()) 
+            // Create and configure the custom child container
             using (var childContainer = container.CreateChild())
-                // Bind some dependency
+            // Bind some dependency
             using (childContainer.Bind<IDependency>().To<Dependency>())
             {
                 // Resolve an instance
@@ -35,7 +35,7 @@ namespace IoC.Tests.UsageScenarios
                 // }
                 // Check the instance's type
                 instance.ShouldBeOfType<Service>();
-                // {
+        // {
             }
         }
 

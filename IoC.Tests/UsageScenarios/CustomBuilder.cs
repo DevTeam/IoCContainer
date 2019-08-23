@@ -1,8 +1,13 @@
-﻿namespace IoC.Tests.UsageScenarios
+﻿// ReSharper disable ClassNeverInstantiated.Local
+namespace IoC.Tests.UsageScenarios
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
-    using Shouldly;
+    using Core;
     using Xunit;
+    using Expression = System.Linq.Expressions.Expression;
 
     public class CustomBuilder
     {
@@ -17,25 +22,35 @@
             // Create and configure the container
             using var container = Container.Create();
             using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<IService>().To<Service>())
-                // Register the custom builder
-            using (container.Bind<IBuilder>().To<MyBuilder>())
+            using (container.Bind<IService>().To<Service>(ctx => new Service(ctx.Container.Resolve<IDependency>(), ctx.Args[0] as string)))
+            // Register the custom builder
+            using (container.Bind<IBuilder>().To<NotNullGuardBuilder>())
             {
-                // Resolve instances
-                var instance1 = container.Resolve<IService>();
-                var instance2 = container.Resolve<IService>();
-
-                // Check that instances are equal
-                instance1.ShouldBe(instance2);
+                // Resolve an instance passing null to the "state" parameter
+                Assert.Throws<ArgumentNullException>(() => container.Resolve<IService>(null as string));
             }
         }
 
-        // This custom builder just adds the Singleton lifetime for any instances
-        public class MyBuilder : IBuilder
+        // This custom builder adds the logic to check parameters of reference types injected via constructors on null
+        private class NotNullGuardBuilder : IBuilder
         {
             public Expression Build(Expression expression, IBuildContext buildContext) =>
-                // Add the Singleton lifetime for any instances
-                buildContext.AddLifetime(expression, new Lifetimes.SingletonLifetime());
+                expression is NewExpression newExpression && newExpression.Arguments.Count != 0
+                    ? newExpression.Update(CheckedArgs(newExpression))
+                    : expression;
+
+            private static IEnumerable<Expression> CheckedArgs(NewExpression newExpression) =>
+                from arg in newExpression.Constructor.GetParameters().Select((info, index) => (info, expression: newExpression.Arguments[index]))
+                let typeDescriptor = arg.info.ParameterType.Descriptor()
+                select !typeDescriptor.IsValueType()
+                    // arg ?? throw new ArgumentNullException(nameof(arg), "The argument ...")
+                    ? Expression.Coalesce(
+                        arg.expression,
+                        // throws an exception when an argument is null
+                        Expression.Block(
+                            Expression.Throw(Expression.Constant(new ArgumentNullException(arg.info.Name, $"The argument \"{arg.info.Name}\" is null while constructing the instance of type \"{newExpression.Type.Name}\"."))),
+                            Expression.Default(typeDescriptor.Type)))
+                    : arg.expression;
         }
         // }
     }

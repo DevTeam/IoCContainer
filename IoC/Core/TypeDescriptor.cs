@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
@@ -233,13 +234,6 @@
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
         public bool IsGenericTypeArgument() => _typeInfo.GetCustomAttribute<GenericTypeArgumentAttribute>(true) != null;
-
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        [Pure]
-        public IEnumerable<T> GetCustomAttributes<T>(bool inherit)
-            where T : Attribute
-            => _typeInfo.GetCustomAttributes<T>(inherit);
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
