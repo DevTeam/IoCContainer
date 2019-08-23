@@ -4716,7 +4716,7 @@ namespace IoC.Lifetimes
     {
         private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
         private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
-        private static readonly MethodInfo GetMethodInfo = typeof(CoreExtensions).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(CoreExtensions.GetByRef)).MakeGenericMethod(typeof(TKey), typeof(object));
+        private static readonly MethodInfo GetMethodInfo = typeof(CoreExtensions).Descriptor().GetDeclaredMethods().Single(i => i.Name == (TypeDescriptor<TKey>.Descriptor.IsValueType() ? nameof(CoreExtensions.Get) : nameof(CoreExtensions.GetByRef))).MakeGenericMethod(typeof(TKey), typeof(object));
         private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
         private static readonly ParameterExpression KeyVar = Expression.Variable(TypeDescriptor<TKey>.Type, "key");
@@ -7790,6 +7790,7 @@ namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
@@ -8021,13 +8022,6 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
         public bool IsGenericTypeArgument() => _typeInfo.GetCustomAttribute<GenericTypeArgumentAttribute>(true) != null;
-
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        [Pure]
-        public IEnumerable<T> GetCustomAttributes<T>(bool inherit)
-            where T : Attribute
-            => _typeInfo.GetCustomAttributes<T>(inherit);
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
