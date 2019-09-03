@@ -17,5 +17,9 @@
   <files>
     <file src="*.cs" target="contentFiles\cs\any" />
     <file src="IoC.Container.Source.targets" target="build\net40" />
+    <file src="..\LICENSE" target="lib\net40" />
+    <file src="..\LICENSE" target="lib\netstandard1.0" />
+    <file src="..\LICENSE" target="lib\netcoreapp1.0" />
+    <file src="..\LICENSE" target="lib\uap10.0" />
   </files>
 </package>
