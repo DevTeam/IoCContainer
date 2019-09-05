@@ -144,7 +144,7 @@
 
         private class EnumerationBase<T>: IObserver<ContainerEvent>, IDisposable
         {
-            [NotNull] public readonly Context Context;
+            [NotNull] protected internal readonly Context Context;
             private readonly IDisposable _subscription;
             private volatile Resolver<T>[] _resolvers;
 
@@ -161,7 +161,7 @@
 
             public void OnCompleted() { }
 
-            public void Dispose() => _subscription.Dispose();            
+            public void Dispose() => _subscription.Dispose();
 
             public Resolver<T>[] GetResolvers()
             {

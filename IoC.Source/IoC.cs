@@ -4062,7 +4062,7 @@ namespace IoC.Features
 
         private class EnumerationBase<T>: IObserver<ContainerEvent>, IDisposable
         {
-            [NotNull] public readonly Context Context;
+            [NotNull] protected internal readonly Context Context;
             private readonly IDisposable _subscription;
             private volatile Resolver<T>[] _resolvers;
 
@@ -4079,7 +4079,7 @@ namespace IoC.Features
 
             public void OnCompleted() { }
 
-            public void Dispose() => _subscription.Dispose();            
+            public void Dispose() => _subscription.Dispose();
 
             public Resolver<T>[] GetResolvers()
             {
@@ -5554,7 +5554,7 @@ namespace IoC.Core
             return LifetimeExpressionBuilder.Shared.Build(baseExpression, this, lifetime);
         }
 
-        public IBuildContext CreateChildInternal(Key key, IContainer container, bool forBuilders = false)
+        private IBuildContext CreateChildInternal(Key key, IContainer container, bool forBuilders = false)
         {
             if (_typesMap.TryGetValue(key.Type, out var type))
             {
@@ -5582,7 +5582,7 @@ namespace IoC.Core
                     }
                 }
 
-                if (Depth >= 64)
+                if (Depth >= 128)
                 {
                     Container.Resolve<IIssueResolver>().CyclicDependenceDetected(Key, Depth);
                 }

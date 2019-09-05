@@ -76,7 +76,7 @@
             return LifetimeExpressionBuilder.Shared.Build(baseExpression, this, lifetime);
         }
 
-        public IBuildContext CreateChildInternal(Key key, IContainer container, bool forBuilders = false)
+        private IBuildContext CreateChildInternal(Key key, IContainer container, bool forBuilders = false)
         {
             if (_typesMap.TryGetValue(key.Type, out var type))
             {
@@ -104,7 +104,7 @@
                     }
                 }
 
-                if (Depth >= 64)
+                if (Depth >= 128)
                 {
                     Container.Resolve<IIssueResolver>().CyclicDependenceDetected(Key, Depth);
                 }
