@@ -10,12 +10,12 @@
     <Authors>NikolayP</Authors>
     <Description>Simple, powerful and fast expressions based Inversion of Control container for .NET.</Description>
     <PackageProjectUrl>https://github.com/DevTeam/IoCContainer/</PackageProjectUrl>
-    <PackageIconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</PackageIconUrl>
+    <PackageIcon>common\icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>ioc container di</PackageTags>
     <Product>IoC Container</Product>
-    <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
+    <Copyright>Copyright (c) 2019 Nikolay Pianikov</Copyright>
     <DocumentationFile>..\Docs\IoC_$(TargetFramework).xml</DocumentationFile>
     <WarningsAsErrors />
     <MSBuildNative>C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild</MSBuildNative>
@@ -49,6 +49,7 @@
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.8" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="icon.png"><Pack>true</Pack><PackagePath>common</PackagePath></None>
     <None Remove="IoC.tt" />
     <Compile Remove="IoC.cs" />
     <PackageReference Include="Vsxmd" Version="1.2.0" Condition="$(HasMSBuildNative)=='true'">

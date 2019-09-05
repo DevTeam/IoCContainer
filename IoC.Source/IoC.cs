@@ -1730,7 +1730,13 @@ namespace IoC
         /// </summary>
         [NotNull] public readonly IEnumerable<Key> Keys;
 
-        internal ContainerEvent([NotNull] IContainer container, EventType eventTypeType, IEnumerable<Key> keys)
+        /// <summary>
+        /// Create new instance of container event.
+        /// </summary>
+        /// <param name="container">The origin container.</param>
+        /// <param name="eventTypeType">The vent type.</param>
+        /// <param name="keys">The set of keys related to this event.</param>
+        public ContainerEvent([NotNull] IContainer container, EventType eventTypeType, IEnumerable<Key> keys)
         {
             Container = container;
             EventTypeType = eventTypeType;

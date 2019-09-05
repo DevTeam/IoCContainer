@@ -4,8 +4,8 @@
     <id>IoC.Container.Source</id>
     <authors>NikolayP</authors>
     <version>$version$</version>
-    <copyright>Copyright (c) 2018 Nikolay Pianikov</copyright>
-    <iconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</iconUrl>
+    <copyright>Copyright (c) 2019 Nikolay Pianikov</copyright>
+    <icon>common\icon.png</icon>
     <projectUrl>https://github.com/DevTeam/IoCContainer/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>Simple, powerful and fast expressions based Inversion of Control container for .NET as embedding-in-code package.</description>
@@ -13,13 +13,14 @@
     <contentFiles>
       <files include="cs/any/*.cs" buildAction="Compile" />
     </contentFiles>
+    <dependencies>
+        <group targetFramework="net40"/>
+    </dependencies>
   </metadata>
   <files>
+    <file src="icon.png" target="common" />
     <file src="*.cs" target="contentFiles\cs\any" />
     <file src="IoC.Container.Source.targets" target="build\net40" />
-    <file src="..\LICENSE" target="lib\net40" />
-    <file src="..\LICENSE" target="lib\netstandard1.0" />
-    <file src="..\LICENSE" target="lib\netcoreapp1.0" />
-    <file src="..\LICENSE" target="lib\uap10.0" />
+    <file src="empty.empty" target="lib\net40" />
   </files>
 </package>

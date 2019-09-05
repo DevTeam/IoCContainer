@@ -10,12 +10,12 @@
     <Authors>NikolayP</Authors>
     <Description>AspNetCore feature for expressions based Inversion of Control container for .NET.</Description>
     <PackageProjectUrl>https://github.com/DevTeam/IoCContainer/</PackageProjectUrl>
-    <PackageIconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</PackageIconUrl>
+    <PackageIcon>common\icon.png</PackageIcon>
     <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>ioc container di asp core</PackageTags>
     <Product>IoC Container AspNetCore feature</Product>
-    <Copyright>Copyright (c) 2018 Nikolay Pianikov</Copyright>
+    <Copyright>Copyright (c) 2019 Nikolay Pianikov</Copyright>
     <DocumentationFile>..\Docs\IoC.AspNetCore_$(TargetFramework).xml</DocumentationFile>
     <WarningsAsErrors />
     <LangVersion>7</LangVersion>
@@ -30,6 +30,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="icon.png"><Pack>true</Pack><PackagePath>common</PackagePath></None>
     <ProjectReference Include="..\IoC\IoC.csproj" />
   </ItemGroup>
 

@@ -4,8 +4,8 @@
     <id>IoC.AspNetCore.Source</id>
     <authors>NikolayP</authors>
     <version>$version$</version>
-    <copyright>Copyright (c) 2018 Nikolay Pianikov</copyright>
-    <iconUrl>https://avatars0.githubusercontent.com/u/12184234?v=3&amp;amp;s=200</iconUrl>
+    <copyright>Copyright (c) 2019 Nikolay Pianikov</copyright>
+    <icon>common\icon.png</icon>
     <projectUrl>https://github.com/DevTeam/IoCContainer/</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>AspNetCore feature for expressions based Inversion of Control container for .NET as embedding-in-code package.</description>
@@ -19,5 +19,6 @@
   </metadata>
   <files>
     <file src="*.cs" target="contentFiles\cs\any" />
+    <file src="icon.png" target="common" />
   </files>
 </package>

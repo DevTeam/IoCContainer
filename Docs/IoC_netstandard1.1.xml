@@ -709,6 +709,14 @@
             The changed keys.
             </summary>
         </member>
+        <member name="M:IoC.ContainerEvent.#ctor(IoC.IContainer,IoC.EventType,System.Collections.Generic.IEnumerable{IoC.Key})">
+            <summary>
+            Create new instance of container event.
+            </summary>
+            <param name="container">The origin container.</param>
+            <param name="eventTypeType">The vent type.</param>
+            <param name="keys">The set of keys related to this event.</param>
+        </member>
         <member name="T:IoC.Context`1">
             <summary>
             Represent the resolving context with an instance.
