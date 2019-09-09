@@ -252,9 +252,9 @@
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             return binding.Tag(Key.AnyTag);
         }
-        
+
         /// <summary>
-        /// Aautowires binding.
+        /// Registers autowiring binding.
         /// </summary>
         /// <param name="binding">The binding token.</param>
         /// <param name="type">The instance type.</param>
@@ -273,7 +273,7 @@
         }
 
         /// <summary>
-        /// Aautowires binding.
+        /// Registers autowiring binding.
         /// </summary>
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="binding">The binding token.</param>
@@ -291,7 +291,7 @@
         }
 
         /// <summary>
-        /// Aautowires binding.
+        /// Registers autowiring binding.
         /// </summary>
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="binding">The binding token.</param>
@@ -342,7 +342,7 @@
 
             return binding.Container.TryRegisterDependency(keys, dependency, binding.Lifetime, out var dependencyToken)
                 ? dependencyToken
-                : binding.Container.GetIssueResolver().CannotRegister(binding.Container, keys.ToArray());
+                : binding.Container.Resolve<IIssueResolver>().CannotRegister(binding.Container, keys.ToArray());
         }
     }
 }

@@ -94,7 +94,7 @@
                 Func<IMyService1> childFunc = () => childRef;
 
                 // When
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 using (childContainer.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => childFunc()))
                 using (childContainer.Bind<IMyService>().As(Lifetime.Transient).To(
                     ctx => new MyService((string)ctx.Args[0], ctx.Container.Parent.Inject<IMyService1>())))
@@ -121,8 +121,8 @@
                 Func<IMyService1> childFunc = () => childRef;
 
                 // When
-                using var childContainer1 = container.CreateChild();
-                using var childContainer2 = childContainer1.CreateChild();
+                using var childContainer1 = container.Create();
+                using var childContainer2 = childContainer1.Create();
                 using (childContainer2.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => childFunc()))
                 using (childContainer2.Bind<IMyService>().As(Lifetime.Transient).To(
                     ctx => new MyService((string)ctx.Args[0], ctx.Container.Parent.Parent.Inject<IMyService1>())))
@@ -151,8 +151,8 @@
                 TestsExtensions.Parallelize(() =>
                 {
                     // When
-                    using var childContainer1 = container.CreateChild();
-                    using var childContainer2 = childContainer1.CreateChild();
+                    using var childContainer1 = container.Create();
+                    using var childContainer2 = childContainer1.Create();
                     using (childContainer2.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => childFunc()))
                     using (childContainer2.Bind<IMyService>().As(Lifetime.Transient).To(
                         ctx => new MyService((string) ctx.Args[0], ctx.Container.Parent.Parent.Inject<IMyService1>())))

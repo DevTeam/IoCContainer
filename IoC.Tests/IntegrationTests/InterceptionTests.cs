@@ -62,7 +62,7 @@
             var interceptor = new Mock<IInterceptor>();
             interceptor.Setup(i => i.Intercept(It.Is<IInvocation>(j => j.Method.Name == "get_Name")));
             using var container = Container.Create().Using<InterceptionFeature>();
-            using var childContainer = container.CreateChild();
+            using var childContainer = container.Create();
 
             // When
             using (childContainer.Bind<string>().To(ctx => "SomeRef"))

@@ -15,8 +15,8 @@
             // Given
             using var parentContainer = Container.Create("parent");
             // When
-            var childContainer1 = parentContainer.CreateChild("child_1");
-            var childContainer2 = parentContainer.CreateChild("child_2");
+            var childContainer1 = parentContainer.Create("child#1");
+            var childContainer2 = parentContainer.Create("child#2");
 
             // Then
             childContainer1.Parent.ShouldBe(parentContainer);
@@ -32,8 +32,8 @@
             TestsExtensions.Parallelize(() =>
             {
                 // When
-                var childContainer1 = parentContainer.CreateChild("child_1");
-                var childContainer2 = parentContainer.CreateChild("child_2");
+                var childContainer1 = parentContainer.Create("child_1");
+                var childContainer2 = parentContainer.Create("child_2");
 
                 // Then
                 childContainer1.Parent.ShouldBe(parentContainer);
@@ -67,7 +67,7 @@
             var expectedInstance = new Mock<IDisposable>();
             using (var container = Container.Create("root"))
             {
-                var childContainer = container.CreateChild("child");
+                var childContainer = container.Create("child");
                 IDisposable actualInstance;
                 using (childContainer.Bind<IDisposable>().As(Lifetime.ContainerSingleton).To(ctx => expectedInstance.Object))
                 {
@@ -92,7 +92,7 @@
             // When
             using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => func()))
             {
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 // Then
                 var actualInstance = childContainer.Resolve<IMyService>();
                 actualInstance.ShouldBe(expectedInstance);

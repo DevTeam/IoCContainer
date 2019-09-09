@@ -22,7 +22,7 @@
                 // Then
                 var instance1 = container.Resolve<IMyService>();
                 var instance2 = container.Resolve<IMyService>();
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 var instance3 = childContainer.Resolve<IMyService>();
                 instance1.ShouldNotBeNull();
                 instance1.ShouldBe(instance2);
@@ -44,7 +44,7 @@
                     // Then
                     var instance1 = container.Resolve<IMyService>();
                     var instance2 = container.Resolve<IMyService>();
-                    using var childContainer = container.CreateChild();
+                    using var childContainer = container.Create();
                     var instance3 = childContainer.Resolve<IMyService>();
                     instance1.ShouldNotBeNull();
                     instance1.ShouldBe(instance2);
@@ -65,7 +65,7 @@
                 // Then
                 var instance1 = container.Resolve<IMyService>();
                 var instance2 = container.Resolve<IMyService1>();
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 var instance3 = childContainer.Resolve<IMyService>();
                 var instance4 = childContainer.Resolve<IMyService1>();
                 instance1.ShouldBe(instance2);
@@ -141,7 +141,7 @@
             using (container.Bind<string>().To(ctx => "abc"))
             {
                 // Then
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 using (childContainer.Bind<IMyService1>().To(ctx => myService12.Object))
                 using (childContainer.Bind<string>().To(ctx => "xyz"))
                 {

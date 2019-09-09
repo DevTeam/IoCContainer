@@ -151,7 +151,7 @@
             using (container.Bind<IMyWrapper>().To<Wrappered>())
             {
                 // When
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Parent.Inject<IMyWrapper>())))
                 {
                     // Then
@@ -172,7 +172,7 @@
                 TestsExtensions.Parallelize(() =>
                 {
                     // When
-                    using var childContainer = container.CreateChild();
+                    using var childContainer = container.Create();
                     using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Parent.Inject<IMyWrapper>())))
                     {
                         // Then

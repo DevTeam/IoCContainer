@@ -32,7 +32,7 @@
             // When
             using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 using (container.Bind<IBuilder>().To<MyBuilder>())
                 {
                     var instance1 = childContainer.Resolve<IMyGenericService<string, int>>();
@@ -52,7 +52,7 @@
             // When
             using (container.Bind<IBuilder>().To<MyBuilder>())
             {
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 using (childContainer.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
                 {
                     var instance1 = childContainer.Resolve<IMyGenericService<string, int>>();

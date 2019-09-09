@@ -35,7 +35,7 @@
                 parentInstance1.ShouldBe(parentInstance2);
 
                 // Create a child container
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 // Resolve the singleton twice
                 var childInstance1 = childContainer.Resolve<IService>();
                 var childInstance2 = childContainer.Resolve<IService>();

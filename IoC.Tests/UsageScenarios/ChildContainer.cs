@@ -15,7 +15,7 @@
             // {
             // Create the parent container
             using var parentContainer = Container.Create();
-            using var childContainer = parentContainer.CreateChild();
+            using var childContainer = parentContainer.Create();
             childContainer.Parent.ShouldBe(parentContainer);
 
             // }

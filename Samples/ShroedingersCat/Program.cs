@@ -29,7 +29,7 @@ namespace ShroedingersCat
             Lazy<IBox<ICat>> lazy,
             IEnumerable<IBox<ICat>> enumerable,
 #if NETCOREAPP3_0
-            IAsyncEnumerable<IBox<ICat>> asyncEnumerable,      
+            IAsyncEnumerable<IBox<ICat>> asyncEnumerable,
 #endif
             IBox<ICat>[] array,
             IList<IBox<ICat>> list,
@@ -63,7 +63,7 @@ namespace ShroedingersCat
                 await foreach (var element in asyncEnumerable)
                 {
                     WriteLine("Async Enumeration {0}", element);
-                }                 
+                }
 #endif
             }
 
@@ -107,6 +107,7 @@ namespace ShroedingersCat
             yield return container.Bind<IBox<TT>>().To<CardboardBox<TT>>();
             yield return container.Bind<ICat>().To<ShroedingersCat>();
 
+            // Provides the random state of cats depending on an atom decay
             yield return container.Bind<Random>().As(Singleton).To<Random>();
             yield return container.Bind<State>().To(ctx => (State)ctx.Container.Resolve<Random>().Next(2));
         }

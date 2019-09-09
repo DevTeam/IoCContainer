@@ -23,7 +23,7 @@
     <XamlTargets>$(MSBuildNative)\Microsoft\WindowsXaml\v15.0\8.21\Microsoft.Windows.UI.Xaml.CSharp.Targets</XamlTargets>
     <TransformOnBuild>True</TransformOnBuild>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
-    <LangVersion>7</LangVersion>    
+    <LangVersion>7</LangVersion>
     <!--NullableContextOptions>enable</NullableContextOptions-->
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">

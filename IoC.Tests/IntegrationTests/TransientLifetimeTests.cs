@@ -24,7 +24,7 @@
                 instance1.ShouldNotBeNull();
                 var instance2 = container.Resolve<IMyService>();
                 instance2.ShouldNotBeNull();
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 var instance3 = childContainer.Resolve<IMyService>();
                 instance3.ShouldNotBeNull();
                 instance1.ShouldNotBe(instance2);
@@ -45,7 +45,7 @@
             using (container.Bind<string>().To(ctx => "abc"))
             {
                 // Then
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 using (childContainer.Bind<IMyService1>().To(ctx => myService12.Object))
                 using (childContainer.Bind<string>().To(ctx => "xyz"))
                 {

@@ -23,7 +23,7 @@ namespace IoC.Tests.UsageScenarios
             // Configure the root container to use a custom container during creating a child container
             using (container.Bind<IContainer>().Tag(WellknownContainers.NewChild).To<MyContainer>()) 
             // Create and configure the custom child container
-            using (var childContainer = container.CreateChild())
+            using (var childContainer = container.Create())
             // Bind some dependency
             using (childContainer.Bind<IDependency>().To<Dependency>())
             {

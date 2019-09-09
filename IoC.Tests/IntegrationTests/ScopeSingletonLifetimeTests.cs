@@ -149,7 +149,7 @@
             using (container.Bind<string>().To(ctx => "abc"))
             {
                 // Then
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 using (childContainer.Bind<IMyService1>().To(ctx => myService12.Object))
                 using (childContainer.Bind<string>().To(ctx => "xyz"))
                 using (var scope = new Scope(99))

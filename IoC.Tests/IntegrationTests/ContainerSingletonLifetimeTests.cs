@@ -25,7 +25,7 @@
 
                 instance1.ShouldBe(instance2);
                 IMyService instance3;
-                using var childContainer1 = container.CreateChild();
+                using var childContainer1 = container.Create();
                 {
                     instance3 = childContainer1.Resolve<IMyService>();
                     var instance4 = childContainer1.Resolve<IMyService>();
@@ -33,7 +33,7 @@
                     instance1.ShouldNotBe(instance3);
                 }
 
-                using var childContainer2 = container.CreateChild();
+                using var childContainer2 = container.Create();
                 var instance5 = childContainer2.Resolve<IMyService>();
                 var instance6 = childContainer2.Resolve<IMyService>();
                 instance5.ShouldBe(instance6);
@@ -60,7 +60,7 @@
                     // Then
                     instance1.ShouldBe(instance2);
                     IMyService instance3;
-                    using (var childContainer1 = container.CreateChild())
+                    using (var childContainer1 = container.Create())
                     {
                         instance3 = childContainer1.Resolve<IMyService>();
                         var instance4 = childContainer1.Resolve<IMyService>();
@@ -68,7 +68,7 @@
                         instance1.ShouldNotBe(instance3);
                     }
 
-                    using var childContainer2 = container.CreateChild();
+                    using var childContainer2 = container.Create();
                     var instance5 = childContainer2.Resolve<IMyService>();
                     var instance6 = childContainer2.Resolve<IMyService>();
                     instance5.ShouldBe(instance6);
@@ -90,7 +90,7 @@
                 // Then
                 var instance1 = container.Resolve<IMyService>();
                 var instance2 = container.Resolve<IMyService1>();
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 var instance3 = childContainer.Resolve<IMyService>();
                 var instance4 = childContainer.Resolve<IMyService1>();
                 instance1.ShouldBe(instance2);
@@ -123,7 +123,7 @@
             using var container = Container.Create();
             using (container.Bind<IMyDisposableService>().As(Lifetime.ContainerSingleton).To(ctx => mock.Object))
             {
-                var childContainer = (Container)container.CreateChild();
+                var childContainer = (Container)container.Create();
                 var instance = childContainer.Resolve<IMyDisposableService>();
 
                 // When
@@ -144,7 +144,7 @@
             var mock = new Mock<IMyDisposableService>();
             using var container = Container.Create();
             var subscriptionToken = container.Bind<IMyDisposableService>().As(Lifetime.ContainerSingleton).To(ctx => mock.Object);
-            var childContainer = (Container)container.CreateChild();
+            var childContainer = (Container)container.Create();
             var instance = childContainer.Resolve<IMyDisposableService>();
 
             // When
@@ -173,7 +173,7 @@
             using (container.Bind<string>().To(ctx => "abc"))
             {
                 // Then
-                using (var childContainer1 = container.CreateChild("child#1"))
+                using (var childContainer1 = container.Create("child#1"))
                 using (childContainer1.Bind<IMyService1>().To(ctx => myService12.Object))
                 using (childContainer1.Bind<string>().To(ctx => "xyz"))
                 {
@@ -185,7 +185,7 @@
                 }
 
                 // Then
-                using var childContainer2 = container.CreateChild("child#2");
+                using var childContainer2 = container.Create("child#2");
                 using (childContainer2.Bind<IMyService1>().To(ctx => myService13.Object))
                 using (childContainer2.Bind<string>().To(ctx => "123"))
                 {

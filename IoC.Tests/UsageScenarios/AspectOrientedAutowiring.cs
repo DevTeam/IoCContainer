@@ -33,8 +33,8 @@ namespace IoC.Tests.UsageScenarios
             // Create the root container
             using (var rootContainer = Container.Create("root"))
             // Configure the child container
-            using (var childContainer = rootContainer.CreateChild("child"))
-            // Configure the child container by the custom aspect oriented autowiring strategy            
+            using (var childContainer = rootContainer.Create("child"))
+            // Configure the child container by the custom aspect oriented autowiring strategy
             using (childContainer.Bind<IAutowiringStrategy>().To(ctx => autowiringStrategy))
             // Configure the child container
             using (childContainer.Bind<IConsole>().Tag("MyConsole").To(ctx => console.Object))

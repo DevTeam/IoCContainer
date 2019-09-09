@@ -37,7 +37,7 @@ namespace IoC
         }
 
         /// <summary>
-        /// Injects the dependency. Just a marker.
+        /// Injects the dependency. Just an injection marker.
         /// </summary>
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
@@ -48,7 +48,7 @@ namespace IoC
         }
 
         /// <summary>
-        /// Injects the dependency. Just a marker.
+        /// Injects the dependency. Just an injection marker.
         /// </summary>
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
@@ -60,7 +60,7 @@ namespace IoC
         }
 
         /// <summary>
-        /// Injects the dependency. Just a marker.
+        /// Injects the dependency. Just an injection marker.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="container">The resolving container.</param>
@@ -72,7 +72,7 @@ namespace IoC
         }
 
         /// <summary>
-        /// Injects the dependency. Just a marker.
+        /// Injects the dependency. Just an injection marker.
         /// </summary>
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
@@ -83,7 +83,7 @@ namespace IoC
         }
 
         /// <summary>
-        /// Injects the dependency. Just a marker.
+        /// Injects the dependency. Just an injection marker.
         /// </summary>
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>

@@ -20,7 +20,7 @@
                 // Then
                 var instance1 = container.Resolve<IMyService>();
                 var instance2 = container.Resolve<IMyService>();
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 var instance3 = childContainer.Resolve<IMyService>();
                 instance1.ShouldNotBeNull();
                 instance1.ShouldBe(instance2);
@@ -40,7 +40,7 @@
                 // Then
                 var instance1 = container.Resolve<IMyService>();
                 var instance2 = container.Resolve<IMyService>();
-                using var childContainer = container.CreateChild();
+                using var childContainer = container.Create();
                 var instance3 = childContainer.Resolve<IMyService>();
                 instance1.ShouldNotBeNull();
                 instance1.ShouldBe(instance2);
