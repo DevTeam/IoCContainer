@@ -14,7 +14,7 @@
             if (reentrancy <= 0) throw new ArgumentOutOfRangeException(nameof(reentrancy));
             if (reentrancy >= 256)
             {
-                throw new InvalidOperationException($"The cyclic dependence detected resolving the dependency {key}. The reentrancy is {reentrancy}.");
+                throw new InvalidOperationException($"The cyclic dependency detected resolving the dependency {key}. The reentrancy is {reentrancy}.");
             }
         }
     }

@@ -9,13 +9,13 @@ namespace IoC.Tests.UsageScenarios
     using Xunit;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public class CyclicDependence
+    public class CyclicDependency
     {
         [Fact]
         // $visible=true
         // $tag=samples
         // $priority=00
-        // $description=Cyclic Dependence
+        // $description=Cyclic Dependency
         // {
         public void Run()
         {

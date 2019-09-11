@@ -335,7 +335,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Interception](#interception-)
   - [Replace Lifetime](#replace-lifetime-)
 - Other Samples
-  - [Cyclic Dependence](#cyclic-dependence-)
+  - [Cyclic Dependency](#cyclic-dependency-)
   - [Generator](#generator-)
   - [Instant Messenger](#instant-messenger-)
   - [Wrapper](#wrapper-)
@@ -1722,7 +1722,7 @@ using (container.Bind<IService>().To<Service>())
 
 
 
-### Cyclic Dependence [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CyclicDependence.cs)
+### Cyclic Dependency [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CyclicDependency.cs)
 
 
 

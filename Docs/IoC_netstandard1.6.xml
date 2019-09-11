@@ -2327,12 +2327,12 @@
         </member>
         <member name="T:IoC.Issues.IFoundCyclicDependency">
             <summary>
-            Resolves the scenario when a cyclic dependence was detected.
+            Resolves the scenario when a cyclic dependency was detected.
             </summary>
         </member>
         <member name="M:IoC.Issues.IFoundCyclicDependency.Resolve(IoC.Key,System.Int32)">
             <summary>
-            Resolves the scenario when a cyclic dependence was detected.
+            Resolves the scenario when a cyclic dependency was detected.
             </summary>
             <param name="key">The resolving key.</param>
             <param name="reentrancy">The level of reentrancy.</param>
