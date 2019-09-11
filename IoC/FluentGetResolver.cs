@@ -3,6 +3,7 @@
     using System;
     using System.Runtime.CompilerServices;
     using Core;
+    using Issues;
 
     /// <summary>
     /// Represents extensions to get a resolver from the container.
@@ -21,7 +22,7 @@
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag)
-            => container.TryGetResolver<T>(type, tag.Value, out var resolver, out var error) ? resolver : container.Resolve<IIssueResolver>().CannotGetResolver<T>(container, new Key(type, tag), error);
+            => container.TryGetResolver<T>(type, tag.Value, out var resolver, out var error) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(type, tag), error);
 
         /// <summary>
         /// Tries getting the resolver.
@@ -70,7 +71,7 @@
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type)
-            => container.TryGetResolver<T>(type, null, out var resolver, out var error) ? resolver : container.Resolve<IIssueResolver>().CannotGetResolver<T>(container, new Key(type), error);
+            => container.TryGetResolver<T>(type, null, out var resolver, out var error) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(type), error);
 
         /// <summary>
         /// Tries getting the resolver.

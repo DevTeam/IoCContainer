@@ -2,16 +2,17 @@
 {
     using System;
     using System.Text.RegularExpressions;
+    using Issues;
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal sealed class StringToLifetimeConverter: IConverter<string, Statement, Lifetime>
     {
-        [NotNull] private readonly IIssueResolver _issueResolver;
+        [NotNull] private readonly ICannotParseLifetime _cannotParseLifetime;
         private static readonly Regex Regex = new Regex(@"(?:\s*\.\s*As\s*\(\s*([\w.^)]+)\s*\)\s*)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline);
 
-        public StringToLifetimeConverter([NotNull] IIssueResolver issueResolver)
+        public StringToLifetimeConverter([NotNull] ICannotParseLifetime cannotParseLifetime)
         {
-            _issueResolver = issueResolver ?? throw new ArgumentNullException(nameof(issueResolver));
+            _cannotParseLifetime = cannotParseLifetime ?? throw new ArgumentNullException(nameof(cannotParseLifetime));
         }
 
         public bool TryConvert(Statement statement, string text, out Lifetime lifetime)
@@ -35,7 +36,7 @@
                 }
                 catch (Exception)
                 {
-                    lifetime = _issueResolver.CannotParseLifetime(statement.Text, statement.LineNumber, statement.Position, lifetimeName);
+                    lifetime = _cannotParseLifetime.Resolve(statement.Text, statement.LineNumber, statement.Position, lifetimeName);
                 }
 
                 success = true;

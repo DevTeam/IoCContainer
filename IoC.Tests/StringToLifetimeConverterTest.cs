@@ -4,6 +4,7 @@ namespace IoC.Tests
     using System.Collections;
     using System.Collections.Generic;
     using Core.Configuration;
+    using Issues;
     using Moq;
     using Shouldly;
     using Xunit;
@@ -15,7 +16,7 @@ namespace IoC.Tests
         public void ShouldConvertStringToLifetime(string text, bool expectedResult, Lifetime expectedLifetime)
         {
             // Given
-            var converter = new StringToLifetimeConverter(Mock.Of<IIssueResolver>());
+            var converter = new StringToLifetimeConverter(Mock.Of<ICannotParseLifetime>());
 
             // When
             var actualResult = converter.TryConvert(new Statement("statement", 1, 2), text, out var actualLifetime);

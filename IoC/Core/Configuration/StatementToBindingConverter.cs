@@ -1,9 +1,11 @@
-﻿namespace IoC.Core.Configuration
+﻿// ReSharper disable IdentifierTypo
+namespace IoC.Core.Configuration
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using Issues;
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal sealed class StatementToBindingConverter: IConverter<Statement, BindingContext, BindingContext>
@@ -12,18 +14,18 @@
         private readonly IConverter<string, BindingContext, Type> _typeConverter;
         [NotNull] private readonly IConverter<string, Statement, Lifetime> _lifetimeConverter;
         [NotNull] private readonly IConverter<string, Statement, IEnumerable<object>> _tagsConverter;
-        private readonly IIssueResolver _issueResolver;
+        private readonly ICannotParseType _сannotParseType;
 
         public StatementToBindingConverter(
             [NotNull] IConverter<string, BindingContext, Type> typeConverter,
             [NotNull] IConverter<string, Statement, Lifetime> lifetimeConverter,
             [NotNull] IConverter<string, Statement, IEnumerable<object>> tagsConverter,
-            [NotNull] IIssueResolver issueResolver)
+            [NotNull] ICannotParseType сannotParseType)
         {
             _typeConverter = typeConverter ?? throw new ArgumentNullException(nameof(typeConverter));
             _lifetimeConverter = lifetimeConverter ?? throw new ArgumentNullException(nameof(lifetimeConverter));
             _tagsConverter = tagsConverter ?? throw new ArgumentNullException(nameof(tagsConverter));
-            _issueResolver = issueResolver ?? throw new ArgumentNullException(nameof(issueResolver));
+            _сannotParseType = сannotParseType ?? throw new ArgumentNullException(nameof(сannotParseType));
         }
 
         public bool TryConvert(BindingContext baseContext, Statement statement, out BindingContext context)
@@ -35,7 +37,7 @@
                 var instanceTypeName = bindingMatch.Groups["instanceType"].Value;
                 if (!_typeConverter.TryConvert(baseContext, instanceTypeName, out var instanceType))
                 {
-                    instanceType = _issueResolver.CannotParseType(statement.Text, statement.LineNumber, statement.Position, instanceTypeName);
+                    instanceType = _сannotParseType.Resolve(statement.Text, statement.LineNumber, statement.Position, instanceTypeName);
                 }
 
                 var contractTypes = new List<Type>();
@@ -43,7 +45,7 @@
                 {
                     if (!_typeConverter.TryConvert(baseContext, contractTypeName, out var contractType))
                     {
-                        contractType = _issueResolver.CannotParseType(statement.Text, statement.LineNumber, statement.Position, contractTypeName);
+                        contractType = _сannotParseType.Resolve(statement.Text, statement.LineNumber, statement.Position, contractTypeName);
                     }
 
                     contractTypes.Add(contractType);

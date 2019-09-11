@@ -2003,6 +2003,7 @@ namespace IoC
     using System.Runtime.CompilerServices;
     using System.Linq.Expressions;
     using Core;
+    using Issues;
 
     /// <summary>
     /// Represents extensions to add bindings to the container.
@@ -2339,7 +2340,7 @@ namespace IoC
 
             return binding.Container.TryRegisterDependency(keys, dependency, binding.Lifetime, out var dependencyToken)
                 ? dependencyToken
-                : binding.Container.Resolve<IIssueResolver>().CannotRegister(binding.Container, keys.ToArray());
+                : binding.Container.Resolve<ICannotRegister>().Resolve(binding.Container, keys.ToArray());
         }
     }
 }
@@ -2538,6 +2539,7 @@ namespace IoC
     using System;
     using System.Runtime.CompilerServices;
     using Core;
+    using Issues;
 
     /// <summary>
     /// Represents extensions to get a resolver from the container.
@@ -2556,7 +2558,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag)
-            => container.TryGetResolver<T>(type, tag.Value, out var resolver, out var error) ? resolver : container.Resolve<IIssueResolver>().CannotGetResolver<T>(container, new Key(type, tag), error);
+            => container.TryGetResolver<T>(type, tag.Value, out var resolver, out var error) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(type, tag), error);
 
         /// <summary>
         /// Tries getting the resolver.
@@ -2605,7 +2607,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type)
-            => container.TryGetResolver<T>(type, null, out var resolver, out var error) ? resolver : container.Resolve<IIssueResolver>().CannotGetResolver<T>(container, new Key(type), error);
+            => container.TryGetResolver<T>(type, null, out var resolver, out var error) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(type), error);
 
         /// <summary>
         /// Tries getting the resolver.
@@ -3288,120 +3290,6 @@ namespace IoC
         /// <param name="error">The error.</param>
         /// <returns>True if success.</returns>
         bool TryBuildExpression([NotNull] IBuildContext buildContext, [CanBeNull] ILifetime lifetime, out Expression baseExpression, out Exception error);
-    }
-}
-
-
-#endregion
-#region IIssueResolver
-
-namespace IoC
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-    using System.Reflection;
-
-    /// <summary>
-    /// Allows to specify behaviour for cases with issue.
-    /// </summary>
-    [PublicAPI]
-    public interface IIssueResolver
-    {
-        /// <summary>
-        /// Handles the scenario when binding cannot be registered.
-        /// </summary>
-        /// <param name="container">The target container.</param>
-        /// <param name="keys">The set of binding keys.</param>
-        /// <returns>The dependency token.</returns>
-        [NotNull] IDisposable CannotRegister([NotNull] IContainer container, [NotNull] Key[] keys);
-
-        /// <summary>
-        /// Handles the scenario when the dependency cannot be resolved.
-        /// </summary>
-        /// <param name="container">The resolving container.</param>
-        /// <param name="key">The resolving key.</param>
-        /// <returns>The pair of the dependency and of the lifetime.</returns>
-        [NotNull] Tuple<IDependency, ILifetime> CannotResolveDependency([NotNull] IContainer container, Key key);
-
-        /// <summary>
-        /// Handles the scenario when cannot get a resolver.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <param name="container">The resolving container.</param>
-        /// <param name="key">The resolving key.</param>
-        /// <param name="error">The error.</param>
-        /// <returns>The resolver.</returns>
-        [NotNull] Resolver<T> CannotGetResolver<T>([NotNull] IContainer container, Key key, [NotNull] Exception error);
-
-        /// <summary>
-        /// Handles the scenario when cannot extract generic type arguments.
-        /// </summary>
-        /// <param name="type">The instance type.</param>
-        /// <returns>The extracted generic type arguments.</returns>
-        [NotNull][ItemNotNull] Type[] CannotGetGenericTypeArguments([NotNull] Type type);
-
-        /// <summary>
-        /// Handles the scenario when a cyclic dependence was detected.
-        /// </summary>
-        /// <param name="key">The resolving key.</param>
-        /// <param name="reentrancy">The level of reentrancy.</param>
-        void CyclicDependenceDetected(Key key, int reentrancy);
-
-        /// <summary>
-        /// Handles the scenario when cannot parse a type from a text.
-        /// </summary>
-        /// <param name="statementText">The statement containing a type metadata.</param>
-        /// <param name="statementLineNumber">The line number in the source data.</param>
-        /// <param name="statementPosition">The position at the line of the source data.</param>
-        /// <param name="typeName">The text with a type metadata.</param>
-        /// <returns></returns>
-        [NotNull] Type CannotParseType([NotNull] string statementText, int statementLineNumber, int statementPosition, [NotNull] string typeName);
-
-        /// <summary>
-        /// Handles the scenario when cannot parse a lifetime from a text.
-        /// </summary>
-        /// <param name="statementText">The statement containing a lifetime metadata.</param>
-        /// <param name="statementLineNumber">The line number in the source data.</param>
-        /// <param name="statementPosition">The position at the line of the source data.</param>
-        /// <param name="lifetimeName">The text with a lifetime metadata.</param>
-        /// <returns></returns>
-        Lifetime CannotParseLifetime([NotNull] string statementText, int statementLineNumber, int statementPosition, [NotNull] string lifetimeName);
-
-        /// <summary>
-        /// Handles the scenario when cannot parse a tag from a text.
-        /// </summary>
-        /// <param name="statementText">The statement containing a tag metadata.</param>
-        /// <param name="statementLineNumber">The line number in the source data.</param>
-        /// <param name="statementPosition">The position at the line of the source data.</param>
-        /// <param name="tag">The text with a tag metadata.</param>
-        /// <returns></returns>
-        [CanBeNull] object CannotParseTag(string statementText, int statementLineNumber, int statementPosition, [NotNull] string tag);
-
-        /// <summary>
-        /// Handles the scenario when cannot build expression.
-        /// </summary>
-        /// <param name="buildContext">The build context.</param>
-        /// <param name="dependency">The dependency.</param>
-        /// <param name="lifetime">The lifetime.</param>
-        /// <param name="error">The error.</param>
-        /// <returns>The resulting expression.</returns>
-        [NotNull] Expression CannotBuildExpression([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, ILifetime lifetime, Exception error);
-
-        /// <summary>
-        /// Handles the scenario when cannot resolve a constructor.
-        /// </summary>
-        /// <param name="constructors">Available constructors.</param>
-        /// <returns>The constructor.</returns>
-        [NotNull] IMethod<ConstructorInfo> CannotResolveConstructor([NotNull] IEnumerable<IMethod<ConstructorInfo>> constructors);
-
-        /// <summary>
-        /// Handles the scenario when cannot resolve the instance type.
-        /// </summary>
-        /// <param name="registeredType">Registered type.</param>
-        /// <param name="resolvingType">Resolving type.</param>
-        /// <returns>The type to create an instance.</returns>
-        Type CannotResolveType([NotNull] Type registeredType, [NotNull] Type resolvingType);
     }
 }
 
@@ -4251,7 +4139,18 @@ namespace IoC.Features
         public IEnumerable<IDisposable> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register(ctx => IssueResolver.Shared);
+            yield return container.Register(ctx => FoundCyclicDependency.Shared);
+            yield return container.Register(ctx => CannotBuildExpression.Shared);
+            yield return container.Register(ctx => CannotGetGenericTypeArguments.Shared);
+            yield return container.Register(ctx => CannotGetResolver.Shared);
+            yield return container.Register(ctx => CannotParseLifetime.Shared);
+            yield return container.Register(ctx => CannotParseTag.Shared);
+            yield return container.Register(ctx => CannotParseType.Shared);
+            yield return container.Register(ctx => CannotRegister.Shared);
+            yield return container.Register(ctx => CannotResolveConstructor.Shared);
+            yield return container.Register(ctx => CannotResolveDependency.Shared);
+            yield return container.Register(ctx => CannotResolveType.Shared);
+
             yield return container.Register(ctx => DefaultAutowiringStrategy.Shared);
             yield return container.Register(ctx => ctx.Container.GetResolver<TT>(ctx.Key.Tag.AsTag()), null, Feature.AnyTag);
 
@@ -4976,6 +4875,310 @@ namespace IoC.Lifetimes
 
 #endregion
 
+#region Issues
+
+#region DependencyDescription
+
+namespace IoC.Issues
+{
+    /// <summary>
+    /// Represents the dependency.
+    /// </summary>
+    [PublicAPI]
+    public struct DependencyDescription
+    {
+        /// <summary>
+        /// The resolved dependency.
+        /// </summary>
+        [NotNull] public readonly IDependency Dependency;
+        /// <summary>
+        /// The lifetime to use.
+        /// </summary>
+        [CanBeNull] public readonly ILifetime Lifetime;
+
+        /// <summary>
+        /// Creates new instance.
+        /// </summary>
+        /// <param name="dependency">The resolved dependency.</param>
+        /// <param name="lifetime">The lifetime to use</param>
+        public DependencyDescription([NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime)
+        {
+            Dependency = dependency;
+            Lifetime = lifetime;
+        }
+    }
+}
+
+
+#endregion
+#region ICannotBuildExpression
+
+namespace IoC.Issues
+{
+    using System;
+    using System.Linq.Expressions;
+
+    /// <summary>
+    /// Resolves the scenario when cannot build expression.
+    /// </summary>
+    [PublicAPI]
+    public interface ICannotBuildExpression
+    {
+        /// <summary>
+        /// Resolves the scenario when cannot build expression.
+        /// </summary>
+        /// <param name="buildContext">The build context.</param>
+        /// <param name="dependency">The dependency.</param>
+        /// <param name="lifetime">The lifetime.</param>
+        /// <param name="error">The error.</param>
+        /// <returns>The resulting expression.</returns>
+        [NotNull] Expression Resolve([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, ILifetime lifetime, Exception error);
+    }
+}
+
+
+#endregion
+#region ICannotGetGenericTypeArguments
+
+namespace IoC.Issues
+{
+    using System;
+
+    /// <summary>
+    /// Resolves the scenario when cannot extract generic type arguments.
+    /// </summary>
+    [PublicAPI]
+    public interface ICannotGetGenericTypeArguments
+    {
+        /// <summary>
+        /// Resolves the scenario when cannot extract generic type arguments.
+        /// </summary>
+        /// <param name="type">The instance type.</param>
+        /// <returns>The extracted generic type arguments.</returns>
+        [NotNull] [ItemNotNull] Type[] Resolve([NotNull] Type type);
+    }
+}
+
+
+#endregion
+#region ICannotGetResolver
+
+namespace IoC.Issues
+{
+    using System;
+
+    /// <summary>
+    /// Resolves the scenario when cannot get a resolver.
+    /// </summary>
+    [PublicAPI]
+    public interface ICannotGetResolver
+    {
+        /// <summary>
+        /// Resolves the scenario when cannot get a resolver.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <param name="container">The resolving container.</param>
+        /// <param name="key">The resolving key.</param>
+        /// <param name="error">The error.</param>
+        /// <returns>The resolver.</returns>
+        [NotNull] Resolver<T> Resolve<T>([NotNull] IContainer container, Key key, [NotNull] Exception error);
+    }
+}
+
+
+#endregion
+#region ICannotParseLifetime
+
+namespace IoC.Issues
+{
+    /// <summary>
+    /// Resolves the scenario when cannot parse a lifetime from a text.
+    /// </summary>
+    [PublicAPI]
+    public interface ICannotParseLifetime
+    {
+        /// <summary>
+        /// Resolves the scenario when cannot parse a lifetime from a text.
+        /// </summary>
+        /// <param name="statementText">The statement containing a lifetime metadata.</param>
+        /// <param name="statementLineNumber">The line number in the source data.</param>
+        /// <param name="statementPosition">The position at the line of the source data.</param>
+        /// <param name="lifetimeName">The text with a lifetime metadata.</param>
+        /// <returns></returns>
+        Lifetime Resolve([NotNull] string statementText, int statementLineNumber, int statementPosition, [NotNull] string lifetimeName);
+    }
+}
+
+
+#endregion
+#region ICannotParseTag
+
+namespace IoC.Issues
+{
+    /// <summary>
+    /// Resolves the scenario when cannot parse a tag from a text.
+    /// </summary>
+    [PublicAPI]
+    public interface ICannotParseTag
+    {
+        /// <summary>
+        /// Resolves the scenario when cannot parse a tag from a text.
+        /// </summary>
+        /// <param name="statementText">The statement containing a tag metadata.</param>
+        /// <param name="statementLineNumber">The line number in the source data.</param>
+        /// <param name="statementPosition">The position at the line of the source data.</param>
+        /// <param name="tag">The text with a tag metadata.</param>
+        /// <returns></returns>
+        [CanBeNull] object Resolve(string statementText, int statementLineNumber, int statementPosition, [NotNull] string tag);
+    }
+}
+
+
+#endregion
+#region ICannotParseType
+
+namespace IoC.Issues
+{
+    using System;
+
+    /// <summary>
+    /// Resolves the scenario when cannot parse a type from a text.
+    /// </summary>
+    [PublicAPI]
+    public interface ICannotParseType
+    {
+        /// <summary>
+        /// Resolves the scenario when cannot parse a type from a text.
+        /// </summary>
+        /// <param name="statementText">The statement containing a type metadata.</param>
+        /// <param name="statementLineNumber">The line number in the source data.</param>
+        /// <param name="statementPosition">The position at the line of the source data.</param>
+        /// <param name="typeName">The text with a type metadata.</param>
+        /// <returns></returns>
+        [NotNull] Type Resolve([NotNull] string statementText, int statementLineNumber, int statementPosition, [NotNull] string typeName);
+    }
+}
+
+
+#endregion
+#region ICannotRegister
+
+namespace IoC.Issues
+{
+    using System;
+
+    /// <summary>
+    /// Resolves the scenario when a new binding cannot be registered.
+    /// </summary>
+    [PublicAPI]
+    public interface ICannotRegister
+    {
+        /// <summary>
+        /// Resolves the scenario when a new binding cannot be registered.
+        /// </summary>
+        /// <param name="container">The target container.</param>
+        /// <param name="keys">The set of binding keys.</param>
+        /// <returns>The dependency token.</returns>
+        [NotNull] IDisposable Resolve([NotNull] IContainer container, [NotNull] Key[] keys);
+    }
+}
+
+
+#endregion
+#region ICannotResolveConstructor
+
+namespace IoC.Issues
+{
+    using System.Collections.Generic;
+    using System.Reflection;
+
+    /// <summary>
+    /// Resolves the scenario when cannot resolve a constructor.
+    /// </summary>
+    [PublicAPI]
+    public interface ICannotResolveConstructor
+    {
+        /// <summary>
+        /// Resolves the scenario when cannot resolve a constructor.
+        /// </summary>
+        /// <param name="constructors">Available constructors.</param>
+        /// <returns>The constructor.</returns>
+        [NotNull] IMethod<ConstructorInfo> Resolve([NotNull] IEnumerable<IMethod<ConstructorInfo>> constructors);
+    }
+}
+
+
+#endregion
+#region ICannotResolveDependency
+
+namespace IoC.Issues
+{
+    /// <summary>
+    /// Resolves issue with unknown dependency.
+    /// </summary>
+    [PublicAPI]
+    public interface ICannotResolveDependency
+    {
+        /// <summary>
+        /// Resolves the scenario when the dependency was not found.
+        /// </summary>
+        /// <param name="container">The resolving container.</param>
+        /// <param name="key">The resolving key.</param>
+        /// <returns>The pair of the dependency and of the lifetime.</returns>
+        DependencyDescription Resolve([NotNull] IContainer container, Key key);
+    }
+}
+
+
+#endregion
+#region ICannotResolveType
+
+namespace IoC.Issues
+{
+    using System;
+
+    /// <summary>
+    /// Resolves the scenario when cannot resolve the instance type.
+    /// </summary>
+    [PublicAPI]
+    public interface ICannotResolveType
+    {
+        /// <summary>
+        /// Resolves the scenario when cannot resolve the instance type.
+        /// </summary>
+        /// <param name="registeredType">Registered type.</param>
+        /// <param name="resolvingType">Resolving type.</param>
+        /// <returns>The type to create an instance.</returns>
+        Type Resolve([NotNull] Type registeredType, [NotNull] Type resolvingType);
+    }
+}
+
+
+#endregion
+#region IFoundCyclicDependency
+
+namespace IoC.Issues
+{
+    /// <summary>
+    /// Resolves the scenario when a cyclic dependence was detected.
+    /// </summary>
+    [PublicAPI]
+    public interface IFoundCyclicDependency
+    {
+        /// <summary>
+        /// Resolves the scenario when a cyclic dependence was detected.
+        /// </summary>
+        /// <param name="key">The resolving key.</param>
+        /// <param name="reentrancy">The level of reentrancy.</param>
+        void Resolve(Key key, int reentrancy);
+    }
+}
+
+
+#endregion
+
+#endregion
+
 #region Core
 
 #region AspectOrientedAutowiringStrategy
@@ -5472,6 +5675,7 @@ namespace IoC.Core
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
+    using Issues;
 
     /// <summary>
     /// Represents build context.
@@ -5561,9 +5765,9 @@ namespace IoC.Core
                 {
                     try
                     {
-                        var dependencyInfo = Container.Resolve<IIssueResolver>().CannotResolveDependency(Container, Key);
-                        dependency = dependencyInfo.Item1;
-                        lifetime = dependencyInfo.Item2;
+                        var dependencyDescription = Container.Resolve<ICannotResolveDependency>().Resolve(Container, Key);
+                        dependency = dependencyDescription.Dependency;
+                        lifetime = dependencyDescription.Lifetime;
                     }
                     catch (Exception ex)
                     {
@@ -5573,7 +5777,7 @@ namespace IoC.Core
 
                 if (Depth >= 128)
                 {
-                    Container.Resolve<IIssueResolver>().CyclicDependenceDetected(Key, Depth);
+                    Container.Resolve<IFoundCyclicDependency>().Resolve(Key, Depth);
                 }
 
                 if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
@@ -5583,7 +5787,7 @@ namespace IoC.Core
 
                 try
                 {
-                    return Container.Resolve<IIssueResolver>().CannotBuildExpression(this, dependency, lifetime, error);
+                    return Container.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
                 }
                 catch (Exception)
                 {
@@ -5614,6 +5818,233 @@ namespace IoC.Core
     }
 }
 
+
+#endregion
+#region CannotBuildExpression
+
+namespace IoC.Core
+{
+    using System;
+    using System.Linq.Expressions;
+    using Issues;
+
+    internal class CannotBuildExpression : ICannotBuildExpression
+    {
+        public static readonly ICannotBuildExpression Shared = new CannotBuildExpression();
+
+        private CannotBuildExpression() { }
+
+        public Expression Resolve(IBuildContext buildContext, IDependency dependency, ILifetime lifetime, Exception error)
+        {
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
+            throw new InvalidOperationException($"Cannot build expression for the key {buildContext.Key} in the container {buildContext.Container}.", error);
+        }
+    }
+}
+
+#endregion
+#region CannotGetGenericTypeArguments
+
+namespace IoC.Core
+{
+    using System;
+    using Issues;
+
+    internal class CannotGetGenericTypeArguments : ICannotGetGenericTypeArguments
+    {
+        public static readonly ICannotGetGenericTypeArguments Shared = new CannotGetGenericTypeArguments();
+
+        private CannotGetGenericTypeArguments() { }
+
+        public Type[] Resolve(Type type)
+        {
+            if (type == null) throw new ArgumentNullException(nameof(type));
+            throw new InvalidOperationException($"Cannot get generic type arguments from the type {type.Name}.");
+        }
+    }
+}
+
+#endregion
+#region CannotGetResolver
+
+namespace IoC.Core
+{
+    using System;
+    using Issues;
+
+    internal class CannotGetResolver : ICannotGetResolver
+    {
+        public static readonly ICannotGetResolver Shared = new CannotGetResolver();
+
+        private CannotGetResolver() { }
+
+        public Resolver<T> Resolve<T>(IContainer container, Key key, Exception error)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (error == null) throw new ArgumentNullException(nameof(error));
+            throw new InvalidOperationException($"Cannot get resolver for the key {key} from the container {container}.", error);
+        }
+    }
+}
+
+#endregion
+#region CannotParseLifetime
+
+namespace IoC.Core
+{
+    using System;
+    using Issues;
+
+    internal class CannotParseLifetime : ICannotParseLifetime
+    {
+        public static readonly ICannotParseLifetime Shared = new CannotParseLifetime();
+
+        private CannotParseLifetime() { }
+
+        public Lifetime Resolve(string statementText, int statementLineNumber, int statementPosition, string lifetimeName)
+        {
+            throw new InvalidOperationException($"Cannot parse the lifetime {lifetimeName} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
+        }
+    }
+}
+
+#endregion
+#region CannotParseTag
+
+namespace IoC.Core
+{
+    using System;
+    using Issues;
+
+    internal class CannotParseTag : ICannotParseTag
+    {
+        public static readonly ICannotParseTag Shared = new CannotParseTag();
+
+        private CannotParseTag() { }
+
+        public object Resolve(string statementText, int statementLineNumber, int statementPosition, string tag)
+        {
+            throw new InvalidOperationException($"Cannot parse the tag {tag} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
+        }
+    }
+}
+
+#endregion
+#region CannotParseType
+
+namespace IoC.Core
+{
+    using System;
+    using Issues;
+
+    internal class CannotParseType : ICannotParseType
+    {
+        public static readonly ICannotParseType Shared = new CannotParseType();
+
+        private CannotParseType() { }
+
+        public Type Resolve(string statementText, int statementLineNumber, int statementPosition, string typeName)
+        {
+            throw new InvalidOperationException($"Cannot parse the type {typeName} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
+        }
+    }
+}
+
+#endregion
+#region CannotRegister
+
+namespace IoC.Core
+{
+    using System;
+    using System.Linq;
+    using Issues;
+
+    internal class CannotRegister : ICannotRegister
+    {
+        public static readonly ICannotRegister Shared = new CannotRegister();
+
+        private CannotRegister() { }
+
+        public IDisposable Resolve(IContainer container, Key[] keys)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            if (keys == null) throw new ArgumentNullException(nameof(keys));
+            throw new InvalidOperationException($"Keys {string.Join(", ", keys.Select(i => i.ToString()))} cannot be registered in the container {container}.");
+        }
+    }
+}
+
+#endregion
+#region CannotResolveConstructor
+
+namespace IoC.Core
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Reflection;
+    using Issues;
+
+    internal class CannotResolveConstructor : ICannotResolveConstructor
+    {
+        public static readonly ICannotResolveConstructor Shared = new CannotResolveConstructor();
+
+        private CannotResolveConstructor() { }
+
+        public IMethod<ConstructorInfo> Resolve(IEnumerable<IMethod<ConstructorInfo>> constructors)
+        {
+            if (constructors == null) throw new ArgumentNullException(nameof(constructors));
+            var type = constructors.Single().Info.DeclaringType;
+            throw new InvalidOperationException($"Cannot find a constructor for the type {type}.");
+        }
+    }
+}
+
+#endregion
+#region CannotResolveDependency
+
+namespace IoC.Core
+{
+    using System;
+    using Issues;
+
+    internal class CannotResolveDependency : ICannotResolveDependency
+    {
+        public static readonly ICannotResolveDependency Shared = new CannotResolveDependency();
+
+        private CannotResolveDependency() { }
+
+        public DependencyDescription Resolve(IContainer container, Key key)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            throw new InvalidOperationException($"Cannot find the dependency for the key {key} in the container {container}.");
+        }
+    }
+}
+
+#endregion
+#region CannotResolveType
+
+namespace IoC.Core
+{
+    using System;
+    using Issues;
+
+    internal class CannotResolveType : ICannotResolveType
+    {
+        public static readonly ICannotResolveType Shared = new CannotResolveType();
+
+        private CannotResolveType() { }
+
+        public Type Resolve(Type registeredType, Type resolvingType)
+        {
+            if (registeredType == null) throw new ArgumentNullException(nameof(registeredType));
+            if (resolvingType == null) throw new ArgumentNullException(nameof(resolvingType));
+            throw new InvalidOperationException($"Cannot resolve instance type based on the registered type {registeredType} for resolving type {registeredType}.");
+        }
+    }
+}
 
 #endregion
 #region CoreExtensions
@@ -6503,6 +6934,7 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
+    using Issues;
 
     /// <summary>
     /// Represents extensions to register a dependency in the container.
@@ -6875,7 +7307,32 @@ namespace IoC.Core
 
             return container.TryRegisterDependency(keys, dependency, lifetime, out var dependencyToken) 
                 ? dependencyToken
-                : container.Resolve<IIssueResolver>().CannotRegister(container, keys.ToArray());
+                : container.Resolve<ICannotRegister>().Resolve(container, keys.ToArray());
+        }
+    }
+}
+
+#endregion
+#region FoundCyclicDependency
+
+namespace IoC.Core
+{
+    using System;
+    using Issues;
+
+    internal class FoundCyclicDependency : IFoundCyclicDependency
+    {
+        public static readonly IFoundCyclicDependency Shared = new FoundCyclicDependency();
+
+        private FoundCyclicDependency() { }
+
+        public void Resolve(Key key, int reentrancy)
+        {
+            if (reentrancy <= 0) throw new ArgumentOutOfRangeException(nameof(reentrancy));
+            if (reentrancy >= 256)
+            {
+                throw new InvalidOperationException($"The cyclic dependence detected resolving the dependency {key}. The reentrancy is {reentrancy}.");
+            }
         }
     }
 }
@@ -6890,6 +7347,7 @@ namespace IoC.Core
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
+    using Issues;
 
     internal class FullAutowiringDependency: IDependency
     {
@@ -7005,7 +7463,7 @@ namespace IoC.Core
                 if (!autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
                 {
                     instanceType = _hasGenericParamsWithConstraints
-                        ? GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)
+                        ? GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<ICannotResolveType>().Resolve(_type, buildContext.Key.Type)
                         : _type;
                 }
 
@@ -7035,7 +7493,7 @@ namespace IoC.Core
                 {
                     if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
                     {
-                        ctor = buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
+                        ctor = buildContext.Container.Resolve<ICannotResolveConstructor>().Resolve(defaultConstructors);
                     }
                 }
 
@@ -7179,97 +7637,6 @@ namespace IoC.Core
         /// <param name="resolverExpression">The lambda expression.</param>
         /// <returns>The resulting delegate.</returns>
         [NotNull] Delegate Compile([NotNull] LambdaExpression resolverExpression);
-    }
-}
-
-
-#endregion
-#region IssueResolver
-
-namespace IoC.Core
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-
-    internal sealed class IssueResolver : IIssueResolver
-    {
-        public static readonly IIssueResolver Shared = new IssueResolver();
-
-        private IssueResolver() { }
-
-        public Tuple<IDependency, ILifetime> CannotResolveDependency(IContainer container, Key key)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            throw new InvalidOperationException($"Cannot find the dependency for the key {key} in the container {container}.");
-        }
-
-        public Resolver<T> CannotGetResolver<T>(IContainer container, Key key, Exception error)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (error == null) throw new ArgumentNullException(nameof(error));
-            throw new InvalidOperationException($"Cannot get resolver for the key {key} from the container {container}.", error);
-        }
-
-        public Type[] CannotGetGenericTypeArguments(Type type)
-        {
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            throw new InvalidOperationException($"Cannot get generic type arguments from the type {type.Name}.");
-        }
-
-        public void CyclicDependenceDetected(Key key, int reentrancy)
-        {
-            if (reentrancy <= 0) throw new ArgumentOutOfRangeException(nameof(reentrancy));
-            if (reentrancy >= 256)
-            {
-                throw new InvalidOperationException($"The cyclic dependence detected resolving the dependency {key}. The reentrancy is {reentrancy}.");
-            }
-        }
-
-        public IDisposable CannotRegister(IContainer container, Key[] keys)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (keys == null) throw new ArgumentNullException(nameof(keys));
-            throw new InvalidOperationException($"Keys {string.Join(", ", keys.Select(i => i.ToString()))} cannot be registered in the container {container}.");
-        }
-
-        public Type CannotParseType(string statementText, int statementLineNumber, int statementPosition, string typeName)
-        {
-            throw new InvalidOperationException($"Cannot parse the type {typeName} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
-        }
-
-        public Lifetime CannotParseLifetime(string statementText, int statementLineNumber, int statementPosition, string lifetimeName)
-        {
-            throw new InvalidOperationException($"Cannot parse the lifetime {lifetimeName} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
-        }
-
-        public object CannotParseTag(string statementText, int statementLineNumber, int statementPosition, string tag)
-        {
-            throw new InvalidOperationException($"Cannot parse the tag {tag} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
-        }
-
-        public Expression CannotBuildExpression(IBuildContext buildContext, IDependency dependency, ILifetime lifetime, Exception error)
-        {
-            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
-            throw new InvalidOperationException($"Cannot build expression for the key {buildContext.Key} in the container {buildContext.Container}.", error);
-        }
-
-        public IMethod<ConstructorInfo> CannotResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors)
-        {
-            if (constructors == null) throw new ArgumentNullException(nameof(constructors));
-            var type = constructors.Single().Info.DeclaringType;
-            throw new InvalidOperationException($"Cannot find a constructor for the type {type}.");
-        }
-
-        public Type CannotResolveType(Type registeredType, Type resolvingType)
-        {
-            if (registeredType == null) throw new ArgumentNullException(nameof(registeredType));
-            if (resolvingType == null) throw new ArgumentNullException(nameof(resolvingType));
-            throw new InvalidOperationException($"Cannot resolve instance type based on the registered type {registeredType} for resolving type {registeredType}.");
-        }
     }
 }
 
@@ -8703,12 +9070,14 @@ namespace IoC.Core.Configuration
 #endregion
 #region StatementToBindingConverter
 
+// ReSharper disable IdentifierTypo
 namespace IoC.Core.Configuration
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text.RegularExpressions;
+    using Issues;
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal sealed class StatementToBindingConverter: IConverter<Statement, BindingContext, BindingContext>
@@ -8717,18 +9086,18 @@ namespace IoC.Core.Configuration
         private readonly IConverter<string, BindingContext, Type> _typeConverter;
         [NotNull] private readonly IConverter<string, Statement, Lifetime> _lifetimeConverter;
         [NotNull] private readonly IConverter<string, Statement, IEnumerable<object>> _tagsConverter;
-        private readonly IIssueResolver _issueResolver;
+        private readonly ICannotParseType _сannotParseType;
 
         public StatementToBindingConverter(
             [NotNull] IConverter<string, BindingContext, Type> typeConverter,
             [NotNull] IConverter<string, Statement, Lifetime> lifetimeConverter,
             [NotNull] IConverter<string, Statement, IEnumerable<object>> tagsConverter,
-            [NotNull] IIssueResolver issueResolver)
+            [NotNull] ICannotParseType сannotParseType)
         {
             _typeConverter = typeConverter ?? throw new ArgumentNullException(nameof(typeConverter));
             _lifetimeConverter = lifetimeConverter ?? throw new ArgumentNullException(nameof(lifetimeConverter));
             _tagsConverter = tagsConverter ?? throw new ArgumentNullException(nameof(tagsConverter));
-            _issueResolver = issueResolver ?? throw new ArgumentNullException(nameof(issueResolver));
+            _сannotParseType = сannotParseType ?? throw new ArgumentNullException(nameof(сannotParseType));
         }
 
         public bool TryConvert(BindingContext baseContext, Statement statement, out BindingContext context)
@@ -8740,7 +9109,7 @@ namespace IoC.Core.Configuration
                 var instanceTypeName = bindingMatch.Groups["instanceType"].Value;
                 if (!_typeConverter.TryConvert(baseContext, instanceTypeName, out var instanceType))
                 {
-                    instanceType = _issueResolver.CannotParseType(statement.Text, statement.LineNumber, statement.Position, instanceTypeName);
+                    instanceType = _сannotParseType.Resolve(statement.Text, statement.LineNumber, statement.Position, instanceTypeName);
                 }
 
                 var contractTypes = new List<Type>();
@@ -8748,7 +9117,7 @@ namespace IoC.Core.Configuration
                 {
                     if (!_typeConverter.TryConvert(baseContext, contractTypeName, out var contractType))
                     {
-                        contractType = _issueResolver.CannotParseType(statement.Text, statement.LineNumber, statement.Position, contractTypeName);
+                        contractType = _сannotParseType.Resolve(statement.Text, statement.LineNumber, statement.Position, contractTypeName);
                     }
 
                     contractTypes.Add(contractType);
@@ -8864,16 +9233,17 @@ namespace IoC.Core.Configuration
 {
     using System;
     using System.Text.RegularExpressions;
+    using Issues;
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal sealed class StringToLifetimeConverter: IConverter<string, Statement, Lifetime>
     {
-        [NotNull] private readonly IIssueResolver _issueResolver;
+        [NotNull] private readonly ICannotParseLifetime _cannotParseLifetime;
         private static readonly Regex Regex = new Regex(@"(?:\s*\.\s*As\s*\(\s*([\w.^)]+)\s*\)\s*)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline);
 
-        public StringToLifetimeConverter([NotNull] IIssueResolver issueResolver)
+        public StringToLifetimeConverter([NotNull] ICannotParseLifetime cannotParseLifetime)
         {
-            _issueResolver = issueResolver ?? throw new ArgumentNullException(nameof(issueResolver));
+            _cannotParseLifetime = cannotParseLifetime ?? throw new ArgumentNullException(nameof(cannotParseLifetime));
         }
 
         public bool TryConvert(Statement statement, string text, out Lifetime lifetime)
@@ -8897,7 +9267,7 @@ namespace IoC.Core.Configuration
                 }
                 catch (Exception)
                 {
-                    lifetime = _issueResolver.CannotParseLifetime(statement.Text, statement.LineNumber, statement.Position, lifetimeName);
+                    lifetime = _cannotParseLifetime.Resolve(statement.Text, statement.LineNumber, statement.Position, lifetimeName);
                 }
 
                 success = true;

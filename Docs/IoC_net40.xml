@@ -2057,106 +2057,6 @@
             <param name="error">The error.</param>
             <returns>True if success.</returns>
         </member>
-        <member name="T:IoC.IIssueResolver">
-            <summary>
-            Allows to specify behaviour for cases with issue.
-            </summary>
-        </member>
-        <member name="M:IoC.IIssueResolver.CannotRegister(IoC.IContainer,IoC.Key[])">
-            <summary>
-            Handles the scenario when binding cannot be registered.
-            </summary>
-            <param name="container">The target container.</param>
-            <param name="keys">The set of binding keys.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.IIssueResolver.CannotResolveDependency(IoC.IContainer,IoC.Key)">
-            <summary>
-            Handles the scenario when the dependency cannot be resolved.
-            </summary>
-            <param name="container">The resolving container.</param>
-            <param name="key">The resolving key.</param>
-            <returns>The pair of the dependency and of the lifetime.</returns>
-        </member>
-        <member name="M:IoC.IIssueResolver.CannotGetResolver``1(IoC.IContainer,IoC.Key,System.Exception)">
-            <summary>
-            Handles the scenario when cannot get a resolver.
-            </summary>
-            <typeparam name="T">The instance type.</typeparam>
-            <param name="container">The resolving container.</param>
-            <param name="key">The resolving key.</param>
-            <param name="error">The error.</param>
-            <returns>The resolver.</returns>
-        </member>
-        <member name="M:IoC.IIssueResolver.CannotGetGenericTypeArguments(System.Type)">
-            <summary>
-            Handles the scenario when cannot extract generic type arguments.
-            </summary>
-            <param name="type">The instance type.</param>
-            <returns>The extracted generic type arguments.</returns>
-        </member>
-        <member name="M:IoC.IIssueResolver.CyclicDependenceDetected(IoC.Key,System.Int32)">
-            <summary>
-            Handles the scenario when a cyclic dependence was detected.
-            </summary>
-            <param name="key">The resolving key.</param>
-            <param name="reentrancy">The level of reentrancy.</param>
-        </member>
-        <member name="M:IoC.IIssueResolver.CannotParseType(System.String,System.Int32,System.Int32,System.String)">
-            <summary>
-            Handles the scenario when cannot parse a type from a text.
-            </summary>
-            <param name="statementText">The statement containing a type metadata.</param>
-            <param name="statementLineNumber">The line number in the source data.</param>
-            <param name="statementPosition">The position at the line of the source data.</param>
-            <param name="typeName">The text with a type metadata.</param>
-            <returns></returns>
-        </member>
-        <member name="M:IoC.IIssueResolver.CannotParseLifetime(System.String,System.Int32,System.Int32,System.String)">
-            <summary>
-            Handles the scenario when cannot parse a lifetime from a text.
-            </summary>
-            <param name="statementText">The statement containing a lifetime metadata.</param>
-            <param name="statementLineNumber">The line number in the source data.</param>
-            <param name="statementPosition">The position at the line of the source data.</param>
-            <param name="lifetimeName">The text with a lifetime metadata.</param>
-            <returns></returns>
-        </member>
-        <member name="M:IoC.IIssueResolver.CannotParseTag(System.String,System.Int32,System.Int32,System.String)">
-            <summary>
-            Handles the scenario when cannot parse a tag from a text.
-            </summary>
-            <param name="statementText">The statement containing a tag metadata.</param>
-            <param name="statementLineNumber">The line number in the source data.</param>
-            <param name="statementPosition">The position at the line of the source data.</param>
-            <param name="tag">The text with a tag metadata.</param>
-            <returns></returns>
-        </member>
-        <member name="M:IoC.IIssueResolver.CannotBuildExpression(IoC.IBuildContext,IoC.IDependency,IoC.ILifetime,System.Exception)">
-            <summary>
-            Handles the scenario when cannot build expression.
-            </summary>
-            <param name="buildContext">The build context.</param>
-            <param name="dependency">The dependency.</param>
-            <param name="lifetime">The lifetime.</param>
-            <param name="error">The error.</param>
-            <returns>The resulting expression.</returns>
-        </member>
-        <member name="M:IoC.IIssueResolver.CannotResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})">
-            <summary>
-            Handles the scenario when cannot resolve a constructor.
-            </summary>
-            <param name="constructors">Available constructors.</param>
-            <returns>The constructor.</returns>
-        </member>
-        <member name="M:IoC.IIssueResolver.CannotResolveType(System.Type,System.Type)">
-            <summary>
-            Handles the scenario when cannot resolve the instance type.
-            </summary>
-            <param name="registeredType">Registered type.</param>
-            <param name="resolvingType">Resolving type.</param>
-            <returns>The type to create an instance.</returns>
-        </member>
         <member name="T:IoC.ILifetime">
             <summary>
             Represents a lifetime for an instance.
@@ -2264,6 +2164,178 @@
             Unregisters a resource from the registry.
             </summary>
             <param name="resource">The target resource.</param>
+        </member>
+        <member name="T:IoC.Issues.DependencyDescription">
+            <summary>
+            Represents the dependency.
+            </summary>
+        </member>
+        <member name="F:IoC.Issues.DependencyDescription.Dependency">
+            <summary>
+            The resolved dependency.
+            </summary>
+        </member>
+        <member name="F:IoC.Issues.DependencyDescription.Lifetime">
+            <summary>
+            The lifetime to use.
+            </summary>
+        </member>
+        <member name="M:IoC.Issues.DependencyDescription.#ctor(IoC.IDependency,IoC.ILifetime)">
+            <summary>
+            Creates new instance.
+            </summary>
+            <param name="dependency">The resolved dependency.</param>
+            <param name="lifetime">The lifetime to use</param>
+        </member>
+        <member name="T:IoC.Issues.ICannotBuildExpression">
+            <summary>
+            Resolves the scenario when cannot build expression.
+            </summary>
+        </member>
+        <member name="M:IoC.Issues.ICannotBuildExpression.Resolve(IoC.IBuildContext,IoC.IDependency,IoC.ILifetime,System.Exception)">
+            <summary>
+            Resolves the scenario when cannot build expression.
+            </summary>
+            <param name="buildContext">The build context.</param>
+            <param name="dependency">The dependency.</param>
+            <param name="lifetime">The lifetime.</param>
+            <param name="error">The error.</param>
+            <returns>The resulting expression.</returns>
+        </member>
+        <member name="T:IoC.Issues.ICannotGetGenericTypeArguments">
+            <summary>
+            Resolves the scenario when cannot extract generic type arguments.
+            </summary>
+        </member>
+        <member name="M:IoC.Issues.ICannotGetGenericTypeArguments.Resolve(System.Type)">
+            <summary>
+            Resolves the scenario when cannot extract generic type arguments.
+            </summary>
+            <param name="type">The instance type.</param>
+            <returns>The extracted generic type arguments.</returns>
+        </member>
+        <member name="T:IoC.Issues.ICannotGetResolver">
+            <summary>
+            Resolves the scenario when cannot get a resolver.
+            </summary>
+        </member>
+        <member name="M:IoC.Issues.ICannotGetResolver.Resolve``1(IoC.IContainer,IoC.Key,System.Exception)">
+            <summary>
+            Resolves the scenario when cannot get a resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The resolving container.</param>
+            <param name="key">The resolving key.</param>
+            <param name="error">The error.</param>
+            <returns>The resolver.</returns>
+        </member>
+        <member name="T:IoC.Issues.ICannotParseLifetime">
+            <summary>
+            Resolves the scenario when cannot parse a lifetime from a text.
+            </summary>
+        </member>
+        <member name="M:IoC.Issues.ICannotParseLifetime.Resolve(System.String,System.Int32,System.Int32,System.String)">
+            <summary>
+            Resolves the scenario when cannot parse a lifetime from a text.
+            </summary>
+            <param name="statementText">The statement containing a lifetime metadata.</param>
+            <param name="statementLineNumber">The line number in the source data.</param>
+            <param name="statementPosition">The position at the line of the source data.</param>
+            <param name="lifetimeName">The text with a lifetime metadata.</param>
+            <returns></returns>
+        </member>
+        <member name="T:IoC.Issues.ICannotParseTag">
+            <summary>
+            Resolves the scenario when cannot parse a tag from a text.
+            </summary>
+        </member>
+        <member name="M:IoC.Issues.ICannotParseTag.Resolve(System.String,System.Int32,System.Int32,System.String)">
+            <summary>
+            Resolves the scenario when cannot parse a tag from a text.
+            </summary>
+            <param name="statementText">The statement containing a tag metadata.</param>
+            <param name="statementLineNumber">The line number in the source data.</param>
+            <param name="statementPosition">The position at the line of the source data.</param>
+            <param name="tag">The text with a tag metadata.</param>
+            <returns></returns>
+        </member>
+        <member name="T:IoC.Issues.ICannotParseType">
+            <summary>
+            Resolves the scenario when cannot parse a type from a text.
+            </summary>
+        </member>
+        <member name="M:IoC.Issues.ICannotParseType.Resolve(System.String,System.Int32,System.Int32,System.String)">
+            <summary>
+            Resolves the scenario when cannot parse a type from a text.
+            </summary>
+            <param name="statementText">The statement containing a type metadata.</param>
+            <param name="statementLineNumber">The line number in the source data.</param>
+            <param name="statementPosition">The position at the line of the source data.</param>
+            <param name="typeName">The text with a type metadata.</param>
+            <returns></returns>
+        </member>
+        <member name="T:IoC.Issues.ICannotRegister">
+            <summary>
+            Resolves the scenario when a new binding cannot be registered.
+            </summary>
+        </member>
+        <member name="M:IoC.Issues.ICannotRegister.Resolve(IoC.IContainer,IoC.Key[])">
+            <summary>
+            Resolves the scenario when a new binding cannot be registered.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="keys">The set of binding keys.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="T:IoC.Issues.ICannotResolveConstructor">
+            <summary>
+            Resolves the scenario when cannot resolve a constructor.
+            </summary>
+        </member>
+        <member name="M:IoC.Issues.ICannotResolveConstructor.Resolve(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})">
+            <summary>
+            Resolves the scenario when cannot resolve a constructor.
+            </summary>
+            <param name="constructors">Available constructors.</param>
+            <returns>The constructor.</returns>
+        </member>
+        <member name="T:IoC.Issues.ICannotResolveDependency">
+            <summary>
+            Resolves issue with unknown dependency.
+            </summary>
+        </member>
+        <member name="M:IoC.Issues.ICannotResolveDependency.Resolve(IoC.IContainer,IoC.Key)">
+            <summary>
+            Resolves the scenario when the dependency was not found.
+            </summary>
+            <param name="container">The resolving container.</param>
+            <param name="key">The resolving key.</param>
+            <returns>The pair of the dependency and of the lifetime.</returns>
+        </member>
+        <member name="T:IoC.Issues.ICannotResolveType">
+            <summary>
+            Resolves the scenario when cannot resolve the instance type.
+            </summary>
+        </member>
+        <member name="M:IoC.Issues.ICannotResolveType.Resolve(System.Type,System.Type)">
+            <summary>
+            Resolves the scenario when cannot resolve the instance type.
+            </summary>
+            <param name="registeredType">Registered type.</param>
+            <param name="resolvingType">Resolving type.</param>
+            <returns>The type to create an instance.</returns>
+        </member>
+        <member name="T:IoC.Issues.IFoundCyclicDependency">
+            <summary>
+            Resolves the scenario when a cyclic dependence was detected.
+            </summary>
+        </member>
+        <member name="M:IoC.Issues.IFoundCyclicDependency.Resolve(IoC.Key,System.Int32)">
+            <summary>
+            Resolves the scenario when a cyclic dependence was detected.
+            </summary>
+            <param name="key">The resolving key.</param>
+            <param name="reentrancy">The level of reentrancy.</param>
         </member>
         <member name="T:IoC.Key">
             <summary>

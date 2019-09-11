@@ -5,6 +5,7 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
+    using Issues;
 
     internal class FullAutowiringDependency: IDependency
     {
@@ -120,7 +121,7 @@
                 if (!autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
                 {
                     instanceType = _hasGenericParamsWithConstraints
-                        ? GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<IIssueResolver>().CannotResolveType(_type, buildContext.Key.Type)
+                        ? GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<ICannotResolveType>().Resolve(_type, buildContext.Key.Type)
                         : _type;
                 }
 
@@ -150,7 +151,7 @@
                 {
                     if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
                     {
-                        ctor = buildContext.Container.Resolve<IIssueResolver>().CannotResolveConstructor(defaultConstructors);
+                        ctor = buildContext.Container.Resolve<ICannotResolveConstructor>().Resolve(defaultConstructors);
                     }
                 }
 

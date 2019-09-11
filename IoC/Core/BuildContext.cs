@@ -5,6 +5,7 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
+    using Issues;
 
     /// <summary>
     /// Represents build context.
@@ -94,9 +95,9 @@
                 {
                     try
                     {
-                        var dependencyInfo = Container.Resolve<IIssueResolver>().CannotResolveDependency(Container, Key);
-                        dependency = dependencyInfo.Item1;
-                        lifetime = dependencyInfo.Item2;
+                        var dependencyDescription = Container.Resolve<ICannotResolveDependency>().Resolve(Container, Key);
+                        dependency = dependencyDescription.Dependency;
+                        lifetime = dependencyDescription.Lifetime;
                     }
                     catch (Exception ex)
                     {
@@ -106,7 +107,7 @@
 
                 if (Depth >= 128)
                 {
-                    Container.Resolve<IIssueResolver>().CyclicDependenceDetected(Key, Depth);
+                    Container.Resolve<IFoundCyclicDependency>().Resolve(Key, Depth);
                 }
 
                 if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
@@ -116,7 +117,7 @@
 
                 try
                 {
-                    return Container.Resolve<IIssueResolver>().CannotBuildExpression(this, dependency, lifetime, error);
+                    return Container.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
                 }
                 catch (Exception)
                 {

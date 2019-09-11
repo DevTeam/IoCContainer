@@ -6,6 +6,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
+    using Issues;
 
     /// <summary>
     /// Represents extensions to register a dependency in the container.
@@ -378,7 +379,7 @@
 
             return container.TryRegisterDependency(keys, dependency, lifetime, out var dependencyToken) 
                 ? dependencyToken
-                : container.Resolve<IIssueResolver>().CannotRegister(container, keys.ToArray());
+                : container.Resolve<ICannotRegister>().Resolve(container, keys.ToArray());
         }
     }
 }

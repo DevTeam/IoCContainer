@@ -6,6 +6,7 @@
     using System.Runtime.CompilerServices;
     using System.Linq.Expressions;
     using Core;
+    using Issues;
 
     /// <summary>
     /// Represents extensions to add bindings to the container.
@@ -342,7 +343,7 @@
 
             return binding.Container.TryRegisterDependency(keys, dependency, binding.Lifetime, out var dependencyToken)
                 ? dependencyToken
-                : binding.Container.Resolve<IIssueResolver>().CannotRegister(binding.Container, keys.ToArray());
+                : binding.Container.Resolve<ICannotRegister>().Resolve(binding.Container, keys.ToArray());
         }
     }
 }

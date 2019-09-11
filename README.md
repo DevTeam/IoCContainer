@@ -556,7 +556,7 @@ using (container.Bind<IService>().As(Singleton).To<Service>())
     parentInstance1.ShouldBe(parentInstance2);
 
     // Create a child container
-    using var childContainer = container.CreateChild();
+    using var childContainer = container.Create();
     // Resolve the singleton twice
     var childInstance1 = childContainer.Resolve<IService>();
     var childInstance2 = childContainer.Resolve<IService>();
@@ -584,7 +584,7 @@ _Transient_ - is default lifetime and a new instance is creating each time
 ``` CSharp
 // Create the parent container
 using var parentContainer = Container.Create();
-using var childContainer = parentContainer.CreateChild();
+using var childContainer = parentContainer.Create();
 childContainer.Parent.ShouldBe(parentContainer);
 
 ```
@@ -610,7 +610,7 @@ using (container.Bind<IService>().As(ContainerSingleton).To<Service>())
     parentInstance1.ShouldBe(parentInstance2);
 
     // Create a child container
-    using var childContainer = container.CreateChild();
+    using var childContainer = container.Create();
     // Resolve the container singleton twice
     var childInstance1 = childContainer.Resolve<IService>();
     var childInstance2 = childContainer.Resolve<IService>();
@@ -889,8 +889,8 @@ public void Run()
     // Create the root container
     using (var rootContainer = Container.Create("root"))
     // Configure the child container
-    using (var childContainer = rootContainer.CreateChild("child"))
-    // Configure the child container by the custom aspect oriented autowiring strategy            
+    using (var childContainer = rootContainer.Create("child"))
+    // Configure the child container by the custom aspect oriented autowiring strategy
     using (childContainer.Bind<IAutowiringStrategy>().To(ctx => autowiringStrategy))
     // Configure the child container
     using (childContainer.Bind<IConsole>().Tag("MyConsole").To(ctx => console.Object))
@@ -1031,7 +1031,7 @@ public void Run()
     // Configure the root container to use a custom container during creating a child container
     using (container.Bind<IContainer>().Tag(WellknownContainers.NewChild).To<MyContainer>()) 
     // Create and configure the custom child container
-    using (var childContainer = container.CreateChild())
+    using (var childContainer = container.Create())
     // Bind some dependency
     using (childContainer.Bind<IDependency>().To<Dependency>())
     {
@@ -1730,13 +1730,13 @@ using (container.Bind<IService>().To<Service>())
 public void Run()
 {
     var expectedException = new InvalidOperationException("error");
-    var issueResolver = new Mock<IIssueResolver>();
+    var issueResolver = new Mock<IFoundCyclicDependency>();
     // Throes the exception for reentrancy 128
-    issueResolver.Setup(i => i.CyclicDependenceDetected(It.IsAny<Key>(), 128)).Throws(expectedException);
+    issueResolver.Setup(i => i.Resolve(It.IsAny<Key>(), 128)).Throws(expectedException);
 
     // Create the container
     using var container = Container.Create();
-    using (container.Bind<IIssueResolver>().To(ctx => issueResolver.Object))
+    using (container.Bind<IFoundCyclicDependency>().To(ctx => issueResolver.Object))
         // Configure the container, where 1,2,3 are tags to produce cyclic dependencies during a resolving
     using (container.Bind<ILink>().To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(1))))
     using (container.Bind<ILink>().Tag(1).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(2))))
@@ -1925,6 +1925,9 @@ public class InstantMessenger<T> : IInstantMessenger<T>
 public void Run()
 {
     var console = new Mock<IConsole>();
+    var clock = new Mock<IClock>();
+    var now = new DateTimeOffset(2019, 9, 9, 12, 31, 34, TimeSpan.FromHours(3));
+    clock.SetupGet(i => i.Now).Returns(now);
 
     // Create and configure the root container
     using (var rootContainer = Container.Create("root"))
@@ -1932,12 +1935,13 @@ public void Run()
     using (rootContainer.Bind<ILogger>().To<Logger>())
     {
         // Create and configure the child container
-        using var childContainer = rootContainer.CreateChild("child");
+        using var childContainer = rootContainer.Create("Some child container");
         using (childContainer.Bind<IConsole>().To(ctx => console.Object))
-            // Bind 'ILogger' to the instance creation, actually represented as an expression tree
+        using (childContainer.Bind<IClock>().To(ctx => clock.Object))
+        // Bind 'ILogger' to the instance creation, actually represented as an expression tree
         using (childContainer.Bind<ILogger>().To<TimeLogger>(
-            // Inject the logger from the parent container to an instance of type TimeLogger
-            ctx => new TimeLogger(ctx.Container.Parent.Inject<ILogger>())))
+            // Inject the base logger from the parent container and the clock from the current container
+            ctx => new TimeLogger(ctx.Container.Parent.Inject<ILogger>(), ctx.Container.Inject<IClock>())))
         {
             // Create a logger
             var logger = childContainer.Resolve<ILogger>();
@@ -1948,7 +1952,7 @@ public void Run()
     }
 
     // Check the console output
-    console.Verify(i => i.WriteLine(It.IsRegex(".+: Hello")));
+    console.Verify(i => i.WriteLine($"{now}: Hello"));
 }
 
 public interface IConsole
@@ -1961,6 +1965,11 @@ public interface ILogger
 {
     // Logs a message
     void Log(string message);
+}
+
+public interface IClock
+{
+    DateTimeOffset Now { get; }
 }
 
 public class Logger : ILogger
@@ -1977,11 +1986,16 @@ public class Logger : ILogger
 public class TimeLogger: ILogger
 {
     private readonly ILogger _baseLogger;
+    private readonly IClock _clock;
 
-    public TimeLogger(ILogger baseLogger) => _baseLogger = baseLogger;
+    public TimeLogger(ILogger baseLogger, IClock clock)
+    {
+        _baseLogger = baseLogger;
+        _clock = clock;
+    }
 
     // Adds current time before a message and writes it to console
-    public void Log(string message) => _baseLogger.Log(DateTimeOffset.Now + ": " + message);
+    public void Log(string message) => _baseLogger.Log($"{_clock.Now}: {message}");
 }
 ```
 
