@@ -127,8 +127,8 @@
     }
 
     var readmeHeaderFile = Path.Combine(solutionPath, "README_HEADER.md");
-    var readmeFeaturesFile = Path.Combine(solutionPath, "README_FEATURES.md");
     var readmeBodyFile = Path.Combine(solutionPath, "README_BODY.md");
+    var readmeFeaturesFile = Path.Combine(solutionPath, "README_FEATURES.md");
     var readmeFooterFile = Path.Combine(solutionPath, "README_FOOTER.md");
     var readmeFile = Path.Combine(solutionPath, "README.md");
     var samplesFile = Path.Combine(currentPath, "README_TEMPLATE.md");
@@ -136,11 +136,11 @@
 
     File.Copy(readmeHeaderFile, readmeFile, true);
 
-    var featuresContent = File.ReadAllText(readmeFeaturesFile);
-    File.AppendAllText(readmeFile, featuresContent);
-
     var bodyContent = File.ReadAllText(readmeBodyFile);
     File.AppendAllText(readmeFile, bodyContent);
+
+    var featuresContent = File.ReadAllText(readmeFeaturesFile);
+    File.AppendAllText(readmeFile, featuresContent);
 
     var samplesContent = File.ReadAllText(samplesFile);
     File.AppendAllText(readmeFile, samplesContent);

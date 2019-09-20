@@ -1,102 +1,6 @@
-# Simple, powerful and fast expressions based Inversion of Control container for .NET
+# Simple, powerful and fast Inversion of Control container for .NET
 
-[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) [![IoC container](https://img.shields.io/badge/core-IoC%20container-orange.svg)](#nuget-packages) ![ASP.NET Core](https://img.shields.io/badge/feature-ASP.NET%20Core-orange.svg) ![Interception](https://img.shields.io/badge/feature-Interception-orange.svg) [<img src="http://tcavs2015.cloudapp.net/app/rest/builds/buildType:(id:DevTeam_IoCContainer_Build)/statusIcon"/>](http://tcavs2015.cloudapp.net/viewType.html?buildTypeId=DevTeam_IoCContainer_Build&guest=1)
-
-## IoC.Container provides the following benefits and features
-
-### [Flexible Bindings](#binding)
-
-  - [Autowiring](#autowiring-)
-  - [Aspect oriented autowiring](#aspect-oriented-autowiring-)
-  - [Generic types bindings](#generics-) and [easy generic types mapping](#generic-autowiring-)
-  - [Named/tagged dependencies](#tags-)
-  - [Containers hierarchy](#child-container-)
-  - [Compile-time verification](#manual-autowiring-)
-  - [Bindings via text metadata](#configuration-via-a-text-metadata-)  
-  - Easy extensible set of lifetimes
-    - [Singleton](#singleton-lifetime-) with [auto-disposing](#auto-dispose-singleton-during-containers-dispose-)
-    - [Singleton per container](#container-singleton-lifetime-)
-    - [Singleton per scope](#scope-singleton-lifetime-)
-  - Binding to
-    - [Several Contracts](#several-contracts-)
-    - [Constant](#constant-), [factory](#func-), [factory with arguments](#func-with-arguments-)
-  - Supports [validation](#validation)
-
-### [Powerful dependency injection](#injection)
-
-  - Through
-    - [Сonstructors](#constructor-autowiring-)
-	- [Methods](#method-injection-)
-	- [Properties](#property-injection)
-	- Fields
-  - Injection of composed dependencies
-    - [Func](#resolve-func-)
-	- [Lazy](#resolve-lazy-)
-	- [ThreadLocal](#resolve-threadlocal-)
-	- [Tuple](#resolve-tuple-)
-	- [ValueTuple](#resolve-valuetuple-)
-    - [IAsyncEnumerable](#resolve-all-appropriate-instances-as-iasyncenumerable-)
-	- [IEnumerable](#resolve-all-appropriate-instances-as-ienumerable-)
-	- [Array](#resolve-all-appropriate-instances-as-array-)
-	- [ICollection](#resolve-all-appropriate-instances-as-icollection-)
-	- [ISet](#resolve-all-appropriate-instances-as-iset-)
-	- [IObservable](#resolve-all-appropriate-instances-as-iobservable-source-)
-  - Detailed diagnostics information
-
-### [Incredible Performance](#why-this-one)
-
-  - One of the fastest, almost as fast as operator `new`
-  - Uses [expression trees](https://docs.microsoft.com/en-us/dotnet/csharp/expression-trees) to produce the [effective injection code](#struct-) without any superfluous operations like a `boxing`, `unboxing` or `cast`
-  - Minimizes memory traffic
-
-### [Fully Customizable](#customization)
-
-  - [Custom containers](#custom-child-container-)
-  - [Custom lifetimes](#custom-lifetime-)
-  - [Replacing predefined lifetimes](#replace-lifetime-)
-  - [Custom builders](#custom-builder-)
-  - [Invocations' interceptors](#interception-)
-
-### [Asynchronous](#multithreading)
-  
-  - [Asynchronous resolving](#asynchronous-resolve-)
-  - [Lightweight asynchronous resolving](#asynchronous-lightweight-resolve-)
-  - [Asynchronous enumerations](#resolve-all-appropriate-instances-as-iasyncenumerable-)	
-
-### [Design Aspects](#design)
-
-  - Allows to preserve an original design of code and to minimize the impact of the [Inversion of Control](https://martinfowler.com/articles/injection.html) approach
-  - Aggregates features into dedicated [configuration classes](#configuration-class-)
-  - [Modifiable on-the-fly](#change-configuration-on-the-fly-)
-  - Free from external dependencies like other frameworks or assemblies
-  - [Embedding packages](#nuget-packages) allow to use all these features without referencing on additional assemblies
-
-### Easy Integration
-
-  - [ASP.NET Core](#aspnet-core)
-  - [Xamarin](https://github.com/DevTeam/IoCContainer/blob/master/Samples/XamarinXaml)
-  - [Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfApp)
-  - [.NET core Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfAppNetCore) 
-  - [Universal Windows Platform](https://github.com/DevTeam/IoCContainer/blob/master/Samples/UwpApp)
-  - [Windows Communication Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WcfServiceLibrary)
-  - [Entity Framework](https://github.com/DevTeam/IoCContainer/tree/master/Samples/EntityFrameworkCore)
-
-### Supported Platforms
-
-  - .NET 4.0+
-  - [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/) 1.0+
-  - [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) 1.0+
-  - [UWP](https://docs.microsoft.com/en-us/windows/uwp/index) 10+
-
-### NuGet Packages
-
-|     | binary packages | embedding packages |
-| --- | --- | ---|
-| ![IoC container](https://img.shields.io/badge/core-IoC%20container-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) | [![NuGet](https://buildstats.info/nuget/IoC.Container.Source)](https://www.nuget.org/packages/IoC.Container.Source) |
-| ![ASP.NET Core](https://img.shields.io/badge/feature-ASP.NET%20Core-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source) |
-| ![Interception](https://img.shields.io/badge/feature-Interception-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.Interception)](https://www.nuget.org/packages/IoC.Interception) | [![NuGet](https://buildstats.info/nuget/IoC.Interception.Source)](https://www.nuget.org/packages/IoC.Interception.Source) |
-
-_Embedding packages_ require C# 7.0 or higher.
+[![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) [<img src="http://tcavs2015.cloudapp.net/app/rest/builds/buildType:(id:DevTeam_IoCContainer_Build)/statusIcon"/>](http://tcavs2015.cloudapp.net/viewType.html?buildTypeId=DevTeam_IoCContainer_Build&guest=1)
 
 ## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://dotnetfiddle.net/dRebQM)
 
@@ -132,11 +36,13 @@ class ShroedingersCat : ICat
 }
 ```
 
-_**It is important to note that our abstraction and our implementation do not know anything about IoC containers**_
+_**It is important to note that our abstraction and our implementation do not know anything about any IoC containers at all**_
 
 ### Let's glue all together
 
-At first add the package reference to [IoC.Container](https://www.nuget.org/packages/IoC.Container). It ships entirely as NuGet packages. Using NuGet packages allows you to optimize your application to include only the necessary dependencies.
+Just add the package reference to [IoC.Container](https://www.nuget.org/packages/IoC.Container). It ships entirely as NuGet packages.
+
+_Using NuGet packages allows you to optimize your application to include only the necessary dependencies._
 
 - Package Manager
 
@@ -150,7 +56,9 @@ At first add the package reference to [IoC.Container](https://www.nuget.org/pack
   dotnet add package IoC.Container
   ```
 
-After that declare required dependencies in a dedicated class _Glue_.
+Declare the required dependencies in a dedicated class _Glue_.
+
+_You can do this anywhere in your code, but collecting this information in one place is often the best solution to maintain order._
 
 ```csharp
 class Glue : IConfiguration
@@ -160,6 +68,7 @@ class Glue : IConfiguration
         yield return container.Bind<IBox<TT>>().To<CardboardBox<TT>>();
         yield return container.Bind<ICat>().To<ShroedingersCat>();
 
+        // Models a random subatomic event that may or may not occur.
         yield return container.Bind<Random>().As(Singleton).To<Random>();
         yield return container.Bind<State>().To(ctx => (State)ctx.Container.Resolve<Random>().Next(2));
     }
@@ -174,7 +83,7 @@ Build up _Program_ using _Glue_
 using (new Glue().BuildUp<Program>()) { }
 ```
 
-injecting a set of dependencies via _Program_ constructor (also it can be done via methods, properties or even fields)
+IoC container injects all required dependencies via _Program_ constructor (also it can be done via methods, properties or even fields). Of course the same is true for dependencies of dependencies. It works for most of well-known .net data strucures automatically as well.
 
 ```csharp
 public Program(
@@ -197,6 +106,8 @@ public Program(
   (IBox<ICat> box, ICat cat, IBox<IBox<ICat>> bigBox) valueTuple) { ... }
 ```
 
+![Cat is alive](https://github.com/DevTeam/IoCContainer/blob/master/Docs/Images/cat-is-alive.png?raw=true)
+
 ### Under the hood
 
 Actually each dependency is resolved by a strongly-typed block of statements like the operator `new` which is compiled from the coresponding expression tree to create or to get a required dependency instance with minimal impact on performance or memory consumtion. For instance, the calling of constructor `Program` looks like:
@@ -205,7 +116,26 @@ Actually each dependency is resolved by a strongly-typed block of statements lik
 new Program(new ShroedingersCat() , new CardboardBox<ShroedingersCat>(new ShroedingersCat()), ...);
 ```
 
-This works the same way for any initializing methods, to define properties or fields. Incredible performance and minimal memory traffic make it possible to use the dependency injection pattern at practically no cost and enjoy all its benefits without any compromises.
+This works the same way for any initializing methods, properties or fields.
+
+_**The incredible performance and the memory traffic minimization make it possible to use all benefits of dependency injection everywhere and everytime without any compromises - just like a keyword `new`.**_
+
+## NuGet packages
+
+|     | binary packages | embedding packages * |
+| --- | --- | ---|
+| ![IoC container](https://img.shields.io/badge/core-IoC%20container-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) | [![NuGet](https://buildstats.info/nuget/IoC.Container.Source)](https://www.nuget.org/packages/IoC.Container.Source) |
+| ![ASP.NET Core](https://img.shields.io/badge/feature-ASP.NET%20Core-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source) |
+| ![Interception](https://img.shields.io/badge/feature-Interception-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.Interception)](https://www.nuget.org/packages/IoC.Interception) | [![NuGet](https://buildstats.info/nuget/IoC.Interception.Source)](https://www.nuget.org/packages/IoC.Interception.Source) |
+
+* _Embedding packages_ require C# 7.0 or higher.
+
+## Class References
+
+- [.NET 4.8](Docs/IoC_net48.md)
+- [.NET Standard 2.0](Docs/IoC_netstandard2.0.md)
+- [.NET Core 3.0](Docs/IoC_netcoreapp3.0.md)
+- [UWP 10.0](Docs/IoC_uap10.0.md)
 
 ## ![ASP.NET Core](https://img.shields.io/badge/feature-ASP.NET%20Core-orange.svg)
 
@@ -242,7 +172,7 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
 }
 ```
 
-For more information see [this sample](Samples/AspNetCore).
+For more information please see [this sample](Samples/AspNetCore).
 
 ## ![Interception](https://img.shields.io/badge/feature-Interception-orange.svg)
 
@@ -269,18 +199,28 @@ using (container.Intercept<IService>(new MyInterceptor()))
 { }
 ```
 
-## Class References
-
-- [.NET 4.8](Docs/IoC_net48.md)
-- [.NET Standard 2.0](Docs/IoC_netstandard2.0.md)
-- [.NET Core 3.0](Docs/IoC_netcoreapp3.0.md)
-- [UWP 10.0](Docs/IoC_uap10.0.md)
-
 ## Why this one?
 
 The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for some popular IoC containers like Castle Windsor, Autofac, Unity, Ninject ...
 
 ![Cat](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/REPORT.jpg)
+### Supported Platforms
+
+  - .NET 4.0+
+  - [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/) 1.0+
+  - [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) 1.0+
+  - [UWP](https://docs.microsoft.com/en-us/windows/uwp/index) 10+
+
+### Easy Integration
+
+  - [ASP.NET Core](#aspnet-core)
+  - [Xamarin](https://github.com/DevTeam/IoCContainer/blob/master/Samples/XamarinXaml)
+  - [Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfApp)
+  - [.NET core Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfAppNetCore) 
+  - [Universal Windows Platform](https://github.com/DevTeam/IoCContainer/blob/master/Samples/UwpApp)
+  - [Windows Communication Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WcfServiceLibrary)
+  - [Entity Framework](https://github.com/DevTeam/IoCContainer/tree/master/Samples/EntityFrameworkCore)
+
 
 ## Usage Scenarios
 

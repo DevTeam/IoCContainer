@@ -4,6 +4,7 @@
 // ReSharper disable ArrangeTypeModifiers
 // ReSharper disable ArrangeTypeMemberModifiers
 // ReSharper disable RedundantTypeArgumentsOfMethod
+// ReSharper disable UnusedMember.Global
 #pragma warning disable 618
 namespace ShroedingersCat
 {
@@ -71,7 +72,7 @@ namespace ShroedingersCat
         }
 
         static void Main()
-        {            
+        {
             using (new Glue().BuildUp<Program>()) { }
         }
     }
@@ -107,7 +108,7 @@ namespace ShroedingersCat
             yield return container.Bind<IBox<TT>>().To<CardboardBox<TT>>();
             yield return container.Bind<ICat>().To<ShroedingersCat>();
 
-            // Provides the random state of cats depending on an atom decay
+            // Models a random subatomic event that may or may not occur.
             yield return container.Bind<Random>().As(Singleton).To<Random>();
             yield return container.Bind<State>().To(ctx => (State)ctx.Container.Resolve<Random>().Next(2));
         }

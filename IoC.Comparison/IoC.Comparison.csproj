@@ -7,11 +7,13 @@
     <WarningsAsErrors />
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\IoC\IoC.csproj" />
     <PackageReference Include="JetBrains.dotMemoryUnit" Version="3.0.20171219.105559" />
     <PackageReference Include="Shouldly" Version="3.0.2" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="Unity" Version="5.10.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.4.1" />
+    <PackageReference Include="DryIoc.dll" Version="4.0.7" />
   </ItemGroup>
   <Choose>
     <When Condition="'$(TargetFramework)'=='net40'">
@@ -22,25 +24,20 @@
         <PackageReference Include="Ninject" Version="3.2.2.0" />
         <PackageReference Include="Castle.Windsor" Version="3.4.0" />
         <PackageReference Include="xunit" Version="1.9.2" />
-        <PackageReference Include="DryIoc.dll" Version="4.0.0" />
-      </ItemGroup>      
+      </ItemGroup>
     </When>
     <Otherwise>
       <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.0.1" />
-        <PackageReference Include="Autofac" Version="4.9.1" />
-        <PackageReference Include="LightInject" Version="5.4.0" />
-        <PackageReference Include="Moq" Version="4.10.1" />
+        <PackageReference Include="Autofac" Version="4.9.4" />
+        <PackageReference Include="LightInject" Version="6.1.0" />
+        <PackageReference Include="Moq" Version="4.13.0" />
         <PackageReference Include="Ninject" Version="3.3.4" />
-        <PackageReference Include="Castle.Windsor" Version="5.0.0" />
+        <PackageReference Include="Castle.Windsor" Version="5.0.1" />
         <PackageReference Include="xunit" Version="2.4.1" />
-        <PackageReference Include="DryIoc.dll" Version="4.0.3" />
       </ItemGroup>
     </Otherwise>
   </Choose>
-  <ItemGroup>
-    <ProjectReference Include="..\IoC\IoC.csproj" />
-  </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netcoreapp3.0'">
     <PackageReference Include="System.Reflection.Emit">
       <Version>4.3.0</Version>

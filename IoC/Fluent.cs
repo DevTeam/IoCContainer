@@ -26,7 +26,7 @@
         }
 
         /// <summary>
-        /// Buildups an instance.
+        /// Buildups an instance which was not registered in container. Can be used as entry point of DI.
         /// </summary>
         /// <param name="configuration">The configurations.</param>
         /// <param name="args">The optional arguments.</param>
