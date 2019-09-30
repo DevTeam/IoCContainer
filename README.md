@@ -122,13 +122,13 @@ _**The incredible performance and the memory traffic minimization make it possib
 
 ## NuGet packages
 
-|     | binary packages | embedding packages * |
+|     | binary packages | source code packages * |
 | --- | --- | ---|
 | ![IoC container](https://img.shields.io/badge/core-IoC%20container-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) | [![NuGet](https://buildstats.info/nuget/IoC.Container.Source)](https://www.nuget.org/packages/IoC.Container.Source) |
 | ![ASP.NET Core](https://img.shields.io/badge/feature-ASP.NET%20Core-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source) |
 | ![Interception](https://img.shields.io/badge/feature-Interception-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.Interception)](https://www.nuget.org/packages/IoC.Interception) | [![NuGet](https://buildstats.info/nuget/IoC.Interception.Source)](https://www.nuget.org/packages/IoC.Interception.Source) |
 
-* _Embedding packages_ require C# 7.0 or higher.
+* _source code packages_ require C# 7.0 or higher.
 
 ## Class References
 
