@@ -1868,7 +1868,7 @@ namespace IoC
         }
 
         /// <summary>
-        /// Buildups an instance.
+        /// Buildups an instance which was not registered in container. Can be used as entry point of DI.
         /// </summary>
         /// <param name="configuration">The configurations.</param>
         /// <param name="args">The optional arguments.</param>
@@ -5191,7 +5191,7 @@ namespace IoC.Core
     using System.Linq;
     using System.Reflection;
 
-    internal class AspectOrientedAutowiringStrategy: IAutowiringStrategy        
+    internal class AspectOrientedAutowiringStrategy: IAutowiringStrategy
     {
         [NotNull] private readonly IAspectOrientedMetadata _metadata;
 
@@ -5243,7 +5243,6 @@ namespace IoC.Core
                     select method.TryInjectDependency(parameter.Position, parameterMetadata.Type ?? parameter.ParameterType, parameterMetadata.Tag ?? methodMetadata.Tag))
                 .All(isInjected => isInjected)
             select method;
-        
 
         private class Metadata
         {
@@ -5566,7 +5565,7 @@ namespace IoC.Core
                     baseExpression,
                     _statements);
 
-                if (_statements.Length == 0)                
+                if (_statements.Length == 0)
                 {
                     if (_isComplexType)
                     {

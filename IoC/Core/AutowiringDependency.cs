@@ -52,7 +52,7 @@
                     baseExpression,
                     _statements);
 
-                if (_statements.Length == 0)                
+                if (_statements.Length == 0)
                 {
                     if (_isComplexType)
                     {

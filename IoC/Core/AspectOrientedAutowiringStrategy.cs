@@ -6,7 +6,7 @@
     using System.Linq;
     using System.Reflection;
 
-    internal class AspectOrientedAutowiringStrategy: IAutowiringStrategy        
+    internal class AspectOrientedAutowiringStrategy: IAutowiringStrategy
     {
         [NotNull] private readonly IAspectOrientedMetadata _metadata;
 
@@ -58,7 +58,6 @@
                     select method.TryInjectDependency(parameter.Position, parameterMetadata.Type ?? parameter.ParameterType, parameterMetadata.Tag ?? methodMetadata.Tag))
                 .All(isInjected => isInjected)
             select method;
-        
 
         private class Metadata
         {
