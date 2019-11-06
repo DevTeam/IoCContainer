@@ -1,0 +1,62 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+namespace IoC.Core
+{
+    using System;
+    using System.Linq.Expressions;
+    using System.Runtime.CompilerServices;
+
+    /// <summary>
+    /// Represents extensions to add bindings to the container.
+    /// </summary>
+    internal static partial class FluentRegister
+    {
+<#for(int num = 1; num <= 3; num++) {
+var range = Enumerable.Range(1, num);
+var types = String.Join(", ", range.Select(i => $"T{i}"));
+var args = String.Join(", ", range.Select(i => $"TypeDescriptor<T{i}>.Type"));
+#>
+        /// <summary>
+        /// Registers a binding.
+        /// </summary>
+        /// <typeparam name="T">The autowiring type.</typeparam>
+<#for(int i = 1; i <= num; i++) {#>
+        /// <typeparam name="T<#=i#>">The contract type #<#=i#>.</typeparam>
+<#}#>
+        /// <param name="container">The target container.</param>
+        /// <param name="lifetime">The target lifetime.</param>
+        /// <param name="tags">The tags.</param>
+        /// <returns>The registration token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Register<T, <#=types#>>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
+            where T: <#=types#>
+            => container.Register(new[] { <#=args#> }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+
+        /// <summary>
+        /// Registers a binding.
+        /// </summary>
+        /// <typeparam name="T">The base type.</typeparam>
+<#for(int i = 1; i <= num; i++) {#>
+        /// <typeparam name="T<#=i#>">The contract type #<#=i#>.</typeparam>
+<#}#>
+        /// <param name="container">The target container.</param>
+        /// <param name="factory">The expression to create an instance.</param>
+        /// <param name="lifetime">The target lifetime.</param>
+        /// <param name="tags">The tags.</param>
+        /// <param name="statements">The set of expressions to initialize an instance.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Register<T, <#=types#>>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
+            where T: <#=types#>
+            // ReSharper disable once CoVariantArrayConversion
+            => container.Register(new[] { TypeDescriptor<T>.Type, <#=args#> }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+
+<#}#>
+    }
+}

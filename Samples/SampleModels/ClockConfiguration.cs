@@ -15,7 +15,7 @@
         public static readonly IConfiguration Shared = new ClockConfiguration();
         private ClockConfiguration() { }
 
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
             // View Models
             yield return container.Bind<IClockViewModel>().As(Singleton).To<ClockViewModel>();

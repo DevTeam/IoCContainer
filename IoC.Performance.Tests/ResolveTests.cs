@@ -22,21 +22,21 @@ namespace IoC.Performance.Tests
             _containerComplex = Container.CreateCore();
             foreach (var type in TestTypeBuilder.Default.Types)
             {
-                _containerComplex.Bind(type).To(type).ToSelf();
+                _containerComplex.Bind(type).To(type);
             }
 
             _containerCore = Container.CreateCore();
-            _containerCore.Bind<IService1>().To<Service1>().ToSelf();
-            _containerCore.Bind<IService2>().As(Singleton).To<Service2>().ToSelf();
-            _containerCore.Bind<IService3>().To<Service3>().ToSelf();
-            _containerCore.Bind<IService4>().To<Service4>().ToSelf();
+            _containerCore.Bind<IService1>().To<Service1>();
+            _containerCore.Bind<IService2>().As(Singleton).To<Service2>();
+            _containerCore.Bind<IService3>().To<Service3>();
+            _containerCore.Bind<IService4>().To<Service4>();
 
             _container = Container.Create();
-            _container.Bind<IService1>().To<Service1>().ToSelf();
-            _container.Bind<IService2>().As(Singleton).To<Service2>().ToSelf();
-            _container.Bind<IService3>().To<Service3>().ToSelf();
-            _container.Bind<IService4>().To<Service4>().ToSelf();
-        }           
+            _container.Bind<IService1>().To<Service1>();
+            _container.Bind<IService2>().As(Singleton).To<Service2>();
+            _container.Bind<IService3>().To<Service3>();
+            _container.Bind<IService4>().To<Service4>();
+        }
 
         [Fact]
         public void TestResolveCore()

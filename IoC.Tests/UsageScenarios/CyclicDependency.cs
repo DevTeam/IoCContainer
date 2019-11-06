@@ -25,25 +25,26 @@ namespace IoC.Tests.UsageScenarios
             foundCyclicDependency.Setup(i => i.Resolve(It.IsAny<Key>(), 128)).Throws(expectedException);
 
             // Create the container
-            using var container = Container.Create();
-            using (container.Bind<IFoundCyclicDependency>().To(ctx => foundCyclicDependency.Object))
-            // Configure the container, where 1,2,3 are tags to produce cyclic dependencies during a resolving
-            using (container.Bind<ILink>().To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(1))))
-            using (container.Bind<ILink>().Tag(1).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(2))))
-            using (container.Bind<ILink>().Tag(2).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(3))))
-            using (container.Bind<ILink>().Tag(3).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(1))))
+            using var container = Container
+                .Create()
+                .Bind<IFoundCyclicDependency>().To(ctx => foundCyclicDependency.Object)
+                // Configure the container, where 1,2,3 are tags to produce cyclic dependencies during a resolving
+                .Bind<ILink>().To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(1)))
+                .Bind<ILink>().Tag(1).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(2)))
+                .Bind<ILink>().Tag(2).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(3)))
+                .Bind<ILink>().Tag(3).To<Link>(ctx => new Link(ctx.Container.Inject<ILink>(1)))
+                .Container;
+
+            try
             {
-                try
-                {
-                    // Resolve the root instance
-                    container.Resolve<ILink>();
-                }
-                // Catch the exception about cyclic dependencies at a depth of 128
-                catch (InvalidOperationException actualException)
-                {
-                    // Check the exception
-                    actualException.ShouldBe(expectedException);
-                }
+                // Resolve the root instance
+                container.Resolve<ILink>();
+            }
+            // Catch the exception about cyclic dependencies at a depth of 128
+            catch (InvalidOperationException actualException)
+            {
+                // Check the exception
+                actualException.ShouldBe(expectedException);
             }
         }
 

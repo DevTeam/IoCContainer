@@ -18,7 +18,7 @@ namespace UwpApp
         {
             yield return container.Apply(ClockConfiguration.Shared);
             yield return container.Bind<IUIDispatcher>().As(Singleton).To<UIDispatcher>();
-            yield return container.Bind<MainPage>().As(Singleton).To<MainPage>();           
+            yield return container.Bind<MainPage>().As(Singleton).To<MainPage>();
         }
     }
 }

@@ -20,15 +20,16 @@ namespace IoC.Tests.UsageScenarios
         public void Run()
         {
             // Create and configure the container
-            using var container = Container.Create();
-            using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<IService>().To<Service>(ctx => new Service(ctx.Container.Resolve<IDependency>(), ctx.Args[0] as string)))
-            // Register the custom builder
-            using (container.Bind<IBuilder>().To<NotNullGuardBuilder>())
-            {
-                // Resolve an instance passing null to the "state" parameter
-                Assert.Throws<ArgumentNullException>(() => container.Resolve<IService>(null as string));
-            }
+            using var container = Container
+                .Create()
+                .Bind<IDependency>().To<Dependency>()
+                .Bind<IService>().To<Service>(ctx => new Service(ctx.Container.Resolve<IDependency>(), ctx.Args[0] as string))
+                // Register the custom builder
+                .Bind<IBuilder>().To<NotNullGuardBuilder>()
+                .Container;
+
+            // Resolve an instance passing null to the "state" parameter
+            Assert.Throws<ArgumentNullException>(() => container.Resolve<IService>(null as string));
         }
 
         // This custom builder adds the logic to check parameters of reference types injected via constructors on null

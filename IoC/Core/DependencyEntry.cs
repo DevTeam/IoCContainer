@@ -6,7 +6,7 @@
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
 
-    internal sealed class DependencyEntry : IDisposable
+    internal sealed class DependencyEntry : IToken
     {
         [CanBeNull] internal readonly ILifetime Lifetime;
         [NotNull] internal readonly IEnumerable<Key> Keys;
@@ -18,23 +18,27 @@
         private bool _disposed;
 
         public DependencyEntry(
+            [NotNull] IContainer container,
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource,
             [NotNull] IEnumerable<Key> keys)
         {
+            Container = container;
             Dependency = dependency;
             Lifetime = lifetime;
             Keys = keys;
             if (lifetime is IDisposable disposableLifetime)
             {
-                _resources = new[] { resource, disposableLifetime };                
+                _resources = new[] { resource, disposableLifetime };
             }
             else
             {
                 _resources = new[] { resource };
             }
         }
+
+        public IContainer Container { get; }
 
         public bool TryCreateResolver(
             Key key,

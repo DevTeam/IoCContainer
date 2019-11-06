@@ -33,15 +33,18 @@ namespace IoC.Tests.UsageScenarios
             // Create the root container
             using (var rootContainer = Container.Create("root"))
             // Configure the child container
-            using (var childContainer = rootContainer.Create("child"))
-            // Configure the child container by the custom aspect oriented autowiring strategy
-            using (childContainer.Bind<IAutowiringStrategy>().To(ctx => autowiringStrategy))
-            // Configure the child container
-            using (childContainer.Bind<IConsole>().Tag("MyConsole").To(ctx => console.Object))
-            using (childContainer.Bind<Clock>().To<Clock>())
-            using (childContainer.Bind<string>().Tag("Prefix").To(ctx => "info"))
-            using (childContainer.Bind<ILogger>().To<Logger>())
             {
+                using var childContainer = rootContainer
+                    .Create("child")
+                    // Configure the child container by the custom aspect oriented autowiring strategy
+                    .Bind<IAutowiringStrategy>().To(ctx => autowiringStrategy)
+                    // Configure the child container
+                    .Bind<IConsole>().Tag("MyConsole").To(ctx => console.Object)
+                    .Bind<Clock>().To<Clock>()
+                    .Bind<string>().Tag("Prefix").To(ctx => "info")
+                    .Bind<ILogger>().To<Logger>()
+                    .Container;
+
                 // Create a logger
                 var logger = childContainer.Resolve<ILogger>();
 

@@ -24,23 +24,24 @@ namespace IoC.Tests.UsageScenarios
         public void Run()
         {
             // Create and configure the container
-            using var container = Container.Create();
-            using (container.Bind<IDependency>().To<Dependency>())
+            using var container = Container
+                .Create()
+                .Bind<IDependency>().To<Dependency>()
                 // Register the tracing builder
-            using (container.Bind<TracingBuilder, IBuilder>().As(Singleton).To<TracingBuilder>())
+                .Bind<TracingBuilder, IBuilder>().As(Singleton).To<TracingBuilder>()
                 // Register a struct
-            using (container.Bind<MyStruct>().To<MyStruct>())
-            {
-                // Resolve an instance
-                var instance = container.Resolve<MyStruct>();
+                .Bind<MyStruct>().To<MyStruct>()
+                .Container;
 
-                // Check the expression which was used to create an instances of MyStruct
-                var expressions = container.Resolve<TracingBuilder>().Expressions;
-                var structExpression = expressions[new Key(typeof(MyStruct))].ToString();
-                structExpression.ShouldBe("new MyStruct(new Dependency())");
-                // Obvious there are no any superfluous operations like a `boxing`, `unboxing` or `cast`,
-                // just only what is really necessary to create an instance
-            }
+            // Resolve an instance
+            var instance = container.Resolve<MyStruct>();
+
+            // Check the expression which was used to create an instances of MyStruct
+            var expressions = container.Resolve<TracingBuilder>().Expressions;
+            var structExpression = expressions[new Key(typeof(MyStruct))].ToString();
+            structExpression.ShouldBe("new MyStruct(new Dependency())");
+            // Obvious there are no any superfluous operations like a `boxing`, `unboxing` or `cast`,
+            // just only what is really necessary to create an instance
         }
 
         public struct MyStruct

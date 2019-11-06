@@ -17,6 +17,11 @@
         [NotNull] IContainer Container { get; }
 
         /// <summary>
+        /// Binding tokens.
+        /// </summary>
+        [NotNull] IEnumerable<IToken> Tokens { get; }
+
+        /// <summary>
         /// The type to bind.
         /// </summary>
         [NotNull][ItemNotNull] IEnumerable<Type> Types { get; }

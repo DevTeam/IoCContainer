@@ -1,6 +1,5 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
-    using System.Reflection;
     using Castle.DynamicProxy;
     using Features;
     using Moq;

@@ -26,19 +26,19 @@
             Func<int> generator = () => id++;
 
             // Create a container
-            using (var container = Container.Create())
-            // Configure the container
-            using (container.Bind<int>().Tag("IdGenerator").To(ctx => generator()))
-            using (container.Bind(typeof(IInstantMessenger<>)).To(typeof(InstantMessenger<>)))
-            using (container.Bind<IMessage>().To<Message>(ctx => new Message(ctx.Container.Inject<int>("IdGenerator"), (string)ctx.Args[0], (string)ctx.Args[1])))
+            using var container = Container
+                .Create()
+                .Bind<int>().Tag("IdGenerator").To(ctx => generator())
+                .Bind(typeof(IInstantMessenger<>)).To(typeof(InstantMessenger<>))
+                .Bind<IMessage>().To<Message>(ctx => new Message(ctx.Container.Inject<int>("IdGenerator"), (string) ctx.Args[0], (string) ctx.Args[1]))
+                .Container;
+
+            var instantMessenger = container.Resolve<IInstantMessenger<IMessage>>();
+            using (instantMessenger.Subscribe(observer.Object))
             {
-                var instantMessenger = container.Resolve<IInstantMessenger<IMessage>>();
-                using (instantMessenger.Subscribe(observer.Object))
+                for (var i = 0; i < 10; i++)
                 {
-                    for (var i = 0; i < 10; i++)
-                    {
-                        instantMessenger.SendMessage("John", "Hello");
-                    }
+                    instantMessenger.SendMessage("John", "Hello");
                 }
             }
 

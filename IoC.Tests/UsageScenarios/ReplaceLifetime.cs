@@ -21,28 +21,29 @@ namespace IoC.Tests.UsageScenarios
             var counter = new Mock<ICounter>();
 
             // Create and configure the container
-            using (var container = Container.Create())
-            using (container.Bind<ICounter>().To(ctx => counter.Object))
-            // Replace the Singleton lifetime
-            using (container.Bind<ILifetime>().Tag(Lifetime.Singleton).To<MySingletonLifetime>(
+            using var container = Container
+                .Create()
+                .Bind<ICounter>().To(ctx => counter.Object)
+                // Replace the Singleton lifetime
+                .Bind<ILifetime>().Tag(Lifetime.Singleton).To<MySingletonLifetime>(
                     // Select the constructor
                     ctx => new MySingletonLifetime(
                         // Inject the singleton lifetime from the parent container to use delegate logic
                         ctx.Container.Parent.Inject<ILifetime>(Lifetime.Singleton),
                         // Inject the counter to store the number of created instances
-                        ctx.Container.Inject<ICounter>())))
-            // Configure the container as usual
-            using (container.Bind<IDependency>().To<Dependency>())
-            // Bind using the custom implementation of Singleton lifetime
-            using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
-            {
-                // Resolve the singleton twice using the custom lifetime
-                var instance1 = container.Resolve<IService>();
-                var instance2 = container.Resolve<IService>();
+                        ctx.Container.Inject<ICounter>()))
+                // Configure the container as usual
+                .Bind<IDependency>().To<Dependency>()
+                // Bind using the custom implementation of Singleton lifetime
+                .Bind<IService>().As(Lifetime.Singleton).To<Service>()
+                .Container;
 
-                // Check that instances are equal
-                instance1.ShouldBe(instance2);
-            }
+            // Resolve the singleton twice using the custom lifetime
+            var instance1 = container.Resolve<IService>();
+            var instance2 = container.Resolve<IService>();
+
+            // Check that instances are equal
+            instance1.ShouldBe(instance2);
 
             // Check the number of created instances
             counter.Verify(i => i.Increment(), Times.Exactly(2));

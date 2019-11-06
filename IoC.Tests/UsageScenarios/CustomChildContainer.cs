@@ -18,25 +18,28 @@ namespace IoC.Tests.UsageScenarios
         public void Run()
         {
             // Create and configure the root container
-            using var container = Container.Create();
-            using (container.Bind<IService>().To<Service>())
-            // Configure the root container to use a custom container during creating a child container
-            using (container.Bind<IContainer>().Tag(WellknownContainers.NewChild).To<MyContainer>()) 
-            // Create and configure the custom child container
-            using (var childContainer = container.Create())
-            // Bind some dependency
-            using (childContainer.Bind<IDependency>().To<Dependency>())
-            {
-                // Resolve an instance
-                var instance = childContainer.Resolve<IService>();
+            using var container = Container
+                .Create()
+                .Bind<IService>().To<Service>()
+                // Configure the root container to use a custom container during creating a child container
+                .Bind<IContainer>().Tag(WellknownContainers.NewChild).To<MyContainer>()
+                .Container;
 
-                // Check the child container's type
-                childContainer.ShouldBeOfType<MyContainer>();
-                // }
-                // Check the instance's type
-                instance.ShouldBeOfType<Service>();
-        // {
-            }
+            // Create and configure the custom child container
+            using var childContainer = container
+                .Create()
+                .Bind<IDependency>().To<Dependency>()
+                .Container;
+
+            // Resolve an instance
+            var instance = childContainer.Resolve<IService>();
+
+            // Check the child container's type
+            childContainer.ShouldBeOfType<MyContainer>();
+            // }
+            // Check the instance's type
+            instance.ShouldBeOfType<Service>();
+            // {
         }
 
         // Sample of transparent container implementation
@@ -50,7 +53,7 @@ namespace IoC.Tests.UsageScenarios
             public IContainer Parent { get; }
 
             // Registers dependencies
-            public bool TryRegisterDependency(IEnumerable<Key> keys, IoC.IDependency dependency, ILifetime lifetime, out IDisposable dependencyToken) 
+            public bool TryRegisterDependency(IEnumerable<Key> keys, IoC.IDependency dependency, ILifetime lifetime, out IToken dependencyToken) 
                 => Parent.TryRegisterDependency(keys, dependency, lifetime, out dependencyToken);
 
             // Gets registered dependencies and lifetimes

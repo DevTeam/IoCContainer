@@ -19,7 +19,7 @@
             _statements = GetStatements(textReader ?? throw new ArgumentNullException(nameof(textReader)));
         }
 
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (_bindingsConverter.TryConvert(BindingContext.Empty, _statements, out var context))
@@ -32,7 +32,7 @@
                     select curBinding.As(binding.Lifetime).To(binding.InstanceType);
             }
 
-            return Enumerable.Empty<IDisposable>();
+            return Enumerable.Empty<IToken>();
         }
 
         private static IEnumerable<Statement> GetStatements([NotNull] TextReader textReader)

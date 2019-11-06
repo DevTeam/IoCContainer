@@ -14,7 +14,7 @@
 
         private ClockDesignTimeConfiguration() { }
 
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
             // Design time View Models
             yield return container.Bind<IClockViewModel>().To<ClockViewModelDesignTime>();

@@ -21,15 +21,14 @@ namespace IoC.Tests.UsageScenarios
             // Create the container and configure it
             using var container = Container.Create()
                 // Bind some dependency
-                .Bind<IDependency>().To<Dependency>().ToSelf()
-                .Bind<IService>().To<Service>().ToSelf();
+                .Bind<IDependency>().To<Dependency>()
+                .Bind<IService>().To<Service>().Container;
+
             // Resolve an instance asynchronously
             var instance = await container.Resolve<Task<IService>>();
             // }
             // Check the instance's type
             instance.ShouldBeOfType<Service>();
-            // {
-            // }
         }
     }
 }

@@ -665,7 +665,7 @@
         <member name="M:IoC.Container.ToString">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Container.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,System.IDisposable@)">
+        <member name="M:IoC.Container.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,IoC.IToken@)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Container.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,System.Exception@,IoC.IContainer)">
@@ -780,6 +780,9 @@
             <summary>
             Represents extensions to register a dependency in the container.
             </summary>
+            <summary>
+            Represents extensions to add bindings to the container.
+            </summary>
         </member>
         <member name="M:IoC.Core.FluentRegister.Register``1(IoC.IContainer,IoC.ILifetime,System.Object[])">
             <summary>
@@ -789,123 +792,7 @@
             <param name="container">The target container.</param>
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``2(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``3(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``4(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``5(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``6(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``7(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <typeparam name="T6">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``8(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <typeparam name="T6">The additional contract type.</typeparam>
-            <typeparam name="T7">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``9(IoC.IContainer,IoC.ILifetime,System.Object[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The autowiring type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <typeparam name="T6">The additional contract type.</typeparam>
-            <typeparam name="T7">The additional contract type.</typeparam>
-            <typeparam name="T8">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <returns>The dependency token.</returns>
+            <returns>The registration token.</returns>
         </member>
         <member name="M:IoC.Core.FluentRegister.Register``1(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
             <summary>
@@ -917,139 +804,7 @@
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
             <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``2(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``3(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``4(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``5(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``6(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``7(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <typeparam name="T6">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``8(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <typeparam name="T6">The additional contract type.</typeparam>
-            <typeparam name="T7">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.Core.FluentRegister.Register``9(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
-            <summary>
-            Registers a binding.
-            </summary>
-            <typeparam name="T">The base type.</typeparam>
-            <typeparam name="T1">The additional contract type.</typeparam>
-            <typeparam name="T2">The additional contract type.</typeparam>
-            <typeparam name="T3">The additional contract type.</typeparam>
-            <typeparam name="T4">The additional contract type.</typeparam>
-            <typeparam name="T5">The additional contract type.</typeparam>
-            <typeparam name="T6">The additional contract type.</typeparam>
-            <typeparam name="T7">The additional contract type.</typeparam>
-            <typeparam name="T8">The additional contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="factory">The expression to create an instance.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <param name="tags">The tags.</param>
-            <param name="statements">The set of expressions to initialize an instance.</param>
-            <returns>The dependency token.</returns>
+            <returns>The registration token.</returns>
         </member>
         <member name="M:IoC.Core.FluentRegister.Register(IoC.IContainer,System.Collections.Generic.IEnumerable{System.Type},IoC.IDependency,IoC.ILifetime,System.Object[])">
             <summary>
@@ -1060,7 +815,85 @@
             <param name="dependency">The dependency.</param>
             <param name="lifetime">The target lifetime.</param>
             <param name="tags">The tags.</param>
-            <returns></returns>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``2(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowiring type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``2(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``3(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowiring type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``3(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``4(IoC.IContainer,IoC.ILifetime,System.Object[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The autowiring type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <returns>The registration token.</returns>
+        </member>
+        <member name="M:IoC.Core.FluentRegister.Register``4(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])">
+            <summary>
+            Registers a binding.
+            </summary>
+            <typeparam name="T">The base type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="factory">The expression to create an instance.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="tags">The tags.</param>
+            <param name="statements">The set of expressions to initialize an instance.</param>
+            <returns>The dependency token.</returns>
         </member>
         <member name="T:IoC.Core.IArray">
             <summary>
@@ -1276,12 +1109,23 @@
             <summary>
             Represents extensions to add bindings to the container.
             </summary>
+            <summary>
+            Represents extensions to add bindings to the container.
+            </summary>
         </member>
         <member name="M:IoC.FluentBind.Bind(IoC.IContainer,System.Type[])">
             <summary>
             Binds the type(s).
             </summary>
             <param name="container">The target container.</param>
+            <param name="types"></param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind(IoC.IToken,System.Type[])">
+            <summary>
+            Binds the type(s).
+            </summary>
+            <param name="token">The container binding token.</param>
             <param name="types"></param>
             <returns>The binding token.</returns>
         </member>
@@ -1293,88 +1137,12 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
-        <member name="M:IoC.FluentBind.Bind``2(IoC.IContainer)">
+        <member name="M:IoC.FluentBind.Bind``1(IoC.IToken)">
             <summary>
-            Binds multiple types.
+            Binds the type.
             </summary>
-            <typeparam name="T">The instance type.</typeparam>
-            <typeparam name="T1">The contract type.</typeparam>
-            <param name="container">The target container.</param>
-            <returns>The binding token.</returns>
-        </member>
-        <member name="M:IoC.FluentBind.Bind``3(IoC.IContainer)">
-            <summary>
-            Binds multiple types.
-            </summary>
-            <typeparam name="T">The instance type.</typeparam>
-            <typeparam name="T1">The contract type #1.</typeparam>
-            <typeparam name="T2">The contract type #2.</typeparam>
-            <param name="container">The target container.</param>
-            <returns>The binding token.</returns>
-        </member>
-        <member name="M:IoC.FluentBind.Bind``4(IoC.IContainer)">
-            <summary>
-            Binds multiple types.
-            </summary>
-            <typeparam name="T">The instance type.</typeparam>
-            <typeparam name="T1">The contract type #1.</typeparam>
-            <typeparam name="T2">The contract type #2.</typeparam>
-            <typeparam name="T3">The contract type #3.</typeparam>
-            <param name="container">The target container.</param>
-            <returns>The binding token.</returns>
-        </member>
-        <member name="M:IoC.FluentBind.Bind``5(IoC.IContainer)">
-            <summary>
-            Binds multiple types.
-            </summary>
-            <typeparam name="T">The instance type.</typeparam>
-            <typeparam name="T1">The contract type #1.</typeparam>
-            <typeparam name="T2">The contract type #2.</typeparam>
-            <typeparam name="T3">The contract type #3.</typeparam>
-            <typeparam name="T4">The contract type #4.</typeparam>
-            <param name="container">The target container.</param>
-            <returns>The binding token.</returns>
-        </member>
-        <member name="M:IoC.FluentBind.Bind``6(IoC.IContainer)">
-            <summary>
-            Binds multiple types.
-            </summary>
-            <typeparam name="T">The instance type.</typeparam>
-            <typeparam name="T1">The contract type #1.</typeparam>
-            <typeparam name="T2">The contract type #2.</typeparam>
-            <typeparam name="T3">The contract type #3.</typeparam>
-            <typeparam name="T4">The contract type #4.</typeparam>
-            <typeparam name="T5">The contract type #5.</typeparam>
-            <param name="container">The target container.</param>
-            <returns>The binding token.</returns>
-        </member>
-        <member name="M:IoC.FluentBind.Bind``7(IoC.IContainer)">
-            <summary>
-            Binds multiple types.
-            </summary>
-            <typeparam name="T">The instance type.</typeparam>
-            <typeparam name="T1">The contract type #1.</typeparam>
-            <typeparam name="T2">The contract type #2.</typeparam>
-            <typeparam name="T3">The contract type #3.</typeparam>
-            <typeparam name="T4">The contract type #4.</typeparam>
-            <typeparam name="T5">The contract type #5.</typeparam>
-            <typeparam name="T6">The contract type #6.</typeparam>
-            <param name="container">The target container.</param>
-            <returns>The binding token.</returns>
-        </member>
-        <member name="M:IoC.FluentBind.Bind``8(IoC.IContainer)">
-            <summary>
-            Binds multiple types.
-            </summary>
-            <typeparam name="T">The instance type.</typeparam>
-            <typeparam name="T1">The contract type #1.</typeparam>
-            <typeparam name="T2">The contract type #2.</typeparam>
-            <typeparam name="T3">The contract type #3.</typeparam>
-            <typeparam name="T4">The contract type #4.</typeparam>
-            <typeparam name="T5">The contract type #5.</typeparam>
-            <typeparam name="T6">The contract type #6.</typeparam>
-            <typeparam name="T7">The contract type #7.</typeparam>
-            <param name="container">The target container.</param>
+            <typeparam name="T">The contract type.</typeparam>
+            <param name="token">The container binding token.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.As``1(IoC.IBinding{``0},IoC.Lifetime)">
@@ -1449,11 +1217,1573 @@
             <param name="statements">The set of expressions to initialize an instance.</param>
             <returns>The dependency token.</returns>
         </member>
-        <member name="M:IoC.FluentBind.ToSelf(System.IDisposable)">
+        <member name="M:IoC.FluentBind.Bind``2(IoC.IContainer)">
             <summary>
-            Puts the dependency token into the target container to manage it.
+            Binds multiple types.
             </summary>
-            <param name="dependencyToken"></param>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``2(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``3(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``3(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``4(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``4(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``5(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``5(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``6(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``6(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``7(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``7(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``8(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``8(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``9(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``9(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``10(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``10(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``11(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``11(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``12(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``12(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``13(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``13(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``14(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``14(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``15(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``15(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``16(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``16(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``17(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``17(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``18(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``18(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``19(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``19(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``20(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``20(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``21(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``21(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``22(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``22(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``23(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``23(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``24(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``24(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``25(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``25(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``26(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``26(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``27(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``27(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``28(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``28(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``29(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``29(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``30(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <typeparam name="T29">The contract type #29.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``30(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <typeparam name="T29">The contract type #29.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``31(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <typeparam name="T29">The contract type #29.</typeparam>
+            <typeparam name="T30">The contract type #30.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``31(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <typeparam name="T29">The contract type #29.</typeparam>
+            <typeparam name="T30">The contract type #30.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``32(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <typeparam name="T29">The contract type #29.</typeparam>
+            <typeparam name="T30">The contract type #30.</typeparam>
+            <typeparam name="T31">The contract type #31.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``32(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <typeparam name="T29">The contract type #29.</typeparam>
+            <typeparam name="T30">The contract type #30.</typeparam>
+            <typeparam name="T31">The contract type #31.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``33(IoC.IContainer)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <typeparam name="T29">The contract type #29.</typeparam>
+            <typeparam name="T30">The contract type #30.</typeparam>
+            <typeparam name="T31">The contract type #31.</typeparam>
+            <typeparam name="T32">The contract type #32.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``33(IoC.IToken)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <typeparam name="T29">The contract type #29.</typeparam>
+            <typeparam name="T30">The contract type #30.</typeparam>
+            <typeparam name="T31">The contract type #31.</typeparam>
+            <typeparam name="T32">The contract type #32.</typeparam>
+            <param name="token">The binding token.</param>
+            <returns>The binding token.</returns>
         </member>
         <member name="T:IoC.FluentConfiguration">
             <summary>
@@ -1839,6 +3169,91 @@
             Represents the generic type parameter marker.
             </summary>
         </member>
+        <member name="T:IoC.TT16">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT17">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT18">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT19">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT20">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT21">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT22">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT23">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT24">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT25">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT26">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT27">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT28">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT29">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT30">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT31">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TT32">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
         <member name="T:IoC.IAutowiringStrategy">
             <summary>
             Represents an abstraction for an autowiring method.
@@ -1878,6 +3293,11 @@
         <member name="P:IoC.IBinding`1.Container">
             <summary>
             The target container.
+            </summary>
+        </member>
+        <member name="P:IoC.IBinding`1.Tokens">
+            <summary>
+            Binding tokens.
             </summary>
         </member>
         <member name="P:IoC.IBinding`1.Types">
@@ -2011,7 +3431,7 @@
             The parent container or null if it has no a parent.
             </summary>
         </member>
-        <member name="M:IoC.IContainer.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,System.IDisposable@)">
+        <member name="M:IoC.IContainer.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,IoC.IToken@)">
             <summary>
             Tries registering the dependency with lifetime.
             </summary>
@@ -2336,6 +3756,16 @@
             </summary>
             <param name="key">The resolving key.</param>
             <param name="reentrancy">The level of reentrancy.</param>
+        </member>
+        <member name="T:IoC.IToken">
+            <summary>
+            The binding token to manage binding lifetime.
+            </summary>
+        </member>
+        <member name="P:IoC.IToken.Container">
+            <summary>
+            The owner container.
+            </summary>
         </member>
         <member name="T:IoC.Key">
             <summary>

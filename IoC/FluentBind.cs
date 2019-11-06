@@ -12,7 +12,7 @@
     /// Represents extensions to add bindings to the container.
     /// </summary>
     [PublicAPI]
-    public static class FluentBind
+    public static partial class FluentBind
     {
         /// <summary>
         /// Binds the type(s).
@@ -31,12 +31,28 @@
         }
 
         /// <summary>
+        /// Binds the type(s).
+        /// </summary>
+        /// <param name="token">The container binding token.</param>
+        /// <param name="types"></param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<object> Bind([NotNull] this IToken token, [NotNull] [ItemNotNull] params Type[] types)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            if (types == null) throw new ArgumentNullException(nameof(types));
+            if (types.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(types));
+            return new Binding<object>(token, types);
+        }
+
+        /// <summary>
         /// Binds the type.
         /// </summary>
         /// <typeparam name="T">The contract type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<T> Bind<T>([NotNull] this IContainer container)
         {
@@ -45,138 +61,18 @@
         }
 
         /// <summary>
-        /// Binds multiple types.
+        /// Binds the type.
         /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <typeparam name="T1">The contract type.</typeparam>
-        /// <param name="container">The target container.</param>
+        /// <typeparam name="T">The contract type.</typeparam>
+        /// <param name="token">The container binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1>([NotNull] this IContainer container)
-            where T : T1
+        public static IBinding<T> Bind<T>([NotNull] this IToken token)
         {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type);
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type);
         }
-
-        /// <summary>
-        /// Binds multiple types.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <typeparam name="T1">The contract type #1.</typeparam>
-        /// <typeparam name="T2">The contract type #2.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IBinding<T> Bind<T, T1, T2>([NotNull] this IContainer container)
-            where T : T1, T2
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type);
-        }
-
-        /// <summary>
-        /// Binds multiple types.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <typeparam name="T1">The contract type #1.</typeparam>
-        /// <typeparam name="T2">The contract type #2.</typeparam>
-        /// <typeparam name="T3">The contract type #3.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3>([NotNull] this IContainer container)
-            where T : T1, T2, T3
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type);
-        }
-
-        /// <summary>
-        /// Binds multiple types.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <typeparam name="T1">The contract type #1.</typeparam>
-        /// <typeparam name="T2">The contract type #2.</typeparam>
-        /// <typeparam name="T3">The contract type #3.</typeparam>
-        /// <typeparam name="T4">The contract type #4.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4>([NotNull] this IContainer container)
-            where T : T1, T2, T3, T4
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type);
-        }
-
-        /// <summary>
-        /// Binds multiple types.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <typeparam name="T1">The contract type #1.</typeparam>
-        /// <typeparam name="T2">The contract type #2.</typeparam>
-        /// <typeparam name="T3">The contract type #3.</typeparam>
-        /// <typeparam name="T4">The contract type #4.</typeparam>
-        /// <typeparam name="T5">The contract type #5.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container)
-            where T : T1, T2, T3, T4, T5
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type);
-        }
-
-        /// <summary>
-        /// Binds multiple types.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <typeparam name="T1">The contract type #1.</typeparam>
-        /// <typeparam name="T2">The contract type #2.</typeparam>
-        /// <typeparam name="T3">The contract type #3.</typeparam>
-        /// <typeparam name="T4">The contract type #4.</typeparam>
-        /// <typeparam name="T5">The contract type #5.</typeparam>
-        /// <typeparam name="T6">The contract type #6.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container)
-            where T : T1, T2, T3, T4, T5, T6
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type);
-        }
-
-        /// <summary>
-        /// Binds multiple types.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <typeparam name="T1">The contract type #1.</typeparam>
-        /// <typeparam name="T2">The contract type #2.</typeparam>
-        /// <typeparam name="T3">The contract type #3.</typeparam>
-        /// <typeparam name="T4">The contract type #4.</typeparam>
-        /// <typeparam name="T5">The contract type #5.</typeparam>
-        /// <typeparam name="T6">The contract type #6.</typeparam>
-        /// <typeparam name="T7">The contract type #7.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container)
-            where T : T1, T2, T3, T4, T5, T6, T7
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type);
-        }
-
 
         /// <summary>
         /// Assigns well-known lifetime to the binding.
@@ -263,14 +159,14 @@
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable To(
+        public static IToken To(
             [NotNull] this IBinding<object> binding,
             [NotNull] Type type,
             [NotNull][ItemNotNull] params Expression<Action<Context<object>>>[] statements)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(type, binding.AutowiringStrategy, statements)));
+            return CreateDependencyToken(binding, CreateDependency(binding, new FullAutowiringDependency(type, binding.AutowiringStrategy, statements)));
         }
 
         /// <summary>
@@ -282,13 +178,13 @@
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable To<T>(
+        public static IToken To<T>(
             [NotNull] this IBinding<T> binding,
             [NotNull][ItemNotNull] params Expression<Action<Context<T>>>[] statements)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(TypeDescriptor<T>.Type, binding.AutowiringStrategy, statements)));
+            return CreateDependencyToken(binding, CreateDependency(binding, new FullAutowiringDependency(TypeDescriptor<T>.Type, binding.AutowiringStrategy, statements)));
         }
 
         /// <summary>
@@ -301,31 +197,14 @@
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable To<T>(
+        public static IToken To<T>(
             [NotNull] this IBinding<T> binding,
             [NotNull] Expression<Func<Context, T>> factory,
             [NotNull][ItemNotNull] params Expression<Action<Context<T>>>[] statements)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new AutowiringDependency(factory, binding.AutowiringStrategy, statements)));
-        }
-
-        /// <summary>
-        /// Puts the dependency token into the target container to manage it.
-        /// </summary>
-        /// <param name="dependencyToken"></param>
-        [MethodImpl((MethodImplOptions)256)]
-        public static IContainer ToSelf([NotNull] this IDisposable dependencyToken)
-        {
-            if (dependencyToken == null) throw new ArgumentNullException(nameof(dependencyToken));
-            if (dependencyToken is DependencyToken token)
-            {
-                token.Container.RegisterResource(dependencyToken);
-                return token.Container;
-            }
-
-            throw new NotSupportedException();
+            return CreateDependencyToken(binding, CreateDependency(binding, new AutowiringDependency(factory, binding.AutowiringStrategy, statements)));
         }
 
         [NotNull]
@@ -345,5 +224,10 @@
                 ? dependencyToken
                 : binding.Container.Resolve<ICannotRegister>().Resolve(binding.Container, keys.ToArray());
         }
+
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        private static IToken CreateDependencyToken<T>(IBinding<T> binding, IDisposable dependency) =>
+            Disposable.Create(binding.Tokens.Concat(Enumerable.Repeat(dependency, 1))).AsTokenOf(binding.Container);
     }
 }

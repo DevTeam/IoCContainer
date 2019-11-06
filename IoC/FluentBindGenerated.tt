@@ -1,0 +1,60 @@
+﻿<#@ template debug="false" hostspecific="false" language="C#" #>
+<#@ assembly name="System.Core" #>
+<#@ import namespace="System.Linq" #>
+<#@ import namespace="System.Text" #>
+<#@ import namespace="System.Collections.Generic" #>
+<#@ output extension=".cs" #>
+namespace IoC
+{
+    using System;
+    using System.Runtime.CompilerServices;
+    using Core;
+
+    /// <summary>
+    /// Represents extensions to add bindings to the container.
+    /// </summary>
+    public static partial class FluentBind
+    {
+<#for(int num = 1; num <= 32; num++) {
+var range = Enumerable.Range(1, num);
+var types = String.Join(", ", range.Select(i => $"T{i}"));
+var args = String.Join(", ", range.Select(i => $"TypeDescriptor<T{i}>.Type"));
+#>
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+<#for(int i = 1; i <= num; i++) {#>
+        /// <typeparam name="T<#=i#>">The contract type #<#=i#>.</typeparam>
+<#}#>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, <#=types#>>([NotNull] this IContainer container)
+            where T: <#=types#>
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, <#=args#>);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+<#for(int i = 1; i <= num; i++) {#>
+        /// <typeparam name="T<#=i#>">The contract type #<#=i#>.</typeparam>
+<#}#>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, <#=types#>>([NotNull] this IToken token)
+            where T: <#=types#>
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, <#=args#>);
+        }
+<#}#>
+    }
+}

@@ -120,13 +120,13 @@
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public bool TryRegisterDependency(IEnumerable<FullKey> keys, IDependency dependency, ILifetime lifetime, out IDisposable dependencyToken)
+        public bool TryRegisterDependency(IEnumerable<FullKey> keys, IDependency dependency, ILifetime lifetime, out IToken dependencyToken)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
             var isRegistered = true;
             var registeredKeys = new List<FullKey>();
-            var dependencyEntry = new DependencyEntry(dependency, lifetime, Disposable.Create(UnregisterKeys), registeredKeys);
+            var dependencyEntry = new DependencyEntry(this, dependency, lifetime, Disposable.Create(UnregisterKeys), registeredKeys);
 
             void UnregisterKeys()
             {
@@ -209,7 +209,7 @@
                 else
                 {
                     dependencyEntry.Dispose();
-                    dependencyToken = default(IDisposable);
+                    dependencyToken = default(IToken);
                 }
             }
 

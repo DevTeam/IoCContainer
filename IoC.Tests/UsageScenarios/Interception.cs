@@ -21,21 +21,23 @@ namespace IoC.Tests.UsageScenarios
         {
             var methods = new List<string>();
             // Create and configure the container
-            using var container = Container.Create().Using<InterceptionFeature>();
-            using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<IService>().To<Service>())
+            using var container = Container
+                .Create()
+                .Using<InterceptionFeature>()
+                .Bind<IDependency>().To<Dependency>()
+                .Bind<IService>().To<Service>()
                 // Configure the interception by 'MyInterceptor'
-            using (container.Intercept<IService>(new MyInterceptor(methods)))
-            {
-                // Resolve an instance
-                var instance = container.Resolve<IService>();
+                .Intercept<IService>(new MyInterceptor(methods))
+                .Container;
 
-                // Invoke the getter "get_State"
-                var state = instance.State;
+            // Resolve an instance
+            var instance = container.Resolve<IService>();
 
-                // Check invocations from the interceptor
-                methods.ShouldContain("get_State");
-            }
+            // Invoke the getter "get_State"
+            var state = instance.State;
+
+            // Check invocations from the interceptor
+            methods.ShouldContain("get_State");
         }
 
         // This interceptor just stores the name of called methods

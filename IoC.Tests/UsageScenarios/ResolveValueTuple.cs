@@ -17,11 +17,13 @@ namespace IoC.Tests.UsageScenarios
             // $description=Resolve ValueTuple
             // {
             // Create and configure the container
-            using var container = Container.Create();
-            using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<IService>().To<Service>())
-            using (container.Bind<INamedService>().To<NamedService>(
-                ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name")))
+            using var container = Container
+                .Create()
+                .Bind<IDependency>().To<Dependency>()
+                .Bind<IService>().To<Service>()
+                .Bind<INamedService>().To<NamedService>(
+                    ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name"))
+                .Container;
             {
                 // Resolve an instance of type (IService service, INamedService namedService)
                 var valueTuple = container.Resolve<(IService service, INamedService namedService)>();

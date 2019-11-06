@@ -20,7 +20,7 @@
         private FuncFeature(bool light = false) => _light = light;
 
         /// <inheritdoc />
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register<Func<TT>>(ctx => () => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container), null, Feature.AnyTag);

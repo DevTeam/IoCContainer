@@ -15,8 +15,9 @@
         private static readonly ProxyGenerator ProxyGenerator = new ProxyGenerator();
         private readonly List<InterceptorsInfo> _interceptors = new List<InterceptorsInfo>();
 
-        public IDisposable Register(Predicate<Key> filter, params IInterceptor[] interceptors)
+        public IToken Register([NotNull] IContainer container, Predicate<Key> filter, params IInterceptor[] interceptors)
         {
+            if (container == null) throw new ArgumentNullException(nameof(container));
             if (filter == null) throw new ArgumentNullException(nameof(filter));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
             var info = new InterceptorsInfo(filter, interceptors);
@@ -31,7 +32,7 @@
                 {
                     _interceptors.Remove(info);
                 }
-            });
+            }).AsTokenOf(container);
         }
 
         public Expression Build(Expression bodyExpression, IBuildContext buildContext)

@@ -23,26 +23,28 @@
             clock.SetupGet(i => i.Now).Returns(now);
 
             // Create and configure the root container
-            using (var rootContainer = Container.Create("root"))
-            using (rootContainer.Bind<IConsole>().To(ctx => console.Object))
-            using (rootContainer.Bind<ILogger>().To<Logger>())
-            {
-                // Create and configure the child container
-                using var childContainer = rootContainer.Create("Some child container");
-                using (childContainer.Bind<IConsole>().To(ctx => console.Object))
-                using (childContainer.Bind<IClock>().To(ctx => clock.Object))
-                // Bind 'ILogger' to the instance creation, actually represented as an expression tree
-                using (childContainer.Bind<ILogger>().To<TimeLogger>(
-                    // Inject the base logger from the parent container and the clock from the current container
-                    ctx => new TimeLogger(ctx.Container.Parent.Inject<ILogger>(), ctx.Container.Inject<IClock>())))
-                {
-                    // Create a logger
-                    var logger = childContainer.Resolve<ILogger>();
+            using var rootContainer = Container
+                .Create("root")
+                .Bind<IConsole>().To(ctx => console.Object)
+                .Bind<ILogger>().To<Logger>()
+                .Container;
 
-                    // Log the message
-                    logger.Log("Hello");
-                }
-            }
+            // Create and configure the child container
+            using var childContainer = rootContainer
+                .Create("Some child container")
+                .Bind<IConsole>().To(ctx => console.Object)
+                .Bind<IClock>().To(ctx => clock.Object)
+                // Bind 'ILogger' to the instance creation, actually represented as an expression tree
+                .Bind<ILogger>().To<TimeLogger>(
+                    // Inject the base logger from the parent container and the clock from the current container
+                    ctx => new TimeLogger(ctx.Container.Parent.Inject<ILogger>(), ctx.Container.Inject<IClock>()))
+                .Container;
+
+            // Create a logger
+            var logger = childContainer.Resolve<ILogger>();
+
+            // Log the message
+            logger.Log("Hello");
 
             // Check the console output
             console.Verify(i => i.WriteLine($"{now}: Hello"));

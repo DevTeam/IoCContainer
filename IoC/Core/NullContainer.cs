@@ -14,7 +14,7 @@
 
         public IContainer Parent => throw new NotSupportedException();
 
-        public bool TryRegisterDependency(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IDisposable dependencyToken)
+        public bool TryRegisterDependency(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IToken dependencyToken)
             => throw NotSupportedException;
 
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)

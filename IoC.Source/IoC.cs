@@ -1319,13 +1319,13 @@ namespace IoC
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public bool TryRegisterDependency(IEnumerable<FullKey> keys, IDependency dependency, ILifetime lifetime, out IDisposable dependencyToken)
+        public bool TryRegisterDependency(IEnumerable<FullKey> keys, IDependency dependency, ILifetime lifetime, out IToken dependencyToken)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
             var isRegistered = true;
             var registeredKeys = new List<FullKey>();
-            var dependencyEntry = new DependencyEntry(dependency, lifetime, Disposable.Create(UnregisterKeys), registeredKeys);
+            var dependencyEntry = new DependencyEntry(this, dependency, lifetime, Disposable.Create(UnregisterKeys), registeredKeys);
 
             void UnregisterKeys()
             {
@@ -1408,7 +1408,7 @@ namespace IoC
                 else
                 {
                     dependencyEntry.Dispose();
-                    dependencyToken = default(IDisposable);
+                    dependencyToken = default(IToken);
                 }
             }
 
@@ -1897,19 +1897,19 @@ namespace IoC
 
             if (container.TryGetResolver<TInstance>(typeof(TInstance), null, out var resolver, out _, container))
             {
-                return new Holder<TInstance>(Disposable.Empty, resolver(container, args));
+                return new Holder<TInstance>(new DependencyToken(container, Disposable.Empty), resolver(container, args));
             }
 
             var buildId = Guid.NewGuid();
-            var childContainer = container.Bind<TInstance>().Tag(buildId).To();
+            var token = container.Bind<TInstance>().Tag(buildId).To();
             try
             {
                 var instance = container.Resolve<TInstance>(buildId.AsTag(), args);
-                return new Holder<TInstance>(childContainer, instance);
+                return new Holder<TInstance>(token, instance);
             }
             catch
             {
-                childContainer.Dispose();
+                token.Dispose();
                 throw;
             }
         }
@@ -1918,7 +1918,7 @@ namespace IoC
         /// Represents a holder for a created instance.
         /// </summary>
         /// <typeparam name="TInstance"></typeparam>
-        public interface IHolder<out TInstance>: IDisposable
+        public interface IHolder<out TInstance>: IToken
             where TInstance : class
         {
             /// <summary>
@@ -1930,24 +1930,28 @@ namespace IoC
         internal class Holder<TInstance> : IHolder<TInstance>
             where TInstance : class
         {
-            [NotNull] private readonly IDisposable _container;
-            
-            public Holder([NotNull] IDisposable container, [NotNull] TInstance instance)
+            [NotNull] private readonly IToken _token;
+
+            public Holder([NotNull] IToken token, [NotNull] TInstance instance)
             {
-                _container = container ?? throw new ArgumentNullException(nameof(container));
+                _token = token ?? throw new ArgumentNullException(nameof(token));
                 Instance = instance ?? throw new ArgumentNullException(nameof(instance));
             }
+
+            public IContainer Container => _token.Container;
 
             public TInstance Instance { get; }
 
             public void Dispose()
             {
-                if (Instance is IDisposable disposable)
+                using (_token.Container)
+                using (_token)
                 {
-                    disposable.Dispose();
+                    if (Instance is IDisposable disposable)
+                    {
+                        disposable.Dispose();
+                    }
                 }
-
-                _container.Dispose();
             }
         }
     }
@@ -2009,7 +2013,7 @@ namespace IoC
     /// Represents extensions to add bindings to the container.
     /// </summary>
     [PublicAPI]
-    public static class FluentBind
+    public static partial class FluentBind
     {
         /// <summary>
         /// Binds the type(s).
@@ -2028,12 +2032,28 @@ namespace IoC
         }
 
         /// <summary>
+        /// Binds the type(s).
+        /// </summary>
+        /// <param name="token">The container binding token.</param>
+        /// <param name="types"></param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<object> Bind([NotNull] this IToken token, [NotNull] [ItemNotNull] params Type[] types)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            if (types == null) throw new ArgumentNullException(nameof(types));
+            if (types.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(types));
+            return new Binding<object>(token, types);
+        }
+
+        /// <summary>
         /// Binds the type.
         /// </summary>
         /// <typeparam name="T">The contract type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IBinding<T> Bind<T>([NotNull] this IContainer container)
         {
@@ -2042,138 +2062,18 @@ namespace IoC
         }
 
         /// <summary>
-        /// Binds multiple types.
+        /// Binds the type.
         /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <typeparam name="T1">The contract type.</typeparam>
-        /// <param name="container">The target container.</param>
+        /// <typeparam name="T">The contract type.</typeparam>
+        /// <param name="token">The container binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1>([NotNull] this IContainer container)
-            where T : T1
+        public static IBinding<T> Bind<T>([NotNull] this IToken token)
         {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type);
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type);
         }
-
-        /// <summary>
-        /// Binds multiple types.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <typeparam name="T1">The contract type #1.</typeparam>
-        /// <typeparam name="T2">The contract type #2.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IBinding<T> Bind<T, T1, T2>([NotNull] this IContainer container)
-            where T : T1, T2
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type);
-        }
-
-        /// <summary>
-        /// Binds multiple types.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <typeparam name="T1">The contract type #1.</typeparam>
-        /// <typeparam name="T2">The contract type #2.</typeparam>
-        /// <typeparam name="T3">The contract type #3.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3>([NotNull] this IContainer container)
-            where T : T1, T2, T3
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type);
-        }
-
-        /// <summary>
-        /// Binds multiple types.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <typeparam name="T1">The contract type #1.</typeparam>
-        /// <typeparam name="T2">The contract type #2.</typeparam>
-        /// <typeparam name="T3">The contract type #3.</typeparam>
-        /// <typeparam name="T4">The contract type #4.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4>([NotNull] this IContainer container)
-            where T : T1, T2, T3, T4
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type);
-        }
-
-        /// <summary>
-        /// Binds multiple types.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <typeparam name="T1">The contract type #1.</typeparam>
-        /// <typeparam name="T2">The contract type #2.</typeparam>
-        /// <typeparam name="T3">The contract type #3.</typeparam>
-        /// <typeparam name="T4">The contract type #4.</typeparam>
-        /// <typeparam name="T5">The contract type #5.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container)
-            where T : T1, T2, T3, T4, T5
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type);
-        }
-
-        /// <summary>
-        /// Binds multiple types.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <typeparam name="T1">The contract type #1.</typeparam>
-        /// <typeparam name="T2">The contract type #2.</typeparam>
-        /// <typeparam name="T3">The contract type #3.</typeparam>
-        /// <typeparam name="T4">The contract type #4.</typeparam>
-        /// <typeparam name="T5">The contract type #5.</typeparam>
-        /// <typeparam name="T6">The contract type #6.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container)
-            where T : T1, T2, T3, T4, T5, T6
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type);
-        }
-
-        /// <summary>
-        /// Binds multiple types.
-        /// </summary>
-        /// <typeparam name="T">The instance type.</typeparam>
-        /// <typeparam name="T1">The contract type #1.</typeparam>
-        /// <typeparam name="T2">The contract type #2.</typeparam>
-        /// <typeparam name="T3">The contract type #3.</typeparam>
-        /// <typeparam name="T4">The contract type #4.</typeparam>
-        /// <typeparam name="T5">The contract type #5.</typeparam>
-        /// <typeparam name="T6">The contract type #6.</typeparam>
-        /// <typeparam name="T7">The contract type #7.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container)
-            where T : T1, T2, T3, T4, T5, T6, T7
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type);
-        }
-
 
         /// <summary>
         /// Assigns well-known lifetime to the binding.
@@ -2260,14 +2160,14 @@ namespace IoC
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable To(
+        public static IToken To(
             [NotNull] this IBinding<object> binding,
             [NotNull] Type type,
             [NotNull][ItemNotNull] params Expression<Action<Context<object>>>[] statements)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(type, binding.AutowiringStrategy, statements)));
+            return CreateDependencyToken(binding, CreateDependency(binding, new FullAutowiringDependency(type, binding.AutowiringStrategy, statements)));
         }
 
         /// <summary>
@@ -2279,13 +2179,13 @@ namespace IoC
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable To<T>(
+        public static IToken To<T>(
             [NotNull] this IBinding<T> binding,
             [NotNull][ItemNotNull] params Expression<Action<Context<T>>>[] statements)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new FullAutowiringDependency(TypeDescriptor<T>.Type, binding.AutowiringStrategy, statements)));
+            return CreateDependencyToken(binding, CreateDependency(binding, new FullAutowiringDependency(TypeDescriptor<T>.Type, binding.AutowiringStrategy, statements)));
         }
 
         /// <summary>
@@ -2298,31 +2198,14 @@ namespace IoC
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable To<T>(
+        public static IToken To<T>(
             [NotNull] this IBinding<T> binding,
             [NotNull] Expression<Func<Context, T>> factory,
             [NotNull][ItemNotNull] params Expression<Action<Context<T>>>[] statements)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return new DependencyToken(binding.Container, CreateDependency(binding, new AutowiringDependency(factory, binding.AutowiringStrategy, statements)));
-        }
-
-        /// <summary>
-        /// Puts the dependency token into the target container to manage it.
-        /// </summary>
-        /// <param name="dependencyToken"></param>
-        [MethodImpl((MethodImplOptions)256)]
-        public static IContainer ToSelf([NotNull] this IDisposable dependencyToken)
-        {
-            if (dependencyToken == null) throw new ArgumentNullException(nameof(dependencyToken));
-            if (dependencyToken is DependencyToken token)
-            {
-                token.Container.RegisterResource(dependencyToken);
-                return token.Container;
-            }
-
-            throw new NotSupportedException();
+            return CreateDependencyToken(binding, CreateDependency(binding, new AutowiringDependency(factory, binding.AutowiringStrategy, statements)));
         }
 
         [NotNull]
@@ -2342,6 +2225,2012 @@ namespace IoC
                 ? dependencyToken
                 : binding.Container.Resolve<ICannotRegister>().Resolve(binding.Container, keys.ToArray());
         }
+
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        private static IToken CreateDependencyToken<T>(IBinding<T> binding, IDisposable dependency) =>
+            Disposable.Create(binding.Tokens.Concat(Enumerable.Repeat(dependency, 1))).AsTokenOf(binding.Container);
+    }
+}
+
+#endregion
+#region FluentBindGenerated
+
+namespace IoC
+{
+    using System;
+    using System.Runtime.CompilerServices;
+    using Core;
+
+    /// <summary>
+    /// Represents extensions to add bindings to the container.
+    /// </summary>
+    public static partial class FluentBind
+    {
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1>([NotNull] this IContainer container)
+            where T: T1
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1>([NotNull] this IToken token)
+            where T: T1
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2>([NotNull] this IContainer container)
+            where T: T1, T2
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2>([NotNull] this IToken token)
+            where T: T1, T2
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3>([NotNull] this IContainer container)
+            where T: T1, T2, T3
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3>([NotNull] this IToken token)
+            where T: T1, T2, T3
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <typeparam name="T26">The contract type #26.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <typeparam name="T26">The contract type #26.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <typeparam name="T26">The contract type #26.</typeparam>
+        /// <typeparam name="T27">The contract type #27.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <typeparam name="T26">The contract type #26.</typeparam>
+        /// <typeparam name="T27">The contract type #27.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <typeparam name="T26">The contract type #26.</typeparam>
+        /// <typeparam name="T27">The contract type #27.</typeparam>
+        /// <typeparam name="T28">The contract type #28.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <typeparam name="T26">The contract type #26.</typeparam>
+        /// <typeparam name="T27">The contract type #27.</typeparam>
+        /// <typeparam name="T28">The contract type #28.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <typeparam name="T26">The contract type #26.</typeparam>
+        /// <typeparam name="T27">The contract type #27.</typeparam>
+        /// <typeparam name="T28">The contract type #28.</typeparam>
+        /// <typeparam name="T29">The contract type #29.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <typeparam name="T26">The contract type #26.</typeparam>
+        /// <typeparam name="T27">The contract type #27.</typeparam>
+        /// <typeparam name="T28">The contract type #28.</typeparam>
+        /// <typeparam name="T29">The contract type #29.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <typeparam name="T26">The contract type #26.</typeparam>
+        /// <typeparam name="T27">The contract type #27.</typeparam>
+        /// <typeparam name="T28">The contract type #28.</typeparam>
+        /// <typeparam name="T29">The contract type #29.</typeparam>
+        /// <typeparam name="T30">The contract type #30.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <typeparam name="T26">The contract type #26.</typeparam>
+        /// <typeparam name="T27">The contract type #27.</typeparam>
+        /// <typeparam name="T28">The contract type #28.</typeparam>
+        /// <typeparam name="T29">The contract type #29.</typeparam>
+        /// <typeparam name="T30">The contract type #30.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <typeparam name="T26">The contract type #26.</typeparam>
+        /// <typeparam name="T27">The contract type #27.</typeparam>
+        /// <typeparam name="T28">The contract type #28.</typeparam>
+        /// <typeparam name="T29">The contract type #29.</typeparam>
+        /// <typeparam name="T30">The contract type #30.</typeparam>
+        /// <typeparam name="T31">The contract type #31.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type, TypeDescriptor<T31>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <typeparam name="T26">The contract type #26.</typeparam>
+        /// <typeparam name="T27">The contract type #27.</typeparam>
+        /// <typeparam name="T28">The contract type #28.</typeparam>
+        /// <typeparam name="T29">The contract type #29.</typeparam>
+        /// <typeparam name="T30">The contract type #30.</typeparam>
+        /// <typeparam name="T31">The contract type #31.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type, TypeDescriptor<T31>.Type);
+        }
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <typeparam name="T26">The contract type #26.</typeparam>
+        /// <typeparam name="T27">The contract type #27.</typeparam>
+        /// <typeparam name="T28">The contract type #28.</typeparam>
+        /// <typeparam name="T29">The contract type #29.</typeparam>
+        /// <typeparam name="T30">The contract type #30.</typeparam>
+        /// <typeparam name="T31">The contract type #31.</typeparam>
+        /// <typeparam name="T32">The contract type #32.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32>([NotNull] this IContainer container)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type, TypeDescriptor<T31>.Type, TypeDescriptor<T32>.Type);
+        }
+
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <typeparam name="T4">The contract type #4.</typeparam>
+        /// <typeparam name="T5">The contract type #5.</typeparam>
+        /// <typeparam name="T6">The contract type #6.</typeparam>
+        /// <typeparam name="T7">The contract type #7.</typeparam>
+        /// <typeparam name="T8">The contract type #8.</typeparam>
+        /// <typeparam name="T9">The contract type #9.</typeparam>
+        /// <typeparam name="T10">The contract type #10.</typeparam>
+        /// <typeparam name="T11">The contract type #11.</typeparam>
+        /// <typeparam name="T12">The contract type #12.</typeparam>
+        /// <typeparam name="T13">The contract type #13.</typeparam>
+        /// <typeparam name="T14">The contract type #14.</typeparam>
+        /// <typeparam name="T15">The contract type #15.</typeparam>
+        /// <typeparam name="T16">The contract type #16.</typeparam>
+        /// <typeparam name="T17">The contract type #17.</typeparam>
+        /// <typeparam name="T18">The contract type #18.</typeparam>
+        /// <typeparam name="T19">The contract type #19.</typeparam>
+        /// <typeparam name="T20">The contract type #20.</typeparam>
+        /// <typeparam name="T21">The contract type #21.</typeparam>
+        /// <typeparam name="T22">The contract type #22.</typeparam>
+        /// <typeparam name="T23">The contract type #23.</typeparam>
+        /// <typeparam name="T24">The contract type #24.</typeparam>
+        /// <typeparam name="T25">The contract type #25.</typeparam>
+        /// <typeparam name="T26">The contract type #26.</typeparam>
+        /// <typeparam name="T27">The contract type #27.</typeparam>
+        /// <typeparam name="T28">The contract type #28.</typeparam>
+        /// <typeparam name="T29">The contract type #29.</typeparam>
+        /// <typeparam name="T30">The contract type #30.</typeparam>
+        /// <typeparam name="T31">The contract type #31.</typeparam>
+        /// <typeparam name="T32">The contract type #32.</typeparam>
+        /// <param name="token">The binding token.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32>([NotNull] this IToken token)
+            where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type, TypeDescriptor<T31>.Type, TypeDescriptor<T32>.Type);
+        }
     }
 }
 
@@ -2354,6 +4243,7 @@ namespace IoC
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using Core;
 
     /// <summary>
@@ -2363,13 +4253,25 @@ namespace IoC
     public static class FluentConfiguration
     {
         /// <summary>
+        /// Converts a disposable resource to the container's token.
+        /// </summary>
+        /// <param name="disposableToken">A disposable resource.</param>
+        /// <param name="container">The target container.</param>
+        /// <returns></returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken AsTokenOf([NotNull] this IDisposable disposableToken, [NotNull] IContainer container) =>
+            new DependencyToken(container ?? throw new ArgumentNullException(nameof(container)), disposableToken ?? throw new ArgumentNullException(nameof(disposableToken)));
+
+        /// <summary>
         /// Applies text configurations for the target container.
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="configurationText">The text configurations.</param>
         /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
+        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationText == null) throw new ArgumentNullException(nameof(configurationText));
@@ -2383,8 +4285,9 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="configurationStreams">The set of streams with text configurations.</param>
         /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
+        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationStreams == null) throw new ArgumentNullException(nameof(configurationStreams));
@@ -2398,8 +4301,9 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="configurationReaders">The set of text readers with text configurations.</param>
         /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
+        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationReaders == null) throw new ArgumentNullException(nameof(configurationReaders));
@@ -2413,6 +4317,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="configurationText">The text configurations.</param>
         /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
         {
@@ -2428,6 +4333,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="configurationStreams">The set of streams with text configurations.</param>
         /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
         {
@@ -2443,6 +4349,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="configurationReaders">The set of text readers with text configurations.</param>
         /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
         {
@@ -2458,12 +4365,13 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations)
+        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
-            return Disposable.Create(configurations.Select(i => i.Apply(container)).SelectMany(i => i));
+            return Disposable.Create(configurations.Select(i => i.Apply(container)).SelectMany(i => i)).AsTokenOf(container);
         }
 
         /// <summary>
@@ -2472,8 +4380,9 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
+        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
@@ -2487,6 +4396,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
@@ -2503,6 +4413,7 @@ namespace IoC
         /// <typeparam name="T">The type of configuration.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IContainer Using<T>([NotNull] this IContainer container)
             where T : IConfiguration, new()
@@ -2511,8 +4422,9 @@ namespace IoC
             return container.Using(new T());
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        private static IDisposable ApplyData<T>([NotNull] this IContainer container, [NotNull] [ItemNotNull] params T[] configurationData)
+        private static IToken ApplyData<T>([NotNull] this IContainer container, [NotNull] [ItemNotNull] params T[] configurationData)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationData == null) throw new ArgumentNullException(nameof(configurationData));
@@ -2520,6 +4432,7 @@ namespace IoC
             return container.Apply(configurationData.Select(configurationItem => container.Resolve<IConfiguration>(configurationItem)).ToArray());
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         private static IContainer UsingData<T>([NotNull] this IContainer container, [NotNull] [ItemNotNull] params T[] configurationData)
         {
@@ -2881,9 +4794,7 @@ namespace IoC
     /// </summary>
     [PublicAPI, AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface)]
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class GenericTypeArgumentAttribute : Attribute
-    {
-    }
+    public class GenericTypeArgumentAttribute : Attribute { }
 }
 
 
@@ -2966,7 +4877,6 @@ namespace IoC
     [PublicAPI, GenericTypeArgument]
     public class TT11 { }
 
-
     /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
@@ -2990,6 +4900,109 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public class TT15 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT16 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT17 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT18 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT19 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT20 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT21 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT22 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT23 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT24 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT25 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT26 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT27 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT28 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT29 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT30 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT31 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TT32 { }
+
 }
 
 
@@ -3056,6 +5069,11 @@ namespace IoC
         /// The target container.
         /// </summary>
         [NotNull] IContainer Container { get; }
+
+        /// <summary>
+        /// Binding tokens.
+        /// </summary>
+        [NotNull] IEnumerable<IToken> Tokens { get; }
 
         /// <summary>
         /// The type to bind.
@@ -3195,7 +5213,6 @@ namespace IoC
 
 namespace IoC
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -3209,7 +5226,7 @@ namespace IoC
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <returns>The enumeration of dependency tokens.</returns>
-        [NotNull][ItemNotNull] IEnumerable<IDisposable> Apply([NotNull] IContainer container);
+        [NotNull][ItemNotNull] IEnumerable<IToken> Apply([NotNull] IContainer container);
     }
 }
 
@@ -3241,7 +5258,7 @@ namespace IoC
         /// <param name="lifetime">The lifetime.</param>
         /// <param name="dependencyToken">The dependency token.</param>
         /// <returns>True if successful.</returns>
-        bool TryRegisterDependency([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IDisposable dependencyToken);
+        bool TryRegisterDependency([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IToken dependencyToken);
 
         /// <summary>
         /// Tries getting the dependency with lifetime.
@@ -3488,6 +5505,26 @@ namespace IoC
         /// </summary>
         /// <param name="resource">The target resource.</param>
         void UnregisterResource([NotNull] IDisposable resource);
+    }
+}
+
+
+#endregion
+#region IToken
+
+namespace IoC
+{
+    using System;
+
+    /// <summary>
+    /// The binding token to manage binding lifetime.
+    /// </summary>
+    public interface IToken: IDisposable
+    {
+        /// <summary>
+        /// The owner container.
+        /// </summary>
+        IContainer Container { get; }
     }
 }
 
@@ -3822,8 +5859,10 @@ namespace IoC.Features
         {
         }
 
+
+
         /// <inheritdoc />
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var containerSingletonResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
@@ -4066,7 +6105,7 @@ namespace IoC.Features
         private ConfigurationFeature() { }
 
         /// <inheritdoc />
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var containerSingletonResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
@@ -4136,7 +6175,7 @@ namespace IoC.Features
         private CoreFeature() { }
 
         /// <inheritdoc />
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => FoundCyclicDependency.Shared);
@@ -4273,7 +6312,7 @@ namespace IoC.Features
         private FuncFeature(bool light = false) => _light = light;
 
         /// <inheritdoc />
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register<Func<TT>>(ctx => () => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container), null, Feature.AnyTag);
@@ -4313,7 +6352,7 @@ namespace IoC.Features
         private LazyFeature() { }
 
         /// <inheritdoc />
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => new Lazy<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag), true), null, Feature.AnyTag);
@@ -4344,7 +6383,7 @@ namespace IoC.Features
         private TaskFeature() { }
 
         /// <inheritdoc />
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => TaskScheduler.Current);
@@ -4388,7 +6427,7 @@ namespace IoC.Features
         private TupleFeature(bool light = false) => _light = light;
 
         /// <inheritdoc />
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => new Tuple<TT>(ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Feature.AnyTag);
@@ -5065,8 +7104,6 @@ namespace IoC.Issues
 
 namespace IoC.Issues
 {
-    using System;
-
     /// <summary>
     /// Resolves the scenario when a new binding cannot be registered.
     /// </summary>
@@ -5079,7 +7116,7 @@ namespace IoC.Issues
         /// <param name="container">The target container.</param>
         /// <param name="keys">The set of binding keys.</param>
         /// <returns>The dependency token.</returns>
-        [NotNull] IDisposable Resolve([NotNull] IContainer container, [NotNull] Key[] keys);
+        [NotNull] IToken Resolve([NotNull] IContainer container, [NotNull] Key[] keys);
     }
 }
 
@@ -5605,6 +7642,19 @@ namespace IoC.Core
         public Binding([NotNull] IContainer container, [NotNull][ItemNotNull] params Type[] types)
         {
             Container = container ?? throw new ArgumentNullException(nameof(container));
+            Tokens = Enumerable.Empty<IToken>();
+            Types = types ?? throw new ArgumentNullException(nameof(types));
+            Lifetime = null;
+            Tags = Enumerable.Empty<object>();
+            AutowiringStrategy = null;
+        }
+
+        // ReSharper disable once StaticMemberInGenericType
+        public Binding([NotNull] IToken token, [NotNull][ItemNotNull] params Type[] types)
+        {
+            if (token == null) { throw new ArgumentNullException(nameof(token)); }
+            Container = token.Container;
+            Tokens = Enumerable.Repeat(token, 1);
             Types = types ?? throw new ArgumentNullException(nameof(types));
             Lifetime = null;
             Tags = Enumerable.Empty<object>();
@@ -5615,6 +7665,7 @@ namespace IoC.Core
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             Container = binding.Container;
+            Tokens = binding.Tokens;
             Types = binding.Types;
             Tags = binding.Tags;
             Lifetime = lifetime != IoC.Lifetime.Transient ? binding.Container.Resolve<ILifetime>(lifetime.AsTag(), binding.Container) : null;
@@ -5625,6 +7676,7 @@ namespace IoC.Core
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             Container = binding.Container;
+            Tokens = binding.Tokens;
             Types = binding.Types;
             Lifetime = lifetime ?? throw new ArgumentNullException(nameof(lifetime));
             Tags = binding.Tags;
@@ -5635,6 +7687,7 @@ namespace IoC.Core
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             Container = binding.Container;
+            Tokens = binding.Tokens;
             Types = binding.Types;
             Lifetime = binding.Lifetime;
             Tags = binding.Tags.Concat(Enumerable.Repeat(tagValue, 1));
@@ -5645,6 +7698,7 @@ namespace IoC.Core
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             Container = binding.Container;
+            Tokens = binding.Tokens;
             Types = binding.Types;
             Lifetime = binding.Lifetime;
             Tags = binding.Tags;
@@ -5652,6 +7706,8 @@ namespace IoC.Core
         }
 
         public IContainer Container { get; }
+
+        public IEnumerable<IToken> Tokens { get; }
 
         public IEnumerable<Type> Types { get; }
 
@@ -5965,7 +8021,7 @@ namespace IoC.Core
 
         private CannotRegister() { }
 
-        public IDisposable Resolve(IContainer container, Key[] keys)
+        public IToken Resolve(IContainer container, Key[] keys)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (keys == null) throw new ArgumentNullException(nameof(keys));
@@ -6230,7 +8286,7 @@ namespace IoC.Core
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
 
-    internal sealed class DependencyEntry : IDisposable
+    internal sealed class DependencyEntry : IToken
     {
         [CanBeNull] internal readonly ILifetime Lifetime;
         [NotNull] internal readonly IEnumerable<Key> Keys;
@@ -6242,23 +8298,27 @@ namespace IoC.Core
         private bool _disposed;
 
         public DependencyEntry(
+            [NotNull] IContainer container,
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource,
             [NotNull] IEnumerable<Key> keys)
         {
+            Container = container;
             Dependency = dependency;
             Lifetime = lifetime;
             Keys = keys;
             if (lifetime is IDisposable disposableLifetime)
             {
-                _resources = new[] { resource, disposableLifetime };                
+                _resources = new[] { resource, disposableLifetime };
             }
             else
             {
                 _resources = new[] { resource };
             }
         }
+
+        public IContainer Container { get; }
 
         public bool TryCreateResolver(
             Key key,
@@ -6710,9 +8770,8 @@ namespace IoC.Core
     using System;
     using System.Runtime.CompilerServices;
 
-    internal struct DependencyToken: IDisposable
+    internal struct DependencyToken: IToken
     {
-        [NotNull] internal readonly IContainer Container;
         [NotNull] private readonly IDisposable _dependencyToken;
 
         public DependencyToken([NotNull] IContainer container, [NotNull] IDisposable dependencyToken)
@@ -6720,6 +8779,8 @@ namespace IoC.Core
             Container = container ?? throw new ArgumentNullException(nameof(container));
             _dependencyToken = dependencyToken ?? throw new ArgumentNullException(nameof(dependencyToken));
         }
+
+        public IContainer Container { get; }
 
         [MethodImpl((MethodImplOptions)256)]
         public void Dispose() => _dependencyToken.Dispose();
@@ -6940,7 +9001,7 @@ namespace IoC.Core
     /// </summary>
     [SuppressMessage("ReSharper", "CoVariantArrayConversion")]
     [PublicAPI]
-    internal static class FluentRegister
+    internal static partial class FluentRegister
     {
         private static readonly IEnumerable<object> DefaultTags = new object[] { null };
 
@@ -6951,337 +9012,26 @@ namespace IoC.Core
         /// <param name="container">The target container.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
-        /// <returns>The dependency token.</returns>
+        /// <returns>The registration token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [IoC.NotNull]
-        public static IDisposable Register<T>([IoC.NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
+        public static IToken Register<T>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
             => container.Register(new[] { TypeDescriptor<T>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
         /// </summary>
-        /// <typeparam name="T">The autowiring type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1>([IoC.NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
-            where T : T1 
-            => container.Register(new[] { TypeDescriptor<T1>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The autowiring type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <typeparam name="T2">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1, T2>([IoC.NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
-            where T : T1, T2 
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The autowiring type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <typeparam name="T2">The additional contract type.</typeparam>
-        /// <typeparam name="T3">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1, T2, T3>([IoC.NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
-            where T : T1, T2, T3 
-            => container.Register(new[] {TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type}, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The autowiring type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <typeparam name="T2">The additional contract type.</typeparam>
-        /// <typeparam name="T3">The additional contract type.</typeparam>
-        /// <typeparam name="T4">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1, T2, T3, T4>([IoC.NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
-            where T : T1, T2, T3, T4
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The autowiring type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <typeparam name="T2">The additional contract type.</typeparam>
-        /// <typeparam name="T3">The additional contract type.</typeparam>
-        /// <typeparam name="T4">The additional contract type.</typeparam>
-        /// <typeparam name="T5">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1, T2, T3, T4, T5>([IoC.NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
-            where T : T1, T2, T3, T4, T5 
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The autowiring type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <typeparam name="T2">The additional contract type.</typeparam>
-        /// <typeparam name="T3">The additional contract type.</typeparam>
-        /// <typeparam name="T4">The additional contract type.</typeparam>
-        /// <typeparam name="T5">The additional contract type.</typeparam>
-        /// <typeparam name="T6">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        public static IDisposable Register<T, T1, T2, T3, T4, T5, T6>([IoC.NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
-            where T : T1, T2, T3, T4, T5, T6
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The autowiring type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <typeparam name="T2">The additional contract type.</typeparam>
-        /// <typeparam name="T3">The additional contract type.</typeparam>
-        /// <typeparam name="T4">The additional contract type.</typeparam>
-        /// <typeparam name="T5">The additional contract type.</typeparam>
-        /// <typeparam name="T6">The additional contract type.</typeparam>
-        /// <typeparam name="T7">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7>([IoC.NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
-            where T : T1, T2, T3, T4, T5, T6, T7
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The autowiring type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <typeparam name="T2">The additional contract type.</typeparam>
-        /// <typeparam name="T3">The additional contract type.</typeparam>
-        /// <typeparam name="T4">The additional contract type.</typeparam>
-        /// <typeparam name="T5">The additional contract type.</typeparam>
-        /// <typeparam name="T6">The additional contract type.</typeparam>
-        /// <typeparam name="T7">The additional contract type.</typeparam>
-        /// <typeparam name="T8">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7, T8>([IoC.NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
-            where T : T1, T2, T3, T4, T5, T6, T7, T8
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8) }, new FullAutowiringDependency(typeof(T)), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
         /// <typeparam name="T">The base type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <param name="factory">The expression to create an instance.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The dependency token.</returns>
+        /// <returns>The registration token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [IoC.NotNull]
-        public static IDisposable Register<T>([IoC.NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
+        public static IToken Register<T>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             => container.Register(new[] { TypeDescriptor<T>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The base type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="factory">The expression to create an instance.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1>([IoC.NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            where T : T1
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The base type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <typeparam name="T2">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="factory">The expression to create an instance.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1, T2>([IoC.NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            where T : T1, T2
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The base type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <typeparam name="T2">The additional contract type.</typeparam>
-        /// <typeparam name="T3">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="factory">The expression to create an instance.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1, T2, T3>([IoC.NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            where T : T1, T2, T3
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The base type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <typeparam name="T2">The additional contract type.</typeparam>
-        /// <typeparam name="T3">The additional contract type.</typeparam>
-        /// <typeparam name="T4">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="factory">The expression to create an instance.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1, T2, T3, T4>([IoC.NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            where T : T1, T2, T3, T4
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The base type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <typeparam name="T2">The additional contract type.</typeparam>
-        /// <typeparam name="T3">The additional contract type.</typeparam>
-        /// <typeparam name="T4">The additional contract type.</typeparam>
-        /// <typeparam name="T5">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="factory">The expression to create an instance.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1, T2, T3, T4, T5>([IoC.NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            where T : T1, T2, T3, T4, T5
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The base type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <typeparam name="T2">The additional contract type.</typeparam>
-        /// <typeparam name="T3">The additional contract type.</typeparam>
-        /// <typeparam name="T4">The additional contract type.</typeparam>
-        /// <typeparam name="T5">The additional contract type.</typeparam>
-        /// <typeparam name="T6">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="factory">The expression to create an instance.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1, T2, T3, T4, T5, T6>([IoC.NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            where T : T1, T2, T3, T4, T5, T6
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The base type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <typeparam name="T2">The additional contract type.</typeparam>
-        /// <typeparam name="T3">The additional contract type.</typeparam>
-        /// <typeparam name="T4">The additional contract type.</typeparam>
-        /// <typeparam name="T5">The additional contract type.</typeparam>
-        /// <typeparam name="T6">The additional contract type.</typeparam>
-        /// <typeparam name="T7">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="factory">The expression to create an instance.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7>([IoC.NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            where T : T1, T2, T3, T4, T5, T6, T7
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
-
-        /// <summary>
-        /// Registers a binding.
-        /// </summary>
-        /// <typeparam name="T">The base type.</typeparam>
-        /// <typeparam name="T1">The additional contract type.</typeparam>
-        /// <typeparam name="T2">The additional contract type.</typeparam>
-        /// <typeparam name="T3">The additional contract type.</typeparam>
-        /// <typeparam name="T4">The additional contract type.</typeparam>
-        /// <typeparam name="T5">The additional contract type.</typeparam>
-        /// <typeparam name="T6">The additional contract type.</typeparam>
-        /// <typeparam name="T7">The additional contract type.</typeparam>
-        /// <typeparam name="T8">The additional contract type.</typeparam>
-        /// <param name="container">The target container.</param>
-        /// <param name="factory">The expression to create an instance.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="tags">The tags.</param>
-        /// <param name="statements">The set of expressions to initialize an instance.</param>
-        /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [IoC.NotNull]
-        public static IDisposable Register<T, T1, T2, T3, T4, T5, T6, T7, T8>([IoC.NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            where T : T1, T2, T3, T4, T5, T6, T7, T8
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -7291,10 +9041,10 @@ namespace IoC.Core
         /// <param name="dependency">The dependency.</param>
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
-        /// <returns></returns>
+        /// <returns>The registration token.</returns>
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         [IoC.NotNull]
-        public static IDisposable Register([IoC.NotNull] this IContainer container, [IoC.NotNull][ItemNotNull] IEnumerable<Type> types, [IoC.NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime = null, [CanBeNull][ItemCanBeNull] params object[] tags)
+        public static IToken Register([NotNull] this IContainer container, [NotNull][ItemNotNull] IEnumerable<Type> types, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime = null, [CanBeNull][ItemCanBeNull] params object[] tags)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (types == null) throw new ArgumentNullException(nameof(types));
@@ -7308,6 +9058,128 @@ namespace IoC.Core
                 ? dependencyToken
                 : container.Resolve<ICannotRegister>().Resolve(container, keys.ToArray());
         }
+    }
+}
+
+#endregion
+#region FluentRegisterGenerated
+
+namespace IoC.Core
+{
+    using System;
+    using System.Linq.Expressions;
+    using System.Runtime.CompilerServices;
+
+    /// <summary>
+    /// Represents extensions to add bindings to the container.
+    /// </summary>
+    internal static partial class FluentRegister
+    {
+        /// <summary>
+        /// Registers a binding.
+        /// </summary>
+        /// <typeparam name="T">The autowiring type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <param name="lifetime">The target lifetime.</param>
+        /// <param name="tags">The tags.</param>
+        /// <returns>The registration token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Register<T, T1>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
+            where T: T1
+            => container.Register(new[] { TypeDescriptor<T1>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+
+        /// <summary>
+        /// Registers a binding.
+        /// </summary>
+        /// <typeparam name="T">The base type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <param name="factory">The expression to create an instance.</param>
+        /// <param name="lifetime">The target lifetime.</param>
+        /// <param name="tags">The tags.</param>
+        /// <param name="statements">The set of expressions to initialize an instance.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Register<T, T1>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
+            where T: T1
+            // ReSharper disable once CoVariantArrayConversion
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+
+        /// <summary>
+        /// Registers a binding.
+        /// </summary>
+        /// <typeparam name="T">The autowiring type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <param name="lifetime">The target lifetime.</param>
+        /// <param name="tags">The tags.</param>
+        /// <returns>The registration token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Register<T, T1, T2>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
+            where T: T1, T2
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+
+        /// <summary>
+        /// Registers a binding.
+        /// </summary>
+        /// <typeparam name="T">The base type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <param name="factory">The expression to create an instance.</param>
+        /// <param name="lifetime">The target lifetime.</param>
+        /// <param name="tags">The tags.</param>
+        /// <param name="statements">The set of expressions to initialize an instance.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Register<T, T1, T2>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
+            where T: T1, T2
+            // ReSharper disable once CoVariantArrayConversion
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+
+        /// <summary>
+        /// Registers a binding.
+        /// </summary>
+        /// <typeparam name="T">The autowiring type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <param name="lifetime">The target lifetime.</param>
+        /// <param name="tags">The tags.</param>
+        /// <returns>The registration token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Register<T, T1, T2, T3>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
+            where T: T1, T2, T3
+            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+
+        /// <summary>
+        /// Registers a binding.
+        /// </summary>
+        /// <typeparam name="T">The base type.</typeparam>
+        /// <typeparam name="T1">The contract type #1.</typeparam>
+        /// <typeparam name="T2">The contract type #2.</typeparam>
+        /// <typeparam name="T3">The contract type #3.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <param name="factory">The expression to create an instance.</param>
+        /// <param name="lifetime">The target lifetime.</param>
+        /// <param name="tags">The tags.</param>
+        /// <param name="statements">The set of expressions to initialize an instance.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Register<T, T1, T2, T3>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
+            where T: T1, T2, T3
+            // ReSharper disable once CoVariantArrayConversion
+            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+
     }
 }
 
@@ -7731,7 +9603,7 @@ namespace IoC.Core
 
         public IContainer Parent => throw new NotSupportedException();
 
-        public bool TryRegisterDependency(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IDisposable dependencyToken)
+        public bool TryRegisterDependency(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IToken dependencyToken)
             => throw NotSupportedException;
 
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
@@ -9750,7 +11622,7 @@ namespace IoC.Core.Configuration
             _statements = GetStatements(textReader ?? throw new ArgumentNullException(nameof(textReader)));
         }
 
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (_bindingsConverter.TryConvert(BindingContext.Empty, _statements, out var context))
@@ -9763,7 +11635,7 @@ namespace IoC.Core.Configuration
                     select curBinding.As(binding.Lifetime).To(binding.InstanceType);
             }
 
-            return Enumerable.Empty<IDisposable>();
+            return Enumerable.Empty<IToken>();
         }
 
         private static IEnumerable<Statement> GetStatements([NotNull] TextReader textReader)

@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using Core;
 
     /// <summary>
@@ -13,13 +14,25 @@
     public static class FluentConfiguration
     {
         /// <summary>
+        /// Converts a disposable resource to the container's token.
+        /// </summary>
+        /// <param name="disposableToken">A disposable resource.</param>
+        /// <param name="container">The target container.</param>
+        /// <returns></returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken AsTokenOf([NotNull] this IDisposable disposableToken, [NotNull] IContainer container) =>
+            new DependencyToken(container ?? throw new ArgumentNullException(nameof(container)), disposableToken ?? throw new ArgumentNullException(nameof(disposableToken)));
+
+        /// <summary>
         /// Applies text configurations for the target container.
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="configurationText">The text configurations.</param>
         /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
+        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationText == null) throw new ArgumentNullException(nameof(configurationText));
@@ -33,8 +46,9 @@
         /// <param name="container">The target container.</param>
         /// <param name="configurationStreams">The set of streams with text configurations.</param>
         /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
+        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationStreams == null) throw new ArgumentNullException(nameof(configurationStreams));
@@ -48,8 +62,9 @@
         /// <param name="container">The target container.</param>
         /// <param name="configurationReaders">The set of text readers with text configurations.</param>
         /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
+        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationReaders == null) throw new ArgumentNullException(nameof(configurationReaders));
@@ -63,6 +78,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="configurationText">The text configurations.</param>
         /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
         {
@@ -78,6 +94,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="configurationStreams">The set of streams with text configurations.</param>
         /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
         {
@@ -93,6 +110,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="configurationReaders">The set of text readers with text configurations.</param>
         /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
         {
@@ -108,12 +126,13 @@
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations)
+        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
-            return Disposable.Create(configurations.Select(i => i.Apply(container)).SelectMany(i => i));
+            return Disposable.Create(configurations.Select(i => i.Apply(container)).SelectMany(i => i)).AsTokenOf(container);
         }
 
         /// <summary>
@@ -122,8 +141,9 @@
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
+        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
@@ -137,6 +157,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
@@ -153,6 +174,7 @@
         /// <typeparam name="T">The type of configuration.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IContainer Using<T>([NotNull] this IContainer container)
             where T : IConfiguration, new()
@@ -161,8 +183,9 @@
             return container.Using(new T());
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        private static IDisposable ApplyData<T>([NotNull] this IContainer container, [NotNull] [ItemNotNull] params T[] configurationData)
+        private static IToken ApplyData<T>([NotNull] this IContainer container, [NotNull] [ItemNotNull] params T[] configurationData)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationData == null) throw new ArgumentNullException(nameof(configurationData));
@@ -170,6 +193,7 @@
             return container.Apply(configurationData.Select(configurationItem => container.Resolve<IConfiguration>(configurationItem)).ToArray());
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         private static IContainer UsingData<T>([NotNull] this IContainer container, [NotNull] [ItemNotNull] params T[] configurationData)
         {

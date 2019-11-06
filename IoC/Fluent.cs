@@ -55,19 +55,19 @@
 
             if (container.TryGetResolver<TInstance>(typeof(TInstance), null, out var resolver, out _, container))
             {
-                return new Holder<TInstance>(Disposable.Empty, resolver(container, args));
+                return new Holder<TInstance>(new DependencyToken(container, Disposable.Empty), resolver(container, args));
             }
 
             var buildId = Guid.NewGuid();
-            var childContainer = container.Bind<TInstance>().Tag(buildId).To();
+            var token = container.Bind<TInstance>().Tag(buildId).To();
             try
             {
                 var instance = container.Resolve<TInstance>(buildId.AsTag(), args);
-                return new Holder<TInstance>(childContainer, instance);
+                return new Holder<TInstance>(token, instance);
             }
             catch
             {
-                childContainer.Dispose();
+                token.Dispose();
                 throw;
             }
         }
@@ -76,7 +76,7 @@
         /// Represents a holder for a created instance.
         /// </summary>
         /// <typeparam name="TInstance"></typeparam>
-        public interface IHolder<out TInstance>: IDisposable
+        public interface IHolder<out TInstance>: IToken
             where TInstance : class
         {
             /// <summary>
@@ -88,24 +88,28 @@
         internal class Holder<TInstance> : IHolder<TInstance>
             where TInstance : class
         {
-            [NotNull] private readonly IDisposable _container;
-            
-            public Holder([NotNull] IDisposable container, [NotNull] TInstance instance)
+            [NotNull] private readonly IToken _token;
+
+            public Holder([NotNull] IToken token, [NotNull] TInstance instance)
             {
-                _container = container ?? throw new ArgumentNullException(nameof(container));
+                _token = token ?? throw new ArgumentNullException(nameof(token));
                 Instance = instance ?? throw new ArgumentNullException(nameof(instance));
             }
+
+            public IContainer Container => _token.Container;
 
             public TInstance Instance { get; }
 
             public void Dispose()
             {
-                if (Instance is IDisposable disposable)
+                using (_token.Container)
+                using (_token)
                 {
-                    disposable.Dispose();
+                    if (Instance is IDisposable disposable)
+                    {
+                        disposable.Dispose();
+                    }
                 }
-
-                _container.Dispose();
             }
         }
     }

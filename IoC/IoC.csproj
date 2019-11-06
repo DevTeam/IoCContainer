@@ -18,9 +18,9 @@
     <Copyright>Copyright (c) 2019 Nikolay Pianikov</Copyright>
     <DocumentationFile>..\Docs\IoC_$(TargetFramework).xml</DocumentationFile>
     <WarningsAsErrors />
-    <MSBuildNative>C:\Program Files (x86)\Microsoft Visual Studio\2017\Professional\MSBuild</MSBuildNative>
+    <MSBuildNative>C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild</MSBuildNative>
     <HasMSBuildNative Condition="Exists('$(XamlTargets)')">true</HasMSBuildNative>
-    <XamlTargets>$(MSBuildNative)\Microsoft\WindowsXaml\v15.0\8.21\Microsoft.Windows.UI.Xaml.CSharp.Targets</XamlTargets>
+    <XamlTargets>$(MSBuildNative)\Microsoft\WindowsXaml\v16.0\8.21\Microsoft.Windows.UI.Xaml.CSharp.Targets</XamlTargets>
     <TransformOnBuild>True</TransformOnBuild>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
     <LangVersion>7</LangVersion>
@@ -46,15 +46,32 @@
     <LanguageTargets Condition="Exists('$(XamlTargets)')">$(XamlTargets)</LanguageTargets>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='uap10.0'">
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.8" />
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.9" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="FluentBindGenerated.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>FluentBindGenerated.tt</DependentUpon>
+    </None>
     <None Include="icon.png"><Pack>true</Pack><PackagePath>common</PackagePath></None>
     <None Remove="IoC.tt" />
     <Compile Remove="IoC.cs" />
     <PackageReference Include="Vsxmd" Version="1.2.0" Condition="$(HasMSBuildNative)=='true'">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <None Update="Core\FluentRegisterGenerated.tt">
+      <LastGenOutput>FluentRegisterGenerated.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="GenericTypeArguments.tt">
+      <LastGenOutput>GenericTypeArguments.cs</LastGenOutput>
+      <Generator>TextTemplatingFileGenerator</Generator>
+    </None>
+    <None Update="FluentBindGenerated.tt">
+      <Generator>TextTemplatingFileGenerator</Generator>
+      <LastGenOutput>FluentBindGenerated.cs</LastGenOutput>
+    </None>
     <None Update="README_TEMPLATE.md">
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
@@ -68,5 +85,22 @@
   </ItemGroup>
   <ItemGroup>
     <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Update="Core\FluentRegisterGenerated.cs">
+      <DependentUpon>FluentRegisterGenerated.tt</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="FluentBindGenerated.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>FluentBindGenerated.tt</DependentUpon>
+    </Compile>
+    <Compile Update="GenericTypeArguments.cs">
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+      <DependentUpon>GenericTypeArguments.tt</DependentUpon>
+    </Compile>
   </ItemGroup>
 </Project>

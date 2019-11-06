@@ -1,6 +1,5 @@
 ﻿namespace IoC
 {
-    using System;
     using System.Collections.Generic;
 
     /// <summary>
@@ -14,6 +13,6 @@
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <returns>The enumeration of dependency tokens.</returns>
-        [NotNull][ItemNotNull] IEnumerable<IDisposable> Apply([NotNull] IContainer container);
+        [NotNull][ItemNotNull] IEnumerable<IToken> Apply([NotNull] IContainer container);
     }
 }

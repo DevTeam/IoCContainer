@@ -1,6 +1,5 @@
 ﻿namespace XamarinXaml
 {
-    using System;
     using System.Collections.Generic;
     using IoC;
     using SampleModels;
@@ -14,11 +13,11 @@
     /// </summary>
     internal class Configuration: IConfiguration
     {
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
-            yield return container.Apply(ClockConfiguration.Shared);
-            yield return container.Bind<IUIDispatcher>().As(Singleton).To<UIDispatcher>();
-            yield return container.Bind<Page>().As(Singleton).To<MainPage>();            
+            yield return container.Apply(ClockConfiguration.Shared)
+                .Bind<IUIDispatcher>().As(Singleton).To<UIDispatcher>()
+                .Bind<Page>().As(Singleton).To<MainPage>();
         }
     }
 }

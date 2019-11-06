@@ -10,7 +10,7 @@
 
         private CannotRegister() { }
 
-        public IDisposable Resolve(IContainer container, Key[] keys)
+        public IToken Resolve(IContainer container, Key[] keys)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (keys == null) throw new ArgumentNullException(nameof(keys));

@@ -22,7 +22,7 @@
         /// <param name="lifetime">The lifetime.</param>
         /// <param name="dependencyToken">The dependency token.</param>
         /// <returns>True if successful.</returns>
-        bool TryRegisterDependency([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IDisposable dependencyToken);
+        bool TryRegisterDependency([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IToken dependencyToken);
 
         /// <summary>
         /// Tries getting the dependency with lifetime.

@@ -1,6 +1,5 @@
 ﻿namespace IoC.Tests.UsageScenarios
 {
-    using System;
     using System.Collections.Generic;
     using Shouldly;
     using Xunit;
@@ -27,11 +26,12 @@
 
         public class Glue : IConfiguration
         {
-            public IEnumerable<IDisposable> Apply(IContainer container)
+            public IEnumerable<IToken> Apply(IContainer container)
             {
                 // Bind using full autowiring
-                yield return container.Bind<IDependency>().To<Dependency>();
-                yield return container.Bind<IService>().To<Service>();
+                yield return container
+                    .Bind<IDependency>().To<Dependency>()
+                    .Bind<IService>().To<Service>();
             }
         }
         // }

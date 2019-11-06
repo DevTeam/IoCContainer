@@ -161,7 +161,7 @@ namespace IoC.Features.Interception
     internal interface IInterceptorRegistry
     {
         [NotNull]
-        IDisposable Register([NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors);
+        IToken Register([NotNull] IContainer container, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors);
     }
 }
 
@@ -185,8 +185,9 @@ namespace IoC.Features.Interception
         private static readonly ProxyGenerator ProxyGenerator = new ProxyGenerator();
         private readonly List<InterceptorsInfo> _interceptors = new List<InterceptorsInfo>();
 
-        public IDisposable Register(Predicate<Key> filter, params IInterceptor[] interceptors)
+        public IToken Register([NotNull] IContainer container, Predicate<Key> filter, params IInterceptor[] interceptors)
         {
+            if (container == null) throw new ArgumentNullException(nameof(container));
             if (filter == null) throw new ArgumentNullException(nameof(filter));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
             var info = new InterceptorsInfo(filter, interceptors);
@@ -201,7 +202,7 @@ namespace IoC.Features.Interception
                 {
                     _interceptors.Remove(info);
                 }
-            });
+            }).AsTokenOf(container);
         }
 
         public Expression Build(Expression bodyExpression, IBuildContext buildContext)
@@ -303,14 +304,31 @@ namespace IoC.Features
         /// <param name="filter">The filter to intercept appropriate instances.</param>
         /// <param name="interceptors">The set of interceptors.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable Intercept([NotNull] this IContainer container, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        public static IToken Intercept([NotNull] this IContainer container, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (filter == null) throw new ArgumentNullException(nameof(filter));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
-            return container.Resolve<IInterceptorRegistry>().Register(filter, interceptors);
+            return container.Resolve<IInterceptorRegistry>().Register(container, filter, interceptors);
+        }
+
+        /// <summary>
+        /// Registers interceptors.
+        /// </summary>
+        /// <param name="token">The binding token.</param>
+        /// <param name="filter">The filter to intercept appropriate instances.</param>
+        /// <param name="interceptors">The set of interceptors.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Intercept([NotNull] this IToken token, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            if (filter == null) throw new ArgumentNullException(nameof(filter));
+            if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
+            return token.Container.Intercept(filter, interceptors);
         }
 
         /// <summary>
@@ -319,9 +337,9 @@ namespace IoC.Features
         /// <param name="container">The target container.</param>
         /// <param name="interceptors">The set of interceptors.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable Intercept<T>([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        public static IToken Intercept<T>([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
@@ -331,33 +349,64 @@ namespace IoC.Features
         /// <summary>
         /// Registers interceptors.
         /// </summary>
+        /// <param name="token">The binding token.</param>
+        /// <param name="interceptors">The set of interceptors.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Intercept<T>([NotNull] this IToken token, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
+            return token.Intercept(new Key(typeof(T)), interceptors);
+        }
+
+        /// <summary>
+        /// Registers interceptors.
+        /// </summary>
+        /// <param name="token">The binding token.</param>
+        /// <param name="key">The key to intercept appropriate instance.</param>
+        /// <param name="interceptors">The set of interceptors.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Intercept([NotNull] this IToken token, Key key, [NotNull] [ItemNotNull] params IInterceptor[] interceptors) =>
+            Intercept(token.Container, key, interceptors);
+
+        /// <summary>
+        /// Registers interceptors.
+        /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="key">The key to intercept appropriate instance.</param>
         /// <param name="interceptors">The set of interceptors.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IDisposable Intercept([NotNull] this IContainer container, Key key, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        public static IToken Intercept([NotNull] this IContainer container, Key key, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
-            return container.Resolve<IInterceptorRegistry>().Register(targetKey =>
-                {
-                    if (targetKey.Equals(key))
-                    {
-                        return true;
-                    }
 
-                    var targetType = targetKey.Type;
-                    var interceptedType = key.Type;
+            return container.Resolve<IInterceptorRegistry>().Register(container, (targetKey) => Filter(targetKey, key), interceptors);
+        }
+
+        private static bool Filter(Key targetKey, Key key)
+        {
+            if (targetKey.Equals(key))
+            {
+                return true;
+            }
+
+            var targetType = targetKey.Type;
+            var interceptedType = key.Type;
 #if NET40
-                    var isGenericTargetType = targetType.IsGenericType;
-                    if (!isGenericTargetType)
-                    {
-                        return false;
-                    }
+            var isGenericTargetType = targetType.IsGenericType;
+            if (!isGenericTargetType)
+            {
+                return false;
+            }
 
-                    var interceptedIsGenericType = interceptedType.IsGenericTypeDefinition || interceptedType.GetGenericArguments().Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
+            var interceptedIsGenericType = interceptedType.IsGenericTypeDefinition || interceptedType.GetGenericArguments().Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
 #else
                     var targetTypeInfo = targetType.GetTypeInfo();
                     var isGenericTargetType = targetTypeInfo.IsGenericType;
@@ -369,21 +418,19 @@ namespace IoC.Features
                     var interceptedIsGenericType = interceptedTypeInfo.IsGenericTypeDefinition || interceptedTypeInfo.GenericTypeArguments.Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
 #endif
 
-                    if (!interceptedIsGenericType)
-                    {
-                        return false;
-                    }
+            if (!interceptedIsGenericType)
+            {
+                return false;
+            }
 
 #if NET40
-                    var genericTypeDefinition = targetType.GetGenericTypeDefinition();
-                    var curGenericTypeDefinition = interceptedType.GetGenericTypeDefinition();
+            var genericTypeDefinition = targetType.GetGenericTypeDefinition();
+            var curGenericTypeDefinition = interceptedType.GetGenericTypeDefinition();
 #else
                     var genericTypeDefinition = targetTypeInfo.GetGenericTypeDefinition();
                     var curGenericTypeDefinition = interceptedTypeInfo.GetGenericTypeDefinition();
 #endif
-                    return new Key(genericTypeDefinition, targetKey.Tag).Equals(new Key(curGenericTypeDefinition, key.Tag));
-                },
-                interceptors);
+            return new Key(genericTypeDefinition, targetKey.Tag).Equals(new Key(curGenericTypeDefinition, key.Tag));
         }
     }
 }
@@ -403,7 +450,7 @@ namespace IoC.Features
     public class InterceptionFeature: IConfiguration
     {
         /// <inheritdoc />
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Bind<InterceptorBuilder, IInterceptorRegistry, IBuilder>().As(Lifetime.Singleton).To();

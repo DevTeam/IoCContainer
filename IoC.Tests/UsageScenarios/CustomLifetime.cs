@@ -15,18 +15,19 @@
         public void Run()
         {
             // Create and configure the container
-            using var container = Container.Create();
-            using (container.Bind<IDependency>().To<Dependency>())
+            using var container = Container
+                .Create()
+                .Bind<IDependency>().To<Dependency>()
                 // Bind interface to implementation using the custom lifetime, based on the Singleton lifetime
-            using (container.Bind<IService>().Lifetime(new MyTransientLifetime()).To<Service>())
-            {
-                // Resolve the singleton twice
-                var instance1 = container.Resolve<IService>();
-                var instance2 = container.Resolve<IService>();
+                .Bind<IService>().Lifetime(new MyTransientLifetime()).To<Service>()
+                .Container;
+            
+            // Resolve the singleton twice
+            var instance1 = container.Resolve<IService>();
+            var instance2 = container.Resolve<IService>();
 
-                // Check that instances from the parent container are equal
-                instance1.ShouldBe(instance2);
-            }
+            // Check that instances from the parent container are equal
+            instance1.ShouldBe(instance2);
         }
 
         // Represents the custom lifetime based on the Singleton lifetime

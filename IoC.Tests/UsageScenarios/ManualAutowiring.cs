@@ -14,24 +14,25 @@
             // $description=Manual Autowiring
             // {
             // Create and configure the container using full autowiring
-            using var container = Container.Create();
-            using (container.Bind<IDependency>().To<Dependency>())
+            using var container = Container
+                .Create()
+                .Bind<IDependency>().To<Dependency>()
                 // Bind 'INamedService' to the instance creation and initialization, actually represented as an expression tree
-            using (container.Bind<INamedService>().To<InitializingNamedService>(
-                // Select the constructor and inject the dependency
-                ctx => new InitializingNamedService(ctx.Container.Inject<IDependency>()),
-                // Configure the initializing method to invoke after the instance creation and inject the dependencies
-                ctx => ctx.It.Initialize("some name", ctx.Container.Inject<IDependency>())))
-            {
-                // Resolve an instance
-                var instance = container.Resolve<INamedService>();
+                .Bind<INamedService>().To<InitializingNamedService>(
+                    // Select the constructor and inject the dependency
+                    ctx => new InitializingNamedService(ctx.Container.Inject<IDependency>()),
+                    // Configure the initializing method to invoke after the instance creation and inject the dependencies
+                    ctx => ctx.It.Initialize("some name", ctx.Container.Inject<IDependency>()))
+                .Container;
 
-                // Check the instance's type
-                instance.ShouldBeOfType<InitializingNamedService>();
+            // Resolve an instance
+            var instance = container.Resolve<INamedService>();
 
-                // Check the injected dependency
-                instance.Name.ShouldBe("some name");
-            }
+            // Check the instance's type
+            instance.ShouldBeOfType<InitializingNamedService>();
+
+            // Check the injected dependency
+            instance.Name.ShouldBe("some name");
 
             // }
         }

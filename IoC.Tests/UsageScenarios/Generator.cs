@@ -58,7 +58,7 @@ namespace IoC.Tests.UsageScenarios
         // Represents IoC configuration
         public class Generators: IConfiguration
         {
-            public IEnumerable<IDisposable> Apply(IContainer container)
+            public IEnumerable<IToken> Apply(IContainer container)
             {
                 var value = 0;
                 // Define function to get sequential integer value

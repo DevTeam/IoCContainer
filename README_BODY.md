@@ -59,14 +59,16 @@ _You can do this anywhere in your code, but collecting this information in one p
 ```csharp
 class Glue : IConfiguration
 {
-    public IEnumerable<IDisposable> Apply(IContainer container)
+    public IEnumerable<IToken> Apply(IContainer container)
     {
-        yield return container.Bind<IBox<TT>>().To<CardboardBox<TT>>();
-        yield return container.Bind<ICat>().To<ShroedingersCat>();
+        yield return container
+            .Bind<IBox<TT>>().To<CardboardBox<TT>>()
+            .Bind<ICat>().To<ShroedingersCat>();
 
         // Models a random subatomic event that may or may not occur.
-        yield return container.Bind<Random>().As(Singleton).To<Random>();
-        yield return container.Bind<State>().To(ctx => (State)ctx.Container.Resolve<Random>().Next(2));
+        yield return container
+            .Bind<Random>().As(Singleton).To<Random>()
+            .Bind<State>().To(ctx => (State)ctx.Container.Resolve<Random>().Next(2));
     }
 }
 ```

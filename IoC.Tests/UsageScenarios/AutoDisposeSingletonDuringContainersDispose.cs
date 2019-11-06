@@ -17,8 +17,11 @@
             var disposableService = new Mock<IDisposableService>();
 
             // Create and configure the container
-            using (var container = Container.Create()
-                .Bind<IService>().As(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object).ToSelf())
+            using (
+                var container = Container
+                .Create()
+                .Bind<IService>().As(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object)
+                .Container)
             {
                 // Resolve singleton instance twice
                 var instance1 = container.Resolve<IService>();
@@ -30,12 +33,12 @@
 
             // Check the singleton was disposed after the container was disposed
             disposableService.Verify(i => i.Dispose(), Times.Once);
-            // }            
+            // }
 #if NETCOREAPP3_0
             // {
             disposableService.Verify(i => i.DisposeAsync(), Times.Once);
             // }
-#endif            
+#endif
         }
     }
 }

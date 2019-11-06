@@ -18,17 +18,17 @@
             Func<IService> func = () => new Service(new Dependency());
 
             // Create and configure the container
-            using var container = Container.Create();
-            using (container.Bind<IService>().To(ctx => func()))
-            {
-                // Resolve an instance
-                var instance = container.Resolve<IService>();
-                // }
-                // Check the instance's type
-                instance.ShouldBeOfType<Service>();
-                // {
-            }
+            using var container = Container
+                .Create()
+                .Bind<IService>().To(ctx => func())
+                .Container;
+
+            // Resolve an instance
+            var instance = container.Resolve<IService>();
             // }
+            // Check the instance's type
+            instance.ShouldBeOfType<Service>();
+
         }
     }
 }

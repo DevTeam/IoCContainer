@@ -17,22 +17,20 @@
             // $description=Resolve Func
             // {
             // Create and configure the container
-            using var container = Container.Create();
-            using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<IService>().To<Service>())
-            {
-                // Resolve function to get instances
-                var func = container.Resolve<Func<IService>>();
-                
-                // Get an instance
-                var instance = func();
-                // }
-                // Check the instance's type
-                instance.ShouldBeOfType<Service>();
-                // {
-            }
+            using var container = Container
+                .Create()
+                .Bind<IDependency>().To<Dependency>()
+                .Bind<IService>().To<Service>()
+                .Container;
 
+            // Resolve function to get instances
+            var func = container.Resolve<Func<IService>>();
+
+            // Get an instance
+            var instance = func();
             // }
+            // Check the instance's type
+            instance.ShouldBeOfType<Service>();
         }
     }
 }

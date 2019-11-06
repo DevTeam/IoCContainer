@@ -1,6 +1,5 @@
 ﻿namespace WpfAppNetCore
 {
-    using System;
     using System.Collections.Generic;
     using IoC;
     using SampleModels;
@@ -13,11 +12,11 @@
     /// </summary>
     internal class Configuration: IConfiguration
     {
-        public IEnumerable<IDisposable> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IContainer container)
         {
-            yield return container.Apply(ClockConfiguration.Shared);
-            yield return container.Bind<IUIDispatcher>().As(Singleton).To<UIDispatcher>();
-            yield return container.Bind<IMainWindowView>().As(Singleton).To<MainWindow>();            
+            yield return container.Apply(ClockConfiguration.Shared)
+                .Bind<IUIDispatcher>().As(Singleton).To<UIDispatcher>()
+                .Bind<IMainWindowView>().As(Singleton).To<MainWindow>();
         }
     }
 }

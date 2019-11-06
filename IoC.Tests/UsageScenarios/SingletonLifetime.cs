@@ -22,30 +22,31 @@
             // $footer=_Transient_ - is default lifetime and a new instance is creating each time
             // {
             // Create and configure the container
-            using var container = Container.Create();
-            using (container.Bind<IDependency>().To<Dependency>())
+            using var container = Container
+                .Create()
+                .Bind<IDependency>().To<Dependency>()
                 // Use the Singleton lifetime
-            using (container.Bind<IService>().As(Singleton).To<Service>())
-            {
-                // Resolve the singleton twice
-                var parentInstance1 = container.Resolve<IService>();
-                var parentInstance2 = container.Resolve<IService>();
+                .Bind<IService>().As(Singleton).To<Service>()
+                .Container;
 
-                // Check that instances from the parent container are equal
-                parentInstance1.ShouldBe(parentInstance2);
+            // Resolve the singleton twice
+            var parentInstance1 = container.Resolve<IService>();
+            var parentInstance2 = container.Resolve<IService>();
 
-                // Create a child container
-                using var childContainer = container.Create();
-                // Resolve the singleton twice
-                var childInstance1 = childContainer.Resolve<IService>();
-                var childInstance2 = childContainer.Resolve<IService>();
+            // Check that instances from the parent container are equal
+            parentInstance1.ShouldBe(parentInstance2);
 
-                // Check that instances from the child container are equal
-                childInstance1.ShouldBe(childInstance2);
+            // Create a child container
+            using var childContainer = container.Create();
+            // Resolve the singleton twice
+            var childInstance1 = childContainer.Resolve<IService>();
+            var childInstance2 = childContainer.Resolve<IService>();
 
-                // Check that instances from different containers are equal
-                parentInstance1.ShouldBe(childInstance1);
-            }
+            // Check that instances from the child container are equal
+            childInstance1.ShouldBe(childInstance2);
+
+            // Check that instances from different containers are equal
+            parentInstance1.ShouldBe(childInstance1);
 
             // }
         }

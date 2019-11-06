@@ -17,22 +17,20 @@
             // $description=Resolve Lazy
             // {
             // Create and configure the container
-            using var container = Container.Create();
-            using (container.Bind<IDependency>().To<Dependency>())
-            using (container.Bind<IService>().To<Service>())
-            {
-                // Resolve the instance of Lazy<IService>
-                var lazy = container.Resolve<Lazy<IService>>();
+            using var container = Container
+                .Create()
+                .Bind<IDependency>().To<Dependency>()
+                .Bind<IService>().To<Service>()
+                .Container;
 
-                // Get the instance via Lazy
-                var instance = lazy.Value;
-                // }
-                // Check the instance's type
-                instance.ShouldBeOfType<Service>();
-                // {
-            }
+            // Resolve the instance of Lazy<IService>
+            var lazy = container.Resolve<Lazy<IService>>();
 
+            // Get the instance via Lazy
+            var instance = lazy.Value;
             // }
+            // Check the instance's type
+            instance.ShouldBeOfType<Service>();
         }
     }
 }

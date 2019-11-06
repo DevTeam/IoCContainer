@@ -15,18 +15,16 @@
             // $header=In this case the specific type is binded to the manually created instance based on an expression tree. This dependency will be introduced as is, without any additional overhead like _lambda call_ or _type cast_.
             // {
             // Create and configure the container
-            using var container = Container.Create();
-            using (container.Bind<IService>().To(ctx => new Service(new Dependency())))
-            {
-                // Resolve an instance
-                var instance = container.Resolve<IService>();
-                // }
-                // Check the instance's type
-                instance.ShouldBeOfType<Service>();
-                // {
-            }
+            using var container = Container
+                .Create()
+                .Bind<IService>().To(ctx => new Service(new Dependency()))
+                .Container;
 
+            // Resolve an instance
+            var instance = container.Resolve<IService>();
             // }
+            // Check the instance's type
+            instance.ShouldBeOfType<Service>();
         }
     }
 }
