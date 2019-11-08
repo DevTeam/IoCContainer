@@ -15,6 +15,7 @@
             // $tag=injection
             // $priority=02
             // $description=Resolve Lazy
+            // $header=_Lazy_ dependency helps when a logic requires to inject some _lazy proxy_ to get instance once on demand.
             // {
             // Create and configure the container
             using var container = Container

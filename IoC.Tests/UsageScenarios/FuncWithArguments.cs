@@ -22,8 +22,7 @@
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
                 // Bind, selecting the constructor and inject argument[0] as the second parameter of type 'string'
-                .Bind<INamedService>().To(
-                    ctx => func(ctx.Container.Inject<IDependency>(), (string) ctx.Args[0]))
+                .Bind<INamedService>().To(ctx => func(ctx.Container.Inject<IDependency>(), (string)ctx.Args[0]))
                 .Container;
 
             // Resolve the instance, putting the string "alpha" into the array of arguments

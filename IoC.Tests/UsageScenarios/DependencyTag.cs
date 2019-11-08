@@ -21,8 +21,7 @@
                 .Create()
                 .Bind<IDependency>().Tag("MyDep").To<Dependency>()
                 // Configure autowiring and inject dependency tagged by "MyDep"
-                .Bind<IService>().To<Service>(
-                    ctx => new Service(ctx.Container.Inject<IDependency>("MyDep")))
+                .Bind<IService>().To<Service>(ctx => new Service(ctx.Container.Inject<IDependency>("MyDep")))
                 .Container;
 
             // Resolve an instance

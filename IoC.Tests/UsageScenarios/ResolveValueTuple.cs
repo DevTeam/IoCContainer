@@ -21,8 +21,7 @@ namespace IoC.Tests.UsageScenarios
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
                 .Bind<IService>().To<Service>()
-                .Bind<INamedService>().To<NamedService>(
-                    ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name"))
+                .Bind<INamedService>().To<NamedService>(ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name"))
                 .Container;
             {
                 // Resolve an instance of type (IService service, INamedService namedService)

@@ -633,6 +633,106 @@
             <param name="tagSelector">The tag selector.</param>
             <returns>The instance of aspect oriented autowiring strategy.</returns>
         </member>
+        <member name="T:IoC.Configuration">
+            <summary>
+            Represents extensions to configure a container.
+            </summary>
+        </member>
+        <member name="M:IoC.Configuration.Create(System.Func{IoC.IContainer,IoC.IToken})">
+            <summary>
+            Creates configuration from factory.
+            </summary>
+            <param name="configurationFactory">The configuration factory.</param>
+            <returns>The configuration instance.</returns>
+        </member>
+        <member name="M:IoC.Configuration.AsTokenOf(System.IDisposable,IoC.IContainer)">
+            <summary>
+            Converts a disposable resource to the container's token.
+            </summary>
+            <param name="disposableToken">A disposable resource.</param>
+            <param name="container">The target container.</param>
+            <returns></returns>
+        </member>
+        <member name="M:IoC.Configuration.Apply(IoC.IContainer,System.String[])">
+            <summary>
+            Applies text configurations for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurationText">The text configurations.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Configuration.Apply(IoC.IContainer,System.IO.Stream[])">
+            <summary>
+            Applies text configurations from streams for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurationStreams">The set of streams with text configurations.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Configuration.Apply(IoC.IContainer,System.IO.TextReader[])">
+            <summary>
+            Applies text configurations from text readers for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurationReaders">The set of text readers with text configurations.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Configuration.Using(IoC.IContainer,System.String[])">
+            <summary>
+            Applies text configurations for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurationText">The text configurations.</param>
+            <returns>The target container.</returns>
+        </member>
+        <member name="M:IoC.Configuration.Using(IoC.IContainer,System.IO.Stream[])">
+            <summary>
+            Applies text configurations from streams for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurationStreams">The set of streams with text configurations.</param>
+            <returns>The target container.</returns>
+        </member>
+        <member name="M:IoC.Configuration.Using(IoC.IContainer,System.IO.TextReader[])">
+            <summary>
+            Applies text configurations from text readers for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurationReaders">The set of text readers with text configurations.</param>
+            <returns>The target container.</returns>
+        </member>
+        <member name="M:IoC.Configuration.Apply(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IConfiguration})">
+            <summary>
+            Applies configurations for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurations">The configurations.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Configuration.Apply(IoC.IContainer,IoC.IConfiguration[])">
+            <summary>
+            Applies configurations for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurations">The configurations.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Configuration.Using(IoC.IContainer,IoC.IConfiguration[])">
+            <summary>
+            Applies configurations for the target container.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="configurations">The configurations.</param>
+            <returns>The target container.</returns>
+        </member>
+        <member name="M:IoC.Configuration.Using``1(IoC.IContainer)">
+            <summary>
+            Applies configuration for the target container.
+            </summary>
+            <typeparam name="T">The type of configuration.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The target container.</returns>
+        </member>
         <member name="T:IoC.Container">
             <summary>
             The IoC container implementation.
@@ -2784,91 +2884,6 @@
             <typeparam name="T32">The contract type #32.</typeparam>
             <param name="token">The binding token.</param>
             <returns>The binding token.</returns>
-        </member>
-        <member name="T:IoC.FluentConfiguration">
-            <summary>
-            Represents extensions to configure a container.
-            </summary>
-        </member>
-        <member name="M:IoC.FluentConfiguration.Apply(IoC.IContainer,System.String[])">
-            <summary>
-            Applies text configurations for the target container.
-            </summary>
-            <param name="container">The target container.</param>
-            <param name="configurationText">The text configurations.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentConfiguration.Apply(IoC.IContainer,System.IO.Stream[])">
-            <summary>
-            Applies text configurations from streams for the target container.
-            </summary>
-            <param name="container">The target container.</param>
-            <param name="configurationStreams">The set of streams with text configurations.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentConfiguration.Apply(IoC.IContainer,System.IO.TextReader[])">
-            <summary>
-            Applies text configurations from text readers for the target container.
-            </summary>
-            <param name="container">The target container.</param>
-            <param name="configurationReaders">The set of text readers with text configurations.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentConfiguration.Using(IoC.IContainer,System.String[])">
-            <summary>
-            Applies text configurations for the target container.
-            </summary>
-            <param name="container">The target container.</param>
-            <param name="configurationText">The text configurations.</param>
-            <returns>The target container.</returns>
-        </member>
-        <member name="M:IoC.FluentConfiguration.Using(IoC.IContainer,System.IO.Stream[])">
-            <summary>
-            Applies text configurations from streams for the target container.
-            </summary>
-            <param name="container">The target container.</param>
-            <param name="configurationStreams">The set of streams with text configurations.</param>
-            <returns>The target container.</returns>
-        </member>
-        <member name="M:IoC.FluentConfiguration.Using(IoC.IContainer,System.IO.TextReader[])">
-            <summary>
-            Applies text configurations from text readers for the target container.
-            </summary>
-            <param name="container">The target container.</param>
-            <param name="configurationReaders">The set of text readers with text configurations.</param>
-            <returns>The target container.</returns>
-        </member>
-        <member name="M:IoC.FluentConfiguration.Apply(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IConfiguration})">
-            <summary>
-            Applies configurations for the target container.
-            </summary>
-            <param name="container">The target container.</param>
-            <param name="configurations">The configurations.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentConfiguration.Apply(IoC.IContainer,IoC.IConfiguration[])">
-            <summary>
-            Applies configurations for the target container.
-            </summary>
-            <param name="container">The target container.</param>
-            <param name="configurations">The configurations.</param>
-            <returns>The dependency token.</returns>
-        </member>
-        <member name="M:IoC.FluentConfiguration.Using(IoC.IContainer,IoC.IConfiguration[])">
-            <summary>
-            Applies configurations for the target container.
-            </summary>
-            <param name="container">The target container.</param>
-            <param name="configurations">The configurations.</param>
-            <returns>The target container.</returns>
-        </member>
-        <member name="M:IoC.FluentConfiguration.Using``1(IoC.IContainer)">
-            <summary>
-            Applies configuration for the target container.
-            </summary>
-            <typeparam name="T">The type of configuration.</typeparam>
-            <param name="container">The target container.</param>
-            <returns>The target container.</returns>
         </member>
         <member name="T:IoC.FluentGetResolver">
             <summary>

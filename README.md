@@ -252,13 +252,13 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Tags](#tags-)
   - [Value](#value-)
   - [Dependency Tag](#dependency-tag-)
-  - [Func](#func-)
   - [Singleton lifetime](#singleton-lifetime-)
   - [Child Container](#child-container-)
   - [Container Singleton lifetime](#container-singleton-lifetime-)
   - [Scope Singleton lifetime](#scope-singleton-lifetime-)
   - [Manual Autowiring](#manual-autowiring-)
   - [Struct](#struct-)
+  - [Func](#func-)
   - [Func With Arguments](#func-with-arguments-)
   - [Auto dispose singleton during container's dispose](#auto-dispose-singleton-during-containers-dispose-)
   - [Configuration via a text metadata](#configuration-via-a-text-metadata-)
@@ -448,27 +448,7 @@ using var container = Container
     .Create()
     .Bind<IDependency>().Tag("MyDep").To<Dependency>()
     // Configure autowiring and inject dependency tagged by "MyDep"
-    .Bind<IService>().To<Service>(
-        ctx => new Service(ctx.Container.Inject<IDependency>("MyDep")))
-    .Container;
-
-// Resolve an instance
-var instance = container.Resolve<IService>();
-```
-
-
-
-### Func [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Func.cs)
-
-_Func_ dependency helps when a logic requires to inject some number of type's instances on demand.
-
-``` CSharp
-Func<IService> func = () => new Service(new Dependency());
-
-// Create and configure the container
-using var container = Container
-    .Create()
-    .Bind<IService>().To(ctx => func())
+    .Bind<IService>().To<Service>(ctx => new Service(ctx.Container.Inject<IDependency>("MyDep")))
     .Container;
 
 // Resolve an instance
@@ -715,6 +695,25 @@ public class TracingBuilder : IBuilder
 
 
 
+### Func [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Func.cs)
+
+
+
+``` CSharp
+Func<IService> func = () => new Service(new Dependency());
+
+// Create and configure the container
+using var container = Container
+    .Create()
+    .Bind<IService>().To(ctx => func())
+    .Container;
+
+// Resolve an instance
+var instance = container.Resolve<IService>();
+```
+
+
+
 ### Func With Arguments [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FuncWithArguments.cs)
 
 
@@ -728,8 +727,7 @@ using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
     // Bind, selecting the constructor and inject argument[0] as the second parameter of type 'string'
-    .Bind<INamedService>().To(
-        ctx => func(ctx.Container.Inject<IDependency>(), (string) ctx.Args[0]))
+    .Bind<INamedService>().To(ctx => func(ctx.Container.Inject<IDependency>(), (string)ctx.Args[0]))
     .Container;
 
 // Resolve the instance, putting the string "alpha" into the array of arguments
@@ -1221,30 +1219,31 @@ public IEnumerable<IToken> Apply(IContainer container)
 
 ``` CSharp
 // Create and configure the container
-using var container = Container.Create();
-using (container.Bind<IDependency>().To<Dependency>())
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    .Container;
+
+// Configure `IService` as Transient
+using (container.Bind<IService>().To<Service>())
 {
-    // Configure `IService` as Transient
-    using (container.Bind<IService>().To<Service>())
-    {
-        // Resolve instances
-        var instance1 = container.Resolve<IService>();
-        var instance2 = container.Resolve<IService>();
+    // Resolve instances
+    var instance1 = container.Resolve<IService>();
+    var instance2 = container.Resolve<IService>();
 
-        // Check that instances are not equal
-        instance1.ShouldNotBe(instance2);
-    }
+    // Check that instances are not equal
+    instance1.ShouldNotBe(instance2);
+}
 
-    // Reconfigure `IService` as Singleton
-    using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
-    {
-        // Resolve the singleton twice
-        var instance1 = container.Resolve<IService>();
-        var instance2 = container.Resolve<IService>();
+// Reconfigure `IService` as Singleton
+using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
+{
+    // Resolve the singleton twice
+    var instance1 = container.Resolve<IService>();
+    var instance2 = container.Resolve<IService>();
 
-        // Check that instances are equal
-        instance1.ShouldBe(instance2);
-    }
+    // Check that instances are equal
+    instance1.ShouldBe(instance2);
 }
 
 ```
@@ -1253,9 +1252,10 @@ using (container.Bind<IDependency>().To<Dependency>())
 
 ### Resolve Func [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveFunc.cs)
 
-
+_Func_ dependency helps when a logic requires to inject some number of type's instances on demand.
 
 ``` CSharp
+// Create and configure the container
 // Create and configure the container
 using var container = Container
     .Create()
@@ -1263,18 +1263,19 @@ using var container = Container
     .Bind<IService>().To<Service>()
     .Container;
 
-// Resolve function to get instances
-var func = container.Resolve<Func<IService>>();
+// Resolve function to create instances
+var factory = container.Resolve<Func<IService>>();
 
-// Get an instance
-var instance = func();
+// Resolve instances
+var instance1 = factory();
+var instance2 = factory();
 ```
 
 
 
 ### Resolve Lazy [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveLazy.cs)
 
-
+_Lazy_ dependency helps when a logic requires to inject some _lazy proxy_ to get instance once on demand.
 
 ``` CSharp
 // Create and configure the container
@@ -1324,8 +1325,7 @@ using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
     .Bind<IService>().To<Service>()
-    .Bind<INamedService>().To<NamedService>(
-        ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name"))
+    .Bind<INamedService>().To<NamedService>(ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name"))
     .Container;
 
 // Resolve an instance of type Tuple<IService, INamedService>
@@ -1344,8 +1344,7 @@ using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
     .Bind<IService>().To<Service>()
-    .Bind<INamedService>().To<NamedService>(
-        ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name"))
+    .Bind<INamedService>().To<NamedService>(ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name"))
     .Container;
 {
     // Resolve an instance of type (IService service, INamedService namedService)
@@ -1741,13 +1740,11 @@ public class Link : ILink
 ``` CSharp
 public void Run()
 {
-    Func<int, int, (int, int)> valueGetter = (sequential, random) => (sequential, random);
-
     // Create and configure the container using a configuration class 'Generators'
     using var container = Container.Create().Using<Generators>();
     using (container.Bind<(int, int)>().To(
         // Use a function because of the expression trees have a limitation in syntax
-        ctx => valueGetter(
+        ctx => ValueTuple.Create(
             // The first one is of sequential number generator
             ctx.Container.Inject<int>(GeneratorType.Sequential),
             // The second one is of random number generator
@@ -1808,75 +1805,102 @@ public void Run()
 {
     var observer = new Mock<IObserver<IMessage>>();
 
-    // Initial message id
-    var id = 33;
-    Func<int> generator = () => id++;
-
     // Create a container
-    using var container = Container
-        .Create()
-        .Bind<int>().Tag("IdGenerator").To(ctx => generator())
-        .Bind(typeof(IInstantMessenger<>)).To(typeof(InstantMessenger<>))
-        .Bind<IMessage>().To<Message>(ctx => new Message(ctx.Container.Inject<int>("IdGenerator"), (string) ctx.Args[0], (string) ctx.Args[1]))
-        .Container;
+    using var container = Container.Create().Using<InstantMessengerConfig>();
 
+    // Resolve messenger
     var instantMessenger = container.Resolve<IInstantMessenger<IMessage>>();
-    using (instantMessenger.Subscribe(observer.Object))
-    {
-        for (var i = 0; i < 10; i++)
-        {
-            instantMessenger.SendMessage("John", "Hello");
-        }
-    }
+    using var subscription = instantMessenger.Subscribe(observer.Object);
 
-    observer.Verify(i => i.OnNext(It.Is<IMessage>(message => message.Id >= 33 && message.Address == "John" && message.Text == "Hello")), Times.Exactly(10));
+    // Send messages
+    instantMessenger.SendMessage("Nik", "John", "Hello, John");
+    instantMessenger.SendMessage("John", "Nik", "Hello, Nik!");
+
+    // Verify messages
+    observer.Verify(i => i.OnNext(It.Is<IMessage>(message => message.Id == 34 && message.Text == "Hello, John")));
+    observer.Verify(i => i.OnNext(It.Is<IMessage>(message => message.Id == 35 && message.Text == "Hello, Nik!")));
+}
+
+public class InstantMessengerConfig: IConfiguration
+{
+    public IEnumerable<IToken> Apply(IContainer container)
+    {
+        // Let's suppose that the initial message ID is 33
+        var id = 33;
+
+        yield return container
+            // id generator
+            .Bind<int>().To(ctx => Interlocked.Increment(ref id))
+            // abstract messenger
+            .Bind(typeof(IInstantMessenger<>)).To(typeof(InstantMessenger<>))
+            // abstract subject
+            .Bind<ISubject<TT>>().To<Subject<TT>>()
+            // message factory
+            .Bind<IMessageFactory<IMessage>>().To<Message>();
+    }
 }
 
 public interface IInstantMessenger<out T>: IObservable<T>
 {
-    void SendMessage(string address, string text);
+    void SendMessage(string addressFrom, string addressTo, string text);
 }
 
 public interface IMessage
 {
     int Id { get; }
 
-    string Address { get; }
+    string AddressFrom { get; }
+
+    string AddressTo { get; }
 
     string Text { get; }
 }
 
-public class Message: IMessage
+public interface IMessageFactory<out T>
 {
-    public Message(int id, [NotNull] string address, [NotNull] string text)
+    T Create([NotNull] string addressFrom, [NotNull] string addressTo, [NotNull] string text);
+}
+
+public class Message: IMessage, IMessageFactory<IMessage>
+{
+    private readonly Func<int> _idFactory;
+
+    // Injected constructor
+    public Message(Func<int> idFactory) => _idFactory = idFactory;
+
+    private Message(int id, [NotNull] string addressFrom, [NotNull] string addressTo, [NotNull] string text)
     {
         Id = id;
-        Address = address ?? throw new ArgumentNullException(nameof(address));
+        AddressFrom = addressFrom ?? throw new ArgumentNullException(nameof(addressFrom));
+        AddressTo = addressTo ?? throw new ArgumentNullException(nameof(addressTo));
         Text = text ?? throw new ArgumentNullException(nameof(text));
     }
 
     public int Id { get; }
 
-    public string Address { get; }
+    public string AddressFrom { get; }
+
+    public string AddressTo { get; }
 
     public string Text { get; }
+
+    public IMessage Create(string addressFrom, string addressTo, string text) => new Message(_idFactory(), addressFrom, addressTo, text);
 }
 
 public class InstantMessenger<T> : IInstantMessenger<T>
 {
-    private readonly Func<string, string, T> _createMessage;
-    private readonly List<IObserver<T>> _observers = new List<IObserver<T>>();
+    private readonly IMessageFactory<T> _messageFactory;
+    private readonly ISubject<T> _messages;
 
-    public InstantMessenger(Func<string, string, T> createMessage) => _createMessage = createMessage;
-
-    public IDisposable Subscribe(IObserver<T> observer)
+    internal InstantMessenger(IMessageFactory<T> messageFactory, ISubject<T> subject)
     {
-        _observers.Add(observer);
-        return Disposable.Create(() => _observers.Remove(observer));
+        _messageFactory = messageFactory;
+        _messages = subject;
     }
 
-    public void SendMessage(string address, string text)
-        => _observers.ForEach(observer => observer.OnNext(_createMessage(address, text)));
+    public IDisposable Subscribe(IObserver<T> observer) => _messages.Subscribe(observer);
+
+    public void SendMessage(string addressFrom, string addressTo, string text) => _messages.OnNext(_messageFactory.Create(addressFrom, addressTo, text));
 }
 ```
 

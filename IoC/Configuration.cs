@@ -11,8 +11,18 @@
     /// Represents extensions to configure a container.
     /// </summary>
     [PublicAPI]
-    public static class FluentConfiguration
+    public static class Configuration
     {
+        /// <summary>
+        /// Creates configuration from factory.
+        /// </summary>
+        /// <param name="configurationFactory">The configuration factory.</param>
+        /// <returns>The configuration instance.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IConfiguration Create([NotNull] Func<IContainer, IToken> configurationFactory) =>
+            new ConfigurationFromDelegate(configurationFactory ?? throw new ArgumentNullException(nameof(configurationFactory)));
+
         /// <summary>
         /// Converts a disposable resource to the container's token.
         /// </summary>

@@ -11,9 +11,8 @@
         {
             // $visible=true
             // $tag=binding
-            // $priority=02
+            // $priority=05
             // $description=Func
-            // $header=_Func_ dependency helps when a logic requires to inject some number of type's instances on demand.
             // {
             Func<IService> func = () => new Service(new Dependency());
 

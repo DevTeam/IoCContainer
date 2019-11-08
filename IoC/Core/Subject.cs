@@ -3,14 +3,12 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Runtime.CompilerServices;
 
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-    internal class Subject<T>: IObservable<T>, IObserver<T>
+    internal class Subject<T>: ISubject<T>
     {
         private readonly List<IObserver<T>> _observers = new List<IObserver<T>>();
 
-        [MethodImpl((MethodImplOptions)256)]
         public IDisposable Subscribe(IObserver<T> observer)
         {
             lock (_observers)
@@ -27,7 +25,6 @@
             });
         }
 
-        [MethodImpl((MethodImplOptions)256)]
         public void OnNext(T value)
         {
             lock (_observers)
@@ -39,7 +36,6 @@
             }
         }
 
-        [MethodImpl((MethodImplOptions)256)]
         public void OnError(Exception error)
         {
             lock (_observers)
@@ -51,7 +47,6 @@
             }
         }
 
-        [MethodImpl((MethodImplOptions)256)]
         public void OnCompleted()
         {
             lock (_observers)

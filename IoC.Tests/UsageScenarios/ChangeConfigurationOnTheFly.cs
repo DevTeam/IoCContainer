@@ -14,30 +14,31 @@
             // $description=Change configuration on-the-fly
             // {
             // Create and configure the container
-            using var container = Container.Create();
-            using (container.Bind<IDependency>().To<Dependency>())
+            using var container = Container
+                .Create()
+                .Bind<IDependency>().To<Dependency>()
+                .Container;
+            
+            // Configure `IService` as Transient
+            using (container.Bind<IService>().To<Service>())
             {
-                // Configure `IService` as Transient
-                using (container.Bind<IService>().To<Service>())
-                {
-                    // Resolve instances
-                    var instance1 = container.Resolve<IService>();
-                    var instance2 = container.Resolve<IService>();
+                // Resolve instances
+                var instance1 = container.Resolve<IService>();
+                var instance2 = container.Resolve<IService>();
 
-                    // Check that instances are not equal
-                    instance1.ShouldNotBe(instance2);
-                }
+                // Check that instances are not equal
+                instance1.ShouldNotBe(instance2);
+            }
 
-                // Reconfigure `IService` as Singleton
-                using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
-                {
-                    // Resolve the singleton twice
-                    var instance1 = container.Resolve<IService>();
-                    var instance2 = container.Resolve<IService>();
+            // Reconfigure `IService` as Singleton
+            using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
+            {
+                // Resolve the singleton twice
+                var instance1 = container.Resolve<IService>();
+                var instance2 = container.Resolve<IService>();
 
-                    // Check that instances are equal
-                    instance1.ShouldBe(instance2);
-                }
+                // Check that instances are equal
+                instance1.ShouldBe(instance2);
             }
 
             // }

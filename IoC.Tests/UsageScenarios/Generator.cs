@@ -19,13 +19,11 @@ namespace IoC.Tests.UsageScenarios
         // {
         public void Run()
         {
-            Func<int, int, (int, int)> valueGetter = (sequential, random) => (sequential, random);
-
             // Create and configure the container using a configuration class 'Generators'
             using var container = Container.Create().Using<Generators>();
             using (container.Bind<(int, int)>().To(
                 // Use a function because of the expression trees have a limitation in syntax
-                ctx => valueGetter(
+                ctx => ValueTuple.Create(
                     // The first one is of sequential number generator
                     ctx.Container.Inject<int>(GeneratorType.Sequential),
                     // The second one is of random number generator
