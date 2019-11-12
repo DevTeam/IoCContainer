@@ -48,7 +48,7 @@ namespace IoC.Tests.UsageScenarios
             // Stores the collection of called method names
             public MyInterceptor(ICollection<string> methods) => _methods = methods;
 
-            // Intercepts the invocations and append the called method name to the collection
+            // Intercepts the invocations and appends the called method name to the collection
             public void Intercept(IInvocation invocation) => _methods.Add(invocation.Method.Name);
         }
         // }

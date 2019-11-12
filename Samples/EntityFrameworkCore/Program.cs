@@ -4,45 +4,34 @@ namespace EntityFrameworkCore
 {
     using System;
     using IoC;
+    using Microsoft.EntityFrameworkCore;
 
     public class Program
     {
         public static void Main()
         {
-            using var program =
+            using var program = Container
                 // Create a container
-                Container.Create()
-                // And configure it
+                .Create()
+                // Configure it
                 .Using<Configuration>()
-                // Build up program
+                // Build up a program
                 .BuildUp<Program>();
         }
 
-        internal Program(
-            // DB context factory
-            Func<PeopleDbContext> newCtx,
-            // Person factory
-            Func<Person> newPerson)
+        internal Program(Db db, Func<Person> person)
         {
-            // Create DB context
-            using var ctx = newCtx();
-
-            // Fill DB by people
-            var nik = newPerson();
+            var nik = person();
             nik.Name = "Nik";
-            ctx.People.Add(nik);
+            db.People.Add(nik);
 
-            var john = newPerson();
+            var john = person();
             john.Name = "John";
-            ctx.People.Add(john);
+            db.People.Add(john);
 
-            ctx.SaveChanges();
+            db.SaveChanges();
 
-            // Fetch people
-            foreach (var person in ctx.People)
-            {
-                Console.WriteLine($"{person.Id}: {person.Name}");
-            }
+            db.People.ForEachAsync(Console.WriteLine);
         }
     }
 }

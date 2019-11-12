@@ -19,7 +19,6 @@
     <DocumentationFile>..\Docs\IoC_$(TargetFramework).xml</DocumentationFile>
     <WarningsAsErrors />
     <MSBuildNative>C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild</MSBuildNative>
-    <HasMSBuildNative Condition="Exists('$(XamlTargets)')">true</HasMSBuildNative>
     <XamlTargets>$(MSBuildNative)\Microsoft\WindowsXaml\v16.0\8.21\Microsoft.Windows.UI.Xaml.CSharp.Targets</XamlTargets>
     <TransformOnBuild>True</TransformOnBuild>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
@@ -57,7 +56,7 @@
     <None Include="icon.png"><Pack>true</Pack><PackagePath>common</PackagePath></None>
     <None Remove="IoC.tt" />
     <Compile Remove="IoC.cs" />
-    <PackageReference Include="Vsxmd" Version="1.2.0" Condition="$(HasMSBuildNative)=='true'">
+    <PackageReference Include="Vsxmd" Version="1.4.2">
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <None Update="Core\FluentRegisterGenerated.tt">

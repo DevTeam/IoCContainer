@@ -28,15 +28,15 @@
         {
             services.AddMvc().AddControllersAsServices();
 
-            // Create IoC container
-            var container = Container.Create()
+            return Container
+                // Create IoC container
+                .Create()
                 // using .NET ASP Feature
                 .Using(new AspNetCoreFeature(services))
                 // using Glue
-                .Using<Glue>();
-
-            // Resolve IServiceProvider
-            return container.Resolve<IServiceProvider>();
+                .Using<Glue>()
+                // Resolve IServiceProvider
+                .Resolve<IServiceProvider>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

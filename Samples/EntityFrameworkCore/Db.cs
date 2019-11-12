@@ -4,9 +4,9 @@ namespace EntityFrameworkCore
 {
     using Microsoft.EntityFrameworkCore;
 
-    internal class PeopleDbContext: DbContext
+    internal class Db: DbContext
     {
-        public PeopleDbContext(DbContextOptions options)
+        public Db(DbContextOptions options)
             :base(options)
         { }
 

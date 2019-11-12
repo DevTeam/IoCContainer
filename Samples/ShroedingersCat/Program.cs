@@ -16,7 +16,6 @@ namespace ShroedingersCat
     using System.Threading.Tasks;
     using IoC;
     using static System.Console;
-    using static IoC.Lifetime;
 
     class Program
     {
@@ -94,9 +93,13 @@ namespace ShroedingersCat
 
     class ShroedingersCat : ICat
     {
-        public ShroedingersCat(State state) => State = state;
+        // Superposition of the state
+        private readonly Lazy<State> _superposition;
 
-        public State State { get; }
+        public ShroedingersCat(Lazy<State> superposition) => _superposition = superposition;
+
+        // Decoherence of the superposition at the time of observation via an irreversible process
+        public State State => _superposition.Value;
 
         public override string ToString() => $"{State} cat";
     }
@@ -109,10 +112,10 @@ namespace ShroedingersCat
                 .Bind<IBox<TT>>().To<CardboardBox<TT>>()
                 .Bind<ICat>().To<ShroedingersCat>();
 
-            // Models a random subatomic event that may or may not occur.
-            yield return container
-                .Bind<Random>().As(Singleton).To<Random>()
-                .Bind<State>().To(ctx => (State)ctx.Container.Resolve<Random>().Next(2));
+            // Models a random subatomic event that may or may not occur
+            var indeterminacy = new Random();
+            // Quantum superposition
+            yield return container.Bind<State>().To(ctx => (State)indeterminacy.Next(2));
         }
     }
 }

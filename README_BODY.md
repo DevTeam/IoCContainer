@@ -26,9 +26,15 @@ class CardboardBox<T> : IBox<T>
 
 class ShroedingersCat : ICat
 {
-    public ShroedingersCat(State state) => State = state;
+    // Superposition of the state
+    private readonly Lazy<State> _superposition;
 
-    public State State { get; }
+    public ShroedingersCat(Lazy<State> superposition) => _superposition = superposition;
+
+    // Decoherence of the superposition at the time of observation via an irreversible process
+    public State State => _superposition.Value;
+
+    public override string ToString() => $"{State} cat";
 }
 ```
 
@@ -59,17 +65,17 @@ _You can do this anywhere in your code, but collecting this information in one p
 ```csharp
 class Glue : IConfiguration
 {
-    public IEnumerable<IToken> Apply(IContainer container)
-    {
-        yield return container
-            .Bind<IBox<TT>>().To<CardboardBox<TT>>()
-            .Bind<ICat>().To<ShroedingersCat>();
+  public IEnumerable<IToken> Apply(IContainer container)
+  {
+    yield return container
+      .Bind<IBox<TT>>().To<CardboardBox<TT>>()
+      .Bind<ICat>().To<ShroedingersCat>();
 
-        // Models a random subatomic event that may or may not occur.
-        yield return container
-            .Bind<Random>().As(Singleton).To<Random>()
-            .Bind<State>().To(ctx => (State)ctx.Container.Resolve<Random>().Next(2));
-    }
+    // Models a random subatomic event that may or may not occur
+    var indeterminacy = new Random();
+    // Quantum superposition
+    yield return container.Bind<State>().To(ctx => (State)indeterminacy.Next(2));
+  }
 }
 ```
 
@@ -120,13 +126,13 @@ _**The incredible performance and the memory traffic minimization make it possib
 
 ## NuGet packages
 
-|     | binary packages | source code packages * |
+|     | binary packages | source code packages ¹ |
 | --- | --- | ---|
 | ![IoC container](https://img.shields.io/badge/core-IoC%20container-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) | [![NuGet](https://buildstats.info/nuget/IoC.Container.Source)](https://www.nuget.org/packages/IoC.Container.Source) |
 | ![ASP.NET Core](https://img.shields.io/badge/feature-ASP.NET%20Core-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source) |
 | ![Interception](https://img.shields.io/badge/feature-Interception-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.Interception)](https://www.nuget.org/packages/IoC.Interception) | [![NuGet](https://buildstats.info/nuget/IoC.Interception.Source)](https://www.nuget.org/packages/IoC.Interception.Source) |
 
-* _source code packages_ require C# 7.0 or higher.
+¹ _source code packages_ require C# 7.0 or higher
 
 ## Class References
 
@@ -158,15 +164,15 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
 {
   services.AddMvc().AddControllersAsServices();
 
-  // Create IoC container
-  var container = Container.Create()
+  return Container
+    // Create IoC container
+    .Create()
     // using .NET ASP Feature
     .Using(new AspNetCoreFeature(services))
     // using Glue
-    .Using<Glue>();
-
-  // Resolve IServiceProvider
-  return container.Resolve<IServiceProvider>();
+    .Using<Glue>()
+    // Resolve IServiceProvider
+    .Resolve<IServiceProvider>();
 }
 ```
 
@@ -188,13 +194,29 @@ For more information please see [this sample](Samples/AspNetCore).
   dotnet add package IoC.Interception
   ```
 
-### Create the _IoC container_ using _InterceptionFeature_ and intercept all invocations to _Service_ by your _MyInterceptor_
+### Add _InterceptionFeature_ to intercept calls to _IService_ by your own _MyInterceptor_
 
 ```csharp
-using var container = Container.Create().Using<InterceptionFeature>();
-using (container.Bind<IService>().To<Service>())
-using (container.Intercept<IService>(new MyInterceptor()))
-{ }
+using var container = Container
+  .Create()
+  .Using<InterceptionFeature>()
+  .Bind<IService>().To<Service>()
+  .Intercept<IService>(new MyInterceptor());
+
+container.Resolve<IService>();
+
+```
+
+where _MyInterceptor_ looks like:
+
+```csharp
+class MyInterceptor : IInterceptor
+{
+  // Intercepts the invocations and appends some logic here
+  public void Intercept(IInvocation invocation)
+  {
+  }
+}
 ```
 
 ## Why this one?

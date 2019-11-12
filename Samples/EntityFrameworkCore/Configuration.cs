@@ -1,12 +1,12 @@
 ﻿// ReSharper disable RedundantTypeArgumentsOfMethod
 namespace EntityFrameworkCore
 {
+    using System;
     using System.Collections.Generic;
     using IoC;
     using IoC.Features;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
-    using static IoC.Lifetime;
 
     internal class Configuration: IConfiguration
     {
@@ -14,14 +14,27 @@ namespace EntityFrameworkCore
         {
             // Create ASP .NET core feature
             var aspNetCoreFeature = new AspNetCoreFeature();
-            aspNetCoreFeature.AddDbContext<PeopleDbContext>(
-                        options => options.UseInMemoryDatabase("People"),
-                        ServiceLifetime.Transient);
+            aspNetCoreFeature.AddDbContext<Db>(
+                options => options.UseInMemoryDatabase("Sample DB"),
+                ServiceLifetime.Singleton);
 
-            // Apply ASP.NET core feature
-            yield return container.Apply(aspNetCoreFeature)
-                .Bind<IIdGenerator>().As(Singleton).To<IdGenerator>()
-                .Bind<Person>().To<Person>(ctx => new Person(ctx.Container.Resolve<IIdGenerator>().Generate()));
+            // Id generator
+            var currentId = new Id();
+            var lockObject = new object();
+            var id = new Func<Id>(() =>
+            {
+                lock (lockObject)
+                {
+                    return currentId = new Id(currentId);
+                }
+            });
+
+            yield return container
+                // Apply ASP.NET core feature
+                .Apply(aspNetCoreFeature)
+                // Add required bindings
+                .Bind<Id>().To(ctx => id())
+                .Bind<Person>().To<Person>();
         }
     }
 }
