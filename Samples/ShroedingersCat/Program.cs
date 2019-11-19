@@ -1,78 +1,28 @@
-﻿// ReSharper disable UnusedMemberInSuper.Global
+﻿// ReSharper disable ArrangeTypeModifiers
 // ReSharper disable ClassNeverInstantiated.Global
-// ReSharper disable ParameterTypeCanBeEnumerable.Local
-// ReSharper disable ArrangeTypeModifiers
 // ReSharper disable ArrangeTypeMemberModifiers
-// ReSharper disable RedundantTypeArgumentsOfMethod
-// ReSharper disable UnusedMember.Global
-#pragma warning disable 618
+// ReSharper disable InconsistentNaming
+// ReSharper disable CommentTypo
 namespace ShroedingersCat
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Reactive.Linq;
-    using System.Threading;
-    using System.Threading.Tasks;
     using IoC;
     using static System.Console;
 
     class Program
     {
-        public Program(
-            ICat cat,
-            IBox<ICat> box,
-            IBox<IBox<ICat>> bigBox,
-            Func<IBox<ICat>> func,
-            Task<IBox<ICat>> task,
-            Tuple<IBox<ICat>, ICat, IBox<IBox<ICat>>> tuple,
-            Lazy<IBox<ICat>> lazy,
-            IEnumerable<IBox<ICat>> enumerable,
-#if NETCOREAPP3_0
-            IAsyncEnumerable<IBox<ICat>> asyncEnumerable,
-#endif
-            IBox<ICat>[] array,
-            IList<IBox<ICat>> list,
-            ISet<IBox<ICat>> set,
-            IObservable<IBox<ICat>> observable,
-            IBox<Lazy<Func<IEnumerable<IBox<ICat>>>>> complex,
-            ThreadLocal<IBox<ICat>> threadLocal,
-            ValueTask<IBox<ICat>> valueTask,
-            (IBox<ICat> box, ICat cat, IBox<IBox<ICat>> bigBox) valueTuple)
+        // Entry point
+        public static void Main()
         {
-            WriteLine(cat);
-            WriteLine(box);
-            WriteLine(bigBox);
-            WriteLine("{0} from func", func());
-            WriteLine("Tuple of {0}", tuple);
-            WriteLine("Lazy of {0}", lazy.Value);
-            WriteLine("Enumeration {0}", enumerable.Single());
-            WriteLine("Array of {0}", array.Single());
-            WriteLine("List of {0}", list.Single());
-            WriteLine("Set of {0}", set.Single());
-            WriteLine("Observable of {0}", observable.Single());
-            WriteLine("Complex {0}", complex.Content.Value().Single());
-            WriteLine("Thread local {0}", threadLocal.Value);
-            WriteLine("Value tuple of {0}", valueTuple);
+            // Creates an Inversion of Control container
+            using var container = Container.Create().Using<Glue>();
 
-            async Task Async()
-            {
-                WriteLine("{0} from task", await task);
-                WriteLine("{0} from value task", await valueTask);
-#if NETCOREAPP3_0
-                await foreach (var element in asyncEnumerable)
-                {
-                    WriteLine("Async Enumeration {0}", element);
-                }
-#endif
-            }
-
-            Async().Wait();
-        }
-
-        static void Main()
-        {
-            using (new Glue().BuildUp<Program>()) { }
+            // Gets a cardboard box in the same way as the following expression:
+            // var box = new CardboardBox<ICat>(new ShroedingersCat(new Lazy<State>(() => (State)indeterminacy.Next(2))));
+            var box = container.Resolve<IBox<ICat>>();
+            // Checks the cat's state
+            WriteLine(box.Content);
         }
     }
 
@@ -87,18 +37,16 @@ namespace ShroedingersCat
         public CardboardBox(T content) => Content = content;
 
         public T Content { get; }
-
-        public override string ToString() => $"[{Content}]";
     }
 
     class ShroedingersCat : ICat
     {
-        // Superposition of the state
+        // Represents the superposition of the states
         private readonly Lazy<State> _superposition;
 
         public ShroedingersCat(Lazy<State> superposition) => _superposition = superposition;
 
-        // Decoherence of the superposition at the time of observation via an irreversible process
+        // The decoherence of the superposition at the time of observation via an irreversible process
         public State State => _superposition.Value;
 
         public override string ToString() => $"{State} cat";
@@ -109,12 +57,14 @@ namespace ShroedingersCat
         public IEnumerable<IToken> Apply(IContainer container)
         {
             yield return container
+                // Represents a cardboard box with any content
                 .Bind<IBox<TT>>().To<CardboardBox<TT>>()
+                // Represents schrodinger's cat
                 .Bind<ICat>().To<ShroedingersCat>();
 
             // Models a random subatomic event that may or may not occur
             var indeterminacy = new Random();
-            // Quantum superposition
+            // Represents a quantum superposition of 2 states: Alive or Dead
             yield return container.Bind<State>().To(ctx => (State)indeterminacy.Next(2));
         }
     }

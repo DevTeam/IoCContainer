@@ -2,7 +2,7 @@
 
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE) [<img src="http://tcavs2015.cloudapp.net/app/rest/builds/buildType:(id:DevTeam_IoCContainer_Build)/statusIcon"/>](http://tcavs2015.cloudapp.net/viewType.html?buildTypeId=DevTeam_IoCContainer_Build&guest=1)
 
-## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://dotnetfiddle.net/dRebQM)
+## [Schrödinger's cat](Samples/ShroedingersCat) shows how it works [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://dotnetfiddle.net/YoDYA7)
 
 ### The reality is that
 
@@ -30,15 +30,15 @@ class CardboardBox<T> : IBox<T>
 
 class ShroedingersCat : ICat
 {
-    // Superposition of the state
-    private readonly Lazy<State> _superposition;
+  // Represents the superposition of the states
+  private readonly Lazy<State> _superposition;
 
-    public ShroedingersCat(Lazy<State> superposition) => _superposition = superposition;
+  public ShroedingersCat(Lazy<State> superposition) => _superposition = superposition;
 
-    // Decoherence of the superposition at the time of observation via an irreversible process
-    public State State => _superposition.Value;
+  // The decoherence of the superposition at the time of observation via an irreversible process
+  public State State => _superposition.Value;
 
-    public override string ToString() => $"{State} cat";
+  public override string ToString() => $"{State} cat";
 }
 ```
 
@@ -67,17 +67,19 @@ Declare the required dependencies in a dedicated class _Glue_.
 _You can do this anywhere in your code, but collecting this information in one place is often the best solution to maintain order._
 
 ```csharp
-class Glue : IConfiguration
+public class Glue : IConfiguration
 {
   public IEnumerable<IToken> Apply(IContainer container)
   {
     yield return container
+      // Represents a cardboard box with any content
       .Bind<IBox<TT>>().To<CardboardBox<TT>>()
+      // Represents schrodinger's cat
       .Bind<ICat>().To<ShroedingersCat>();
 
     // Models a random subatomic event that may or may not occur
     var indeterminacy = new Random();
-    // Quantum superposition
+    // Represents a quantum superposition of 2 states: Alive or Dead
     yield return container.Bind<State>().To(ctx => (State)indeterminacy.Next(2));
   }
 }
@@ -85,48 +87,25 @@ class Glue : IConfiguration
 
 ### Time to open boxes!
 
-Build up _Program_ using _Glue_
-
 ```csharp
-using (new Glue().BuildUp<Program>()) { }
+// Creates an Inversion of Control container
+using var container = Container.Create().Using<Glue>();
+
+// Gets a cardboard box in the same way as the following expression:
+// var box = new CardboardBox<ICat>(new ShroedingersCat(new Lazy<State>(() => (State)indeterminacy.Next(2))));
+var box = container.Resolve<IBox<ICat>>();
+// Checks the cat's state
+WriteLine(box.Content);
 ```
 
-IoC container injects all required dependencies via _Program_ constructor (also it can be done via methods, properties or even fields). Of course the same is true for dependencies of dependencies. It works for most of well-known .net data strucures automatically as well.
+Each dependency is resolved by a strongly-typed block of statements like the operator `new` which is compiled on the fly from the coresponding expression tree to create or to get a required dependency instance with minimal impact on performance or memory consumtion. For instance, the getting (or injecting) of a box looks like:
 
 ```csharp
-public Program(
-  ICat cat,
-  IBox<ICat> box,
-  IBox<IBox<ICat>> bigBox,
-  Func<IBox<ICat>> func,
-  Task<IBox<ICat>> task,
-  Tuple<IBox<ICat>, ICat, IBox<IBox<ICat>>> tuple,
-  Lazy<IBox<ICat>> lazy,
-  IEnumerable<IBox<ICat>> enumerable,
-  IAsyncEnumerable<IBox<ICat>> asyncEnumerable,
-  IBox<ICat>[] array,
-  IList<IBox<ICat>> list,
-  ISet<IBox<ICat>> set,
-  IObservable<IBox<ICat>> observable,
-  IBox<Lazy<Func<IEnumerable<IBox<ICat>>>>> complex,
-  ThreadLocal<IBox<ICat>> threadLocal,
-  ValueTask<IBox<ICat>> valueTask,
-  (IBox<ICat> box, ICat cat, IBox<IBox<ICat>> bigBox) valueTuple) { ... }
+var indeterminacy = new Random();
+var box = new CardboardBox<ICat>(new ShroedingersCat(new Lazy<State>(() => (State)indeterminacy.Next(2))));
 ```
 
-![Cat is alive](https://github.com/DevTeam/IoCContainer/blob/master/Docs/Images/cat-is-alive.png?raw=true)
-
-### Under the hood
-
-Actually each dependency is resolved by a strongly-typed block of statements like the operator `new` which is compiled from the coresponding expression tree to create or to get a required dependency instance with minimal impact on performance or memory consumtion. For instance, the calling of constructor `Program` looks like:
-
-```csharp
-new Program(new ShroedingersCat() , new CardboardBox<ShroedingersCat>(new ShroedingersCat()), ...);
-```
-
-This works the same way for any initializing methods, properties or fields.
-
-_**The incredible performance and the memory traffic minimization make it possible to use all benefits of dependency injection everywhere and everytime without any compromises - just like a keyword `new`.**_
+It allows you to take full advantage of dependency injection everywhere and every time without any compromises - in the same way as just a `new` keyword to create any instances.
 
 ## NuGet packages
 
