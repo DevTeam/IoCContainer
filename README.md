@@ -111,9 +111,9 @@ It allows you to take full advantage of dependency injection everywhere and ever
 
 |     | binary packages | source code packages ¹ |
 | --- | --- | ---|
-| ![IoC container](https://img.shields.io/badge/core-IoC%20container-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) | [![NuGet](https://buildstats.info/nuget/IoC.Container.Source)](https://www.nuget.org/packages/IoC.Container.Source) |
-| ![ASP.NET Core](https://img.shields.io/badge/feature-ASP.NET%20Core-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source) |
-| ![Interception](https://img.shields.io/badge/feature-Interception-orange.svg) | [![NuGet](https://buildstats.info/nuget/IoC.Interception)](https://www.nuget.org/packages/IoC.Interception) | [![NuGet](https://buildstats.info/nuget/IoC.Interception.Source)](https://www.nuget.org/packages/IoC.Interception.Source) |
+| IoC container | [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) | [![NuGet](https://buildstats.info/nuget/IoC.Container.Source)](https://www.nuget.org/packages/IoC.Container.Source) |
+| ASP.NET Core | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source) |
+| Interception | [![NuGet](https://buildstats.info/nuget/IoC.Interception)](https://www.nuget.org/packages/IoC.Interception) | [![NuGet](https://buildstats.info/nuget/IoC.Interception.Source)](https://www.nuget.org/packages/IoC.Interception.Source) |
 
 ¹ _source code packages_ require C# 7.0 or higher
 
@@ -124,9 +124,9 @@ It allows you to take full advantage of dependency injection everywhere and ever
 - [.NET Core 3.0](Docs/IoC_netcoreapp3.0.md)
 - [UWP 10.0](Docs/IoC_uap10.0.md)
 
-## ![ASP.NET Core](https://img.shields.io/badge/feature-ASP.NET%20Core-orange.svg)
+## ASP.NET Core
 
-### Add the [_NuGet_ package](https://www.nuget.org/packages/IoC.AspNetCore) reference
+### Add the  [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) reference (or [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source))
 
 - Package Manager
 
@@ -148,22 +148,22 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
   services.AddMvc().AddControllersAsServices();
 
   return Container
-    // Create IoC container
+    // Creates an Inversion of Control container
     .Create()
     // using .NET ASP Feature
     .Using(new AspNetCoreFeature(services))
     // using Glue
     .Using<Glue>()
-    // Resolve IServiceProvider
+    // Resolves IServiceProvider
     .Resolve<IServiceProvider>();
 }
 ```
 
 For more information please see [this sample](Samples/AspNetCore).
 
-## ![Interception](https://img.shields.io/badge/feature-Interception-orange.svg)
+## Interception
 
-### Add the [_NuGet_ package](https://www.nuget.org/packages/IoC.Interception) reference
+### Add the [![NuGet](https://buildstats.info/nuget/IoC.Interception)](https://www.nuget.org/packages/IoC.Interception) reference (or [![NuGet](https://buildstats.info/nuget/IoC.Interception.Source)](https://www.nuget.org/packages/IoC.Interception.Source))
 
 - Package Manager
 
@@ -181,16 +181,20 @@ For more information please see [this sample](Samples/AspNetCore).
 
 ```csharp
 using var container = Container
+  // Creates an Inversion of Control container
   .Create()
+  // Using the feature InterceptionFeature
   .Using<InterceptionFeature>()
+  // Configures binds
   .Bind<IService>().To<Service>()
+  // Configures interception for IService calls
   .Intercept<IService>(new MyInterceptor());
 
 container.Resolve<IService>();
 
 ```
 
-where _MyInterceptor_ looks like:
+where _MyInterceptor_ could look like:
 
 ```csharp
 class MyInterceptor : IInterceptor
@@ -198,9 +202,12 @@ class MyInterceptor : IInterceptor
   // Intercepts the invocations and appends some logic here
   public void Intercept(IInvocation invocation)
   {
+    ..
   }
 }
 ```
+
+For details please see [this sample](IoC.Tests/UsageScenarios/Interception.cs).
 
 ## Why this one?
 

@@ -84,9 +84,10 @@
                 }
             }
 
-            yield return container.Bind<IServiceProvider>().Lifetime(singletonLifetimeResolver(container)).To<ServiceProvider>();
-            yield return container.Bind<IServiceScopeFactory>().Lifetime(singletonLifetimeResolver(container)).To<ServiceScopeFactory>();
-            yield return container.Bind<IServiceScope>().To<ServiceScope>(ctx => new ServiceScope(ctx.Container.Inject<Scope>(), ctx.Container.Inject<IContainer>()));
+            yield return container
+                .Bind<IServiceProvider>().Lifetime(singletonLifetimeResolver(container)).To<ServiceProvider>()
+                .Bind<IServiceScopeFactory>().Lifetime(singletonLifetimeResolver(container)).To<ServiceScopeFactory>()
+                .Bind<IServiceScope>().To<ServiceScope>(ctx => new ServiceScope(ctx.Container.Inject<Scope>(), ctx.Container.Inject<IContainer>()));
         }
     }
 }

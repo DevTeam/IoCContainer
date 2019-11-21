@@ -29,13 +29,13 @@
             services.AddMvc().AddControllersAsServices();
 
             return Container
-                // Create IoC container
+                // Creates an Inversion of Control container
                 .Create()
                 // using .NET ASP Feature
                 .Using(new AspNetCoreFeature(services))
                 // using Glue
                 .Using<Glue>()
-                // Resolve IServiceProvider
+                // Resolves IServiceProvider
                 .Resolve<IServiceProvider>();
         }
 

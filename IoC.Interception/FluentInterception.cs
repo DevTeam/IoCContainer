@@ -28,7 +28,7 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (filter == null) throw new ArgumentNullException(nameof(filter));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
-            return container.Resolve<IInterceptorRegistry>().Register(container, filter, interceptors);
+            return container.GetRegistry().Register(container, filter, interceptors);
         }
 
         /// <summary>
@@ -104,7 +104,20 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
 
-            return container.Resolve<IInterceptorRegistry>().Register(container, (targetKey) => Filter(targetKey, key), interceptors);
+            return container.GetRegistry().Register(container, (targetKey) => Filter(targetKey, key), interceptors);
+        }
+
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        private static IInterceptorRegistry GetRegistry([NotNull] this IContainer container)
+        {
+            if (container.TryGetResolver<IInterceptorRegistry>(typeof(IInterceptorRegistry), out var resolver))
+            {
+                return resolver(container);
+            }
+
+            throw new InvalidOperationException($"Apply the configuration '{typeof(InterceptionFeature).Name}' before an interception. For details please see this sample: https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Interception.cs");
         }
 
         private static bool Filter(Key targetKey, Key key)
