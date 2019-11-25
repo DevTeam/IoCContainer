@@ -5,10 +5,10 @@
 
     internal class ServiceScope : IServiceScope, IServiceProvider
     {
-        [NotNull] private readonly Scope _scope;
+        [NotNull] private readonly IScope _scope;
         [NotNull] private readonly IContainer _container;
 
-        public ServiceScope([NotNull] Scope scope, [NotNull] IContainer container)
+        public ServiceScope([NotNull] IScope scope, [NotNull] IContainer container)
         {
             _scope = scope ?? throw new ArgumentNullException(nameof(scope));
             _container = container ?? throw new ArgumentNullException(nameof(container));
@@ -18,7 +18,7 @@
 
         public object GetService(Type serviceType)
         {
-            using (_scope.Begin())
+            using (_scope.Activate())
             {
                 return _container.Resolve<object>(serviceType);
             }

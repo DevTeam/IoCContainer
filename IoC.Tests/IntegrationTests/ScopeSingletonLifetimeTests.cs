@@ -2,6 +2,7 @@
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using Core;
     using Moq;
     using Shouldly;
     using Xunit;
@@ -25,10 +26,10 @@
                 // Default resolving scope
                 var instance1 = (MyService) container.Resolve<IMyService>("abc");
 
-                // Resolving scope 2
+                // Resolve scope
                 MyService instance2;
-                using (var scope = new Scope(2))
-                using (scope.Begin())
+                using (var scope = container.Resolve<IScope>())
+                using (scope.Activate())
                 {
                     instance2 = (MyService) container.Resolve<IMyService>("xyz");
                 }
@@ -65,8 +66,8 @@
 
                     // Resolving scope 2
                     MyService instance2;
-                    using (var scope = new Scope(2))
-                    using (scope.Begin())
+                    using (var scope = container.Resolve<IScope>())
+                    using (scope.Activate())
                     {
                         instance2 = (MyService) container.Resolve<IMyService>("xyz");
                     }
@@ -91,13 +92,13 @@
             using var container = Container.Create();
             using (container.Bind<IMyDisposableService>().As(Lifetime.ScopeSingleton).To(ctx => mock.Object))
             {
-                var scope = new Scope(99);
-                using (scope.Begin())
+                var scope = (Scope)container.Resolve<IScope>();
+                using (scope.Activate())
                 {
                     var instance = container.Resolve<IMyDisposableService>();
                 }
 
-                // When                
+                // When
                 scope.Dispose();
 
                 // Then
@@ -117,8 +118,8 @@
             var mock = new Mock<IMyDisposableService>();
             using var container = Container.Create();
             var subscriptionToken = container.Bind<IMyDisposableService>().As(Lifetime.ScopeSingleton).To(ctx => mock.Object);
-            var scope = new Scope(99);
-            using (scope.Begin())
+            var scope = (Scope)container.Resolve<IScope>();
+            using (scope.Activate())
             {
                 var instance = container.Resolve<IMyDisposableService>();
             }
@@ -152,8 +153,9 @@
                 using var childContainer = container.Create();
                 using (childContainer.Bind<IMyService1>().To(ctx => myService12.Object))
                 using (childContainer.Bind<string>().To(ctx => "xyz"))
-                using (var scope = new Scope(99))
                 {
+                    using var scope = container.Resolve<IScope>();
+
                     // Then
                     var instance = childContainer.Resolve<IMyService>();
                     instance.ShouldNotBeNull();

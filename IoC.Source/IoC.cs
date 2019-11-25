@@ -1231,7 +1231,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IToken AsTokenOf([NotNull] this IDisposable disposableToken, [NotNull] IContainer container) =>
-            new DependencyToken(container ?? throw new ArgumentNullException(nameof(container)), disposableToken ?? throw new ArgumentNullException(nameof(disposableToken)));
+            new Token(container ?? throw new ArgumentNullException(nameof(container)), disposableToken ?? throw new ArgumentNullException(nameof(disposableToken)));
 
         /// <summary>
         /// Applies text configurations for the target container.
@@ -2117,7 +2117,7 @@ namespace IoC
 
             if (container.TryGetResolver<TInstance>(typeof(TInstance), null, out var resolver, out _, container))
             {
-                return new Holder<TInstance>(new DependencyToken(container, Disposable.Empty), resolver(container, args));
+                return new Holder<TInstance>(new Token(container, Disposable.Empty), resolver(container, args));
             }
 
             var buildId = Guid.NewGuid();
@@ -4793,6 +4793,33 @@ namespace IoC
 }
 
 #endregion
+#region FluentScope
+
+namespace IoC
+{
+    using System;
+
+    /// <summary>
+    /// Represents extensions dealing with scopes.
+    /// </summary>
+    public static class FluentScope
+    {
+        /// <summary>
+        /// Creates new resolving scope. Can be used with <c>ScopeSingleton</c>.
+        /// </summary>
+        /// <param name="container">A container to resolve a scope.</param>
+        /// <returns>Tne new scope instance.</returns>
+        [NotNull]
+        public static IScope CreateScope([NotNull] this IContainer container)
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return container.Resolve<IScope>();
+        }
+    }
+}
+
+
+#endregion
 #region GenericTypeArgumentAttribute
 
 namespace IoC
@@ -5520,6 +5547,27 @@ namespace IoC
 
 
 #endregion
+#region IScope
+
+namespace IoC
+{
+    using System;
+
+    /// <summary>
+    /// Represents the scope which could be used with <c>Lifetime.ScopeSingleton</c>
+    /// </summary>
+    [PublicAPI]
+    public interface IScope : IDisposable
+    {
+        /// <summary>
+        /// Activate the scope.
+        /// </summary>
+        /// <returns>The token to deactivate the scope.</returns>
+        IDisposable Activate();
+    }
+}
+
+#endregion
 #region IToken
 
 namespace IoC
@@ -5663,94 +5711,6 @@ namespace IoC
 
 
 #endregion
-#region Scope
-
-namespace IoC
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Core;
-
-    /// <summary>
-    /// Represents the scope which could be used with <c>Lifetime.ScopeSingleton</c>
-    /// </summary>
-    [PublicAPI]
-    public sealed class Scope: IDisposable
-    {
-        [NotNull] private static readonly Scope Default = new Scope(DefaultScopeKey.Shared);
-        [CanBeNull] [ThreadStatic] private static Scope _current;
-        [NotNull] internal readonly object ScopeKey;
-        [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
-        [CanBeNull] private Scope _prevScope;
-
-        /// <summary>
-        /// The current scope.
-        /// </summary>
-        [NotNull]
-        public static Scope Current => _current ?? Default;
-
-        /// <summary>
-        /// Creates the instance of a new scope.
-        /// </summary>
-        /// <param name="scopeKey">The key of scope.</param>
-        public Scope([NotNull] object scopeKey) => ScopeKey = scopeKey ?? throw new ArgumentNullException(nameof(scopeKey));
-
-        /// <summary>
-        /// Begins scope.
-        /// </summary>
-        /// <returns>The scope token to end the scope.</returns>
-        public IDisposable Begin()
-        {
-            _prevScope = Current;
-            _current = this;
-            return Disposable.Create(() => { _current = _prevScope ?? throw new NotSupportedException(); });
-        }
-
-        /// <inheritdoc />
-        public void Dispose()
-        {
-            foreach (var resource in _resources.ToList())
-            {
-                resource.Dispose();
-            }
-
-            _resources.Clear();
-        }
-
-        /// <inheritdoc />
-        public override bool Equals(object obj)
-        {
-            if (obj is null) return false;
-            if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return ScopeKey.Equals(((Scope) obj).ScopeKey);
-        }
-
-        /// <inheritdoc />
-        public override int GetHashCode() => ScopeKey.GetHashCode();
-
-        internal int ResourceCount => _resources.Count;
-
-        internal void RegisterResource(IDisposable resource) => _resources.Add(resource);
-
-        internal void UnregisterResource(IDisposable resource) => _resources.Remove(resource);
-
-        private class DefaultScopeKey
-        {
-            public static readonly object Shared = new DefaultScopeKey();
-
-            private DefaultScopeKey()
-            {
-            }
-
-            public override string ToString() => "Default Resolving Scope Key";
-        }
-    }
-}
-
-
-#endregion
 #region Tag
 
 namespace IoC
@@ -5822,12 +5782,6 @@ namespace IoC
         /// </summary>
         [NotNull]
         public static readonly ParameterExpression ArgsParameter = Expression.Parameter(TypeDescriptor<object[]>.Type, nameof(Context.Args));
-
-        /// <summary>
-        /// All resolvers parameters.
-        /// </summary>
-        [NotNull][ItemNotNull]
-        public static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression>{ ContainerParameter, ArgsParameter };
     }
 }
 
@@ -6211,7 +6165,7 @@ namespace IoC.Features
             // Scope
             long scopeId = 0;
             Func<long> createScopeId = () => Interlocked.Increment(ref scopeId);
-            yield return container.Register(ctx => new Scope(createScopeId()));
+            yield return container.Register<IScope>(ctx => new Scope(createScopeId()));
 
             // ThreadLocal
             yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Feature.AnyTag);
@@ -6784,10 +6738,10 @@ namespace IoC.Lifetimes
     /// Represents singleton per scope lifetime.
     /// </summary>
     [PublicAPI]
-    public sealed class ScopeSingletonLifetime: KeyBasedLifetime<Scope>
+    public sealed class ScopeSingletonLifetime: KeyBasedLifetime<IScope>
     {
         /// <inheritdoc />
-        protected override Scope CreateKey(IContainer container, object[] args) => Scope.Current;
+        protected override IScope CreateKey(IContainer container, object[] args) => Scope.Current;
 
         /// <inheritdoc />
         public override string ToString() => Lifetime.ScopeSingleton.ToString();
@@ -6796,29 +6750,39 @@ namespace IoC.Lifetimes
         public override ILifetime Create() => new ScopeSingletonLifetime();
 
         /// <inheritdoc />
-        protected override T OnNewInstanceCreated<T>(T newInstance, Scope scope, IContainer container, object[] args)
+        protected override T OnNewInstanceCreated<T>(T newInstance, IScope scope, IContainer container, object[] args)
         {
+            if (!(scope is IResourceRegistry resourceRegistry))
+            {
+                return newInstance;
+            }
+
             if (newInstance is IDisposable disposable)
             {
-                scope.RegisterResource(disposable);
+                resourceRegistry.RegisterResource(disposable);
             }
 
 #if NETCOREAPP3_0
-            if (newInstance is IAsyncDisposable asyncDisposable)
-            {
-                scope.RegisterResource(asyncDisposable.ToDisposable());
-            }
+                if (newInstance is IAsyncDisposable asyncDisposable)
+                {
+                    resourceRegistry.RegisterResource(asyncDisposable.ToDisposable());
+                }
 #endif
 
             return newInstance;
         }
 
         /// <inheritdoc />
-        protected override void OnInstanceReleased(object releasedInstance, Scope scope)
+        protected override void OnInstanceReleased(object releasedInstance, IScope scope)
         {
+            if (!(scope is IResourceRegistry resourceRegistry))
+            {
+                return;
+            }
+
             if (releasedInstance is IDisposable disposable)
             {
-                scope.UnregisterResource(disposable);
+                resourceRegistry.UnregisterResource(disposable);
                 disposable.Dispose();
             }
 
@@ -6826,7 +6790,7 @@ namespace IoC.Lifetimes
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();
-                scope.UnregisterResource(disposable);
+                resourceRegistry.UnregisterResource(disposable);
                 disposable.Dispose();
             }
 #endif
@@ -8323,6 +8287,11 @@ namespace IoC.Core
 
     internal sealed class DependencyEntry : IToken
     {
+        /// <summary>
+        /// All resolvers parameters.
+        /// </summary>
+        [NotNull] [ItemNotNull] internal static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression> { WellknownExpressions.ContainerParameter, WellknownExpressions.ArgsParameter };
+
         [CanBeNull] internal readonly ILifetime Lifetime;
         [NotNull] internal readonly IEnumerable<Key> Keys;
         [NotNull] internal readonly IDependency Dependency;
@@ -8379,7 +8348,7 @@ namespace IoC.Core
                 return false;
             }
 
-            var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, WellknownExpressions.ResolverParameters);
+            var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, ResolverParameters);
             resolver = ExpressionCompiler.Shared.Compile(resolverExpression);
             error = default(Exception);
             return true;
@@ -8416,7 +8385,7 @@ namespace IoC.Core
                 }
 
                 return lifetime;
-            }            
+            }
         }
 
         public void Dispose()
@@ -8442,7 +8411,7 @@ namespace IoC.Core
             }
         }
 
-        public override string ToString() => $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
+        public override string ToString() => $"{String.Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
 
         private struct LifetimeKey
         {
@@ -8452,7 +8421,7 @@ namespace IoC.Core
             public LifetimeKey(Type[] genericTypes)
             {
                 _genericTypes = genericTypes;
-                _hashCode = genericTypes.GetHash();                
+                _hashCode = genericTypes.GetHash();
             }
 
             // ReSharper disable once PossibleNullReferenceException
@@ -8793,32 +8762,6 @@ namespace IoC.Core
         }
 
         private delegate IContainer ContainerSelector(IContainer container);
-    }
-}
-
-
-#endregion
-#region DependencyToken
-
-namespace IoC.Core
-{
-    using System;
-    using System.Runtime.CompilerServices;
-
-    internal struct DependencyToken: IToken
-    {
-        [NotNull] private readonly IDisposable _dependencyToken;
-
-        public DependencyToken([NotNull] IContainer container, [NotNull] IDisposable dependencyToken)
-        {
-            Container = container ?? throw new ArgumentNullException(nameof(container));
-            _dependencyToken = dependencyToken ?? throw new ArgumentNullException(nameof(dependencyToken));
-        }
-
-        public IContainer Container { get; }
-
-        [MethodImpl((MethodImplOptions)256)]
-        public void Dispose() => _dependencyToken.Dispose();
     }
 }
 
@@ -9798,6 +9741,100 @@ namespace IoC.Core
 
 
 #endregion
+#region Scope
+
+namespace IoC.Core
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+
+    [DebuggerDisplay("{" + nameof(ToString) + "()} with {" + nameof(ResourceCount) + "} resources")]
+    internal sealed class Scope: IScope, IResourceRegistry
+    {
+        [NotNull] private static readonly Scope Default = new Scope(0);
+        [CanBeNull] [ThreadStatic] private static Scope _current;
+        internal readonly long ScopeKey;
+        [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
+        [CanBeNull] private Scope _prevScope;
+
+        [NotNull]
+        internal static Scope Current => _current ?? Default;
+
+        public Scope(long scopeKey) => ScopeKey = scopeKey;
+
+        public IDisposable Activate()
+        {
+            if (ReferenceEquals(this, Current))
+            {
+                return Disposable.Empty;
+            }
+
+            _prevScope = Current;
+
+            _current = this;
+            return Disposable.Create(() => { _current = _prevScope ?? throw new NotSupportedException(); });
+        }
+
+        public void Dispose()
+        {
+            List<IDisposable> resources;
+            lock (_resources)
+            {
+                 resources = _resources.ToList();
+                 _resources.Clear();
+            }
+
+            foreach (var resource in resources)
+            {
+                resource.Dispose();
+            }
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is null) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            if (obj.GetType() != GetType()) return false;
+            return ScopeKey.Equals(((Scope) obj).ScopeKey);
+        }
+
+        public void RegisterResource(IDisposable resource)
+        {
+            lock (_resources)
+            {
+                _resources.Add(resource ?? throw new ArgumentNullException(nameof(resource)));
+            }
+        }
+
+        public void UnregisterResource(IDisposable resource)
+        {
+            lock (_resources)
+            {
+                _resources.Remove(resource ?? throw new ArgumentNullException(nameof(resource)));
+            }
+        }
+
+        public override int GetHashCode() => ScopeKey.GetHashCode();
+
+        public override string ToString() => $"#{ScopeKey} Scope";
+
+        internal int ResourceCount
+        {
+            get
+            {
+                lock (_resources)
+                {
+                    return _resources.Count;
+                }
+            }
+        }
+    }
+}
+
+
+#endregion
 #region Subject
 
 namespace IoC.Core
@@ -10050,6 +10087,32 @@ namespace IoC.Core
         }
     }
 }
+
+#endregion
+#region Token
+
+namespace IoC.Core
+{
+    using System;
+    using System.Runtime.CompilerServices;
+
+    internal struct Token: IToken
+    {
+        [NotNull] private readonly IDisposable _dependencyToken;
+
+        public Token([NotNull] IContainer container, [NotNull] IDisposable dependencyToken)
+        {
+            Container = container ?? throw new ArgumentNullException(nameof(container));
+            _dependencyToken = dependencyToken ?? throw new ArgumentNullException(nameof(dependencyToken));
+        }
+
+        public IContainer Container { get; }
+
+        [MethodImpl((MethodImplOptions)256)]
+        public void Dispose() => _dependencyToken.Dispose();
+    }
+}
+
 
 #endregion
 #region TypeDescriptor

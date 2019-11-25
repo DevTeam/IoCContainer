@@ -14,17 +14,13 @@
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public AspNetCoreFeature()
-        {
-        }
+        public AspNetCoreFeature() { }
 
         /// <summary>
         /// Creates an instance of feature based on a list of ServiceDescriptor.
         /// </summary>
         /// <param name="list"></param>
-        public AspNetCoreFeature([NotNull] IList<ServiceDescriptor> list) : base(list)
-        {
-        }
+        public AspNetCoreFeature([NotNull] IList<ServiceDescriptor> list) : base(list) { }
 
         /// <inheritdoc />
         public IEnumerable<IToken> Apply(IContainer container)
@@ -87,7 +83,7 @@
             yield return container
                 .Bind<IServiceProvider>().Lifetime(singletonLifetimeResolver(container)).To<ServiceProvider>()
                 .Bind<IServiceScopeFactory>().Lifetime(singletonLifetimeResolver(container)).To<ServiceScopeFactory>()
-                .Bind<IServiceScope>().To<ServiceScope>(ctx => new ServiceScope(ctx.Container.Inject<Scope>(), ctx.Container.Inject<IContainer>()));
+                .Bind<IServiceScope>().To<ServiceScope>();
         }
     }
 }

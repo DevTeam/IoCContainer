@@ -73,10 +73,10 @@ namespace IoC.Features.AspNetCore
 
     internal class ServiceScope : IServiceScope, IServiceProvider
     {
-        [NotNull] private readonly Scope _scope;
+        [NotNull] private readonly IScope _scope;
         [NotNull] private readonly IContainer _container;
 
-        public ServiceScope([NotNull] Scope scope, [NotNull] IContainer container)
+        public ServiceScope([NotNull] IScope scope, [NotNull] IContainer container)
         {
             _scope = scope ?? throw new ArgumentNullException(nameof(scope));
             _container = container ?? throw new ArgumentNullException(nameof(container));
@@ -86,7 +86,7 @@ namespace IoC.Features.AspNetCore
 
         public object GetService(Type serviceType)
         {
-            using (_scope.Begin())
+            using (_scope.Activate())
             {
                 return _container.Resolve<object>(serviceType);
             }
@@ -145,17 +145,13 @@ namespace IoC.Features
         /// <summary>
         /// Default constructor.
         /// </summary>
-        public AspNetCoreFeature()
-        {
-        }
+        public AspNetCoreFeature() { }
 
         /// <summary>
         /// Creates an instance of feature based on a list of ServiceDescriptor.
         /// </summary>
         /// <param name="list"></param>
-        public AspNetCoreFeature([NotNull] IList<ServiceDescriptor> list) : base(list)
-        {
-        }
+        public AspNetCoreFeature([NotNull] IList<ServiceDescriptor> list) : base(list) { }
 
         /// <inheritdoc />
         public IEnumerable<IToken> Apply(IContainer container)
@@ -218,7 +214,7 @@ namespace IoC.Features
             yield return container
                 .Bind<IServiceProvider>().Lifetime(singletonLifetimeResolver(container)).To<ServiceProvider>()
                 .Bind<IServiceScopeFactory>().Lifetime(singletonLifetimeResolver(container)).To<ServiceScopeFactory>()
-                .Bind<IServiceScope>().To<ServiceScope>(ctx => new ServiceScope(ctx.Container.Inject<Scope>(), ctx.Container.Inject<IContainer>()));
+                .Bind<IServiceScope>().To<ServiceScope>();
         }
     }
 }

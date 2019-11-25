@@ -22,11 +22,14 @@ namespace IoC.Tests.UsageScenarios
             var methods = new List<string>();
             // Create and configure the container
             using var container = Container
+                // Creates an Inversion of Control container
                 .Create()
+                // Using the feature InterceptionFeature
                 .Using<InterceptionFeature>()
+                // Configures binds
                 .Bind<IDependency>().To<Dependency>()
                 .Bind<IService>().To<Service>()
-                // Configure the interception by 'MyInterceptor'
+                // Configures interception for IService calls
                 .Intercept<IService>(new MyInterceptor(methods))
                 .Container;
 

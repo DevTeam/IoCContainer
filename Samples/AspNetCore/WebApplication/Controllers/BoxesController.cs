@@ -12,17 +12,15 @@
     {
         private readonly Func<IBox<ICat>> _boxFactory;
 
-        public BoxesController(Func<IBox<ICat>> boxFactory)
-        {
+        public BoxesController(Func<IBox<ICat>> boxFactory) => 
             _boxFactory = boxFactory;
-        }
 
         // GET api/boxes
         [HttpGet]
         public IEnumerable<string> Get()
         {
-            yield return _boxFactory().ToString();
-            yield return _boxFactory().ToString();
+            yield return _boxFactory().Content.ToString();
+            yield return _boxFactory().Content.ToString();
         }
 
         // GET api/boxes/5
@@ -31,20 +29,14 @@
 
         // POST api/boxes
         [HttpPost]
-        public void Post([FromBody] string value)
-        {
-        }
+        public void Post([FromBody] string value) { }
 
         // PUT api/boxes/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
+        public void Put(int id, [FromBody] string value) { }
 
         // DELETE api/boxes/5
         [HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }
+        public void Delete(int id) { }
     }
 }

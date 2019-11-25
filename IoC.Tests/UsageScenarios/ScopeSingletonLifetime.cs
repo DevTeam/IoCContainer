@@ -30,13 +30,14 @@
                 // Check that instances from the default scope are equal
                 defaultScopeInstance1.ShouldBe(defaultScopeInstance2);
 
-                // Using the scope "a"
-                using (new Scope("a").Begin())
+                // Using the scope #1
+                using var scope1 = container.CreateScope();
+                using (scope1.Activate())
                 {
                     var scopeInstance1 = container.Resolve<IService>();
                     var scopeInstance2 = container.Resolve<IService>();
 
-                    // Check that instances from the scope "a" are equal
+                    // Check that instances from the scope #1 are equal
                     scopeInstance1.ShouldBe(scopeInstance2);
 
                     // Check that instances from different scopes are not equal
@@ -63,10 +64,11 @@
                 // Check that dependencies from the default scope are equal
                 transientInstance1.Dependency.ShouldBe(transientInstance2.Dependency);
 
-                // Using the scope "a"
-                using (new Scope("a").Begin())
+                // Using the scope #1
+                using var scope2 = container.CreateScope();
+                using (scope2.Activate())
                 {
-                    // Resolve a transient instance in scope "a"
+                    // Resolve a transient instance in scope #2
                     var transientInstance3 = container.Resolve<IService>();
 
                     // Check that dependencies from different scopes are not equal

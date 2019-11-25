@@ -55,7 +55,7 @@
 
             if (container.TryGetResolver<TInstance>(typeof(TInstance), null, out var resolver, out _, container))
             {
-                return new Holder<TInstance>(new DependencyToken(container, Disposable.Empty), resolver(container, args));
+                return new Holder<TInstance>(new Token(container, Disposable.Empty), resolver(container, args));
             }
 
             var buildId = Guid.NewGuid();

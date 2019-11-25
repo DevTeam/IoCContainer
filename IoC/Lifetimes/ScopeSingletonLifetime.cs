@@ -8,10 +8,10 @@
     /// Represents singleton per scope lifetime.
     /// </summary>
     [PublicAPI]
-    public sealed class ScopeSingletonLifetime: KeyBasedLifetime<Scope>
+    public sealed class ScopeSingletonLifetime: KeyBasedLifetime<IScope>
     {
         /// <inheritdoc />
-        protected override Scope CreateKey(IContainer container, object[] args) => Scope.Current;
+        protected override IScope CreateKey(IContainer container, object[] args) => Scope.Current;
 
         /// <inheritdoc />
         public override string ToString() => Lifetime.ScopeSingleton.ToString();
@@ -20,29 +20,39 @@
         public override ILifetime Create() => new ScopeSingletonLifetime();
 
         /// <inheritdoc />
-        protected override T OnNewInstanceCreated<T>(T newInstance, Scope scope, IContainer container, object[] args)
+        protected override T OnNewInstanceCreated<T>(T newInstance, IScope scope, IContainer container, object[] args)
         {
+            if (!(scope is IResourceRegistry resourceRegistry))
+            {
+                return newInstance;
+            }
+
             if (newInstance is IDisposable disposable)
             {
-                scope.RegisterResource(disposable);
+                resourceRegistry.RegisterResource(disposable);
             }
 
 #if NETCOREAPP3_0
-            if (newInstance is IAsyncDisposable asyncDisposable)
-            {
-                scope.RegisterResource(asyncDisposable.ToDisposable());
-            }
+                if (newInstance is IAsyncDisposable asyncDisposable)
+                {
+                    resourceRegistry.RegisterResource(asyncDisposable.ToDisposable());
+                }
 #endif
 
             return newInstance;
         }
 
         /// <inheritdoc />
-        protected override void OnInstanceReleased(object releasedInstance, Scope scope)
+        protected override void OnInstanceReleased(object releasedInstance, IScope scope)
         {
+            if (!(scope is IResourceRegistry resourceRegistry))
+            {
+                return;
+            }
+
             if (releasedInstance is IDisposable disposable)
             {
-                scope.UnregisterResource(disposable);
+                resourceRegistry.UnregisterResource(disposable);
                 disposable.Dispose();
             }
 
@@ -50,7 +60,7 @@
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();
-                scope.UnregisterResource(disposable);
+                resourceRegistry.UnregisterResource(disposable);
                 disposable.Dispose();
             }
 #endif

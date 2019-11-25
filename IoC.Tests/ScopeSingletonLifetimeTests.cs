@@ -1,6 +1,7 @@
 ﻿namespace IoC.Tests
 {
     using System;
+    using Core;
     using Lifetimes;
     using Moq;
     using Shouldly;
@@ -23,10 +24,10 @@
             using (var scope1 = new Scope(1))
             using (var scope2 = new Scope(2))
             {
-                using (scope1.Begin())
+                using (scope1.Activate())
                 {
                     instance11 = resolver(Mock.Of<IContainer>());
-                    using (scope2.Begin())
+                    using (scope2.Activate())
                     {
                         instance21 = resolver(Mock.Of<IContainer>());
                     }
@@ -34,7 +35,7 @@
                     instance12 = resolver(Mock.Of<IContainer>());
                 }
 
-                using (scope2.Begin())
+                using (scope2.Activate())
                 {
                     instance22 = resolver(Mock.Of<IContainer>());
                 }

@@ -32,7 +32,7 @@
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IToken AsTokenOf([NotNull] this IDisposable disposableToken, [NotNull] IContainer container) =>
-            new DependencyToken(container ?? throw new ArgumentNullException(nameof(container)), disposableToken ?? throw new ArgumentNullException(nameof(disposableToken)));
+            new Token(container ?? throw new ArgumentNullException(nameof(container)), disposableToken ?? throw new ArgumentNullException(nameof(disposableToken)));
 
         /// <summary>
         /// Applies text configurations for the target container.

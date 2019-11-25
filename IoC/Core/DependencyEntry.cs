@@ -8,6 +8,11 @@
 
     internal sealed class DependencyEntry : IToken
     {
+        /// <summary>
+        /// All resolvers parameters.
+        /// </summary>
+        [NotNull] [ItemNotNull] internal static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression> { WellknownExpressions.ContainerParameter, WellknownExpressions.ArgsParameter };
+
         [CanBeNull] internal readonly ILifetime Lifetime;
         [NotNull] internal readonly IEnumerable<Key> Keys;
         [NotNull] internal readonly IDependency Dependency;
@@ -64,7 +69,7 @@
                 return false;
             }
 
-            var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, WellknownExpressions.ResolverParameters);
+            var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, ResolverParameters);
             resolver = ExpressionCompiler.Shared.Compile(resolverExpression);
             error = default(Exception);
             return true;
@@ -101,7 +106,7 @@
                 }
 
                 return lifetime;
-            }            
+            }
         }
 
         public void Dispose()
@@ -127,7 +132,7 @@
             }
         }
 
-        public override string ToString() => $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
+        public override string ToString() => $"{String.Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
 
         private struct LifetimeKey
         {
@@ -137,7 +142,7 @@
             public LifetimeKey(Type[] genericTypes)
             {
                 _genericTypes = genericTypes;
-                _hashCode = genericTypes.GetHash();                
+                _hashCode = genericTypes.GetHash();
             }
 
             // ReSharper disable once PossibleNullReferenceException

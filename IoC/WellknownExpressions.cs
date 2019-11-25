@@ -21,11 +21,5 @@
         /// </summary>
         [NotNull]
         public static readonly ParameterExpression ArgsParameter = Expression.Parameter(TypeDescriptor<object[]>.Type, nameof(Context.Args));
-
-        /// <summary>
-        /// All resolvers parameters.
-        /// </summary>
-        [NotNull][ItemNotNull]
-        public static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression>{ ContainerParameter, ArgsParameter };
     }
 }
