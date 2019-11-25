@@ -43,27 +43,29 @@
             }
 
             var array = new T[size];
-#if NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
-            Array.Fill(array, value);
-#else
             for (var i = 0; i < size; i++)
             {
                 array[i] = value;
             }
-#endif
+
             return array;
         }
 
         [MethodImpl((MethodImplOptions) 256)]
         [Pure]
         [NotNull]
-        public static T[] Add<T>([NotNull] this T[] previous, [CanBeNull] T value)
+        public static T[] Add<T>([NotNull] this T[] source, [CanBeNull] T value)
         {
-            var length = previous.Length;
-            var result = new T[length + 1];
-            Array.Copy(previous, result, length);
-            result[length] = value;
-            return result;
+            var length = source.Length;
+            var destination = new T[length + 1];
+            Array.Copy(
+                source,
+                source.GetLowerBound(0),
+                destination,
+                destination.GetLowerBound(0),
+                length);
+            destination[length] = value;
+            return destination;
         }
 
         [MethodImpl((MethodImplOptions) 256)]
