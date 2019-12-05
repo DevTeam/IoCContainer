@@ -60,7 +60,7 @@
 
             disposable?.Dispose();
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             IAsyncDisposable asyncDisposable;
             lock (_lockObject)
             {

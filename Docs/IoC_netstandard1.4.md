@@ -105,6 +105,8 @@
   - [#ctor(dependency,lifetime)](#M-IoC-Issues-DependencyDescription-#ctor-IoC-IDependency,IoC-ILifetime- 'IoC.Issues.DependencyDescription.#ctor(IoC.IDependency,IoC.ILifetime)')
   - [Dependency](#F-IoC-Issues-DependencyDescription-Dependency 'IoC.Issues.DependencyDescription.Dependency')
   - [Lifetime](#F-IoC-Issues-DependencyDescription-Lifetime 'IoC.Issues.DependencyDescription.Lifetime')
+- [DependencyEntry](#T-IoC-Core-DependencyEntry 'IoC.Core.DependencyEntry')
+  - [ResolverParameters](#F-IoC-Core-DependencyEntry-ResolverParameters 'IoC.Core.DependencyEntry.ResolverParameters')
 - [EventType](#T-IoC-EventType 'IoC.EventType')
   - [DependencyRegistration](#F-IoC-EventType-DependencyRegistration 'IoC.EventType.DependencyRegistration')
   - [DependencyUnregistration](#F-IoC-EventType-DependencyUnregistration 'IoC.EventType.DependencyUnregistration')
@@ -229,6 +231,8 @@
   - [Resolve\`\`1(container,tag,args)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,IoC-Tag,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,IoC.Tag,System.Object[])')
   - [Resolve\`\`1(container,type,args)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Type,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type,System.Object[])')
   - [Resolve\`\`1(container,type,tag,args)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Type,IoC-Tag,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type,IoC.Tag,System.Object[])')
+- [FluentScope](#T-IoC-FluentScope 'IoC.FluentScope')
+  - [CreateScope(container)](#M-IoC-FluentScope-CreateScope-IoC-IContainer- 'IoC.FluentScope.CreateScope(IoC.IContainer)')
 - [FuncFeature](#T-IoC-Features-FuncFeature 'IoC.Features.FuncFeature')
   - [Default](#F-IoC-Features-FuncFeature-Default 'IoC.Features.FuncFeature.Default')
   - [Light](#F-IoC-Features-FuncFeature-Light 'IoC.Features.FuncFeature.Light')
@@ -307,6 +311,8 @@
 - [IResourceRegistry](#T-IoC-IResourceRegistry 'IoC.IResourceRegistry')
   - [RegisterResource(resource)](#M-IoC-IResourceRegistry-RegisterResource-System-IDisposable- 'IoC.IResourceRegistry.RegisterResource(System.IDisposable)')
   - [UnregisterResource(resource)](#M-IoC-IResourceRegistry-UnregisterResource-System-IDisposable- 'IoC.IResourceRegistry.UnregisterResource(System.IDisposable)')
+- [IScope](#T-IoC-IScope 'IoC.IScope')
+  - [Activate()](#M-IoC-IScope-Activate 'IoC.IScope.Activate')
 - [IToken](#T-IoC-IToken 'IoC.IToken')
   - [Container](#P-IoC-IToken-Container 'IoC.IToken.Container')
 - [ImplicitNotNullAttribute](#T-IoC-ImplicitNotNullAttribute 'IoC.ImplicitNotNullAttribute')
@@ -372,18 +378,11 @@
 - [RazorSectionAttribute](#T-IoC-RazorSectionAttribute 'IoC.RazorSectionAttribute')
 - [RegexPatternAttribute](#T-IoC-RegexPatternAttribute 'IoC.RegexPatternAttribute')
 - [Resolver\`1](#T-IoC-Resolver`1 'IoC.Resolver`1')
-- [Scope](#T-IoC-Scope 'IoC.Scope')
-  - [#ctor(scopeKey)](#M-IoC-Scope-#ctor-System-Object- 'IoC.Scope.#ctor(System.Object)')
-  - [Current](#P-IoC-Scope-Current 'IoC.Scope.Current')
-  - [Begin()](#M-IoC-Scope-Begin 'IoC.Scope.Begin')
-  - [Dispose()](#M-IoC-Scope-Dispose 'IoC.Scope.Dispose')
-  - [Equals()](#M-IoC-Scope-Equals-System-Object- 'IoC.Scope.Equals(System.Object)')
-  - [GetHashCode()](#M-IoC-Scope-GetHashCode 'IoC.Scope.GetHashCode')
 - [ScopeSingletonLifetime](#T-IoC-Lifetimes-ScopeSingletonLifetime 'IoC.Lifetimes.ScopeSingletonLifetime')
   - [Create()](#M-IoC-Lifetimes-ScopeSingletonLifetime-Create 'IoC.Lifetimes.ScopeSingletonLifetime.Create')
   - [CreateKey()](#M-IoC-Lifetimes-ScopeSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])')
-  - [OnInstanceReleased()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnInstanceReleased-System-Object,IoC-Scope- 'IoC.Lifetimes.ScopeSingletonLifetime.OnInstanceReleased(System.Object,IoC.Scope)')
-  - [OnNewInstanceCreated\`\`1()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-Scope,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.Scope,IoC.IContainer,System.Object[])')
+  - [OnInstanceReleased()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnInstanceReleased-System-Object,IoC-IScope- 'IoC.Lifetimes.ScopeSingletonLifetime.OnInstanceReleased(System.Object,IoC.IScope)')
+  - [OnNewInstanceCreated\`\`1()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-IScope,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.IScope,IoC.IContainer,System.Object[])')
   - [ToString()](#M-IoC-Lifetimes-ScopeSingletonLifetime-ToString 'IoC.Lifetimes.ScopeSingletonLifetime.ToString')
 - [SingletonLifetime](#T-IoC-Lifetimes-SingletonLifetime 'IoC.Lifetimes.SingletonLifetime')
   - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-IBuildContext- 'IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)')
@@ -445,7 +444,6 @@
 - [WellknownExpressions](#T-IoC-WellknownExpressions 'IoC.WellknownExpressions')
   - [ArgsParameter](#F-IoC-WellknownExpressions-ArgsParameter 'IoC.WellknownExpressions.ArgsParameter')
   - [ContainerParameter](#F-IoC-WellknownExpressions-ContainerParameter 'IoC.WellknownExpressions.ContainerParameter')
-  - [ResolverParameters](#F-IoC-WellknownExpressions-ResolverParameters 'IoC.WellknownExpressions.ResolverParameters')
 - [XamlItemBindingOfItemsControlAttribute](#T-IoC-XamlItemBindingOfItemsControlAttribute 'IoC.XamlItemBindingOfItemsControlAttribute')
 - [XamlItemsControlAttribute](#T-IoC-XamlItemsControlAttribute 'IoC.XamlItemsControlAttribute')
 
@@ -1713,6 +1711,20 @@ The resolved dependency.
 ##### Summary
 
 The lifetime to use.
+
+<a name='T-IoC-Core-DependencyEntry'></a>
+## DependencyEntry `type`
+
+##### Namespace
+
+IoC.Core
+
+<a name='F-IoC-Core-DependencyEntry-ResolverParameters'></a>
+### ResolverParameters `constants`
+
+##### Summary
+
+All resolvers parameters.
 
 <a name='T-IoC-EventType'></a>
 ## EventType `type`
@@ -5488,6 +5500,34 @@ The instance.
 | ---- | ----------- |
 | T | The instance type. |
 
+<a name='T-IoC-FluentScope'></a>
+## FluentScope `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents extensions dealing with scopes.
+
+<a name='M-IoC-FluentScope-CreateScope-IoC-IContainer-'></a>
+### CreateScope(container) `method`
+
+##### Summary
+
+Creates new resolving scope. Can be used with `ScopeSingleton`.
+
+##### Returns
+
+Tne new scope instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | A container to resolve a scope. |
+
 <a name='T-IoC-Features-FuncFeature'></a>
 ## FuncFeature `type`
 
@@ -6528,6 +6568,32 @@ Unregisters a resource from the registry.
 | ---- | ---- | ----------- |
 | resource | [System.IDisposable](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IDisposable 'System.IDisposable') | The target resource. |
 
+<a name='T-IoC-IScope'></a>
+## IScope `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the scope which could be used with `Lifetime.ScopeSingleton`
+
+<a name='M-IoC-IScope-Activate'></a>
+### Activate() `method`
+
+##### Summary
+
+Activate the scope.
+
+##### Returns
+
+The token to deactivate the scope.
+
+##### Parameters
+
+This method has no parameters.
+
 <a name='T-IoC-IToken'></a>
 ## IToken `type`
 
@@ -7393,85 +7459,6 @@ The resolved instance.
 | ---- | ----------- |
 | T | The type of resolving instance. |
 
-<a name='T-IoC-Scope'></a>
-## Scope `type`
-
-##### Namespace
-
-IoC
-
-##### Summary
-
-Represents the scope which could be used with `Lifetime.ScopeSingleton`
-
-<a name='M-IoC-Scope-#ctor-System-Object-'></a>
-### #ctor(scopeKey) `constructor`
-
-##### Summary
-
-Creates the instance of a new scope.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| scopeKey | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The key of scope. |
-
-<a name='P-IoC-Scope-Current'></a>
-### Current `property`
-
-##### Summary
-
-The current scope.
-
-<a name='M-IoC-Scope-Begin'></a>
-### Begin() `method`
-
-##### Summary
-
-Begins scope.
-
-##### Returns
-
-The scope token to end the scope.
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='M-IoC-Scope-Dispose'></a>
-### Dispose() `method`
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='M-IoC-Scope-Equals-System-Object-'></a>
-### Equals() `method`
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='M-IoC-Scope-GetHashCode'></a>
-### GetHashCode() `method`
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
 <a name='T-IoC-Lifetimes-ScopeSingletonLifetime'></a>
 ## ScopeSingletonLifetime `type`
 
@@ -7505,7 +7492,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-IoC-Lifetimes-ScopeSingletonLifetime-OnInstanceReleased-System-Object,IoC-Scope-'></a>
+<a name='M-IoC-Lifetimes-ScopeSingletonLifetime-OnInstanceReleased-System-Object,IoC-IScope-'></a>
 ### OnInstanceReleased() `method`
 
 ##### Summary
@@ -7516,7 +7503,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-Scope,IoC-IContainer,System-Object[]-'></a>
+<a name='M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-IScope,IoC-IContainer,System-Object[]-'></a>
 ### OnNewInstanceCreated\`\`1() `method`
 
 ##### Summary
@@ -8193,13 +8180,6 @@ The args parameters.
 ##### Summary
 
 The container parameter.
-
-<a name='F-IoC-WellknownExpressions-ResolverParameters'></a>
-### ResolverParameters `constants`
-
-##### Summary
-
-All resolvers parameters.
 
 <a name='T-IoC-XamlItemBindingOfItemsControlAttribute'></a>
 ## XamlItemBindingOfItemsControlAttribute `type`

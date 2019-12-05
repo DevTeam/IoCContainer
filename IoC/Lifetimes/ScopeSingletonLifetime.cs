@@ -32,7 +32,7 @@
                 resourceRegistry.RegisterResource(disposable);
             }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
                 if (newInstance is IAsyncDisposable asyncDisposable)
                 {
                     resourceRegistry.RegisterResource(asyncDisposable.ToDisposable());
@@ -56,7 +56,7 @@
                 disposable.Dispose();
             }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();

@@ -5838,7 +5838,7 @@ namespace IoC.Features
 #if !NET40
             yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<List<TT>>()));
 #endif
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx), containerSingletonResolver(container));
 #endif
         }
@@ -5883,7 +5883,7 @@ namespace IoC.Features
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
         private class AsyncEnumeration<T> : EnumerationBase<T>, IAsyncEnumerable<T>
         {
             public AsyncEnumeration([NotNull] Context context)
@@ -6352,7 +6352,7 @@ namespace IoC.Features
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => TaskScheduler.Current);
             yield return container.Register(ctx => StartTask(new Task<TT>(ctx.Container.Inject<Func<TT>>(ctx.Key.Tag)), ctx.Container.Inject<TaskScheduler>()), null, Feature.AnyTag);
-#if NETCOREAPP2_0 || NETCOREAPP2_1 || NETCOREAPP2_2 || NETCOREAPP3_0
+#if !NET40 && !NET403 && !NET45 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47 && !NET48 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2&& !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !WINDOWS_UWP
             yield return container.Register(ctx => new ValueTask<TT>(StartTask(new Task<TT>(ctx.Container.Inject<Func<TT>>(ctx.Key.Tag)), ctx.Container.Inject<TaskScheduler>())), null, Feature.AnyTag);
 #endif
         }
@@ -6553,7 +6553,7 @@ namespace IoC.Lifetimes
                 targetContainer.RegisterResource(disposable);
             }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (newInstance is IAsyncDisposable asyncDisposable)
             {
                 targetContainer.RegisterResource(asyncDisposable.ToDisposable());
@@ -6572,7 +6572,7 @@ namespace IoC.Lifetimes
                 disposable.Dispose();
             }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();
@@ -6762,7 +6762,7 @@ namespace IoC.Lifetimes
                 resourceRegistry.RegisterResource(disposable);
             }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
                 if (newInstance is IAsyncDisposable asyncDisposable)
                 {
                     resourceRegistry.RegisterResource(asyncDisposable.ToDisposable());
@@ -6786,7 +6786,7 @@ namespace IoC.Lifetimes
                 disposable.Dispose();
             }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();
@@ -6864,7 +6864,7 @@ namespace IoC.Lifetimes
 
             disposable?.Dispose();
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             IAsyncDisposable asyncDisposable;
             lock (_lockObject)
             {
@@ -8803,13 +8803,13 @@ namespace IoC.Core
             return new CompositeDisposable(disposables);
         }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
         public static IDisposable ToDisposable([NotNull] this IAsyncDisposable asyncDisposable)
         {
 #if DEBUG
             if (asyncDisposable == null) throw new ArgumentNullException(nameof(asyncDisposable));
 #endif
-            return new DisposableAction(() => { asyncDisposable.DisposeAsync().AsTask().Wait(); }, asyncDisposable);            
+            return new DisposableAction(() => { asyncDisposable.DisposeAsync().AsTask().Wait(); }, asyncDisposable);
         }
 #endif
         private sealed class DisposableAction : IDisposable

@@ -16,10 +16,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <DotNetCliToolReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Tools" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\..\..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
     <ProjectReference Include="..\..\..\IoC\IoC.csproj" />
     <ProjectReference Include="..\..\ShroedingersCat\ShroedingersCat.csproj" />

@@ -105,9 +105,9 @@
                 scope.ResourceCount.ShouldBe(0);
 
                 mock.Verify(i => i.Dispose(), Times.Once);
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
                 mock.Verify(i => i.DisposeAsync(), Times.Once);
-#endif                
+#endif
             }
         }
 
@@ -131,7 +131,7 @@
             scope.ResourceCount.ShouldBe(0);
 
             mock.Verify(i => i.Dispose(), Times.Once);
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
             mock.Verify(i => i.DisposeAsync(), Times.Once);
 #endif                
             scope.Dispose();

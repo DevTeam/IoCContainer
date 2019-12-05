@@ -876,6 +876,11 @@
             Represents build context.
             </summary>
         </member>
+        <member name="F:IoC.Core.DependencyEntry.ResolverParameters">
+            <summary>
+            All resolvers parameters.
+            </summary>
+        </member>
         <member name="T:IoC.Core.FluentRegister">
             <summary>
             Represents extensions to register a dependency in the container.
@@ -3099,6 +3104,18 @@
             <param name="args">The optional arguments.</param>
             <returns>The instance.</returns>
         </member>
+        <member name="T:IoC.FluentScope">
+            <summary>
+            Represents extensions dealing with scopes.
+            </summary>
+        </member>
+        <member name="M:IoC.FluentScope.CreateScope(IoC.IContainer)">
+            <summary>
+            Creates new resolving scope. Can be used with <c>ScopeSingleton</c>.
+            </summary>
+            <param name="container">A container to resolve a scope.</param>
+            <returns>Tne new scope instance.</returns>
+        </member>
         <member name="T:IoC.GenericTypeArgumentAttribute">
             <summary>
             Represents the generic type parameter marker.
@@ -3600,6 +3617,17 @@
             </summary>
             <param name="resource">The target resource.</param>
         </member>
+        <member name="T:IoC.IScope">
+            <summary>
+            Represents the scope which could be used with <c>Lifetime.ScopeSingleton</c>
+            </summary>
+        </member>
+        <member name="M:IoC.IScope.Activate">
+            <summary>
+            Activate the scope.
+            </summary>
+            <returns>The token to deactivate the scope.</returns>
+        </member>
         <member name="T:IoC.Issues.DependencyDescription">
             <summary>
             Represents the dependency.
@@ -3923,10 +3951,10 @@
         <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.Create">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.Scope,IoC.IContainer,System.Object[])">
+        <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.IScope,IoC.IContainer,System.Object[])">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.OnInstanceReleased(System.Object,IoC.Scope)">
+        <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.OnInstanceReleased(System.Object,IoC.IScope)">
             <inheritdoc />
         </member>
         <member name="T:IoC.Lifetimes.SingletonLifetime">
@@ -3957,37 +3985,6 @@
             <param name="container">The resolving container.</param>
             <param name="args">The optional resolving arguments.</param>
             <returns>The resolved instance.</returns>
-        </member>
-        <member name="T:IoC.Scope">
-            <summary>
-            Represents the scope which could be used with <c>Lifetime.ScopeSingleton</c>
-            </summary>
-        </member>
-        <member name="P:IoC.Scope.Current">
-            <summary>
-            The current scope.
-            </summary>
-        </member>
-        <member name="M:IoC.Scope.#ctor(System.Object)">
-            <summary>
-            Creates the instance of a new scope.
-            </summary>
-            <param name="scopeKey">The key of scope.</param>
-        </member>
-        <member name="M:IoC.Scope.Begin">
-            <summary>
-            Begins scope.
-            </summary>
-            <returns>The scope token to end the scope.</returns>
-        </member>
-        <member name="M:IoC.Scope.Dispose">
-            <inheritdoc />
-        </member>
-        <member name="M:IoC.Scope.Equals(System.Object)">
-            <inheritdoc />
-        </member>
-        <member name="M:IoC.Scope.GetHashCode">
-            <inheritdoc />
         </member>
         <member name="T:IoC.Tag">
             <summary>
@@ -4025,11 +4022,6 @@
         <member name="F:IoC.WellknownExpressions.ArgsParameter">
             <summary>
             The args parameters.
-            </summary>
-        </member>
-        <member name="F:IoC.WellknownExpressions.ResolverParameters">
-            <summary>
-            All resolvers parameters.
             </summary>
         </member>
     </members>

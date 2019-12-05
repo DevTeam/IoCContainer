@@ -42,7 +42,7 @@
 #if !NET40
             yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<List<TT>>()));
 #endif
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx), containerSingletonResolver(container));
 #endif
         }
@@ -87,7 +87,7 @@
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
         private class AsyncEnumeration<T> : EnumerationBase<T>, IAsyncEnumerable<T>
         {
             public AsyncEnumeration([NotNull] Context context)

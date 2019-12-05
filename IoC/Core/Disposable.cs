@@ -30,13 +30,13 @@
             return new CompositeDisposable(disposables);
         }
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
         public static IDisposable ToDisposable([NotNull] this IAsyncDisposable asyncDisposable)
         {
 #if DEBUG
             if (asyncDisposable == null) throw new ArgumentNullException(nameof(asyncDisposable));
 #endif
-            return new DisposableAction(() => { asyncDisposable.DisposeAsync().AsTask().Wait(); }, asyncDisposable);            
+            return new DisposableAction(() => { asyncDisposable.DisposeAsync().AsTask().Wait(); }, asyncDisposable);
         }
 #endif
         private sealed class DisposableAction : IDisposable

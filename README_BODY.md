@@ -116,8 +116,8 @@ It allows you to take full advantage of dependency injection everywhere and ever
 ## Class References
 
 - [.NET 4.8](Docs/IoC_net48.md)
-- [.NET Standard 2.0](Docs/IoC_netstandard2.0.md)
-- [.NET Core 3.0](Docs/IoC_netcoreapp3.0.md)
+- [.NET Standard 2.1](Docs/IoC_netstandard2.1.md)
+- [.NET Core 3.1](Docs/IoC_netcoreapp3.1.md)
 - [UWP 10.0](Docs/IoC_uap10.0.md)
 
 ## ASP.NET Core

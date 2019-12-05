@@ -131,7 +131,7 @@
 
                 // Then
                 mock.Verify(i => i.Dispose(), Times.Once);
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
                 mock.Verify(i => i.DisposeAsync(), Times.Once);
 #endif
             }
@@ -152,7 +152,7 @@
 
             // Then
             mock.Verify(i => i.Dispose(), Times.Once);
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
             mock.Verify(i => i.DisposeAsync(), Times.Once);
 #endif
             childContainer.Dispose();
