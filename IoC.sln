@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2027
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29519.181
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC", "IoC\IoC.csproj", "{F84EE174-3C3A-437F-B03F-26E78A8E6437}"
 EndProject
@@ -27,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC.Interception", "IoC.Int
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC.Interception.Source", "IoC.Interception.Source\IoC.Interception.Source.csproj", "{4ADDA72E-D96D-4712-964F-AE883591C1FD}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IoC.Performance.Tests", "IoC.Performance.Tests\IoC.Performance.Tests.csproj", "{E1E5F348-4934-4EFA-B488-896F93B59AB5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC.Performance.Tests", "IoC.Performance.Tests\IoC.Performance.Tests.csproj", "{E1E5F348-4934-4EFA-B488-896F93B59AB5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

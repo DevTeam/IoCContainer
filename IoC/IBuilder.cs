@@ -10,9 +10,9 @@
         /// <summary>
         /// Builds the expression.
         /// </summary>
+        /// <param name="context">Current context for building.</param>
         /// <param name="bodyExpression">The expression body to get an instance.</param>
-        /// <param name="buildContext">The build context.</param>
         /// <returns>The new expression.</returns>
-        [NotNull] Expression Build([NotNull] Expression bodyExpression, [NotNull] IBuildContext buildContext);
+        [NotNull] Expression Build([NotNull] IBuildContext context, [NotNull] Expression bodyExpression);
     }
 }

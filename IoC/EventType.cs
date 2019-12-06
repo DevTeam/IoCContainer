@@ -6,13 +6,28 @@
     public enum EventType
     {
         /// <summary>
-        /// The dependency was registered.
+        /// On container creation.
         /// </summary>
-        DependencyRegistration,
+        CreateContainer,
 
         /// <summary>
-        /// The dependency was unregistered.
+        /// On container dispose.
         /// </summary>
-        DependencyUnregistration,
+        DisposeContainer,
+
+        /// <summary>
+        /// On dependency registration.
+        /// </summary>
+        RegisterDependency,
+
+        /// <summary>
+        /// On dependency unregistration.
+        /// </summary>
+        UnregisterDependency,
+
+        /// <summary>
+        /// On resolver compilation
+        /// </summary>
+        ResolverCompilation
     }
 }

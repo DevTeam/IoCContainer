@@ -54,9 +54,9 @@ namespace IoC.Tests.UsageScenarios
         {
             public readonly IDictionary<Key, Expression> Expressions = new Dictionary<Key, Expression>();
 
-            public Expression Build(Expression expression, IBuildContext buildContext)
+            public Expression Build(IBuildContext context, Expression expression)
             {
-                Expressions[buildContext.Key] = expression;
+                Expressions[context.Key] = expression;
                 return expression;
             }
         }

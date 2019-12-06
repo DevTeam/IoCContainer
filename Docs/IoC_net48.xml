@@ -799,9 +799,19 @@
             The target container.
             </summary>
         </member>
-        <member name="F:IoC.ContainerEvent.EventTypeType">
+        <member name="F:IoC.ContainerEvent.EventType">
             <summary>
             The type of event.
+            </summary>
+        </member>
+        <member name="F:IoC.ContainerEvent.IsSuccess">
+            <summary>
+            True if success.
+            </summary>
+        </member>
+        <member name="F:IoC.ContainerEvent.Error">
+            <summary>
+            Error during operation.
             </summary>
         </member>
         <member name="F:IoC.ContainerEvent.Keys">
@@ -809,13 +819,27 @@
             The changed keys.
             </summary>
         </member>
-        <member name="M:IoC.ContainerEvent.#ctor(IoC.IContainer,IoC.EventType,System.Collections.Generic.IEnumerable{IoC.Key})">
+        <member name="F:IoC.ContainerEvent.Dependency">
+            <summary>
+            Related dependency.
+            </summary>
+        </member>
+        <member name="F:IoC.ContainerEvent.Lifetime">
+            <summary>
+            Related lifetime.
+            </summary>
+        </member>
+        <member name="F:IoC.ContainerEvent.ResolverExpression">
+            <summary>
+            Related lifetime.
+            </summary>
+        </member>
+        <member name="M:IoC.ContainerEvent.#ctor(IoC.IContainer,IoC.EventType)">
             <summary>
             Create new instance of container event.
             </summary>
             <param name="container">The origin container.</param>
-            <param name="eventTypeType">The vent type.</param>
-            <param name="keys">The set of keys related to this event.</param>
+            <param name="eventType">The event type.</param>
         </member>
         <member name="T:IoC.Context`1">
             <summary>
@@ -1019,31 +1043,34 @@
             <param name="context">The expression build context.</param>
             <returns>The new expression.</returns>
         </member>
-        <member name="T:IoC.Core.IExpressionCompiler">
-            <summary>
-            Represents a expression compiler.
-            </summary>
-        </member>
-        <member name="M:IoC.Core.IExpressionCompiler.Compile(System.Linq.Expressions.LambdaExpression)">
-            <summary>
-            Compiles an expression to a delegate.
-            </summary>
-            <param name="resolverExpression">The lambda expression.</param>
-            <returns>The resulting delegate.</returns>
-        </member>
         <member name="T:IoC.EventType">
             <summary>
             The types of event.
             </summary>
         </member>
-        <member name="F:IoC.EventType.DependencyRegistration">
+        <member name="F:IoC.EventType.CreateContainer">
             <summary>
-            The dependency was registered.
+            On container creation.
             </summary>
         </member>
-        <member name="F:IoC.EventType.DependencyUnregistration">
+        <member name="F:IoC.EventType.DisposeContainer">
             <summary>
-            The dependency was unregistered.
+            On container dispose.
+            </summary>
+        </member>
+        <member name="F:IoC.EventType.RegisterDependency">
+            <summary>
+            On dependency registration.
+            </summary>
+        </member>
+        <member name="F:IoC.EventType.UnregisterDependency">
+            <summary>
+            On dependency unregistration.
+            </summary>
+        </member>
+        <member name="F:IoC.EventType.ResolverCompilation">
+            <summary>
+            On resolver compilation
             </summary>
         </member>
         <member name="T:IoC.Features.CollectionFeature">
@@ -3433,13 +3460,27 @@
             Represents a builder for an instance.
             </summary>
         </member>
-        <member name="M:IoC.IBuilder.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)">
+        <member name="M:IoC.IBuilder.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)">
             <summary>
             Builds the expression.
             </summary>
+            <param name="context">Current context for building.</param>
             <param name="bodyExpression">The expression body to get an instance.</param>
-            <param name="buildContext">The build context.</param>
             <returns>The new expression.</returns>
+        </member>
+        <member name="T:IoC.ICompiler">
+            <summary>
+            Represents a expression compiler.
+            </summary>
+        </member>
+        <member name="M:IoC.ICompiler.TryCompile(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,System.Delegate@)">
+            <summary>
+            Compiles an expression to a delegate.
+            </summary>
+            <param name="context">Current context for building.</param>
+            <param name="expression">The lambda expression to compile.</param>
+            <param name="resolver">The compiled resolver delegate.</param>
+            <returns>True if success.</returns>
         </member>
         <member name="T:IoC.IConfiguration">
             <summary>
@@ -3900,7 +3941,7 @@
             </summary>
             <typeparam name="TKey">The key type.</typeparam>
         </member>
-        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)">
+        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)">
@@ -3962,7 +4003,7 @@
             Represents singleton lifetime.
             </summary>
         </member>
-        <member name="M:IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)">
+        <member name="M:IoC.Lifetimes.SingletonLifetime.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)">
             <inheritdoc />
         </member>
         <member name="M:IoC.Lifetimes.SingletonLifetime.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)">

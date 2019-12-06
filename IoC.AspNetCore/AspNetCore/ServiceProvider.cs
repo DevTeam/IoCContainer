@@ -8,14 +8,10 @@
     {
         private readonly IContainer _container;
 
-        public ServiceProvider([NotNull] IContainer container)
-        {
+        public ServiceProvider([NotNull] IContainer container) => 
             _container = container ?? throw new ArgumentNullException(nameof(container));
-        }
 
-        public object GetService(Type serviceType)
-        {
-            return _container.GetResolver<object>(serviceType)(_container);
-        }
+        public object GetService(Type serviceType) => 
+            _container.GetResolver<object>(serviceType)(_container);
     }
 }

@@ -31,7 +31,8 @@
 
         [NotNull] private readonly IContainer _parent;
         [NotNull] private readonly string _name;
-        [NotNull] private readonly Subject<ContainerEvent> _eventSubject = new Subject<ContainerEvent>();
+        [NotNull] private readonly ILockObject _lockObject;
+        [NotNull] private readonly Subject<ContainerEvent> _eventSubject;
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
         [NotNull] private Table<FullKey, DependencyEntry> _dependencies = Table<FullKey, DependencyEntry>.Empty;
         [NotNull] private Table<ShortKey, DependencyEntry> _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
@@ -80,20 +81,24 @@
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
             if (parentContainer == null) throw new ArgumentNullException(nameof(parentContainer));
-            return new Container(CreateContainerName(name), parentContainer);
+            return new Container(CreateContainerName(name), parentContainer, parentContainer.Resolve<ILockObject>());
         }
 
         private static Container CreateRootContainer([NotNull][ItemNotNull] IEnumerable<IConfiguration> configurations)
         {
-            var container = new Container(string.Empty, NullContainer.Shared);
+            var lockObject = new LockObject();
+            var container = new Container(string.Empty, NullContainer.Shared, lockObject);
             container.ApplyConfigurations(configurations);
+            container.Register<ILockObject>(ctx => lockObject);
             return container;
         }
 
-        internal Container([NotNull] string name, [NotNull] IContainer parent)
+        internal Container([NotNull] string name, [NotNull] IContainer parent, [NotNull] ILockObject lockObject)
         {
+            _lockObject = lockObject;
             _name = $"{parent}/{name ?? throw new ArgumentNullException(nameof(name))}";
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
+            _eventSubject = new Subject<ContainerEvent>(_lockObject);
             _registrationTracker = new RegistrationTracker(this);
 
             // Subscribe to events from the parent container
@@ -105,8 +110,11 @@
             // Register the current container in the parent container
             _parent.RegisterResource(this);
 
+            // Notifies about the container creation
+            _eventSubject.OnNext(new ContainerEvent(_parent, EventType.CreateContainer));
+
             // Notifies about existing registrations in parent containers
-            _eventSubject.OnNext(new ContainerEvent(_parent, EventType.DependencyRegistration, _parent.SelectMany(i => i)));
+            _eventSubject.OnNext(new ContainerEvent(_parent, EventType.RegisterDependency) { Keys = _parent.SelectMany(i => i) });
         }
 
         /// <inheritdoc />
@@ -126,11 +134,11 @@
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
             var isRegistered = true;
             var registeredKeys = new List<FullKey>();
-            var dependencyEntry = new DependencyEntry(this, dependency, lifetime, Disposable.Create(UnregisterKeys), registeredKeys);
+            var dependencyEntry = new DependencyEntry(_lockObject, this, dependency, lifetime, Disposable.Create(UnregisterKeys), registeredKeys);
 
             void UnregisterKeys()
             {
-                lock (_eventSubject)
+                lock (_lockObject)
                 {
                     foreach (var curKey in registeredKeys)
                     {
@@ -144,13 +152,13 @@
                         }
                     }
 
-                    _eventSubject.OnNext(new ContainerEvent(this, EventType.DependencyUnregistration, registeredKeys));
+                    _eventSubject.OnNext(new ContainerEvent(this, EventType.UnregisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime });
                 }
             }
 
             try
             {
-                lock (_eventSubject)
+                lock (_lockObject)
                 {
                     var dependenciesForTagAny = _dependenciesForTagAny;
                     var dependencies = _dependencies;
@@ -191,12 +199,13 @@
                     {
                         _dependenciesForTagAny = dependenciesForTagAny;
                         _dependencies = dependencies;
-                        _eventSubject.OnNext(new ContainerEvent(this, EventType.DependencyRegistration, registeredKeys));
+                        _eventSubject.OnNext(new ContainerEvent(this, EventType.RegisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime });
                     }
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _eventSubject.OnNext(new ContainerEvent(this, EventType.RegisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime, Error = ex, IsSuccess = false });
                 isRegistered = false;
                 throw;
             }
@@ -248,7 +257,7 @@
 
             // tries finding in dependencies
             bool hasDependency;
-            lock (_eventSubject)
+            lock (_lockObject)
             {
                 hasDependency = TryGetDependency(key, hashCode, out var dependencyEntry);
                 if (hasDependency)
@@ -256,7 +265,13 @@
                     // tries creating resolver
                     resolvingContainer = resolvingContainer ?? this;
                     resolvingContainer = dependencyEntry.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
-                    if (!dependencyEntry.TryCreateResolver(key, resolvingContainer, _registrationTracker.Builders, _registrationTracker.AutowiringStrategy, out var resolverDelegate, out error))
+                    if (!dependencyEntry.TryCreateResolver(
+                        key,
+                        resolvingContainer,
+                        _registrationTracker,
+                        _eventSubject,
+                        out var resolverDelegate,
+                        out error))
                     {
                         resolver = default(Resolver<T>);
                         return false;
@@ -280,7 +295,7 @@
             if (resolvingContainer == null || resolvingContainer == this)
             {
                 // Add resolver to tables
-                lock (_eventSubject)
+                lock (_lockObject)
                 {
                     Resolvers = Resolvers.Set(hashCode, key, resolver);
                     if (tag == null)
@@ -310,9 +325,12 @@
         /// <inheritdoc />
         public void Dispose()
         {
+            // Notifies about the container disposing
+            _eventSubject.OnNext(new ContainerEvent(_parent, EventType.DisposeContainer));
+
             _parent.UnregisterResource(this);
             List<IDisposable> entriesToDispose;
-            lock (_eventSubject)
+            lock (_lockObject)
             {
                 entriesToDispose = new List<IDisposable>(_dependencies.Count + _dependenciesForTagAny.Count + _resources.Count);
                 entriesToDispose.AddRange(_dependencies.Select(i => i.Value));
@@ -337,7 +355,7 @@
         public void RegisterResource(IDisposable resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
-            lock (_eventSubject)
+            lock (_lockObject)
             {
                 _resources.Add(resource);
             }
@@ -347,7 +365,7 @@
         public void UnregisterResource(IDisposable resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
-            lock (_eventSubject)
+            lock (_lockObject)
             {
                 _resources.Remove(resource);
             }
@@ -373,7 +391,7 @@
         
         internal void Reset()
         {
-            lock (_eventSubject)
+            lock (_lockObject)
             {
                 Resolvers = Table<FullKey, ResolverDelegate>.Empty;
                 ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
@@ -383,7 +401,7 @@
         [MethodImpl((MethodImplOptions) 256)]
         private IEnumerable<IEnumerable<FullKey>> GetAllKeys()
         {
-            lock (_eventSubject)
+            lock (_lockObject)
             {
                 return _dependencies.Select(i => i.Value.Keys).Concat(_dependenciesForTagAny.Select(i => i.Value.Keys)).Distinct();
             }
@@ -418,7 +436,7 @@
         [MethodImpl((MethodImplOptions)256)]
         private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)
         {
-            lock (_eventSubject)
+            lock (_lockObject)
             {
                 dependencyEntry = _dependencies.Get(hashCode, key);
                 if (dependencyEntry != default(DependencyEntry))

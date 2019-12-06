@@ -8,16 +8,21 @@
     [DebuggerDisplay("{" + nameof(ToString) + "()} with {" + nameof(ResourceCount) + "} resources")]
     internal sealed class Scope: IScope, IResourceRegistry
     {
-        [NotNull] private static readonly Scope Default = new Scope(0);
+        [NotNull] private static readonly Scope Default = new Scope(0, new LockObject());
         [CanBeNull] [ThreadStatic] private static Scope _current;
         internal readonly long ScopeKey;
+        [NotNull] private readonly ILockObject _lockObject;
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
         [CanBeNull] private Scope _prevScope;
 
         [NotNull]
         internal static Scope Current => _current ?? Default;
 
-        public Scope(long scopeKey) => ScopeKey = scopeKey;
+        public Scope(long scopeKey, [NotNull] ILockObject lockObject)
+        {
+            ScopeKey = scopeKey;
+            _lockObject = lockObject ?? throw new ArgumentNullException(nameof(lockObject));
+        }
 
         public IDisposable Activate()
         {
@@ -35,7 +40,7 @@
         public void Dispose()
         {
             List<IDisposable> resources;
-            lock (_resources)
+            lock (_lockObject)
             {
                  resources = _resources.ToList();
                  _resources.Clear();
@@ -57,7 +62,7 @@
 
         public void RegisterResource(IDisposable resource)
         {
-            lock (_resources)
+            lock (_lockObject)
             {
                 _resources.Add(resource ?? throw new ArgumentNullException(nameof(resource)));
             }
@@ -65,7 +70,7 @@
 
         public void UnregisterResource(IDisposable resource)
         {
-            lock (_resources)
+            lock (_lockObject)
             {
                 _resources.Remove(resource ?? throw new ArgumentNullException(nameof(resource)));
             }
@@ -79,7 +84,7 @@
         {
             get
             {
-                lock (_resources)
+                lock (_lockObject)
                 {
                     return _resources.Count;
                 }

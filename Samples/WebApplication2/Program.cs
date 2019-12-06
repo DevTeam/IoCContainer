@@ -1,4 +1,4 @@
-﻿namespace WebApplication
+﻿namespace WebApplication2
 {
     using Microsoft.AspNetCore;
     using Microsoft.AspNetCore.Hosting;

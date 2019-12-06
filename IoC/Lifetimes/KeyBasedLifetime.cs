@@ -22,15 +22,15 @@
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
         private static readonly ParameterExpression KeyVar = Expression.Variable(TypeDescriptor<TKey>.Type, "key");
 
-        [NotNull] private readonly object _lockObject = new object();
+        [NotNull] private readonly ILockObject _lockObject = new LockObject();
         private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
 
         /// <inheritdoc />
-        public Expression Build(Expression bodyExpression, IBuildContext buildContext)
+        public Expression Build(IBuildContext context, Expression bodyExpression)
         {
             if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
-            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            var returnType = buildContext.Key.Type;
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            var returnType = context.Key.Type;
             var thisConst = Expression.Constant(this);
             var instanceVar = Expression.Variable(returnType, "val");
             var instancesField = Expression.Field(thisConst, InstancesFieldInfo);

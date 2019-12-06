@@ -15,7 +15,7 @@
         private readonly IDictionary<Type, Func<Attribute, Type>> _typeSelectors; 
         private readonly IDictionary<Type, Func<Attribute, IComparable>> _orderSelectors;
         private readonly IDictionary<Type, Func<Attribute, object>> _tagSelectors;
-        private readonly object _lockObject;
+        private readonly ILockObject _lockObject;
         private volatile IAutowiringStrategy _autowiringStrategy;
 
         public static AspectOrientedMetadata Type<TTypeAttribute>(AspectOrientedMetadata metadata, Func<TTypeAttribute, Type> typeSelector)
@@ -44,7 +44,7 @@
             [NotNull] IDictionary<Type, Func<Attribute, IComparable>> orderSelectors,
             [NotNull] IDictionary<Type, Func<Attribute, object>> tagSelectors)
         {
-            _lockObject = new object();
+            _lockObject = new LockObject();
             _typeSelectors = typeSelectors;
             _orderSelectors = orderSelectors;
             _tagSelectors = tagSelectors;

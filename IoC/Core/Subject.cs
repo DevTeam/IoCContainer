@@ -7,18 +7,24 @@
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
     internal class Subject<T>: ISubject<T>
     {
+        private readonly ILockObject _lockObject;
         private readonly List<IObserver<T>> _observers = new List<IObserver<T>>();
+
+        public Subject([NotNull] ILockObject lockObject)
+        {
+            _lockObject = lockObject ?? throw new ArgumentNullException(nameof(lockObject));
+        }
 
         public IDisposable Subscribe(IObserver<T> observer)
         {
-            lock (_observers)
+            lock (_lockObject)
             {
                 _observers.Add(observer);
             }
 
             return Disposable.Create(() =>
             {
-                lock (_observers)
+                lock (_lockObject)
                 {
                     _observers.Remove(observer);
                 }
@@ -27,7 +33,7 @@
 
         public void OnNext(T value)
         {
-            lock (_observers)
+            lock (_lockObject)
             {
                 for (var index = 0; index < _observers.Count; index++)
                 {
@@ -38,7 +44,7 @@
 
         public void OnError(Exception error)
         {
-            lock (_observers)
+            lock (_lockObject)
             {
                 for (var index = 0; index < _observers.Count; index++)
                 {
@@ -49,7 +55,7 @@
 
         public void OnCompleted()
         {
-            lock (_observers)
+            lock (_lockObject)
             {
                 for (var index = 0; index < _observers.Count; index++)
                 {

@@ -12,7 +12,7 @@
         public Expression Build(Expression bodyExpression, IBuildContext buildContext, ILifetime lifetime)
         {
             if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
-            return lifetime?.Build(bodyExpression, buildContext) ?? bodyExpression;
+            return lifetime?.Build(buildContext, bodyExpression) ?? bodyExpression;
         }
     }
 }

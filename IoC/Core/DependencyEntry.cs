@@ -5,6 +5,7 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
+    using static System.String;
 
     internal sealed class DependencyEntry : IToken
     {
@@ -15,14 +16,15 @@
 
         [CanBeNull] internal readonly ILifetime Lifetime;
         [NotNull] internal readonly IEnumerable<Key> Keys;
+        [NotNull] private readonly ILockObject _lockObject;
         [NotNull] internal readonly IDependency Dependency;
 
         [NotNull] private readonly IEnumerable<IDisposable> _resources;
-        private readonly object _lockObject = new object();
         private volatile Table<LifetimeKey, ILifetime> _lifetimes = Table<LifetimeKey, ILifetime>.Empty;
         private bool _disposed;
 
         public DependencyEntry(
+            [NotNull] ILockObject lockObject,
             [NotNull] IContainer container,
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
@@ -30,6 +32,7 @@
             [NotNull] IEnumerable<Key> keys)
         {
             Container = container;
+            _lockObject = lockObject;
             Dependency = dependency;
             Lifetime = lifetime;
             Keys = keys;
@@ -48,8 +51,8 @@
         public bool TryCreateResolver(
             Key key,
             [NotNull] IContainer resolvingContainer,
-            [NotNull] IEnumerable<IBuilder> builders,
-            [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
+            [NotNull] IRegistrationTracker registrationTracker,
+            [NotNull] IObserver<ContainerEvent> eventObserver,
             out Delegate resolver,
             out Exception error)
         {
@@ -62,17 +65,36 @@
             }
 
             var typeDescriptor = key.Type.Descriptor();
-            var buildContext = new BuildContext(key, resolvingContainer, _resources, builders, defaultAutowiringStrategy);
-            if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression, out error))
+            var buildContext = new BuildContext(key, resolvingContainer, _resources, registrationTracker.Builders, registrationTracker.AutowiringStrategy);
+            var lifetime = GetLifetime(typeDescriptor);
+            if (!Dependency.TryBuildExpression(buildContext, lifetime, out var expression, out error))
             {
                 resolver = default(Delegate);
                 return false;
             }
 
             var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, ResolverParameters);
-            resolver = ExpressionCompiler.Shared.Compile(resolverExpression);
+            resolver = default(Delegate);
+            try
+            {
+                foreach (var compiler in registrationTracker.Compilers)
+                {
+                    if (compiler.TryCompile(buildContext, resolverExpression, out resolver))
+                    {
+                        eventObserver.OnNext(new ContainerEvent(Container, EventType.ResolverCompilation) {Keys = Enumerable.Repeat(key, 1), Dependency = Dependency, Lifetime = lifetime, ResolverExpression = resolverExpression });
+                        break;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                eventObserver.OnNext(new ContainerEvent(Container, EventType.ResolverCompilation) { Keys = Enumerable.Repeat(key, 1), Dependency = Dependency, Lifetime = lifetime, ResolverExpression = resolverExpression, IsSuccess = false, Error = ex });
+                error = ex;
+                return false;
+            }
+
             error = default(Exception);
-            return true;
+            return resolver != default(Delegate);
         }
 
         [MethodImpl((MethodImplOptions)256)]
@@ -132,7 +154,7 @@
             }
         }
 
-        public override string ToString() => $"{String.Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
+        public override string ToString() => $"{Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
 
         private struct LifetimeKey
         {

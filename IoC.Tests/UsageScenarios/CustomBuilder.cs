@@ -35,7 +35,7 @@ namespace IoC.Tests.UsageScenarios
         // This custom builder adds the logic to check parameters of reference types injected via constructors on null
         private class NotNullGuardBuilder : IBuilder
         {
-            public Expression Build(Expression expression, IBuildContext buildContext) =>
+            public Expression Build(IBuildContext context, Expression expression) =>
                 expression is NewExpression newExpression && newExpression.Arguments.Count != 0
                     ? newExpression.Update(CheckedArgs(newExpression))
                     : expression;

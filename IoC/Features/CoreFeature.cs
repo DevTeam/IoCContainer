@@ -44,7 +44,7 @@
             // Scope
             long scopeId = 0;
             Func<long> createScopeId = () => Interlocked.Increment(ref scopeId);
-            yield return container.Register<IScope>(ctx => new Scope(createScopeId()));
+            yield return container.Register<IScope>(ctx => new Scope(createScopeId(), ctx.Container.Resolve<ILockObject>()));
 
             // ThreadLocal
             yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Feature.AnyTag);
@@ -58,7 +58,9 @@
                 ctx => new Container(
                     ctx.Args.Length == 1
                         ? Container.CreateContainerName(ctx.Args[0] as string)
-                        : Container.CreateContainerName(string.Empty), ctx.Container),
+                        : Container.CreateContainerName(string.Empty),
+                    ctx.Container,
+                    ctx.Container.Resolve<ILockObject>()),
                 null,
                 new object[] { WellknownContainers.NewChild });
             

@@ -34,7 +34,7 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var containerSingletonResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
-            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx), containerSingletonResolver(container));
+            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx, ctx.Container.Resolve<ILockObject>()), containerSingletonResolver(container));
             yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToList());
             yield return container.Register(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToArray());
             yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => new HashSet<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
@@ -43,7 +43,7 @@
             yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<List<TT>>()));
 #endif
 #if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx), containerSingletonResolver(container));
+            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx, ctx.Container.Resolve<ILockObject>()), containerSingletonResolver(container));
 #endif
         }
 
@@ -67,8 +67,8 @@
 
         private class Enumeration<T> : EnumerationBase<T>, IEnumerable<T>
         {
-            public Enumeration([NotNull] Context context)
-            : base(context)
+            public Enumeration([NotNull] Context context, [NotNull] ILockObject lockObject)
+            : base(context, lockObject)
             {
             }
 
@@ -90,8 +90,8 @@
 #if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
         private class AsyncEnumeration<T> : EnumerationBase<T>, IAsyncEnumerable<T>
         {
-            public AsyncEnumeration([NotNull] Context context)
-                : base(context)
+            public AsyncEnumeration([NotNull] Context context, [NotNull] ILockObject lockObject)
+                : base(context, lockObject)
             {
             }
 
@@ -147,12 +147,14 @@
         private class EnumerationBase<T>: IObserver<ContainerEvent>, IDisposable
         {
             [NotNull] protected internal readonly Context Context;
+            private readonly ILockObject _lockObject;
             private readonly IDisposable _subscription;
             private volatile Resolver<T>[] _resolvers;
 
-            public EnumerationBase([NotNull] Context context)
+            public EnumerationBase([NotNull] Context context, [NotNull] ILockObject lockObject)
             {
                 Context = context;
+                _lockObject = lockObject;
                 _subscription = context.Container.Subscribe(this);
                 Reset();
             }
@@ -172,7 +174,7 @@
                     return _resolvers;
                 }
 
-                lock (_subscription)
+                lock (_lockObject)
                 {
                     if (_resolvers == null)
                     {
@@ -185,7 +187,7 @@
 
             private void Reset()
             {
-                lock (_subscription)
+                lock (_lockObject)
                 {
                     _resolvers = null;
                 }

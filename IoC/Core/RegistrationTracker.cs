@@ -3,14 +3,15 @@
     using System;
     using System.Collections.Generic;
 
-    internal class RegistrationTracker: IObserver<ContainerEvent>
+    internal class RegistrationTracker: IRegistrationTracker
     {
         private readonly Container _container;
         private readonly Dictionary<Key, object> _instances = new Dictionary<Key, object>();
         private readonly List<IBuilder> _builders = new List<IBuilder>();
         private readonly List<IAutowiringStrategy> _autowiringStrategies = new List<IAutowiringStrategy> { DefaultAutowiringStrategy.Shared };
+        private readonly List<ICompiler> _compilers = new List<ICompiler> { DefaultCompiler.Shared };
 
-        public RegistrationTracker(Container container)
+        public RegistrationTracker([NotNull] Container container)
         {
             _container = container;
             _autowiringStrategies.Add(DefaultAutowiringStrategy.Shared);
@@ -20,12 +21,19 @@
 
         public IAutowiringStrategy AutowiringStrategy => _autowiringStrategies[0];
 
+        public IEnumerable<ICompiler> Compilers => _compilers;
+
         public void OnNext(ContainerEvent value)
         {
-            _container.Reset();
-            switch (value.EventTypeType)
+            if (value.Keys == null)
             {
-                case EventType.DependencyRegistration:
+                return;
+            }
+
+            switch (value.EventType)
+            {
+                case EventType.RegisterDependency:
+                    _container.Reset();
                     var container = value.Container;
                     foreach (var key in value.Keys)
                     {
@@ -39,11 +47,18 @@
                             // ReSharper disable once RedundantJumpStatement
                             continue;
                         }
+
+                        if (Track<ICompiler>(key, container, i => _compilers.Insert(0, i)))
+                        {
+                            // ReSharper disable once RedundantJumpStatement
+                            continue;
+                        }
                     }
 
                     break;
 
-                case EventType.DependencyUnregistration:
+                case EventType.UnregisterDependency:
+                    _container.Reset();
                     foreach (var key in value.Keys)
                     {
                         if (_builders.Count > 0)
@@ -57,6 +72,15 @@
                         if (_autowiringStrategies.Count > 1)
                         {
                             if (Untrack<IAutowiringStrategy>(key, i => _autowiringStrategies.Remove(i)))
+                            {
+                                // ReSharper disable once RedundantJumpStatement
+                                continue;
+                            }
+                        }
+
+                        if (_compilers.Count > 1)
+                        {
+                            if (Untrack<ICompiler>(key, i => _compilers.Remove(i)))
                             {
                                 // ReSharper disable once RedundantJumpStatement
                                 continue;

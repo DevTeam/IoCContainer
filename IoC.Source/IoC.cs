@@ -1675,7 +1675,14 @@ namespace IoC
                     // tries creating resolver
                     resolvingContainer = resolvingContainer ?? this;
                     resolvingContainer = dependencyEntry.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
-                    if (!dependencyEntry.TryCreateResolver(key, resolvingContainer, _registrationTracker.Builders, _registrationTracker.AutowiringStrategy, out var resolverDelegate, out error))
+                    if (!dependencyEntry.TryCreateResolver(
+                        key,
+                        resolvingContainer,
+                        _registrationTracker.Builders,
+                        _registrationTracker.AutowiringStrategy,
+                        _registrationTracker.Compilers,
+                        out var resolverDelegate,
+                        out error))
                     {
                         resolver = default(Resolver<T>);
                         return false;
@@ -5237,10 +5244,36 @@ namespace IoC
         /// <summary>
         /// Builds the expression.
         /// </summary>
+        /// <param name="context">Current context for building.</param>
         /// <param name="bodyExpression">The expression body to get an instance.</param>
-        /// <param name="buildContext">The build context.</param>
         /// <returns>The new expression.</returns>
-        [NotNull] Expression Build([NotNull] Expression bodyExpression, [NotNull] IBuildContext buildContext);
+        [NotNull] Expression Build([NotNull] IBuildContext context, [NotNull] Expression bodyExpression);
+    }
+}
+
+
+#endregion
+#region ICompiler
+
+namespace IoC
+{
+    using System;
+    using System.Linq.Expressions;
+
+    /// <summary>
+    /// Represents a expression compiler.
+    /// </summary>
+    [PublicAPI]
+    public interface ICompiler
+    {
+        /// <summary>
+        /// Compiles an expression to a delegate.
+        /// </summary>
+        /// <param name="context">Current context for building.</param>
+        /// <param name="expression">The lambda expression to compile.</param>
+        /// <param name="resolver">The compiled resolver delegate.</param>
+        /// <returns>True if success.</returns>
+        bool TryCompile([NotNull] IBuildContext context, [NotNull] LambdaExpression expression, out Delegate resolver);
     }
 }
 
@@ -6616,11 +6649,11 @@ namespace IoC.Lifetimes
         private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
 
         /// <inheritdoc />
-        public Expression Build(Expression bodyExpression, IBuildContext buildContext)
+        public Expression Build(IBuildContext context, Expression bodyExpression)
         {
             if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
-            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            var returnType = buildContext.Key.Type;
+            if (context == null) throw new ArgumentNullException(nameof(context));
+            var returnType = context.Key.Type;
             var thisConst = Expression.Constant(this);
             var instanceVar = Expression.Variable(returnType, "val");
             var instancesField = Expression.Field(thisConst, InstancesFieldInfo);
@@ -6825,10 +6858,10 @@ namespace IoC.Lifetimes
 #pragma warning restore CS0649, IDE0044
 
         /// <inheritdoc />
-        public Expression Build(Expression expression, IBuildContext buildContext)
+        public Expression Build(IBuildContext context, Expression expression)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            if (context == null) throw new ArgumentNullException(nameof(context));
 
             var thisConst = Expression.Constant(this);
             var lockObjectConst = Expression.Constant(_lockObject);
@@ -7768,7 +7801,7 @@ namespace IoC.Core
                 foreach (var builder in _builders)
                 {
                     baseExpression = baseExpression.Convert(Key.Type);
-                    baseExpression = builder.Build(baseExpression, buildContext);
+                    baseExpression = builder.Build(buildContext, baseExpression);
                 }
             }
 
@@ -8277,6 +8310,34 @@ namespace IoC.Core
 
 
 #endregion
+#region DefaultCompiler
+
+namespace IoC.Core
+{
+    using System;
+    using System.Linq.Expressions;
+
+    internal class DefaultCompiler : ICompiler
+    {
+        public static readonly ICompiler Shared = new DefaultCompiler();
+
+        private DefaultCompiler() { }
+
+        public bool TryCompile(IBuildContext context, LambdaExpression expression, out Delegate resolver)
+        {
+            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            if (expression.CanReduce)
+            {
+                expression = (LambdaExpression)expression.Reduce();
+            }
+
+            resolver = expression.Compile();
+            return true;
+        }
+    }
+}
+
+#endregion
 #region DependencyEntry
 
 namespace IoC.Core
@@ -8286,6 +8347,7 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
+    using static System.String;
 
     internal sealed class DependencyEntry : IToken
     {
@@ -8330,7 +8392,8 @@ namespace IoC.Core
             Key key,
             [NotNull] IContainer resolvingContainer,
             [NotNull] IEnumerable<IBuilder> builders,
-            [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
+            [NotNull] IAutowiringStrategy autowiringStrategy,
+            [NotNull] IEnumerable<ICompiler> compilers,
             out Delegate resolver,
             out Exception error)
         {
@@ -8343,7 +8406,7 @@ namespace IoC.Core
             }
 
             var typeDescriptor = key.Type.Descriptor();
-            var buildContext = new BuildContext(key, resolvingContainer, _resources, builders, defaultAutowiringStrategy);
+            var buildContext = new BuildContext(key, resolvingContainer, _resources, builders, autowiringStrategy);
             if (!Dependency.TryBuildExpression(buildContext, GetLifetime(typeDescriptor), out var expression, out error))
             {
                 resolver = default(Delegate);
@@ -8351,9 +8414,17 @@ namespace IoC.Core
             }
 
             var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, ResolverParameters);
-            resolver = ExpressionCompiler.Shared.Compile(resolverExpression);
+            resolver = default(Delegate);
+            foreach (var compiler in compilers)
+            {
+                if (compiler.TryCompile(buildContext, resolverExpression, out resolver))
+                {
+                    break;
+                }
+            }
+
             error = default(Exception);
-            return true;
+            return resolver != default(Delegate);
         }
 
         [MethodImpl((MethodImplOptions)256)]
@@ -8413,7 +8484,7 @@ namespace IoC.Core
             }
         }
 
-        public override string ToString() => $"{String.Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
+        public override string ToString() => $"{Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
 
         private struct LifetimeKey
         {
@@ -8937,33 +9008,6 @@ namespace IoC.Core
 }
 
 #endregion
-#region ExpressionCompiler
-
-namespace IoC.Core
-{
-    using System;
-    using System.Linq.Expressions;
-
-    internal class ExpressionCompiler : IExpressionCompiler
-    {
-        public static readonly IExpressionCompiler Shared = new ExpressionCompiler();
-
-        private ExpressionCompiler() { }
-
-        public Delegate Compile(LambdaExpression resolverExpression)
-        {
-            if (resolverExpression == null) throw new ArgumentNullException(nameof(resolverExpression));
-            if (resolverExpression.CanReduce)
-            {
-                resolverExpression = (LambdaExpression)resolverExpression.Reduce();
-            }
-
-            return resolverExpression.Compile();
-        }
-    }
-}
-
-#endregion
 #region FluentRegister
 
 namespace IoC.Core
@@ -9469,30 +9513,6 @@ namespace IoC.Core
 
 
 #endregion
-#region IExpressionCompiler
-
-namespace IoC.Core
-{
-    using System;
-    using System.Linq.Expressions;
-
-    /// <summary>
-    /// Represents a expression compiler.
-    /// </summary>
-    [PublicAPI]
-    internal interface IExpressionCompiler
-    {
-        /// <summary>
-        /// Compiles an expression to a delegate.
-        /// </summary>
-        /// <param name="resolverExpression">The lambda expression.</param>
-        /// <returns>The resulting delegate.</returns>
-        [NotNull] Delegate Compile([NotNull] LambdaExpression resolverExpression);
-    }
-}
-
-
-#endregion
 #region ISubject
 
 namespace IoC.Core
@@ -9520,7 +9540,7 @@ namespace IoC.Core
         public Expression Build(Expression bodyExpression, IBuildContext buildContext, ILifetime lifetime)
         {
             if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
-            return lifetime?.Build(bodyExpression, buildContext) ?? bodyExpression;
+            return lifetime?.Build(buildContext, bodyExpression) ?? bodyExpression;
         }
     }
 }
@@ -9642,6 +9662,7 @@ namespace IoC.Core
         private readonly Dictionary<Key, object> _instances = new Dictionary<Key, object>();
         private readonly List<IBuilder> _builders = new List<IBuilder>();
         private readonly List<IAutowiringStrategy> _autowiringStrategies = new List<IAutowiringStrategy> { DefaultAutowiringStrategy.Shared };
+        private readonly List<ICompiler> _compilers = new List<ICompiler> { DefaultCompiler.Shared };
 
         public RegistrationTracker(Container container)
         {
@@ -9652,6 +9673,8 @@ namespace IoC.Core
         public IEnumerable<IBuilder> Builders => _builders;
 
         public IAutowiringStrategy AutowiringStrategy => _autowiringStrategies[0];
+
+        public IEnumerable<ICompiler> Compilers => _compilers;
 
         public void OnNext(ContainerEvent value)
         {
@@ -9668,6 +9691,12 @@ namespace IoC.Core
                         }
 
                         if (Track<IAutowiringStrategy>(key, container, i => _autowiringStrategies.Insert(0, i)))
+                        {
+                            // ReSharper disable once RedundantJumpStatement
+                            continue;
+                        }
+
+                        if (Track<ICompiler>(key, container, i => _compilers.Insert(0, i)))
                         {
                             // ReSharper disable once RedundantJumpStatement
                             continue;
@@ -9690,6 +9719,15 @@ namespace IoC.Core
                         if (_autowiringStrategies.Count > 1)
                         {
                             if (Untrack<IAutowiringStrategy>(key, i => _autowiringStrategies.Remove(i)))
+                            {
+                                // ReSharper disable once RedundantJumpStatement
+                                continue;
+                            }
+                        }
+
+                        if (_compilers.Count > 1)
+                        {
+                            if (Untrack<ICompiler>(key, i => _compilers.Remove(i)))
                             {
                                 // ReSharper disable once RedundantJumpStatement
                                 continue;
@@ -10112,6 +10150,25 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         public void Dispose() => _dependencyToken.Dispose();
+    }
+}
+
+
+#endregion
+#region TracingCompiler
+
+namespace IoC.Core
+{
+    using System;
+    using System.Linq.Expressions;
+
+    internal class TracingCompiler: ICompiler
+    {
+        public bool TryCompile(IBuildContext context, LambdaExpression expression, out Delegate resolver)
+        {
+            resolver = default(Delegate);
+            return false;
+        }
     }
 }
 

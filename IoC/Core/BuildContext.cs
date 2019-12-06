@@ -69,7 +69,7 @@
                 foreach (var builder in _builders)
                 {
                     baseExpression = baseExpression.Convert(Key.Type);
-                    baseExpression = builder.Build(baseExpression, buildContext);
+                    baseExpression = builder.Build(buildContext, baseExpression);
                 }
             }
 

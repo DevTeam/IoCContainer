@@ -66,9 +66,9 @@
 
         public class MyBuilder : IBuilder
         {
-            public Expression Build(Expression expression, IBuildContext buildContext)
+            public Expression Build(IBuildContext context, Expression expression)
             {
-                return buildContext.AddLifetime(expression, new Lifetimes.SingletonLifetime());
+                return context.AddLifetime(expression, new Lifetimes.SingletonLifetime());
             }
         }
     }

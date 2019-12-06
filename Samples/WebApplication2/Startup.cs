@@ -1,4 +1,4 @@
-﻿namespace WebApplication
+﻿namespace WebApplication2
 {
     using System;
     using System.Diagnostics.CodeAnalysis;

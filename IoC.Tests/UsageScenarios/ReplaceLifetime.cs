@@ -70,10 +70,10 @@ namespace IoC.Tests.UsageScenarios
                 _counter = counter;
             }
 
-            public Expression Build(Expression expression, IBuildContext buildContext)
+            public Expression Build(IBuildContext context, Expression expression)
             {
                 // Builds expression using base lifetime
-                expression = _baseSingletonLifetime.Build(expression, buildContext);
+                expression = _baseSingletonLifetime.Build(context, expression);
 
                 // Defines `this` variable to store the reference to the current lifetime instance to call internal method 'IncrementCounter'
                 var thisVar = Expression.Constant(this);
