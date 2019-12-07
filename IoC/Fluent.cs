@@ -26,6 +26,21 @@
         }
 
         /// <summary>
+        /// Creates child container.
+        /// </summary>
+        /// <param name="token">The parent container token.</param>
+        /// <param name="name">The name of child container.</param>
+        /// <returns>The child container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IContainer Create([NotNull] this IToken token, [NotNull] string name = "")
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            if (name == null) throw new ArgumentNullException(nameof(name));
+            return token.Container.GetResolver<IContainer>(WellknownContainers.NewChild.AsTag())(token.Container, name);
+        }
+
+        /// <summary>
         /// Buildups an instance which was not registered in container. Can be used as entry point of DI.
         /// </summary>
         /// <param name="configuration">The configurations.</param>

@@ -15,12 +15,12 @@
             _cannotParseLifetime = cannotParseLifetime ?? throw new ArgumentNullException(nameof(cannotParseLifetime));
         }
 
-        public bool TryConvert(Statement statement, string text, out Lifetime lifetime)
+        public bool TryConvert(Statement statement, string text, out Lifetime dst)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
             Match match = null;
             var success = false;
-            lifetime = Lifetime.Transient;
+            dst = Lifetime.Transient;
             do
             {
                 match = match?.NextMatch() ?? Regex.Match(text);
@@ -32,11 +32,11 @@
                 var lifetimeName = match.Groups[1].Value.Replace(" ", string.Empty).Replace($"{nameof(Lifetime)}.", string.Empty).Trim();
                 try
                 {
-                    lifetime = (Lifetime) Enum.Parse(TypeDescriptor<Lifetime>.Type, lifetimeName, true);
+                    dst = (Lifetime) Enum.Parse(TypeDescriptor<Lifetime>.Type, lifetimeName, true);
                 }
                 catch (Exception)
                 {
-                    lifetime = _cannotParseLifetime.Resolve(statement.Text, statement.LineNumber, statement.Position, lifetimeName);
+                    dst = _cannotParseLifetime.Resolve(statement.Text, statement.LineNumber, statement.Position, lifetimeName);
                 }
 
                 success = true;

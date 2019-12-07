@@ -216,6 +216,8 @@
             }
 
             return canBeResolved ? _registeredTypeDescriptor.MakeGenericType(registeredGenericTypeParameters) : null;
-        }        
+        }
+
+        public override string ToString() => $"new {_type.Descriptor()}(...)";
     }
 }

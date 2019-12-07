@@ -86,6 +86,7 @@
   - [Dependency](#F-IoC-ContainerEvent-Dependency 'IoC.ContainerEvent.Dependency')
   - [Error](#F-IoC-ContainerEvent-Error 'IoC.ContainerEvent.Error')
   - [EventType](#F-IoC-ContainerEvent-EventType 'IoC.ContainerEvent.EventType')
+  - [IsHidden](#F-IoC-ContainerEvent-IsHidden 'IoC.ContainerEvent.IsHidden')
   - [IsSuccess](#F-IoC-ContainerEvent-IsSuccess 'IoC.ContainerEvent.IsSuccess')
   - [Keys](#F-IoC-ContainerEvent-Keys 'IoC.ContainerEvent.Keys')
   - [Lifetime](#F-IoC-ContainerEvent-Lifetime 'IoC.ContainerEvent.Lifetime')
@@ -126,6 +127,7 @@
   - [BuildUp\`\`1(configuration,args)](#M-IoC-Fluent-BuildUp``1-IoC-IConfiguration,System-Object[]- 'IoC.Fluent.BuildUp``1(IoC.IConfiguration,System.Object[])')
   - [BuildUp\`\`1(container,args)](#M-IoC-Fluent-BuildUp``1-IoC-IContainer,System-Object[]- 'IoC.Fluent.BuildUp``1(IoC.IContainer,System.Object[])')
   - [Create(parentContainer,name)](#M-IoC-Fluent-Create-IoC-IContainer,System-String- 'IoC.Fluent.Create(IoC.IContainer,System.String)')
+  - [Create(token,name)](#M-IoC-Fluent-Create-IoC-IToken,System-String- 'IoC.Fluent.Create(IoC.IToken,System.String)')
 - [FluentAutowiring](#T-IoC-FluentAutowiring 'IoC.FluentAutowiring')
   - [TryInjectDependency\`\`1(method,parameterPosition,dependencyType,dependencyTag)](#M-IoC-FluentAutowiring-TryInjectDependency``1-IoC-IMethod{``0},System-Int32,System-Type,System-Object- 'IoC.FluentAutowiring.TryInjectDependency``1(IoC.IMethod{``0},System.Int32,System.Type,System.Object)')
 - [FluentBind](#T-IoC-FluentBind 'IoC.FluentBind')
@@ -241,6 +243,10 @@
   - [Resolve\`\`1(container,type,tag,args)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Type,IoC-Tag,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type,IoC.Tag,System.Object[])')
 - [FluentScope](#T-IoC-FluentScope 'IoC.FluentScope')
   - [CreateScope(container)](#M-IoC-FluentScope-CreateScope-IoC-IContainer- 'IoC.FluentScope.CreateScope(IoC.IContainer)')
+- [FluentTrace](#T-IoC-FluentTrace 'IoC.FluentTrace')
+  - [ToTraceSource(container)](#M-IoC-FluentTrace-ToTraceSource-IoC-IContainer- 'IoC.FluentTrace.ToTraceSource(IoC.IContainer)')
+  - [Trace(container,onTraceMessage)](#M-IoC-FluentTrace-Trace-IoC-IContainer,System-Action{System-String}- 'IoC.FluentTrace.Trace(IoC.IContainer,System.Action{System.String})')
+  - [Trace(token,onTraceMessage)](#M-IoC-FluentTrace-Trace-IoC-IToken,System-Action{System-String}- 'IoC.FluentTrace.Trace(IoC.IToken,System.Action{System.String})')
 - [FuncFeature](#T-IoC-Features-FuncFeature 'IoC.Features.FuncFeature')
   - [Default](#F-IoC-Features-FuncFeature-Default 'IoC.Features.FuncFeature.Default')
   - [Light](#F-IoC-Features-FuncFeature-Light 'IoC.Features.FuncFeature.Light')
@@ -440,6 +446,9 @@
   - [Default](#F-IoC-Features-TaskFeature-Default 'IoC.Features.TaskFeature.Default')
   - [Apply()](#M-IoC-Features-TaskFeature-Apply-IoC-IContainer- 'IoC.Features.TaskFeature.Apply(IoC.IContainer)')
 - [TerminatesProgramAttribute](#T-IoC-TerminatesProgramAttribute 'IoC.TerminatesProgramAttribute')
+- [TraceEvent](#T-IoC-FluentTrace-TraceEvent 'IoC.FluentTrace.TraceEvent')
+  - [ContainerEvent](#F-IoC-FluentTrace-TraceEvent-ContainerEvent 'IoC.FluentTrace.TraceEvent.ContainerEvent')
+  - [Message](#F-IoC-FluentTrace-TraceEvent-Message 'IoC.FluentTrace.TraceEvent.Message')
 - [TupleFeature](#T-IoC-Features-TupleFeature 'IoC.Features.TupleFeature')
   - [Default](#F-IoC-Features-TupleFeature-Default 'IoC.Features.TupleFeature.Default')
   - [Light](#F-IoC-Features-TupleFeature-Light 'IoC.Features.TupleFeature.Light')
@@ -1529,12 +1538,19 @@ Error during operation.
 
 The type of event.
 
+<a name='F-IoC-ContainerEvent-IsHidden'></a>
+### IsHidden `constants`
+
+##### Summary
+
+True if it is hidden.
+
 <a name='F-IoC-ContainerEvent-IsSuccess'></a>
 ### IsSuccess `constants`
 
 ##### Summary
 
-True if success.
+True if it is success.
 
 <a name='F-IoC-ContainerEvent-Keys'></a>
 ### Keys `constants`
@@ -1922,6 +1938,24 @@ The child container.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | parentContainer | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The parent container. |
+| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The name of child container. |
+
+<a name='M-IoC-Fluent-Create-IoC-IToken,System-String-'></a>
+### Create(token,name) `method`
+
+##### Summary
+
+Creates child container.
+
+##### Returns
+
+The child container.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The parent container token. |
 | name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The name of child container. |
 
 <a name='T-IoC-FluentAutowiring'></a>
@@ -5591,6 +5625,70 @@ Tne new scope instance.
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | A container to resolve a scope. |
 
+<a name='T-IoC-FluentTrace'></a>
+## FluentTrace `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents extensions to trace the container.
+
+<a name='M-IoC-FluentTrace-ToTraceSource-IoC-IContainer-'></a>
+### ToTraceSource(container) `method`
+
+##### Summary
+
+Gets container trace source.
+
+##### Returns
+
+The race source.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container to trace. |
+
+<a name='M-IoC-FluentTrace-Trace-IoC-IContainer,System-Action{System-String}-'></a>
+### Trace(container,onTraceMessage) `method`
+
+##### Summary
+
+Trace container action by handler.
+
+##### Returns
+
+The trace token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container to trace. |
+| onTraceMessage | [System.Action{System.String}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{System.String}') | The trace handler. |
+
+<a name='M-IoC-FluentTrace-Trace-IoC-IToken,System-Action{System-String}-'></a>
+### Trace(token,onTraceMessage) `method`
+
+##### Summary
+
+Trace container action by handler.
+
+##### Returns
+
+The trace token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The token of target container to trace. |
+| onTraceMessage | [System.Action{System.String}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{System.String}') | The trace handler. |
+
 <a name='T-IoC-Features-FuncFeature'></a>
 ## FuncFeature `type`
 
@@ -8143,6 +8241,31 @@ IoC
 
 Indicates that the marked method unconditionally terminates control flow execution.
 For example, it could unconditionally throw exception.
+
+<a name='T-IoC-FluentTrace-TraceEvent'></a>
+## TraceEvent `type`
+
+##### Namespace
+
+IoC.FluentTrace
+
+##### Summary
+
+Represents a trace event.
+
+<a name='F-IoC-FluentTrace-TraceEvent-ContainerEvent'></a>
+### ContainerEvent `constants`
+
+##### Summary
+
+The origin container event.
+
+<a name='F-IoC-FluentTrace-TraceEvent-Message'></a>
+### Message `constants`
+
+##### Summary
+
+The trace message.
 
 <a name='T-IoC-Features-TupleFeature'></a>
 ## TupleFeature `type`

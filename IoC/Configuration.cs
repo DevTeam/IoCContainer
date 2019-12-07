@@ -142,7 +142,7 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
-            return Disposable.Create(configurations.Select(i => i.Apply(container)).SelectMany(i => i)).AsTokenOf(container);
+            return Disposable.Create(configurations.Select(i => i.Apply(container)).SelectMany(i => i).ToArray()).AsTokenOf(container);
         }
 
         /// <summary>

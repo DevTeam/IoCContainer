@@ -66,6 +66,9 @@
             
             // Parent
             yield return container.Register(ctx => ctx.Container.Parent, null, new object[] { WellknownContainers.Parent });
+
+            yield return container.Register(ctx => ContainerEventToStringConverter.Shared);
+            yield return container.Register(ctx => TypeToStringConverter.Shared);
         }
     }
 }

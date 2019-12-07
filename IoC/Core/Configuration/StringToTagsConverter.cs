@@ -11,7 +11,7 @@
     {
         private static readonly Regex Regex = new Regex(@"(?:\s*\.\s*Tag\s*\(\s*([^)]*)\s*\)\s*)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline);
 
-        public bool TryConvert(Statement context, string text, out IEnumerable<object> tags)
+        public bool TryConvert(Statement context, string text, out IEnumerable<object> dst)
         {
             if (text == null) throw new ArgumentNullException(nameof(text));
             var tagSet = new HashSet<object>();
@@ -75,7 +75,7 @@
             }
             while (true);
 
-            tags = tagSet;
+            dst = tagSet;
             return tagSet.Any();
         }
     }

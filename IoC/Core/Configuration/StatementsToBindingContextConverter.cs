@@ -14,7 +14,7 @@
             _statementToContextConverters = statementToContextConverters ?? throw new ArgumentNullException(nameof(statementToContextConverters));
         }
 
-        public bool TryConvert(BindingContext baseContext, IEnumerable<Statement> statements, out BindingContext context)
+        public bool TryConvert(BindingContext baseContext, IEnumerable<Statement> statements, out BindingContext dst)
         {
             if (baseContext == null) throw new ArgumentNullException(nameof(baseContext));
             if (statements == null) throw new ArgumentNullException(nameof(statements));
@@ -30,7 +30,7 @@
                 }
             }
 
-            context = baseContext;
+            dst = baseContext;
             return true;
         }
     }

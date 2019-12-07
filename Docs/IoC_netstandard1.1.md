@@ -81,10 +81,16 @@
   - [TryRegisterDependency()](#M-IoC-Container-TryRegisterDependency-System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime,IoC-IToken@- 'IoC.Container.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,IoC.IToken@)')
   - [UnregisterResource()](#M-IoC-Container-UnregisterResource-System-IDisposable- 'IoC.Container.UnregisterResource(System.IDisposable)')
 - [ContainerEvent](#T-IoC-ContainerEvent 'IoC.ContainerEvent')
-  - [#ctor(container,eventTypeType,keys)](#M-IoC-ContainerEvent-#ctor-IoC-IContainer,IoC-EventType,System-Collections-Generic-IEnumerable{IoC-Key}- 'IoC.ContainerEvent.#ctor(IoC.IContainer,IoC.EventType,System.Collections.Generic.IEnumerable{IoC.Key})')
+  - [#ctor(container,eventType)](#M-IoC-ContainerEvent-#ctor-IoC-IContainer,IoC-EventType- 'IoC.ContainerEvent.#ctor(IoC.IContainer,IoC.EventType)')
   - [Container](#F-IoC-ContainerEvent-Container 'IoC.ContainerEvent.Container')
-  - [EventTypeType](#F-IoC-ContainerEvent-EventTypeType 'IoC.ContainerEvent.EventTypeType')
+  - [Dependency](#F-IoC-ContainerEvent-Dependency 'IoC.ContainerEvent.Dependency')
+  - [Error](#F-IoC-ContainerEvent-Error 'IoC.ContainerEvent.Error')
+  - [EventType](#F-IoC-ContainerEvent-EventType 'IoC.ContainerEvent.EventType')
+  - [IsHidden](#F-IoC-ContainerEvent-IsHidden 'IoC.ContainerEvent.IsHidden')
+  - [IsSuccess](#F-IoC-ContainerEvent-IsSuccess 'IoC.ContainerEvent.IsSuccess')
   - [Keys](#F-IoC-ContainerEvent-Keys 'IoC.ContainerEvent.Keys')
+  - [Lifetime](#F-IoC-ContainerEvent-Lifetime 'IoC.ContainerEvent.Lifetime')
+  - [ResolverExpression](#F-IoC-ContainerEvent-ResolverExpression 'IoC.ContainerEvent.ResolverExpression')
 - [ContainerSingletonLifetime](#T-IoC-Lifetimes-ContainerSingletonLifetime 'IoC.Lifetimes.ContainerSingletonLifetime')
   - [Create()](#M-IoC-Lifetimes-ContainerSingletonLifetime-Create 'IoC.Lifetimes.ContainerSingletonLifetime.Create')
   - [CreateKey()](#M-IoC-Lifetimes-ContainerSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ContainerSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])')
@@ -108,8 +114,11 @@
 - [DependencyEntry](#T-IoC-Core-DependencyEntry 'IoC.Core.DependencyEntry')
   - [ResolverParameters](#F-IoC-Core-DependencyEntry-ResolverParameters 'IoC.Core.DependencyEntry.ResolverParameters')
 - [EventType](#T-IoC-EventType 'IoC.EventType')
-  - [DependencyRegistration](#F-IoC-EventType-DependencyRegistration 'IoC.EventType.DependencyRegistration')
-  - [DependencyUnregistration](#F-IoC-EventType-DependencyUnregistration 'IoC.EventType.DependencyUnregistration')
+  - [CreateContainer](#F-IoC-EventType-CreateContainer 'IoC.EventType.CreateContainer')
+  - [DisposeContainer](#F-IoC-EventType-DisposeContainer 'IoC.EventType.DisposeContainer')
+  - [RegisterDependency](#F-IoC-EventType-RegisterDependency 'IoC.EventType.RegisterDependency')
+  - [ResolverCompilation](#F-IoC-EventType-ResolverCompilation 'IoC.EventType.ResolverCompilation')
+  - [UnregisterDependency](#F-IoC-EventType-UnregisterDependency 'IoC.EventType.UnregisterDependency')
 - [Feature](#T-IoC-Features-Feature 'IoC.Features.Feature')
   - [CoreSet](#F-IoC-Features-Feature-CoreSet 'IoC.Features.Feature.CoreSet')
   - [DefaultSet](#F-IoC-Features-Feature-DefaultSet 'IoC.Features.Feature.DefaultSet')
@@ -118,6 +127,7 @@
   - [BuildUp\`\`1(configuration,args)](#M-IoC-Fluent-BuildUp``1-IoC-IConfiguration,System-Object[]- 'IoC.Fluent.BuildUp``1(IoC.IConfiguration,System.Object[])')
   - [BuildUp\`\`1(container,args)](#M-IoC-Fluent-BuildUp``1-IoC-IContainer,System-Object[]- 'IoC.Fluent.BuildUp``1(IoC.IContainer,System.Object[])')
   - [Create(parentContainer,name)](#M-IoC-Fluent-Create-IoC-IContainer,System-String- 'IoC.Fluent.Create(IoC.IContainer,System.String)')
+  - [Create(token,name)](#M-IoC-Fluent-Create-IoC-IToken,System-String- 'IoC.Fluent.Create(IoC.IToken,System.String)')
 - [FluentAutowiring](#T-IoC-FluentAutowiring 'IoC.FluentAutowiring')
   - [TryInjectDependency\`\`1(method,parameterPosition,dependencyType,dependencyTag)](#M-IoC-FluentAutowiring-TryInjectDependency``1-IoC-IMethod{``0},System-Int32,System-Type,System-Object- 'IoC.FluentAutowiring.TryInjectDependency``1(IoC.IMethod{``0},System.Int32,System.Type,System.Object)')
 - [FluentBind](#T-IoC-FluentBind 'IoC.FluentBind')
@@ -233,6 +243,10 @@
   - [Resolve\`\`1(container,type,tag,args)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Type,IoC-Tag,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type,IoC.Tag,System.Object[])')
 - [FluentScope](#T-IoC-FluentScope 'IoC.FluentScope')
   - [CreateScope(container)](#M-IoC-FluentScope-CreateScope-IoC-IContainer- 'IoC.FluentScope.CreateScope(IoC.IContainer)')
+- [FluentTrace](#T-IoC-FluentTrace 'IoC.FluentTrace')
+  - [ToTraceSource(container)](#M-IoC-FluentTrace-ToTraceSource-IoC-IContainer- 'IoC.FluentTrace.ToTraceSource(IoC.IContainer)')
+  - [Trace(container,onTraceMessage)](#M-IoC-FluentTrace-Trace-IoC-IContainer,System-Action{System-String}- 'IoC.FluentTrace.Trace(IoC.IContainer,System.Action{System.String})')
+  - [Trace(token,onTraceMessage)](#M-IoC-FluentTrace-Trace-IoC-IToken,System-Action{System-String}- 'IoC.FluentTrace.Trace(IoC.IToken,System.Action{System.String})')
 - [FuncFeature](#T-IoC-Features-FuncFeature 'IoC.Features.FuncFeature')
   - [Default](#F-IoC-Features-FuncFeature-Default 'IoC.Features.FuncFeature.Default')
   - [Light](#F-IoC-Features-FuncFeature-Light 'IoC.Features.FuncFeature.Light')
@@ -263,7 +277,7 @@
   - [ReplaceTypes(baseExpression)](#M-IoC-IBuildContext-ReplaceTypes-System-Linq-Expressions-Expression- 'IoC.IBuildContext.ReplaceTypes(System.Linq.Expressions.Expression)')
   - [TryReplaceType(type,targetType)](#M-IoC-IBuildContext-TryReplaceType-System-Type,System-Type@- 'IoC.IBuildContext.TryReplaceType(System.Type,System.Type@)')
 - [IBuilder](#T-IoC-IBuilder 'IoC.IBuilder')
-  - [Build(bodyExpression,buildContext)](#M-IoC-IBuilder-Build-System-Linq-Expressions-Expression,IoC-IBuildContext- 'IoC.IBuilder.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)')
+  - [Build(context,bodyExpression)](#M-IoC-IBuilder-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.IBuilder.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
 - [ICannotBuildExpression](#T-IoC-Issues-ICannotBuildExpression 'IoC.Issues.ICannotBuildExpression')
   - [Resolve(buildContext,dependency,lifetime,error)](#M-IoC-Issues-ICannotBuildExpression-Resolve-IoC-IBuildContext,IoC-IDependency,IoC-ILifetime,System-Exception- 'IoC.Issues.ICannotBuildExpression.Resolve(IoC.IBuildContext,IoC.IDependency,IoC.ILifetime,System.Exception)')
 - [ICannotGetGenericTypeArguments](#T-IoC-Issues-ICannotGetGenericTypeArguments 'IoC.Issues.ICannotGetGenericTypeArguments')
@@ -284,6 +298,8 @@
   - [Resolve(container,key)](#M-IoC-Issues-ICannotResolveDependency-Resolve-IoC-IContainer,IoC-Key- 'IoC.Issues.ICannotResolveDependency.Resolve(IoC.IContainer,IoC.Key)')
 - [ICannotResolveType](#T-IoC-Issues-ICannotResolveType 'IoC.Issues.ICannotResolveType')
   - [Resolve(registeredType,resolvingType)](#M-IoC-Issues-ICannotResolveType-Resolve-System-Type,System-Type- 'IoC.Issues.ICannotResolveType.Resolve(System.Type,System.Type)')
+- [ICompiler](#T-IoC-ICompiler 'IoC.ICompiler')
+  - [TryCompile(context,expression,resolver)](#M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@- 'IoC.ICompiler.TryCompile(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,System.Delegate@)')
 - [IConfiguration](#T-IoC-IConfiguration 'IoC.IConfiguration')
   - [Apply(container)](#M-IoC-IConfiguration-Apply-IoC-IContainer- 'IoC.IConfiguration.Apply(IoC.IContainer)')
 - [IContainer](#T-IoC-IContainer 'IoC.IContainer')
@@ -295,8 +311,6 @@
   - [TryBuildExpression(buildContext,lifetime,baseExpression,error)](#M-IoC-IDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.IDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
 - [IExpressionBuilder\`1](#T-IoC-Core-IExpressionBuilder`1 'IoC.Core.IExpressionBuilder`1')
   - [Build(bodyExpression,buildContext,context)](#M-IoC-Core-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-IBuildContext,`0- 'IoC.Core.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext,`0)')
-- [IExpressionCompiler](#T-IoC-Core-IExpressionCompiler 'IoC.Core.IExpressionCompiler')
-  - [Compile(resolverExpression)](#M-IoC-Core-IExpressionCompiler-Compile-System-Linq-Expressions-LambdaExpression- 'IoC.Core.IExpressionCompiler.Compile(System.Linq.Expressions.LambdaExpression)')
 - [IFoundCyclicDependency](#T-IoC-Issues-IFoundCyclicDependency 'IoC.Issues.IFoundCyclicDependency')
   - [Resolve(key,reentrancy)](#M-IoC-Issues-IFoundCyclicDependency-Resolve-IoC-Key,System-Int32- 'IoC.Issues.IFoundCyclicDependency.Resolve(IoC.Key,System.Int32)')
 - [IHolder\`1](#T-IoC-Fluent-IHolder`1 'IoC.Fluent.IHolder`1')
@@ -344,7 +358,7 @@
   - [GetHashCode()](#M-IoC-Key-GetHashCode 'IoC.Key.GetHashCode')
   - [ToString()](#M-IoC-Key-ToString 'IoC.Key.ToString')
 - [KeyBasedLifetime\`1](#T-IoC-Lifetimes-KeyBasedLifetime`1 'IoC.Lifetimes.KeyBasedLifetime`1')
-  - [Build()](#M-IoC-Lifetimes-KeyBasedLifetime`1-Build-System-Linq-Expressions-Expression,IoC-IBuildContext- 'IoC.Lifetimes.KeyBasedLifetime`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)')
+  - [Build()](#M-IoC-Lifetimes-KeyBasedLifetime`1-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.KeyBasedLifetime`1.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
   - [Create()](#M-IoC-Lifetimes-KeyBasedLifetime`1-Create 'IoC.Lifetimes.KeyBasedLifetime`1.Create')
   - [CreateKey(container,args)](#M-IoC-Lifetimes-KeyBasedLifetime`1-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.KeyBasedLifetime`1.CreateKey(IoC.IContainer,System.Object[])')
   - [Dispose()](#M-IoC-Lifetimes-KeyBasedLifetime`1-Dispose 'IoC.Lifetimes.KeyBasedLifetime`1.Dispose')
@@ -385,7 +399,7 @@
   - [OnNewInstanceCreated\`\`1()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-IScope,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.IScope,IoC.IContainer,System.Object[])')
   - [ToString()](#M-IoC-Lifetimes-ScopeSingletonLifetime-ToString 'IoC.Lifetimes.ScopeSingletonLifetime.ToString')
 - [SingletonLifetime](#T-IoC-Lifetimes-SingletonLifetime 'IoC.Lifetimes.SingletonLifetime')
-  - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-IBuildContext- 'IoC.Lifetimes.SingletonLifetime.Build(System.Linq.Expressions.Expression,IoC.IBuildContext)')
+  - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.SingletonLifetime.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
   - [Create()](#M-IoC-Lifetimes-SingletonLifetime-Create 'IoC.Lifetimes.SingletonLifetime.Create')
   - [Dispose()](#M-IoC-Lifetimes-SingletonLifetime-Dispose 'IoC.Lifetimes.SingletonLifetime.Dispose')
   - [SelectResolvingContainer()](#M-IoC-Lifetimes-SingletonLifetime-SelectResolvingContainer-IoC-IContainer,IoC-IContainer- 'IoC.Lifetimes.SingletonLifetime.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)')
@@ -432,6 +446,9 @@
   - [Default](#F-IoC-Features-TaskFeature-Default 'IoC.Features.TaskFeature.Default')
   - [Apply()](#M-IoC-Features-TaskFeature-Apply-IoC-IContainer- 'IoC.Features.TaskFeature.Apply(IoC.IContainer)')
 - [TerminatesProgramAttribute](#T-IoC-TerminatesProgramAttribute 'IoC.TerminatesProgramAttribute')
+- [TraceEvent](#T-IoC-FluentTrace-TraceEvent 'IoC.FluentTrace.TraceEvent')
+  - [ContainerEvent](#F-IoC-FluentTrace-TraceEvent-ContainerEvent 'IoC.FluentTrace.TraceEvent.ContainerEvent')
+  - [Message](#F-IoC-FluentTrace-TraceEvent-Message 'IoC.FluentTrace.TraceEvent.Message')
 - [TupleFeature](#T-IoC-Features-TupleFeature 'IoC.Features.TupleFeature')
   - [Default](#F-IoC-Features-TupleFeature-Default 'IoC.Features.TupleFeature.Default')
   - [Light](#F-IoC-Features-TupleFeature-Light 'IoC.Features.TupleFeature.Light')
@@ -1479,8 +1496,8 @@ IoC
 
 Provides information about changes in the container.
 
-<a name='M-IoC-ContainerEvent-#ctor-IoC-IContainer,IoC-EventType,System-Collections-Generic-IEnumerable{IoC-Key}-'></a>
-### #ctor(container,eventTypeType,keys) `constructor`
+<a name='M-IoC-ContainerEvent-#ctor-IoC-IContainer,IoC-EventType-'></a>
+### #ctor(container,eventType) `constructor`
 
 ##### Summary
 
@@ -1491,8 +1508,7 @@ Create new instance of container event.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The origin container. |
-| eventTypeType | [IoC.EventType](#T-IoC-EventType 'IoC.EventType') | The vent type. |
-| keys | [System.Collections.Generic.IEnumerable{IoC.Key}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.Key}') | The set of keys related to this event. |
+| eventType | [IoC.EventType](#T-IoC-EventType 'IoC.EventType') | The event type. |
 
 <a name='F-IoC-ContainerEvent-Container'></a>
 ### Container `constants`
@@ -1501,12 +1517,40 @@ Create new instance of container event.
 
 The target container.
 
-<a name='F-IoC-ContainerEvent-EventTypeType'></a>
-### EventTypeType `constants`
+<a name='F-IoC-ContainerEvent-Dependency'></a>
+### Dependency `constants`
+
+##### Summary
+
+Related dependency.
+
+<a name='F-IoC-ContainerEvent-Error'></a>
+### Error `constants`
+
+##### Summary
+
+Error during operation.
+
+<a name='F-IoC-ContainerEvent-EventType'></a>
+### EventType `constants`
 
 ##### Summary
 
 The type of event.
+
+<a name='F-IoC-ContainerEvent-IsHidden'></a>
+### IsHidden `constants`
+
+##### Summary
+
+True if it is hidden.
+
+<a name='F-IoC-ContainerEvent-IsSuccess'></a>
+### IsSuccess `constants`
+
+##### Summary
+
+True if it is success.
 
 <a name='F-IoC-ContainerEvent-Keys'></a>
 ### Keys `constants`
@@ -1514,6 +1558,20 @@ The type of event.
 ##### Summary
 
 The changed keys.
+
+<a name='F-IoC-ContainerEvent-Lifetime'></a>
+### Lifetime `constants`
+
+##### Summary
+
+Related lifetime.
+
+<a name='F-IoC-ContainerEvent-ResolverExpression'></a>
+### ResolverExpression `constants`
+
+##### Summary
+
+Related lifetime.
 
 <a name='T-IoC-Lifetimes-ContainerSingletonLifetime'></a>
 ## ContainerSingletonLifetime `type`
@@ -1737,19 +1795,40 @@ IoC
 
 The types of event.
 
-<a name='F-IoC-EventType-DependencyRegistration'></a>
-### DependencyRegistration `constants`
+<a name='F-IoC-EventType-CreateContainer'></a>
+### CreateContainer `constants`
 
 ##### Summary
 
-The dependency was registered.
+On container creation.
 
-<a name='F-IoC-EventType-DependencyUnregistration'></a>
-### DependencyUnregistration `constants`
+<a name='F-IoC-EventType-DisposeContainer'></a>
+### DisposeContainer `constants`
 
 ##### Summary
 
-The dependency was unregistered.
+On container dispose.
+
+<a name='F-IoC-EventType-RegisterDependency'></a>
+### RegisterDependency `constants`
+
+##### Summary
+
+On dependency registration.
+
+<a name='F-IoC-EventType-ResolverCompilation'></a>
+### ResolverCompilation `constants`
+
+##### Summary
+
+On resolver compilation
+
+<a name='F-IoC-EventType-UnregisterDependency'></a>
+### UnregisterDependency `constants`
+
+##### Summary
+
+On dependency unregistration.
 
 <a name='T-IoC-Features-Feature'></a>
 ## Feature `type`
@@ -1859,6 +1938,24 @@ The child container.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | parentContainer | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The parent container. |
+| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The name of child container. |
+
+<a name='M-IoC-Fluent-Create-IoC-IToken,System-String-'></a>
+### Create(token,name) `method`
+
+##### Summary
+
+Creates child container.
+
+##### Returns
+
+The child container.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The parent container token. |
 | name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The name of child container. |
 
 <a name='T-IoC-FluentAutowiring'></a>
@@ -5528,6 +5625,70 @@ Tne new scope instance.
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | A container to resolve a scope. |
 
+<a name='T-IoC-FluentTrace'></a>
+## FluentTrace `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents extensions to trace the container.
+
+<a name='M-IoC-FluentTrace-ToTraceSource-IoC-IContainer-'></a>
+### ToTraceSource(container) `method`
+
+##### Summary
+
+Gets container trace source.
+
+##### Returns
+
+The race source.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container to trace. |
+
+<a name='M-IoC-FluentTrace-Trace-IoC-IContainer,System-Action{System-String}-'></a>
+### Trace(container,onTraceMessage) `method`
+
+##### Summary
+
+Trace container action by handler.
+
+##### Returns
+
+The trace token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container to trace. |
+| onTraceMessage | [System.Action{System.String}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{System.String}') | The trace handler. |
+
+<a name='M-IoC-FluentTrace-Trace-IoC-IToken,System-Action{System-String}-'></a>
+### Trace(token,onTraceMessage) `method`
+
+##### Summary
+
+Trace container action by handler.
+
+##### Returns
+
+The trace token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The token of target container to trace. |
+| onTraceMessage | [System.Action{System.String}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{System.String}') | The trace handler. |
+
 <a name='T-IoC-Features-FuncFeature'></a>
 ## FuncFeature `type`
 
@@ -5863,8 +6024,8 @@ IoC
 
 Represents a builder for an instance.
 
-<a name='M-IoC-IBuilder-Build-System-Linq-Expressions-Expression,IoC-IBuildContext-'></a>
-### Build(bodyExpression,buildContext) `method`
+<a name='M-IoC-IBuilder-Build-IoC-IBuildContext,System-Linq-Expressions-Expression-'></a>
+### Build(context,bodyExpression) `method`
 
 ##### Summary
 
@@ -5878,8 +6039,8 @@ The new expression.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| context | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | Current context for building. |
 | bodyExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The expression body to get an instance. |
-| buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context. |
 
 <a name='T-IoC-Issues-ICannotBuildExpression'></a>
 ## ICannotBuildExpression `type`
@@ -6184,6 +6345,36 @@ The type to create an instance.
 | registeredType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | Registered type. |
 | resolvingType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | Resolving type. |
 
+<a name='T-IoC-ICompiler'></a>
+## ICompiler `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents a expression compiler.
+
+<a name='M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@-'></a>
+### TryCompile(context,expression,resolver) `method`
+
+##### Summary
+
+Compiles an expression to a delegate.
+
+##### Returns
+
+True if success.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| context | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | Current context for building. |
+| expression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The lambda expression to compile. |
+| resolver | [System.Delegate@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Delegate@ 'System.Delegate@') | The compiled resolver delegate. |
+
 <a name='T-IoC-IConfiguration'></a>
 ## IConfiguration `type`
 
@@ -6356,34 +6547,6 @@ The new expression.
 | bodyExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The expression body to get an instance. |
 | buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context. |
 | context | [\`0](#T-`0 '`0') | The expression build context. |
-
-<a name='T-IoC-Core-IExpressionCompiler'></a>
-## IExpressionCompiler `type`
-
-##### Namespace
-
-IoC.Core
-
-##### Summary
-
-Represents a expression compiler.
-
-<a name='M-IoC-Core-IExpressionCompiler-Compile-System-Linq-Expressions-LambdaExpression-'></a>
-### Compile(resolverExpression) `method`
-
-##### Summary
-
-Compiles an expression to a delegate.
-
-##### Returns
-
-The resulting delegate.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| resolverExpression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The lambda expression. |
 
 <a name='T-IoC-Issues-IFoundCyclicDependency'></a>
 ## IFoundCyclicDependency `type`
@@ -6970,7 +7133,7 @@ Represents the abstraction for singleton based lifetimes.
 | ---- | ----------- |
 | TKey | The key type. |
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-Build-System-Linq-Expressions-Expression,IoC-IBuildContext-'></a>
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-Build-IoC-IBuildContext,System-Linq-Expressions-Expression-'></a>
 ### Build() `method`
 
 ##### Summary
@@ -7536,7 +7699,7 @@ IoC.Lifetimes
 
 Represents singleton lifetime.
 
-<a name='M-IoC-Lifetimes-SingletonLifetime-Build-System-Linq-Expressions-Expression,IoC-IBuildContext-'></a>
+<a name='M-IoC-Lifetimes-SingletonLifetime-Build-IoC-IBuildContext,System-Linq-Expressions-Expression-'></a>
 ### Build() `method`
 
 ##### Summary
@@ -8078,6 +8241,31 @@ IoC
 
 Indicates that the marked method unconditionally terminates control flow execution.
 For example, it could unconditionally throw exception.
+
+<a name='T-IoC-FluentTrace-TraceEvent'></a>
+## TraceEvent `type`
+
+##### Namespace
+
+IoC.FluentTrace
+
+##### Summary
+
+Represents a trace event.
+
+<a name='F-IoC-FluentTrace-TraceEvent-ContainerEvent'></a>
+### ContainerEvent `constants`
+
+##### Summary
+
+The origin container event.
+
+<a name='F-IoC-FluentTrace-TraceEvent-Message'></a>
+### Message `constants`
+
+##### Summary
+
+The trace message.
 
 <a name='T-IoC-Features-TupleFeature'></a>
 ## TupleFeature `type`

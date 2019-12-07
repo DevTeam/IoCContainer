@@ -110,8 +110,8 @@
             // Register the current container in the parent container
             _parent.RegisterResource(this);
 
-            // Notifies about the container creation
-            _eventSubject.OnNext(new ContainerEvent(_parent, EventType.CreateContainer));
+            // Notifies parent container about the child container creation
+            (_parent as Container)?._eventSubject.OnNext(new ContainerEvent(this, EventType.CreateContainer));
 
             // Notifies about existing registrations in parent containers
             _eventSubject.OnNext(new ContainerEvent(_parent, EventType.RegisterDependency) { Keys = _parent.SelectMany(i => i) });
@@ -325,8 +325,8 @@
         /// <inheritdoc />
         public void Dispose()
         {
-            // Notifies about the container disposing
-            _eventSubject.OnNext(new ContainerEvent(_parent, EventType.DisposeContainer));
+            // Notifies parent container about the child container disposing
+            (_parent as Container)?._eventSubject.OnNext(new ContainerEvent(this, EventType.DisposeContainer));
 
             _parent.UnregisterResource(this);
             List<IDisposable> entriesToDispose;

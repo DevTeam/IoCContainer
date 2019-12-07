@@ -9,21 +9,21 @@
     {
         private static readonly Regex Regex = new Regex(@"using\s+([\w.,\s]+)", RegexOptions.IgnoreCase | RegexOptions.CultureInvariant | RegexOptions.Singleline);
 
-        public bool TryConvert(BindingContext baseContext, Statement statement, out BindingContext context)
+        public bool TryConvert(BindingContext baseContext, Statement statement, out BindingContext dst)
         {
             if (baseContext == null) throw new ArgumentNullException(nameof(baseContext));
             var match = Regex.Match(statement.Text);
             if (match.Success)
             {
                 var namespaces = match.Groups[1].Value.Split(Separators.Namespace).Select(i => i.Trim()).Where(i => !string.IsNullOrWhiteSpace(i));
-                context = new BindingContext(
+                dst = new BindingContext(
                     baseContext.Assemblies,
                     baseContext.Namespaces.Concat(namespaces).Distinct(),
                     baseContext.Bindings);
                 return true;
             }
 
-            context = default(BindingContext);
+            dst = default(BindingContext);
             return false;
         }
     }

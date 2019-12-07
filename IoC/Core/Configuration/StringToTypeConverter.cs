@@ -10,7 +10,7 @@
     internal sealed class StringToTypeConverter : IConverter<string, BindingContext, Type>
     {
         // ReSharper disable StringLiteralTypo
-        private static readonly Dictionary<string, Type> PrimitiveTypes = new Dictionary<string, Type>
+        internal static readonly IDictionary<string, Type> PrimitiveTypes = new Dictionary<string, Type>
         {
             {"byte", TypeDescriptor<byte>.Type},
             {"sbyte", TypeDescriptor<sbyte>.Type},
@@ -28,16 +28,16 @@
             {"decimal", TypeDescriptor<decimal>.Type}
         };
 
-        public bool TryConvert(BindingContext context, string typeName, out Type type)
+        public bool TryConvert(BindingContext context, string typeName, out Type dst)
         {
             if (context == null) throw new ArgumentNullException(nameof(context));
             if (string.IsNullOrWhiteSpace(typeName))
             {
-                type = default(Type);
+                dst = default(Type);
                 return false;
             }
 
-            if (TryResolveSimpleType(typeName, out type))
+            if (TryResolveSimpleType(typeName, out dst))
             {
                 return true;
             }
@@ -48,7 +48,7 @@
                 return false;
             }
 
-            type = typeDescription.Type;
+            dst = typeDescription.Type;
             return true;
         }
 

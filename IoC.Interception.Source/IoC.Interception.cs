@@ -205,16 +205,16 @@ namespace IoC.Features.Interception
             }).AsTokenOf(container);
         }
 
-        public Expression Build(Expression bodyExpression, IBuildContext buildContext)
+        public Expression Build(IBuildContext context, Expression bodyExpression)
         {
             lock (_interceptors)
             {
                 var proxyGeneratorExpression = Expression.Constant(ProxyGenerator);
                 foreach (var interceptors in _interceptors)
                 {
-                    if (interceptors.Accept(buildContext.Key))
+                    if (interceptors.Accept(context.Key))
                     {
-                        bodyExpression = interceptors.Build(bodyExpression, buildContext, proxyGeneratorExpression);
+                        bodyExpression = interceptors.Build(bodyExpression, context, proxyGeneratorExpression);
                     }
                 }
 

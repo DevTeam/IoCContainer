@@ -50,15 +50,11 @@ namespace IoC.Features.AspNetCore
     {
         private readonly IContainer _container;
 
-        public ServiceProvider([NotNull] IContainer container)
-        {
+        public ServiceProvider([NotNull] IContainer container) => 
             _container = container ?? throw new ArgumentNullException(nameof(container));
-        }
 
-        public object GetService(Type serviceType)
-        {
-            return _container.GetResolver<object>(serviceType)(_container);
-        }
+        public object GetService(Type serviceType) => 
+            _container.GetResolver<object>(serviceType)(_container);
     }
 }
 
@@ -111,15 +107,74 @@ namespace IoC.Features.AspNetCore
     {
         [NotNull] private readonly Func<IServiceScope> _serviceScopeFactory;
 
-        public ServiceScopeFactory([NotNull] Func<IServiceScope> serviceScopeFactory)
-        {
+        public ServiceScopeFactory([NotNull] Func<IServiceScope> serviceScopeFactory) => 
             _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
-        }
 
-        public IServiceScope CreateScope() => _serviceScopeFactory();
+        public IServiceScope CreateScope() =>
+            _serviceScopeFactory();
     }
 }
 
+
+#endregion
+#region TokenFactory
+
+namespace IoC.Features.AspNetCore
+{
+    using System;
+    using Issues;
+    using Microsoft.Extensions.DependencyInjection;
+
+    internal class TokenFactory : ICannotRegister
+    {
+        private readonly ServiceDescriptor _service;
+        private readonly IBinding<object> _binding;
+        private IBinding<object> _currentBinding;
+        private int _tag;
+
+        public TokenFactory(ServiceDescriptor service, IBinding<object> binding)
+        {
+            _service = service;
+            _binding = binding;
+            _currentBinding = binding;
+        }
+
+        public bool TryCreateToken(out IToken token)
+        {
+            if (_service.ImplementationType != null)
+            {
+                token = _currentBinding.To(_service.ImplementationType);
+                return true;
+            }
+
+            if (_service.ImplementationFactory != null)
+            {
+                token = _currentBinding.To(ctx => _service.ImplementationFactory(ctx.Container.Inject<IServiceProvider>()));
+                return true;
+            }
+
+            if (_service.ImplementationInstance != null)
+            {
+                token = _currentBinding.To(ctx => _service.ImplementationInstance);
+                return true;
+            }
+
+            token = default(IToken);
+            return false;
+        }
+
+        IToken ICannotRegister.Resolve(IContainer container, Key[] keys)
+        {
+            _currentBinding = _binding.Tag(_tag++);
+            if (TryCreateToken(out var token))
+            {
+                return token;
+            }
+
+            throw new InvalidOperationException("Cannot create a binding token.");
+        }
+    }
+}
 
 #endregion
 
@@ -136,11 +191,12 @@ namespace IoC.Features
     using System.Collections.ObjectModel;
     using System.Linq;
     using AspNetCore;
+    using Issues;
     using Microsoft.Extensions.DependencyInjection;
 
     /// <inheritdoc cref="IConfiguration" />
     [PublicAPI]
-    public class AspNetCoreFeature: Collection<ServiceDescriptor>, IServiceCollection, IConfiguration
+    public class AspNetCoreFeature : Collection<ServiceDescriptor>, IServiceCollection, IConfiguration
     {
         /// <summary>
         /// Default constructor.
@@ -159,9 +215,9 @@ namespace IoC.Features
             if (container == null) throw new ArgumentNullException(nameof(container));
             var singletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.Singleton.AsTag());
             var scopeSingletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.ScopeSingleton.AsTag());
+
             foreach (var serviceGroup in this.GroupBy(i => i.ServiceType))
             {
-                var tag = 0;
                 foreach (var service in serviceGroup.Reverse())
                 {
                     var binding = container.Bind(service.ServiceType);
@@ -182,34 +238,20 @@ namespace IoC.Features
                             throw new NotSupportedException($"Unknown lifetime {service.Lifetime}.");
                     }
 
-                    if (tag > 0)
+                    var tokenFactory = new TokenFactory(service, binding);
+                    using (container.Bind<ICannotRegister>().To(ctx => tokenFactory))
                     {
-                        binding = binding.Tag(tag);
-                    }
-
-                    tag++;
-
-                    if (service.ImplementationType != null)
-                    {
-                        yield return binding.To(service.ImplementationType);
-                        continue;
-                    }
-
-                    if (service.ImplementationFactory != null)
-                    {
-                        yield return binding.To(ctx => service.ImplementationFactory(ctx.Container.Inject<IServiceProvider>()));
-                        continue;
-                    }
-
-                    if (service.ImplementationInstance != null)
-                    {
-                        yield return binding.To(ctx => service.ImplementationInstance);
-                        continue;
+                        if (tokenFactory.TryCreateToken(out var token))
+                        {
+                            yield return token;
+                            continue;
+                        }
                     }
 
                     throw new NotSupportedException($"The service descriptor {service} is not supported.");
                 }
             }
+
 
             yield return container
                 .Bind<IServiceProvider>().Lifetime(singletonLifetimeResolver(container)).To<ServiceProvider>()

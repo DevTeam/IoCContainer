@@ -24,7 +24,7 @@
         [NotNull]
         public static IDisposable Create([NotNull][ItemCanBeNull] IEnumerable<IDisposable> disposables)
         {
-#if DEBUG   
+#if DEBUG
             if (disposables == null) throw new ArgumentNullException(nameof(disposables));
 #endif
             return new CompositeDisposable(disposables);
@@ -70,33 +70,23 @@
 
         private sealed class CompositeDisposable : IDisposable
         {
-            private IDisposable[] _disposables;
+            private readonly IEnumerable<IDisposable> _disposables;
+            private bool _isDisposed;
             
             public CompositeDisposable(IEnumerable<IDisposable> disposables)
-                => _disposables = disposables.ToArray();
+                => _disposables = disposables;
 
             public void Dispose()
             {
-                var disposables = _disposables;
-                if (disposables == null)
+                if (_isDisposed)
                 {
                     return;
                 }
 
-                lock (disposables)
+                _isDisposed = true;
+                foreach (var disposable in _disposables)
                 {
-                    if (_disposables == null)
-                    {
-                        return;
-                    }
-
-                    _disposables = null;
-                }
-
-                // ReSharper disable once ForCanBeConvertedToForeach
-                for (var index = 0; index < disposables.Length; index++)
-                {
-                    disposables[index]?.Dispose();
+                    disposable?.Dispose();
                 }
             }
         }

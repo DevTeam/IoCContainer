@@ -270,6 +270,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Func With Arguments](#func-with-arguments-)
   - [Auto dispose singleton during container's dispose](#auto-dispose-singleton-during-containers-dispose-)
   - [Configuration via a text metadata](#configuration-via-a-text-metadata-)
+  - [Tracing](#tracing-)
   - [Validation](#validation-)
   - [Aspect Oriented Autowiring](#aspect-oriented-autowiring-)
 - Multithreading-Ready
@@ -695,9 +696,9 @@ public class TracingBuilder : IBuilder
 {
     public readonly IDictionary<Key, Expression> Expressions = new Dictionary<Key, Expression>();
 
-    public Expression Build(Expression expression, IBuildContext buildContext)
+    public Expression Build(IBuildContext context, Expression expression)
     {
-        Expressions[buildContext.Key] = expression;
+        Expressions[context.Key] = expression;
         return expression;
     }
 }
@@ -803,6 +804,37 @@ using var container = Container.Create().Using(
     "Bind<IService>().To<Service>();");
 // Resolve an instance
 var instance = container.Resolve<IService>();
+```
+
+
+
+### Tracing [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Tracing.cs)
+
+
+
+``` CSharp
+// Create and configure the container
+var messages = new List<string>();
+{
+    using var rootContainer = Container
+        .Create("root")
+        .Trace(message => messages.Add(message))
+        .Container;
+
+    using var parentContainer = rootContainer
+        .Create("parent")
+        .Bind<IDependency>().To<Dependency>(ctx => new Dependency())
+        .Container;
+
+    using var childContainer = parentContainer
+        .Create("child")
+        .Bind<IService<TT>>().To<Service<TT>>()
+        .Container;
+
+    childContainer.Resolve<IService<int>>();
+}
+
+messages.Count.ShouldBe(8);
 ```
 
 
@@ -953,7 +985,7 @@ public void Run()
 // This custom builder adds the logic to check parameters of reference types injected via constructors on null
 private class NotNullGuardBuilder : IBuilder
 {
-    public Expression Build(Expression expression, IBuildContext buildContext) =>
+    public Expression Build(IBuildContext context, Expression expression) =>
         expression is NewExpression newExpression && newExpression.Arguments.Count != 0
             ? newExpression.Update(CheckedArgs(newExpression))
             : expression;
@@ -1042,8 +1074,8 @@ public class MyTransientLifetime : ILifetime
     private ILifetime _baseLifetime = new Lifetimes.SingletonLifetime();
 
     // Wraps the expression by the Singleton lifetime expression
-    public Expression Build(Expression expression, IBuildContext buildContext)
-        => buildContext.AddLifetime(expression, _baseLifetime);
+    public Expression Build(IBuildContext context, Expression expression)
+        => context.AddLifetime(expression, _baseLifetime);
 
     // Creates the similar lifetime to use with generic instances
     public ILifetime Create() => new MyTransientLifetime();
@@ -1166,10 +1198,10 @@ public class MySingletonLifetime : ILifetime
         _counter = counter;
     }
 
-    public Expression Build(Expression expression, IBuildContext buildContext)
+    public Expression Build(IBuildContext context, Expression expression)
     {
         // Builds expression using base lifetime
-        expression = _baseSingletonLifetime.Build(expression, buildContext);
+        expression = _baseSingletonLifetime.Build(context, expression);
 
         // Defines `this` variable to store the reference to the current lifetime instance to call internal method 'IncrementCounter'
         var thisVar = Expression.Constant(this);

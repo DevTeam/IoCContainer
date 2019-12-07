@@ -806,7 +806,12 @@
         </member>
         <member name="F:IoC.ContainerEvent.IsSuccess">
             <summary>
-            True if success.
+            True if it is success.
+            </summary>
+        </member>
+        <member name="F:IoC.ContainerEvent.IsHidden">
+            <summary>
+            True if it is hidden.
             </summary>
         </member>
         <member name="F:IoC.ContainerEvent.Error">
@@ -1188,6 +1193,14 @@
             Creates child container.
             </summary>
             <param name="parentContainer">The parent container.</param>
+            <param name="name">The name of child container.</param>
+            <returns>The child container.</returns>
+        </member>
+        <member name="M:IoC.Fluent.Create(IoC.IToken,System.String)">
+            <summary>
+            Creates child container.
+            </summary>
+            <param name="token">The parent container token.</param>
             <param name="name">The name of child container.</param>
             <returns>The child container.</returns>
         </member>
@@ -3142,6 +3155,49 @@
             </summary>
             <param name="container">A container to resolve a scope.</param>
             <returns>Tne new scope instance.</returns>
+        </member>
+        <member name="T:IoC.FluentTrace">
+            <summary>
+            Represents extensions to trace the container.
+            </summary>
+        </member>
+        <member name="M:IoC.FluentTrace.ToTraceSource(IoC.IContainer)">
+            <summary>
+            Gets container trace source.
+            </summary>
+            <param name="container">The target container to trace.</param>
+            <returns>The race source.</returns>
+        </member>
+        <member name="M:IoC.FluentTrace.Trace(IoC.IContainer,System.Action{System.String})">
+            <summary>
+            Trace container action by handler.
+            </summary>
+            <param name="container">The target container to trace.</param>
+            <param name="onTraceMessage">The trace handler.</param>
+            <returns>The trace token.</returns>
+        </member>
+        <member name="M:IoC.FluentTrace.Trace(IoC.IToken,System.Action{System.String})">
+            <summary>
+            Trace container action by handler.
+            </summary>
+            <param name="token">The token of target container to trace.</param>
+            <param name="onTraceMessage">The trace handler.</param>
+            <returns>The trace token.</returns>
+        </member>
+        <member name="T:IoC.FluentTrace.TraceEvent">
+            <summary>
+            Represents a trace event.
+            </summary>
+        </member>
+        <member name="F:IoC.FluentTrace.TraceEvent.ContainerEvent">
+            <summary>
+            The origin container event.
+            </summary>
+        </member>
+        <member name="F:IoC.FluentTrace.TraceEvent.Message">
+            <summary>
+            The trace message.
+            </summary>
         </member>
         <member name="T:IoC.GenericTypeArgumentAttribute">
             <summary>

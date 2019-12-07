@@ -228,6 +228,6 @@
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         private static IToken CreateDependencyToken<T>(IBinding<T> binding, IDisposable dependency) =>
-            Disposable.Create(binding.Tokens.Concat(Enumerable.Repeat(dependency, 1))).AsTokenOf(binding.Container);
+            Disposable.Create(binding.Tokens.Concat(Enumerable.Repeat(dependency, 1)).ToArray()).AsTokenOf(binding.Container);
     }
 }

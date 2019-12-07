@@ -138,7 +138,7 @@
         [Pure]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
 
-        public override string ToString() => Type.ToString();
+        public override string ToString() => TypeToStringConverter.Convert(Type);
 
         public override bool Equals(object obj)
         {
@@ -286,7 +286,7 @@
         [Pure]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
 
-        public override string ToString() => Type.ToString();
+        public override string ToString() => TypeToStringConverter.Convert(Type);
 
         public override bool Equals(object obj)
         {

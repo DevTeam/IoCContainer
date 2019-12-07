@@ -72,6 +72,8 @@
                 baseExpression = default(Expression);
                 return false;
             }
-        }        
+        }
+
+        public override string ToString() => $"{_expression}";
     }
 }

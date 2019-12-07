@@ -28,7 +28,7 @@ namespace IoC.Core.Configuration
             _сannotParseType = сannotParseType ?? throw new ArgumentNullException(nameof(сannotParseType));
         }
 
-        public bool TryConvert(BindingContext baseContext, Statement statement, out BindingContext context)
+        public bool TryConvert(BindingContext baseContext, Statement statement, out BindingContext dst)
         {
             if (baseContext == null) throw new ArgumentNullException(nameof(baseContext));
             var bindingMatch = BindingRegex.Match(statement.Text);
@@ -68,7 +68,7 @@ namespace IoC.Core.Configuration
 
                     var binding = new Binding(contractTypes.Distinct().ToArray(), lifetime, tags.ToArray(), instanceType);
 
-                    context = new BindingContext(
+                    dst = new BindingContext(
                         baseContext.Assemblies,
                         baseContext.Namespaces,
                         baseContext.Bindings.Concat(Enumerable.Repeat(binding, 1)).Distinct());
@@ -77,7 +77,7 @@ namespace IoC.Core.Configuration
                 }
             }
 
-            context = default(BindingContext);
+            dst = default(BindingContext);
             return false;
         }
     }
