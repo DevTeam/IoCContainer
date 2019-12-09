@@ -21,7 +21,7 @@ namespace IoC.Comparison
     using Unity;
     using Unity.Lifetime;
     using Xunit;
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
     using Xunit.Abstractions;
 #endif
 
@@ -76,7 +76,7 @@ namespace IoC.Comparison
             new TestInfo("Autofac", AutofacComplex) { PerformanceRate = 100 },
         };
 
-#if NETCOREAPP3_0
+#if NETCOREAPP3_1
         public ComparisonTests(ITestOutputHelper output)
         {
             DotMemoryUnitTestOutput.SetOutputMethod(output.WriteLine);
