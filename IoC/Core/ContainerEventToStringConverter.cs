@@ -1,9 +1,13 @@
 ﻿namespace IoC.Core
 {
     using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using static TypeDescriptorExtensions;
 
     internal class ContainerEventToStringConverter: IConverter<ContainerEvent, IContainer, string>
     {
+        private static readonly PropertyInfo PropertyInfo = Descriptor<Expression>().GetDeclaredProperties().SingleOrDefault(i => i.Name == "DebugView");
         public static readonly IConverter<ContainerEvent, IContainer, string> Shared = new ContainerEventToStringConverter();
 
         private ContainerEventToStringConverter() { }
@@ -30,7 +34,8 @@
                     break;
 
                 case EventType.ResolverCompilation:
-                    text = $"compiles {FormatDependency(src)} from: {GetString(src.ResolverExpression?.Body)}.";
+                    var body = src.ResolverExpression?.Body;
+                    text = $"compiles {FormatDependency(src)} from:\n{GetString(GetDebugView(body))}.";
                     break;
 
                 default:
@@ -40,6 +45,16 @@
 
             dst = FormatPrefix(context) + text;
             return true;
+        }
+
+        [CanBeNull] private static string GetDebugView([CanBeNull] Expression expression)
+        {
+            if (expression == null)
+            {
+                return null;
+            }
+
+            return PropertyInfo?.GetValue(expression, null) as string ?? expression.ToString();
         }
 
         [NotNull] private static string FormatDependency(ContainerEvent containerEvent)

@@ -1,57 +1,31 @@
+// ReSharper disable ClassNeverInstantiated.Global
 namespace WebApplication3
 {
-    using System;
     using IoC;
-    using IoC.Features;
+    using IoC.Features.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
-    using Microsoft.AspNetCore.Http;
-    using Microsoft.AspNetCore.Mvc;
-    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Hosting;
-    using Microsoft.Extensions.Options;
     using ShroedingersCat;
 
     public class Program
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-                .UseServiceProviderFactory(new Aaa())
-                .ConfigureWebHostDefaults(webBuilder =>
-                {
-                    webBuilder.UseStartup<Startup>();
-                });
-    }
-
-    public class Aaa : IServiceProviderFactory<IContainer>
-    {
-        public IContainer CreateBuilder(IServiceCollection services)
-        {
-            //IOptions<MvcOptions> mvcOptions
-            return Container
+            using var container = Container
                 // Creates an Inversion of Control container
                 .Create()
-                // using .NET ASP Feature
-                .Using(new AspNetCoreFeature(services))
                 // using Glue
-                .Using<Glue>()
-                .Bind<IHttpContextAccessor>().To<HttpContextAccessor>().Container;
-        }
+                .Using<Glue>();
 
-        public IServiceProvider CreateServiceProvider(IContainer containerBuilder)
-        {
-            using(var scope = containerBuilder.Resolve<IScope>())
-            using (scope.Activate())
-            {
-                var mvcOption = containerBuilder.Resolve<IOptions<MvcOptions>>();
-            }
+            // Creates a host
+            using var host = Host
+                .CreateDefaultBuilder(args)
+                // Adds a service provider for the Inversion of Control container
+                .UseServiceProviderFactory(new ServiceProviderFactory(container))
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+                .Build();
 
-            return containerBuilder.Resolve<IServiceProvider>();
+            host.Run();
         }
     }
-
 }

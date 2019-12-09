@@ -661,11 +661,27 @@
             <param name="configurationText">The text configurations.</param>
             <returns>The dependency token.</returns>
         </member>
+        <member name="M:IoC.Configuration.Apply(IoC.IToken,System.String[])">
+            <summary>
+            Applies text configurations for the target container.
+            </summary>
+            <param name="token">The target container token.</param>
+            <param name="configurationText">The text configurations.</param>
+            <returns>The dependency token.</returns>
+        </member>
         <member name="M:IoC.Configuration.Apply(IoC.IContainer,System.IO.Stream[])">
             <summary>
             Applies text configurations from streams for the target container.
             </summary>
             <param name="container">The target container.</param>
+            <param name="configurationStreams">The set of streams with text configurations.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Configuration.Apply(IoC.IToken,System.IO.Stream[])">
+            <summary>
+            Applies text configurations from streams for the target container.
+            </summary>
+            <param name="token">The target container token.</param>
             <param name="configurationStreams">The set of streams with text configurations.</param>
             <returns>The dependency token.</returns>
         </member>
@@ -677,11 +693,27 @@
             <param name="configurationReaders">The set of text readers with text configurations.</param>
             <returns>The dependency token.</returns>
         </member>
+        <member name="M:IoC.Configuration.Apply(IoC.IToken,System.IO.TextReader[])">
+            <summary>
+            Applies text configurations from text readers for the target container.
+            </summary>
+            <param name="token">The target container token.</param>
+            <param name="configurationReaders">The set of text readers with text configurations.</param>
+            <returns>The dependency token.</returns>
+        </member>
         <member name="M:IoC.Configuration.Using(IoC.IContainer,System.String[])">
             <summary>
             Applies text configurations for the target container.
             </summary>
             <param name="container">The target container.</param>
+            <param name="configurationText">The text configurations.</param>
+            <returns>The target container.</returns>
+        </member>
+        <member name="M:IoC.Configuration.Using(IoC.IToken,System.String[])">
+            <summary>
+            Applies text configurations for the target container.
+            </summary>
+            <param name="token">The target container token.</param>
             <param name="configurationText">The text configurations.</param>
             <returns>The target container.</returns>
         </member>
@@ -693,11 +725,27 @@
             <param name="configurationStreams">The set of streams with text configurations.</param>
             <returns>The target container.</returns>
         </member>
+        <member name="M:IoC.Configuration.Using(IoC.IToken,System.IO.Stream[])">
+            <summary>
+            Applies text configurations from streams for the target container.
+            </summary>
+            <param name="token">The target container token.</param>
+            <param name="configurationStreams">The set of streams with text configurations.</param>
+            <returns>The target container.</returns>
+        </member>
         <member name="M:IoC.Configuration.Using(IoC.IContainer,System.IO.TextReader[])">
             <summary>
             Applies text configurations from text readers for the target container.
             </summary>
             <param name="container">The target container.</param>
+            <param name="configurationReaders">The set of text readers with text configurations.</param>
+            <returns>The target container.</returns>
+        </member>
+        <member name="M:IoC.Configuration.Using(IoC.IToken,System.IO.TextReader[])">
+            <summary>
+            Applies text configurations from text readers for the target container.
+            </summary>
+            <param name="token">The target container token.</param>
             <param name="configurationReaders">The set of text readers with text configurations.</param>
             <returns>The target container.</returns>
         </member>
@@ -709,11 +757,27 @@
             <param name="configurations">The configurations.</param>
             <returns>The dependency token.</returns>
         </member>
+        <member name="M:IoC.Configuration.Apply(IoC.IToken,System.Collections.Generic.IEnumerable{IoC.IConfiguration})">
+            <summary>
+            Applies configurations for the target container.
+            </summary>
+            <param name="token">The target container token.</param>
+            <param name="configurations">The configurations.</param>
+            <returns>The dependency token.</returns>
+        </member>
         <member name="M:IoC.Configuration.Apply(IoC.IContainer,IoC.IConfiguration[])">
             <summary>
             Applies configurations for the target container.
             </summary>
             <param name="container">The target container.</param>
+            <param name="configurations">The configurations.</param>
+            <returns>The dependency token.</returns>
+        </member>
+        <member name="M:IoC.Configuration.Apply(IoC.IToken,IoC.IConfiguration[])">
+            <summary>
+            Applies configurations for the target container.
+            </summary>
+            <param name="token">The target container token.</param>
             <param name="configurations">The configurations.</param>
             <returns>The dependency token.</returns>
         </member>
@@ -725,12 +789,28 @@
             <param name="configurations">The configurations.</param>
             <returns>The target container.</returns>
         </member>
+        <member name="M:IoC.Configuration.Using(IoC.IToken,IoC.IConfiguration[])">
+            <summary>
+            Applies configurations for the target container.
+            </summary>
+            <param name="token">The target container token.</param>
+            <param name="configurations">The configurations.</param>
+            <returns>The target container.</returns>
+        </member>
         <member name="M:IoC.Configuration.Using``1(IoC.IContainer)">
             <summary>
             Applies configuration for the target container.
             </summary>
             <typeparam name="T">The type of configuration.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The target container.</returns>
+        </member>
+        <member name="M:IoC.Configuration.Using``1(IoC.IToken)">
+            <summary>
+            Applies configuration for the target container.
+            </summary>
+            <typeparam name="T">The type of configuration.</typeparam>
+            <param name="token">The target container token.</param>
             <returns>The target container.</returns>
         </member>
         <member name="T:IoC.Container">
@@ -807,11 +887,6 @@
         <member name="F:IoC.ContainerEvent.IsSuccess">
             <summary>
             True if it is success.
-            </summary>
-        </member>
-        <member name="F:IoC.ContainerEvent.IsHidden">
-            <summary>
-            True if it is hidden.
             </summary>
         </member>
         <member name="F:IoC.ContainerEvent.Error">

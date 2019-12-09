@@ -140,7 +140,31 @@ It allows you to take full advantage of dependency injection everywhere and ever
   dotnet add package IoC.AspNetCore
   ```
 
-### Create the _IoC container_ with feature _AspNetCoreFeature_ and configure it at [Startup](Samples/AspNetCore/WebApplication/Startup.cs)
+### For ASP.NET Core 3 create the _IoC container_ and use the service provider factory based on this container at [Main](Samples/WebApplication3/Program.cs)
+
+```csharp
+public static void Main(string[] args)
+{
+  using var container = Container
+    // Creates an Inversion of Control container
+    .Create()
+    // using Glue
+    .Using<Glue>();
+
+  // Creates a host
+  using var host = Host
+    .CreateDefaultBuilder(args)
+    // Adds a service provider for the Inversion of Control container
+    .UseServiceProviderFactory(new ServiceProviderFactory(container))
+    .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+    .Build();
+
+  host.Run();
+}
+
+```
+
+### For ASP.NET Core 2 create the _IoC container_ with feature _AspNetCoreFeature_ and configure it at [Startup](Samples/WebApplication2/Startup.cs)
 
 ```csharp
 public IServiceProvider ConfigureServices(IServiceCollection services)
@@ -813,19 +837,23 @@ var instance = container.Resolve<IService>();
 
 
 ``` CSharp
-// Create and configure the container
-var messages = new List<string>();
+var traceMessages = new List<string>();
+
 {
+    // Create and configure the root container
     using var rootContainer = Container
         .Create("root")
-        .Trace(message => messages.Add(message))
+        // Aggregate trace messages to the list 'traceMessages'
+        .Trace(message => traceMessages.Add(message))
         .Container;
 
+    // Create and configure the parent container
     using var parentContainer = rootContainer
         .Create("parent")
         .Bind<IDependency>().To<Dependency>(ctx => new Dependency())
         .Container;
 
+    // Create and configure the child container
     using var childContainer = parentContainer
         .Create("child")
         .Bind<IService<TT>>().To<Service<TT>>()
@@ -834,7 +862,7 @@ var messages = new List<string>();
     childContainer.Resolve<IService<int>>();
 }
 
-messages.Count.ShouldBe(8);
+traceMessages.Count.ShouldBe(8);
 ```
 
 

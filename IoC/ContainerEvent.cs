@@ -26,11 +26,6 @@
         public bool IsSuccess;
 
         /// <summary>
-        /// True if it is hidden.
-        /// </summary>
-        internal bool IsHidden;
-
-        /// <summary>
         /// Error during operation.
         /// </summary>
         public Exception Error;
@@ -65,14 +60,11 @@
             Container = container;
             EventType = eventType;
             IsSuccess = true;
-            IsHidden = false;
             Error = default(Exception);
             Keys = default(IEnumerable<Key>);
             Dependency = default(IDependency);
             Lifetime = default(ILifetime);
             ResolverExpression = default(LambdaExpression);
         }
-
-        internal ContainerEvent Copy() => new ContainerEvent(Container, EventType) { IsSuccess = IsSuccess, IsHidden = IsHidden, Error = Error, Keys = Keys, Dependency = Dependency, Lifetime = Lifetime, ResolverExpression = ResolverExpression };
     }
 }

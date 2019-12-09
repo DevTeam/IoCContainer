@@ -136,7 +136,31 @@ It allows you to take full advantage of dependency injection everywhere and ever
   dotnet add package IoC.AspNetCore
   ```
 
-### Create the _IoC container_ with feature _AspNetCoreFeature_ and configure it at [Startup](Samples/AspNetCore/WebApplication/Startup.cs)
+### For ASP.NET Core 3 create the _IoC container_ and use the service provider factory based on this container at [Main](Samples/WebApplication3/Program.cs)
+
+```csharp
+public static void Main(string[] args)
+{
+  using var container = Container
+    // Creates an Inversion of Control container
+    .Create()
+    // using Glue
+    .Using<Glue>();
+
+  // Creates a host
+  using var host = Host
+    .CreateDefaultBuilder(args)
+    // Adds a service provider for the Inversion of Control container
+    .UseServiceProviderFactory(new ServiceProviderFactory(container))
+    .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
+    .Build();
+
+  host.Run();
+}
+
+```
+
+### For ASP.NET Core 2 create the _IoC container_ with feature _AspNetCoreFeature_ and configure it at [Startup](Samples/WebApplication2/Startup.cs)
 
 ```csharp
 public IServiceProvider ConfigureServices(IServiceCollection services)

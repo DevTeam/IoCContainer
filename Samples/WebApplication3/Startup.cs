@@ -16,6 +16,7 @@ namespace WebApplication3
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc(option => option.EnableEndpointRouting = false);
+            services.AddHttpContextAccessor();
             services.AddControllers();
         }
 

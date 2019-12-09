@@ -34,7 +34,18 @@
         private static int GetOrder(MethodBase method)
         {
             var order = method.GetParameters().Length + 1;
-            return method.IsPublic ? order : order << 10;
+            
+            if (method.GetCustomAttributes(typeof(ObsoleteAttribute), true).Any())
+            {
+                order <<= 4;
+            }
+
+            if (!method.IsPublic)
+            {
+                order <<= 8;
+            }
+
+            return order;
         }
     }
 }

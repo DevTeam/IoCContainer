@@ -108,6 +108,11 @@
         public IEnumerable<FieldInfo> GetDeclaredFields() => Type.GetFields(DefaultBindingFlags);
 
         [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        [Pure]
+        public IEnumerable<PropertyInfo> GetDeclaredProperties() => Type.GetProperties(DefaultBindingFlags);
+
+        [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
         [Pure]
         public Type GetBaseType() => Type.BaseType;
@@ -254,6 +259,11 @@
         [NotNull]
         [Pure]
         public IEnumerable<FieldInfo> GetDeclaredFields() => _typeInfo.DeclaredFields;
+
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        [Pure]
+        public IEnumerable<PropertyInfo> GetDeclaredProperties() => _typeInfo.DeclaredProperties;
 
         [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]

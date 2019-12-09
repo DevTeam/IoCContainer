@@ -1250,6 +1250,20 @@ namespace IoC
         }
 
         /// <summary>
+        /// Applies text configurations for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurationText">The text configurations.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params string[] configurationText)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Apply(configurationText);
+        }
+
+        /// <summary>
         /// Applies text configurations from streams for the target container.
         /// </summary>
         /// <param name="container">The target container.</param>
@@ -1263,6 +1277,20 @@ namespace IoC
             if (configurationStreams == null) throw new ArgumentNullException(nameof(configurationStreams));
             if (configurationStreams.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationStreams));
             return container.ApplyData(configurationStreams);
+        }
+
+        /// <summary>
+        /// Applies text configurations from streams for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurationStreams">The set of streams with text configurations.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Apply(configurationStreams);
         }
 
         /// <summary>
@@ -1282,6 +1310,22 @@ namespace IoC
         }
 
         /// <summary>
+        /// Applies text configurations from text readers for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurationReaders">The set of text readers with text configurations.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            if (configurationReaders == null) throw new ArgumentNullException(nameof(configurationReaders));
+            if (configurationReaders.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationReaders));
+            return token.Container.Apply(configurationReaders);
+        }
+
+        /// <summary>
         /// Applies text configurations for the target container.
         /// </summary>
         /// <param name="container">The target container.</param>
@@ -1295,6 +1339,20 @@ namespace IoC
             if (configurationText == null) throw new ArgumentNullException(nameof(configurationText));
             if (configurationText.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationText));
             return container.UsingData(configurationText);
+        }
+
+        /// <summary>
+        /// Applies text configurations for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurationText">The text configurations.</param>
+        /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params string[] configurationText)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Using(configurationText);
         }
 
         /// <summary>
@@ -1314,6 +1372,20 @@ namespace IoC
         }
 
         /// <summary>
+        /// Applies text configurations from streams for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurationStreams">The set of streams with text configurations.</param>
+        /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Using(configurationStreams);
+        }
+
+        /// <summary>
         /// Applies text configurations from text readers for the target container.
         /// </summary>
         /// <param name="container">The target container.</param>
@@ -1330,6 +1402,20 @@ namespace IoC
         }
 
         /// <summary>
+        /// Applies text configurations from text readers for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurationReaders">The set of text readers with text configurations.</param>
+        /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Using(configurationReaders);
+        }
+
+        /// <summary>
         /// Applies configurations for the target container.
         /// </summary>
         /// <param name="container">The target container.</param>
@@ -1342,6 +1428,20 @@ namespace IoC
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
             return Disposable.Create(configurations.Select(i => i.Apply(container)).SelectMany(i => i).ToArray()).AsTokenOf(container);
+        }
+
+        /// <summary>
+        /// Applies configurations for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurations">The configurations.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Apply(configurations);
         }
 
         /// <summary>
@@ -1363,6 +1463,20 @@ namespace IoC
         /// <summary>
         /// Applies configurations for the target container.
         /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurations">The configurations.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Apply(configurations);
+        }
+
+        /// <summary>
+        /// Applies configurations for the target container.
+        /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The target container.</returns>
@@ -1378,6 +1492,20 @@ namespace IoC
         }
 
         /// <summary>
+        /// Applies configurations for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurations">The configurations.</param>
+        /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Using(configurations);
+        }
+
+        /// <summary>
         /// Applies configuration for the target container.
         /// </summary>
         /// <typeparam name="T">The type of configuration.</typeparam>
@@ -1390,6 +1518,21 @@ namespace IoC
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             return container.Using(new T());
+        }
+
+        /// <summary>
+        /// Applies configuration for the target container.
+        /// </summary>
+        /// <typeparam name="T">The type of configuration.</typeparam>
+        /// <param name="token">The target container token.</param>
+        /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IContainer Using<T>([NotNull] this IToken token)
+            where T : IConfiguration, new()
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Using<T>();
         }
 
         [MethodImpl((MethodImplOptions)256)]
@@ -1971,11 +2114,6 @@ namespace IoC
         public bool IsSuccess;
 
         /// <summary>
-        /// True if it is hidden.
-        /// </summary>
-        internal bool IsHidden;
-
-        /// <summary>
         /// Error during operation.
         /// </summary>
         public Exception Error;
@@ -2010,15 +2148,12 @@ namespace IoC
             Container = container;
             EventType = eventType;
             IsSuccess = true;
-            IsHidden = false;
             Error = default(Exception);
             Keys = default(IEnumerable<Key>);
             Dependency = default(IDependency);
             Lifetime = default(ILifetime);
             ResolverExpression = default(LambdaExpression);
         }
-
-        internal ContainerEvent Copy() => new ContainerEvent(Container, EventType) { IsSuccess = IsSuccess, IsHidden = IsHidden, Error = Error, Keys = Keys, Dependency = Dependency, Lifetime = Lifetime, ResolverExpression = ResolverExpression };
     }
 }
 
@@ -4967,13 +5102,26 @@ namespace IoC
         /// <param name="token">The token of target container to trace.</param>
         /// <param name="onTraceMessage">The trace handler.</param>
         /// <returns>The trace token.</returns>
-        public static IToken Trace([NotNull] this IToken token, [NotNull] Action<string> onTraceMessage)
-        {
-            if (token == null) throw new ArgumentNullException(nameof(token));
-            if (onTraceMessage == null) throw new ArgumentNullException(nameof(onTraceMessage));
+        public static IToken Trace([NotNull] this IToken token, [NotNull] Action<string> onTraceMessage) =>
+            (token ?? throw new ArgumentNullException(nameof(token))).Container.Trace(onTraceMessage ?? throw new ArgumentNullException(nameof(onTraceMessage)));
 
-            return token.Container.Trace(onTraceMessage);
-        }
+#if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETCOREAPP1_0&& !NETCOREAPP1_1 && !WINDOWS_UWP
+        /// <summary>
+        /// Trace container action by handler.
+        /// </summary>
+        /// <param name="container">The target container to trace.</param>
+        /// <returns>The trace token.</returns>
+        public static IToken Trace([NotNull] this IContainer container) =>
+            (container ?? throw new ArgumentNullException(nameof(container))).Trace(message => System.Diagnostics.Trace.WriteLine(message));
+
+        /// <summary>
+        /// Trace container action by handler.
+        /// </summary>
+        /// <param name="token">The token of target container to trace.</param>
+        /// <returns>The trace token.</returns>
+        public static IToken Trace([NotNull] this IToken token) =>
+            (token ?? throw new ArgumentNullException(nameof(token))).Container.Trace();
+#endif
 
         private static void Subscribe(
             IContainer container,
@@ -8377,9 +8525,13 @@ namespace IoC.Core
 namespace IoC.Core
 {
     using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using static TypeDescriptorExtensions;
 
     internal class ContainerEventToStringConverter: IConverter<ContainerEvent, IContainer, string>
     {
+        private static readonly PropertyInfo PropertyInfo = Descriptor<Expression>().GetDeclaredProperties().SingleOrDefault(i => i.Name == "DebugView");
         public static readonly IConverter<ContainerEvent, IContainer, string> Shared = new ContainerEventToStringConverter();
 
         private ContainerEventToStringConverter() { }
@@ -8406,7 +8558,8 @@ namespace IoC.Core
                     break;
 
                 case EventType.ResolverCompilation:
-                    text = $"compiles {FormatDependency(src)} from: {GetString(src.ResolverExpression?.Body)}.";
+                    var body = src.ResolverExpression?.Body;
+                    text = $"compiles {FormatDependency(src)} from:\n{GetString(GetDebugView(body))}.";
                     break;
 
                 default:
@@ -8416,6 +8569,16 @@ namespace IoC.Core
 
             dst = FormatPrefix(context) + text;
             return true;
+        }
+
+        [CanBeNull] private static string GetDebugView([CanBeNull] Expression expression)
+        {
+            if (expression == null)
+            {
+                return null;
+            }
+
+            return PropertyInfo?.GetValue(expression, null) as string ?? expression.ToString();
         }
 
         [NotNull] private static string FormatDependency(ContainerEvent containerEvent)
@@ -8630,7 +8793,18 @@ namespace IoC.Core
         private static int GetOrder(MethodBase method)
         {
             var order = method.GetParameters().Length + 1;
-            return method.IsPublic ? order : order << 10;
+            
+            if (method.GetCustomAttributes(typeof(ObsoleteAttribute), true).Any())
+            {
+                order <<= 4;
+            }
+
+            if (!method.IsPublic)
+            {
+                order <<= 8;
+            }
+
+            return order;
         }
     }
 }
@@ -10746,6 +10920,11 @@ namespace IoC.Core
         public IEnumerable<FieldInfo> GetDeclaredFields() => Type.GetFields(DefaultBindingFlags);
 
         [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        [Pure]
+        public IEnumerable<PropertyInfo> GetDeclaredProperties() => Type.GetProperties(DefaultBindingFlags);
+
+        [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
         [Pure]
         public Type GetBaseType() => Type.BaseType;
@@ -10892,6 +11071,11 @@ namespace IoC.Core
         [NotNull]
         [Pure]
         public IEnumerable<FieldInfo> GetDeclaredFields() => _typeInfo.DeclaredFields;
+
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        [Pure]
+        public IEnumerable<PropertyInfo> GetDeclaredProperties() => _typeInfo.DeclaredProperties;
 
         [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]

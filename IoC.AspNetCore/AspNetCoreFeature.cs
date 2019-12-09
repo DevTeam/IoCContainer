@@ -10,8 +10,13 @@
 
     /// <inheritdoc cref="IConfiguration" />
     [PublicAPI]
-    public class AspNetCoreFeature : Collection<ServiceDescriptor>, IServiceCollection, IConfiguration
+    public class AspNetCoreFeature : Collection<ServiceDescriptor>, IServiceCollection, IConfiguration, ICannotRegister
     {
+        private object _lockObject = new object();
+        private long _tag;
+        private ServiceDescriptor _service;
+        private IBinding<object> _binding;
+
         /// <summary>
         /// Default constructor.
         /// </summary>
@@ -30,47 +35,88 @@
             var singletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.Singleton.AsTag());
             var scopeSingletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.ScopeSingleton.AsTag());
 
-            foreach (var serviceGroup in this.GroupBy(i => i.ServiceType))
+            using (container.Bind<ICannotRegister>().To(ctx => this))
             {
-                foreach (var service in serviceGroup.Reverse())
+                foreach (var serviceGroup in this.GroupBy(i => i.ServiceType))
                 {
-                    var binding = container.Bind(service.ServiceType);
-                    switch (service.Lifetime)
+                    foreach (var service in serviceGroup.Reverse())
                     {
-                        case ServiceLifetime.Transient:
-                            break;
+                        var binding = container.Bind(service.ServiceType);
+                        switch (service.Lifetime)
+                        {
+                            case ServiceLifetime.Transient:
+                                break;
 
-                        case ServiceLifetime.Singleton:
-                            binding = binding.Lifetime(singletonLifetimeResolver(container));
-                            break;
+                            case ServiceLifetime.Singleton:
+                                binding = binding.Lifetime(singletonLifetimeResolver(container));
+                                break;
 
-                        case ServiceLifetime.Scoped:
-                            binding = binding.Lifetime(scopeSingletonLifetimeResolver(container));
-                            break;
+                            case ServiceLifetime.Scoped:
+                                binding = binding.Lifetime(scopeSingletonLifetimeResolver(container));
+                                break;
 
-                        default:
-                            throw new NotSupportedException($"Unknown lifetime {service.Lifetime}.");
-                    }
+                            default:
+                                throw new NotSupportedException($"Unknown lifetime {service.Lifetime}.");
+                        }
 
-                    var tokenFactory = new TokenFactory(service, binding);
-                    using (container.Bind<ICannotRegister>().To(ctx => tokenFactory))
-                    {
-                        if (tokenFactory.TryCreateToken(out var token))
+                        if (TryCreateToken(service, binding, out var token))
                         {
                             yield return token;
                             continue;
                         }
-                    }
 
-                    throw new NotSupportedException($"The service descriptor {service} is not supported.");
+                        throw new NotSupportedException($"The service descriptor {service} is not supported.");
+                    }
                 }
             }
-
 
             yield return container
                 .Bind<IServiceProvider>().Lifetime(singletonLifetimeResolver(container)).To<ServiceProvider>()
                 .Bind<IServiceScopeFactory>().Lifetime(singletonLifetimeResolver(container)).To<ServiceScopeFactory>()
                 .Bind<IServiceScope>().To<ServiceScope>();
+        }
+
+        IToken ICannotRegister.Resolve(IContainer container, Key[] keys)
+        {
+            lock (_lockObject)
+            {
+                if (TryCreateToken(_service, _binding, out var token))
+                {
+                    return token;
+                }
+            }
+
+            throw new InvalidOperationException("Cannot create a binding token.");
+        }
+
+        private bool TryCreateToken(ServiceDescriptor service, IBinding<object> binding, out IToken token)
+        {
+            lock (_lockObject)
+            {
+                _service = service;
+                _binding = binding.Tag(_tag++);
+
+                if (service.ImplementationType != null)
+                {
+                    token = binding.To(service.ImplementationType);
+                    return true;
+                }
+
+                if (service.ImplementationFactory != null)
+                {
+                    token = binding.To(ctx => service.ImplementationFactory(ctx.Container.Inject<IServiceProvider>()));
+                    return true;
+                }
+
+                if (service.ImplementationInstance != null)
+                {
+                    token = binding.To(ctx => service.ImplementationInstance);
+                    return true;
+                }
+
+                token = default(IToken);
+                return false;
+            }
         }
     }
 }

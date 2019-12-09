@@ -51,6 +51,20 @@
         }
 
         /// <summary>
+        /// Applies text configurations for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurationText">The text configurations.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params string[] configurationText)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Apply(configurationText);
+        }
+
+        /// <summary>
         /// Applies text configurations from streams for the target container.
         /// </summary>
         /// <param name="container">The target container.</param>
@@ -64,6 +78,20 @@
             if (configurationStreams == null) throw new ArgumentNullException(nameof(configurationStreams));
             if (configurationStreams.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationStreams));
             return container.ApplyData(configurationStreams);
+        }
+
+        /// <summary>
+        /// Applies text configurations from streams for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurationStreams">The set of streams with text configurations.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Apply(configurationStreams);
         }
 
         /// <summary>
@@ -83,6 +111,22 @@
         }
 
         /// <summary>
+        /// Applies text configurations from text readers for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurationReaders">The set of text readers with text configurations.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            if (configurationReaders == null) throw new ArgumentNullException(nameof(configurationReaders));
+            if (configurationReaders.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationReaders));
+            return token.Container.Apply(configurationReaders);
+        }
+
+        /// <summary>
         /// Applies text configurations for the target container.
         /// </summary>
         /// <param name="container">The target container.</param>
@@ -96,6 +140,20 @@
             if (configurationText == null) throw new ArgumentNullException(nameof(configurationText));
             if (configurationText.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationText));
             return container.UsingData(configurationText);
+        }
+
+        /// <summary>
+        /// Applies text configurations for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurationText">The text configurations.</param>
+        /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params string[] configurationText)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Using(configurationText);
         }
 
         /// <summary>
@@ -115,6 +173,20 @@
         }
 
         /// <summary>
+        /// Applies text configurations from streams for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurationStreams">The set of streams with text configurations.</param>
+        /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Using(configurationStreams);
+        }
+
+        /// <summary>
         /// Applies text configurations from text readers for the target container.
         /// </summary>
         /// <param name="container">The target container.</param>
@@ -131,6 +203,20 @@
         }
 
         /// <summary>
+        /// Applies text configurations from text readers for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurationReaders">The set of text readers with text configurations.</param>
+        /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Using(configurationReaders);
+        }
+
+        /// <summary>
         /// Applies configurations for the target container.
         /// </summary>
         /// <param name="container">The target container.</param>
@@ -143,6 +229,20 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
             return Disposable.Create(configurations.Select(i => i.Apply(container)).SelectMany(i => i).ToArray()).AsTokenOf(container);
+        }
+
+        /// <summary>
+        /// Applies configurations for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurations">The configurations.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Apply(configurations);
         }
 
         /// <summary>
@@ -164,6 +264,20 @@
         /// <summary>
         /// Applies configurations for the target container.
         /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurations">The configurations.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Apply(configurations);
+        }
+
+        /// <summary>
+        /// Applies configurations for the target container.
+        /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The target container.</returns>
@@ -179,6 +293,20 @@
         }
 
         /// <summary>
+        /// Applies configurations for the target container.
+        /// </summary>
+        /// <param name="token">The target container token.</param>
+        /// <param name="configurations">The configurations.</param>
+        /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Using(configurations);
+        }
+
+        /// <summary>
         /// Applies configuration for the target container.
         /// </summary>
         /// <typeparam name="T">The type of configuration.</typeparam>
@@ -191,6 +319,21 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             return container.Using(new T());
+        }
+
+        /// <summary>
+        /// Applies configuration for the target container.
+        /// </summary>
+        /// <typeparam name="T">The type of configuration.</typeparam>
+        /// <param name="token">The target container token.</param>
+        /// <returns>The target container.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IContainer Using<T>([NotNull] this IToken token)
+            where T : IConfiguration, new()
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Using<T>();
         }
 
         [MethodImpl((MethodImplOptions)256)]

@@ -14,19 +14,23 @@
             // $priority=08
             // $description=Tracing
             // {
-            // Create and configure the container
-            var messages = new List<string>();
+            var traceMessages = new List<string>();
+
             {
+                // Create and configure the root container
                 using var rootContainer = Container
                     .Create("root")
-                    .Trace(message => messages.Add(message))
+                    // Aggregate trace messages to the list 'traceMessages'
+                    .Trace(message => traceMessages.Add(message))
                     .Container;
 
+                // Create and configure the parent container
                 using var parentContainer = rootContainer
                     .Create("parent")
                     .Bind<IDependency>().To<Dependency>(ctx => new Dependency())
                     .Container;
 
+                // Create and configure the child container
                 using var childContainer = parentContainer
                     .Create("child")
                     .Bind<IService<TT>>().To<Service<TT>>()
@@ -35,7 +39,7 @@
                 childContainer.Resolve<IService<int>>();
             }
 
-            messages.Count.ShouldBe(8);
+            traceMessages.Count.ShouldBe(8);
             // }
         }
     }

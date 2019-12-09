@@ -21,5 +21,25 @@
         <member name="M:IoC.Features.AspNetCoreFeature.Apply(IoC.IContainer)">
             <inheritdoc />
         </member>
+        <member name="T:IoC.Features.AspNetCore.ServiceProviderFactory">
+            <summary>
+            Creates a builder and an <see cref="T:System.IServiceProvider" />.
+            </summary>
+        </member>
+        <member name="M:IoC.Features.AspNetCore.ServiceProviderFactory.#ctor(IoC.IContainer)">
+            <summary>
+            Creates a new instance of <c>IServiceProviderFactory</c>.
+            </summary>
+            <param name="container"></param>
+        </member>
+        <member name="M:IoC.Features.AspNetCore.ServiceProviderFactory.CreateBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Features.AspNetCore.ServiceProviderFactory.CreateServiceProvider(IoC.IContainer)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Features.AspNetCore.ServiceProviderFactory.Dispose">
+            <inheritdoc />
+        </member>
     </members>
 </doc>
