@@ -297,9 +297,10 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Tracing](#tracing-)
   - [Validation](#validation-)
   - [Aspect Oriented Autowiring](#aspect-oriented-autowiring-)
-- Multithreading-Ready
+- Asynchronous cases
   - [Asynchronous resolve](#asynchronous-resolve-)
   - [Asynchronous lightweight resolve](#asynchronous-lightweight-resolve-)
+  - [Asynchronous construction](#asynchronous-construction-)
 - Design Aspects
   - [Configuration class](#configuration-class-)
   - [Change configuration on-the-fly](#change-configuration-on-the-fly-)
@@ -314,6 +315,81 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Generator](#generator-)
   - [Instant Messenger](#instant-messenger-)
   - [Wrapper](#wrapper-)
+
+### Asynchronous resolve [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousResolve.cs)
+
+
+
+``` CSharp
+// Create the container and configure it
+using var container = Container.Create()
+    // Bind some dependency
+    .Bind<IDependency>().To<Dependency>()
+    .Bind<IService>().To<Service>().Container;
+
+// Resolve an instance asynchronously
+var instance = await container.Resolve<Task<IService>>();
+```
+
+
+
+### Asynchronous lightweight resolve [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousValueResolve.cs)
+
+
+
+``` CSharp
+// Create a container
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    // Bind Service
+    .Bind<IService>().To<Service>()
+    .Container;
+
+// Resolve an instance asynchronously via ValueTask
+var instance = await container.Resolve<ValueTask<IService>>();
+```
+
+
+
+### Asynchronous construction [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousConstruction.cs)
+
+
+
+``` CSharp
+public async void Run()
+{
+    // Create the container and configure it
+    using var container = Container.Create()
+        // Bind some dependency
+        .Bind<IDependency>().To<SomeDependency>()
+        .Bind<Consumer>().To<Consumer>().Container;
+
+    // Resolve an instance asynchronously
+    var instance = await container.Resolve<Task<Consumer>>();
+
+    // Check the instance's type
+    instance.ShouldBeOfType<Consumer>();
+}
+
+public class SomeDependency: IDependency
+{
+    // Time-consuming logic constructor
+    public SomeDependency() { }
+}
+
+public class Consumer
+{
+    public Consumer(Task<IDependency> dependency1, Task<IDependency> dependency2)
+    {
+        // Time-consuming logic
+        var dep1 = dependency1.Result;
+        var dep2 = dependency2.Result;
+    }
+}
+```
+
+
 
 ### Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Autowiring.cs)
 
@@ -1718,42 +1794,6 @@ var instances = container.Resolve<ISet<IService>>();
 
 // Check the number of resolved instances
 instances.Count.ShouldBe(3);
-```
-
-
-
-### Asynchronous resolve [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousResolve.cs)
-
-
-
-``` CSharp
-// Create the container and configure it
-using var container = Container.Create()
-    // Bind some dependency
-    .Bind<IDependency>().To<Dependency>()
-    .Bind<IService>().To<Service>().Container;
-
-// Resolve an instance asynchronously
-var instance = await container.Resolve<Task<IService>>();
-```
-
-
-
-### Asynchronous lightweight resolve [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousValueResolve.cs)
-
-
-
-``` CSharp
-// Create a container
-using var container = Container
-    .Create()
-    .Bind<IDependency>().To<Dependency>()
-    // Bind Service
-    .Bind<IService>().To<Service>()
-    .Container;
-
-// Resolve an instance asynchronously via ValueTask
-var instance = await container.Resolve<ValueTask<IService>>();
 ```
 
 
