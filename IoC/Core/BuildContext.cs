@@ -43,11 +43,8 @@
 
         public int Depth { get; }
 
-        public IBuildContext CreateChild(Key key, IContainer container)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return CreateChildInternal(key, container);
-        }
+        public IBuildContext CreateChild(Key key, IContainer container) => 
+            CreateChildInternal(key, container ?? throw new ArgumentNullException(nameof(container)));
 
         public Expression ReplaceTypes(Expression baseExpression) =>
             TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, _typesMap);

@@ -173,7 +173,7 @@
                 baseExpression = default(Expression);
                 return false;
             }
-        }        
+        }
 
         [CanBeNull]
         internal Type GetInstanceTypeBasedOnTargetGenericConstrains(Type targetType)

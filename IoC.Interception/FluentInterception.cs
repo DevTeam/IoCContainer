@@ -1,4 +1,5 @@
-﻿namespace IoC.Features
+﻿// ReSharper disable MemberCanBePrivate.Global
+namespace IoC.Features
 {
     using System;
     using System.Linq;

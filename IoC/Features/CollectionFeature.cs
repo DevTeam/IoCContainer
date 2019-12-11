@@ -1,4 +1,5 @@
-﻿namespace IoC.Features
+﻿// ReSharper disable MemberCanBeProtected.Local
+namespace IoC.Features
 {
     using System;
     using System.Collections;
@@ -24,10 +25,7 @@
         public static readonly IConfiguration Default = new CollectionFeature();
 
         private CollectionFeature()
-        {
-        }
-
-
+        { }
 
         /// <inheritdoc />
         public IEnumerable<IToken> Apply(IContainer container)
@@ -69,8 +67,7 @@
         {
             public Enumeration([NotNull] Context context, [NotNull] ILockObject lockObject)
             : base(context, lockObject)
-            {
-            }
+            { }
 
             [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
             public IEnumerator<T> GetEnumerator()
@@ -92,8 +89,7 @@
         {
             public AsyncEnumeration([NotNull] Context context, [NotNull] ILockObject lockObject)
                 : base(context, lockObject)
-            {
-            }
+            { }
 
             public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken()) => 
                 new AsyncEnumerator<T>(this, cancellationToken);
@@ -137,7 +133,7 @@
             public ValueTask DisposeAsync() => new ValueTask();
 
             private Task<bool> StartTask(Task<bool> task)
-            {                
+            {
                 task.Start(_taskScheduler);
                 return task;
             }
@@ -169,20 +165,19 @@
 
             public Resolver<T>[] GetResolvers()
             {
-                if (_resolvers != null)
-                {
-                    return _resolvers;
-                }
-
                 lock (_lockObject)
                 {
-                    if (_resolvers == null)
+                    var resolvers = _resolvers;
+                    if (resolvers != null)
                     {
-                        _resolvers = GetResolvers(Context.Container).ToArray();
+                        return resolvers;
                     }
-                }
+                    
+                    resolvers = GetResolvers(Context.Container).ToArray();
+                    _resolvers = resolvers;
 
-                return _resolvers;
+                    return resolvers;
+                }
             }
 
             private void Reset()

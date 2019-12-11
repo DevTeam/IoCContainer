@@ -5,10 +5,10 @@
 
     internal interface IRegistrationTracker : IObserver<ContainerEvent>
     {
-        IEnumerable<IBuilder> Builders { get; }
-        
-        IAutowiringStrategy AutowiringStrategy { get; }
+        [NotNull] IEnumerable<IBuilder> Builders { get; }
 
-        IEnumerable<ICompiler> Compilers { get; }
+        [NotNull] IAutowiringStrategy AutowiringStrategy { get; }
+
+        [NotNull] IEnumerable<ICompiler> Compilers { get; }
     }
 }

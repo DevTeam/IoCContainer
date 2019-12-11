@@ -9,9 +9,7 @@
 
         private CannotParseTag() { }
 
-        public object Resolve(string statementText, int statementLineNumber, int statementPosition, string tag)
-        {
+        public object Resolve(string statementText, int statementLineNumber, int statementPosition, string tag) => 
             throw new InvalidOperationException($"Cannot parse the tag {tag} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
-        }
     }
 }

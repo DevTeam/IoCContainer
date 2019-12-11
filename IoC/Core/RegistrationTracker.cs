@@ -1,27 +1,35 @@
-﻿namespace IoC.Core
+﻿// ReSharper disable ForCanBeConvertedToForeach
+namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
 
-    internal class RegistrationTracker: IRegistrationTracker
+    internal class RegistrationTracker : IRegistrationTracker
     {
         private readonly Container _container;
-        private readonly Dictionary<Key, object> _instances = new Dictionary<Key, object>();
-        private readonly List<IBuilder> _builders = new List<IBuilder>();
-        private readonly List<IAutowiringStrategy> _autowiringStrategies = new List<IAutowiringStrategy> { DefaultAutowiringStrategy.Shared };
-        private readonly List<ICompiler> _compilers = new List<ICompiler> { DefaultCompiler.Shared };
+        private readonly ITracker[] _trackers = new ITracker[3];
+        private readonly Tracker<IBuilder> _builderTracker;
+        private readonly Tracker<IAutowiringStrategy> _autowiringStrategyTracker;
+        private readonly Tracker<ICompiler> _compilerTracker;
 
         public RegistrationTracker([NotNull] Container container)
         {
             _container = container;
-            _autowiringStrategies.Add(DefaultAutowiringStrategy.Shared);
+
+            _trackers[0] = _autowiringStrategyTracker = new Tracker<IAutowiringStrategy>((list, val) => list.Insert(0, val));
+            _autowiringStrategyTracker.Items.Add(DefaultAutowiringStrategy.Shared);
+
+            _trackers[1] = _compilerTracker = new Tracker<ICompiler>((list, val) => list.Insert(0, val));
+            _compilerTracker.Items.Add(DefaultCompiler.Shared);
+
+            _trackers[2] = _builderTracker = new Tracker<IBuilder>((list, val) => list.Add(val));
         }
 
-        public IEnumerable<IBuilder> Builders => _builders;
+        public IEnumerable<IBuilder> Builders => _builderTracker.Items;
 
-        public IAutowiringStrategy AutowiringStrategy => _autowiringStrategies[0];
+        public IAutowiringStrategy AutowiringStrategy => _autowiringStrategyTracker.Items[0];
 
-        public IEnumerable<ICompiler> Compilers => _compilers;
+        public IEnumerable<ICompiler> Compilers => _compilerTracker.Items;
 
         public void OnNext(ContainerEvent value)
         {
@@ -30,28 +38,20 @@
                 return;
             }
 
+            IContainer container;
             switch (value.EventType)
             {
                 case EventType.RegisterDependency:
                     _container.Reset();
-                    var container = value.Container;
+                    container = value.Container;
                     foreach (var key in value.Keys)
                     {
-                        if (Track<IBuilder>(key, container, i => _builders.Add(i)))
+                        for (var index = 0; index < _trackers.Length; index++)
                         {
-                            continue;
-                        }
-
-                        if (Track<IAutowiringStrategy>(key, container, i => _autowiringStrategies.Insert(0, i)))
-                        {
-                            // ReSharper disable once RedundantJumpStatement
-                            continue;
-                        }
-
-                        if (Track<ICompiler>(key, container, i => _compilers.Insert(0, i)))
-                        {
-                            // ReSharper disable once RedundantJumpStatement
-                            continue;
+                            if (_trackers[index].Track(key, container))
+                            {
+                                break;
+                            }
                         }
                     }
 
@@ -59,31 +59,14 @@
 
                 case EventType.UnregisterDependency:
                     _container.Reset();
+                    container = value.Container;
                     foreach (var key in value.Keys)
                     {
-                        if (_builders.Count > 0)
+                        for (var index = 0; index < _trackers.Length; index++)
                         {
-                            if (Untrack<IBuilder>(key, i => _builders.Remove(i)))
+                            if (_trackers[index].Untrack(key, container))
                             {
-                                continue;
-                            }
-                        }
-
-                        if (_autowiringStrategies.Count > 1)
-                        {
-                            if (Untrack<IAutowiringStrategy>(key, i => _autowiringStrategies.Remove(i)))
-                            {
-                                // ReSharper disable once RedundantJumpStatement
-                                continue;
-                            }
-                        }
-
-                        if (_compilers.Count > 1)
-                        {
-                            if (Untrack<ICompiler>(key, i => _compilers.Remove(i)))
-                            {
-                                // ReSharper disable once RedundantJumpStatement
-                                continue;
+                                break;
                             }
                         }
                     }
@@ -96,38 +79,58 @@
 
         public void OnCompleted() { }
 
-        private bool Track<T>(Key key, IContainer container, Action<T> trackAction)
+        private interface ITracker
         {
-            if (key.Type != typeof(T))
-            {
-                return false;
-            }
+            bool Track(Key key, IContainer container);
 
-            if (!container.TryGetResolver<T>(key.Type, key.Tag, out var resolver, out _, container))
-            {
-                return false;
-            }
-
-            var instance = resolver(container);
-            _instances[key] = instance;
-            trackAction(instance);
-            return true;
+            bool Untrack(Key key, IContainer container);
         }
 
-        private bool Untrack<T>(Key key, Action<T> untrackAction)
+        private class Tracker<T> : ITracker
         {
-            if (key.Type != typeof(T))
-            {
-                return false;
-            }
+            private readonly Action<IList<T>, T> _updater;
+            private readonly Dictionary<IContainer, T> _map = new Dictionary<IContainer, T>();
+            public readonly IList<T> Items = new List<T>();
 
-            if (!_instances.TryGetValue(key, out var instance))
+            public Tracker(Action<IList<T>, T> updater) => 
+                _updater = updater;
+
+            public bool Track(Key key, IContainer container)
             {
+                if (key.Type != typeof(T))
+                {
+                    return false;
+                }
+
+                if (_map.ContainsKey(container))
+                {
+                    return true;
+                }
+
+                if (container.TryGetResolver<T>(key.Type, key.Tag, out var resolver, out _, container))
+                {
+                    var instance = resolver(container);
+                    _map.Add(container, instance);
+                    _updater(Items, instance);
+                }
+
                 return true;
             }
 
-            untrackAction((T)instance);
-            return true;
+            public bool Untrack(Key key, IContainer container)
+            {
+                if (key.Type != typeof(T))
+                {
+                    return false;
+                }
+
+                if (_map.TryGetValue(container, out var instance))
+                {
+                    Items.Remove(instance);
+                }
+
+                return true;
+            }
         }
     }
 }

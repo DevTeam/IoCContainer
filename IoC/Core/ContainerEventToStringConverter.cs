@@ -47,15 +47,8 @@
             return true;
         }
 
-        [CanBeNull] private static string GetDebugView([CanBeNull] Expression expression)
-        {
-            if (expression == null)
-            {
-                return null;
-            }
-
-            return PropertyInfo?.GetValue(expression, null) as string ?? expression.ToString();
-        }
+        [CanBeNull] private static string GetDebugView([CanBeNull] Expression expression) => 
+            expression == null ? null : PropertyInfo?.GetValue(expression, null) as string ?? expression.ToString();
 
         [NotNull] private static string FormatDependency(ContainerEvent containerEvent)
         {
@@ -94,6 +87,7 @@
             where T: class =>
             value?.ToString() ?? defaultString;
 
-        [NotNull] private static string Quoted([NotNull] string text) => $"\"{text}\"";
+        [NotNull] private static string Quoted([NotNull] string text) =>
+            $"\"{text}\"";
     }
 }

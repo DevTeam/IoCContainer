@@ -54,8 +54,10 @@
                 {
                     // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
+
                     // type
                     var type = methodCall.Method.GetGenericArguments()[0];
+
                     // tag
                     var tagExpression = methodCall.Arguments[1];
                     var tag = GetTag(tagExpression);
@@ -182,14 +184,12 @@
         }
 
         [NotNull]
-        private Expression CreateNewContextExpression()
-        {
-            return Expression.New(
+        private Expression CreateNewContextExpression() =>
+            Expression.New(
                 ContextConstructor,
                 Expression.Constant(_buildContext.Key),
                 ContainerParameter,
                 ArgsParameter);
-        }
 
         [CanBeNull]
         private object GetTag([NotNull] Expression tagExpression)
@@ -213,10 +213,8 @@
         }
 
         [NotNull]
-        private IEnumerable<Expression> InjectAll(IEnumerable<Expression> expressions)
-        {
-            return expressions.Select(Visit);
-        }
+        private IEnumerable<Expression> InjectAll(IEnumerable<Expression> expressions) => 
+            expressions.Select(Visit);
 
         [NotNull]
         private IContainer SelectedContainer([NotNull] Expression containerExpression)

@@ -48,7 +48,7 @@
             _typeSelectors = typeSelectors;
             _orderSelectors = orderSelectors;
             _tagSelectors = tagSelectors;
-            _autowiringStrategy = null;
+            _autowiringStrategy = default(IAutowiringStrategy);
         }
 
         bool IAspectOrientedMetadata.TryGetType(Attribute attribute, out Type type)
@@ -111,14 +111,14 @@
 
         private IAutowiringStrategy GetAutowiringStrategy()
         {
-            if (_autowiringStrategy != null)
+            if (_autowiringStrategy != default(IAutowiringStrategy))
             {
                 return _autowiringStrategy;
             }
 
             lock (_lockObject)
             {
-                if (_autowiringStrategy == null)
+                if (_autowiringStrategy == default(IAutowiringStrategy))
                 {
                     _autowiringStrategy = new AspectOrientedAutowiringStrategy(this);
                 }

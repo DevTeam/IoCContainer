@@ -35,7 +35,7 @@
             }
 
             // Says that current logic should be used
-            return constructor != null;
+            return constructor != default(IMethod<ConstructorInfo>);
         }
 
         /// <inheritdoc />
@@ -59,7 +59,7 @@
                 .All(isInjected => isInjected)
             select method;
 
-        private class Metadata
+        private struct Metadata
         {
             [CanBeNull] public readonly Type Type;
             [CanBeNull] public readonly IComparable Order;
@@ -67,6 +67,9 @@
 
             public Metadata(IAspectOrientedMetadata metadata, IEnumerable<object> attributes)
             {
+                Type = default(Type);
+                Order = null;
+                Tag = default(object);
                 foreach (var attribute in attributes)
                 {
                     if (!(attribute is Attribute attributeValue))
@@ -74,7 +77,7 @@
                         continue;
                     }
 
-                    if (Type == null && metadata.TryGetType(attributeValue, out var curType))
+                    if (Type == default(Type) && metadata.TryGetType(attributeValue, out var curType))
                     {
                         Type = curType;
                     }
@@ -84,19 +87,19 @@
                         Order = curOrder;
                     }
 
-                    if (Tag == null && metadata.TryGetTag(attributeValue, out var curTag))
+                    if (Tag == default(object) && metadata.TryGetTag(attributeValue, out var curTag))
                     {
                         Tag = curTag;
                     }
 
-                    if (Type != null && Order != null && Tag != null)
+                    if (Type != default(Type) && Order != null && Tag != default(object))
                     {
                         break;
                     }
                 }
             }
 
-            public bool IsEmpty => Type == null && Order == null && Tag == null;
+            public bool IsEmpty => Type == default(Type) && Order == null && Tag == default(object);
         }
     }
 }

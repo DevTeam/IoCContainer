@@ -16,7 +16,7 @@
         [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
         public AutowiringDependency(
             [NotNull] LambdaExpression constructor,
-            [CanBeNull] IAutowiringStrategy autoWiringStrategy = null,
+            [CanBeNull] IAutowiringStrategy autoWiringStrategy = default(IAutowiringStrategy),
             [NotNull][ItemNotNull] params LambdaExpression[] statements)
             :this(
                 constructor?.Body ?? throw new ArgumentNullException(nameof(constructor)),
@@ -27,7 +27,7 @@
 
         public AutowiringDependency(
             [NotNull] Expression constructorExpression,
-            [CanBeNull] IAutowiringStrategy autoWiringStrategy = null,
+            [CanBeNull] IAutowiringStrategy autoWiringStrategy = default(IAutowiringStrategy),
             [NotNull][ItemNotNull] params Expression[] statementExpressions)
         {
             _expression = constructorExpression ?? throw new ArgumentNullException(nameof(constructorExpression));

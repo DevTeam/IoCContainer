@@ -4,6 +4,7 @@
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Threading;
 
     internal static class Disposable
     {
@@ -14,7 +15,7 @@
         [NotNull]
         public static IDisposable Create([NotNull] Action action)
         {
-#if DEBUG   
+#if DEBUG
             if (action == null) throw new ArgumentNullException(nameof(action));
 #endif
             return new DisposableAction(action);
@@ -43,7 +44,8 @@
         {
             [NotNull] private readonly Action _action;
             [CanBeNull] private readonly object _key;
-            
+            private int _counter;
+
             public DisposableAction([NotNull] Action action, [CanBeNull] object key = null)
             {
                 _action = action;
@@ -52,6 +54,7 @@
 
             public void Dispose()
             {
+                if (Interlocked.Increment(ref _counter) != 1) return;
                 _action();
             }
 
@@ -62,28 +65,21 @@
                 return obj is DisposableAction other && Equals(_key, other._key);
             }
 
-            public override int GetHashCode()
-            {
-                return _key != null ? _key.GetHashCode() : 0;
-            }
+            public override int GetHashCode() => 
+                _key != null ? _key.GetHashCode() : 0;
         }
 
         private sealed class CompositeDisposable : IDisposable
         {
             private readonly IEnumerable<IDisposable> _disposables;
-            private bool _isDisposed;
-            
+            private int _counter;
+
             public CompositeDisposable(IEnumerable<IDisposable> disposables)
                 => _disposables = disposables;
 
             public void Dispose()
             {
-                if (_isDisposed)
-                {
-                    return;
-                }
-
-                _isDisposed = true;
+                if (Interlocked.Increment(ref _counter) != 1) return;
                 foreach (var disposable in _disposables)
                 {
                     disposable?.Dispose();
@@ -93,8 +89,7 @@
 
         private class EmptyDisposable: IDisposable
         {
-            [NotNull]
-            public static readonly IDisposable Shared = new EmptyDisposable();
+            [NotNull] public static readonly IDisposable Shared = new EmptyDisposable();
 
             private EmptyDisposable() { }
 

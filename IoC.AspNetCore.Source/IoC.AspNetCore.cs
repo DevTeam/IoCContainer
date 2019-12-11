@@ -95,6 +95,7 @@ namespace IoC.Features.AspNetCore
 #endregion
 #region ServiceScope
 
+// ReSharper disable ClassNeverInstantiated.Global
 namespace IoC.Features.AspNetCore
 {
     using System;

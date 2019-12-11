@@ -123,10 +123,8 @@
             return Expression.Lambda(ReplaceType(node.Type), body, parameters);
         }
 
-        protected override Expression VisitNewArray(NewArrayExpression node)
-        {
-            return Expression.NewArrayInit(ReplaceType(node.Type.GetElementType()), ReplaceAll(node.Expressions));
-        }
+        protected override Expression VisitNewArray(NewArrayExpression node) => 
+            Expression.NewArrayInit(ReplaceType(node.Type.GetElementType()), ReplaceAll(node.Expressions));
 
         protected override Expression VisitListInit(ListInitExpression node)
         {
@@ -237,9 +235,7 @@
         }
 
         [MethodImpl((MethodImplOptions) 256)]
-        private IEnumerable<Expression> ReplaceAll(IEnumerable<Expression> expressions)
-        {
-            return expressions.Select(Visit);
-        }
+        private IEnumerable<Expression> ReplaceAll(IEnumerable<Expression> expressions) => 
+            expressions.Select(Visit);
     }
 }

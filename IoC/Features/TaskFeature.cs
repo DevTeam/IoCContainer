@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using Core;
 
@@ -27,6 +28,7 @@
 #endif
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         private static Task<T> StartTask<T>(Task<T> task, TaskScheduler taskScheduler)
         {
             task.Start(taskScheduler);

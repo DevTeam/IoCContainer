@@ -1,4 +1,5 @@
-﻿namespace IoC.Core
+﻿// ReSharper disable LoopCanBeConvertedToQuery
+namespace IoC.Core
 {
     using System;
     using System.Runtime.CompilerServices;
@@ -6,10 +7,8 @@
     internal static class CoreExtensions
     {
         [MethodImpl((MethodImplOptions)256)]
-        public static bool SequenceEqual<T>([NotNull] this T[] array1, [NotNull] T[] array2)
-        {
-            return ((System.Collections.IStructuralEquatable)array1).Equals(array2, System.Collections.StructuralComparisons.StructuralEqualityComparer);
-        }
+        public static bool SequenceEqual<T>([NotNull] this T[] array1, [NotNull] T[] array2) =>
+            ((System.Collections.IStructuralEquatable)array1).Equals(array2, System.Collections.StructuralComparisons.StructuralEqualityComparer);
 
         [MethodImpl((MethodImplOptions)256)]
         public static int GetHash<T>([NotNull][ItemNotNull] this T[] items)
@@ -29,10 +28,8 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        public static T[] EmptyArray<T>()
-        {
-            return Empty<T>.Array;
-        }
+        public static T[] EmptyArray<T>() =>
+            Empty<T>.Array;
 
         [MethodImpl((MethodImplOptions) 256)]
         public static T[] CreateArray<T>(int size = 0, T value = default(T))

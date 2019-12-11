@@ -11,8 +11,7 @@
         public static readonly IAutowiringStrategy Shared = new DefaultAutowiringStrategy();
 
         private DefaultAutowiringStrategy()
-        {
-        }
+        { }
 
         [MethodImpl((MethodImplOptions)256)]
         public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
@@ -34,7 +33,7 @@
         private static int GetOrder(MethodBase method)
         {
             var order = method.GetParameters().Length + 1;
-            
+
             if (method.GetCustomAttributes(typeof(ObsoleteAttribute), true).Any())
             {
                 order <<= 4;

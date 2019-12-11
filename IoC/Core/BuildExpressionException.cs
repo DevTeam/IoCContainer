@@ -9,7 +9,6 @@
     {
         public BuildExpressionException(string message, [CanBeNull] Exception innerException)
             : base(message, innerException)
-        {
-        }
+        { }
     }
 }

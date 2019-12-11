@@ -42,9 +42,7 @@
             yield return container.Register<ILifetime>(ctx => new ScopeSingletonLifetime(), null, new object[] { Lifetime.ScopeSingleton });
 
             // Scope
-            long scopeId = 0;
-            Func<long> createScopeId = () => Interlocked.Increment(ref scopeId);
-            yield return container.Register<IScope>(ctx => new Scope(createScopeId(), ctx.Container.Resolve<ILockObject>()));
+            yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Resolve<ILockObject>()));
 
             // ThreadLocal
             yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Feature.AnyTag);

@@ -105,9 +105,9 @@
         [CanBeNull]
         private ILifetime GetLifetime(TypeDescriptor typeDescriptor)
         {
-            if (Lifetime == null)
+            if (Lifetime == default(ILifetime))
             {
-                return null;
+                return default(ILifetime);
             }
             
             if (!typeDescriptor.IsConstructedGenericType())
@@ -120,7 +120,7 @@
             lock (_lockObject)
             {
                 var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
-                if (lifetime == null)
+                if (lifetime == default(ILifetime))
                 {
 
                     lifetime = Lifetime.Create();

@@ -30,16 +30,15 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        public static Type ToResolverType(this Type type) => ResolverGenericTypeDescriptor.MakeGenericType(type);
+        public static Type ToResolverType(this Type type) =>
+            ResolverGenericTypeDescriptor.MakeGenericType(type);
 
         [MethodImpl((MethodImplOptions)256)]
-        public static Expression Lock(this Expression body, Expression lockObject)
-        {
-            return Expression.TryFinally(
+        public static Expression Lock(this Expression body, Expression lockObject) =>
+            Expression.TryFinally(
                 Expression.Block(
                     Expression.Call(EnterMethodInfo, lockObject),
                     body), 
                 Expression.Call(ExitMethodInfo, lockObject));
-        }
     }
 }

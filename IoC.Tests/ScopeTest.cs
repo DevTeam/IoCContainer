@@ -12,8 +12,8 @@
         public void ScopeShouldSupportEqWhenNotEq()
         {
             // Given
-            using var scope1 = new Scope(1, new LockObject());
-            using var scope2 = new Scope(2, new LockObject());
+            using var scope1 = new Scope(new LockObject(), 1);
+            using var scope2 = new Scope(new LockObject(), 2);
 
             // When
 
@@ -26,8 +26,8 @@
         public void ScopeShouldSupportEqWhenEq()
         {
             // Given
-            using var scope11 = new Scope(1, new LockObject());
-            using var scope12 = new Scope(1, new LockObject());
+            using var scope11 = new Scope(new LockObject(), 1);
+            using var scope12 = new Scope(new LockObject(), 1);
 
             // When
 
@@ -40,8 +40,8 @@
         public void ActiveScopeShouldAccessibleViaCurrentProperty()
         {
             // Given
-            using var scope1 = new Scope(1, new LockObject());
-            using var scope2 = new Scope(2, new LockObject());
+            using var scope1 = new Scope(new LockObject(), 1);
+            using var scope2 = new Scope(new LockObject(), 2);
 
             // When
             using var token1 = scope1.Activate();
@@ -58,7 +58,7 @@
         public void ShouldSupportMultiActivation()
         {
             // Given
-            using var scope1 = new Scope(1, new LockObject());
+            using var scope1 = new Scope(new LockObject(), 1);
 
             // When
             using var token1 = scope1.Activate();
@@ -73,7 +73,7 @@
         public void ShouldManageResources()
         {
             // Given
-            using var scope = new Scope(1, new LockObject());
+            using var scope = new Scope(new LockObject(), 1);
             var resource1 = new Mock<IDisposable>();
             var resource2 = new Mock<IDisposable>();
             var resource3 = new Mock<IDisposable>();

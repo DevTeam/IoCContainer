@@ -1608,11 +1608,8 @@ namespace IoC
         /// <param name="name">The optional name of the container.</param>
         /// <returns>The root container.</returns>
         [NotNull]
-        public static Container Create([NotNull] string name = "")
-        {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            return Create(name, DefaultRootContainer.Value);
-        }
+        public static Container Create([NotNull] string name = "") => 
+            Create(name ?? throw new ArgumentNullException(nameof(name)), DefaultRootContainer.Value);
 
         /// <summary>
         /// Creates a root container with minimal set of features.
@@ -1620,11 +1617,8 @@ namespace IoC
         /// <param name="name">The optional name of the container.</param>
         /// <returns>The root container.</returns>
         [NotNull]
-        public static Container CreateCore([NotNull] string name = "")
-        {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            return Create(name, CoreRootContainer.Value);
-        }
+        public static Container CreateCore([NotNull] string name = "") => 
+            Create(name ?? throw new ArgumentNullException(nameof(name)), CoreRootContainer.Value);
 
         /// <summary>
         /// Creates a root container with minimalist default features.
@@ -1632,11 +1626,8 @@ namespace IoC
         /// <param name="name">The optional name of the container.</param>
         /// <returns>The root container.</returns>
         [NotNull]
-        public static Container CreateLight([NotNull] string name = "")
-        {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            return Create(name, LightRootContainer.Value);
-        }
+        public static Container CreateLight([NotNull] string name = "") => 
+            Create(name ?? throw new ArgumentNullException(nameof(name)), LightRootContainer.Value);
 
         [NotNull]
         private static Container Create([NotNull] string name, [NotNull] IContainer parentContainer)
@@ -1683,10 +1674,7 @@ namespace IoC
         public IContainer Parent => _parent;
 
         /// <inheritdoc />
-        public override string ToString()
-        {
-            return _name;
-        }
+        public override string ToString() => _name;
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
@@ -1933,24 +1921,17 @@ namespace IoC
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() =>
+            GetEnumerator();
 
         /// <inheritdoc />
-        public IEnumerator<IEnumerable<FullKey>> GetEnumerator()
-        {
-            return GetAllKeys().Concat(_parent).GetEnumerator();
-        }
+        public IEnumerator<IEnumerable<FullKey>> GetEnumerator() =>
+            GetAllKeys().Concat(_parent).GetEnumerator();
 
         /// <inheritdoc />
-        public IDisposable Subscribe(IObserver<ContainerEvent> observer)
-        {
-            if (observer == null) throw new ArgumentNullException(nameof(observer));
-            return _eventSubject.Subscribe(observer);
-        }
-        
+        public IDisposable Subscribe(IObserver<ContainerEvent> observer) =>
+            _eventSubject.Subscribe(observer ?? throw new ArgumentNullException(nameof(observer)));
+
         internal void Reset()
         {
             lock (_lockObject)
@@ -1983,17 +1964,12 @@ namespace IoC
 
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        internal static string CreateContainerName([CanBeNull] string name = "")
-        {
-            // ReSharper disable once AssignNullToNotNullAttribute
-            return !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
-        }
+        internal static string CreateContainerName([CanBeNull] string name = "") =>
+            !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
 
         [MethodImpl((MethodImplOptions) 256)]
-        private void ApplyConfigurations(IEnumerable<IConfiguration> configurations)
-        {
+        private void ApplyConfigurations(IEnumerable<IConfiguration> configurations) =>
             _resources.Add(this.Apply(configurations));
-        }
 
         [MethodImpl((MethodImplOptions)256)]
         private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)
@@ -2039,8 +2015,7 @@ namespace IoC
                 // For array
                 if (typeDescriptor.IsArray())
                 {
-                    var arrayType = typeof(IArray);
-                    var arrayKey = new FullKey(arrayType, key.Tag);
+                    var arrayKey = new FullKey(typeof(IArray), key.Tag);
                     // For generic type
                     dependencyEntry = _dependencies.Get(arrayKey.GetHashCode(), arrayKey);
                     if (dependencyEntry != default(DependencyEntry))
@@ -2049,7 +2024,7 @@ namespace IoC
                     }
 
                     // For generic type and Any tag
-                    dependencyEntry = _dependenciesForTagAny.GetByRef(arrayType.GetHashCode(), arrayType);
+                    dependencyEntry = _dependenciesForTagAny.GetByRef(typeof(IArray).GetHashCode(), typeof(IArray));
                     if (dependencyEntry != default(DependencyEntry))
                     {
                         return true;
@@ -2065,10 +2040,8 @@ namespace IoC
         {
             private readonly Container _container;
 
-            public ContainerDebugView([NotNull] Container container)
-            {
+            public ContainerDebugView([NotNull] Container container) =>
                 _container = container ?? throw new ArgumentNullException(nameof(container));
-            }
 
             [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
             public FullKey[] Keys => _container.GetAllKeys().SelectMany(i => i).ToArray();
@@ -2321,6 +2294,19 @@ namespace IoC
         public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IConfiguration configuration, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class
             => Container.Create().Using(configuration ?? throw new ArgumentNullException(nameof(configuration))).BuildUp<TInstance>(args ?? throw new ArgumentNullException(nameof(args)));
+
+        /// <summary>
+        /// Buildups an instance.
+        /// Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
+        /// </summary>
+        /// <typeparam name="TInstance">The instance type.</typeparam>
+        /// <param name="token">The target container token.</param>
+        /// <param name="args">The optional arguments.</param>
+        /// <returns>The disposable instance holder.</returns>
+        [NotNull]
+        public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
+            where TInstance : class =>
+            token.Container.BuildUp<TInstance>(args);
 
         /// <summary>
         /// Buildups an instance.
@@ -6204,6 +6190,7 @@ namespace IoC
 
 #region CollectionFeature
 
+// ReSharper disable MemberCanBeProtected.Local
 namespace IoC.Features
 {
     using System;
@@ -6230,10 +6217,7 @@ namespace IoC.Features
         public static readonly IConfiguration Default = new CollectionFeature();
 
         private CollectionFeature()
-        {
-        }
-
-
+        { }
 
         /// <inheritdoc />
         public IEnumerable<IToken> Apply(IContainer container)
@@ -6275,8 +6259,7 @@ namespace IoC.Features
         {
             public Enumeration([NotNull] Context context, [NotNull] ILockObject lockObject)
             : base(context, lockObject)
-            {
-            }
+            { }
 
             [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
             public IEnumerator<T> GetEnumerator()
@@ -6298,8 +6281,7 @@ namespace IoC.Features
         {
             public AsyncEnumeration([NotNull] Context context, [NotNull] ILockObject lockObject)
                 : base(context, lockObject)
-            {
-            }
+            { }
 
             public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken()) => 
                 new AsyncEnumerator<T>(this, cancellationToken);
@@ -6343,7 +6325,7 @@ namespace IoC.Features
             public ValueTask DisposeAsync() => new ValueTask();
 
             private Task<bool> StartTask(Task<bool> task)
-            {                
+            {
                 task.Start(_taskScheduler);
                 return task;
             }
@@ -6375,20 +6357,19 @@ namespace IoC.Features
 
             public Resolver<T>[] GetResolvers()
             {
-                if (_resolvers != null)
-                {
-                    return _resolvers;
-                }
-
                 lock (_lockObject)
                 {
-                    if (_resolvers == null)
+                    var resolvers = _resolvers;
+                    if (resolvers != null)
                     {
-                        _resolvers = GetResolvers(Context.Container).ToArray();
+                        return resolvers;
                     }
-                }
+                    
+                    resolvers = GetResolvers(Context.Container).ToArray();
+                    _resolvers = resolvers;
 
-                return _resolvers;
+                    return resolvers;
+                }
             }
 
             private void Reset()
@@ -6575,9 +6556,7 @@ namespace IoC.Features
             yield return container.Register<ILifetime>(ctx => new ScopeSingletonLifetime(), null, new object[] { Lifetime.ScopeSingleton });
 
             // Scope
-            long scopeId = 0;
-            Func<long> createScopeId = () => Interlocked.Increment(ref scopeId);
-            yield return container.Register<IScope>(ctx => new Scope(createScopeId(), ctx.Container.Resolve<ILockObject>()));
+            yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Resolve<ILockObject>()));
 
             // ThreadLocal
             yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Feature.AnyTag);
@@ -6701,13 +6680,13 @@ namespace IoC.Features
             yield return container.Register<Func<TT1, TT2, TT>>(ctx => (arg1, arg2) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2), null, Feature.AnyTag);
             yield return container.Register<Func<TT1, TT2, TT3, TT>>(ctx => (arg1, arg2, arg3) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3), null, Feature.AnyTag);
             yield return container.Register<Func<TT1, TT2, TT3, TT4, TT>>(ctx => (arg1, arg2, arg3, arg4) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4), null, Feature.AnyTag);
-            if (!_light)
-            {
-                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5), null, Feature.AnyTag);
-                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6), null, Feature.AnyTag);
-                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6, arg7) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7), null, Feature.AnyTag);
-                yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8), null, Feature.AnyTag);
-            }
+
+            if (_light) yield break;
+
+            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5), null, Feature.AnyTag);
+            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6), null, Feature.AnyTag);
+            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6, arg7) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7), null, Feature.AnyTag);
+            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8), null, Feature.AnyTag);
         }
     }
 }
@@ -6749,6 +6728,7 @@ namespace IoC.Features
 {
     using System;
     using System.Collections.Generic;
+    using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using Core;
 
@@ -6774,6 +6754,7 @@ namespace IoC.Features
 #endif
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         private static Task<T> StartTask<T>(Task<T> task, TaskScheduler taskScheduler)
         {
             task.Start(taskScheduler);
@@ -7648,7 +7629,7 @@ namespace IoC.Core
             }
 
             // Says that current logic should be used
-            return constructor != null;
+            return constructor != default(IMethod<ConstructorInfo>);
         }
 
         /// <inheritdoc />
@@ -7672,7 +7653,7 @@ namespace IoC.Core
                 .All(isInjected => isInjected)
             select method;
 
-        private class Metadata
+        private struct Metadata
         {
             [CanBeNull] public readonly Type Type;
             [CanBeNull] public readonly IComparable Order;
@@ -7680,6 +7661,9 @@ namespace IoC.Core
 
             public Metadata(IAspectOrientedMetadata metadata, IEnumerable<object> attributes)
             {
+                Type = default(Type);
+                Order = null;
+                Tag = default(object);
                 foreach (var attribute in attributes)
                 {
                     if (!(attribute is Attribute attributeValue))
@@ -7687,7 +7671,7 @@ namespace IoC.Core
                         continue;
                     }
 
-                    if (Type == null && metadata.TryGetType(attributeValue, out var curType))
+                    if (Type == default(Type) && metadata.TryGetType(attributeValue, out var curType))
                     {
                         Type = curType;
                     }
@@ -7697,19 +7681,19 @@ namespace IoC.Core
                         Order = curOrder;
                     }
 
-                    if (Tag == null && metadata.TryGetTag(attributeValue, out var curTag))
+                    if (Tag == default(object) && metadata.TryGetTag(attributeValue, out var curTag))
                     {
                         Tag = curTag;
                     }
 
-                    if (Type != null && Order != null && Tag != null)
+                    if (Type != default(Type) && Order != null && Tag != default(object))
                     {
                         break;
                     }
                 }
             }
 
-            public bool IsEmpty => Type == null && Order == null && Tag == null;
+            public bool IsEmpty => Type == default(Type) && Order == null && Tag == default(object);
         }
     }
 }
@@ -7768,7 +7752,7 @@ namespace IoC.Core
             _typeSelectors = typeSelectors;
             _orderSelectors = orderSelectors;
             _tagSelectors = tagSelectors;
-            _autowiringStrategy = null;
+            _autowiringStrategy = default(IAutowiringStrategy);
         }
 
         bool IAspectOrientedMetadata.TryGetType(Attribute attribute, out Type type)
@@ -7831,14 +7815,14 @@ namespace IoC.Core
 
         private IAutowiringStrategy GetAutowiringStrategy()
         {
-            if (_autowiringStrategy != null)
+            if (_autowiringStrategy != default(IAutowiringStrategy))
             {
                 return _autowiringStrategy;
             }
 
             lock (_lockObject)
             {
-                if (_autowiringStrategy == null)
+                if (_autowiringStrategy == default(IAutowiringStrategy))
                 {
                     _autowiringStrategy = new AspectOrientedAutowiringStrategy(this);
                 }
@@ -7957,7 +7941,7 @@ namespace IoC.Core
         [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
         public AutowiringDependency(
             [NotNull] LambdaExpression constructor,
-            [CanBeNull] IAutowiringStrategy autoWiringStrategy = null,
+            [CanBeNull] IAutowiringStrategy autoWiringStrategy = default(IAutowiringStrategy),
             [NotNull][ItemNotNull] params LambdaExpression[] statements)
             :this(
                 constructor?.Body ?? throw new ArgumentNullException(nameof(constructor)),
@@ -7968,7 +7952,7 @@ namespace IoC.Core
 
         public AutowiringDependency(
             [NotNull] Expression constructorExpression,
-            [CanBeNull] IAutowiringStrategy autoWiringStrategy = null,
+            [CanBeNull] IAutowiringStrategy autoWiringStrategy = default(IAutowiringStrategy),
             [NotNull][ItemNotNull] params Expression[] statementExpressions)
         {
             _expression = constructorExpression ?? throw new ArgumentNullException(nameof(constructorExpression));
@@ -8037,9 +8021,9 @@ namespace IoC.Core
             Container = container ?? throw new ArgumentNullException(nameof(container));
             Tokens = Enumerable.Empty<IToken>();
             Types = types ?? throw new ArgumentNullException(nameof(types));
-            Lifetime = null;
+            Lifetime = default(ILifetime);
             Tags = Enumerable.Empty<object>();
-            AutowiringStrategy = null;
+            AutowiringStrategy = default(IAutowiringStrategy);
         }
 
         // ReSharper disable once StaticMemberInGenericType
@@ -8049,9 +8033,9 @@ namespace IoC.Core
             Container = token.Container;
             Tokens = Enumerable.Repeat(token, 1);
             Types = types ?? throw new ArgumentNullException(nameof(types));
-            Lifetime = null;
+            Lifetime = default(ILifetime);
             Tags = Enumerable.Empty<object>();
-            AutowiringStrategy = null;
+            AutowiringStrategy = default(IAutowiringStrategy);
         }
 
         public Binding([NotNull] IBinding<T> binding, Lifetime lifetime)
@@ -8161,11 +8145,8 @@ namespace IoC.Core
 
         public int Depth { get; }
 
-        public IBuildContext CreateChild(Key key, IContainer container)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return CreateChildInternal(key, container);
-        }
+        public IBuildContext CreateChild(Key key, IContainer container) => 
+            CreateChildInternal(key, container ?? throw new ArgumentNullException(nameof(container)));
 
         public Expression ReplaceTypes(Expression baseExpression) =>
             TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, _typesMap);
@@ -8261,8 +8242,7 @@ namespace IoC.Core
     {
         public BuildExpressionException(string message, [CanBeNull] Exception innerException)
             : base(message, innerException)
-        {
-        }
+        { }
     }
 }
 
@@ -8350,10 +8330,8 @@ namespace IoC.Core
 
         private CannotParseLifetime() { }
 
-        public Lifetime Resolve(string statementText, int statementLineNumber, int statementPosition, string lifetimeName)
-        {
+        public Lifetime Resolve(string statementText, int statementLineNumber, int statementPosition, string lifetimeName) => 
             throw new InvalidOperationException($"Cannot parse the lifetime {lifetimeName} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
-        }
     }
 }
 
@@ -8371,10 +8349,8 @@ namespace IoC.Core
 
         private CannotParseTag() { }
 
-        public object Resolve(string statementText, int statementLineNumber, int statementPosition, string tag)
-        {
+        public object Resolve(string statementText, int statementLineNumber, int statementPosition, string tag) => 
             throw new InvalidOperationException($"Cannot parse the tag {tag} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
-        }
     }
 }
 
@@ -8392,10 +8368,8 @@ namespace IoC.Core
 
         private CannotParseType() { }
 
-        public Type Resolve(string statementText, int statementLineNumber, int statementPosition, string typeName)
-        {
+        public Type Resolve(string statementText, int statementLineNumber, int statementPosition, string typeName) => 
             throw new InvalidOperationException($"Cannot parse the type {typeName} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
-        }
     }
 }
 
@@ -8506,10 +8480,8 @@ namespace IoC.Core
     {
         [NotNull] private readonly Func<IContainer, IToken> _configurationFactory;
 
-        public ConfigurationFromDelegate([NotNull] Func<IContainer, IToken> configurationFactory)
-        {
+        public ConfigurationFromDelegate([NotNull] Func<IContainer, IToken> configurationFactory) => 
             _configurationFactory = configurationFactory ?? throw new ArgumentNullException(nameof(configurationFactory));
-        }
 
         public IEnumerable<IToken> Apply(IContainer container)
         {
@@ -8571,15 +8543,8 @@ namespace IoC.Core
             return true;
         }
 
-        [CanBeNull] private static string GetDebugView([CanBeNull] Expression expression)
-        {
-            if (expression == null)
-            {
-                return null;
-            }
-
-            return PropertyInfo?.GetValue(expression, null) as string ?? expression.ToString();
-        }
+        [CanBeNull] private static string GetDebugView([CanBeNull] Expression expression) => 
+            expression == null ? null : PropertyInfo?.GetValue(expression, null) as string ?? expression.ToString();
 
         [NotNull] private static string FormatDependency(ContainerEvent containerEvent)
         {
@@ -8618,7 +8583,8 @@ namespace IoC.Core
             where T: class =>
             value?.ToString() ?? defaultString;
 
-        [NotNull] private static string Quoted([NotNull] string text) => $"\"{text}\"";
+        [NotNull] private static string Quoted([NotNull] string text) =>
+            $"\"{text}\"";
     }
 }
 
@@ -8626,6 +8592,7 @@ namespace IoC.Core
 #endregion
 #region CoreExtensions
 
+// ReSharper disable LoopCanBeConvertedToQuery
 namespace IoC.Core
 {
     using System;
@@ -8634,10 +8601,8 @@ namespace IoC.Core
     internal static class CoreExtensions
     {
         [MethodImpl((MethodImplOptions)256)]
-        public static bool SequenceEqual<T>([NotNull] this T[] array1, [NotNull] T[] array2)
-        {
-            return ((System.Collections.IStructuralEquatable)array1).Equals(array2, System.Collections.StructuralComparisons.StructuralEqualityComparer);
-        }
+        public static bool SequenceEqual<T>([NotNull] this T[] array1, [NotNull] T[] array2) =>
+            ((System.Collections.IStructuralEquatable)array1).Equals(array2, System.Collections.StructuralComparisons.StructuralEqualityComparer);
 
         [MethodImpl((MethodImplOptions)256)]
         public static int GetHash<T>([NotNull][ItemNotNull] this T[] items)
@@ -8657,10 +8622,8 @@ namespace IoC.Core
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        public static T[] EmptyArray<T>()
-        {
-            return Empty<T>.Array;
-        }
+        public static T[] EmptyArray<T>() =>
+            Empty<T>.Array;
 
         [MethodImpl((MethodImplOptions) 256)]
         public static T[] CreateArray<T>(int size = 0, T value = default(T))
@@ -8770,8 +8733,7 @@ namespace IoC.Core
         public static readonly IAutowiringStrategy Shared = new DefaultAutowiringStrategy();
 
         private DefaultAutowiringStrategy()
-        {
-        }
+        { }
 
         [MethodImpl((MethodImplOptions)256)]
         public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
@@ -8793,7 +8755,7 @@ namespace IoC.Core
         private static int GetOrder(MethodBase method)
         {
             var order = method.GetParameters().Length + 1;
-            
+
             if (method.GetCustomAttributes(typeof(ObsoleteAttribute), true).Any())
             {
                 order <<= 4;
@@ -8948,9 +8910,9 @@ namespace IoC.Core
         [CanBeNull]
         private ILifetime GetLifetime(TypeDescriptor typeDescriptor)
         {
-            if (Lifetime == null)
+            if (Lifetime == default(ILifetime))
             {
-                return null;
+                return default(ILifetime);
             }
             
             if (!typeDescriptor.IsConstructedGenericType())
@@ -8963,7 +8925,7 @@ namespace IoC.Core
             lock (_lockObject)
             {
                 var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
-                if (lifetime == null)
+                if (lifetime == default(ILifetime))
                 {
 
                     lifetime = Lifetime.Create();
@@ -9034,8 +8996,7 @@ namespace IoC.Core
         public static readonly IExpressionBuilder<Expression> Shared = new DependencyInjectionExpressionBuilder();
 
         private DependencyInjectionExpressionBuilder()
-        {
-        }
+        { }
 
         public Expression Build(Expression bodyExpression, IBuildContext buildContext, Expression thisExpression)
         {
@@ -9108,8 +9069,10 @@ namespace IoC.Core
                 {
                     // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
+
                     // type
                     var type = methodCall.Method.GetGenericArguments()[0];
+
                     // tag
                     var tagExpression = methodCall.Arguments[1];
                     var tag = GetTag(tagExpression);
@@ -9236,14 +9199,12 @@ namespace IoC.Core
         }
 
         [NotNull]
-        private Expression CreateNewContextExpression()
-        {
-            return Expression.New(
+        private Expression CreateNewContextExpression() =>
+            Expression.New(
                 ContextConstructor,
                 Expression.Constant(_buildContext.Key),
                 ContainerParameter,
                 ArgsParameter);
-        }
 
         [CanBeNull]
         private object GetTag([NotNull] Expression tagExpression)
@@ -9267,10 +9228,8 @@ namespace IoC.Core
         }
 
         [NotNull]
-        private IEnumerable<Expression> InjectAll(IEnumerable<Expression> expressions)
-        {
-            return expressions.Select(Visit);
-        }
+        private IEnumerable<Expression> InjectAll(IEnumerable<Expression> expressions) => 
+            expressions.Select(Visit);
 
         [NotNull]
         private IContainer SelectedContainer([NotNull] Expression containerExpression)
@@ -9361,6 +9320,7 @@ namespace IoC.Core
     using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
+    using System.Threading;
 
     internal static class Disposable
     {
@@ -9371,7 +9331,7 @@ namespace IoC.Core
         [NotNull]
         public static IDisposable Create([NotNull] Action action)
         {
-#if DEBUG   
+#if DEBUG
             if (action == null) throw new ArgumentNullException(nameof(action));
 #endif
             return new DisposableAction(action);
@@ -9400,7 +9360,8 @@ namespace IoC.Core
         {
             [NotNull] private readonly Action _action;
             [CanBeNull] private readonly object _key;
-            
+            private int _counter;
+
             public DisposableAction([NotNull] Action action, [CanBeNull] object key = null)
             {
                 _action = action;
@@ -9409,6 +9370,7 @@ namespace IoC.Core
 
             public void Dispose()
             {
+                if (Interlocked.Increment(ref _counter) != 1) return;
                 _action();
             }
 
@@ -9419,28 +9381,21 @@ namespace IoC.Core
                 return obj is DisposableAction other && Equals(_key, other._key);
             }
 
-            public override int GetHashCode()
-            {
-                return _key != null ? _key.GetHashCode() : 0;
-            }
+            public override int GetHashCode() => 
+                _key != null ? _key.GetHashCode() : 0;
         }
 
         private sealed class CompositeDisposable : IDisposable
         {
             private readonly IEnumerable<IDisposable> _disposables;
-            private bool _isDisposed;
-            
+            private int _counter;
+
             public CompositeDisposable(IEnumerable<IDisposable> disposables)
                 => _disposables = disposables;
 
             public void Dispose()
             {
-                if (_isDisposed)
-                {
-                    return;
-                }
-
-                _isDisposed = true;
+                if (Interlocked.Increment(ref _counter) != 1) return;
                 foreach (var disposable in _disposables)
                 {
                     disposable?.Dispose();
@@ -9450,8 +9405,7 @@ namespace IoC.Core
 
         private class EmptyDisposable: IDisposable
         {
-            [NotNull]
-            public static readonly IDisposable Shared = new EmptyDisposable();
+            [NotNull] public static readonly IDisposable Shared = new EmptyDisposable();
 
             private EmptyDisposable() { }
 
@@ -9496,23 +9450,23 @@ namespace IoC.Core
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        public static Type ToResolverType(this Type type) => ResolverGenericTypeDescriptor.MakeGenericType(type);
+        public static Type ToResolverType(this Type type) =>
+            ResolverGenericTypeDescriptor.MakeGenericType(type);
 
         [MethodImpl((MethodImplOptions)256)]
-        public static Expression Lock(this Expression body, Expression lockObject)
-        {
-            return Expression.TryFinally(
+        public static Expression Lock(this Expression body, Expression lockObject) =>
+            Expression.TryFinally(
                 Expression.Block(
                     Expression.Call(EnterMethodInfo, lockObject),
                     body), 
                 Expression.Call(ExitMethodInfo, lockObject));
-        }
     }
 }
 
 #endregion
 #region FluentRegister
 
+// ReSharper disable RedundantNameQualifier
 namespace IoC.Core
 {
     using System;
@@ -9913,7 +9867,7 @@ namespace IoC.Core
                 baseExpression = default(Expression);
                 return false;
             }
-        }        
+        }
 
         [CanBeNull]
         internal Type GetInstanceTypeBasedOnTargetGenericConstrains(Type targetType)
@@ -10034,7 +9988,7 @@ namespace IoC.Core
 
 namespace IoC.Core
 {
-    interface ILockObject { }
+    internal interface ILockObject { }
 }
 
 
@@ -10048,11 +10002,11 @@ namespace IoC.Core
 
     internal interface IRegistrationTracker : IObserver<ContainerEvent>
     {
-        IEnumerable<IBuilder> Builders { get; }
-        
-        IAutowiringStrategy AutowiringStrategy { get; }
+        [NotNull] IEnumerable<IBuilder> Builders { get; }
 
-        IEnumerable<ICompiler> Compilers { get; }
+        [NotNull] IAutowiringStrategy AutowiringStrategy { get; }
+
+        [NotNull] IEnumerable<ICompiler> Compilers { get; }
     }
 }
 
@@ -10268,30 +10222,38 @@ namespace IoC.Core
 #endregion
 #region RegistrationTracker
 
+// ReSharper disable ForCanBeConvertedToForeach
 namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
 
-    internal class RegistrationTracker: IRegistrationTracker
+    internal class RegistrationTracker : IRegistrationTracker
     {
         private readonly Container _container;
-        private readonly Dictionary<Key, object> _instances = new Dictionary<Key, object>();
-        private readonly List<IBuilder> _builders = new List<IBuilder>();
-        private readonly List<IAutowiringStrategy> _autowiringStrategies = new List<IAutowiringStrategy> { DefaultAutowiringStrategy.Shared };
-        private readonly List<ICompiler> _compilers = new List<ICompiler> { DefaultCompiler.Shared };
+        private readonly ITracker[] _trackers = new ITracker[3];
+        private readonly Tracker<IBuilder> _builderTracker;
+        private readonly Tracker<IAutowiringStrategy> _autowiringStrategyTracker;
+        private readonly Tracker<ICompiler> _compilerTracker;
 
         public RegistrationTracker([NotNull] Container container)
         {
             _container = container;
-            _autowiringStrategies.Add(DefaultAutowiringStrategy.Shared);
+
+            _trackers[0] = _autowiringStrategyTracker = new Tracker<IAutowiringStrategy>((list, val) => list.Insert(0, val));
+            _autowiringStrategyTracker.Items.Add(DefaultAutowiringStrategy.Shared);
+
+            _trackers[1] = _compilerTracker = new Tracker<ICompiler>((list, val) => list.Insert(0, val));
+            _compilerTracker.Items.Add(DefaultCompiler.Shared);
+
+            _trackers[2] = _builderTracker = new Tracker<IBuilder>((list, val) => list.Add(val));
         }
 
-        public IEnumerable<IBuilder> Builders => _builders;
+        public IEnumerable<IBuilder> Builders => _builderTracker.Items;
 
-        public IAutowiringStrategy AutowiringStrategy => _autowiringStrategies[0];
+        public IAutowiringStrategy AutowiringStrategy => _autowiringStrategyTracker.Items[0];
 
-        public IEnumerable<ICompiler> Compilers => _compilers;
+        public IEnumerable<ICompiler> Compilers => _compilerTracker.Items;
 
         public void OnNext(ContainerEvent value)
         {
@@ -10300,28 +10262,20 @@ namespace IoC.Core
                 return;
             }
 
+            IContainer container;
             switch (value.EventType)
             {
                 case EventType.RegisterDependency:
                     _container.Reset();
-                    var container = value.Container;
+                    container = value.Container;
                     foreach (var key in value.Keys)
                     {
-                        if (Track<IBuilder>(key, container, i => _builders.Add(i)))
+                        for (var index = 0; index < _trackers.Length; index++)
                         {
-                            continue;
-                        }
-
-                        if (Track<IAutowiringStrategy>(key, container, i => _autowiringStrategies.Insert(0, i)))
-                        {
-                            // ReSharper disable once RedundantJumpStatement
-                            continue;
-                        }
-
-                        if (Track<ICompiler>(key, container, i => _compilers.Insert(0, i)))
-                        {
-                            // ReSharper disable once RedundantJumpStatement
-                            continue;
+                            if (_trackers[index].Track(key, container))
+                            {
+                                break;
+                            }
                         }
                     }
 
@@ -10329,31 +10283,14 @@ namespace IoC.Core
 
                 case EventType.UnregisterDependency:
                     _container.Reset();
+                    container = value.Container;
                     foreach (var key in value.Keys)
                     {
-                        if (_builders.Count > 0)
+                        for (var index = 0; index < _trackers.Length; index++)
                         {
-                            if (Untrack<IBuilder>(key, i => _builders.Remove(i)))
+                            if (_trackers[index].Untrack(key, container))
                             {
-                                continue;
-                            }
-                        }
-
-                        if (_autowiringStrategies.Count > 1)
-                        {
-                            if (Untrack<IAutowiringStrategy>(key, i => _autowiringStrategies.Remove(i)))
-                            {
-                                // ReSharper disable once RedundantJumpStatement
-                                continue;
-                            }
-                        }
-
-                        if (_compilers.Count > 1)
-                        {
-                            if (Untrack<ICompiler>(key, i => _compilers.Remove(i)))
-                            {
-                                // ReSharper disable once RedundantJumpStatement
-                                continue;
+                                break;
                             }
                         }
                     }
@@ -10366,38 +10303,58 @@ namespace IoC.Core
 
         public void OnCompleted() { }
 
-        private bool Track<T>(Key key, IContainer container, Action<T> trackAction)
+        private interface ITracker
         {
-            if (key.Type != typeof(T))
-            {
-                return false;
-            }
+            bool Track(Key key, IContainer container);
 
-            if (!container.TryGetResolver<T>(key.Type, key.Tag, out var resolver, out _, container))
-            {
-                return false;
-            }
-
-            var instance = resolver(container);
-            _instances[key] = instance;
-            trackAction(instance);
-            return true;
+            bool Untrack(Key key, IContainer container);
         }
 
-        private bool Untrack<T>(Key key, Action<T> untrackAction)
+        private class Tracker<T> : ITracker
         {
-            if (key.Type != typeof(T))
-            {
-                return false;
-            }
+            private readonly Action<IList<T>, T> _updater;
+            private readonly Dictionary<IContainer, T> _map = new Dictionary<IContainer, T>();
+            public readonly IList<T> Items = new List<T>();
 
-            if (!_instances.TryGetValue(key, out var instance))
+            public Tracker(Action<IList<T>, T> updater) => 
+                _updater = updater;
+
+            public bool Track(Key key, IContainer container)
             {
+                if (key.Type != typeof(T))
+                {
+                    return false;
+                }
+
+                if (_map.ContainsKey(container))
+                {
+                    return true;
+                }
+
+                if (container.TryGetResolver<T>(key.Type, key.Tag, out var resolver, out _, container))
+                {
+                    var instance = resolver(container);
+                    _map.Add(container, instance);
+                    _updater(Items, instance);
+                }
+
                 return true;
             }
 
-            untrackAction((T)instance);
-            return true;
+            public bool Untrack(Key key, IContainer container)
+            {
+                if (key.Type != typeof(T))
+                {
+                    return false;
+                }
+
+                if (_map.TryGetValue(container, out var instance))
+                {
+                    Items.Remove(instance);
+                }
+
+                return true;
+            }
         }
     }
 }
@@ -10412,23 +10369,30 @@ namespace IoC.Core
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using System.Threading;
 
     [DebuggerDisplay("{" + nameof(ToString) + "()} with {" + nameof(ResourceCount) + "} resources")]
     internal sealed class Scope: IScope, IResourceRegistry
     {
-        [NotNull] private static readonly Scope Default = new Scope(0, new LockObject());
+        private static long _currentScopeKey;
+        [NotNull] private static readonly Scope Default = new Scope(new LockObject());
         [CanBeNull] [ThreadStatic] private static Scope _current;
         internal readonly long ScopeKey;
         [NotNull] private readonly ILockObject _lockObject;
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
         [CanBeNull] private Scope _prevScope;
 
-        [NotNull]
-        internal static Scope Current => _current ?? Default;
+        [NotNull] internal static Scope Current => _current ?? Default;
 
-        public Scope(long scopeKey, [NotNull] ILockObject lockObject)
+        public Scope([NotNull] ILockObject lockObject, long key)
         {
-            ScopeKey = scopeKey;
+            ScopeKey = key;
+            _lockObject = lockObject ?? throw new ArgumentNullException(nameof(lockObject));
+        }
+
+        public Scope([NotNull] ILockObject lockObject)
+        {
+            ScopeKey = Interlocked.Increment(ref _currentScopeKey);
             _lockObject = lockObject ?? throw new ArgumentNullException(nameof(lockObject));
         }
 
@@ -10784,25 +10748,6 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         public void Dispose() => _dependencyToken.Dispose();
-    }
-}
-
-
-#endregion
-#region TracingCompiler
-
-namespace IoC.Core
-{
-    using System;
-    using System.Linq.Expressions;
-
-    internal class TracingCompiler: ICompiler
-    {
-        public bool TryCompile(IBuildContext context, LambdaExpression expression, out Delegate resolver)
-        {
-            resolver = default(Delegate);
-            return false;
-        }
     }
 }
 
@@ -11453,10 +11398,8 @@ namespace IoC.Core
             return Expression.Lambda(ReplaceType(node.Type), body, parameters);
         }
 
-        protected override Expression VisitNewArray(NewArrayExpression node)
-        {
-            return Expression.NewArrayInit(ReplaceType(node.Type.GetElementType()), ReplaceAll(node.Expressions));
-        }
+        protected override Expression VisitNewArray(NewArrayExpression node) => 
+            Expression.NewArrayInit(ReplaceType(node.Type.GetElementType()), ReplaceAll(node.Expressions));
 
         protected override Expression VisitListInit(ListInitExpression node)
         {
@@ -11567,10 +11510,8 @@ namespace IoC.Core
         }
 
         [MethodImpl((MethodImplOptions) 256)]
-        private IEnumerable<Expression> ReplaceAll(IEnumerable<Expression> expressions)
-        {
-            return expressions.Select(Visit);
-        }
+        private IEnumerable<Expression> ReplaceAll(IEnumerable<Expression> expressions) => 
+            expressions.Select(Visit);
     }
 }
 

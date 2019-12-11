@@ -8,8 +8,7 @@
         public static readonly IExpressionBuilder<Expression> Shared = new DependencyInjectionExpressionBuilder();
 
         private DependencyInjectionExpressionBuilder()
-        {
-        }
+        { }
 
         public Expression Build(Expression bodyExpression, IBuildContext buildContext, Expression thisExpression)
         {

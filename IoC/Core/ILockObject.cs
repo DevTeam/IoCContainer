@@ -1,4 +1,4 @@
 ﻿namespace IoC.Core
 {
-    interface ILockObject { }
+    internal interface ILockObject { }
 }

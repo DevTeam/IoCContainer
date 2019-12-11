@@ -12,9 +12,9 @@
             Container = container ?? throw new ArgumentNullException(nameof(container));
             Tokens = Enumerable.Empty<IToken>();
             Types = types ?? throw new ArgumentNullException(nameof(types));
-            Lifetime = null;
+            Lifetime = default(ILifetime);
             Tags = Enumerable.Empty<object>();
-            AutowiringStrategy = null;
+            AutowiringStrategy = default(IAutowiringStrategy);
         }
 
         // ReSharper disable once StaticMemberInGenericType
@@ -24,9 +24,9 @@
             Container = token.Container;
             Tokens = Enumerable.Repeat(token, 1);
             Types = types ?? throw new ArgumentNullException(nameof(types));
-            Lifetime = null;
+            Lifetime = default(ILifetime);
             Tags = Enumerable.Empty<object>();
-            AutowiringStrategy = null;
+            AutowiringStrategy = default(IAutowiringStrategy);
         }
 
         public Binding([NotNull] IBinding<T> binding, Lifetime lifetime)

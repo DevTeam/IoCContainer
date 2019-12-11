@@ -46,11 +46,8 @@
         /// <param name="name">The optional name of the container.</param>
         /// <returns>The root container.</returns>
         [NotNull]
-        public static Container Create([NotNull] string name = "")
-        {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            return Create(name, DefaultRootContainer.Value);
-        }
+        public static Container Create([NotNull] string name = "") => 
+            Create(name ?? throw new ArgumentNullException(nameof(name)), DefaultRootContainer.Value);
 
         /// <summary>
         /// Creates a root container with minimal set of features.
@@ -58,11 +55,8 @@
         /// <param name="name">The optional name of the container.</param>
         /// <returns>The root container.</returns>
         [NotNull]
-        public static Container CreateCore([NotNull] string name = "")
-        {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            return Create(name, CoreRootContainer.Value);
-        }
+        public static Container CreateCore([NotNull] string name = "") => 
+            Create(name ?? throw new ArgumentNullException(nameof(name)), CoreRootContainer.Value);
 
         /// <summary>
         /// Creates a root container with minimalist default features.
@@ -70,11 +64,8 @@
         /// <param name="name">The optional name of the container.</param>
         /// <returns>The root container.</returns>
         [NotNull]
-        public static Container CreateLight([NotNull] string name = "")
-        {
-            if (name == null) throw new ArgumentNullException(nameof(name));
-            return Create(name, LightRootContainer.Value);
-        }
+        public static Container CreateLight([NotNull] string name = "") => 
+            Create(name ?? throw new ArgumentNullException(nameof(name)), LightRootContainer.Value);
 
         [NotNull]
         private static Container Create([NotNull] string name, [NotNull] IContainer parentContainer)
@@ -121,10 +112,7 @@
         public IContainer Parent => _parent;
 
         /// <inheritdoc />
-        public override string ToString()
-        {
-            return _name;
-        }
+        public override string ToString() => _name;
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
@@ -371,24 +359,17 @@
             }
         }
 
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() =>
+            GetEnumerator();
 
         /// <inheritdoc />
-        public IEnumerator<IEnumerable<FullKey>> GetEnumerator()
-        {
-            return GetAllKeys().Concat(_parent).GetEnumerator();
-        }
+        public IEnumerator<IEnumerable<FullKey>> GetEnumerator() =>
+            GetAllKeys().Concat(_parent).GetEnumerator();
 
         /// <inheritdoc />
-        public IDisposable Subscribe(IObserver<ContainerEvent> observer)
-        {
-            if (observer == null) throw new ArgumentNullException(nameof(observer));
-            return _eventSubject.Subscribe(observer);
-        }
-        
+        public IDisposable Subscribe(IObserver<ContainerEvent> observer) =>
+            _eventSubject.Subscribe(observer ?? throw new ArgumentNullException(nameof(observer)));
+
         internal void Reset()
         {
             lock (_lockObject)
@@ -421,17 +402,12 @@
 
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        internal static string CreateContainerName([CanBeNull] string name = "")
-        {
-            // ReSharper disable once AssignNullToNotNullAttribute
-            return !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
-        }
+        internal static string CreateContainerName([CanBeNull] string name = "") =>
+            !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
 
         [MethodImpl((MethodImplOptions) 256)]
-        private void ApplyConfigurations(IEnumerable<IConfiguration> configurations)
-        {
+        private void ApplyConfigurations(IEnumerable<IConfiguration> configurations) =>
             _resources.Add(this.Apply(configurations));
-        }
 
         [MethodImpl((MethodImplOptions)256)]
         private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)
@@ -477,8 +453,7 @@
                 // For array
                 if (typeDescriptor.IsArray())
                 {
-                    var arrayType = typeof(IArray);
-                    var arrayKey = new FullKey(arrayType, key.Tag);
+                    var arrayKey = new FullKey(typeof(IArray), key.Tag);
                     // For generic type
                     dependencyEntry = _dependencies.Get(arrayKey.GetHashCode(), arrayKey);
                     if (dependencyEntry != default(DependencyEntry))
@@ -487,7 +462,7 @@
                     }
 
                     // For generic type and Any tag
-                    dependencyEntry = _dependenciesForTagAny.GetByRef(arrayType.GetHashCode(), arrayType);
+                    dependencyEntry = _dependenciesForTagAny.GetByRef(typeof(IArray).GetHashCode(), typeof(IArray));
                     if (dependencyEntry != default(DependencyEntry))
                     {
                         return true;
@@ -503,10 +478,8 @@
         {
             private readonly Container _container;
 
-            public ContainerDebugView([NotNull] Container container)
-            {
+            public ContainerDebugView([NotNull] Container container) =>
                 _container = container ?? throw new ArgumentNullException(nameof(container));
-            }
 
             [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
             public FullKey[] Keys => _container.GetAllKeys().SelectMany(i => i).ToArray();
