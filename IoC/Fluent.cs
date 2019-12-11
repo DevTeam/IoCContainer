@@ -58,6 +58,19 @@
         /// Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
         /// </summary>
         /// <typeparam name="TInstance">The instance type.</typeparam>
+        /// <param name="token">The target container token.</param>
+        /// <param name="args">The optional arguments.</param>
+        /// <returns>The disposable instance holder.</returns>
+        [NotNull]
+        public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
+            where TInstance : class =>
+            token.Container.BuildUp<TInstance>(args);
+
+        /// <summary>
+        /// Buildups an instance.
+        /// Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
+        /// </summary>
+        /// <typeparam name="TInstance">The instance type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>

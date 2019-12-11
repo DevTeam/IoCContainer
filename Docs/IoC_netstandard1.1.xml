@@ -1288,6 +1288,16 @@
             <typeparam name="TInstance">The instance type.</typeparam>
             <returns>The disposable instance holder.</returns>
         </member>
+        <member name="M:IoC.Fluent.BuildUp``1(IoC.IToken,System.Object[])">
+            <summary>
+            Buildups an instance.
+            Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
+            </summary>
+            <typeparam name="TInstance">The instance type.</typeparam>
+            <param name="token">The target container token.</param>
+            <param name="args">The optional arguments.</param>
+            <returns>The disposable instance holder.</returns>
+        </member>
         <member name="M:IoC.Fluent.BuildUp``1(IoC.IContainer,System.Object[])">
             <summary>
             Buildups an instance.

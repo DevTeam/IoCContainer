@@ -14,26 +14,21 @@ namespace EntityFrameworkCore
         {
             // Create ASP .NET core feature
             var aspNetCoreFeature = new AspNetCoreFeature();
-            aspNetCoreFeature.AddDbContext<Db>(
-                options => options.UseInMemoryDatabase("Sample DB"),
-                ServiceLifetime.Singleton);
+
+            // Configure services
+            aspNetCoreFeature
+                .AddLogging()
+                .AddDbContext<Db>(options => options.UseInMemoryDatabase("Sample DB"), ServiceLifetime.Singleton);
 
             // Id generator
-            var currentId = new Id();
-            var lockObject = new object();
-            var id = new Func<Id>(() =>
-            {
-                lock (lockObject)
-                {
-                    return currentId = new Id(currentId);
-                }
-            });
+            var id = new Id();
+            var generateId = new Func<Id>(() => id = new Id(id));
 
             yield return container
                 // Apply ASP.NET core feature
                 .Apply(aspNetCoreFeature)
                 // Add required bindings
-                .Bind<Id>().To(ctx => id())
+                .Bind<Id>().To(ctx => generateId())
                 .Bind<Person>().To<Person>();
         }
     }

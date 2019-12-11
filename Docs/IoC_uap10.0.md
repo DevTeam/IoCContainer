@@ -134,6 +134,7 @@
   - [LightSet](#F-IoC-Features-Feature-LightSet 'IoC.Features.Feature.LightSet')
 - [Fluent](#T-IoC-Fluent 'IoC.Fluent')
   - [BuildUp\`\`1(configuration,args)](#M-IoC-Fluent-BuildUp``1-IoC-IConfiguration,System-Object[]- 'IoC.Fluent.BuildUp``1(IoC.IConfiguration,System.Object[])')
+  - [BuildUp\`\`1(token,args)](#M-IoC-Fluent-BuildUp``1-IoC-IToken,System-Object[]- 'IoC.Fluent.BuildUp``1(IoC.IToken,System.Object[])')
   - [BuildUp\`\`1(container,args)](#M-IoC-Fluent-BuildUp``1-IoC-IContainer,System-Object[]- 'IoC.Fluent.BuildUp``1(IoC.IContainer,System.Object[])')
   - [Create(parentContainer,name)](#M-IoC-Fluent-Create-IoC-IContainer,System-String- 'IoC.Fluent.Create(IoC.IContainer,System.String)')
   - [Create(token,name)](#M-IoC-Fluent-Create-IoC-IToken,System-String- 'IoC.Fluent.Create(IoC.IToken,System.String)')
@@ -2076,6 +2077,31 @@ The disposable instance holder.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | configuration | [IoC.IConfiguration](#T-IoC-IConfiguration 'IoC.IConfiguration') | The configurations. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| TInstance | The instance type. |
+
+<a name='M-IoC-Fluent-BuildUp``1-IoC-IToken,System-Object[]-'></a>
+### BuildUp\`\`1(token,args) `method`
+
+##### Summary
+
+Buildups an instance.
+Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
+
+##### Returns
+
+The disposable instance holder.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The target container token. |
 | args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
 
 ##### Generic Types
