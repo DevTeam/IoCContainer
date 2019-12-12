@@ -31,16 +31,15 @@
             yield return container.Register<StringToTypeConverter, IConverter<string, BindingContext, Type>>(containerSingletonResolver(container));
             yield return container.Register<StringToLifetimeConverter, IConverter<string, Statement, Lifetime>>(containerSingletonResolver(container));
             yield return container.Register<StringToTagsConverter, IConverter<string, Statement, IEnumerable<object>>>(containerSingletonResolver(container));
-            yield return container.Register<IConfiguration>(ctx => CreateTextConfiguration(ctx));
+            yield return container.Register<IConfiguration>(ctx => CreateTextConfiguration(ctx, ctx.Container.Inject<IConverter<IEnumerable<Statement>, BindingContext, BindingContext>>()));
         }
 
-        internal static TextConfiguration CreateTextConfiguration(Context ctx)
+        internal static TextConfiguration CreateTextConfiguration([NotNull] Context ctx, [NotNull] IConverter<IEnumerable<Statement>, BindingContext, BindingContext> converter)
         {
-            if (ctx.Args.Length != 1)
-            {
-                // ReSharper disable once NotResolvedInText
-                throw new ArgumentOutOfRangeException("Should have single argument.");
-            }
+            if (ctx == null) throw new ArgumentNullException(nameof(ctx));
+            if (converter == null) throw new ArgumentNullException(nameof(converter));
+            // ReSharper disable once NotResolvedInText
+            if (ctx.Args.Length != 1) throw new ArgumentOutOfRangeException("Should have single argument.");
 
             TextReader reader;
             switch (ctx.Args[0])
@@ -61,7 +60,7 @@
                     throw new ArgumentException("Invalid type of argument.");
             }
 
-            return new TextConfiguration(reader, ctx.Container.Resolve<IConverter<IEnumerable<Statement>, BindingContext, BindingContext>>());
+            return new TextConfiguration(reader, converter);
         }
     }
 }

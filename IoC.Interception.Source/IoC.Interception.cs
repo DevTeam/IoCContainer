@@ -9,7 +9,7 @@ because it may be changed even in minor updates of package.
 
 MIT License
 
-Copyright (c) 2018-2019 Nikolay Pianikov
+Copyright (c) 2018-2020 Nikolay Pianikov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -347,14 +347,14 @@ namespace IoC.Features
 
             var interceptedIsGenericType = interceptedType.IsGenericTypeDefinition || interceptedType.GetGenericArguments().Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
 #else
-                    var targetTypeInfo = targetType.GetTypeInfo();
-                    var isGenericTargetType = targetTypeInfo.IsGenericType;
-                    if (!isGenericTargetType) {
-                        return false;
-                    }
+            var targetTypeInfo = targetType.GetTypeInfo();
+            var isGenericTargetType = targetTypeInfo.IsGenericType;
+            if (!isGenericTargetType) {
+                return false;
+            }
 
-                    var interceptedTypeInfo = interceptedType.GetTypeInfo();
-                    var interceptedIsGenericType = interceptedTypeInfo.IsGenericTypeDefinition || interceptedTypeInfo.GenericTypeArguments.Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
+            var interceptedTypeInfo = interceptedType.GetTypeInfo();
+            var interceptedIsGenericType = interceptedTypeInfo.IsGenericTypeDefinition || interceptedTypeInfo.GenericTypeArguments.Any(i => i.GetAttribute<GenericTypeArgumentAttribute>() != null);
 #endif
 
             if (!interceptedIsGenericType)
@@ -366,8 +366,8 @@ namespace IoC.Features
             var genericTypeDefinition = targetType.GetGenericTypeDefinition();
             var curGenericTypeDefinition = interceptedType.GetGenericTypeDefinition();
 #else
-                    var genericTypeDefinition = targetTypeInfo.GetGenericTypeDefinition();
-                    var curGenericTypeDefinition = interceptedTypeInfo.GetGenericTypeDefinition();
+            var genericTypeDefinition = targetTypeInfo.GetGenericTypeDefinition();
+            var curGenericTypeDefinition = interceptedTypeInfo.GetGenericTypeDefinition();
 #endif
             return new Key(genericTypeDefinition, targetKey.Tag).Equals(new Key(curGenericTypeDefinition, key.Tag));
         }

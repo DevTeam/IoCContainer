@@ -13,7 +13,7 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=Asynchronous cases
+        // $tag=async
         // $priority=03
         // $description=Asynchronous construction
         // {

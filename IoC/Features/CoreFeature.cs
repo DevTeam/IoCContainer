@@ -42,7 +42,7 @@
             yield return container.Register<ILifetime>(ctx => new ScopeSingletonLifetime(), null, new object[] { Lifetime.ScopeSingleton });
 
             // Scope
-            yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Resolve<ILockObject>()));
+            yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Inject<ILockObject>()));
 
             // ThreadLocal
             yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Feature.AnyTag);
@@ -58,7 +58,7 @@
                         ? Container.CreateContainerName(ctx.Args[0] as string)
                         : Container.CreateContainerName(string.Empty),
                     ctx.Container,
-                    ctx.Container.Resolve<ILockObject>()),
+                    ctx.Container.Inject<ILockObject>()),
                 null,
                 new object[] { WellknownContainers.NewChild });
             

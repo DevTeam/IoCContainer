@@ -13,7 +13,7 @@ namespace IoC.Tests.UsageScenarios
         public async ValueTask Run()
         {
             // $visible=true
-            // $tag=injection
+            // $tag=async
             // $priority=05
             // $description=Resolve all appropriate instances as IAsyncEnumerable
             // {

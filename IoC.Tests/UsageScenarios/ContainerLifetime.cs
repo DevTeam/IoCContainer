@@ -40,7 +40,6 @@
 
             // Check that instances from different containers are not equal
             parentInstance1.ShouldNotBe(childInstance1);
-
             // }
         }
     }

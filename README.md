@@ -268,7 +268,6 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Property Injection](#property-injection-)
   - [Constructor Autowiring](#constructor-autowiring-)
   - [Resolve all appropriate instances as Array](#resolve-all-appropriate-instances-as-array-)
-  - [Resolve all appropriate instances as IAsyncEnumerable](#resolve-all-appropriate-instances-as-iasyncenumerable-)
   - [Resolve all appropriate instances as ICollection](#resolve-all-appropriate-instances-as-icollection-)
   - [Resolve all appropriate instances as IEnumerable](#resolve-all-appropriate-instances-as-ienumerable-)
   - [Resolve all appropriate instances as IObservable source](#resolve-all-appropriate-instances-as-iobservable-source-)
@@ -297,10 +296,11 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Tracing](#tracing-)
   - [Validation](#validation-)
   - [Aspect Oriented Autowiring](#aspect-oriented-autowiring-)
-- Asynchronous cases
+- Asynchronous
   - [Asynchronous resolve](#asynchronous-resolve-)
   - [Asynchronous lightweight resolve](#asynchronous-lightweight-resolve-)
   - [Asynchronous construction](#asynchronous-construction-)
+  - [Resolve all appropriate instances as IAsyncEnumerable](#resolve-all-appropriate-instances-as-iasyncenumerable-)
 - Design Aspects
   - [Configuration class](#configuration-class-)
   - [Change configuration on-the-fly](#change-configuration-on-the-fly-)
@@ -391,6 +391,36 @@ public class Consumer
 
 
 
+### Resolve all appropriate instances as IAsyncEnumerable [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsyncEnumerables.cs)
+
+
+
+``` CSharp
+// Create and configure the container
+using var container = Container
+    .CreateCore()
+    .Using(CollectionFeature.Default)
+    .Bind<IDependency>().To<Dependency>()
+    // Bind to the implementation #1
+    .Bind<IService>().Tag(1).To<Service>()
+    // Bind to the implementation #2
+    .Bind<IService>().Tag(2).Tag("abc").To<Service>()
+    // Bind to the implementation #3
+    .Bind<IService>().Tag(3).To<Service>()
+    .Container;
+
+// Resolve all appropriate instances
+var instances = container.Resolve<IAsyncEnumerable<IService>>();
+var items = new List<IService>();
+await foreach (var instance in instances) { items.Add(instance); }
+
+// Check the number of resolved instances
+items.Count.ShouldBe(3);
+
+```
+
+
+
 ### Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Autowiring.cs)
 
 Auto-writing is most natural way to use containers. At first step we should create a container. At the second step we bind interfaces to their implementations. After that the container is ready to resolve dependencies.
@@ -428,20 +458,39 @@ var instance = container.Resolve<INamedService>();
 
 ### Generic Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GenericAutowiring.cs)
 
-Auto-writing of generic types as simple as auto-writing of other types. Just use a generic parameters markers like _TT_, _TT1_ and etc. or bind open generic types.
+Auto-writing of generic types as simple as auto-writing of other types. Just use a generic parameters markers like _TT_, _TT1_, _TT2_ and etc., create your own generic parameters markers or bind open generic types.
 
 ``` CSharp
-// Create and configure the container using autowiring
-using var container = Container
-    .Create()
-    .Bind<IDependency>().To<Dependency>()
-    // Bind to the instance creation, actually represented as an expression tree
-    .Bind<IService<TT>>().To<Service<TT>>()
-    // or the same: using (container.Bind(typeof(IService<>)).To(typeof(Service<>)))
-    .Container;
+public void Run()
+{
+    // Create and configure the container using autowiring
+    using var container = Container
+        .Create()
+        .Bind<IDependency>().To<Dependency>()
+        // Bind using the predefined generic parameters marker TT (or TT1, TT2, TT3 ...)
+        .Bind<IService<TT>>().To<Service<TT>>()
+        // Bind using the custom generic parameters marker TCustom
+        .Bind<IService<TTMy>>().Tag("custom marker").To<Service<TTMy>>()
+        // Bind using the open generic type
+        .Bind(typeof(IService<>)).Tag("open type").To(typeof(Service<>))
+        .Container;
 
-// Resolve a generic instance
-var instance = container.Resolve<IService<int>>();
+    // Resolve a generic instance
+    var instances = container.Resolve<ICollection<IService<int>>>();
+
+    instances.Count.ShouldBe(3);
+    // Check the instance's type
+    foreach (var instance in instances)
+    {
+        instance.ShouldBeOfType<Service<int>>();
+    }
+}
+
+// Custom generic type marker using predefined attribute `GenericTypeArgument`
+[GenericTypeArgument]
+class TTMy { }
+}
+}
 ```
 
 
@@ -652,7 +701,6 @@ childInstance1.ShouldBe(childInstance2);
 
 // Check that instances from different containers are not equal
 parentInstance1.ShouldNotBe(childInstance1);
-
 ```
 
 
@@ -1626,36 +1674,6 @@ using var container = Container
 
 // Resolve all appropriate instances
 var instances = container.Resolve<IService[]>();
-```
-
-
-
-### Resolve all appropriate instances as IAsyncEnumerable [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsyncEnumerables.cs)
-
-
-
-``` CSharp
-// Create and configure the container
-using var container = Container
-    .CreateCore()
-    .Using(CollectionFeature.Default)
-    .Bind<IDependency>().To<Dependency>()
-    // Bind to the implementation #1
-    .Bind<IService>().Tag(1).To<Service>()
-    // Bind to the implementation #2
-    .Bind<IService>().Tag(2).Tag("abc").To<Service>()
-    // Bind to the implementation #3
-    .Bind<IService>().Tag(3).To<Service>()
-    .Container;
-
-// Resolve all appropriate instances
-var instances = container.Resolve<IAsyncEnumerable<IService>>();
-var items = new List<IService>();
-await foreach (var instance in instances) { items.Add(instance); }
-
-// Check the number of resolved instances
-items.Count.ShouldBe(3);
-
 ```
 
 

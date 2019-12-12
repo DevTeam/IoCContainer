@@ -9,7 +9,7 @@ because it may be changed even in minor updates of package.
 
 MIT License
 
-Copyright (c) 2018-2019 Nikolay Pianikov
+Copyright (c) 2018-2020 Nikolay Pianikov
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -6224,7 +6224,7 @@ namespace IoC.Features
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var containerSingletonResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
-            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx, ctx.Container.Resolve<ILockObject>()), containerSingletonResolver(container));
+            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), containerSingletonResolver(container));
             yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToList());
             yield return container.Register(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToArray());
             yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => new HashSet<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
@@ -6233,7 +6233,7 @@ namespace IoC.Features
             yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<List<TT>>()));
 #endif
 #if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx, ctx.Container.Resolve<ILockObject>()), containerSingletonResolver(container));
+            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), containerSingletonResolver(container));
 #endif
         }
 
@@ -6473,16 +6473,15 @@ namespace IoC.Features
             yield return container.Register<StringToTypeConverter, IConverter<string, BindingContext, Type>>(containerSingletonResolver(container));
             yield return container.Register<StringToLifetimeConverter, IConverter<string, Statement, Lifetime>>(containerSingletonResolver(container));
             yield return container.Register<StringToTagsConverter, IConverter<string, Statement, IEnumerable<object>>>(containerSingletonResolver(container));
-            yield return container.Register<IConfiguration>(ctx => CreateTextConfiguration(ctx));
+            yield return container.Register<IConfiguration>(ctx => CreateTextConfiguration(ctx, ctx.Container.Inject<IConverter<IEnumerable<Statement>, BindingContext, BindingContext>>()));
         }
 
-        internal static TextConfiguration CreateTextConfiguration(Context ctx)
+        internal static TextConfiguration CreateTextConfiguration([NotNull] Context ctx, [NotNull] IConverter<IEnumerable<Statement>, BindingContext, BindingContext> converter)
         {
-            if (ctx.Args.Length != 1)
-            {
-                // ReSharper disable once NotResolvedInText
-                throw new ArgumentOutOfRangeException("Should have single argument.");
-            }
+            if (ctx == null) throw new ArgumentNullException(nameof(ctx));
+            if (converter == null) throw new ArgumentNullException(nameof(converter));
+            // ReSharper disable once NotResolvedInText
+            if (ctx.Args.Length != 1) throw new ArgumentOutOfRangeException("Should have single argument.");
 
             TextReader reader;
             switch (ctx.Args[0])
@@ -6503,7 +6502,7 @@ namespace IoC.Features
                     throw new ArgumentException("Invalid type of argument.");
             }
 
-            return new TextConfiguration(reader, ctx.Container.Resolve<IConverter<IEnumerable<Statement>, BindingContext, BindingContext>>());
+            return new TextConfiguration(reader, converter);
         }
     }
 }
@@ -6556,7 +6555,7 @@ namespace IoC.Features
             yield return container.Register<ILifetime>(ctx => new ScopeSingletonLifetime(), null, new object[] { Lifetime.ScopeSingleton });
 
             // Scope
-            yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Resolve<ILockObject>()));
+            yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Inject<ILockObject>()));
 
             // ThreadLocal
             yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Feature.AnyTag);
@@ -6572,7 +6571,7 @@ namespace IoC.Features
                         ? Container.CreateContainerName(ctx.Args[0] as string)
                         : Container.CreateContainerName(string.Empty),
                     ctx.Container,
-                    ctx.Container.Resolve<ILockObject>()),
+                    ctx.Container.Inject<ILockObject>()),
                 null,
                 new object[] { WellknownContainers.NewChild });
             
