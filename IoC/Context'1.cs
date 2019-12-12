@@ -10,16 +10,14 @@
         /// <summary>
         /// The resolved instance.
         /// </summary>
-        public readonly T It;
+        [NotNull] public readonly T It;
 
         internal Context(
             T it,
             Key key,
             [NotNull] IContainer container,
             [NotNull] [ItemCanBeNull] params object[] args)
-            : base(key, container, args)
-        {
+            : base(key, container, args) =>
             It = it;
-        }
     }
 }

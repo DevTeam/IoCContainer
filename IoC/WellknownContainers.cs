@@ -1,7 +1,7 @@
 ﻿namespace IoC
 {
     /// <summary>
-    /// Represents the enumeration of well-known containers.
+    /// The enumeration of well-known containers.
     /// </summary>
     [PublicAPI]
     public enum WellknownContainers

@@ -7,12 +7,12 @@
     public enum Lifetime
     {
         /// <summary>
-        /// Default lifetime. New instance each time (default).
+        /// It is default lifetime. A new instance wll be created each time.
         /// </summary>
         Transient = 1,
 
         /// <summary>
-        /// Single instance per dependency
+        /// Singleton
         /// </summary>
         Singleton = 2,
 

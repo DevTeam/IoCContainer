@@ -5,7 +5,7 @@
     using System.Runtime.CompilerServices;
 
     /// <summary>
-    /// Represents the container key.
+    /// Represents a dependency key.
     /// </summary>
     [PublicAPI]
     [DebuggerDisplay("Type = {" + nameof(Type) + "}, Tag = {" + nameof(Tag) + "}")]
