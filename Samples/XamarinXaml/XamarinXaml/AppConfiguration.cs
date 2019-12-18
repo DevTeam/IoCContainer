@@ -1,22 +1,22 @@
-﻿namespace WpfApp
+﻿namespace XamarinXaml
 {
     using System.Collections.Generic;
     using IoC;
-    using SampleModels;
     using SampleModels.VewModels;
     using Views;
+    using Xamarin.Forms;
     using static IoC.Lifetime;
 
     /// <summary>
     /// IoC Configuration.
     /// </summary>
-    internal class Configuration: IConfiguration
+    internal class AppConfiguration: IConfiguration
     {
         public IEnumerable<IToken> Apply(IContainer container)
         {
-            yield return container.Apply(ClockConfiguration.Shared)
+            yield return container
                 .Bind<IUIDispatcher>().As(Singleton).To<UIDispatcher>()
-                .Bind<IMainWindowView>().As(Singleton).To<MainWindow>();
+                .Bind<Page>().As(Singleton).To<MainPage>();
         }
     }
 }

@@ -3,7 +3,10 @@
 ### [Create the IoC container](App.xaml.cs#L26)
 
 ```csharp
-Container = IoC.Container.Create().Using<Configuration>();
+internal readonly IContainer Container = IoC.Container
+    .Create()
+    .Using<ClockConfiguration>()
+    .Using<AppConfiguration>();
 ```
 
 Where _Configuration_ is the [configuration](Configuration.cs) of IoC container.
@@ -32,28 +35,21 @@ private void OnNavigating(object sender, NavigatingCancelEventArgs navigatingCan
 ```csharp
 internal class DataProvider
 {
-    // Design Time Container
-    private static readonly Lazy<IContainer> ContainerDesignTime 
-        = new Lazy<IContainer>(() => Container.Create().Using<ConfigurationDesignTime>());
+    private readonly IContainer _container =
+        (Application.Current as App)?.Container
+        // Resolves from Design Time Container
+        ?? Container.Create().Using<ClockDesignTimeConfiguration>();
 
-    private static readonly IEnumerable<TypeInfo> TypeInfos = typeof(DataProvider).GetTypeInfo().Assembly.DefinedTypes;
-    private Type _type;
+    private Type _objectType;
 
     public string ObjectType
     {
-        private get => _type?.Name;
-        set => 
-            _type = value != null 
-            ? TypeInfos.First(i => i.Name.EndsWith(value, StringComparison.CurrentCultureIgnoreCase)).AsType()
-            : null;
+        set => _objectType = value != null ? Type.GetType(value, true) : typeof(object);
     }
 
     public object Tag { get; set; }
 
-    public object It => 
-        Application.Current is App app 
-            ? app.Container.Resolve<object>(_type, Tag)
-            : ContainerDesignTime.Value.Resolve<object>(_type, Tag);
+    public object It => _container.Resolve<object>(_objectType, Tag);
 }
 ```
 
@@ -66,15 +62,18 @@ Where _ConfigurationDesignTime_ is the [desing time configuration](Configuration
     x:Class="UwpApp.Views.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:local="using:UwpApp">
+    xmlns:uwpApp="using:UwpApp">
     <Page.Resources>
-        <local:DataProvider x:Key="ClockViewModel" ObjectType="IClockViewModel"/>
+        <uwpApp:DataProvider x:Key="ClockViewModel" ObjectType="SampleModels.VewModels.IClockViewModel, SampleModels"/>
     </Page.Resources>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" DataContext="{StaticResource ClockViewModel}">
+            <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
             <TextBlock Text="{Binding It.Date}" FontSize="64" />
+            <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
             <TextBlock Text="{Binding It.Time}" FontSize="64" />
         </StackPanel>
     </Grid>
 </Page>
+
 ```

@@ -1,23 +1,22 @@
-﻿namespace XamarinXaml
+﻿// ReSharper disable RedundantTypeArgumentsOfMethod
+namespace UwpApp
 {
     using System.Collections.Generic;
     using IoC;
-    using SampleModels;
     using SampleModels.VewModels;
     using Views;
-    using Xamarin.Forms;
     using static IoC.Lifetime;
 
     /// <summary>
     /// IoC Configuration.
     /// </summary>
-    internal class Configuration: IConfiguration
+    internal class AppConfiguration: IConfiguration
     {
         public IEnumerable<IToken> Apply(IContainer container)
         {
-            yield return container.Apply(ClockConfiguration.Shared)
+            yield return container
                 .Bind<IUIDispatcher>().As(Singleton).To<UIDispatcher>()
-                .Bind<Page>().As(Singleton).To<MainPage>();
+                .Bind<MainPage>().As(Singleton).To<MainPage>();
         }
     }
 }

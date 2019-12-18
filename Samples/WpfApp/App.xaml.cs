@@ -2,6 +2,7 @@
 {
     using System.Windows;
     using IoC;
+    using SampleModels;
     using Views;
 
     /// <summary>
@@ -9,12 +10,14 @@
     /// </summary>
     public partial class App
     {
-        internal IContainer Container;
+        internal readonly IContainer Container = IoC.Container
+            .Create()
+            .Using<ClockConfiguration>()
+            .Using<AppConfiguration>();
 
         protected override void OnStartup(StartupEventArgs e)
         {
             base.OnStartup(e);
-            Container = IoC.Container.Create().Using<Configuration>();
             Container.Resolve<IMainWindowView>().Show();
         }
 

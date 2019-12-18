@@ -1,4 +1,4 @@
-# [WPF](https://docs.microsoft.com/en-us/dotnet/framework/wpf/index) sample
+# [WPF](https://github.com/dotnet/wpf) sample
 
 ### Create the IoC container, like [here](App.xaml.cs)
 
@@ -49,10 +49,10 @@ Where _ClockDesignTimeConfiguration_ is the [desing time configuration](https://
 ### Use it in XAML do bind view models like [here](Views/MainWindow.xaml)
 
 ```xml
-<Window x:Class="WpfApp.Views.MainWindow" x:ClassModifier="internal"
+<Window x:Class="WpfAppNetCore.Views.MainWindow" x:ClassModifier="internal"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        xmlns:local="clr-namespace:WpfApp"
+        xmlns:local="clr-namespace:WpfAppNetCore"
         xmlns:vewModels="clr-namespace:SampleModels.VewModels;assembly=SampleModels">
     <Window.Resources>
         <local:DataProvider x:Key="ClockViewModel" ObjectType="{x:Type vewModels:IClockViewModel}" />
@@ -63,12 +63,8 @@ Where _ClockDesignTimeConfiguration_ is the [desing time configuration](https://
             <TextBlock Text="{Binding Date}" FontSize="64" />
             <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->
             <TextBlock Text="{Binding Time}" FontSize="64" />
-            <StackPanel.Effect>
-                <DropShadowEffect Color="Black" Direction="20" ShadowDepth="5" Opacity="0.5"/>
-            </StackPanel.Effect>
+            <StackPanel.Effect> <DropShadowEffect Color="Black" Direction="20" ShadowDepth="5" Opacity="0.5"/> </StackPanel.Effect>
         </StackPanel>
     </Grid>
 </Window>
-
-
 ```

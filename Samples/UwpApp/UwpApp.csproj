@@ -98,7 +98,7 @@
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Configuration.cs" />
+    <Compile Include="AppConfiguration.cs" />
     <Compile Include="DataProvider.cs" />
     <Compile Include="UIDispatcher.cs" />
     <Compile Include="Views\MainPage.xaml.cs">
@@ -135,7 +135,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="IoC.Container">
-      <Version>1.1.15</Version>
+      <Version>1.2.0-beta368</Version>
     </PackageReference>
     <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform">
       <Version>6.2.9</Version>

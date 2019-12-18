@@ -61,14 +61,10 @@
   - [Apply(token,configurations)](#M-IoC-Configuration-Apply-IoC-IToken,System-Collections-Generic-IEnumerable{IoC-IConfiguration}- 'IoC.Configuration.Apply(IoC.IToken,System.Collections.Generic.IEnumerable{IoC.IConfiguration})')
   - [Apply(container,configurations)](#M-IoC-Configuration-Apply-IoC-IContainer,IoC-IConfiguration[]- 'IoC.Configuration.Apply(IoC.IContainer,IoC.IConfiguration[])')
   - [Apply(token,configurations)](#M-IoC-Configuration-Apply-IoC-IToken,IoC-IConfiguration[]- 'IoC.Configuration.Apply(IoC.IToken,IoC.IConfiguration[])')
+  - [Apply\`\`1(container)](#M-IoC-Configuration-Apply``1-IoC-IContainer- 'IoC.Configuration.Apply``1(IoC.IContainer)')
+  - [Apply\`\`1(token)](#M-IoC-Configuration-Apply``1-IoC-IToken- 'IoC.Configuration.Apply``1(IoC.IToken)')
   - [AsTokenOf(disposableToken,container)](#M-IoC-Configuration-AsTokenOf-System-IDisposable,IoC-IContainer- 'IoC.Configuration.AsTokenOf(System.IDisposable,IoC.IContainer)')
   - [Create(configurationFactory)](#M-IoC-Configuration-Create-System-Func{IoC-IContainer,IoC-IToken}- 'IoC.Configuration.Create(System.Func{IoC.IContainer,IoC.IToken})')
-  - [Using(container,configurationText)](#M-IoC-Configuration-Using-IoC-IContainer,System-String[]- 'IoC.Configuration.Using(IoC.IContainer,System.String[])')
-  - [Using(token,configurationText)](#M-IoC-Configuration-Using-IoC-IToken,System-String[]- 'IoC.Configuration.Using(IoC.IToken,System.String[])')
-  - [Using(container,configurationStreams)](#M-IoC-Configuration-Using-IoC-IContainer,System-IO-Stream[]- 'IoC.Configuration.Using(IoC.IContainer,System.IO.Stream[])')
-  - [Using(token,configurationStreams)](#M-IoC-Configuration-Using-IoC-IToken,System-IO-Stream[]- 'IoC.Configuration.Using(IoC.IToken,System.IO.Stream[])')
-  - [Using(container,configurationReaders)](#M-IoC-Configuration-Using-IoC-IContainer,System-IO-TextReader[]- 'IoC.Configuration.Using(IoC.IContainer,System.IO.TextReader[])')
-  - [Using(token,configurationReaders)](#M-IoC-Configuration-Using-IoC-IToken,System-IO-TextReader[]- 'IoC.Configuration.Using(IoC.IToken,System.IO.TextReader[])')
   - [Using(container,configurations)](#M-IoC-Configuration-Using-IoC-IContainer,IoC-IConfiguration[]- 'IoC.Configuration.Using(IoC.IContainer,IoC.IConfiguration[])')
   - [Using(token,configurations)](#M-IoC-Configuration-Using-IoC-IToken,IoC-IConfiguration[]- 'IoC.Configuration.Using(IoC.IToken,IoC.IConfiguration[])')
   - [Using\`\`1(container)](#M-IoC-Configuration-Using``1-IoC-IContainer- 'IoC.Configuration.Using``1(IoC.IContainer)')
@@ -1260,6 +1256,52 @@ The dependency token.
 | token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The target container token. |
 | configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The configurations. |
 
+<a name='M-IoC-Configuration-Apply``1-IoC-IContainer-'></a>
+### Apply\`\`1(container) `method`
+
+##### Summary
+
+Applies a configuration for the target container.
+
+##### Returns
+
+The target container token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The type of configuration. |
+
+<a name='M-IoC-Configuration-Apply``1-IoC-IToken-'></a>
+### Apply\`\`1(token) `method`
+
+##### Summary
+
+Applies a configuration for the target container.
+
+##### Returns
+
+The target container token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The target container token. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The type of configuration. |
+
 <a name='M-IoC-Configuration-AsTokenOf-System-IDisposable,IoC-IContainer-'></a>
 ### AsTokenOf(disposableToken,container) `method`
 
@@ -1294,114 +1336,6 @@ The configuration instance.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | configurationFactory | [System.Func{IoC.IContainer,IoC.IToken}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Func 'System.Func{IoC.IContainer,IoC.IToken}') | The configuration factory. |
-
-<a name='M-IoC-Configuration-Using-IoC-IContainer,System-String[]-'></a>
-### Using(container,configurationText) `method`
-
-##### Summary
-
-Applies text configurations for the target container.
-
-##### Returns
-
-The target container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| configurationText | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') | The text configurations. |
-
-<a name='M-IoC-Configuration-Using-IoC-IToken,System-String[]-'></a>
-### Using(token,configurationText) `method`
-
-##### Summary
-
-Applies text configurations for the target container.
-
-##### Returns
-
-The target container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The target container token. |
-| configurationText | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') | The text configurations. |
-
-<a name='M-IoC-Configuration-Using-IoC-IContainer,System-IO-Stream[]-'></a>
-### Using(container,configurationStreams) `method`
-
-##### Summary
-
-Applies text configurations from streams for the target container.
-
-##### Returns
-
-The target container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| configurationStreams | [System.IO.Stream[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.Stream[] 'System.IO.Stream[]') | The set of streams with text configurations. |
-
-<a name='M-IoC-Configuration-Using-IoC-IToken,System-IO-Stream[]-'></a>
-### Using(token,configurationStreams) `method`
-
-##### Summary
-
-Applies text configurations from streams for the target container.
-
-##### Returns
-
-The target container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The target container token. |
-| configurationStreams | [System.IO.Stream[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.Stream[] 'System.IO.Stream[]') | The set of streams with text configurations. |
-
-<a name='M-IoC-Configuration-Using-IoC-IContainer,System-IO-TextReader[]-'></a>
-### Using(container,configurationReaders) `method`
-
-##### Summary
-
-Applies text configurations from text readers for the target container.
-
-##### Returns
-
-The target container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| configurationReaders | [System.IO.TextReader[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.TextReader[] 'System.IO.TextReader[]') | The set of text readers with text configurations. |
-
-<a name='M-IoC-Configuration-Using-IoC-IToken,System-IO-TextReader[]-'></a>
-### Using(token,configurationReaders) `method`
-
-##### Summary
-
-Applies text configurations from text readers for the target container.
-
-##### Returns
-
-The target container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The target container token. |
-| configurationReaders | [System.IO.TextReader[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.TextReader[] 'System.IO.TextReader[]') | The set of text readers with text configurations. |
 
 <a name='M-IoC-Configuration-Using-IoC-IContainer,IoC-IConfiguration[]-'></a>
 ### Using(container,configurations) `method`
@@ -1444,7 +1378,7 @@ The target container.
 
 ##### Summary
 
-Applies configuration for the target container.
+Uses a configuration for the target container.
 
 ##### Returns
 
@@ -1467,7 +1401,7 @@ The target container.
 
 ##### Summary
 
-Applies configuration for the target container.
+Uses a configuration for the target container.
 
 ##### Returns
 
@@ -7284,7 +7218,7 @@ IoC
 
 ##### Summary
 
-Represents the container key.
+Represents a dependency key.
 
 <a name='M-IoC-Key-#ctor-System-Type,System-Object-'></a>
 ### #ctor(type,tag) `constructor`
@@ -7533,14 +7467,14 @@ Singleton per scope
 
 ##### Summary
 
-Single instance per dependency
+Singleton
 
 <a name='F-IoC-Lifetime-Transient'></a>
 ### Transient `constants`
 
 ##### Summary
 
-Default lifetime. New instance each time (default).
+It is default lifetime. A new instance wll be created each time.
 
 <a name='T-IoC-LinqTunnelAttribute'></a>
 ## LinqTunnelAttribute `type`
@@ -8577,7 +8511,7 @@ IoC
 
 ##### Summary
 
-Represents the enumeration of well-known containers.
+The enumeration of well-known containers.
 
 <a name='F-IoC-WellknownContainers-NewChild'></a>
 ### NewChild `constants`

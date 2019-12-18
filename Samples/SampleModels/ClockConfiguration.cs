@@ -12,17 +12,15 @@
     /// </summary>
     public class ClockConfiguration: IConfiguration
     {
-        public static readonly IConfiguration Shared = new ClockConfiguration();
-        private ClockConfiguration() { }
-
         public IEnumerable<IToken> Apply(IContainer container)
         {
             // View Models
             yield return container.Bind<IClockViewModel>().As(Singleton).To<ClockViewModel>();
 
             // Models
-            yield return container.Bind<ITimer>().As(Singleton).To(ctx => new Timer(TimeSpan.FromSeconds(1)));
-            yield return container.Bind<IClock>().As(Singleton).To<Clock>();
+            yield return container
+                .Bind<ITimer>().As(Singleton).To(ctx => new Timer(TimeSpan.FromSeconds(1)))
+                .Bind<IClock>().As(Singleton).To<Clock>();
         }
     }
 }

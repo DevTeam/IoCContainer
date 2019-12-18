@@ -1,17 +1,26 @@
 ﻿namespace XamarinXaml
 {
     using IoC;
+    using SampleModels;
     using Xamarin.Forms;
 
     public partial class App
     {
-        internal readonly IContainer Container;
+        internal readonly IContainer Container = IoC.Container
+            .Create()
+            .Using<ClockConfiguration>()
+            .Using<AppConfiguration>();
 
         public App()
         {
             InitializeComponent();
-            Container = IoC.Container.Create().Using<Configuration>();
             MainPage = Container.Resolve<Page>();
+        }
+
+        protected override void CleanUp()
+        {
+            Container.Dispose();
+            base.CleanUp();
         }
     }
 }

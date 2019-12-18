@@ -7,6 +7,6 @@ namespace XamarinXaml
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class UIDispatcher: IUIDispatcher
     {
-        public void Dispatch(Action action) => action();        
+        public void Dispatch(Action action) => action();
     }
 }

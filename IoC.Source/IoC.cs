@@ -1326,96 +1326,6 @@ namespace IoC
         }
 
         /// <summary>
-        /// Applies text configurations for the target container.
-        /// </summary>
-        /// <param name="container">The target container.</param>
-        /// <param name="configurationText">The text configurations.</param>
-        /// <returns>The target container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (configurationText == null) throw new ArgumentNullException(nameof(configurationText));
-            if (configurationText.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationText));
-            return container.UsingData(configurationText);
-        }
-
-        /// <summary>
-        /// Applies text configurations for the target container.
-        /// </summary>
-        /// <param name="token">The target container token.</param>
-        /// <param name="configurationText">The text configurations.</param>
-        /// <returns>The target container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public static IContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params string[] configurationText)
-        {
-            if (token == null) throw new ArgumentNullException(nameof(token));
-            return token.Container.Using(configurationText);
-        }
-
-        /// <summary>
-        /// Applies text configurations from streams for the target container.
-        /// </summary>
-        /// <param name="container">The target container.</param>
-        /// <param name="configurationStreams">The set of streams with text configurations.</param>
-        /// <returns>The target container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (configurationStreams == null) throw new ArgumentNullException(nameof(configurationStreams));
-            if (configurationStreams.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationStreams));
-            return container.UsingData(configurationStreams);
-        }
-
-        /// <summary>
-        /// Applies text configurations from streams for the target container.
-        /// </summary>
-        /// <param name="token">The target container token.</param>
-        /// <param name="configurationStreams">The set of streams with text configurations.</param>
-        /// <returns>The target container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public static IContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
-        {
-            if (token == null) throw new ArgumentNullException(nameof(token));
-            return token.Container.Using(configurationStreams);
-        }
-
-        /// <summary>
-        /// Applies text configurations from text readers for the target container.
-        /// </summary>
-        /// <param name="container">The target container.</param>
-        /// <param name="configurationReaders">The set of text readers with text configurations.</param>
-        /// <returns>The target container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (configurationReaders == null) throw new ArgumentNullException(nameof(configurationReaders));
-            if (configurationReaders.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationReaders));
-            return container.UsingData(configurationReaders);
-        }
-
-        /// <summary>
-        /// Applies text configurations from text readers for the target container.
-        /// </summary>
-        /// <param name="token">The target container token.</param>
-        /// <param name="configurationReaders">The set of text readers with text configurations.</param>
-        /// <returns>The target container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        public static IContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
-        {
-            if (token == null) throw new ArgumentNullException(nameof(token));
-            return token.Container.Using(configurationReaders);
-        }
-
-        /// <summary>
         /// Applies configurations for the target container.
         /// </summary>
         /// <param name="container">The target container.</param>
@@ -1475,6 +1385,36 @@ namespace IoC
         }
 
         /// <summary>
+        /// Applies a configuration for the target container.
+        /// </summary>
+        /// <typeparam name="T">The type of configuration.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <returns>The target container token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Apply<T>([NotNull] this IContainer container)
+            where T : IConfiguration, new()
+        {
+            if (container == null) throw new ArgumentNullException(nameof(container));
+            return container.Apply(new T());
+        }
+
+        /// <summary>
+        /// Applies a configuration for the target container.
+        /// </summary>
+        /// <typeparam name="T">The type of configuration.</typeparam>
+        /// <param name="token">The target container token.</param>
+        /// <returns>The target container token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IToken Apply<T>([NotNull] this IToken token)
+            where T : IConfiguration, new()
+        {
+            if (token == null) throw new ArgumentNullException(nameof(token));
+            return token.Container.Apply<T>();
+        }
+
+        /// <summary>
         /// Applies configurations for the target container.
         /// </summary>
         /// <param name="container">The target container.</param>
@@ -1506,7 +1446,7 @@ namespace IoC
         }
 
         /// <summary>
-        /// Applies configuration for the target container.
+        /// Uses a configuration for the target container.
         /// </summary>
         /// <typeparam name="T">The type of configuration.</typeparam>
         /// <param name="container">The target container.</param>
@@ -1521,7 +1461,7 @@ namespace IoC
         }
 
         /// <summary>
-        /// Applies configuration for the target container.
+        /// Uses a configuration for the target container.
         /// </summary>
         /// <typeparam name="T">The type of configuration.</typeparam>
         /// <param name="token">The target container token.</param>
@@ -1543,16 +1483,6 @@ namespace IoC
             if (configurationData == null) throw new ArgumentNullException(nameof(configurationData));
             if (configurationData.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationData));
             return container.Apply(configurationData.Select(configurationItem => container.Resolve<IConfiguration>(configurationItem)).ToArray());
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        private static IContainer UsingData<T>([NotNull] this IContainer container, [NotNull] [ItemNotNull] params T[] configurationData)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            if (configurationData == null) throw new ArgumentNullException(nameof(configurationData));
-            if (configurationData.Length == 0) throw new ArgumentException("Value cannot be an empty collection.", nameof(configurationData));
-            return container.Using(configurationData.Select(configurationItem => container.Resolve<IConfiguration>(configurationItem)).ToArray());
         }
     }
 }

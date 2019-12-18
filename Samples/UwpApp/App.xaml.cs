@@ -7,6 +7,7 @@
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Navigation;
     using IoC;
+    using SampleModels;
     using Views;
 
     /// <summary>
@@ -14,7 +15,10 @@
     /// </summary>
     sealed partial class App
     {
-        internal readonly IContainer Container;
+        internal readonly IContainer Container = IoC.Container
+            .Create()
+            .Using<ClockConfiguration>()
+            .Using<AppConfiguration>();
 
         /// <summary>
         /// Initializes the singleton application object.  This is the first line of authored code
@@ -23,7 +27,6 @@
         public App()
         {
             InitializeComponent();
-            Container = IoC.Container.Create().Using<Configuration>();
             Suspending += OnSuspending;
         }
 

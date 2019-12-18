@@ -8,6 +8,6 @@ namespace WpfApp
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class UIDispatcher: IUIDispatcher
     {
-        public void Dispatch(Action action) => Application.Current.Dispatcher.Invoke(action);        
+        public void Dispatch(Action action) => Application.Current?.Dispatcher?.Invoke(action);
     }
 }
