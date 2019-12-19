@@ -64,7 +64,7 @@
         [NotNull]
         public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class =>
-            token.Container.BuildUp<TInstance>(args);
+            (token ?? throw new ArgumentNullException(nameof(token))).Container.BuildUp<TInstance>(args ?? throw new ArgumentNullException(nameof(args)));
 
         /// <summary>
         /// Buildups an instance.
@@ -97,47 +97,6 @@
             {
                 token.Dispose();
                 throw;
-            }
-        }
-
-        /// <summary>
-        /// Represents a holder for a created instance.
-        /// </summary>
-        /// <typeparam name="TInstance"></typeparam>
-        public interface IHolder<out TInstance>: IToken
-            where TInstance : class
-        {
-            /// <summary>
-            /// The created instance.
-            /// </summary>
-            [NotNull] TInstance Instance { get; }
-        }
-
-        internal class Holder<TInstance> : IHolder<TInstance>
-            where TInstance : class
-        {
-            [NotNull] private readonly IToken _token;
-
-            public Holder([NotNull] IToken token, [NotNull] TInstance instance)
-            {
-                _token = token ?? throw new ArgumentNullException(nameof(token));
-                Instance = instance ?? throw new ArgumentNullException(nameof(instance));
-            }
-
-            public IContainer Container => _token.Container;
-
-            public TInstance Instance { get; }
-
-            public void Dispose()
-            {
-                using (_token.Container)
-                using (_token)
-                {
-                    if (Instance is IDisposable disposable)
-                    {
-                        disposable.Dispose();
-                    }
-                }
             }
         }
     }

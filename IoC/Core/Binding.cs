@@ -22,7 +22,7 @@
         {
             if (token == null) { throw new ArgumentNullException(nameof(token)); }
             Container = token.Container;
-            Tokens = Enumerable.Repeat(token, 1);
+            Tokens = new[] { token };
             Types = types ?? throw new ArgumentNullException(nameof(types));
             Lifetime = default(ILifetime);
             Tags = Enumerable.Empty<object>();
