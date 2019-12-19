@@ -28,7 +28,7 @@
         /// <summary>
         /// Error during operation.
         /// </summary>
-        public Exception Error;
+        [CanBeNull] public Exception Error;
 
         /// <summary>
         /// The changed keys.
@@ -51,11 +51,11 @@
         [CanBeNull] public LambdaExpression ResolverExpression;
 
         /// <summary>
-        /// Create new instance of container event.
+        /// Creates new instance of container event.
         /// </summary>
         /// <param name="container">The origin container.</param>
         /// <param name="eventType">The event type.</param>
-        public ContainerEvent([NotNull] IContainer container, EventType eventType)
+        internal ContainerEvent([NotNull] IContainer container, EventType eventType)
         {
             Container = container;
             EventType = eventType;

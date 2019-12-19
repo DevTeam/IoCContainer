@@ -109,12 +109,6 @@
   - [CoreSet](#F-IoC-Features-Feature-CoreSet 'IoC.Features.Feature.CoreSet')
   - [DefaultSet](#F-IoC-Features-Feature-DefaultSet 'IoC.Features.Feature.DefaultSet')
   - [LightSet](#F-IoC-Features-Feature-LightSet 'IoC.Features.Feature.LightSet')
-- [Fluent](#T-IoC-Fluent 'IoC.Fluent')
-  - [BuildUp\`\`1(configuration,args)](#M-IoC-Fluent-BuildUp``1-IoC-IConfiguration,System-Object[]- 'IoC.Fluent.BuildUp``1(IoC.IConfiguration,System.Object[])')
-  - [BuildUp\`\`1(token,args)](#M-IoC-Fluent-BuildUp``1-IoC-IToken,System-Object[]- 'IoC.Fluent.BuildUp``1(IoC.IToken,System.Object[])')
-  - [BuildUp\`\`1(container,args)](#M-IoC-Fluent-BuildUp``1-IoC-IContainer,System-Object[]- 'IoC.Fluent.BuildUp``1(IoC.IContainer,System.Object[])')
-  - [Create(parentContainer,name)](#M-IoC-Fluent-Create-IoC-IContainer,System-String- 'IoC.Fluent.Create(IoC.IContainer,System.String)')
-  - [Create(token,name)](#M-IoC-Fluent-Create-IoC-IToken,System-String- 'IoC.Fluent.Create(IoC.IToken,System.String)')
 - [FluentAutowiring](#T-IoC-FluentAutowiring 'IoC.FluentAutowiring')
   - [TryInjectDependency\`\`1(method,parameterPosition,dependencyType,dependencyTag)](#M-IoC-FluentAutowiring-TryInjectDependency``1-IoC-IMethod{``0},System-Int32,System-Type,System-Object- 'IoC.FluentAutowiring.TryInjectDependency``1(IoC.IMethod{``0},System.Int32,System.Type,System.Object)')
 - [FluentBind](#T-IoC-FluentBind 'IoC.FluentBind')
@@ -213,6 +207,12 @@
   - [Using(token,configurations)](#M-IoC-FluentConfiguration-Using-IoC-IToken,IoC-IConfiguration[]- 'IoC.FluentConfiguration.Using(IoC.IToken,IoC.IConfiguration[])')
   - [Using\`\`1(container)](#M-IoC-FluentConfiguration-Using``1-IoC-IContainer- 'IoC.FluentConfiguration.Using``1(IoC.IContainer)')
   - [Using\`\`1(token)](#M-IoC-FluentConfiguration-Using``1-IoC-IToken- 'IoC.FluentConfiguration.Using``1(IoC.IToken)')
+- [FluentContainer](#T-IoC-FluentContainer 'IoC.FluentContainer')
+  - [BuildUp\`\`1(configuration,args)](#M-IoC-FluentContainer-BuildUp``1-IoC-IConfiguration,System-Object[]- 'IoC.FluentContainer.BuildUp``1(IoC.IConfiguration,System.Object[])')
+  - [BuildUp\`\`1(token,args)](#M-IoC-FluentContainer-BuildUp``1-IoC-IToken,System-Object[]- 'IoC.FluentContainer.BuildUp``1(IoC.IToken,System.Object[])')
+  - [BuildUp\`\`1(container,args)](#M-IoC-FluentContainer-BuildUp``1-IoC-IContainer,System-Object[]- 'IoC.FluentContainer.BuildUp``1(IoC.IContainer,System.Object[])')
+  - [Create(parentContainer,name)](#M-IoC-FluentContainer-Create-IoC-IContainer,System-String- 'IoC.FluentContainer.Create(IoC.IContainer,System.String)')
+  - [Create(token,name)](#M-IoC-FluentContainer-Create-IoC-IToken,System-String- 'IoC.FluentContainer.Create(IoC.IToken,System.String)')
 - [FluentGetResolver](#T-IoC-FluentGetResolver 'IoC.FluentGetResolver')
   - [AsTag(tagValue)](#M-IoC-FluentGetResolver-AsTag-System-Object- 'IoC.FluentGetResolver.AsTag(System.Object)')
   - [GetResolver\`\`1(type,tag,container)](#M-IoC-FluentGetResolver-GetResolver``1-IoC-IContainer,System-Type,IoC-Tag- 'IoC.FluentGetResolver.GetResolver``1(IoC.IContainer,System.Type,IoC.Tag)')
@@ -454,9 +454,10 @@
   - [Default](#F-IoC-Features-TaskFeature-Default 'IoC.Features.TaskFeature.Default')
   - [Apply()](#M-IoC-Features-TaskFeature-Apply-IoC-IContainer- 'IoC.Features.TaskFeature.Apply(IoC.IContainer)')
 - [TerminatesProgramAttribute](#T-IoC-TerminatesProgramAttribute 'IoC.TerminatesProgramAttribute')
-- [TraceEvent](#T-IoC-FluentTrace-TraceEvent 'IoC.FluentTrace.TraceEvent')
-  - [ContainerEvent](#F-IoC-FluentTrace-TraceEvent-ContainerEvent 'IoC.FluentTrace.TraceEvent.ContainerEvent')
-  - [Message](#F-IoC-FluentTrace-TraceEvent-Message 'IoC.FluentTrace.TraceEvent.Message')
+- [TraceEvent](#T-IoC-TraceEvent 'IoC.TraceEvent')
+  - [#ctor(containerEvent,message)](#M-IoC-TraceEvent-#ctor-IoC-ContainerEvent,System-String- 'IoC.TraceEvent.#ctor(IoC.ContainerEvent,System.String)')
+  - [ContainerEvent](#F-IoC-TraceEvent-ContainerEvent 'IoC.TraceEvent.ContainerEvent')
+  - [Message](#F-IoC-TraceEvent-Message 'IoC.TraceEvent.Message')
 - [TupleFeature](#T-IoC-Features-TupleFeature 'IoC.Features.TupleFeature')
   - [Default](#F-IoC-Features-TupleFeature-Default 'IoC.Features.TupleFeature.Default')
   - [Light](#F-IoC-Features-TupleFeature-Light 'IoC.Features.TupleFeature.Light')
@@ -1278,7 +1279,7 @@ Provides information about changes in the container.
 
 ##### Summary
 
-Create new instance of container event.
+Creates new instance of container event.
 
 ##### Parameters
 
@@ -1631,127 +1632,6 @@ Default features.
 ##### Summary
 
 The light set of features.
-
-<a name='T-IoC-Fluent'></a>
-## Fluent `type`
-
-##### Namespace
-
-IoC
-
-##### Summary
-
-Extension methods for IoC containers and configurations.
-
-<a name='M-IoC-Fluent-BuildUp``1-IoC-IConfiguration,System-Object[]-'></a>
-### BuildUp\`\`1(configuration,args) `method`
-
-##### Summary
-
-Buildups an instance which was not registered in container. Can be used as entry point of DI.
-
-##### Returns
-
-The disposable instance holder.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| configuration | [IoC.IConfiguration](#T-IoC-IConfiguration 'IoC.IConfiguration') | The configurations. |
-| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| TInstance | The instance type. |
-
-<a name='M-IoC-Fluent-BuildUp``1-IoC-IToken,System-Object[]-'></a>
-### BuildUp\`\`1(token,args) `method`
-
-##### Summary
-
-Buildups an instance.
-Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
-
-##### Returns
-
-The disposable instance holder.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The target container token. |
-| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| TInstance | The instance type. |
-
-<a name='M-IoC-Fluent-BuildUp``1-IoC-IContainer,System-Object[]-'></a>
-### BuildUp\`\`1(container,args) `method`
-
-##### Summary
-
-Buildups an instance.
-Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
-
-##### Returns
-
-The disposable instance holder.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| TInstance | The instance type. |
-
-<a name='M-IoC-Fluent-Create-IoC-IContainer,System-String-'></a>
-### Create(parentContainer,name) `method`
-
-##### Summary
-
-Creates child container.
-
-##### Returns
-
-The child container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| parentContainer | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The parent container. |
-| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The name of child container. |
-
-<a name='M-IoC-Fluent-Create-IoC-IToken,System-String-'></a>
-### Create(token,name) `method`
-
-##### Summary
-
-Creates child container.
-
-##### Returns
-
-The child container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The parent container token. |
-| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The name of child container. |
 
 <a name='T-IoC-FluentAutowiring'></a>
 ## FluentAutowiring `type`
@@ -4951,6 +4831,127 @@ The target container.
 | Name | Description |
 | ---- | ----------- |
 | T | The type of configuration. |
+
+<a name='T-IoC-FluentContainer'></a>
+## FluentContainer `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Extension methods for IoC containers and configurations.
+
+<a name='M-IoC-FluentContainer-BuildUp``1-IoC-IConfiguration,System-Object[]-'></a>
+### BuildUp\`\`1(configuration,args) `method`
+
+##### Summary
+
+Buildups an instance which was not registered in container. Can be used as entry point of DI.
+
+##### Returns
+
+The disposable instance holder.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| configuration | [IoC.IConfiguration](#T-IoC-IConfiguration 'IoC.IConfiguration') | The configurations. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| TInstance | The instance type. |
+
+<a name='M-IoC-FluentContainer-BuildUp``1-IoC-IToken,System-Object[]-'></a>
+### BuildUp\`\`1(token,args) `method`
+
+##### Summary
+
+Buildups an instance.
+Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
+
+##### Returns
+
+The disposable instance holder.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The target container token. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| TInstance | The instance type. |
+
+<a name='M-IoC-FluentContainer-BuildUp``1-IoC-IContainer,System-Object[]-'></a>
+### BuildUp\`\`1(container,args) `method`
+
+##### Summary
+
+Buildups an instance.
+Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
+
+##### Returns
+
+The disposable instance holder.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| TInstance | The instance type. |
+
+<a name='M-IoC-FluentContainer-Create-IoC-IContainer,System-String-'></a>
+### Create(parentContainer,name) `method`
+
+##### Summary
+
+Creates child container.
+
+##### Returns
+
+The child container.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| parentContainer | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The parent container. |
+| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The name of child container. |
+
+<a name='M-IoC-FluentContainer-Create-IoC-IToken,System-String-'></a>
+### Create(token,name) `method`
+
+##### Summary
+
+Creates child container.
+
+##### Returns
+
+The child container.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The parent container token. |
+| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The name of child container. |
 
 <a name='T-IoC-FluentGetResolver'></a>
 ## FluentGetResolver `type`
@@ -8425,25 +8426,39 @@ IoC
 Indicates that the marked method unconditionally terminates control flow execution.
 For example, it could unconditionally throw exception.
 
-<a name='T-IoC-FluentTrace-TraceEvent'></a>
+<a name='T-IoC-TraceEvent'></a>
 ## TraceEvent `type`
 
 ##### Namespace
 
-IoC.FluentTrace
+IoC
 
 ##### Summary
 
 Represents a trace event.
 
-<a name='F-IoC-FluentTrace-TraceEvent-ContainerEvent'></a>
+<a name='M-IoC-TraceEvent-#ctor-IoC-ContainerEvent,System-String-'></a>
+### #ctor(containerEvent,message) `constructor`
+
+##### Summary
+
+Creates new instance of trace event.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| containerEvent | [IoC.ContainerEvent](#T-IoC-ContainerEvent 'IoC.ContainerEvent') | The original instance of container event. |
+| message | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The trace message. |
+
+<a name='F-IoC-TraceEvent-ContainerEvent'></a>
 ### ContainerEvent `constants`
 
 ##### Summary
 
 The origin container event.
 
-<a name='F-IoC-FluentTrace-TraceEvent-Message'></a>
+<a name='F-IoC-TraceEvent-Message'></a>
 ### Message `constants`
 
 ##### Summary

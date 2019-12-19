@@ -736,7 +736,7 @@
         </member>
         <member name="M:IoC.ContainerEvent.#ctor(IoC.IContainer,IoC.EventType)">
             <summary>
-            Create new instance of container event.
+            Creates new instance of container event.
             </summary>
             <param name="container">The origin container.</param>
             <param name="eventType">The event type.</param>
@@ -1077,56 +1077,6 @@
         </member>
         <member name="M:IoC.Features.TupleFeature.Apply(IoC.IContainer)">
             <inheritdoc />
-        </member>
-        <member name="T:IoC.Fluent">
-            <summary>
-            Extension methods for IoC containers and configurations.
-            </summary>
-        </member>
-        <member name="M:IoC.Fluent.Create(IoC.IContainer,System.String)">
-            <summary>
-            Creates child container.
-            </summary>
-            <param name="parentContainer">The parent container.</param>
-            <param name="name">The name of child container.</param>
-            <returns>The child container.</returns>
-        </member>
-        <member name="M:IoC.Fluent.Create(IoC.IToken,System.String)">
-            <summary>
-            Creates child container.
-            </summary>
-            <param name="token">The parent container token.</param>
-            <param name="name">The name of child container.</param>
-            <returns>The child container.</returns>
-        </member>
-        <member name="M:IoC.Fluent.BuildUp``1(IoC.IConfiguration,System.Object[])">
-            <summary>
-            Buildups an instance which was not registered in container. Can be used as entry point of DI.
-            </summary>
-            <param name="configuration">The configurations.</param>
-            <param name="args">The optional arguments.</param>
-            <typeparam name="TInstance">The instance type.</typeparam>
-            <returns>The disposable instance holder.</returns>
-        </member>
-        <member name="M:IoC.Fluent.BuildUp``1(IoC.IToken,System.Object[])">
-            <summary>
-            Buildups an instance.
-            Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
-            </summary>
-            <typeparam name="TInstance">The instance type.</typeparam>
-            <param name="token">The target container token.</param>
-            <param name="args">The optional arguments.</param>
-            <returns>The disposable instance holder.</returns>
-        </member>
-        <member name="M:IoC.Fluent.BuildUp``1(IoC.IContainer,System.Object[])">
-            <summary>
-            Buildups an instance.
-            Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
-            </summary>
-            <typeparam name="TInstance">The instance type.</typeparam>
-            <param name="container">The target container.</param>
-            <param name="args">The optional arguments.</param>
-            <returns>The disposable instance holder.</returns>
         </member>
         <member name="T:IoC.FluentAutowiring">
             <summary>
@@ -2972,6 +2922,56 @@
             <param name="token">The target container token.</param>
             <returns>The target container.</returns>
         </member>
+        <member name="T:IoC.FluentContainer">
+            <summary>
+            Extension methods for IoC containers and configurations.
+            </summary>
+        </member>
+        <member name="M:IoC.FluentContainer.Create(IoC.IContainer,System.String)">
+            <summary>
+            Creates child container.
+            </summary>
+            <param name="parentContainer">The parent container.</param>
+            <param name="name">The name of child container.</param>
+            <returns>The child container.</returns>
+        </member>
+        <member name="M:IoC.FluentContainer.Create(IoC.IToken,System.String)">
+            <summary>
+            Creates child container.
+            </summary>
+            <param name="token">The parent container token.</param>
+            <param name="name">The name of child container.</param>
+            <returns>The child container.</returns>
+        </member>
+        <member name="M:IoC.FluentContainer.BuildUp``1(IoC.IConfiguration,System.Object[])">
+            <summary>
+            Buildups an instance which was not registered in container. Can be used as entry point of DI.
+            </summary>
+            <param name="configuration">The configurations.</param>
+            <param name="args">The optional arguments.</param>
+            <typeparam name="TInstance">The instance type.</typeparam>
+            <returns>The disposable instance holder.</returns>
+        </member>
+        <member name="M:IoC.FluentContainer.BuildUp``1(IoC.IToken,System.Object[])">
+            <summary>
+            Buildups an instance.
+            Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
+            </summary>
+            <typeparam name="TInstance">The instance type.</typeparam>
+            <param name="token">The target container token.</param>
+            <param name="args">The optional arguments.</param>
+            <returns>The disposable instance holder.</returns>
+        </member>
+        <member name="M:IoC.FluentContainer.BuildUp``1(IoC.IContainer,System.Object[])">
+            <summary>
+            Buildups an instance.
+            Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
+            </summary>
+            <typeparam name="TInstance">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="args">The optional arguments.</param>
+            <returns>The disposable instance holder.</returns>
+        </member>
         <member name="T:IoC.FluentGetResolver">
             <summary>
             Represents extensions to get a resolver from the container.
@@ -3239,21 +3239,6 @@
             </summary>
             <param name="token">The token of target container to trace.</param>
             <returns>The trace token.</returns>
-        </member>
-        <member name="T:IoC.FluentTrace.TraceEvent">
-            <summary>
-            Represents a trace event.
-            </summary>
-        </member>
-        <member name="F:IoC.FluentTrace.TraceEvent.ContainerEvent">
-            <summary>
-            The origin container event.
-            </summary>
-        </member>
-        <member name="F:IoC.FluentTrace.TraceEvent.Message">
-            <summary>
-            The trace message.
-            </summary>
         </member>
         <member name="T:IoC.GenericTypeArgumentAttribute">
             <summary>
@@ -4157,6 +4142,28 @@
         </member>
         <member name="M:IoC.Tag.ToString">
             <inheritdoc />
+        </member>
+        <member name="T:IoC.TraceEvent">
+            <summary>
+            Represents a trace event.
+            </summary>
+        </member>
+        <member name="F:IoC.TraceEvent.ContainerEvent">
+            <summary>
+            The origin container event.
+            </summary>
+        </member>
+        <member name="F:IoC.TraceEvent.Message">
+            <summary>
+            The trace message.
+            </summary>
+        </member>
+        <member name="M:IoC.TraceEvent.#ctor(IoC.ContainerEvent,System.String)">
+            <summary>
+            Creates new instance of trace event.
+            </summary>
+            <param name="containerEvent">The original instance of container event.</param>
+            <param name="message">The trace message.</param>
         </member>
         <member name="T:IoC.WellknownContainers">
             <summary>

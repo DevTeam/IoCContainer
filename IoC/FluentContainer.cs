@@ -8,7 +8,7 @@
     /// Extension methods for IoC containers and configurations.
     /// </summary>
     [PublicAPI]
-    public static class Fluent
+    public static class FluentContainer
     {
         /// <summary>
         /// Creates child container.

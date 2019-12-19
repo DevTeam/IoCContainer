@@ -132,26 +132,5 @@
                 subscriptions.Add(container, subscription);
             }
         }
-
-        /// <summary>
-        /// Represents a trace event.
-        /// </summary>
-        public struct TraceEvent
-        {
-            /// <summary>
-            /// The origin container event.
-            /// </summary>
-            public readonly ContainerEvent ContainerEvent;
-            /// <summary>
-            /// The trace message.
-            /// </summary>
-            [NotNull] public readonly string Message;
-
-            internal TraceEvent(ContainerEvent containerEvent, [NotNull] string message)
-            {
-                ContainerEvent = containerEvent;
-                Message = message ?? throw new ArgumentNullException(nameof(message));
-            }
-        }
     }
 }
