@@ -113,13 +113,6 @@ It allows you to take full advantage of dependency injection everywhere and ever
 
 ¹ _source code packages_ require C# 7.0 or higher
 
-## Class References
-
-- [.NET 4.8](Docs/IoC_net48.md)
-- [.NET Standard 2.1](Docs/IoC_netstandard2.1.md)
-- [.NET Core 3.1](Docs/IoC_netcoreapp3.1.md)
-- [UWP 10.0](Docs/IoC_uap10.0.md)
-
 ## ASP.NET Core
 
 ### Add the  [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) reference (or [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source))
