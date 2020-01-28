@@ -3250,7 +3250,147 @@
             Represents the generic type parameter marker.
             </summary>
         </member>
+        <member name="T:IoC.TTDisposable">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary`2">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
         <member name="T:IoC.TT1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDisposable1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable1`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable1`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable1`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator1`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection1`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList1`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet1`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer1`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer1`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary1`2">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable1`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver1`1">
             <summary>
             Represents the generic type parameter marker.
             </summary>
@@ -3260,7 +3400,147 @@
             Represents the generic type parameter marker.
             </summary>
         </member>
+        <member name="T:IoC.TTDisposable2">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable2">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable2`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable2`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable2`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator2`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection2`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList2`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet2`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer2`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer2`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary2`2">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable2`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver2`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
         <member name="T:IoC.TT3">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDisposable3">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable3">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable3`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable3`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable3`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator3`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection3`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList3`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet3`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer3`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer3`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary3`2">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable3`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver3`1">
             <summary>
             Represents the generic type parameter marker.
             </summary>
@@ -3270,7 +3550,147 @@
             Represents the generic type parameter marker.
             </summary>
         </member>
+        <member name="T:IoC.TTDisposable4">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable4">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable4`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable4`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable4`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator4`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection4`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList4`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet4`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer4`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer4`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary4`2">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable4`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver4`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
         <member name="T:IoC.TT5">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDisposable5">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable5">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable5`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable5`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable5`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator5`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection5`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList5`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet5`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer5`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer5`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary5`2">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable5`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver5`1">
             <summary>
             Represents the generic type parameter marker.
             </summary>
@@ -3280,12 +3700,222 @@
             Represents the generic type parameter marker.
             </summary>
         </member>
+        <member name="T:IoC.TTDisposable6">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable6">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable6`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable6`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable6`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator6`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection6`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList6`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet6`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer6`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer6`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary6`2">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable6`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver6`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
         <member name="T:IoC.TT7">
             <summary>
             Represents the generic type parameter marker.
             </summary>
         </member>
+        <member name="T:IoC.TTDisposable7">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable7">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable7`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable7`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable7`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator7`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection7`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList7`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet7`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer7`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer7`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary7`2">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable7`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver7`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
         <member name="T:IoC.TT8">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDisposable8">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable8">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable8`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable8`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable8`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator8`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection8`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList8`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet8`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer8`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer8`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary8`2">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable8`1">
+            <summary>
+            Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver8`1">
             <summary>
             Represents the generic type parameter marker.
             </summary>

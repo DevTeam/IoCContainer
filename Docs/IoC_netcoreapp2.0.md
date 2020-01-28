@@ -448,6 +448,132 @@
 - [TT7](#T-IoC-TT7 'IoC.TT7')
 - [TT8](#T-IoC-TT8 'IoC.TT8')
 - [TT9](#T-IoC-TT9 'IoC.TT9')
+- [TTCollection1\`1](#T-IoC-TTCollection1`1 'IoC.TTCollection1`1')
+- [TTCollection2\`1](#T-IoC-TTCollection2`1 'IoC.TTCollection2`1')
+- [TTCollection3\`1](#T-IoC-TTCollection3`1 'IoC.TTCollection3`1')
+- [TTCollection4\`1](#T-IoC-TTCollection4`1 'IoC.TTCollection4`1')
+- [TTCollection5\`1](#T-IoC-TTCollection5`1 'IoC.TTCollection5`1')
+- [TTCollection6\`1](#T-IoC-TTCollection6`1 'IoC.TTCollection6`1')
+- [TTCollection7\`1](#T-IoC-TTCollection7`1 'IoC.TTCollection7`1')
+- [TTCollection8\`1](#T-IoC-TTCollection8`1 'IoC.TTCollection8`1')
+- [TTCollection\`1](#T-IoC-TTCollection`1 'IoC.TTCollection`1')
+- [TTComparable](#T-IoC-TTComparable 'IoC.TTComparable')
+- [TTComparable1](#T-IoC-TTComparable1 'IoC.TTComparable1')
+- [TTComparable1\`1](#T-IoC-TTComparable1`1 'IoC.TTComparable1`1')
+- [TTComparable2](#T-IoC-TTComparable2 'IoC.TTComparable2')
+- [TTComparable2\`1](#T-IoC-TTComparable2`1 'IoC.TTComparable2`1')
+- [TTComparable3](#T-IoC-TTComparable3 'IoC.TTComparable3')
+- [TTComparable3\`1](#T-IoC-TTComparable3`1 'IoC.TTComparable3`1')
+- [TTComparable4](#T-IoC-TTComparable4 'IoC.TTComparable4')
+- [TTComparable4\`1](#T-IoC-TTComparable4`1 'IoC.TTComparable4`1')
+- [TTComparable5](#T-IoC-TTComparable5 'IoC.TTComparable5')
+- [TTComparable5\`1](#T-IoC-TTComparable5`1 'IoC.TTComparable5`1')
+- [TTComparable6](#T-IoC-TTComparable6 'IoC.TTComparable6')
+- [TTComparable6\`1](#T-IoC-TTComparable6`1 'IoC.TTComparable6`1')
+- [TTComparable7](#T-IoC-TTComparable7 'IoC.TTComparable7')
+- [TTComparable7\`1](#T-IoC-TTComparable7`1 'IoC.TTComparable7`1')
+- [TTComparable8](#T-IoC-TTComparable8 'IoC.TTComparable8')
+- [TTComparable8\`1](#T-IoC-TTComparable8`1 'IoC.TTComparable8`1')
+- [TTComparable\`1](#T-IoC-TTComparable`1 'IoC.TTComparable`1')
+- [TTComparer1\`1](#T-IoC-TTComparer1`1 'IoC.TTComparer1`1')
+- [TTComparer2\`1](#T-IoC-TTComparer2`1 'IoC.TTComparer2`1')
+- [TTComparer3\`1](#T-IoC-TTComparer3`1 'IoC.TTComparer3`1')
+- [TTComparer4\`1](#T-IoC-TTComparer4`1 'IoC.TTComparer4`1')
+- [TTComparer5\`1](#T-IoC-TTComparer5`1 'IoC.TTComparer5`1')
+- [TTComparer6\`1](#T-IoC-TTComparer6`1 'IoC.TTComparer6`1')
+- [TTComparer7\`1](#T-IoC-TTComparer7`1 'IoC.TTComparer7`1')
+- [TTComparer8\`1](#T-IoC-TTComparer8`1 'IoC.TTComparer8`1')
+- [TTComparer\`1](#T-IoC-TTComparer`1 'IoC.TTComparer`1')
+- [TTDictionary1\`2](#T-IoC-TTDictionary1`2 'IoC.TTDictionary1`2')
+- [TTDictionary2\`2](#T-IoC-TTDictionary2`2 'IoC.TTDictionary2`2')
+- [TTDictionary3\`2](#T-IoC-TTDictionary3`2 'IoC.TTDictionary3`2')
+- [TTDictionary4\`2](#T-IoC-TTDictionary4`2 'IoC.TTDictionary4`2')
+- [TTDictionary5\`2](#T-IoC-TTDictionary5`2 'IoC.TTDictionary5`2')
+- [TTDictionary6\`2](#T-IoC-TTDictionary6`2 'IoC.TTDictionary6`2')
+- [TTDictionary7\`2](#T-IoC-TTDictionary7`2 'IoC.TTDictionary7`2')
+- [TTDictionary8\`2](#T-IoC-TTDictionary8`2 'IoC.TTDictionary8`2')
+- [TTDictionary\`2](#T-IoC-TTDictionary`2 'IoC.TTDictionary`2')
+- [TTDisposable](#T-IoC-TTDisposable 'IoC.TTDisposable')
+- [TTDisposable1](#T-IoC-TTDisposable1 'IoC.TTDisposable1')
+- [TTDisposable2](#T-IoC-TTDisposable2 'IoC.TTDisposable2')
+- [TTDisposable3](#T-IoC-TTDisposable3 'IoC.TTDisposable3')
+- [TTDisposable4](#T-IoC-TTDisposable4 'IoC.TTDisposable4')
+- [TTDisposable5](#T-IoC-TTDisposable5 'IoC.TTDisposable5')
+- [TTDisposable6](#T-IoC-TTDisposable6 'IoC.TTDisposable6')
+- [TTDisposable7](#T-IoC-TTDisposable7 'IoC.TTDisposable7')
+- [TTDisposable8](#T-IoC-TTDisposable8 'IoC.TTDisposable8')
+- [TTEnumerable1\`1](#T-IoC-TTEnumerable1`1 'IoC.TTEnumerable1`1')
+- [TTEnumerable2\`1](#T-IoC-TTEnumerable2`1 'IoC.TTEnumerable2`1')
+- [TTEnumerable3\`1](#T-IoC-TTEnumerable3`1 'IoC.TTEnumerable3`1')
+- [TTEnumerable4\`1](#T-IoC-TTEnumerable4`1 'IoC.TTEnumerable4`1')
+- [TTEnumerable5\`1](#T-IoC-TTEnumerable5`1 'IoC.TTEnumerable5`1')
+- [TTEnumerable6\`1](#T-IoC-TTEnumerable6`1 'IoC.TTEnumerable6`1')
+- [TTEnumerable7\`1](#T-IoC-TTEnumerable7`1 'IoC.TTEnumerable7`1')
+- [TTEnumerable8\`1](#T-IoC-TTEnumerable8`1 'IoC.TTEnumerable8`1')
+- [TTEnumerable\`1](#T-IoC-TTEnumerable`1 'IoC.TTEnumerable`1')
+- [TTEnumerator1\`1](#T-IoC-TTEnumerator1`1 'IoC.TTEnumerator1`1')
+- [TTEnumerator2\`1](#T-IoC-TTEnumerator2`1 'IoC.TTEnumerator2`1')
+- [TTEnumerator3\`1](#T-IoC-TTEnumerator3`1 'IoC.TTEnumerator3`1')
+- [TTEnumerator4\`1](#T-IoC-TTEnumerator4`1 'IoC.TTEnumerator4`1')
+- [TTEnumerator5\`1](#T-IoC-TTEnumerator5`1 'IoC.TTEnumerator5`1')
+- [TTEnumerator6\`1](#T-IoC-TTEnumerator6`1 'IoC.TTEnumerator6`1')
+- [TTEnumerator7\`1](#T-IoC-TTEnumerator7`1 'IoC.TTEnumerator7`1')
+- [TTEnumerator8\`1](#T-IoC-TTEnumerator8`1 'IoC.TTEnumerator8`1')
+- [TTEnumerator\`1](#T-IoC-TTEnumerator`1 'IoC.TTEnumerator`1')
+- [TTEqualityComparer1\`1](#T-IoC-TTEqualityComparer1`1 'IoC.TTEqualityComparer1`1')
+- [TTEqualityComparer2\`1](#T-IoC-TTEqualityComparer2`1 'IoC.TTEqualityComparer2`1')
+- [TTEqualityComparer3\`1](#T-IoC-TTEqualityComparer3`1 'IoC.TTEqualityComparer3`1')
+- [TTEqualityComparer4\`1](#T-IoC-TTEqualityComparer4`1 'IoC.TTEqualityComparer4`1')
+- [TTEqualityComparer5\`1](#T-IoC-TTEqualityComparer5`1 'IoC.TTEqualityComparer5`1')
+- [TTEqualityComparer6\`1](#T-IoC-TTEqualityComparer6`1 'IoC.TTEqualityComparer6`1')
+- [TTEqualityComparer7\`1](#T-IoC-TTEqualityComparer7`1 'IoC.TTEqualityComparer7`1')
+- [TTEqualityComparer8\`1](#T-IoC-TTEqualityComparer8`1 'IoC.TTEqualityComparer8`1')
+- [TTEqualityComparer\`1](#T-IoC-TTEqualityComparer`1 'IoC.TTEqualityComparer`1')
+- [TTEquatable1\`1](#T-IoC-TTEquatable1`1 'IoC.TTEquatable1`1')
+- [TTEquatable2\`1](#T-IoC-TTEquatable2`1 'IoC.TTEquatable2`1')
+- [TTEquatable3\`1](#T-IoC-TTEquatable3`1 'IoC.TTEquatable3`1')
+- [TTEquatable4\`1](#T-IoC-TTEquatable4`1 'IoC.TTEquatable4`1')
+- [TTEquatable5\`1](#T-IoC-TTEquatable5`1 'IoC.TTEquatable5`1')
+- [TTEquatable6\`1](#T-IoC-TTEquatable6`1 'IoC.TTEquatable6`1')
+- [TTEquatable7\`1](#T-IoC-TTEquatable7`1 'IoC.TTEquatable7`1')
+- [TTEquatable8\`1](#T-IoC-TTEquatable8`1 'IoC.TTEquatable8`1')
+- [TTEquatable\`1](#T-IoC-TTEquatable`1 'IoC.TTEquatable`1')
+- [TTList1\`1](#T-IoC-TTList1`1 'IoC.TTList1`1')
+- [TTList2\`1](#T-IoC-TTList2`1 'IoC.TTList2`1')
+- [TTList3\`1](#T-IoC-TTList3`1 'IoC.TTList3`1')
+- [TTList4\`1](#T-IoC-TTList4`1 'IoC.TTList4`1')
+- [TTList5\`1](#T-IoC-TTList5`1 'IoC.TTList5`1')
+- [TTList6\`1](#T-IoC-TTList6`1 'IoC.TTList6`1')
+- [TTList7\`1](#T-IoC-TTList7`1 'IoC.TTList7`1')
+- [TTList8\`1](#T-IoC-TTList8`1 'IoC.TTList8`1')
+- [TTList\`1](#T-IoC-TTList`1 'IoC.TTList`1')
+- [TTObservable1\`1](#T-IoC-TTObservable1`1 'IoC.TTObservable1`1')
+- [TTObservable2\`1](#T-IoC-TTObservable2`1 'IoC.TTObservable2`1')
+- [TTObservable3\`1](#T-IoC-TTObservable3`1 'IoC.TTObservable3`1')
+- [TTObservable4\`1](#T-IoC-TTObservable4`1 'IoC.TTObservable4`1')
+- [TTObservable5\`1](#T-IoC-TTObservable5`1 'IoC.TTObservable5`1')
+- [TTObservable6\`1](#T-IoC-TTObservable6`1 'IoC.TTObservable6`1')
+- [TTObservable7\`1](#T-IoC-TTObservable7`1 'IoC.TTObservable7`1')
+- [TTObservable8\`1](#T-IoC-TTObservable8`1 'IoC.TTObservable8`1')
+- [TTObservable\`1](#T-IoC-TTObservable`1 'IoC.TTObservable`1')
+- [TTObserver1\`1](#T-IoC-TTObserver1`1 'IoC.TTObserver1`1')
+- [TTObserver2\`1](#T-IoC-TTObserver2`1 'IoC.TTObserver2`1')
+- [TTObserver3\`1](#T-IoC-TTObserver3`1 'IoC.TTObserver3`1')
+- [TTObserver4\`1](#T-IoC-TTObserver4`1 'IoC.TTObserver4`1')
+- [TTObserver5\`1](#T-IoC-TTObserver5`1 'IoC.TTObserver5`1')
+- [TTObserver6\`1](#T-IoC-TTObserver6`1 'IoC.TTObserver6`1')
+- [TTObserver7\`1](#T-IoC-TTObserver7`1 'IoC.TTObserver7`1')
+- [TTObserver8\`1](#T-IoC-TTObserver8`1 'IoC.TTObserver8`1')
+- [TTObserver\`1](#T-IoC-TTObserver`1 'IoC.TTObserver`1')
+- [TTSet1\`1](#T-IoC-TTSet1`1 'IoC.TTSet1`1')
+- [TTSet2\`1](#T-IoC-TTSet2`1 'IoC.TTSet2`1')
+- [TTSet3\`1](#T-IoC-TTSet3`1 'IoC.TTSet3`1')
+- [TTSet4\`1](#T-IoC-TTSet4`1 'IoC.TTSet4`1')
+- [TTSet5\`1](#T-IoC-TTSet5`1 'IoC.TTSet5`1')
+- [TTSet6\`1](#T-IoC-TTSet6`1 'IoC.TTSet6`1')
+- [TTSet7\`1](#T-IoC-TTSet7`1 'IoC.TTSet7`1')
+- [TTSet8\`1](#T-IoC-TTSet8`1 'IoC.TTSet8`1')
+- [TTSet\`1](#T-IoC-TTSet`1 'IoC.TTSet`1')
 - [Tag](#T-IoC-Tag 'IoC.Tag')
   - [ToString()](#M-IoC-Tag-ToString 'IoC.Tag.ToString')
 - [TaskFeature](#T-IoC-Features-TaskFeature 'IoC.Features.TaskFeature')
@@ -8358,6 +8484,1392 @@ Represents the generic type parameter marker.
 
 <a name='T-IoC-TT9'></a>
 ## TT9 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTCollection1`1'></a>
+## TTCollection1\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTCollection2`1'></a>
+## TTCollection2\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTCollection3`1'></a>
+## TTCollection3\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTCollection4`1'></a>
+## TTCollection4\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTCollection5`1'></a>
+## TTCollection5\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTCollection6`1'></a>
+## TTCollection6\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTCollection7`1'></a>
+## TTCollection7\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTCollection8`1'></a>
+## TTCollection8\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTCollection`1'></a>
+## TTCollection\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable'></a>
+## TTComparable `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable1'></a>
+## TTComparable1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable1`1'></a>
+## TTComparable1\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable2'></a>
+## TTComparable2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable2`1'></a>
+## TTComparable2\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable3'></a>
+## TTComparable3 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable3`1'></a>
+## TTComparable3\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable4'></a>
+## TTComparable4 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable4`1'></a>
+## TTComparable4\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable5'></a>
+## TTComparable5 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable5`1'></a>
+## TTComparable5\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable6'></a>
+## TTComparable6 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable6`1'></a>
+## TTComparable6\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable7'></a>
+## TTComparable7 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable7`1'></a>
+## TTComparable7\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable8'></a>
+## TTComparable8 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable8`1'></a>
+## TTComparable8\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparable`1'></a>
+## TTComparable\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparer1`1'></a>
+## TTComparer1\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparer2`1'></a>
+## TTComparer2\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparer3`1'></a>
+## TTComparer3\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparer4`1'></a>
+## TTComparer4\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparer5`1'></a>
+## TTComparer5\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparer6`1'></a>
+## TTComparer6\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparer7`1'></a>
+## TTComparer7\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparer8`1'></a>
+## TTComparer8\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTComparer`1'></a>
+## TTComparer\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDictionary1`2'></a>
+## TTDictionary1\`2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDictionary2`2'></a>
+## TTDictionary2\`2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDictionary3`2'></a>
+## TTDictionary3\`2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDictionary4`2'></a>
+## TTDictionary4\`2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDictionary5`2'></a>
+## TTDictionary5\`2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDictionary6`2'></a>
+## TTDictionary6\`2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDictionary7`2'></a>
+## TTDictionary7\`2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDictionary8`2'></a>
+## TTDictionary8\`2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDictionary`2'></a>
+## TTDictionary\`2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDisposable'></a>
+## TTDisposable `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDisposable1'></a>
+## TTDisposable1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDisposable2'></a>
+## TTDisposable2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDisposable3'></a>
+## TTDisposable3 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDisposable4'></a>
+## TTDisposable4 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDisposable5'></a>
+## TTDisposable5 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDisposable6'></a>
+## TTDisposable6 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDisposable7'></a>
+## TTDisposable7 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTDisposable8'></a>
+## TTDisposable8 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerable1`1'></a>
+## TTEnumerable1\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerable2`1'></a>
+## TTEnumerable2\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerable3`1'></a>
+## TTEnumerable3\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerable4`1'></a>
+## TTEnumerable4\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerable5`1'></a>
+## TTEnumerable5\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerable6`1'></a>
+## TTEnumerable6\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerable7`1'></a>
+## TTEnumerable7\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerable8`1'></a>
+## TTEnumerable8\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerable`1'></a>
+## TTEnumerable\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerator1`1'></a>
+## TTEnumerator1\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerator2`1'></a>
+## TTEnumerator2\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerator3`1'></a>
+## TTEnumerator3\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerator4`1'></a>
+## TTEnumerator4\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerator5`1'></a>
+## TTEnumerator5\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerator6`1'></a>
+## TTEnumerator6\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerator7`1'></a>
+## TTEnumerator7\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerator8`1'></a>
+## TTEnumerator8\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEnumerator`1'></a>
+## TTEnumerator\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEqualityComparer1`1'></a>
+## TTEqualityComparer1\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEqualityComparer2`1'></a>
+## TTEqualityComparer2\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEqualityComparer3`1'></a>
+## TTEqualityComparer3\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEqualityComparer4`1'></a>
+## TTEqualityComparer4\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEqualityComparer5`1'></a>
+## TTEqualityComparer5\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEqualityComparer6`1'></a>
+## TTEqualityComparer6\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEqualityComparer7`1'></a>
+## TTEqualityComparer7\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEqualityComparer8`1'></a>
+## TTEqualityComparer8\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEqualityComparer`1'></a>
+## TTEqualityComparer\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEquatable1`1'></a>
+## TTEquatable1\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEquatable2`1'></a>
+## TTEquatable2\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEquatable3`1'></a>
+## TTEquatable3\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEquatable4`1'></a>
+## TTEquatable4\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEquatable5`1'></a>
+## TTEquatable5\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEquatable6`1'></a>
+## TTEquatable6\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEquatable7`1'></a>
+## TTEquatable7\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEquatable8`1'></a>
+## TTEquatable8\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTEquatable`1'></a>
+## TTEquatable\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTList1`1'></a>
+## TTList1\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTList2`1'></a>
+## TTList2\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTList3`1'></a>
+## TTList3\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTList4`1'></a>
+## TTList4\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTList5`1'></a>
+## TTList5\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTList6`1'></a>
+## TTList6\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTList7`1'></a>
+## TTList7\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTList8`1'></a>
+## TTList8\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTList`1'></a>
+## TTList\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObservable1`1'></a>
+## TTObservable1\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObservable2`1'></a>
+## TTObservable2\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObservable3`1'></a>
+## TTObservable3\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObservable4`1'></a>
+## TTObservable4\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObservable5`1'></a>
+## TTObservable5\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObservable6`1'></a>
+## TTObservable6\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObservable7`1'></a>
+## TTObservable7\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObservable8`1'></a>
+## TTObservable8\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObservable`1'></a>
+## TTObservable\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObserver1`1'></a>
+## TTObserver1\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObserver2`1'></a>
+## TTObserver2\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObserver3`1'></a>
+## TTObserver3\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObserver4`1'></a>
+## TTObserver4\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObserver5`1'></a>
+## TTObserver5\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObserver6`1'></a>
+## TTObserver6\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObserver7`1'></a>
+## TTObserver7\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObserver8`1'></a>
+## TTObserver8\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTObserver`1'></a>
+## TTObserver\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTSet1`1'></a>
+## TTSet1\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTSet2`1'></a>
+## TTSet2\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTSet3`1'></a>
+## TTSet3\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTSet4`1'></a>
+## TTSet4\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTSet5`1'></a>
+## TTSet5\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTSet6`1'></a>
+## TTSet6\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTSet7`1'></a>
+## TTSet7\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTSet8`1'></a>
+## TTSet8\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker.
+
+<a name='T-IoC-TTSet`1'></a>
+## TTSet\`1 `type`
 
 ##### Namespace
 
