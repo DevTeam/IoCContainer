@@ -38,6 +38,25 @@ var args = String.Join(", ", range.Select(i => $"TypeDescriptor<T{i}>.Type"));
             return new Binding<T>(container, TypeDescriptor<T>.Type, <#=args#>);
         }
 
+        
+        /// <summary>
+        /// Binds multiple types.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+<#for(int i = 1; i <= num; i++) {#>
+        /// <typeparam name="T<#=i#>">The contract type #<#=i#>.</typeparam>
+<#}#>
+        /// <param name="binding">The target binding.</param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions) 256)]
+        [NotNull]
+        public static IBinding<T> Bind<T, <#=types#>>([NotNull] this IBinding binding)
+            where T: <#=types#>
+        {
+            if (binding == null) throw new ArgumentNullException(nameof(binding));
+            return new Binding<T>(binding, TypeDescriptor<T>.Type, <#=args#>);
+        }
+
         /// <summary>
         /// Binds multiple types.
         /// </summary>

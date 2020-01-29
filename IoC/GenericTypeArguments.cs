@@ -9,7 +9,7 @@ namespace IoC
     [PublicAPI, GenericTypeArgument]
     public abstract class TT { }
 
-    /// <summary>
+/// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -99,7 +99,7 @@ namespace IoC
     [PublicAPI, GenericTypeArgument]
     public abstract class TT1 { }
 
-    /// <summary>
+/// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -189,7 +189,7 @@ namespace IoC
     [PublicAPI, GenericTypeArgument]
     public abstract class TT2 { }
 
-    /// <summary>
+/// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -279,7 +279,7 @@ namespace IoC
     [PublicAPI, GenericTypeArgument]
     public abstract class TT3 { }
 
-    /// <summary>
+/// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -369,7 +369,7 @@ namespace IoC
     [PublicAPI, GenericTypeArgument]
     public abstract class TT4 { }
 
-    /// <summary>
+/// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -459,7 +459,7 @@ namespace IoC
     [PublicAPI, GenericTypeArgument]
     public abstract class TT5 { }
 
-    /// <summary>
+/// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -549,7 +549,7 @@ namespace IoC
     [PublicAPI, GenericTypeArgument]
     public abstract class TT6 { }
 
-    /// <summary>
+/// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -639,7 +639,7 @@ namespace IoC
     [PublicAPI, GenericTypeArgument]
     public abstract class TT7 { }
 
-    /// <summary>
+/// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -729,7 +729,7 @@ namespace IoC
     [PublicAPI, GenericTypeArgument]
     public abstract class TT8 { }
 
-    /// <summary>
+/// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -819,142 +819,142 @@ namespace IoC
     [PublicAPI, GenericTypeArgument]
     public abstract class TT9 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT10 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT11 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT12 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT13 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT14 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT15 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT16 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT17 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT18 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT19 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT20 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT21 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT22 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT23 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT24 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT25 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT26 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT27 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT28 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT29 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT30 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT31 { }
 
-        /// <summary>
+    /// <summary>
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT32 { }
 
-    }
+}

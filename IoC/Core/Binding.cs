@@ -29,6 +29,17 @@
             AutowiringStrategy = default(IAutowiringStrategy);
         }
 
+        public Binding([NotNull] IBinding binding, [NotNull][ItemNotNull] params Type[] types)
+        {
+            if (binding == null) throw new ArgumentNullException(nameof(binding));
+            Container = binding.Container;
+            Tokens = binding.Tokens;
+            Types = binding.Types.Concat(types);
+            Tags = binding.Tags;
+            Lifetime = binding.Lifetime;
+            AutowiringStrategy = binding.AutowiringStrategy;
+        }
+
         public Binding([NotNull] IBinding<T> binding, Lifetime lifetime)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));

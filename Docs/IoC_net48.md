@@ -119,69 +119,102 @@
   - [Bind(token,types)](#M-IoC-FluentBind-Bind-IoC-IToken,System-Type[]- 'IoC.FluentBind.Bind(IoC.IToken,System.Type[])')
   - [Bind\`\`1(container)](#M-IoC-FluentBind-Bind``1-IoC-IContainer- 'IoC.FluentBind.Bind``1(IoC.IContainer)')
   - [Bind\`\`1(token)](#M-IoC-FluentBind-Bind``1-IoC-IToken- 'IoC.FluentBind.Bind``1(IoC.IToken)')
+  - [Bind\`\`1(binding)](#M-IoC-FluentBind-Bind``1-IoC-IBinding- 'IoC.FluentBind.Bind``1(IoC.IBinding)')
   - [Bind\`\`10(container)](#M-IoC-FluentBind-Bind``10-IoC-IContainer- 'IoC.FluentBind.Bind``10(IoC.IContainer)')
+  - [Bind\`\`10(binding)](#M-IoC-FluentBind-Bind``10-IoC-IBinding- 'IoC.FluentBind.Bind``10(IoC.IBinding)')
   - [Bind\`\`10(token)](#M-IoC-FluentBind-Bind``10-IoC-IToken- 'IoC.FluentBind.Bind``10(IoC.IToken)')
   - [Bind\`\`11(container)](#M-IoC-FluentBind-Bind``11-IoC-IContainer- 'IoC.FluentBind.Bind``11(IoC.IContainer)')
+  - [Bind\`\`11(binding)](#M-IoC-FluentBind-Bind``11-IoC-IBinding- 'IoC.FluentBind.Bind``11(IoC.IBinding)')
   - [Bind\`\`11(token)](#M-IoC-FluentBind-Bind``11-IoC-IToken- 'IoC.FluentBind.Bind``11(IoC.IToken)')
   - [Bind\`\`12(container)](#M-IoC-FluentBind-Bind``12-IoC-IContainer- 'IoC.FluentBind.Bind``12(IoC.IContainer)')
+  - [Bind\`\`12(binding)](#M-IoC-FluentBind-Bind``12-IoC-IBinding- 'IoC.FluentBind.Bind``12(IoC.IBinding)')
   - [Bind\`\`12(token)](#M-IoC-FluentBind-Bind``12-IoC-IToken- 'IoC.FluentBind.Bind``12(IoC.IToken)')
   - [Bind\`\`13(container)](#M-IoC-FluentBind-Bind``13-IoC-IContainer- 'IoC.FluentBind.Bind``13(IoC.IContainer)')
+  - [Bind\`\`13(binding)](#M-IoC-FluentBind-Bind``13-IoC-IBinding- 'IoC.FluentBind.Bind``13(IoC.IBinding)')
   - [Bind\`\`13(token)](#M-IoC-FluentBind-Bind``13-IoC-IToken- 'IoC.FluentBind.Bind``13(IoC.IToken)')
   - [Bind\`\`14(container)](#M-IoC-FluentBind-Bind``14-IoC-IContainer- 'IoC.FluentBind.Bind``14(IoC.IContainer)')
+  - [Bind\`\`14(binding)](#M-IoC-FluentBind-Bind``14-IoC-IBinding- 'IoC.FluentBind.Bind``14(IoC.IBinding)')
   - [Bind\`\`14(token)](#M-IoC-FluentBind-Bind``14-IoC-IToken- 'IoC.FluentBind.Bind``14(IoC.IToken)')
   - [Bind\`\`15(container)](#M-IoC-FluentBind-Bind``15-IoC-IContainer- 'IoC.FluentBind.Bind``15(IoC.IContainer)')
+  - [Bind\`\`15(binding)](#M-IoC-FluentBind-Bind``15-IoC-IBinding- 'IoC.FluentBind.Bind``15(IoC.IBinding)')
   - [Bind\`\`15(token)](#M-IoC-FluentBind-Bind``15-IoC-IToken- 'IoC.FluentBind.Bind``15(IoC.IToken)')
   - [Bind\`\`16(container)](#M-IoC-FluentBind-Bind``16-IoC-IContainer- 'IoC.FluentBind.Bind``16(IoC.IContainer)')
+  - [Bind\`\`16(binding)](#M-IoC-FluentBind-Bind``16-IoC-IBinding- 'IoC.FluentBind.Bind``16(IoC.IBinding)')
   - [Bind\`\`16(token)](#M-IoC-FluentBind-Bind``16-IoC-IToken- 'IoC.FluentBind.Bind``16(IoC.IToken)')
   - [Bind\`\`17(container)](#M-IoC-FluentBind-Bind``17-IoC-IContainer- 'IoC.FluentBind.Bind``17(IoC.IContainer)')
+  - [Bind\`\`17(binding)](#M-IoC-FluentBind-Bind``17-IoC-IBinding- 'IoC.FluentBind.Bind``17(IoC.IBinding)')
   - [Bind\`\`17(token)](#M-IoC-FluentBind-Bind``17-IoC-IToken- 'IoC.FluentBind.Bind``17(IoC.IToken)')
   - [Bind\`\`18(container)](#M-IoC-FluentBind-Bind``18-IoC-IContainer- 'IoC.FluentBind.Bind``18(IoC.IContainer)')
+  - [Bind\`\`18(binding)](#M-IoC-FluentBind-Bind``18-IoC-IBinding- 'IoC.FluentBind.Bind``18(IoC.IBinding)')
   - [Bind\`\`18(token)](#M-IoC-FluentBind-Bind``18-IoC-IToken- 'IoC.FluentBind.Bind``18(IoC.IToken)')
   - [Bind\`\`19(container)](#M-IoC-FluentBind-Bind``19-IoC-IContainer- 'IoC.FluentBind.Bind``19(IoC.IContainer)')
+  - [Bind\`\`19(binding)](#M-IoC-FluentBind-Bind``19-IoC-IBinding- 'IoC.FluentBind.Bind``19(IoC.IBinding)')
   - [Bind\`\`19(token)](#M-IoC-FluentBind-Bind``19-IoC-IToken- 'IoC.FluentBind.Bind``19(IoC.IToken)')
   - [Bind\`\`2(container)](#M-IoC-FluentBind-Bind``2-IoC-IContainer- 'IoC.FluentBind.Bind``2(IoC.IContainer)')
+  - [Bind\`\`2(binding)](#M-IoC-FluentBind-Bind``2-IoC-IBinding- 'IoC.FluentBind.Bind``2(IoC.IBinding)')
   - [Bind\`\`2(token)](#M-IoC-FluentBind-Bind``2-IoC-IToken- 'IoC.FluentBind.Bind``2(IoC.IToken)')
   - [Bind\`\`20(container)](#M-IoC-FluentBind-Bind``20-IoC-IContainer- 'IoC.FluentBind.Bind``20(IoC.IContainer)')
+  - [Bind\`\`20(binding)](#M-IoC-FluentBind-Bind``20-IoC-IBinding- 'IoC.FluentBind.Bind``20(IoC.IBinding)')
   - [Bind\`\`20(token)](#M-IoC-FluentBind-Bind``20-IoC-IToken- 'IoC.FluentBind.Bind``20(IoC.IToken)')
   - [Bind\`\`21(container)](#M-IoC-FluentBind-Bind``21-IoC-IContainer- 'IoC.FluentBind.Bind``21(IoC.IContainer)')
+  - [Bind\`\`21(binding)](#M-IoC-FluentBind-Bind``21-IoC-IBinding- 'IoC.FluentBind.Bind``21(IoC.IBinding)')
   - [Bind\`\`21(token)](#M-IoC-FluentBind-Bind``21-IoC-IToken- 'IoC.FluentBind.Bind``21(IoC.IToken)')
   - [Bind\`\`22(container)](#M-IoC-FluentBind-Bind``22-IoC-IContainer- 'IoC.FluentBind.Bind``22(IoC.IContainer)')
+  - [Bind\`\`22(binding)](#M-IoC-FluentBind-Bind``22-IoC-IBinding- 'IoC.FluentBind.Bind``22(IoC.IBinding)')
   - [Bind\`\`22(token)](#M-IoC-FluentBind-Bind``22-IoC-IToken- 'IoC.FluentBind.Bind``22(IoC.IToken)')
   - [Bind\`\`23(container)](#M-IoC-FluentBind-Bind``23-IoC-IContainer- 'IoC.FluentBind.Bind``23(IoC.IContainer)')
+  - [Bind\`\`23(binding)](#M-IoC-FluentBind-Bind``23-IoC-IBinding- 'IoC.FluentBind.Bind``23(IoC.IBinding)')
   - [Bind\`\`23(token)](#M-IoC-FluentBind-Bind``23-IoC-IToken- 'IoC.FluentBind.Bind``23(IoC.IToken)')
   - [Bind\`\`24(container)](#M-IoC-FluentBind-Bind``24-IoC-IContainer- 'IoC.FluentBind.Bind``24(IoC.IContainer)')
+  - [Bind\`\`24(binding)](#M-IoC-FluentBind-Bind``24-IoC-IBinding- 'IoC.FluentBind.Bind``24(IoC.IBinding)')
   - [Bind\`\`24(token)](#M-IoC-FluentBind-Bind``24-IoC-IToken- 'IoC.FluentBind.Bind``24(IoC.IToken)')
   - [Bind\`\`25(container)](#M-IoC-FluentBind-Bind``25-IoC-IContainer- 'IoC.FluentBind.Bind``25(IoC.IContainer)')
+  - [Bind\`\`25(binding)](#M-IoC-FluentBind-Bind``25-IoC-IBinding- 'IoC.FluentBind.Bind``25(IoC.IBinding)')
   - [Bind\`\`25(token)](#M-IoC-FluentBind-Bind``25-IoC-IToken- 'IoC.FluentBind.Bind``25(IoC.IToken)')
   - [Bind\`\`26(container)](#M-IoC-FluentBind-Bind``26-IoC-IContainer- 'IoC.FluentBind.Bind``26(IoC.IContainer)')
+  - [Bind\`\`26(binding)](#M-IoC-FluentBind-Bind``26-IoC-IBinding- 'IoC.FluentBind.Bind``26(IoC.IBinding)')
   - [Bind\`\`26(token)](#M-IoC-FluentBind-Bind``26-IoC-IToken- 'IoC.FluentBind.Bind``26(IoC.IToken)')
   - [Bind\`\`27(container)](#M-IoC-FluentBind-Bind``27-IoC-IContainer- 'IoC.FluentBind.Bind``27(IoC.IContainer)')
+  - [Bind\`\`27(binding)](#M-IoC-FluentBind-Bind``27-IoC-IBinding- 'IoC.FluentBind.Bind``27(IoC.IBinding)')
   - [Bind\`\`27(token)](#M-IoC-FluentBind-Bind``27-IoC-IToken- 'IoC.FluentBind.Bind``27(IoC.IToken)')
   - [Bind\`\`28(container)](#M-IoC-FluentBind-Bind``28-IoC-IContainer- 'IoC.FluentBind.Bind``28(IoC.IContainer)')
+  - [Bind\`\`28(binding)](#M-IoC-FluentBind-Bind``28-IoC-IBinding- 'IoC.FluentBind.Bind``28(IoC.IBinding)')
   - [Bind\`\`28(token)](#M-IoC-FluentBind-Bind``28-IoC-IToken- 'IoC.FluentBind.Bind``28(IoC.IToken)')
   - [Bind\`\`29(container)](#M-IoC-FluentBind-Bind``29-IoC-IContainer- 'IoC.FluentBind.Bind``29(IoC.IContainer)')
+  - [Bind\`\`29(binding)](#M-IoC-FluentBind-Bind``29-IoC-IBinding- 'IoC.FluentBind.Bind``29(IoC.IBinding)')
   - [Bind\`\`29(token)](#M-IoC-FluentBind-Bind``29-IoC-IToken- 'IoC.FluentBind.Bind``29(IoC.IToken)')
   - [Bind\`\`3(container)](#M-IoC-FluentBind-Bind``3-IoC-IContainer- 'IoC.FluentBind.Bind``3(IoC.IContainer)')
+  - [Bind\`\`3(binding)](#M-IoC-FluentBind-Bind``3-IoC-IBinding- 'IoC.FluentBind.Bind``3(IoC.IBinding)')
   - [Bind\`\`3(token)](#M-IoC-FluentBind-Bind``3-IoC-IToken- 'IoC.FluentBind.Bind``3(IoC.IToken)')
   - [Bind\`\`30(container)](#M-IoC-FluentBind-Bind``30-IoC-IContainer- 'IoC.FluentBind.Bind``30(IoC.IContainer)')
+  - [Bind\`\`30(binding)](#M-IoC-FluentBind-Bind``30-IoC-IBinding- 'IoC.FluentBind.Bind``30(IoC.IBinding)')
   - [Bind\`\`30(token)](#M-IoC-FluentBind-Bind``30-IoC-IToken- 'IoC.FluentBind.Bind``30(IoC.IToken)')
   - [Bind\`\`31(container)](#M-IoC-FluentBind-Bind``31-IoC-IContainer- 'IoC.FluentBind.Bind``31(IoC.IContainer)')
+  - [Bind\`\`31(binding)](#M-IoC-FluentBind-Bind``31-IoC-IBinding- 'IoC.FluentBind.Bind``31(IoC.IBinding)')
   - [Bind\`\`31(token)](#M-IoC-FluentBind-Bind``31-IoC-IToken- 'IoC.FluentBind.Bind``31(IoC.IToken)')
   - [Bind\`\`32(container)](#M-IoC-FluentBind-Bind``32-IoC-IContainer- 'IoC.FluentBind.Bind``32(IoC.IContainer)')
+  - [Bind\`\`32(binding)](#M-IoC-FluentBind-Bind``32-IoC-IBinding- 'IoC.FluentBind.Bind``32(IoC.IBinding)')
   - [Bind\`\`32(token)](#M-IoC-FluentBind-Bind``32-IoC-IToken- 'IoC.FluentBind.Bind``32(IoC.IToken)')
   - [Bind\`\`33(container)](#M-IoC-FluentBind-Bind``33-IoC-IContainer- 'IoC.FluentBind.Bind``33(IoC.IContainer)')
+  - [Bind\`\`33(binding)](#M-IoC-FluentBind-Bind``33-IoC-IBinding- 'IoC.FluentBind.Bind``33(IoC.IBinding)')
   - [Bind\`\`33(token)](#M-IoC-FluentBind-Bind``33-IoC-IToken- 'IoC.FluentBind.Bind``33(IoC.IToken)')
   - [Bind\`\`4(container)](#M-IoC-FluentBind-Bind``4-IoC-IContainer- 'IoC.FluentBind.Bind``4(IoC.IContainer)')
+  - [Bind\`\`4(binding)](#M-IoC-FluentBind-Bind``4-IoC-IBinding- 'IoC.FluentBind.Bind``4(IoC.IBinding)')
   - [Bind\`\`4(token)](#M-IoC-FluentBind-Bind``4-IoC-IToken- 'IoC.FluentBind.Bind``4(IoC.IToken)')
   - [Bind\`\`5(container)](#M-IoC-FluentBind-Bind``5-IoC-IContainer- 'IoC.FluentBind.Bind``5(IoC.IContainer)')
+  - [Bind\`\`5(binding)](#M-IoC-FluentBind-Bind``5-IoC-IBinding- 'IoC.FluentBind.Bind``5(IoC.IBinding)')
   - [Bind\`\`5(token)](#M-IoC-FluentBind-Bind``5-IoC-IToken- 'IoC.FluentBind.Bind``5(IoC.IToken)')
   - [Bind\`\`6(container)](#M-IoC-FluentBind-Bind``6-IoC-IContainer- 'IoC.FluentBind.Bind``6(IoC.IContainer)')
+  - [Bind\`\`6(binding)](#M-IoC-FluentBind-Bind``6-IoC-IBinding- 'IoC.FluentBind.Bind``6(IoC.IBinding)')
   - [Bind\`\`6(token)](#M-IoC-FluentBind-Bind``6-IoC-IToken- 'IoC.FluentBind.Bind``6(IoC.IToken)')
   - [Bind\`\`7(container)](#M-IoC-FluentBind-Bind``7-IoC-IContainer- 'IoC.FluentBind.Bind``7(IoC.IContainer)')
+  - [Bind\`\`7(binding)](#M-IoC-FluentBind-Bind``7-IoC-IBinding- 'IoC.FluentBind.Bind``7(IoC.IBinding)')
   - [Bind\`\`7(token)](#M-IoC-FluentBind-Bind``7-IoC-IToken- 'IoC.FluentBind.Bind``7(IoC.IToken)')
   - [Bind\`\`8(container)](#M-IoC-FluentBind-Bind``8-IoC-IContainer- 'IoC.FluentBind.Bind``8(IoC.IContainer)')
+  - [Bind\`\`8(binding)](#M-IoC-FluentBind-Bind``8-IoC-IBinding- 'IoC.FluentBind.Bind``8(IoC.IBinding)')
   - [Bind\`\`8(token)](#M-IoC-FluentBind-Bind``8-IoC-IToken- 'IoC.FluentBind.Bind``8(IoC.IToken)')
   - [Bind\`\`9(container)](#M-IoC-FluentBind-Bind``9-IoC-IContainer- 'IoC.FluentBind.Bind``9(IoC.IContainer)')
+  - [Bind\`\`9(binding)](#M-IoC-FluentBind-Bind``9-IoC-IBinding- 'IoC.FluentBind.Bind``9(IoC.IBinding)')
   - [Bind\`\`9(token)](#M-IoC-FluentBind-Bind``9-IoC-IToken- 'IoC.FluentBind.Bind``9(IoC.IToken)')
   - [Lifetime\`\`1(binding,lifetime)](#M-IoC-FluentBind-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime- 'IoC.FluentBind.Lifetime``1(IoC.IBinding{``0},IoC.ILifetime)')
   - [Tag\`\`1(binding,tagValue)](#M-IoC-FluentBind-Tag``1-IoC-IBinding{``0},System-Object- 'IoC.FluentBind.Tag``1(IoC.IBinding{``0},System.Object)')
@@ -265,13 +298,14 @@
   - [TryResolveConstructor(constructors,constructor)](#M-IoC-IAutowiringStrategy-TryResolveConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@- 'IoC.IAutowiringStrategy.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)')
   - [TryResolveInitializers(methods,initializers)](#M-IoC-IAutowiringStrategy-TryResolveInitializers-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@- 'IoC.IAutowiringStrategy.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)')
   - [TryResolveType(registeredType,resolvingType,instanceType)](#M-IoC-IAutowiringStrategy-TryResolveType-System-Type,System-Type,System-Type@- 'IoC.IAutowiringStrategy.TryResolveType(System.Type,System.Type,System.Type@)')
+- [IBinding](#T-IoC-IBinding 'IoC.IBinding')
+  - [AutowiringStrategy](#P-IoC-IBinding-AutowiringStrategy 'IoC.IBinding.AutowiringStrategy')
+  - [Container](#P-IoC-IBinding-Container 'IoC.IBinding.Container')
+  - [Lifetime](#P-IoC-IBinding-Lifetime 'IoC.IBinding.Lifetime')
+  - [Tags](#P-IoC-IBinding-Tags 'IoC.IBinding.Tags')
+  - [Tokens](#P-IoC-IBinding-Tokens 'IoC.IBinding.Tokens')
+  - [Types](#P-IoC-IBinding-Types 'IoC.IBinding.Types')
 - [IBinding\`1](#T-IoC-IBinding`1 'IoC.IBinding`1')
-  - [AutowiringStrategy](#P-IoC-IBinding`1-AutowiringStrategy 'IoC.IBinding`1.AutowiringStrategy')
-  - [Container](#P-IoC-IBinding`1-Container 'IoC.IBinding`1.Container')
-  - [Lifetime](#P-IoC-IBinding`1-Lifetime 'IoC.IBinding`1.Lifetime')
-  - [Tags](#P-IoC-IBinding`1-Tags 'IoC.IBinding`1.Tags')
-  - [Tokens](#P-IoC-IBinding`1-Tokens 'IoC.IBinding`1.Tokens')
-  - [Types](#P-IoC-IBinding`1-Types 'IoC.IBinding`1.Types')
 - [IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext')
   - [AutowiringStrategy](#P-IoC-IBuildContext-AutowiringStrategy 'IoC.IBuildContext.AutowiringStrategy')
   - [Container](#P-IoC-IBuildContext-Container 'IoC.IBuildContext.Container')
@@ -1960,6 +1994,29 @@ The binding token.
 | ---- | ----------- |
 | T | The contract type. |
 
+<a name='M-IoC-FluentBind-Bind``1-IoC-IBinding-'></a>
+### Bind\`\`1(binding) `method`
+
+##### Summary
+
+Binds the type.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') |  |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The contract type. |
+
 <a name='M-IoC-FluentBind-Bind``10-IoC-IContainer-'></a>
 ### Bind\`\`10(container) `method`
 
@@ -1976,6 +2033,38 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+
+<a name='M-IoC-FluentBind-Bind``10-IoC-IBinding-'></a>
+### Bind\`\`10(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -2057,6 +2146,39 @@ The binding token.
 | T9 | The contract type #9. |
 | T10 | The contract type #10. |
 
+<a name='M-IoC-FluentBind-Bind``11-IoC-IBinding-'></a>
+### Bind\`\`11(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+
 <a name='M-IoC-FluentBind-Bind``11-IoC-IToken-'></a>
 ### Bind\`\`11(token) `method`
 
@@ -2106,6 +2228,40 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+
+<a name='M-IoC-FluentBind-Bind``12-IoC-IBinding-'></a>
+### Bind\`\`12(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -2193,6 +2349,41 @@ The binding token.
 | T11 | The contract type #11. |
 | T12 | The contract type #12. |
 
+<a name='M-IoC-FluentBind-Bind``13-IoC-IBinding-'></a>
+### Bind\`\`13(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+
 <a name='M-IoC-FluentBind-Bind``13-IoC-IToken-'></a>
 ### Bind\`\`13(token) `method`
 
@@ -2244,6 +2435,42 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+
+<a name='M-IoC-FluentBind-Bind``14-IoC-IBinding-'></a>
+### Bind\`\`14(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -2337,6 +2564,43 @@ The binding token.
 | T13 | The contract type #13. |
 | T14 | The contract type #14. |
 
+<a name='M-IoC-FluentBind-Bind``15-IoC-IBinding-'></a>
+### Bind\`\`15(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+
 <a name='M-IoC-FluentBind-Bind``15-IoC-IToken-'></a>
 ### Bind\`\`15(token) `method`
 
@@ -2390,6 +2654,44 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+
+<a name='M-IoC-FluentBind-Bind``16-IoC-IBinding-'></a>
+### Bind\`\`16(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -2489,6 +2791,45 @@ The binding token.
 | T15 | The contract type #15. |
 | T16 | The contract type #16. |
 
+<a name='M-IoC-FluentBind-Bind``17-IoC-IBinding-'></a>
+### Bind\`\`17(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+
 <a name='M-IoC-FluentBind-Bind``17-IoC-IToken-'></a>
 ### Bind\`\`17(token) `method`
 
@@ -2544,6 +2885,46 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+
+<a name='M-IoC-FluentBind-Bind``18-IoC-IBinding-'></a>
+### Bind\`\`18(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -2649,6 +3030,47 @@ The binding token.
 | T17 | The contract type #17. |
 | T18 | The contract type #18. |
 
+<a name='M-IoC-FluentBind-Bind``19-IoC-IBinding-'></a>
+### Bind\`\`19(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+
 <a name='M-IoC-FluentBind-Bind``19-IoC-IToken-'></a>
 ### Bind\`\`19(token) `method`
 
@@ -2714,6 +3136,30 @@ The binding token.
 | T | The instance type. |
 | T1 | The contract type #1. |
 
+<a name='M-IoC-FluentBind-Bind``2-IoC-IBinding-'></a>
+### Bind\`\`2(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+
 <a name='M-IoC-FluentBind-Bind``2-IoC-IToken-'></a>
 ### Bind\`\`2(token) `method`
 
@@ -2754,6 +3200,48 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+| T19 | The contract type #19. |
+
+<a name='M-IoC-FluentBind-Bind``20-IoC-IBinding-'></a>
+### Bind\`\`20(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -2865,6 +3353,49 @@ The binding token.
 | T19 | The contract type #19. |
 | T20 | The contract type #20. |
 
+<a name='M-IoC-FluentBind-Bind``21-IoC-IBinding-'></a>
+### Bind\`\`21(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+| T19 | The contract type #19. |
+| T20 | The contract type #20. |
+
 <a name='M-IoC-FluentBind-Bind``21-IoC-IToken-'></a>
 ### Bind\`\`21(token) `method`
 
@@ -2924,6 +3455,50 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+| T19 | The contract type #19. |
+| T20 | The contract type #20. |
+| T21 | The contract type #21. |
+
+<a name='M-IoC-FluentBind-Bind``22-IoC-IBinding-'></a>
+### Bind\`\`22(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -3041,6 +3616,51 @@ The binding token.
 | T21 | The contract type #21. |
 | T22 | The contract type #22. |
 
+<a name='M-IoC-FluentBind-Bind``23-IoC-IBinding-'></a>
+### Bind\`\`23(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+| T19 | The contract type #19. |
+| T20 | The contract type #20. |
+| T21 | The contract type #21. |
+| T22 | The contract type #22. |
+
 <a name='M-IoC-FluentBind-Bind``23-IoC-IToken-'></a>
 ### Bind\`\`23(token) `method`
 
@@ -3102,6 +3722,52 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+| T19 | The contract type #19. |
+| T20 | The contract type #20. |
+| T21 | The contract type #21. |
+| T22 | The contract type #22. |
+| T23 | The contract type #23. |
+
+<a name='M-IoC-FluentBind-Bind``24-IoC-IBinding-'></a>
+### Bind\`\`24(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -3225,6 +3891,53 @@ The binding token.
 | T23 | The contract type #23. |
 | T24 | The contract type #24. |
 
+<a name='M-IoC-FluentBind-Bind``25-IoC-IBinding-'></a>
+### Bind\`\`25(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+| T19 | The contract type #19. |
+| T20 | The contract type #20. |
+| T21 | The contract type #21. |
+| T22 | The contract type #22. |
+| T23 | The contract type #23. |
+| T24 | The contract type #24. |
+
 <a name='M-IoC-FluentBind-Bind``25-IoC-IToken-'></a>
 ### Bind\`\`25(token) `method`
 
@@ -3288,6 +4001,54 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+| T19 | The contract type #19. |
+| T20 | The contract type #20. |
+| T21 | The contract type #21. |
+| T22 | The contract type #22. |
+| T23 | The contract type #23. |
+| T24 | The contract type #24. |
+| T25 | The contract type #25. |
+
+<a name='M-IoC-FluentBind-Bind``26-IoC-IBinding-'></a>
+### Bind\`\`26(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -3417,6 +4178,55 @@ The binding token.
 | T25 | The contract type #25. |
 | T26 | The contract type #26. |
 
+<a name='M-IoC-FluentBind-Bind``27-IoC-IBinding-'></a>
+### Bind\`\`27(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+| T19 | The contract type #19. |
+| T20 | The contract type #20. |
+| T21 | The contract type #21. |
+| T22 | The contract type #22. |
+| T23 | The contract type #23. |
+| T24 | The contract type #24. |
+| T25 | The contract type #25. |
+| T26 | The contract type #26. |
+
 <a name='M-IoC-FluentBind-Bind``27-IoC-IToken-'></a>
 ### Bind\`\`27(token) `method`
 
@@ -3482,6 +4292,56 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+| T19 | The contract type #19. |
+| T20 | The contract type #20. |
+| T21 | The contract type #21. |
+| T22 | The contract type #22. |
+| T23 | The contract type #23. |
+| T24 | The contract type #24. |
+| T25 | The contract type #25. |
+| T26 | The contract type #26. |
+| T27 | The contract type #27. |
+
+<a name='M-IoC-FluentBind-Bind``28-IoC-IBinding-'></a>
+### Bind\`\`28(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -3617,6 +4477,57 @@ The binding token.
 | T27 | The contract type #27. |
 | T28 | The contract type #28. |
 
+<a name='M-IoC-FluentBind-Bind``29-IoC-IBinding-'></a>
+### Bind\`\`29(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+| T19 | The contract type #19. |
+| T20 | The contract type #20. |
+| T21 | The contract type #21. |
+| T22 | The contract type #22. |
+| T23 | The contract type #23. |
+| T24 | The contract type #24. |
+| T25 | The contract type #25. |
+| T26 | The contract type #26. |
+| T27 | The contract type #27. |
+| T28 | The contract type #28. |
+
 <a name='M-IoC-FluentBind-Bind``29-IoC-IToken-'></a>
 ### Bind\`\`29(token) `method`
 
@@ -3693,6 +4604,31 @@ The binding token.
 | T1 | The contract type #1. |
 | T2 | The contract type #2. |
 
+<a name='M-IoC-FluentBind-Bind``3-IoC-IBinding-'></a>
+### Bind\`\`3(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+
 <a name='M-IoC-FluentBind-Bind``3-IoC-IToken-'></a>
 ### Bind\`\`3(token) `method`
 
@@ -3734,6 +4670,58 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+| T19 | The contract type #19. |
+| T20 | The contract type #20. |
+| T21 | The contract type #21. |
+| T22 | The contract type #22. |
+| T23 | The contract type #23. |
+| T24 | The contract type #24. |
+| T25 | The contract type #25. |
+| T26 | The contract type #26. |
+| T27 | The contract type #27. |
+| T28 | The contract type #28. |
+| T29 | The contract type #29. |
+
+<a name='M-IoC-FluentBind-Bind``30-IoC-IBinding-'></a>
+### Bind\`\`30(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -3875,6 +4863,59 @@ The binding token.
 | T29 | The contract type #29. |
 | T30 | The contract type #30. |
 
+<a name='M-IoC-FluentBind-Bind``31-IoC-IBinding-'></a>
+### Bind\`\`31(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+| T19 | The contract type #19. |
+| T20 | The contract type #20. |
+| T21 | The contract type #21. |
+| T22 | The contract type #22. |
+| T23 | The contract type #23. |
+| T24 | The contract type #24. |
+| T25 | The contract type #25. |
+| T26 | The contract type #26. |
+| T27 | The contract type #27. |
+| T28 | The contract type #28. |
+| T29 | The contract type #29. |
+| T30 | The contract type #30. |
+
 <a name='M-IoC-FluentBind-Bind``31-IoC-IToken-'></a>
 ### Bind\`\`31(token) `method`
 
@@ -3944,6 +4985,60 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+| T19 | The contract type #19. |
+| T20 | The contract type #20. |
+| T21 | The contract type #21. |
+| T22 | The contract type #22. |
+| T23 | The contract type #23. |
+| T24 | The contract type #24. |
+| T25 | The contract type #25. |
+| T26 | The contract type #26. |
+| T27 | The contract type #27. |
+| T28 | The contract type #28. |
+| T29 | The contract type #29. |
+| T30 | The contract type #30. |
+| T31 | The contract type #31. |
+
+<a name='M-IoC-FluentBind-Bind``32-IoC-IBinding-'></a>
+### Bind\`\`32(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -4091,6 +5186,61 @@ The binding token.
 | T31 | The contract type #31. |
 | T32 | The contract type #32. |
 
+<a name='M-IoC-FluentBind-Bind``33-IoC-IBinding-'></a>
+### Bind\`\`33(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+| T9 | The contract type #9. |
+| T10 | The contract type #10. |
+| T11 | The contract type #11. |
+| T12 | The contract type #12. |
+| T13 | The contract type #13. |
+| T14 | The contract type #14. |
+| T15 | The contract type #15. |
+| T16 | The contract type #16. |
+| T17 | The contract type #17. |
+| T18 | The contract type #18. |
+| T19 | The contract type #19. |
+| T20 | The contract type #20. |
+| T21 | The contract type #21. |
+| T22 | The contract type #22. |
+| T23 | The contract type #23. |
+| T24 | The contract type #24. |
+| T25 | The contract type #25. |
+| T26 | The contract type #26. |
+| T27 | The contract type #27. |
+| T28 | The contract type #28. |
+| T29 | The contract type #29. |
+| T30 | The contract type #30. |
+| T31 | The contract type #31. |
+| T32 | The contract type #32. |
+
 <a name='M-IoC-FluentBind-Bind``33-IoC-IToken-'></a>
 ### Bind\`\`33(token) `method`
 
@@ -4172,6 +5322,32 @@ The binding token.
 | T2 | The contract type #2. |
 | T3 | The contract type #3. |
 
+<a name='M-IoC-FluentBind-Bind``4-IoC-IBinding-'></a>
+### Bind\`\`4(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+
 <a name='M-IoC-FluentBind-Bind``4-IoC-IToken-'></a>
 ### Bind\`\`4(token) `method`
 
@@ -4214,6 +5390,33 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+
+<a name='M-IoC-FluentBind-Bind``5-IoC-IBinding-'></a>
+### Bind\`\`5(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -4280,6 +5483,34 @@ The binding token.
 | T4 | The contract type #4. |
 | T5 | The contract type #5. |
 
+<a name='M-IoC-FluentBind-Bind``6-IoC-IBinding-'></a>
+### Bind\`\`6(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+
 <a name='M-IoC-FluentBind-Bind``6-IoC-IToken-'></a>
 ### Bind\`\`6(token) `method`
 
@@ -4324,6 +5555,35 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+
+<a name='M-IoC-FluentBind-Bind``7-IoC-IBinding-'></a>
+### Bind\`\`7(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -4396,6 +5656,36 @@ The binding token.
 | T6 | The contract type #6. |
 | T7 | The contract type #7. |
 
+<a name='M-IoC-FluentBind-Bind``8-IoC-IBinding-'></a>
+### Bind\`\`8(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+
 <a name='M-IoC-FluentBind-Bind``8-IoC-IToken-'></a>
 ### Bind\`\`8(token) `method`
 
@@ -4442,6 +5732,37 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+| T1 | The contract type #1. |
+| T2 | The contract type #2. |
+| T3 | The contract type #3. |
+| T4 | The contract type #4. |
+| T5 | The contract type #5. |
+| T6 | The contract type #6. |
+| T7 | The contract type #7. |
+| T8 | The contract type #8. |
+
+<a name='M-IoC-FluentBind-Bind``9-IoC-IBinding-'></a>
+### Bind\`\`9(binding) `method`
+
+##### Summary
+
+Binds multiple types.
+
+##### Returns
+
+The binding token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding](#T-IoC-IBinding 'IoC.IBinding') | The target binding. |
 
 ##### Generic Types
 
@@ -6115,6 +7436,59 @@ True if the type was resolved.
 | resolvingType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | Resolving type. |
 | instanceType | [System.Type@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type@ 'System.Type@') | The type to create an instance. |
 
+<a name='T-IoC-IBinding'></a>
+## IBinding `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+The container's binding.
+
+<a name='P-IoC-IBinding-AutowiringStrategy'></a>
+### AutowiringStrategy `property`
+
+##### Summary
+
+The specified autowiring strategy or null.
+
+<a name='P-IoC-IBinding-Container'></a>
+### Container `property`
+
+##### Summary
+
+The target container.
+
+<a name='P-IoC-IBinding-Lifetime'></a>
+### Lifetime `property`
+
+##### Summary
+
+The specified lifetime instance or null.
+
+<a name='P-IoC-IBinding-Tags'></a>
+### Tags `property`
+
+##### Summary
+
+The tags to mark the binding.
+
+<a name='P-IoC-IBinding-Tokens'></a>
+### Tokens `property`
+
+##### Summary
+
+Binding tokens.
+
+<a name='P-IoC-IBinding-Types'></a>
+### Types `property`
+
+##### Summary
+
+The type to bind.
+
 <a name='T-IoC-IBinding`1'></a>
 ## IBinding\`1 `type`
 
@@ -6131,48 +7505,6 @@ The container's binding.
 | Name | Description |
 | ---- | ----------- |
 | T |  |
-
-<a name='P-IoC-IBinding`1-AutowiringStrategy'></a>
-### AutowiringStrategy `property`
-
-##### Summary
-
-The specified autowiring strategy or null.
-
-<a name='P-IoC-IBinding`1-Container'></a>
-### Container `property`
-
-##### Summary
-
-The target container.
-
-<a name='P-IoC-IBinding`1-Lifetime'></a>
-### Lifetime `property`
-
-##### Summary
-
-The specified lifetime instance or null.
-
-<a name='P-IoC-IBinding`1-Tags'></a>
-### Tags `property`
-
-##### Summary
-
-The tags to mark the binding.
-
-<a name='P-IoC-IBinding`1-Tokens'></a>
-### Tokens `property`
-
-##### Summary
-
-Binding tokens.
-
-<a name='P-IoC-IBinding`1-Types'></a>
-### Types `property`
-
-##### Summary
-
-The type to bind.
 
 <a name='T-IoC-IBuildContext'></a>
 ## IBuildContext `type`
@@ -8502,7 +9834,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection2`1'></a>
 ## TTCollection2\`1 `type`
@@ -8513,7 +9845,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection3`1'></a>
 ## TTCollection3\`1 `type`
@@ -8524,7 +9856,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection4`1'></a>
 ## TTCollection4\`1 `type`
@@ -8535,7 +9867,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection5`1'></a>
 ## TTCollection5\`1 `type`
@@ -8546,7 +9878,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection6`1'></a>
 ## TTCollection6\`1 `type`
@@ -8557,7 +9889,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection7`1'></a>
 ## TTCollection7\`1 `type`
@@ -8568,7 +9900,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection8`1'></a>
 ## TTCollection8\`1 `type`
@@ -8579,7 +9911,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection`1'></a>
 ## TTCollection\`1 `type`
@@ -8590,7 +9922,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTComparable'></a>
 ## TTComparable `type`
@@ -8601,7 +9933,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable1'></a>
 ## TTComparable1 `type`
@@ -8612,7 +9944,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable1`1'></a>
 ## TTComparable1\`1 `type`
@@ -8623,7 +9955,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable2'></a>
 ## TTComparable2 `type`
@@ -8634,7 +9966,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable2`1'></a>
 ## TTComparable2\`1 `type`
@@ -8645,7 +9977,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable3'></a>
 ## TTComparable3 `type`
@@ -8656,7 +9988,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable3`1'></a>
 ## TTComparable3\`1 `type`
@@ -8667,7 +9999,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable4'></a>
 ## TTComparable4 `type`
@@ -8678,7 +10010,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable4`1'></a>
 ## TTComparable4\`1 `type`
@@ -8689,7 +10021,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable5'></a>
 ## TTComparable5 `type`
@@ -8700,7 +10032,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable5`1'></a>
 ## TTComparable5\`1 `type`
@@ -8711,7 +10043,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable6'></a>
 ## TTComparable6 `type`
@@ -8722,7 +10054,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable6`1'></a>
 ## TTComparable6\`1 `type`
@@ -8733,7 +10065,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable7'></a>
 ## TTComparable7 `type`
@@ -8744,7 +10076,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable7`1'></a>
 ## TTComparable7\`1 `type`
@@ -8755,7 +10087,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable8'></a>
 ## TTComparable8 `type`
@@ -8766,7 +10098,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable8`1'></a>
 ## TTComparable8\`1 `type`
@@ -8777,7 +10109,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable`1'></a>
 ## TTComparable\`1 `type`
@@ -8788,7 +10120,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparer1`1'></a>
 ## TTComparer1\`1 `type`
@@ -8799,7 +10131,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer2`1'></a>
 ## TTComparer2\`1 `type`
@@ -8810,7 +10142,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer3`1'></a>
 ## TTComparer3\`1 `type`
@@ -8821,7 +10153,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer4`1'></a>
 ## TTComparer4\`1 `type`
@@ -8832,7 +10164,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer5`1'></a>
 ## TTComparer5\`1 `type`
@@ -8843,7 +10175,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer6`1'></a>
 ## TTComparer6\`1 `type`
@@ -8854,7 +10186,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer7`1'></a>
 ## TTComparer7\`1 `type`
@@ -8865,7 +10197,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer8`1'></a>
 ## TTComparer8\`1 `type`
@@ -8876,7 +10208,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer`1'></a>
 ## TTComparer\`1 `type`
@@ -8887,7 +10219,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTDictionary1`2'></a>
 ## TTDictionary1\`2 `type`
@@ -8898,7 +10230,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary2`2'></a>
 ## TTDictionary2\`2 `type`
@@ -8909,7 +10241,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary3`2'></a>
 ## TTDictionary3\`2 `type`
@@ -8920,7 +10252,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary4`2'></a>
 ## TTDictionary4\`2 `type`
@@ -8931,7 +10263,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary5`2'></a>
 ## TTDictionary5\`2 `type`
@@ -8942,7 +10274,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary6`2'></a>
 ## TTDictionary6\`2 `type`
@@ -8953,7 +10285,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary7`2'></a>
 ## TTDictionary7\`2 `type`
@@ -8964,7 +10296,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary8`2'></a>
 ## TTDictionary8\`2 `type`
@@ -8975,7 +10307,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary`2'></a>
 ## TTDictionary\`2 `type`
@@ -8986,7 +10318,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDisposable'></a>
 ## TTDisposable `type`
@@ -8997,7 +10329,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable1'></a>
 ## TTDisposable1 `type`
@@ -9008,7 +10340,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable2'></a>
 ## TTDisposable2 `type`
@@ -9019,7 +10351,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable3'></a>
 ## TTDisposable3 `type`
@@ -9030,7 +10362,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable4'></a>
 ## TTDisposable4 `type`
@@ -9041,7 +10373,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable5'></a>
 ## TTDisposable5 `type`
@@ -9052,7 +10384,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable6'></a>
 ## TTDisposable6 `type`
@@ -9063,7 +10395,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable7'></a>
 ## TTDisposable7 `type`
@@ -9074,7 +10406,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable8'></a>
 ## TTDisposable8 `type`
@@ -9085,7 +10417,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IDisposable`.
 
 <a name='T-IoC-TTEnumerable1`1'></a>
 ## TTEnumerable1\`1 `type`
@@ -9096,7 +10428,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable2`1'></a>
 ## TTEnumerable2\`1 `type`
@@ -9107,7 +10439,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable3`1'></a>
 ## TTEnumerable3\`1 `type`
@@ -9118,7 +10450,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable4`1'></a>
 ## TTEnumerable4\`1 `type`
@@ -9129,7 +10461,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable5`1'></a>
 ## TTEnumerable5\`1 `type`
@@ -9140,7 +10472,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable6`1'></a>
 ## TTEnumerable6\`1 `type`
@@ -9151,7 +10483,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable7`1'></a>
 ## TTEnumerable7\`1 `type`
@@ -9162,7 +10494,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable8`1'></a>
 ## TTEnumerable8\`1 `type`
@@ -9173,7 +10505,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable`1'></a>
 ## TTEnumerable\`1 `type`
@@ -9184,7 +10516,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerator1`1'></a>
 ## TTEnumerator1\`1 `type`
@@ -9195,7 +10527,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator2`1'></a>
 ## TTEnumerator2\`1 `type`
@@ -9206,7 +10538,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator3`1'></a>
 ## TTEnumerator3\`1 `type`
@@ -9217,7 +10549,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator4`1'></a>
 ## TTEnumerator4\`1 `type`
@@ -9228,7 +10560,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator5`1'></a>
 ## TTEnumerator5\`1 `type`
@@ -9239,7 +10571,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator6`1'></a>
 ## TTEnumerator6\`1 `type`
@@ -9250,7 +10582,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator7`1'></a>
 ## TTEnumerator7\`1 `type`
@@ -9261,7 +10593,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator8`1'></a>
 ## TTEnumerator8\`1 `type`
@@ -9272,7 +10604,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator`1'></a>
 ## TTEnumerator\`1 `type`
@@ -9283,7 +10615,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEqualityComparer1`1'></a>
 ## TTEqualityComparer1\`1 `type`
@@ -9294,7 +10626,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer2`1'></a>
 ## TTEqualityComparer2\`1 `type`
@@ -9305,7 +10637,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer3`1'></a>
 ## TTEqualityComparer3\`1 `type`
@@ -9316,7 +10648,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer4`1'></a>
 ## TTEqualityComparer4\`1 `type`
@@ -9327,7 +10659,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer5`1'></a>
 ## TTEqualityComparer5\`1 `type`
@@ -9338,7 +10670,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer6`1'></a>
 ## TTEqualityComparer6\`1 `type`
@@ -9349,7 +10681,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer7`1'></a>
 ## TTEqualityComparer7\`1 `type`
@@ -9360,7 +10692,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer8`1'></a>
 ## TTEqualityComparer8\`1 `type`
@@ -9371,7 +10703,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer`1'></a>
 ## TTEqualityComparer\`1 `type`
@@ -9382,7 +10714,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEquatable1`1'></a>
 ## TTEquatable1\`1 `type`
@@ -9393,7 +10725,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable2`1'></a>
 ## TTEquatable2\`1 `type`
@@ -9404,7 +10736,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable3`1'></a>
 ## TTEquatable3\`1 `type`
@@ -9415,7 +10747,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable4`1'></a>
 ## TTEquatable4\`1 `type`
@@ -9426,7 +10758,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable5`1'></a>
 ## TTEquatable5\`1 `type`
@@ -9437,7 +10769,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable6`1'></a>
 ## TTEquatable6\`1 `type`
@@ -9448,7 +10780,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable7`1'></a>
 ## TTEquatable7\`1 `type`
@@ -9459,7 +10791,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable8`1'></a>
 ## TTEquatable8\`1 `type`
@@ -9470,7 +10802,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable`1'></a>
 ## TTEquatable\`1 `type`
@@ -9481,7 +10813,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTList1`1'></a>
 ## TTList1\`1 `type`
@@ -9492,7 +10824,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList2`1'></a>
 ## TTList2\`1 `type`
@@ -9503,7 +10835,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList3`1'></a>
 ## TTList3\`1 `type`
@@ -9514,7 +10846,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList4`1'></a>
 ## TTList4\`1 `type`
@@ -9525,7 +10857,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList5`1'></a>
 ## TTList5\`1 `type`
@@ -9536,7 +10868,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList6`1'></a>
 ## TTList6\`1 `type`
@@ -9547,7 +10879,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList7`1'></a>
 ## TTList7\`1 `type`
@@ -9558,7 +10890,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList8`1'></a>
 ## TTList8\`1 `type`
@@ -9569,7 +10901,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList`1'></a>
 ## TTList\`1 `type`
@@ -9580,7 +10912,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTObservable1`1'></a>
 ## TTObservable1\`1 `type`
@@ -9591,7 +10923,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable2`1'></a>
 ## TTObservable2\`1 `type`
@@ -9602,7 +10934,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable3`1'></a>
 ## TTObservable3\`1 `type`
@@ -9613,7 +10945,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable4`1'></a>
 ## TTObservable4\`1 `type`
@@ -9624,7 +10956,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable5`1'></a>
 ## TTObservable5\`1 `type`
@@ -9635,7 +10967,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable6`1'></a>
 ## TTObservable6\`1 `type`
@@ -9646,7 +10978,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable7`1'></a>
 ## TTObservable7\`1 `type`
@@ -9657,7 +10989,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable8`1'></a>
 ## TTObservable8\`1 `type`
@@ -9668,7 +11000,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable`1'></a>
 ## TTObservable\`1 `type`
@@ -9679,7 +11011,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObserver1`1'></a>
 ## TTObserver1\`1 `type`
@@ -9690,7 +11022,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver2`1'></a>
 ## TTObserver2\`1 `type`
@@ -9701,7 +11033,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver3`1'></a>
 ## TTObserver3\`1 `type`
@@ -9712,7 +11044,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver4`1'></a>
 ## TTObserver4\`1 `type`
@@ -9723,7 +11055,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver5`1'></a>
 ## TTObserver5\`1 `type`
@@ -9734,7 +11066,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver6`1'></a>
 ## TTObserver6\`1 `type`
@@ -9745,7 +11077,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver7`1'></a>
 ## TTObserver7\`1 `type`
@@ -9756,7 +11088,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver8`1'></a>
 ## TTObserver8\`1 `type`
@@ -9767,7 +11099,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver`1'></a>
 ## TTObserver\`1 `type`
@@ -9778,7 +11110,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTSet1`1'></a>
 ## TTSet1\`1 `type`
@@ -9789,7 +11121,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet2`1'></a>
 ## TTSet2\`1 `type`
@@ -9800,7 +11132,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet3`1'></a>
 ## TTSet3\`1 `type`
@@ -9811,7 +11143,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet4`1'></a>
 ## TTSet4\`1 `type`
@@ -9822,7 +11154,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet5`1'></a>
 ## TTSet5\`1 `type`
@@ -9833,7 +11165,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet6`1'></a>
 ## TTSet6\`1 `type`
@@ -9844,7 +11176,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet7`1'></a>
 ## TTSet7\`1 `type`
@@ -9855,7 +11187,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet8`1'></a>
 ## TTSet8\`1 `type`
@@ -9866,7 +11198,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet`1'></a>
 ## TTSet\`1 `type`
@@ -9877,7 +11209,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-Tag'></a>
 ## Tag `type`

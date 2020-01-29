@@ -1134,6 +1134,14 @@
             <param name="token">The container binding token.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``1(IoC.IBinding)">
+            <summary>
+            Binds the type.
+            </summary>
+            <typeparam name="T">The contract type.</typeparam>
+            <param name="binding"></param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.As``1(IoC.IBinding{``0},IoC.Lifetime)">
             <summary>
             Assigns well-known lifetime to the binding.
@@ -1215,6 +1223,15 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``2(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``2(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -1232,6 +1249,16 @@
             <typeparam name="T1">The contract type #1.</typeparam>
             <typeparam name="T2">The contract type #2.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``3(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``3(IoC.IToken)">
@@ -1255,6 +1282,17 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``4(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``4(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -1276,6 +1314,18 @@
             <typeparam name="T3">The contract type #3.</typeparam>
             <typeparam name="T4">The contract type #4.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``5(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``5(IoC.IToken)">
@@ -1303,6 +1353,19 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``6(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``6(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -1328,6 +1391,20 @@
             <typeparam name="T5">The contract type #5.</typeparam>
             <typeparam name="T6">The contract type #6.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``7(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``7(IoC.IToken)">
@@ -1359,6 +1436,21 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``8(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``8(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -1388,6 +1480,22 @@
             <typeparam name="T7">The contract type #7.</typeparam>
             <typeparam name="T8">The contract type #8.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``9(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``9(IoC.IToken)">
@@ -1423,6 +1531,23 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``10(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``10(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -1456,6 +1581,24 @@
             <typeparam name="T9">The contract type #9.</typeparam>
             <typeparam name="T10">The contract type #10.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``11(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``11(IoC.IToken)">
@@ -1495,6 +1638,25 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``12(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``12(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -1532,6 +1694,26 @@
             <typeparam name="T11">The contract type #11.</typeparam>
             <typeparam name="T12">The contract type #12.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``13(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``13(IoC.IToken)">
@@ -1575,6 +1757,27 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``14(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``14(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -1616,6 +1819,28 @@
             <typeparam name="T13">The contract type #13.</typeparam>
             <typeparam name="T14">The contract type #14.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``15(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``15(IoC.IToken)">
@@ -1663,6 +1888,29 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``16(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``16(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -1708,6 +1956,30 @@
             <typeparam name="T15">The contract type #15.</typeparam>
             <typeparam name="T16">The contract type #16.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``17(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``17(IoC.IToken)">
@@ -1759,6 +2031,31 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``18(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``18(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -1808,6 +2105,32 @@
             <typeparam name="T17">The contract type #17.</typeparam>
             <typeparam name="T18">The contract type #18.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``19(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``19(IoC.IToken)">
@@ -1863,6 +2186,33 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``20(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``20(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -1916,6 +2266,34 @@
             <typeparam name="T19">The contract type #19.</typeparam>
             <typeparam name="T20">The contract type #20.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``21(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``21(IoC.IToken)">
@@ -1975,6 +2353,35 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``22(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``22(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -2032,6 +2439,36 @@
             <typeparam name="T21">The contract type #21.</typeparam>
             <typeparam name="T22">The contract type #22.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``23(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``23(IoC.IToken)">
@@ -2095,6 +2532,37 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``24(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``24(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -2156,6 +2624,38 @@
             <typeparam name="T23">The contract type #23.</typeparam>
             <typeparam name="T24">The contract type #24.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``25(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``25(IoC.IToken)">
@@ -2223,6 +2723,39 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``26(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``26(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -2288,6 +2821,40 @@
             <typeparam name="T25">The contract type #25.</typeparam>
             <typeparam name="T26">The contract type #26.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``27(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``27(IoC.IToken)">
@@ -2359,6 +2926,41 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``28(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``28(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -2428,6 +3030,42 @@
             <typeparam name="T27">The contract type #27.</typeparam>
             <typeparam name="T28">The contract type #28.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``29(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``29(IoC.IToken)">
@@ -2503,6 +3141,43 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``30(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <typeparam name="T29">The contract type #29.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``30(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -2576,6 +3251,44 @@
             <typeparam name="T29">The contract type #29.</typeparam>
             <typeparam name="T30">The contract type #30.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``31(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <typeparam name="T29">The contract type #29.</typeparam>
+            <typeparam name="T30">The contract type #30.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``31(IoC.IToken)">
@@ -2655,6 +3368,45 @@
             <param name="container">The target container.</param>
             <returns>The binding token.</returns>
         </member>
+        <member name="M:IoC.FluentBind.Bind``32(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <typeparam name="T29">The contract type #29.</typeparam>
+            <typeparam name="T30">The contract type #30.</typeparam>
+            <typeparam name="T31">The contract type #31.</typeparam>
+            <param name="binding">The target binding.</param>
+            <returns>The binding token.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind``32(IoC.IToken)">
             <summary>
             Binds multiple types.
@@ -2732,6 +3484,46 @@
             <typeparam name="T31">The contract type #31.</typeparam>
             <typeparam name="T32">The contract type #32.</typeparam>
             <param name="container">The target container.</param>
+            <returns>The binding token.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.Bind``33(IoC.IBinding)">
+            <summary>
+            Binds multiple types.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <typeparam name="T1">The contract type #1.</typeparam>
+            <typeparam name="T2">The contract type #2.</typeparam>
+            <typeparam name="T3">The contract type #3.</typeparam>
+            <typeparam name="T4">The contract type #4.</typeparam>
+            <typeparam name="T5">The contract type #5.</typeparam>
+            <typeparam name="T6">The contract type #6.</typeparam>
+            <typeparam name="T7">The contract type #7.</typeparam>
+            <typeparam name="T8">The contract type #8.</typeparam>
+            <typeparam name="T9">The contract type #9.</typeparam>
+            <typeparam name="T10">The contract type #10.</typeparam>
+            <typeparam name="T11">The contract type #11.</typeparam>
+            <typeparam name="T12">The contract type #12.</typeparam>
+            <typeparam name="T13">The contract type #13.</typeparam>
+            <typeparam name="T14">The contract type #14.</typeparam>
+            <typeparam name="T15">The contract type #15.</typeparam>
+            <typeparam name="T16">The contract type #16.</typeparam>
+            <typeparam name="T17">The contract type #17.</typeparam>
+            <typeparam name="T18">The contract type #18.</typeparam>
+            <typeparam name="T19">The contract type #19.</typeparam>
+            <typeparam name="T20">The contract type #20.</typeparam>
+            <typeparam name="T21">The contract type #21.</typeparam>
+            <typeparam name="T22">The contract type #22.</typeparam>
+            <typeparam name="T23">The contract type #23.</typeparam>
+            <typeparam name="T24">The contract type #24.</typeparam>
+            <typeparam name="T25">The contract type #25.</typeparam>
+            <typeparam name="T26">The contract type #26.</typeparam>
+            <typeparam name="T27">The contract type #27.</typeparam>
+            <typeparam name="T28">The contract type #28.</typeparam>
+            <typeparam name="T29">The contract type #29.</typeparam>
+            <typeparam name="T30">The contract type #30.</typeparam>
+            <typeparam name="T31">The contract type #31.</typeparam>
+            <typeparam name="T32">The contract type #32.</typeparam>
+            <param name="binding">The target binding.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``33(IoC.IToken)">
@@ -3236,9 +4028,149 @@
             Represents the generic type parameter marker.
             </summary>
         </member>
+        <member name="T:IoC.TTDisposable">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary`2">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+            </summary>
+        </member>
         <member name="T:IoC.TT1">
             <summary>
             Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDisposable1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable1`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable1`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable1`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator1`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection1`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList1`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet1`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer1`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer1`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary1`2">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable1`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver1`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TT2">
@@ -3246,9 +4178,149 @@
             Represents the generic type parameter marker.
             </summary>
         </member>
+        <member name="T:IoC.TTDisposable2">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable2">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable2`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable2`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable2`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator2`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection2`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList2`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet2`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer2`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer2`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary2`2">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable2`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver2`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+            </summary>
+        </member>
         <member name="T:IoC.TT3">
             <summary>
             Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDisposable3">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable3">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable3`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable3`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable3`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator3`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection3`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList3`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet3`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer3`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer3`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary3`2">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable3`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver3`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TT4">
@@ -3256,9 +4328,149 @@
             Represents the generic type parameter marker.
             </summary>
         </member>
+        <member name="T:IoC.TTDisposable4">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable4">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable4`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable4`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable4`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator4`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection4`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList4`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet4`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer4`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer4`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary4`2">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable4`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver4`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+            </summary>
+        </member>
         <member name="T:IoC.TT5">
             <summary>
             Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDisposable5">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable5">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable5`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable5`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable5`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator5`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection5`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList5`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet5`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer5`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer5`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary5`2">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable5`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver5`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TT6">
@@ -3266,14 +4478,224 @@
             Represents the generic type parameter marker.
             </summary>
         </member>
+        <member name="T:IoC.TTDisposable6">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable6">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable6`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable6`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable6`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator6`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection6`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList6`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet6`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer6`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer6`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary6`2">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable6`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver6`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+            </summary>
+        </member>
         <member name="T:IoC.TT7">
             <summary>
             Represents the generic type parameter marker.
             </summary>
         </member>
+        <member name="T:IoC.TTDisposable7">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable7">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable7`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable7`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable7`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator7`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection7`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList7`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet7`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer7`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer7`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary7`2">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable7`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver7`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+            </summary>
+        </member>
         <member name="T:IoC.TT8">
             <summary>
             Represents the generic type parameter marker.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDisposable8">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable8">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparable8`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEquatable8`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerable8`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEnumerator8`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTCollection8`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTList8`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTSet8`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTComparer8`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTEqualityComparer8`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTDictionary8`2">
+            <summary>
+            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObservable8`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            </summary>
+        </member>
+        <member name="T:IoC.TTObserver8`1">
+            <summary>
+            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TT9">
@@ -3426,41 +4848,46 @@
             <param name="initializers">The set of initializing methods in the appropriate order.</param>
             <returns>True if initializing methods were resolved.</returns>
         </member>
+        <member name="T:IoC.IBinding">
+            <summary>
+            The container's binding.
+            </summary>
+        </member>
+        <member name="P:IoC.IBinding.Container">
+            <summary>
+            The target container.
+            </summary>
+        </member>
+        <member name="P:IoC.IBinding.Tokens">
+            <summary>
+            Binding tokens.
+            </summary>
+        </member>
+        <member name="P:IoC.IBinding.Types">
+            <summary>
+            The type to bind.
+            </summary>
+        </member>
+        <member name="P:IoC.IBinding.Tags">
+            <summary>
+            The tags to mark the binding.
+            </summary>
+        </member>
+        <member name="P:IoC.IBinding.Lifetime">
+            <summary>
+            The specified lifetime instance or null.
+            </summary>
+        </member>
+        <member name="P:IoC.IBinding.AutowiringStrategy">
+            <summary>
+            The specified autowiring strategy or null.
+            </summary>
+        </member>
         <member name="T:IoC.IBinding`1">
             <summary>
             The container's binding.
             </summary>
             <typeparam name="T"></typeparam>
-        </member>
-        <member name="P:IoC.IBinding`1.Container">
-            <summary>
-            The target container.
-            </summary>
-        </member>
-        <member name="P:IoC.IBinding`1.Tokens">
-            <summary>
-            Binding tokens.
-            </summary>
-        </member>
-        <member name="P:IoC.IBinding`1.Types">
-            <summary>
-            The type to bind.
-            </summary>
-        </member>
-        <member name="P:IoC.IBinding`1.Tags">
-            <summary>
-            The tags to mark the binding.
-            </summary>
-        </member>
-        <member name="P:IoC.IBinding`1.Lifetime">
-            <summary>
-            The specified lifetime instance or null.
-            </summary>
-        </member>
-        <member name="P:IoC.IBinding`1.AutowiringStrategy">
-            <summary>
-            The specified autowiring strategy or null.
-            </summary>
         </member>
         <member name="T:IoC.IBuildContext">
             <summary>

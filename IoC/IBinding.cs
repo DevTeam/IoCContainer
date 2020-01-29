@@ -6,10 +6,9 @@
     /// <summary>
     /// The container's binding.
     /// </summary>
-    /// <typeparam name="T"></typeparam>
     [PublicAPI]
     // ReSharper disable once UnusedTypeParameter
-    public interface IBinding<in T>
+    public interface IBinding
     {
         /// <summary>
         /// The target container.
@@ -24,12 +23,12 @@
         /// <summary>
         /// The type to bind.
         /// </summary>
-        [NotNull][ItemNotNull] IEnumerable<Type> Types { get; }
+        [NotNull] [ItemNotNull] IEnumerable<Type> Types { get; }
 
         /// <summary>
         /// The tags to mark the binding.
         /// </summary>
-        [NotNull][ItemCanBeNull] IEnumerable<object> Tags { get; }
+        [NotNull] [ItemCanBeNull] IEnumerable<object> Tags { get; }
 
         /// <summary>
         /// The specified lifetime instance or null.
@@ -40,5 +39,15 @@
         /// The specified autowiring strategy or null.
         /// </summary>
         [CanBeNull] IAutowiringStrategy AutowiringStrategy { get; }
+    }
+
+    /// <summary>
+    /// The container's binding.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
+    [PublicAPI]
+    // ReSharper disable once UnusedTypeParameter
+    public interface IBinding<in T> : IBinding
+    {
     }
 }

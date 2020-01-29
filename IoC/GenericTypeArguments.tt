@@ -29,13 +29,14 @@ var baseTypes = new Dictionary<string, string> {
     [PublicAPI, GenericTypeArgument]
     public abstract class TT<#=i == 0 ? "" : i.ToString()#> { }
 
-    <#
+<#
     if (i > 8)
     {
         continue;
     }
 
-    foreach(var baseType in baseTypes){#>
+    foreach(var baseType in baseTypes)
+    {#>
 /// <summary>
     /// Represents the generic type parameter marker for <c><#=baseType.Key.Replace('<','[').Replace('>',']')#></c>.
     /// </summary>

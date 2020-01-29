@@ -75,6 +75,20 @@
         }
 
         /// <summary>
+        /// Binds the type.
+        /// </summary>
+        /// <typeparam name="T">The contract type.</typeparam>
+        /// <param name="binding"></param>
+        /// <returns>The binding token.</returns>
+        [MethodImpl((MethodImplOptions)256)]
+        [NotNull]
+        public static IBinding<T> Bind<T>([NotNull] this IBinding binding)
+        {
+            if (binding == null) throw new ArgumentNullException(nameof(binding));
+            return new Binding<T>(binding, TypeDescriptor<T>.Type);
+        }
+
+        /// <summary>
         /// Assigns well-known lifetime to the binding.
         /// </summary>
         /// <typeparam name="T">The instance type.</typeparam>
