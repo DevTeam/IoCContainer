@@ -87,10 +87,11 @@ namespace IoC.Core
         }
 
         private class Tracker<T> : ITracker
+            where T: class
         {
             private readonly Action<IList<T>, T> _updater;
-            private readonly Dictionary<IContainer, T> _map = new Dictionary<IContainer, T>();
             public readonly IList<T> Items = new List<T>();
+            private Table<IContainer, T> _map = Table<IContainer, T>.Empty;
 
             public Tracker(Action<IList<T>, T> updater) => 
                 _updater = updater;
@@ -102,7 +103,8 @@ namespace IoC.Core
                     return false;
                 }
 
-                if (_map.ContainsKey(container))
+                var hashCode = container.GetHashCode();
+                if (_map.GetByRef(hashCode, container) != null)
                 {
                     return true;
                 }
@@ -110,7 +112,7 @@ namespace IoC.Core
                 if (container.TryGetResolver<T>(key.Type, key.Tag, out var resolver, out _, container))
                 {
                     var instance = resolver(container);
-                    _map.Add(container, instance);
+                    _map = _map.Set(hashCode, container, instance);
                     _updater(Items, instance);
                 }
 
@@ -124,7 +126,9 @@ namespace IoC.Core
                     return false;
                 }
 
-                if (_map.TryGetValue(container, out var instance))
+                var hashCode = container.GetHashCode();
+                var instance = _map.GetByRef(hashCode, container);
+                if (instance != null)
                 {
                     Items.Remove(instance);
                 }

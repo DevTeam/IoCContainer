@@ -957,4 +957,44 @@ namespace IoC
     [PublicAPI, GenericTypeArgument]
     public abstract class TT32 { }
 
+
+    internal class GenericTypeArguments
+    {
+        internal static readonly System.Type[] Arguments =
+        {
+            Core.TypeDescriptor<TT>.Type,
+            Core.TypeDescriptor<TT1>.Type,
+            Core.TypeDescriptor<TT2>.Type,
+            Core.TypeDescriptor<TT3>.Type,
+            Core.TypeDescriptor<TT4>.Type,
+            Core.TypeDescriptor<TT5>.Type,
+            Core.TypeDescriptor<TT6>.Type,
+            Core.TypeDescriptor<TT7>.Type,
+            Core.TypeDescriptor<TT8>.Type,
+            Core.TypeDescriptor<TT9>.Type,
+            Core.TypeDescriptor<TT10>.Type,
+            Core.TypeDescriptor<TT11>.Type,
+            Core.TypeDescriptor<TT12>.Type,
+            Core.TypeDescriptor<TT13>.Type,
+            Core.TypeDescriptor<TT14>.Type,
+            Core.TypeDescriptor<TT15>.Type,
+            Core.TypeDescriptor<TT16>.Type,
+            Core.TypeDescriptor<TT17>.Type,
+            Core.TypeDescriptor<TT18>.Type,
+            Core.TypeDescriptor<TT19>.Type,
+            Core.TypeDescriptor<TT20>.Type,
+            Core.TypeDescriptor<TT21>.Type,
+            Core.TypeDescriptor<TT22>.Type,
+            Core.TypeDescriptor<TT23>.Type,
+            Core.TypeDescriptor<TT24>.Type,
+            Core.TypeDescriptor<TT25>.Type,
+            Core.TypeDescriptor<TT26>.Type,
+            Core.TypeDescriptor<TT27>.Type,
+            Core.TypeDescriptor<TT28>.Type,
+            Core.TypeDescriptor<TT29>.Type,
+            Core.TypeDescriptor<TT30>.Type,
+            Core.TypeDescriptor<TT31>.Type,
+            Core.TypeDescriptor<TT32>.Type,
+        };
+    }
 }

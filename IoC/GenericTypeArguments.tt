@@ -45,4 +45,14 @@ var baseTypes = new Dictionary<string, string> {
 
     <#}#>
 <#}#>
+
+    internal class GenericTypeArguments
+    {
+        internal static readonly System.Type[] Arguments =
+        {
+<#for(var i = 0; i <= 32; i++) {#>
+            Core.TypeDescriptor<TT<#=i == 0 ? "" : i.ToString()#>>.Type,
+<#}#>
+        };
+    }
 }

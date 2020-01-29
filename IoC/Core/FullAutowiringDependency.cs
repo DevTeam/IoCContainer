@@ -9,26 +9,6 @@
 
     internal class FullAutowiringDependency: IDependency
     {
-        private static readonly Type[] GenericTypeArguments =
-        {
-            TypeDescriptor<TT>.Type,
-            TypeDescriptor<TT1>.Type,
-            TypeDescriptor<TT2>.Type,
-            TypeDescriptor<TT3>.Type,
-            TypeDescriptor<TT4>.Type,
-            TypeDescriptor<TT5>.Type,
-            TypeDescriptor<TT6>.Type,
-            TypeDescriptor<TT7>.Type,
-            TypeDescriptor<TT8>.Type,
-            TypeDescriptor<TT9>.Type,
-            TypeDescriptor<TT10>.Type,
-            TypeDescriptor<TT11>.Type,
-            TypeDescriptor<TT12>.Type,
-            TypeDescriptor<TT13>.Type,
-            TypeDescriptor<TT14>.Type,
-            TypeDescriptor<TT15>.Type
-        };
-
         [NotNull] private readonly Type _type;
         [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;
         private readonly bool _hasGenericParamsWithConstraints;
@@ -66,6 +46,11 @@
             }
 
             _registeredGenericTypeParameters = _registeredTypeDescriptor.GetGenericTypeParameters();
+            if (_registeredGenericTypeParameters.Length > GenericTypeArguments.Arguments.Length)
+            {
+                throw new ArgumentException($"Too many generic type parameters in the type \"{type}\".", nameof(type));
+            }
+
             var genericTypePos = 0;
             var typesMap = new Dictionary<Type, Type>();
             for (var position = 0; position < _registeredGenericTypeParameters.Length; position++)
@@ -83,7 +68,7 @@
                     {
                         try
                         {
-                            curType = GenericTypeArguments[genericTypePos++];
+                            curType = GenericTypeArguments.Arguments[genericTypePos++];
                             typesMap[genericType] = curType;
                         }
                         catch (IndexOutOfRangeException ex)

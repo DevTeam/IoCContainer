@@ -7066,6 +7066,46 @@ namespace IoC
     [PublicAPI, GenericTypeArgument]
     public abstract class TT32 { }
 
+
+    internal class GenericTypeArguments
+    {
+        internal static readonly System.Type[] Arguments =
+        {
+            Core.TypeDescriptor<TT>.Type,
+            Core.TypeDescriptor<TT1>.Type,
+            Core.TypeDescriptor<TT2>.Type,
+            Core.TypeDescriptor<TT3>.Type,
+            Core.TypeDescriptor<TT4>.Type,
+            Core.TypeDescriptor<TT5>.Type,
+            Core.TypeDescriptor<TT6>.Type,
+            Core.TypeDescriptor<TT7>.Type,
+            Core.TypeDescriptor<TT8>.Type,
+            Core.TypeDescriptor<TT9>.Type,
+            Core.TypeDescriptor<TT10>.Type,
+            Core.TypeDescriptor<TT11>.Type,
+            Core.TypeDescriptor<TT12>.Type,
+            Core.TypeDescriptor<TT13>.Type,
+            Core.TypeDescriptor<TT14>.Type,
+            Core.TypeDescriptor<TT15>.Type,
+            Core.TypeDescriptor<TT16>.Type,
+            Core.TypeDescriptor<TT17>.Type,
+            Core.TypeDescriptor<TT18>.Type,
+            Core.TypeDescriptor<TT19>.Type,
+            Core.TypeDescriptor<TT20>.Type,
+            Core.TypeDescriptor<TT21>.Type,
+            Core.TypeDescriptor<TT22>.Type,
+            Core.TypeDescriptor<TT23>.Type,
+            Core.TypeDescriptor<TT24>.Type,
+            Core.TypeDescriptor<TT25>.Type,
+            Core.TypeDescriptor<TT26>.Type,
+            Core.TypeDescriptor<TT27>.Type,
+            Core.TypeDescriptor<TT28>.Type,
+            Core.TypeDescriptor<TT29>.Type,
+            Core.TypeDescriptor<TT30>.Type,
+            Core.TypeDescriptor<TT31>.Type,
+            Core.TypeDescriptor<TT32>.Type,
+        };
+    }
 }
 
 
@@ -11401,26 +11441,6 @@ namespace IoC.Core
 
     internal class FullAutowiringDependency: IDependency
     {
-        private static readonly Type[] GenericTypeArguments =
-        {
-            TypeDescriptor<TT>.Type,
-            TypeDescriptor<TT1>.Type,
-            TypeDescriptor<TT2>.Type,
-            TypeDescriptor<TT3>.Type,
-            TypeDescriptor<TT4>.Type,
-            TypeDescriptor<TT5>.Type,
-            TypeDescriptor<TT6>.Type,
-            TypeDescriptor<TT7>.Type,
-            TypeDescriptor<TT8>.Type,
-            TypeDescriptor<TT9>.Type,
-            TypeDescriptor<TT10>.Type,
-            TypeDescriptor<TT11>.Type,
-            TypeDescriptor<TT12>.Type,
-            TypeDescriptor<TT13>.Type,
-            TypeDescriptor<TT14>.Type,
-            TypeDescriptor<TT15>.Type
-        };
-
         [NotNull] private readonly Type _type;
         [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;
         private readonly bool _hasGenericParamsWithConstraints;
@@ -11458,6 +11478,11 @@ namespace IoC.Core
             }
 
             _registeredGenericTypeParameters = _registeredTypeDescriptor.GetGenericTypeParameters();
+            if (_registeredGenericTypeParameters.Length > GenericTypeArguments.Arguments.Length)
+            {
+                throw new ArgumentException($"Too many generic type parameters in the type \"{type}\".", nameof(type));
+            }
+
             var genericTypePos = 0;
             var typesMap = new Dictionary<Type, Type>();
             for (var position = 0; position < _registeredGenericTypeParameters.Length; position++)
@@ -11475,7 +11500,7 @@ namespace IoC.Core
                     {
                         try
                         {
-                            curType = GenericTypeArguments[genericTypePos++];
+                            curType = GenericTypeArguments.Arguments[genericTypePos++];
                             typesMap[genericType] = curType;
                         }
                         catch (IndexOutOfRangeException ex)
@@ -12044,10 +12069,11 @@ namespace IoC.Core
         }
 
         private class Tracker<T> : ITracker
+            where T: class
         {
             private readonly Action<IList<T>, T> _updater;
-            private readonly Dictionary<IContainer, T> _map = new Dictionary<IContainer, T>();
             public readonly IList<T> Items = new List<T>();
+            private Table<IContainer, T> _map = Table<IContainer, T>.Empty;
 
             public Tracker(Action<IList<T>, T> updater) => 
                 _updater = updater;
@@ -12059,7 +12085,8 @@ namespace IoC.Core
                     return false;
                 }
 
-                if (_map.ContainsKey(container))
+                var hashCode = container.GetHashCode();
+                if (_map.GetByRef(hashCode, container) != null)
                 {
                     return true;
                 }
@@ -12067,7 +12094,7 @@ namespace IoC.Core
                 if (container.TryGetResolver<T>(key.Type, key.Tag, out var resolver, out _, container))
                 {
                     var instance = resolver(container);
-                    _map.Add(container, instance);
+                    _map = _map.Set(hashCode, container, instance);
                     _updater(Items, instance);
                 }
 
@@ -12081,7 +12108,9 @@ namespace IoC.Core
                     return false;
                 }
 
-                if (_map.TryGetValue(container, out var instance))
+                var hashCode = container.GetHashCode();
+                var instance = _map.GetByRef(hashCode, container);
+                if (instance != null)
                 {
                     Items.Remove(instance);
                 }
