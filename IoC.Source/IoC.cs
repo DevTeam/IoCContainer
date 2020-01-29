@@ -1319,42 +1319,20 @@ namespace IoC
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
+
             var isRegistered = true;
             var registeredKeys = new List<FullKey>();
-            var dependencyEntry = new DependencyEntry(_lockObject, this, dependency, lifetime, Disposable.Create(UnregisterKeys), registeredKeys);
-
-            void UnregisterKeys()
-            {
-                lock (_lockObject)
-                {
-                    foreach (var curKey in registeredKeys)
-                    {
-                        if (curKey.Tag == AnyTag)
-                        {
-                            TryUnregister(curKey.Type, ref _dependenciesForTagAny);
-                        }
-                        else
-                        {
-                            TryUnregister(curKey, ref _dependencies);
-                        }
-                    }
-
-                    _eventSubject.OnNext(new ContainerEvent(this, EventType.UnregisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime });
-                }
-            }
-
+            var dependencyEntry = new DependencyEntry(_lockObject, this, dependency, lifetime, Disposable.Create(() => UnregisterKeys(registeredKeys, dependency, lifetime)), registeredKeys);
             try
             {
                 lock (_lockObject)
                 {
                     var dependenciesForTagAny = _dependenciesForTagAny;
                     var dependencies = _dependencies;
-
                     foreach (var curKey in keys)
                     {
                         var type = curKey.Type.ToGenericType();
                         var key = type != curKey.Type ? new FullKey(type, curKey.Tag) : curKey;
-
                         if (key.Tag == AnyTag)
                         {
                             var hashCode = key.Type.GetHashCode();
@@ -1575,6 +1553,26 @@ namespace IoC
             {
                 Resolvers = Table<FullKey, ResolverDelegate>.Empty;
                 ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
+            }
+        }
+
+        private void UnregisterKeys(List<FullKey> registeredKeys, IDependency dependency, ILifetime lifetime)
+        {
+            lock (_lockObject)
+            {
+                foreach (var curKey in registeredKeys)
+                {
+                    if (curKey.Tag == AnyTag)
+                    {
+                        TryUnregister(curKey.Type, ref _dependenciesForTagAny);
+                    }
+                    else
+                    {
+                        TryUnregister(curKey, ref _dependencies);
+                    }
+                }
+
+                _eventSubject.OnNext(new ContainerEvent(this, EventType.UnregisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime });
             }
         }
 
@@ -9837,21 +9835,21 @@ namespace IoC.Core
     internal class BuildContext : IBuildContext
     {
         private static readonly ICollection<IBuilder> EmptyBuilders = new List<IBuilder>();
-        private readonly IEnumerable<IDisposable> _resources;
+        private readonly IDisposable _resource;
         [NotNull] private readonly IEnumerable<IBuilder> _builders;
         private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
 
         internal BuildContext(
             Key key,
             [NotNull] IContainer resolvingContainer,
-            [NotNull] IEnumerable<IDisposable> resources,
+            [NotNull] IDisposable resource,
             [NotNull] IEnumerable<IBuilder> builders,
             [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
             int depth = 0)
         {
             Key = key;
             Container = resolvingContainer ?? throw new ArgumentNullException(nameof(resolvingContainer));
-            _resources = resources ?? throw new ArgumentNullException(nameof(resources));
+            _resource = resource ?? throw new ArgumentNullException(nameof(resource));
             _builders = builders ?? throw new ArgumentNullException(nameof(builders));
             AutowiringStrategy = defaultAutowiringStrategy ?? throw new ArgumentNullException(nameof(defaultAutowiringStrategy));
             Depth = depth;
@@ -9903,7 +9901,7 @@ namespace IoC.Core
                 key = new Key(type, key.Tag);
             }
 
-            return new BuildContext(key, container, _resources, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
+            return new BuildContext(key, container, _resource, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
         }
 
         public Expression DependencyExpression
@@ -10540,11 +10538,11 @@ namespace IoC.Core
         [NotNull] [ItemNotNull] internal static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression> { WellknownExpressions.ContainerParameter, WellknownExpressions.ArgsParameter };
 
         [CanBeNull] internal readonly ILifetime Lifetime;
+        [NotNull] private readonly IDisposable _resource;
         [NotNull] internal readonly IEnumerable<Key> Keys;
         [NotNull] private readonly ILockObject _lockObject;
         [NotNull] internal readonly IDependency Dependency;
 
-        [NotNull] private readonly IEnumerable<IDisposable> _resources;
         private volatile Table<LifetimeKey, ILifetime> _lifetimes = Table<LifetimeKey, ILifetime>.Empty;
         [CanBeNull] private bool? _isGenericTypeDefinition;
         private bool _disposed;
@@ -10561,15 +10559,8 @@ namespace IoC.Core
             _lockObject = lockObject;
             Dependency = dependency;
             Lifetime = lifetime;
+            _resource = resource;
             Keys = keys;
-            if (lifetime is IDisposable disposableLifetime)
-            {
-                _resources = new[] { resource, disposableLifetime };
-            }
-            else
-            {
-                _resources = new[] { resource };
-            }
         }
 
         public IContainer Container { get; }
@@ -10590,9 +10581,8 @@ namespace IoC.Core
                 }
             }
 
-            var typeDescriptor = key.Type.Descriptor();
-            var buildContext = new BuildContext(key, resolvingContainer, _resources, registrationTracker.Builders, registrationTracker.AutowiringStrategy);
-            var lifetime = GetLifetime(typeDescriptor);
+            var buildContext = new BuildContext(key, resolvingContainer, this, registrationTracker.Builders, registrationTracker.AutowiringStrategy);
+            var lifetime = GetLifetime(key.Type);
             if (!Dependency.TryBuildExpression(buildContext, lifetime, out var expression, out error))
             {
                 resolver = default(Delegate);
@@ -10625,38 +10615,35 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
-        public ILifetime GetLifetime([NotNull] Type type) => GetLifetime(type.Descriptor());
-
-        [MethodImpl((MethodImplOptions)256)]
-        [CanBeNull]
-        private ILifetime GetLifetime(TypeDescriptor typeDescriptor)
+        public ILifetime GetLifetime([NotNull] Type type)
         {
             if (Lifetime == default(ILifetime))
             {
                 return default(ILifetime);
             }
 
-            if (!_isGenericTypeDefinition.HasValue)
-            {
-                _isGenericTypeDefinition = Keys.Any(key => key.Type.Descriptor().IsGenericTypeDefinition());
-            }
-            
-            if (!_isGenericTypeDefinition.Value)
-            {
-                return Lifetime;
-            }
-
-            var lifetimeKey = new LifetimeKey(typeDescriptor.GetGenericTypeArguments());
-            var lifetimeHashCode = lifetimeKey.GetHashCode();
             lock (_lockObject)
             {
-                var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
-                if (lifetime == default(ILifetime))
+                if (!_isGenericTypeDefinition.HasValue)
                 {
-
-                    lifetime = Lifetime.Create();
-                    _lifetimes = _lifetimes.Set(lifetimeHashCode, lifetimeKey, lifetime);
+                    _isGenericTypeDefinition = Keys.Any(key => key.Type.Descriptor().IsGenericTypeDefinition());
                 }
+
+                if (!_isGenericTypeDefinition.Value)
+                {
+                    return Lifetime;
+                }
+
+                var lifetimeKey = new LifetimeKey(type.Descriptor().GetGenericTypeArguments());
+                var lifetimeHashCode = lifetimeKey.GetHashCode();
+                var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
+                if (lifetime != default(ILifetime))
+                {
+                    return lifetime;
+                }
+
+                lifetime = Lifetime.Create();
+                _lifetimes = _lifetimes.Set(lifetimeHashCode, lifetimeKey, lifetime);
 
                 return lifetime;
             }
@@ -10670,19 +10657,17 @@ namespace IoC.Core
                 {
                     return;
                 }
-                
+
                 _disposed = true;
             }
-            
-            foreach (var resource in _resources)
-            {
-                resource.Dispose();
-            }
-            
+
+            Lifetime?.Dispose();
             foreach (var lifetime in _lifetimes)
             {
                 lifetime.Value.Dispose();
             }
+
+            _resource.Dispose();
         }
 
         public override string ToString() => $"{Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";

@@ -120,42 +120,20 @@
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
+
             var isRegistered = true;
             var registeredKeys = new List<FullKey>();
-            var dependencyEntry = new DependencyEntry(_lockObject, this, dependency, lifetime, Disposable.Create(UnregisterKeys), registeredKeys);
-
-            void UnregisterKeys()
-            {
-                lock (_lockObject)
-                {
-                    foreach (var curKey in registeredKeys)
-                    {
-                        if (curKey.Tag == AnyTag)
-                        {
-                            TryUnregister(curKey.Type, ref _dependenciesForTagAny);
-                        }
-                        else
-                        {
-                            TryUnregister(curKey, ref _dependencies);
-                        }
-                    }
-
-                    _eventSubject.OnNext(new ContainerEvent(this, EventType.UnregisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime });
-                }
-            }
-
+            var dependencyEntry = new DependencyEntry(_lockObject, this, dependency, lifetime, Disposable.Create(() => UnregisterKeys(registeredKeys, dependency, lifetime)), registeredKeys);
             try
             {
                 lock (_lockObject)
                 {
                     var dependenciesForTagAny = _dependenciesForTagAny;
                     var dependencies = _dependencies;
-
                     foreach (var curKey in keys)
                     {
                         var type = curKey.Type.ToGenericType();
                         var key = type != curKey.Type ? new FullKey(type, curKey.Tag) : curKey;
-
                         if (key.Tag == AnyTag)
                         {
                             var hashCode = key.Type.GetHashCode();
@@ -376,6 +354,26 @@
             {
                 Resolvers = Table<FullKey, ResolverDelegate>.Empty;
                 ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
+            }
+        }
+
+        private void UnregisterKeys(List<FullKey> registeredKeys, IDependency dependency, ILifetime lifetime)
+        {
+            lock (_lockObject)
+            {
+                foreach (var curKey in registeredKeys)
+                {
+                    if (curKey.Tag == AnyTag)
+                    {
+                        TryUnregister(curKey.Type, ref _dependenciesForTagAny);
+                    }
+                    else
+                    {
+                        TryUnregister(curKey, ref _dependencies);
+                    }
+                }
+
+                _eventSubject.OnNext(new ContainerEvent(this, EventType.UnregisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime });
             }
         }
 

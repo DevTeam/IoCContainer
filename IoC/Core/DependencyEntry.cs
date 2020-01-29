@@ -15,11 +15,11 @@
         [NotNull] [ItemNotNull] internal static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression> { WellknownExpressions.ContainerParameter, WellknownExpressions.ArgsParameter };
 
         [CanBeNull] internal readonly ILifetime Lifetime;
+        [NotNull] private readonly IDisposable _resource;
         [NotNull] internal readonly IEnumerable<Key> Keys;
         [NotNull] private readonly ILockObject _lockObject;
         [NotNull] internal readonly IDependency Dependency;
 
-        [NotNull] private readonly IEnumerable<IDisposable> _resources;
         private volatile Table<LifetimeKey, ILifetime> _lifetimes = Table<LifetimeKey, ILifetime>.Empty;
         [CanBeNull] private bool? _isGenericTypeDefinition;
         private bool _disposed;
@@ -36,15 +36,8 @@
             _lockObject = lockObject;
             Dependency = dependency;
             Lifetime = lifetime;
+            _resource = resource;
             Keys = keys;
-            if (lifetime is IDisposable disposableLifetime)
-            {
-                _resources = new[] { resource, disposableLifetime };
-            }
-            else
-            {
-                _resources = new[] { resource };
-            }
         }
 
         public IContainer Container { get; }
@@ -65,9 +58,8 @@
                 }
             }
 
-            var typeDescriptor = key.Type.Descriptor();
-            var buildContext = new BuildContext(key, resolvingContainer, _resources, registrationTracker.Builders, registrationTracker.AutowiringStrategy);
-            var lifetime = GetLifetime(typeDescriptor);
+            var buildContext = new BuildContext(key, resolvingContainer, this, registrationTracker.Builders, registrationTracker.AutowiringStrategy);
+            var lifetime = GetLifetime(key.Type);
             if (!Dependency.TryBuildExpression(buildContext, lifetime, out var expression, out error))
             {
                 resolver = default(Delegate);
@@ -100,38 +92,35 @@
 
         [MethodImpl((MethodImplOptions)256)]
         [CanBeNull]
-        public ILifetime GetLifetime([NotNull] Type type) => GetLifetime(type.Descriptor());
-
-        [MethodImpl((MethodImplOptions)256)]
-        [CanBeNull]
-        private ILifetime GetLifetime(TypeDescriptor typeDescriptor)
+        public ILifetime GetLifetime([NotNull] Type type)
         {
             if (Lifetime == default(ILifetime))
             {
                 return default(ILifetime);
             }
 
-            if (!_isGenericTypeDefinition.HasValue)
-            {
-                _isGenericTypeDefinition = Keys.Any(key => key.Type.Descriptor().IsGenericTypeDefinition());
-            }
-            
-            if (!_isGenericTypeDefinition.Value)
-            {
-                return Lifetime;
-            }
-
-            var lifetimeKey = new LifetimeKey(typeDescriptor.GetGenericTypeArguments());
-            var lifetimeHashCode = lifetimeKey.GetHashCode();
             lock (_lockObject)
             {
-                var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
-                if (lifetime == default(ILifetime))
+                if (!_isGenericTypeDefinition.HasValue)
                 {
-
-                    lifetime = Lifetime.Create();
-                    _lifetimes = _lifetimes.Set(lifetimeHashCode, lifetimeKey, lifetime);
+                    _isGenericTypeDefinition = Keys.Any(key => key.Type.Descriptor().IsGenericTypeDefinition());
                 }
+
+                if (!_isGenericTypeDefinition.Value)
+                {
+                    return Lifetime;
+                }
+
+                var lifetimeKey = new LifetimeKey(type.Descriptor().GetGenericTypeArguments());
+                var lifetimeHashCode = lifetimeKey.GetHashCode();
+                var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
+                if (lifetime != default(ILifetime))
+                {
+                    return lifetime;
+                }
+
+                lifetime = Lifetime.Create();
+                _lifetimes = _lifetimes.Set(lifetimeHashCode, lifetimeKey, lifetime);
 
                 return lifetime;
             }
@@ -145,19 +134,17 @@
                 {
                     return;
                 }
-                
+
                 _disposed = true;
             }
-            
-            foreach (var resource in _resources)
-            {
-                resource.Dispose();
-            }
-            
+
+            Lifetime?.Dispose();
             foreach (var lifetime in _lifetimes)
             {
                 lifetime.Value.Dispose();
             }
+
+            _resource.Dispose();
         }
 
         public override string ToString() => $"{Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";

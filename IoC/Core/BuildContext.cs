@@ -15,21 +15,21 @@
     internal class BuildContext : IBuildContext
     {
         private static readonly ICollection<IBuilder> EmptyBuilders = new List<IBuilder>();
-        private readonly IEnumerable<IDisposable> _resources;
+        private readonly IDisposable _resource;
         [NotNull] private readonly IEnumerable<IBuilder> _builders;
         private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
 
         internal BuildContext(
             Key key,
             [NotNull] IContainer resolvingContainer,
-            [NotNull] IEnumerable<IDisposable> resources,
+            [NotNull] IDisposable resource,
             [NotNull] IEnumerable<IBuilder> builders,
             [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
             int depth = 0)
         {
             Key = key;
             Container = resolvingContainer ?? throw new ArgumentNullException(nameof(resolvingContainer));
-            _resources = resources ?? throw new ArgumentNullException(nameof(resources));
+            _resource = resource ?? throw new ArgumentNullException(nameof(resource));
             _builders = builders ?? throw new ArgumentNullException(nameof(builders));
             AutowiringStrategy = defaultAutowiringStrategy ?? throw new ArgumentNullException(nameof(defaultAutowiringStrategy));
             Depth = depth;
@@ -81,7 +81,7 @@
                 key = new Key(type, key.Tag);
             }
 
-            return new BuildContext(key, container, _resources, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
+            return new BuildContext(key, container, _resource, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
         }
 
         public Expression DependencyExpression
