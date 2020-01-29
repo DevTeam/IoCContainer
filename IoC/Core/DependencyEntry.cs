@@ -5,7 +5,6 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
-    using static System.String;
 
     internal sealed class DependencyEntry : IToken
     {
@@ -16,24 +15,20 @@
 
         [CanBeNull] internal readonly ILifetime Lifetime;
         [NotNull] private readonly IDisposable _resource;
-        [NotNull] internal readonly IEnumerable<Key> Keys;
-        [NotNull] private readonly ILockObject _lockObject;
+        [NotNull] internal readonly ICollection<Key> Keys;
         [NotNull] internal readonly IDependency Dependency;
 
         private volatile Table<LifetimeKey, ILifetime> _lifetimes = Table<LifetimeKey, ILifetime>.Empty;
-        [CanBeNull] private bool? _isGenericTypeDefinition;
         private bool _disposed;
 
         public DependencyEntry(
-            [NotNull] ILockObject lockObject,
             [NotNull] IContainer container,
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource,
-            [NotNull] IEnumerable<Key> keys)
+            [NotNull] ICollection<Key> keys)
         {
             Container = container;
-            _lockObject = lockObject;
             Dependency = dependency;
             Lifetime = lifetime;
             _resource = resource;
@@ -50,15 +45,12 @@
             out Delegate resolver,
             out Exception error)
         {
-            lock (_lockObject)
+            if (_disposed)
             {
-                if (_disposed)
-                {
-                    throw new ObjectDisposedException(nameof(DependencyEntry));
-                }
+                throw new ObjectDisposedException(nameof(DependencyEntry));
             }
 
-            var buildContext = new BuildContext(key, resolvingContainer, this, registrationTracker.Builders, registrationTracker.AutowiringStrategy);
+            var buildContext = new BuildContext(key, resolvingContainer, registrationTracker.Builders, registrationTracker.AutowiringStrategy);
             var lifetime = GetLifetime(key.Type);
             if (!Dependency.TryBuildExpression(buildContext, lifetime, out var expression, out error))
             {
@@ -99,44 +91,41 @@
                 return default(ILifetime);
             }
 
-            lock (_lockObject)
+            var hasLifetimes = _lifetimes.Count != 0;
+            if (!hasLifetimes && !Keys.Any(key => key.Type.Descriptor().IsGenericTypeDefinition()))
             {
-                if (!_isGenericTypeDefinition.HasValue)
-                {
-                    _isGenericTypeDefinition = Keys.Any(key => key.Type.Descriptor().IsGenericTypeDefinition());
-                }
+                return Lifetime;
+            }
 
-                if (!_isGenericTypeDefinition.Value)
-                {
-                    return Lifetime;
-                }
+            var lifetimeKey = new LifetimeKey(type.Descriptor().GetGenericTypeArguments());
+            var lifetimeHashCode = lifetimeKey.GetHashCode();
 
-                var lifetimeKey = new LifetimeKey(type.Descriptor().GetGenericTypeArguments());
-                var lifetimeHashCode = lifetimeKey.GetHashCode();
-                var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
-                if (lifetime != default(ILifetime))
-                {
-                    return lifetime;
-                }
+            if (!hasLifetimes)
+            {
+                _lifetimes = _lifetimes.Set(lifetimeHashCode, lifetimeKey, Lifetime);
+                return Lifetime;
+            }
 
-                lifetime = Lifetime.Create();
-                _lifetimes = _lifetimes.Set(lifetimeHashCode, lifetimeKey, lifetime);
-
+            var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
+            if (lifetime != default(ILifetime))
+            {
                 return lifetime;
             }
+
+            lifetime = Lifetime.Create();
+            _lifetimes = _lifetimes.Set(lifetimeHashCode, lifetimeKey, lifetime);
+
+            return lifetime;
         }
 
         public void Dispose()
         {
-            lock (_lockObject)
+            if (_disposed)
             {
-                if (_disposed)
-                {
-                    return;
-                }
-
-                _disposed = true;
+                return;
             }
+
+            _disposed = true;
 
             Lifetime?.Dispose();
             foreach (var lifetime in _lifetimes)
@@ -147,7 +136,8 @@
             _resource.Dispose();
         }
 
-        public override string ToString() => $"{Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
+        public override string ToString() => 
+            $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
 
         private struct LifetimeKey
         {
