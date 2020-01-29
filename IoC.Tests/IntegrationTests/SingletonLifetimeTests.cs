@@ -75,6 +75,26 @@
         }
 
         [Fact]
+        public void ContainerShouldResolveWhenSingletonLifetimeAndSeveralContractsAsDependencies()
+        {
+            // Given
+            using var container = Container.Create();
+            // When
+            using (container
+                .Bind<IMyGenericService1<string>, IMyService1>().As(Lifetime.Singleton).To<MyGenericService<string, int>>(ctx => new MyGenericService<string, int>("a"))
+                .Bind<MyClass>().To<MyClass>(ctx => new MyClass(ctx.Container.Inject<IMyGenericService1<string>>(), ctx.Container.Inject<IMyService1>())))
+            {
+                // Then
+                var instance1 = container.Resolve<MyClass>();
+                using var childContainer = container.Create();
+                var instance2 = childContainer.Resolve<MyClass>();
+                instance1.Dep1.ShouldBe(instance1.Dep2);
+                instance1.Dep1.ShouldBe(instance2.Dep1);
+                instance1.Dep1.ShouldBe(instance2.Dep2);
+            }
+        }
+
+        [Fact]
         public void ContainerShouldDisposeWhenDependencyTokenDisposed()
         {
             // Given
@@ -151,6 +171,18 @@
                     instance.Name.ShouldBe("abc");
                     instance.SomeRef.ShouldBe(myService1.Object);
                 }
+            }
+        }
+
+        internal class MyClass
+        {
+            public IMyGenericService1<string> Dep1 { get; }
+            public IMyService1 Dep2 { get; }
+
+            public MyClass(IMyGenericService1<string> dep1, IMyService1 dep2)
+            {
+                Dep1 = dep1;
+                Dep2 = dep2;
             }
         }
     }

@@ -42,7 +42,7 @@ namespace IoC.Tests.IntegrationTests
         public IMyService Service { get; }
     }
 
-    public interface IMyGenericService<out T>
+    public interface IMyGenericService<out T>: IMyService1
     {
         T Value { get; }
 
@@ -121,7 +121,7 @@ namespace IoC.Tests.IntegrationTests
         void Do();
     }
 
-    public interface IMyGenericService1<T1>
+    public interface IMyGenericService1<T1>: IMyService1
     {
     }
 

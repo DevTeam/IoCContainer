@@ -21,6 +21,7 @@
 
         [NotNull] private readonly IEnumerable<IDisposable> _resources;
         private volatile Table<LifetimeKey, ILifetime> _lifetimes = Table<LifetimeKey, ILifetime>.Empty;
+        [CanBeNull] private bool? _isGenericTypeDefinition;
         private bool _disposed;
 
         public DependencyEntry(
@@ -109,8 +110,13 @@
             {
                 return default(ILifetime);
             }
+
+            if (!_isGenericTypeDefinition.HasValue)
+            {
+                _isGenericTypeDefinition = Keys.Any(key => key.Type.Descriptor().IsGenericTypeDefinition());
+            }
             
-            if (!typeDescriptor.IsConstructedGenericType())
+            if (!_isGenericTypeDefinition.Value)
             {
                 return Lifetime;
             }
