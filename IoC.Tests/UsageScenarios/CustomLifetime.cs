@@ -18,7 +18,7 @@
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
-                // Bind interface to implementation using the custom lifetime, based on the Singleton lifetime
+                // Bind an interface to an implementation using the custom lifetime, based on the Singleton lifetime
                 .Bind<IService>().Lifetime(new MyTransientLifetime()).To<Service>()
                 .Container;
             
