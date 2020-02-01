@@ -267,6 +267,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Method Injection](#method-injection-)
   - [Property Injection](#property-injection-)
   - [Constructor Autowiring](#constructor-autowiring-)
+  - [Containers Injection](#containers-injection-)
   - [Resolve all appropriate instances as Array](#resolve-all-appropriate-instances-as-array-)
   - [Resolve all appropriate instances as ICollection](#resolve-all-appropriate-instances-as-icollection-)
   - [Resolve all appropriate instances as IEnumerable](#resolve-all-appropriate-instances-as-ienumerable-)
@@ -288,7 +289,6 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Child Container](#child-container-)
   - [Container Singleton lifetime](#container-singleton-lifetime-)
   - [Scope Singleton lifetime](#scope-singleton-lifetime-)
-  - [Containers Injection](#containers-injection-)
   - [Manual Autowiring](#manual-autowiring-)
   - [Struct](#struct-)
   - [Func](#func-)
@@ -795,49 +795,6 @@ using (container.Bind<IService>().As(Transient).To<Service>())
     }
 }
 
-```
-
-
-
-### Containers Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ContainersInjection.cs)
-
-
-
-``` CSharp
-public void Run()
-{
-    // Create the parent container
-    using var currentContainer = Container
-        .Create("root")
-        .Bind<MyClass>()
-        .To<MyClass>()
-        .Container;
-
-    var instance = currentContainer.Resolve<MyClass>();
-    instance.CurrentContainer.ShouldBe(currentContainer);
-    instance.ChildContainer.Parent.ShouldBe(currentContainer);
-    instance.NamedChildContainer.Parent.ShouldBe(currentContainer);
-    instance.NamedChildContainer.ToString().ShouldBe("//root/Some name");
-}
-
-public class MyClass
-{
-    public MyClass(
-        IContainer currentContainer,
-        Func<IContainer> childContainerFactory,
-        Func<string, IContainer> nameChildContainerFactory)
-    {
-        CurrentContainer = currentContainer;
-        ChildContainer = childContainerFactory();
-        NamedChildContainer = nameChildContainerFactory("Some name");
-    }
-
-    public IContainer CurrentContainer { get; }
-
-    public IContainer ChildContainer { get; }
-
-    public IContainer NamedChildContainer { get; }
-}
 ```
 
 
@@ -1718,6 +1675,49 @@ var instance = container.Resolve<IService>();
 
 // Check the injected constant
 instance.State.ShouldBe("some state");
+```
+
+
+
+### Containers Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ContainersInjection.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    // Create the parent container
+    using var currentContainer = Container
+        .Create("root")
+        .Bind<MyClass>()
+        .To<MyClass>()
+        .Container;
+
+    var instance = currentContainer.Resolve<MyClass>();
+    instance.CurrentContainer.ShouldBe(currentContainer);
+    instance.ChildContainer.Parent.ShouldBe(currentContainer);
+    instance.NamedChildContainer.Parent.ShouldBe(currentContainer);
+    instance.NamedChildContainer.ToString().ShouldBe("//root/Some name");
+}
+
+public class MyClass
+{
+    public MyClass(
+        IContainer currentContainer,
+        Func<IContainer> childContainerFactory,
+        Func<string, IContainer> nameChildContainerFactory)
+    {
+        CurrentContainer = currentContainer;
+        ChildContainer = childContainerFactory();
+        NamedChildContainer = nameChildContainerFactory("Some name");
+    }
+
+    public IContainer CurrentContainer { get; }
+
+    public IContainer ChildContainer { get; }
+
+    public IContainer NamedChildContainer { get; }
+}
 ```
 
 

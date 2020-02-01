@@ -12,7 +12,7 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=binding
+        // $tag=injection
         // $priority=04
         // $description=Containers Injection
         // {
