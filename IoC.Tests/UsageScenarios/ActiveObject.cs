@@ -12,13 +12,14 @@ namespace IoC.Tests.UsageScenarios
 
     using static Lifetime;
 
-    public class ActiveObjectPattern
+    public class ActiveObject
     {
         [Fact]
         // $visible=true
         // $tag=injection
         // $priority=05
-        // $description=Active Object Pattern
+        // $description=Active Object
+        // $header=In [object-oriented programming](https://en.wikipedia.org/wiki/Object-oriented_programming) an object is active when its state depends on clock. Usually an active object encapsulates a task that updates the object's state.
         // {
         public void Run()
         {

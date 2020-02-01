@@ -268,7 +268,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Property Injection](#property-injection-)
   - [Constructor Autowiring](#constructor-autowiring-)
   - [Containers Injection](#containers-injection-)
-  - [Active Object Pattern](#active-object-pattern-)
+  - [Active Object](#active-object-)
   - [Resolve all appropriate instances as Array](#resolve-all-appropriate-instances-as-array-)
   - [Resolve all appropriate instances as ICollection](#resolve-all-appropriate-instances-as-icollection-)
   - [Resolve all appropriate instances as IEnumerable](#resolve-all-appropriate-instances-as-ienumerable-)
@@ -1722,9 +1722,9 @@ public class MyClass
 
 
 
-### Active Object Pattern [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ActiveObjectPattern.cs)
+### Active Object [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ActiveObject.cs)
 
-
+In [object-oriented programming](https://en.wikipedia.org/wiki/Object-oriented_programming) an object is active when its state depends on clock. Usually an active object encapsulates a task that updates the object's state.
 
 ``` CSharp
 public void Run()
