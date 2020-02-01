@@ -9,6 +9,12 @@
     [PublicAPI]
     public interface IBuildContext
     {
+
+        /// <summary>
+        /// The parent build context.
+        /// </summary>
+        [CanBeNull] IBuildContext Parent { get; }
+
         /// <summary>
         /// The target key.
         /// </summary>

@@ -310,6 +310,7 @@
   - [DependencyExpression](#P-IoC-IBuildContext-DependencyExpression 'IoC.IBuildContext.DependencyExpression')
   - [Depth](#P-IoC-IBuildContext-Depth 'IoC.IBuildContext.Depth')
   - [Key](#P-IoC-IBuildContext-Key 'IoC.IBuildContext.Key')
+  - [Parent](#P-IoC-IBuildContext-Parent 'IoC.IBuildContext.Parent')
   - [AddLifetime(baseExpression,lifetime)](#M-IoC-IBuildContext-AddLifetime-System-Linq-Expressions-Expression,IoC-ILifetime- 'IoC.IBuildContext.AddLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)')
   - [BindTypes(type,targetType)](#M-IoC-IBuildContext-BindTypes-System-Type,System-Type- 'IoC.IBuildContext.BindTypes(System.Type,System.Type)')
   - [CreateChild(key,container)](#M-IoC-IBuildContext-CreateChild-IoC-Key,IoC-IContainer- 'IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)')
@@ -7515,6 +7516,13 @@ The depth of current context.
 ##### Summary
 
 The target key.
+
+<a name='P-IoC-IBuildContext-Parent'></a>
+### Parent `property`
+
+##### Summary
+
+The parent build context.
 
 <a name='M-IoC-IBuildContext-AddLifetime-System-Linq-Expressions-Expression,IoC-ILifetime-'></a>
 ### AddLifetime(baseExpression,lifetime) `method`

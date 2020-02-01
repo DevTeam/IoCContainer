@@ -4894,6 +4894,11 @@
             Represents the abstraction for build context.
             </summary>
         </member>
+        <member name="P:IoC.IBuildContext.Parent">
+            <summary>
+            The parent build context.
+            </summary>
+        </member>
         <member name="P:IoC.IBuildContext.Key">
             <summary>
             The target key.

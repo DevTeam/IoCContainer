@@ -50,7 +50,7 @@
                 throw new ObjectDisposedException(nameof(DependencyEntry));
             }
 
-            var buildContext = new BuildContext(key, resolvingContainer, registrationTracker.Builders, registrationTracker.AutowiringStrategy);
+            var buildContext = new BuildContext(null, key, resolvingContainer, registrationTracker.Builders, registrationTracker.AutowiringStrategy);
             var lifetime = GetLifetime(key.Type);
             if (!Dependency.TryBuildExpression(buildContext, lifetime, out var expression, out error))
             {

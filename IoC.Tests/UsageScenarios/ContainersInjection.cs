@@ -21,8 +21,7 @@ namespace IoC.Tests.UsageScenarios
             // Create the parent container
             using var currentContainer = Container
                 .Create("root")
-                .Bind<MyClass>()
-                .To<MyClass>()
+                .Bind<MyClass>().To<MyClass>()
                 .Container;
 
             var instance = currentContainer.Resolve<MyClass>();

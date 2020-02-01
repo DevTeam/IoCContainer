@@ -7224,6 +7224,12 @@ namespace IoC
     [PublicAPI]
     public interface IBuildContext
     {
+
+        /// <summary>
+        /// The parent build context.
+        /// </summary>
+        [CanBeNull] IBuildContext Parent { get; }
+
         /// <summary>
         /// The target key.
         /// </summary>
@@ -9868,6 +9874,7 @@ namespace IoC.Core
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Text;
     using Issues;
 
     /// <summary>
@@ -9882,18 +9889,22 @@ namespace IoC.Core
         private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
 
         internal BuildContext(
+            [CanBeNull] IBuildContext parent,
             Key key,
             [NotNull] IContainer resolvingContainer,
             [NotNull] IEnumerable<IBuilder> builders,
             [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
             int depth = 0)
         {
+            Parent = parent;
             Key = key;
             Container = resolvingContainer ?? throw new ArgumentNullException(nameof(resolvingContainer));
             _builders = builders ?? throw new ArgumentNullException(nameof(builders));
             AutowiringStrategy = defaultAutowiringStrategy ?? throw new ArgumentNullException(nameof(defaultAutowiringStrategy));
             Depth = depth;
         }
+
+        public IBuildContext Parent { get; }
 
         public Key Key { get; }
 
@@ -9941,7 +9952,7 @@ namespace IoC.Core
                 key = new Key(type, key.Tag);
             }
 
-            return new BuildContext(key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
+            return new BuildContext(this, key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
         }
 
         public Expression DependencyExpression
@@ -9958,7 +9969,7 @@ namespace IoC.Core
                     }
                     catch (Exception ex)
                     {
-                        throw new BuildExpressionException(ex.Message, ex.InnerException);
+                        throw new BuildExpressionException($"{ex.Message}\n{this}", ex.InnerException);
                     }
                 }
 
@@ -9981,6 +9992,25 @@ namespace IoC.Core
                     throw error;
                 }
             }
+        }
+
+        public override string ToString()
+        {
+            var path = new List<IBuildContext>();
+            IBuildContext context = this;
+            while (context != null)
+            {
+                path.Add(context);
+                context = context.Parent;
+            }
+
+            var text = new StringBuilder();
+            for (var i = path.Count - 1; i >= 0; i--)
+            {
+                text.AppendLine($"{new string(' ', path[i].Depth << 1)} building {path[i].Key} in {path[i].Container}");
+            }
+
+            return text.ToString();
         }
     }
 }
@@ -10613,7 +10643,7 @@ namespace IoC.Core
                 throw new ObjectDisposedException(nameof(DependencyEntry));
             }
 
-            var buildContext = new BuildContext(key, resolvingContainer, registrationTracker.Builders, registrationTracker.AutowiringStrategy);
+            var buildContext = new BuildContext(null, key, resolvingContainer, registrationTracker.Builders, registrationTracker.AutowiringStrategy);
             var lifetime = GetLifetime(key.Type);
             if (!Dependency.TryBuildExpression(buildContext, lifetime, out var expression, out error))
             {

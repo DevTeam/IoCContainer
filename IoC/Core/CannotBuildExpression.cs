@@ -14,7 +14,7 @@
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
-            throw new InvalidOperationException($"Cannot build expression for the key {buildContext.Key} in the container {buildContext.Container}.", error);
+            throw new InvalidOperationException($"Cannot build expression for the key {buildContext.Key} in the container {buildContext.Container}.\n{buildContext}", error);
         }
     }
 }
