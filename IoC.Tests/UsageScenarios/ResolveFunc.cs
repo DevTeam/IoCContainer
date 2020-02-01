@@ -15,7 +15,7 @@
             // $tag=injection
             // $priority=01
             // $description=Resolve Func
-            // $header=_Func_ dependency helps when a logic requires to inject some number of type's instances on demand.
+            // $header=_Func_ dependency helps when a logic needs to inject some number of type instances on demand.
             // {
             // Create and configure the container
             // Create and configure the container

@@ -15,7 +15,7 @@ namespace IoC.Tests.UsageScenarios
         // $tag=customization
         // $priority=00
         // $description=Replace Lifetime
-        // $header=Is it possible to replace default lifetimes by your own. The sample below shows how to count the number of attempts to resolve singleton instances.
+        // $header=Is it possible to replace default lifetimes by your own. The sample below shows how to count the number of attempts to resolve [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instances.
         // {
         public void Run()
         {

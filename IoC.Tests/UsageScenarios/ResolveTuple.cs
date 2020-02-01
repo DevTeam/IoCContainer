@@ -15,6 +15,7 @@
             // $tag=injection
             // $priority=02
             // $description=Resolve Tuple
+            // $header=[Tuple](https://docs.microsoft.com/en-us/dotnet/api/system.tuple) has a specific number and sequence of elements which may be resolved from the box.
             // {
             // Create and configure the container
             using var container = Container

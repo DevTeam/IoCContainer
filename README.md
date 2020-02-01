@@ -657,7 +657,7 @@ var instance = container.Resolve<IService>();
 
 ### Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SingletonLifetime.cs)
 
-Singleton is a design pattern which stands for having only one instance of some class during the whole application lifetime. The main complaint about Singleton is that it contradicts the Dependency Injection principle and thus hinders testability. It essentially acts as a global constant, and it is hard to substitute it with a test when needed. The _Singleton lifetime_ is indispensable in this case.
+[Singleton](https://en.wikipedia.org/wiki/Singleton_pattern) is a design pattern which stands for having only one instance of some class during the whole application lifetime. The main complaint about Singleton is that it contradicts the Dependency Injection principle and thus hinders testability. It essentially acts as a global constant, and it is hard to substitute it with a test when needed. The _Singleton lifetime_ is indispensable in this case.
 
 ``` CSharp
 // Create and configure the container
@@ -690,7 +690,7 @@ parentInstance1.ShouldBe(childInstance1);
 ```
 
 The lifetime could be:
-- _Singleton_ - single instance
+- [_Singleton_](https://en.wikipedia.org/wiki/Singleton_pattern) - single instance
 - _ContainerSingleton_ - singleton per container
 - _ScopeSingleton_ - singleton per scope
 
@@ -762,7 +762,7 @@ parentInstance1.ShouldNotBe(childInstance1);
 
 ### Scope Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ScopeSingletonLifetime.cs)
 
-Each scope has its own singleton instance for specific binding. Scopes can be created, activated and deactivated. Scope can be injected like other registered container instances.
+Each scope has its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding. Scopes can be created, activated and deactivated. Scope can be injected like other registered container instances.
 
 ``` CSharp
 // Create and configure the container
@@ -833,7 +833,7 @@ using (container.Bind<IService>().As(Transient).To<Service>())
 
 ### Thread Singleton Lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ThreadSingletonLifetime.cs)
 
-Sometimes it is useful to have the singleton per a thread lifetime (or more generally a singleton per something else). There is no special "lifetime" type in this framework to achieve this requirement, but it is quite easy create your own "lifetime" type for that.
+Sometimes it is useful to have the [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) per a thread lifetime (or more generally a singleton per something else). There is no special "lifetime" type in this framework to achieve this requirement, but it is quite easy create your own "lifetime" type for that using base type [_KeyBasedLifetime<>_](IoCContainer/blob/master/IoC/Lifetimes/KeyBasedLifetime.cs).
 
 ``` CSharp
 public void Run()
@@ -897,7 +897,7 @@ public class ThreadLifetime : KeyBasedLifetime<int>
 
 
 
-### Manual Wiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ManualAutowiring.cs)
+### Manual Wiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ManualWiring.cs)
 
 In the case when the full control of creating an instance is required it is possible to do it in simple way without any performance impact.
 
@@ -925,7 +925,7 @@ instance.Name.ShouldBe("some name");
 
 ```
 
-
+It's important to note that injection is possible by several ways in the sample above. **The first one** is an expressions like `ctx.Container.Inject<IDependency>()`. It uses the injection context `ctx` to access to the current (or other parents) container and method `Inject` to inject a dependency. But actually this method has no implementation, it ust a marker and it every such method wil be replaced by expression which creates dependency in place without any additional invocations. **Another one way** is to use an expressions like `ctx.Resolve<IDependency>()`. It will access a container each time to resolve a dependency. That is, each time it will look for the necessary binding in the container and call the method to create an instance of the dependency type. **In summary: wherever possible, use the first approach like `ctx.Container.Inject<IDependency>()`.**
 
 ### Struct [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Struct.cs)
 
@@ -1034,7 +1034,7 @@ otherInstance.Name.ShouldBe("beta");
 
 ### Auto dispose a singleton during owning container's dispose [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoDisposeSingletonDuringContainersDispose.cs)
 
-Singleton instance it's a very special instance. If it implements the _IDisposable_ (or IAsyncDisposable) interface the _Sigleton_ lifetime take care about disposing this instance after disposing of the owning container (where this type was registered) or if after the binding cancelation.
+A [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance it's a very special instance. If it implements the _IDisposable_ (or IAsyncDisposable) interface the _Sigleton_ lifetime take care about disposing this instance after disposing of the owning container (where this type was registered) or if after the binding cancelation.
 
 ``` CSharp
 var disposableService = new Mock<IDisposableService>();
@@ -1245,7 +1245,7 @@ Also you can specify your own aspect oriented autowiring by implementing the int
 
 ### Custom Builder [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomBuilder.cs)
 
-The sample below shows how to use this extension point _IBuilder_ to rewrite the expression tree of creation any instances to check constructor arguments on null. It is possible to create other own builders to make any manipulation on expression tree before they will be compiled into factories for the instances creation. Any logic any automation - checking arguments, logging, thread safety, authorization aspects and etc.
+The sample below shows how to use this extension point [_IBuilder_](IoCContainer/blob/master/IoC/IBuilder.cs) to rewrite the expression tree of creation any instances to check constructor arguments on null. It is possible to create other own builders to make any manipulation on expression tree before they will be compiled into factories for the instances creation. Any logic any automation - checking arguments, logging, thread safety, authorization aspects and etc.
 
 ``` CSharp
 public void Run()
@@ -1327,7 +1327,7 @@ public class MyContainer: IContainer
 
 ### Custom Lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomLifetime.cs)
 
-Custom lifetimes allow to implement your own logic controlling every aspects of resolved instances. Also you could use the class _KeyBasedLifetime_ as a base for others.
+Custom lifetimes allow to implement your own logic controlling every aspects of resolved instances. Also you could use the class [_KeyBasedLifetime<>_](IoCContainer/blob/master/IoC/Lifetimes/KeyBasedLifetime.cs) as a base for others.
 
 ``` CSharp
 public void Run()
@@ -1422,7 +1422,7 @@ public class MyInterceptor : IInterceptor
 
 ### Replace Lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ReplaceLifetime.cs)
 
-Is it possible to replace default lifetimes by your own. The sample below shows how to count the number of attempts to resolve singleton instances.
+Is it possible to replace default lifetimes by your own. The sample below shows how to count the number of attempts to resolve [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instances.
 
 ``` CSharp
 public void Run()
@@ -1578,7 +1578,7 @@ using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
 
 ### Resolve Func [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveFunc.cs)
 
-_Func_ dependency helps when a logic requires to inject some number of type's instances on demand.
+_Func_ dependency helps when a logic needs to inject some number of type instances on demand.
 
 ``` CSharp
 // Create and configure the container
@@ -1601,7 +1601,7 @@ var instance2 = factory();
 
 ### Resolve Lazy [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveLazy.cs)
 
-_Lazy_ dependency helps when a logic requires to inject some _lazy proxy_ to get instance once on demand.
+_Lazy_ dependency helps when a logic needs to inject some _lazy proxy_ to get instance once on demand.
 
 ``` CSharp
 // Create and configure the container
@@ -1643,7 +1643,7 @@ var instance = lazy.Value;
 
 ### Resolve Tuple [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveTuple.cs)
 
-
+[Tuple](https://docs.microsoft.com/en-us/dotnet/api/system.tuple) has a specific number and sequence of elements which may be resolved from the box.
 
 ``` CSharp
 // Create and configure the container
