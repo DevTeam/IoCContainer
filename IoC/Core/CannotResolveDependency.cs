@@ -9,10 +9,10 @@
 
         private CannotResolveDependency() { }
 
-        public DependencyDescription Resolve(IContainer container, Key key)
+        public DependencyDescription Resolve(IBuildContext buildContext)
         {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            throw new InvalidOperationException($"Cannot find the dependency for the key {key} in the container {container}.");
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            throw new InvalidOperationException($"Cannot find the dependency for the key {buildContext.Key} in the container {buildContext.Container}.\n{buildContext}");
         }
     }
 }

@@ -4894,6 +4894,11 @@
             Represents the abstraction for build context.
             </summary>
         </member>
+        <member name="P:IoC.IBuildContext.Parent">
+            <summary>
+            The parent build context.
+            </summary>
+        </member>
         <member name="P:IoC.IBuildContext.Key">
             <summary>
             The target key.
@@ -5227,18 +5232,6 @@
             <param name="error">The error.</param>
             <returns>The resulting expression.</returns>
         </member>
-        <member name="T:IoC.Issues.ICannotGetGenericTypeArguments">
-            <summary>
-            Resolves the scenario when cannot extract generic type arguments.
-            </summary>
-        </member>
-        <member name="M:IoC.Issues.ICannotGetGenericTypeArguments.Resolve(System.Type)">
-            <summary>
-            Resolves the scenario when cannot extract generic type arguments.
-            </summary>
-            <param name="type">The instance type.</param>
-            <returns>The extracted generic type arguments.</returns>
-        </member>
         <member name="T:IoC.Issues.ICannotGetResolver">
             <summary>
             Resolves the scenario when cannot get a resolver.
@@ -5317,10 +5310,11 @@
             Resolves the scenario when cannot resolve a constructor.
             </summary>
         </member>
-        <member name="M:IoC.Issues.ICannotResolveConstructor.Resolve(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})">
+        <member name="M:IoC.Issues.ICannotResolveConstructor.Resolve(IoC.IBuildContext,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})">
             <summary>
             Resolves the scenario when cannot resolve a constructor.
             </summary>
+            <param name="buildContext">The build context.</param>
             <param name="constructors">Available constructors.</param>
             <returns>The constructor.</returns>
         </member>
@@ -5329,12 +5323,11 @@
             Resolves issue with unknown dependency.
             </summary>
         </member>
-        <member name="M:IoC.Issues.ICannotResolveDependency.Resolve(IoC.IContainer,IoC.Key)">
+        <member name="M:IoC.Issues.ICannotResolveDependency.Resolve(IoC.IBuildContext)">
             <summary>
             Resolves the scenario when the dependency was not found.
             </summary>
-            <param name="container">The resolving container.</param>
-            <param name="key">The resolving key.</param>
+            <param name="buildContext">The build context.</param>
             <returns>The pair of the dependency and of the lifetime.</returns>
         </member>
         <member name="T:IoC.Issues.ICannotResolveType">
@@ -5342,10 +5335,11 @@
             Resolves the scenario when cannot resolve the instance type.
             </summary>
         </member>
-        <member name="M:IoC.Issues.ICannotResolveType.Resolve(System.Type,System.Type)">
+        <member name="M:IoC.Issues.ICannotResolveType.Resolve(IoC.IBuildContext,System.Type,System.Type)">
             <summary>
             Resolves the scenario when cannot resolve the instance type.
             </summary>
+            <param name="buildContext">The build context.</param>
             <param name="registeredType">Registered type.</param>
             <param name="resolvingType">Resolving type.</param>
             <returns>The type to create an instance.</returns>
@@ -5355,12 +5349,11 @@
             Resolves the scenario when a cyclic dependency was detected.
             </summary>
         </member>
-        <member name="M:IoC.Issues.IFoundCyclicDependency.Resolve(IoC.Key,System.Int32)">
+        <member name="M:IoC.Issues.IFoundCyclicDependency.Resolve(IoC.IBuildContext)">
             <summary>
             Resolves the scenario when a cyclic dependency was detected.
             </summary>
-            <param name="key">The resolving key.</param>
-            <param name="reentrancy">The level of reentrancy.</param>
+            <param name="buildContext">The build context.</param>
         </member>
         <member name="T:IoC.IToken">
             <summary>

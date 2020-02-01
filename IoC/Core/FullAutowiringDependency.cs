@@ -106,7 +106,7 @@
                 if (!autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
                 {
                     instanceType = _hasGenericParamsWithConstraints
-                        ? GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<ICannotResolveType>().Resolve(_type, buildContext.Key.Type)
+                        ? GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<ICannotResolveType>().Resolve(buildContext, _type, buildContext.Key.Type)
                         : _type;
                 }
 
@@ -136,7 +136,7 @@
                 {
                     if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
                     {
-                        ctor = buildContext.Container.Resolve<ICannotResolveConstructor>().Resolve(defaultConstructors);
+                        ctor = buildContext.Container.Resolve<ICannotResolveConstructor>().Resolve(buildContext, defaultConstructors);
                     }
                 }
 

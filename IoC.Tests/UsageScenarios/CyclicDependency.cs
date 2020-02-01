@@ -22,7 +22,7 @@ namespace IoC.Tests.UsageScenarios
             var expectedException = new InvalidOperationException("error");
             var foundCyclicDependency = new Mock<IFoundCyclicDependency>();
             // Throws the exception for reentrancy 128
-            foundCyclicDependency.Setup(i => i.Resolve(It.IsAny<Key>(), 128)).Throws(expectedException);
+            foundCyclicDependency.Setup(i => i.Resolve(It.Is<IBuildContext>(ctx => ctx.Depth == 128))).Throws(expectedException);
 
             // Create the container
             using var container = Container

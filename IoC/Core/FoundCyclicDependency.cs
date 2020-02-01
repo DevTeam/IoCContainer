@@ -9,12 +9,13 @@
 
         private FoundCyclicDependency() { }
 
-        public void Resolve(Key key, int reentrancy)
+        public void Resolve(IBuildContext buildContext)
         {
-            if (reentrancy <= 0) throw new ArgumentOutOfRangeException(nameof(reentrancy));
-            if (reentrancy >= 256)
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+
+            if (buildContext.Depth >= 256)
             {
-                throw new InvalidOperationException($"The cyclic dependency detected resolving the dependency {key}. The reentrancy is {reentrancy}.");
+                throw new InvalidOperationException($"The cyclic dependency detected resolving the dependency {buildContext.Key}. The reentrancy is {buildContext.Depth}.\n{buildContext}");
             }
         }
     }

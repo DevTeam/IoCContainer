@@ -23,7 +23,6 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => FoundCyclicDependency.Shared);
             yield return container.Register(ctx => CannotBuildExpression.Shared);
-            yield return container.Register(ctx => CannotGetGenericTypeArguments.Shared);
             yield return container.Register(ctx => CannotGetResolver.Shared);
             yield return container.Register(ctx => CannotParseLifetime.Shared);
             yield return container.Register(ctx => CannotParseTag.Shared);

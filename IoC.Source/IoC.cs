@@ -8290,7 +8290,6 @@ namespace IoC.Features
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => FoundCyclicDependency.Shared);
             yield return container.Register(ctx => CannotBuildExpression.Shared);
-            yield return container.Register(ctx => CannotGetGenericTypeArguments.Shared);
             yield return container.Register(ctx => CannotGetResolver.Shared);
             yield return container.Register(ctx => CannotParseLifetime.Shared);
             yield return container.Register(ctx => CannotParseTag.Shared);
@@ -9105,29 +9104,6 @@ namespace IoC.Issues
 
 
 #endregion
-#region ICannotGetGenericTypeArguments
-
-namespace IoC.Issues
-{
-    using System;
-
-    /// <summary>
-    /// Resolves the scenario when cannot extract generic type arguments.
-    /// </summary>
-    [PublicAPI]
-    public interface ICannotGetGenericTypeArguments
-    {
-        /// <summary>
-        /// Resolves the scenario when cannot extract generic type arguments.
-        /// </summary>
-        /// <param name="type">The instance type.</param>
-        /// <returns>The extracted generic type arguments.</returns>
-        [NotNull] [ItemNotNull] Type[] Resolve([NotNull] Type type);
-    }
-}
-
-
-#endregion
 #region ICannotGetResolver
 
 namespace IoC.Issues
@@ -9266,9 +9242,10 @@ namespace IoC.Issues
         /// <summary>
         /// Resolves the scenario when cannot resolve a constructor.
         /// </summary>
+        /// <param name="buildContext">The build context.</param>
         /// <param name="constructors">Available constructors.</param>
         /// <returns>The constructor.</returns>
-        [NotNull] IMethod<ConstructorInfo> Resolve([NotNull] IEnumerable<IMethod<ConstructorInfo>> constructors);
+        [NotNull] IMethod<ConstructorInfo> Resolve(IBuildContext buildContext, [NotNull] IEnumerable<IMethod<ConstructorInfo>> constructors);
     }
 }
 
@@ -9287,10 +9264,9 @@ namespace IoC.Issues
         /// <summary>
         /// Resolves the scenario when the dependency was not found.
         /// </summary>
-        /// <param name="container">The resolving container.</param>
-        /// <param name="key">The resolving key.</param>
+        /// <param name="buildContext">The build context.</param>
         /// <returns>The pair of the dependency and of the lifetime.</returns>
-        DependencyDescription Resolve([NotNull] IContainer container, Key key);
+        DependencyDescription Resolve([NotNull] IBuildContext buildContext);
     }
 }
 
@@ -9311,10 +9287,11 @@ namespace IoC.Issues
         /// <summary>
         /// Resolves the scenario when cannot resolve the instance type.
         /// </summary>
+        /// <param name="buildContext">The build context.</param>
         /// <param name="registeredType">Registered type.</param>
         /// <param name="resolvingType">Resolving type.</param>
         /// <returns>The type to create an instance.</returns>
-        Type Resolve([NotNull] Type registeredType, [NotNull] Type resolvingType);
+        Type Resolve(IBuildContext buildContext, [NotNull] Type registeredType, [NotNull] Type resolvingType);
     }
 }
 
@@ -9333,9 +9310,8 @@ namespace IoC.Issues
         /// <summary>
         /// Resolves the scenario when a cyclic dependency was detected.
         /// </summary>
-        /// <param name="key">The resolving key.</param>
-        /// <param name="reentrancy">The level of reentrancy.</param>
-        void Resolve(Key key, int reentrancy);
+        /// <param name="buildContext">The build context.</param>
+        void Resolve([NotNull] IBuildContext buildContext);
     }
 }
 
@@ -9963,19 +9939,19 @@ namespace IoC.Core
                 {
                     try
                     {
-                        var dependencyDescription = Container.Resolve<ICannotResolveDependency>().Resolve(Container, Key);
+                        var dependencyDescription = Container.Resolve<ICannotResolveDependency>().Resolve(this);
                         dependency = dependencyDescription.Dependency;
                         lifetime = dependencyDescription.Lifetime;
                     }
                     catch (Exception ex)
                     {
-                        throw new BuildExpressionException($"{ex.Message}\n{this}", ex.InnerException);
+                        throw new BuildExpressionException(ex.Message, ex.InnerException);
                     }
                 }
 
                 if (Depth >= 128)
                 {
-                    Container.Resolve<IFoundCyclicDependency>().Resolve(Key, Depth);
+                    Container.Resolve<IFoundCyclicDependency>().Resolve(this);
                 }
 
                 if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
@@ -9983,14 +9959,7 @@ namespace IoC.Core
                     return expression;
                 }
 
-                try
-                {
-                    return Container.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
-                }
-                catch (Exception)
-                {
-                    throw error;
-                }
+                return Container.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
             }
         }
 
@@ -10054,29 +10023,7 @@ namespace IoC.Core
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
-            throw new InvalidOperationException($"Cannot build expression for the key {buildContext.Key} in the container {buildContext.Container}.", error);
-        }
-    }
-}
-
-#endregion
-#region CannotGetGenericTypeArguments
-
-namespace IoC.Core
-{
-    using System;
-    using Issues;
-
-    internal class CannotGetGenericTypeArguments : ICannotGetGenericTypeArguments
-    {
-        public static readonly ICannotGetGenericTypeArguments Shared = new CannotGetGenericTypeArguments();
-
-        private CannotGetGenericTypeArguments() { }
-
-        public Type[] Resolve(Type type)
-        {
-            if (type == null) throw new ArgumentNullException(nameof(type));
-            throw new InvalidOperationException($"Cannot get generic type arguments from the type {type.Name}.");
+            throw new InvalidOperationException($"Cannot build expression for the key {buildContext.Key} in the container {buildContext.Container}.\n{buildContext}", error);
         }
     }
 }
@@ -10202,11 +10149,11 @@ namespace IoC.Core
 
         private CannotResolveConstructor() { }
 
-        public IMethod<ConstructorInfo> Resolve(IEnumerable<IMethod<ConstructorInfo>> constructors)
+        public IMethod<ConstructorInfo> Resolve(IBuildContext buildContext, IEnumerable<IMethod<ConstructorInfo>> constructors)
         {
             if (constructors == null) throw new ArgumentNullException(nameof(constructors));
             var type = constructors.Single().Info.DeclaringType;
-            throw new InvalidOperationException($"Cannot find a constructor for the type {type}.");
+            throw new InvalidOperationException($"Cannot find a constructor for the type {type}.\n{buildContext}");
         }
     }
 }
@@ -10225,10 +10172,10 @@ namespace IoC.Core
 
         private CannotResolveDependency() { }
 
-        public DependencyDescription Resolve(IContainer container, Key key)
+        public DependencyDescription Resolve(IBuildContext buildContext)
         {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            throw new InvalidOperationException($"Cannot find the dependency for the key {key} in the container {container}.");
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            throw new InvalidOperationException($"Cannot find the dependency for the key {buildContext.Key} in the container {buildContext.Container}.\n{buildContext}");
         }
     }
 }
@@ -10247,11 +10194,11 @@ namespace IoC.Core
 
         private CannotResolveType() { }
 
-        public Type Resolve(Type registeredType, Type resolvingType)
+        public Type Resolve(IBuildContext buildContext, Type registeredType, Type resolvingType)
         {
             if (registeredType == null) throw new ArgumentNullException(nameof(registeredType));
             if (resolvingType == null) throw new ArgumentNullException(nameof(resolvingType));
-            throw new InvalidOperationException($"Cannot resolve instance type based on the registered type {registeredType} for resolving type {registeredType}.");
+            throw new InvalidOperationException($"Cannot resolve instance type based on the registered type {registeredType} for resolving type {registeredType}.\n{buildContext}");
         }
     }
 }
@@ -11449,12 +11396,13 @@ namespace IoC.Core
 
         private FoundCyclicDependency() { }
 
-        public void Resolve(Key key, int reentrancy)
+        public void Resolve(IBuildContext buildContext)
         {
-            if (reentrancy <= 0) throw new ArgumentOutOfRangeException(nameof(reentrancy));
-            if (reentrancy >= 256)
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+
+            if (buildContext.Depth >= 256)
             {
-                throw new InvalidOperationException($"The cyclic dependency detected resolving the dependency {key}. The reentrancy is {reentrancy}.");
+                throw new InvalidOperationException($"The cyclic dependency detected resolving the dependency {buildContext.Key}. The reentrancy is {buildContext.Depth}.\n{buildContext}");
             }
         }
     }
@@ -11571,7 +11519,7 @@ namespace IoC.Core
                 if (!autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
                 {
                     instanceType = _hasGenericParamsWithConstraints
-                        ? GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<ICannotResolveType>().Resolve(_type, buildContext.Key.Type)
+                        ? GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<ICannotResolveType>().Resolve(buildContext, _type, buildContext.Key.Type)
                         : _type;
                 }
 
@@ -11601,7 +11549,7 @@ namespace IoC.Core
                 {
                     if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
                     {
-                        ctor = buildContext.Container.Resolve<ICannotResolveConstructor>().Resolve(defaultConstructors);
+                        ctor = buildContext.Container.Resolve<ICannotResolveConstructor>().Resolve(buildContext, defaultConstructors);
                     }
                 }
 

@@ -321,8 +321,6 @@
   - [Build(context,bodyExpression)](#M-IoC-IBuilder-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.IBuilder.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
 - [ICannotBuildExpression](#T-IoC-Issues-ICannotBuildExpression 'IoC.Issues.ICannotBuildExpression')
   - [Resolve(buildContext,dependency,lifetime,error)](#M-IoC-Issues-ICannotBuildExpression-Resolve-IoC-IBuildContext,IoC-IDependency,IoC-ILifetime,System-Exception- 'IoC.Issues.ICannotBuildExpression.Resolve(IoC.IBuildContext,IoC.IDependency,IoC.ILifetime,System.Exception)')
-- [ICannotGetGenericTypeArguments](#T-IoC-Issues-ICannotGetGenericTypeArguments 'IoC.Issues.ICannotGetGenericTypeArguments')
-  - [Resolve(type)](#M-IoC-Issues-ICannotGetGenericTypeArguments-Resolve-System-Type- 'IoC.Issues.ICannotGetGenericTypeArguments.Resolve(System.Type)')
 - [ICannotGetResolver](#T-IoC-Issues-ICannotGetResolver 'IoC.Issues.ICannotGetResolver')
   - [Resolve\`\`1(container,key,error)](#M-IoC-Issues-ICannotGetResolver-Resolve``1-IoC-IContainer,IoC-Key,System-Exception- 'IoC.Issues.ICannotGetResolver.Resolve``1(IoC.IContainer,IoC.Key,System.Exception)')
 - [ICannotParseLifetime](#T-IoC-Issues-ICannotParseLifetime 'IoC.Issues.ICannotParseLifetime')
@@ -334,11 +332,11 @@
 - [ICannotRegister](#T-IoC-Issues-ICannotRegister 'IoC.Issues.ICannotRegister')
   - [Resolve(container,keys)](#M-IoC-Issues-ICannotRegister-Resolve-IoC-IContainer,IoC-Key[]- 'IoC.Issues.ICannotRegister.Resolve(IoC.IContainer,IoC.Key[])')
 - [ICannotResolveConstructor](#T-IoC-Issues-ICannotResolveConstructor 'IoC.Issues.ICannotResolveConstructor')
-  - [Resolve(constructors)](#M-IoC-Issues-ICannotResolveConstructor-Resolve-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}}- 'IoC.Issues.ICannotResolveConstructor.Resolve(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})')
+  - [Resolve(buildContext,constructors)](#M-IoC-Issues-ICannotResolveConstructor-Resolve-IoC-IBuildContext,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}}- 'IoC.Issues.ICannotResolveConstructor.Resolve(IoC.IBuildContext,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})')
 - [ICannotResolveDependency](#T-IoC-Issues-ICannotResolveDependency 'IoC.Issues.ICannotResolveDependency')
-  - [Resolve(container,key)](#M-IoC-Issues-ICannotResolveDependency-Resolve-IoC-IContainer,IoC-Key- 'IoC.Issues.ICannotResolveDependency.Resolve(IoC.IContainer,IoC.Key)')
+  - [Resolve(buildContext)](#M-IoC-Issues-ICannotResolveDependency-Resolve-IoC-IBuildContext- 'IoC.Issues.ICannotResolveDependency.Resolve(IoC.IBuildContext)')
 - [ICannotResolveType](#T-IoC-Issues-ICannotResolveType 'IoC.Issues.ICannotResolveType')
-  - [Resolve(registeredType,resolvingType)](#M-IoC-Issues-ICannotResolveType-Resolve-System-Type,System-Type- 'IoC.Issues.ICannotResolveType.Resolve(System.Type,System.Type)')
+  - [Resolve(buildContext,registeredType,resolvingType)](#M-IoC-Issues-ICannotResolveType-Resolve-IoC-IBuildContext,System-Type,System-Type- 'IoC.Issues.ICannotResolveType.Resolve(IoC.IBuildContext,System.Type,System.Type)')
 - [ICompiler](#T-IoC-ICompiler 'IoC.ICompiler')
   - [TryCompile(context,expression,resolver)](#M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@- 'IoC.ICompiler.TryCompile(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,System.Delegate@)')
 - [IConfiguration](#T-IoC-IConfiguration 'IoC.IConfiguration')
@@ -353,7 +351,7 @@
 - [IExpressionBuilder\`1](#T-IoC-Core-IExpressionBuilder`1 'IoC.Core.IExpressionBuilder`1')
   - [Build(bodyExpression,buildContext,context)](#M-IoC-Core-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-IBuildContext,`0- 'IoC.Core.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext,`0)')
 - [IFoundCyclicDependency](#T-IoC-Issues-IFoundCyclicDependency 'IoC.Issues.IFoundCyclicDependency')
-  - [Resolve(key,reentrancy)](#M-IoC-Issues-IFoundCyclicDependency-Resolve-IoC-Key,System-Int32- 'IoC.Issues.IFoundCyclicDependency.Resolve(IoC.Key,System.Int32)')
+  - [Resolve(buildContext)](#M-IoC-Issues-IFoundCyclicDependency-Resolve-IoC-IBuildContext- 'IoC.Issues.IFoundCyclicDependency.Resolve(IoC.IBuildContext)')
 - [IHolder\`1](#T-IoC-IHolder`1 'IoC.IHolder`1')
   - [Instance](#P-IoC-IHolder`1-Instance 'IoC.IHolder`1.Instance')
 - [ILifetime](#T-IoC-ILifetime 'IoC.ILifetime')
@@ -7687,34 +7685,6 @@ The resulting expression.
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The lifetime. |
 | error | [System.Exception](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception 'System.Exception') | The error. |
 
-<a name='T-IoC-Issues-ICannotGetGenericTypeArguments'></a>
-## ICannotGetGenericTypeArguments `type`
-
-##### Namespace
-
-IoC.Issues
-
-##### Summary
-
-Resolves the scenario when cannot extract generic type arguments.
-
-<a name='M-IoC-Issues-ICannotGetGenericTypeArguments-Resolve-System-Type-'></a>
-### Resolve(type) `method`
-
-##### Summary
-
-Resolves the scenario when cannot extract generic type arguments.
-
-##### Returns
-
-The extracted generic type arguments.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The instance type. |
-
 <a name='T-IoC-Issues-ICannotGetResolver'></a>
 ## ICannotGetResolver `type`
 
@@ -7884,8 +7854,8 @@ IoC.Issues
 
 Resolves the scenario when cannot resolve a constructor.
 
-<a name='M-IoC-Issues-ICannotResolveConstructor-Resolve-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}}-'></a>
-### Resolve(constructors) `method`
+<a name='M-IoC-Issues-ICannotResolveConstructor-Resolve-IoC-IBuildContext,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}}-'></a>
+### Resolve(buildContext,constructors) `method`
 
 ##### Summary
 
@@ -7899,6 +7869,7 @@ The constructor.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context. |
 | constructors | [System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}}') | Available constructors. |
 
 <a name='T-IoC-Issues-ICannotResolveDependency'></a>
@@ -7912,8 +7883,8 @@ IoC.Issues
 
 Resolves issue with unknown dependency.
 
-<a name='M-IoC-Issues-ICannotResolveDependency-Resolve-IoC-IContainer,IoC-Key-'></a>
-### Resolve(container,key) `method`
+<a name='M-IoC-Issues-ICannotResolveDependency-Resolve-IoC-IBuildContext-'></a>
+### Resolve(buildContext) `method`
 
 ##### Summary
 
@@ -7927,8 +7898,7 @@ The pair of the dependency and of the lifetime.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
-| key | [IoC.Key](#T-IoC-Key 'IoC.Key') | The resolving key. |
+| buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context. |
 
 <a name='T-IoC-Issues-ICannotResolveType'></a>
 ## ICannotResolveType `type`
@@ -7941,8 +7911,8 @@ IoC.Issues
 
 Resolves the scenario when cannot resolve the instance type.
 
-<a name='M-IoC-Issues-ICannotResolveType-Resolve-System-Type,System-Type-'></a>
-### Resolve(registeredType,resolvingType) `method`
+<a name='M-IoC-Issues-ICannotResolveType-Resolve-IoC-IBuildContext,System-Type,System-Type-'></a>
+### Resolve(buildContext,registeredType,resolvingType) `method`
 
 ##### Summary
 
@@ -7956,6 +7926,7 @@ The type to create an instance.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context. |
 | registeredType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | Registered type. |
 | resolvingType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | Resolving type. |
 
@@ -8173,8 +8144,8 @@ IoC.Issues
 
 Resolves the scenario when a cyclic dependency was detected.
 
-<a name='M-IoC-Issues-IFoundCyclicDependency-Resolve-IoC-Key,System-Int32-'></a>
-### Resolve(key,reentrancy) `method`
+<a name='M-IoC-Issues-IFoundCyclicDependency-Resolve-IoC-IBuildContext-'></a>
+### Resolve(buildContext) `method`
 
 ##### Summary
 
@@ -8184,8 +8155,7 @@ Resolves the scenario when a cyclic dependency was detected.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| key | [IoC.Key](#T-IoC-Key 'IoC.Key') | The resolving key. |
-| reentrancy | [System.Int32](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Int32 'System.Int32') | The level of reentrancy. |
+| buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context. |
 
 <a name='T-IoC-IHolder`1'></a>
 ## IHolder\`1 `type`

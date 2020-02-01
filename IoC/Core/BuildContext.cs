@@ -94,19 +94,19 @@
                 {
                     try
                     {
-                        var dependencyDescription = Container.Resolve<ICannotResolveDependency>().Resolve(Container, Key);
+                        var dependencyDescription = Container.Resolve<ICannotResolveDependency>().Resolve(this);
                         dependency = dependencyDescription.Dependency;
                         lifetime = dependencyDescription.Lifetime;
                     }
                     catch (Exception ex)
                     {
-                        throw new BuildExpressionException($"{ex.Message}\n{this}", ex.InnerException);
+                        throw new BuildExpressionException(ex.Message, ex.InnerException);
                     }
                 }
 
                 if (Depth >= 128)
                 {
-                    Container.Resolve<IFoundCyclicDependency>().Resolve(Key, Depth);
+                    Container.Resolve<IFoundCyclicDependency>().Resolve(this);
                 }
 
                 if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))

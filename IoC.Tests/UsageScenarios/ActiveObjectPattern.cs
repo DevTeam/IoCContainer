@@ -17,7 +17,7 @@ namespace IoC.Tests.UsageScenarios
         [Fact]
         // $visible=true
         // $tag=injection
-        // $priority=2
+        // $priority=05
         // $description=Active Object Pattern
         // {
         public void Run()

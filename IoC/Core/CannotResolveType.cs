@@ -9,11 +9,11 @@
 
         private CannotResolveType() { }
 
-        public Type Resolve(Type registeredType, Type resolvingType)
+        public Type Resolve(IBuildContext buildContext, Type registeredType, Type resolvingType)
         {
             if (registeredType == null) throw new ArgumentNullException(nameof(registeredType));
             if (resolvingType == null) throw new ArgumentNullException(nameof(resolvingType));
-            throw new InvalidOperationException($"Cannot resolve instance type based on the registered type {registeredType} for resolving type {registeredType}.");
+            throw new InvalidOperationException($"Cannot resolve instance type based on the registered type {registeredType} for resolving type {registeredType}.\n{buildContext}");
         }
     }
 }

@@ -268,13 +268,13 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Property Injection](#property-injection-)
   - [Constructor Autowiring](#constructor-autowiring-)
   - [Containers Injection](#containers-injection-)
+  - [Active Object Pattern](#active-object-pattern-)
   - [Resolve all appropriate instances as Array](#resolve-all-appropriate-instances-as-array-)
   - [Resolve all appropriate instances as ICollection](#resolve-all-appropriate-instances-as-icollection-)
   - [Resolve all appropriate instances as IEnumerable](#resolve-all-appropriate-instances-as-ienumerable-)
   - [Resolve all appropriate instances as IObservable source](#resolve-all-appropriate-instances-as-iobservable-source-)
   - [Resolve Using Arguments](#resolve-using-arguments-)
   - [Resolve all appropriate instances as ISet](#resolve-all-appropriate-instances-as-iset-)
-  - [Active Object Pattern](#active-object-pattern-)
 - Flexible Binding
   - [Autowiring](#autowiring-)
   - [Autowiring with initialization](#autowiring-with-initialization-)
@@ -1722,6 +1722,53 @@ public class MyClass
 
 
 
+### Active Object Pattern [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ActiveObjectPattern.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    // Create the parent container
+    var container = Container
+        .Create()
+        // This singleton instance "Activation" of type "CancellationTokenSource" was registered as singleton and it implements "IDisposable"
+        // So it will be automatically disposed during container disposing
+        // And every related "Activation" tasks will be finished automatically
+        .Bind<CancellationTokenSource>().Tag("Activation").As(Singleton).To<CancellationTokenSource>()
+        // Bind some type of Active Object
+        .Bind<IAnotherService>().Bind<IActiveObject>().To<MyActiveObject>(ctx
+            // While resolving an Active Object the method "Activate" will be invoked for each instance
+            // And a singleton instance "Activation" of type "CancellationTokenSource" is passed as an argument to deactivate every Active Objects
+            => ctx.It.Activate(ctx.Container.Inject<CancellationTokenSource>("Activation")))
+        .Container;
+
+    using (container)
+    {
+        // Resolves an Active Object
+        container.Resolve<IAnotherService>();
+    }
+
+    // Every Active Objects will be deactivated here
+}
+
+public interface IActiveObject
+{
+     void Activate(CancellationTokenSource cancellationTokenSource);
+}
+
+public class MyActiveObject: IAnotherService, IActiveObject
+{
+    public void Activate(CancellationTokenSource cancellationTokenSource)
+    {
+        // Do some actions
+        Task.Delay(TimeSpan.FromDays(1), cancellationTokenSource.Token);
+    }
+}
+```
+
+
+
 ### Resolve all appropriate instances as Array [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Array.cs)
 
 
@@ -1883,53 +1930,6 @@ instances.Count.ShouldBe(3);
 
 
 
-### Active Object Pattern [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ActiveObjectPattern.cs)
-
-
-
-``` CSharp
-public void Run()
-{
-    // Create the parent container
-    var container = Container
-        .Create()
-        // This singleton instance "Activation" of type "CancellationTokenSource" was registered as singleton and it implements "IDisposable"
-        // So it will be automatically disposed during container disposing
-        // And every related "Activation" tasks will be finished automatically
-        .Bind<CancellationTokenSource>().Tag("Activation").As(Singleton).To<CancellationTokenSource>()
-        // Bind some type of Active Object
-        .Bind<IAnotherService>().Bind<IActiveObject>().To<MyActiveObject>(ctx
-            // While resolving an Active Object the method "Activate" will be invoked for each instance
-            // And a singleton instance "Activation" of type "CancellationTokenSource" is passed as an argument to deactivate every Active Objects
-            => ctx.It.Activate(ctx.Container.Inject<CancellationTokenSource>("Activation")))
-        .Container;
-
-    using (container)
-    {
-        // Resolves an Active Object
-        container.Resolve<IAnotherService>();
-    }
-
-    // Every Active Objects will be deactivated here
-}
-
-public interface IActiveObject
-{
-     void Activate(CancellationTokenSource cancellationTokenSource);
-}
-
-public class MyActiveObject: IAnotherService, IActiveObject
-{
-    public void Activate(CancellationTokenSource cancellationTokenSource)
-    {
-        // Do some actions
-        Task.Delay(TimeSpan.FromDays(1), cancellationTokenSource.Token);
-    }
-}
-```
-
-
-
 ### Cyclic Dependency [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CyclicDependency.cs)
 
 
@@ -1940,7 +1940,7 @@ public void Run()
     var expectedException = new InvalidOperationException("error");
     var foundCyclicDependency = new Mock<IFoundCyclicDependency>();
     // Throws the exception for reentrancy 128
-    foundCyclicDependency.Setup(i => i.Resolve(It.IsAny<Key>(), 128)).Throws(expectedException);
+    foundCyclicDependency.Setup(i => i.Resolve(It.Is<IBuildContext>(ctx => ctx.Depth == 128))).Throws(expectedException);
 
     // Create the container
     using var container = Container
