@@ -13,6 +13,7 @@
             // $tag=binding
             // $priority=03
             // $description=Scope Singleton lifetime
+            // $header=Each scope has its own singleton instance for specific binding. Scopes can be created, activated and deactivated. Scope can be injected like other registered container instances.
             // {
             // Create and configure the container
             using var container = Container

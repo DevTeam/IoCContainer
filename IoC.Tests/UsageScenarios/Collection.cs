@@ -12,7 +12,7 @@
             // $visible=true
             // $tag=injection
             // $priority=05
-            // $description=Resolve all appropriate instances as ICollection
+            // $description=Resolve instances as ICollection
             // {
             // Create and configure the container
             using var container = Container

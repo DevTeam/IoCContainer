@@ -12,7 +12,8 @@
             // $visible=true
             // $tag=binding
             // $priority=06
-            // $description=Auto dispose singleton during container's dispose
+            // $description=Auto dispose a singleton during owning container's dispose
+            // $header=Singleton instance it's a very special instance. If it implements the _IDisposable_ (or IAsyncDisposable) interface the _Sigleton_ lifetime take care about disposing this instance after disposing of the owning container (where this type was registered) or if after the binding cancelation.
             // {
             var disposableService = new Mock<IDisposableService>();
 
@@ -23,12 +24,7 @@
                 .Bind<IService>().As(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object)
                 .Container)
             {
-                // Resolve singleton instance twice
-                var instance1 = container.Resolve<IService>();
-                var instance2 = container.Resolve<IService>();
-
-                // Check that instances are equal
-                instance1.ShouldBe(instance2);
+                var disposableInstance = container.Resolve<IService>();
             }
 
             // Check the singleton was disposed after the container was disposed

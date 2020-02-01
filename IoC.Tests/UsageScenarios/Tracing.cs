@@ -13,9 +13,11 @@
             // $tag=binding
             // $priority=08
             // $description=Tracing
+            // $header=Tracing allows to explore most aspects of container behavior: creating and removing child containers, adding and removing bindings, compiling instance factories.
             // {
             var traceMessages = new List<string>();
 
+            // This block to mark the scope for "using" statements
             {
                 // Create and configure the root container
                 using var rootContainer = Container
@@ -38,6 +40,7 @@
 
                 childContainer.Resolve<IService<int>>();
             }
+            // Every containers were disposed here
 
             traceMessages.Count.ShouldBe(8);
             // }

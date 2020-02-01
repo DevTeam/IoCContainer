@@ -14,6 +14,7 @@ namespace IoC.Tests.UsageScenarios
         // $tag=customization
         // $priority=00
         // $description=Custom Child Container
+        // $header=You may replace the default implementation of container by your own. I can’t imagine why, but it’s possible!
         // {
         public void Run()
         {
@@ -39,14 +40,14 @@ namespace IoC.Tests.UsageScenarios
             // }
             // Check the instance's type
             instance.ShouldBeOfType<Service>();
-            // {
+        // {
         }
 
         // Sample of transparent container implementation
         public class MyContainer: IContainer
         {
             // some implementation here
-            // }
+        // }
             // Stores the parent container to delegate all logic
             public MyContainer(IContainer currentContainer) => Parent = currentContainer;
 
@@ -80,7 +81,7 @@ namespace IoC.Tests.UsageScenarios
 
             // Subscribes an observer to receive container events
             public IDisposable Subscribe(IObserver<ContainerEvent> observer) => Parent.Subscribe(observer);
-            // {
+        // {
         }
         // }
     }

@@ -11,6 +11,7 @@
         // $tag=customization
         // $priority=00
         // $description=Custom Lifetime
+        // $header=Custom lifetimes allow to implement your own logic controlling every aspects of resolved instances. Also you could use the class _KeyBasedLifetime_ as a base for others.
         // {
         public void Run()
         {

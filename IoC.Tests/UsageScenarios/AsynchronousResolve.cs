@@ -17,6 +17,7 @@ namespace IoC.Tests.UsageScenarios
             // $tag=async
             // $priority=02
             // $description=Asynchronous resolve
+            // $header=Do you want to receive instances asynchronously? It's simple ...
             // {
             // Create the container and configure it
             using var container = Container.Create()

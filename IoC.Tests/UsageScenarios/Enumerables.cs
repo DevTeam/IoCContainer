@@ -13,7 +13,7 @@
             // $visible=true
             // $tag=injection
             // $priority=05
-            // $description=Resolve all appropriate instances as IEnumerable
+            // $description=Resolve instances as IEnumerable
             // {
             // Create and configure the container
             using var container = Container

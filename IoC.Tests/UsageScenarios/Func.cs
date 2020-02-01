@@ -13,6 +13,7 @@
             // $tag=binding
             // $priority=05
             // $description=Func
+            // $header=No comments. Everything is very simple!
             // {
             Func<IService> func = () => new Service(new Dependency());
 

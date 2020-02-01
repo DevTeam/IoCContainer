@@ -15,7 +15,7 @@ namespace IoC.Tests.UsageScenarios
             // $visible=true
             // $tag=async
             // $priority=05
-            // $description=Resolve all appropriate instances as IAsyncEnumerable
+            // $description=Resolve instances as IAsyncEnumerable
             // {
             // Create and configure the container
             using var container = Container

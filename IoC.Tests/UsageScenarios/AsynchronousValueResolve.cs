@@ -17,6 +17,7 @@ namespace IoC.Tests.UsageScenarios
             // $tag=async
             // $priority=02
             // $description=Asynchronous lightweight resolve
+            // $header=Asynchronously and economically. Why load a GC?
             // {
             // Create a container
             using var container = Container

@@ -12,21 +12,26 @@
             // $tag=binding
             // $priority=00
             // $description=Autowiring with initialization
-            // $header=Auto-writing allows to perform some initializations.
+            // $header=Sometimes instances required some actions before you give them to use - some methods of initialization or fields which should be defined. You can solve these things easy.
             // {
-            // Create the container and configure it, using full autowiring
+            // Create the container and configure it using full autowiring
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
-                .Bind<INamedService>().To<InitializingNamedService>(ctx => ctx.It.Initialize("text", ctx.Container.Resolve<IDependency>()))
+                .Bind<INamedService>().To<InitializingNamedService>(
+                    // Configure the container to invoke method "Initialize" for every created instance of this type
+                    ctx => ctx.It.Initialize("initialized !!!", ctx.Container.Resolve<IDependency>()))
                 .Container;
+
             // Resolve an instance of interface `IService`
             var instance = container.Resolve<INamedService>();
-            // }
+            
             // Check the instance's type
             instance.ShouldBeOfType<InitializingNamedService>();
-            // Check the initialization
-            instance.Name.ShouldBe("text");
+
+            // Check the initialization is ok
+            instance.Name.ShouldBe("initialized !!!");
+            // }
         }
     }
 }

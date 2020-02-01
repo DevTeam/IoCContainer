@@ -14,6 +14,7 @@ namespace IoC.Tests.UsageScenarios
         // $tag=customization
         // $priority=00
         // $description=Interception
+        // $header=The _Interception_ feature allows specify the set of bindings which will be used to produce instances wrapped by proxy objects. These proxy objects intercept any invocations to the created (or injected) instances and allows to add any logic around it: checking arguments, logging, thread safety, authorization aspects and etc.
         // {
         // To use this feature just add the NuGet package https://www.nuget.org/packages/IoC.Interception
         // or https://www.nuget.org/packages/IoC.Interception.Source

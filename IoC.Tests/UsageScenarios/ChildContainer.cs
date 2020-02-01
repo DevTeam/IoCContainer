@@ -12,12 +12,28 @@
             // $tag=binding
             // $priority=03
             // $description=Child Container
+            // $header=Child containers allow to override or just to add bindings of a parent containers without any influence on a parent containers. This is most useful when there are some base parent container(s). And these containers are shared between several components which have its own child containers based on common parent container(s) and have some additional bindings.
             // {
             // Create the parent container
-            using var parentContainer = Container.Create();
-            using var childContainer = parentContainer.Create();
-            childContainer.Parent.ShouldBe(parentContainer);
+            using var parentContainer = Container
+                .Create()
+                .Bind<IDependency>().To<Dependency>()
+                // Bind IService to Service
+                .Bind<IService>().To<Service>()
+                .Container;
 
+            using var childContainer = parentContainer
+                .Create()
+                // Override binding of IService to Service<int>
+                .Bind<IService>().To<Service<int>>()
+                .Container;
+
+            var instance1 = parentContainer.Resolve<IService>();
+            var instance2 = childContainer.Resolve<IService>();
+
+            childContainer.Parent.ShouldBe(parentContainer);
+            instance1.ShouldBeOfType<Service>();
+            instance2.ShouldBeOfType<Service<int>>();
             // }
         }
     }

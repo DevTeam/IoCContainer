@@ -16,7 +16,7 @@ namespace IoC.Tests.UsageScenarios
         // $tag=binding
         // $priority=00
         // $description=Generic Autowiring
-        // $header=Auto-writing of generic types as simple as auto-writing of other types. Just use a generic parameters markers like _TT_, _TT1_, _TT2_ and etc., create your own generic parameters markers or bind open generic types.
+        // $header=Auto-writing of generic types as simple as auto-writing of other types. Just use a generic parameters markers like _TT_, _TT1_, _TT2_ and etc. or other special markers like TTDisposable, TTDisposable1 and etc. TTList<>, TTDictionary<> ... or create your own generic parameters markers or bind open generic types.
         // {
         public void Run()
         {
@@ -26,6 +26,9 @@ namespace IoC.Tests.UsageScenarios
                 .Bind<IDependency>().To<Dependency>()
                 // Bind using the predefined generic parameters marker TT (or TT1, TT2, TT3 ...)
                 .Bind<IService<TT>>().To<Service<TT>>()
+                // Bind using the predefined generic parameters marker TTList (or TTList1, TTList2 ...)
+                // Of other cases there are TTComparable, TTComparable<in T>, TTEquatable<T>, TTEnumerable<out T>, TTDictionary<TKey, TValue> and etc.
+                .Bind<IListService<TTList<int>>>().To<ListService<TTList<int>>>()
                 // Bind using the custom generic parameters marker TCustom
                 .Bind<IService<TTMy>>().Tag("custom marker").To<Service<TTMy>>()
                 // Bind using the open generic type
@@ -33,6 +36,7 @@ namespace IoC.Tests.UsageScenarios
                 .Container;
 
             // Resolve a generic instance
+            var listService = container.Resolve<IListService<IList<int>>>();
             var instances = container.Resolve<ICollection<IService<int>>>();
 
             instances.Count.ShouldBe(3);
@@ -41,6 +45,8 @@ namespace IoC.Tests.UsageScenarios
             {
                 instance.ShouldBeOfType<Service<int>>();
             }
+
+            listService.ShouldBeOfType<ListService<IList<int>>>();
         }
 
         // Custom generic type marker using predefined attribute `GenericTypeArgument`

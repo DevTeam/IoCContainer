@@ -20,6 +20,7 @@ namespace IoC.Tests.UsageScenarios
         // $tag=binding
         // $priority=04
         // $description=Struct
+        // $header=Value types are fully supported avoiding any boxing/unboxing or cast operations, so the performance does not suffer!
         // {
         public void Run()
         {
@@ -39,6 +40,7 @@ namespace IoC.Tests.UsageScenarios
             // Check the expression which was used to create an instances of MyStruct
             var expressions = container.Resolve<TracingBuilder>().Expressions;
             var structExpression = expressions[new Key(typeof(MyStruct))].ToString();
+            // The actual code is "new MyStruct(new Dependency())"!
             structExpression.ShouldBe("new MyStruct(new Dependency())");
             // Obvious there are no any superfluous operations like a `boxing`, `unboxing` or `cast`,
             // just only what is really necessary to create an instance

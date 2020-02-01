@@ -11,7 +11,7 @@
             // $visible=true
             // $tag=injection
             // $priority=05
-            // $description=Resolve all appropriate instances as Array
+            // $description=Resolve instances as Array
             // {
             // Create and configure the container
             using var container = Container

@@ -2,6 +2,7 @@
 namespace IoC.Tests.UsageScenarios
 {
     using System;
+    using System.Collections.Generic;
 
     public interface IDependency { }
 
@@ -73,5 +74,15 @@ namespace IoC.Tests.UsageScenarios
         public string Name { get; set; }
 
         public void Initialize(string name, IDependency otherDependency) => Name = name;
+    }
+
+    public interface IListService<T>
+        where T: IList<int>
+    {
+    }
+
+    public class ListService<T> : IListService<T>
+        where T : IList<int>
+    {
     }
 }

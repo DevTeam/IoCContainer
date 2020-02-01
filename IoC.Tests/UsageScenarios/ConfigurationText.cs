@@ -12,6 +12,7 @@
             // $tag=binding
             // $priority=07
             // $description=Configuration via a text metadata
+            // $header=The container's configuration could be parsed and applied from simple text metadata.
             // {
             // Create and configure the container from a metadata string
             using var container = Container.Create().Apply(

@@ -13,6 +13,7 @@
             // $tag=binding
             // $priority=03
             // $description=Container Singleton lifetime
+            // $header=Each container has its own singleton instance for specific binding.
             // {
             // Create and configure the container
             using var container = Container

@@ -16,6 +16,7 @@ namespace IoC.Tests.UsageScenarios
         // $tag=async
         // $priority=03
         // $description=Asynchronous construction
+        // $header=It is easy to inject dependencies in asynchronous style.
         // {
         public async void Run()
         {
