@@ -833,7 +833,7 @@ using (container.Bind<IService>().As(Transient).To<Service>())
 
 ### Thread Singleton Lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ThreadSingletonLifetime.cs)
 
-Sometimes it is useful to have the [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) per a thread lifetime (or more generally a singleton per something else). There is no special "lifetime" type in this framework to achieve this requirement, but it is quite easy create your own "lifetime" type for that using base type [_KeyBasedLifetime<>_](IoCContainer/blob/master/IoC/Lifetimes/KeyBasedLifetime.cs).
+Sometimes it is useful to have the [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) per a thread lifetime (or more generally a singleton per something else). There is no special "lifetime" type in this framework to achieve this requirement, but it is quite easy create your own "lifetime" type for that using base type [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs).
 
 ``` CSharp
 public void Run()
@@ -1327,7 +1327,7 @@ public class MyContainer: IContainer
 
 ### Custom Lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomLifetime.cs)
 
-Custom lifetimes allow to implement your own logic controlling every aspects of resolved instances. Also you could use the class [_KeyBasedLifetime<>_](IoCContainer/blob/master/IoC/Lifetimes/KeyBasedLifetime.cs) as a base for others.
+Custom lifetimes allow to implement your own logic controlling every aspects of resolved instances. Also you could use the class [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs) as a base for others.
 
 ``` CSharp
 public void Run()

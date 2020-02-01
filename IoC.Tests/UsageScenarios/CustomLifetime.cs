@@ -11,7 +11,7 @@
         // $tag=customization
         // $priority=00
         // $description=Custom Lifetime
-        // $header=Custom lifetimes allow to implement your own logic controlling every aspects of resolved instances. Also you could use the class [_KeyBasedLifetime<>_](IoCContainer/blob/master/IoC/Lifetimes/KeyBasedLifetime.cs) as a base for others.
+        // $header=Custom lifetimes allow to implement your own logic controlling every aspects of resolved instances. Also you could use the class [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs) as a base for others.
         // {
         public void Run()
         {
