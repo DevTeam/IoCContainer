@@ -277,6 +277,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Autowiring](#autowiring-)
   - [Autowiring with initialization](#autowiring-with-initialization-)
   - [Generic Autowiring](#generic-autowiring-)
+  - [Bindings](#bindings-)
   - [Constant](#constant-)
   - [Generics](#generics-)
   - [Several Contracts](#several-contracts-)
@@ -287,6 +288,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Child Container](#child-container-)
   - [Container Singleton lifetime](#container-singleton-lifetime-)
   - [Scope Singleton lifetime](#scope-singleton-lifetime-)
+  - [Containers Injection](#containers-injection-)
   - [Manual Autowiring](#manual-autowiring-)
   - [Struct](#struct-)
   - [Func](#func-)
@@ -491,6 +493,27 @@ public void Run()
 class TTMy { }
 }
 }
+```
+
+
+
+### Bindings [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Bindings.cs)
+
+It is possible to bind any number of types.
+
+``` CSharp
+// Create and configure the container
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    // Bind using several tags
+    .Bind<IService>().Bind<IAnotherService>().Tag("abc").To<Service>()
+    .Container;
+
+// Resolve instances using tags
+var instance1 = container.Resolve<IService>("abc".AsTag());
+var instance2 = container.Resolve<IAnotherService>("abc".AsTag());
+
 ```
 
 
@@ -772,6 +795,49 @@ using (container.Bind<IService>().As(Transient).To<Service>())
     }
 }
 
+```
+
+
+
+### Containers Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ContainersInjection.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    // Create the parent container
+    using var currentContainer = Container
+        .Create("root")
+        .Bind<MyClass>()
+        .To<MyClass>()
+        .Container;
+
+    var instance = currentContainer.Resolve<MyClass>();
+    instance.CurrentContainer.ShouldBe(currentContainer);
+    instance.ChildContainer.Parent.ShouldBe(currentContainer);
+    instance.NamedChildContainer.Parent.ShouldBe(currentContainer);
+    instance.NamedChildContainer.ToString().ShouldBe("//root/Some name");
+}
+
+public class MyClass
+{
+    public MyClass(
+        IContainer currentContainer,
+        Func<IContainer> childContainerFactory,
+        Func<string, IContainer> nameChildContainerFactory)
+    {
+        CurrentContainer = currentContainer;
+        ChildContainer = childContainerFactory();
+        NamedChildContainer = nameChildContainerFactory("Some name");
+    }
+
+    public IContainer CurrentContainer { get; }
+
+    public IContainer ChildContainer { get; }
+
+    public IContainer NamedChildContainer { get; }
+}
 ```
 
 

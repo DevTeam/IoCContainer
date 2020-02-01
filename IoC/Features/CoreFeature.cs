@@ -61,7 +61,10 @@
                     ctx.Container.Inject<ILockObject>()),
                 null,
                 new object[] { WellknownContainers.NewChild });
-            
+
+            yield return container.Register<Func<IContainer>>(ctx => () => ctx.Container.Inject<IContainer>(WellknownContainers.NewChild));
+            yield return container.Register<Func<string, IContainer>>(ctx => name => ctx.Container.Resolve<IContainer>(WellknownContainers.NewChild.AsTag(), name));
+
             // Parent
             yield return container.Register(ctx => ctx.Container.Parent, null, new object[] { WellknownContainers.Parent });
 
