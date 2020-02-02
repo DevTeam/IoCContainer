@@ -8,7 +8,7 @@
     {
         [Fact]
         // $visible=true
-        // $tag=design
+        // $tag=binding
         // $priority=00
         // $description=Configuration class
         // $header=Configuration classes are used to dedicate a logic responsible for configuring containers.

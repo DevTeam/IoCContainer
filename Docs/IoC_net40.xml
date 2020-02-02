@@ -5425,22 +5425,22 @@
         </member>
         <member name="F:IoC.Lifetime.Transient">
             <summary>
-            It is default lifetime. A new instance wll be created each time.
+            A new instance is creating each time (it's default).
             </summary>
         </member>
         <member name="F:IoC.Lifetime.Singleton">
             <summary>
-            Singleton
+            Single instance.
             </summary>
         </member>
         <member name="F:IoC.Lifetime.ContainerSingleton">
             <summary>
-            Singleton per container
+            Singleton instance per container.
             </summary>
         </member>
         <member name="F:IoC.Lifetime.ScopeSingleton">
             <summary>
-            Singleton per scope
+            Singleton instance per scope.
             </summary>
         </member>
         <member name="T:IoC.Lifetimes.ContainerSingletonLifetime">

@@ -15,11 +15,10 @@
             // $description=Singleton lifetime
             // $header=[Singleton](https://en.wikipedia.org/wiki/Singleton_pattern) is a design pattern which stands for having only one instance of some class during the whole application lifetime. The main complaint about Singleton is that it contradicts the Dependency Injection principle and thus hinders testability. It essentially acts as a global constant, and it is hard to substitute it with a test when needed. The _Singleton lifetime_ is indispensable in this case.
             // $footer=The lifetime could be:
+            // $footer=- _Transient_ - a new instance is creating each time (it's default lifetime)
             // $footer=- [_Singleton_](https://en.wikipedia.org/wiki/Singleton_pattern) - single instance
             // $footer=- _ContainerSingleton_ - singleton per container
             // $footer=- _ScopeSingleton_ - singleton per scope
-            // $footer=
-            // $footer=_Transient_ - is default lifetime and a new instance is creating each time
             // {
             // Create and configure the container
             using var container = Container

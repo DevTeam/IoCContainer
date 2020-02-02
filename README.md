@@ -305,7 +305,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Asynchronous lightweight resolve](#asynchronous-lightweight-resolve-)
   - [Asynchronous construction](#asynchronous-construction-)
   - [Resolve instances as IAsyncEnumerable](#resolve-instances-as-iasyncenumerable-)
-- Design Aspects
+- design
   - [Configuration class](#configuration-class-)
   - [Change configuration on-the-fly](#change-configuration-on-the-fly-)
 - Fully Customizable

@@ -95,7 +95,6 @@
         var groupName = group.Key;
         groupName = groupName.Replace("binding", "Flexible Binding");
         groupName = groupName.Replace("async", "Asynchronous");
-        groupName = groupName.Replace("design", "Design Aspects");
         groupName = groupName.Replace("injection", "Powerful Injection");
         groupName = groupName.Replace("customization", "Fully Customizable");
         groupName = groupName.Replace("samples", "Other Samples");

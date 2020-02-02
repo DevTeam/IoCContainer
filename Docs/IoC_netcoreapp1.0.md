@@ -8854,28 +8854,28 @@ The enumeration of well-known lifetimes.
 
 ##### Summary
 
-Singleton per container
+Singleton instance per container.
 
 <a name='F-IoC-Lifetime-ScopeSingleton'></a>
 ### ScopeSingleton `constants`
 
 ##### Summary
 
-Singleton per scope
+Singleton instance per scope.
 
 <a name='F-IoC-Lifetime-Singleton'></a>
 ### Singleton `constants`
 
 ##### Summary
 
-Singleton
+Single instance.
 
 <a name='F-IoC-Lifetime-Transient'></a>
 ### Transient `constants`
 
 ##### Summary
 
-It is default lifetime. A new instance wll be created each time.
+A new instance is creating each time (it's default).
 
 <a name='T-IoC-LinqTunnelAttribute'></a>
 ## LinqTunnelAttribute `type`

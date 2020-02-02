@@ -7,22 +7,22 @@
     public enum Lifetime
     {
         /// <summary>
-        /// It is default lifetime. A new instance wll be created each time.
+        /// A new instance is creating each time (it's default).
         /// </summary>
         Transient = 1,
 
         /// <summary>
-        /// Singleton
+        /// Single instance.
         /// </summary>
         Singleton = 2,
 
         /// <summary>
-        /// Singleton per container
+        /// Singleton instance per container.
         /// </summary>
         ContainerSingleton = 3,
 
         /// <summary>
-        /// Singleton per scope
+        /// Singleton instance per scope.
         /// </summary>
         ScopeSingleton = 4
     }
