@@ -278,8 +278,10 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
 - Flexible Binding
   - [Autowiring](#autowiring-)
   - [Autowiring with initialization](#autowiring-with-initialization-)
+  - [Configuration class](#configuration-class-)
   - [Generic Autowiring](#generic-autowiring-)
   - [Bindings](#bindings-)
+  - [Change configuration on-the-fly](#change-configuration-on-the-fly-)
   - [Constant](#constant-)
   - [Generics](#generics-)
   - [Several Contracts](#several-contracts-)
@@ -304,10 +306,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Asynchronous resolve](#asynchronous-resolve-)
   - [Asynchronous lightweight resolve](#asynchronous-lightweight-resolve-)
   - [Asynchronous construction](#asynchronous-construction-)
-  - [Resolve instances as IAsyncEnumerable](#resolve-instances-as-iasyncenumerable-)
-- design
-  - [Configuration class](#configuration-class-)
-  - [Change configuration on-the-fly](#change-configuration-on-the-fly-)
+  - [Resolve instances via IAsyncEnumerable](#resolve-instances-via-iasyncenumerable-)
 - Fully Customizable
   - [Custom Builder](#custom-builder-)
   - [Custom Child Container](#custom-child-container-)
@@ -395,9 +394,9 @@ public class Consumer
 
 
 
-### Resolve instances as IAsyncEnumerable [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsyncEnumerables.cs)
+### Resolve instances via IAsyncEnumerable [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsyncEnumerables.cs)
 
-
+It is easy to resolve an enumerator [IAsyncEnumerable<>](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1) that provides asynchronous iteration over values of a type for every tags.
 
 ``` CSharp
 // Create and configure the container
@@ -405,6 +404,8 @@ using var container = Container
     .CreateCore()
     .Using(CollectionFeature.Default)
     .Bind<IDependency>().To<Dependency>()
+    // Bind to the default implementation
+    .Bind<IService>().To<Service>()
     // Bind to the implementation #1
     .Bind<IService>().Tag(1).To<Service>()
     // Bind to the implementation #2
@@ -419,7 +420,7 @@ var items = new List<IService>();
 await foreach (var instance in instances) { items.Add(instance); }
 
 // Check the number of resolved instances
-items.Count.ShouldBe(3);
+items.Count.ShouldBe(4);
 
 ```
 
@@ -465,6 +466,33 @@ instance.ShouldBeOfType<InitializingNamedService>();
 
 // Check the initialization is ok
 instance.Name.ShouldBe("initialized !!!");
+```
+
+
+
+### Configuration class [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConfigurationClass.cs)
+
+Configuration classes are used to dedicate a logic responsible for configuring containers.
+
+``` CSharp
+public void Run()
+{
+    // Create and configure the container
+    using var container = Container.Create().Using<Glue>();
+    // Resolve an instance
+    var instance = container.Resolve<IService>();
+}
+
+ic class Glue : IConfiguration
+{
+public IEnumerable<IToken> Apply(IContainer container)
+{
+    // Bind using full autowiring
+    yield return container
+        .Bind<IDependency>().To<Dependency>()
+        .Bind<IService>().To<Service>();
+}
+}
 ```
 
 
@@ -530,6 +558,43 @@ using var container = Container
 // Resolve instances using tags
 var instance1 = container.Resolve<IService>("abc".AsTag());
 var instance2 = container.Resolve<IAnotherService>("abc".AsTag());
+
+```
+
+
+
+### Change configuration on-the-fly [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ChangeConfigurationOnTheFly.cs)
+
+
+
+``` CSharp
+// Create and configure the container
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    .Container;
+
+// Configure `IService` as Transient
+using (container.Bind<IService>().To<Service>())
+{
+    // Resolve instances
+    var instance1 = container.Resolve<IService>();
+    var instance2 = container.Resolve<IService>();
+
+    // Check that instances are not equal
+    instance1.ShouldNotBe(instance2);
+}
+
+// Reconfigure `IService` as Singleton
+using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
+{
+    // Resolve the singleton twice
+    var instance1 = container.Resolve<IService>();
+    var instance2 = container.Resolve<IService>();
+
+    // Check that instances are equal
+    instance1.ShouldBe(instance2);
+}
 
 ```
 
@@ -690,11 +755,10 @@ parentInstance1.ShouldBe(childInstance1);
 ```
 
 The lifetime could be:
+- _Transient_ - a new instance is creating each time (it's default lifetime)
 - [_Singleton_](https://en.wikipedia.org/wiki/Singleton_pattern) - single instance
 - _ContainerSingleton_ - singleton per container
 - _ScopeSingleton_ - singleton per scope
-
-_Transient_ - is default lifetime and a new instance is creating each time
 
 ### Child Container [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ChildContainer.cs)
 
@@ -727,7 +791,7 @@ instance2.ShouldBeOfType<Service<int>>();
 
 ### Container Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ContainerLifetime.cs)
 
-Each container has its own singleton instance for specific binding.
+Each container may have its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding.
 
 ``` CSharp
 // Create and configure the container
@@ -762,7 +826,7 @@ parentInstance1.ShouldNotBe(childInstance1);
 
 ### Scope Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ScopeSingletonLifetime.cs)
 
-Each scope has its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding. Scopes can be created, activated and deactivated. Scope can be injected like other registered container instances.
+Each scope has its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding. Scopes can be created, activated and deactivated. Scope can be injected like any other instance from container.
 
 ``` CSharp
 // Create and configure the container
@@ -833,7 +897,7 @@ using (container.Bind<IService>().As(Transient).To<Service>())
 
 ### Thread Singleton Lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ThreadSingletonLifetime.cs)
 
-Sometimes it is useful to have the [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) per a thread lifetime (or more generally a singleton per something else). There is no special "lifetime" type in this framework to achieve this requirement, but it is quite easy create your own "lifetime" type for that using base type [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs).
+Sometimes it is useful to have a [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance per a thread (or more generally a singleton per something else). There is no special "lifetime" type in this framework to achieve this requirement, but it is quite easy create your own "lifetime" type for that using base type [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs).
 
 ``` CSharp
 public void Run()
@@ -1508,70 +1572,6 @@ public class MySingletonLifetime : ILifetime
     // Just counts the number of calls
     internal void IncrementCounter() => _counter.Increment();
 }
-```
-
-
-
-### Configuration class [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConfigurationClass.cs)
-
-Configuration classes are used to dedicate a logic responsible for configuring containers.
-
-``` CSharp
-public void Run()
-{
-    // Create and configure the container
-    using var container = Container.Create().Using<Glue>();
-    // Resolve an instance
-    var instance = container.Resolve<IService>();
-}
-
-ic class Glue : IConfiguration
-{
-public IEnumerable<IToken> Apply(IContainer container)
-{
-    // Bind using full autowiring
-    yield return container
-        .Bind<IDependency>().To<Dependency>()
-        .Bind<IService>().To<Service>();
-}
-}
-```
-
-
-
-### Change configuration on-the-fly [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ChangeConfigurationOnTheFly.cs)
-
-
-
-``` CSharp
-// Create and configure the container
-using var container = Container
-    .Create()
-    .Bind<IDependency>().To<Dependency>()
-    .Container;
-
-// Configure `IService` as Transient
-using (container.Bind<IService>().To<Service>())
-{
-    // Resolve instances
-    var instance1 = container.Resolve<IService>();
-    var instance2 = container.Resolve<IService>();
-
-    // Check that instances are not equal
-    instance1.ShouldNotBe(instance2);
-}
-
-// Reconfigure `IService` as Singleton
-using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
-{
-    // Resolve the singleton twice
-    var instance1 = container.Resolve<IService>();
-    var instance2 = container.Resolve<IService>();
-
-    // Check that instances are equal
-    instance1.ShouldBe(instance2);
-}
-
 ```
 
 

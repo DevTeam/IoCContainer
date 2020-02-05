@@ -15,13 +15,16 @@ namespace IoC.Tests.UsageScenarios
             // $visible=true
             // $tag=async
             // $priority=05
-            // $description=Resolve instances as IAsyncEnumerable
+            // $description=Resolve instances via IAsyncEnumerable
+            // $header=It is easy to resolve an enumerator [IAsyncEnumerable<>](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1) that provides asynchronous iteration over values of a type for every tags.
             // {
             // Create and configure the container
             using var container = Container
                 .CreateCore()
                 .Using(CollectionFeature.Default)
                 .Bind<IDependency>().To<Dependency>()
+                // Bind to the default implementation
+                .Bind<IService>().To<Service>()
                 // Bind to the implementation #1
                 .Bind<IService>().Tag(1).To<Service>()
                 // Bind to the implementation #2
@@ -36,7 +39,7 @@ namespace IoC.Tests.UsageScenarios
             await foreach (var instance in instances) { items.Add(instance); }
             
             // Check the number of resolved instances
-            items.Count.ShouldBe(3);
+            items.Count.ShouldBe(4);
 
             // }
             // Check the instances' type
