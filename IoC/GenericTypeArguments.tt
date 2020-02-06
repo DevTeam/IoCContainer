@@ -27,7 +27,7 @@ var baseTypes = new Dictionary<string, string> {
     /// Represents the generic type parameter marker.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public abstract class TT<#=i == 0 ? "" : i.ToString()#> { }
+    public class TT<#=i == 0 ? "" : i.ToString()#> { }
 
 <#
     if (i > 8)
