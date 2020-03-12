@@ -199,16 +199,72 @@
         }
 
         [Fact]
-        public void ContainerShouldResolveWhenGenericAutowiringWithNewConstraint()
+        public void ContainerShouldResolveWhenGenericAutowiringWithRefTypeConstraint()
         {
             // Given
             using var container = Container.Create();
             // When
-            using (container.Bind(typeof(Holder<>)).To(typeof(Holder<>)))
+            using (container.Bind(typeof(RefTypeHolder<>)).To(typeof(RefTypeHolder<>)))
             {
                 // Then
-                var actualInstance = container.Resolve<Holder<Content>>();
-                actualInstance.ShouldBeOfType<Holder<Content>>();
+                var actualInstance = container.Resolve<RefTypeHolder<Content>>();
+                actualInstance.ShouldBeOfType<RefTypeHolder<Content>>();
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenGenericAutowiringWithDefaultCtorConstraint()
+        {
+            // Given
+            using var container = Container.Create();
+            // When
+            using (container.Bind(typeof(DefaultCtorHolder<>)).To(typeof(DefaultCtorHolder<>)))
+            {
+                // Then
+                var actualInstance = container.Resolve<DefaultCtorHolder<Content>>();
+                actualInstance.ShouldBeOfType<DefaultCtorHolder<Content>>();
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenGenericAutowiringWithCovariantConstraint()
+        {
+            // Given
+            using var container = Container.Create();
+            // When
+            using (container.Bind(typeof(ICovariantHolder<>)).To(typeof(CovariantHolder<>)))
+            {
+                // Then
+                var actualInstance = container.Resolve<ICovariantHolder<Content>>();
+                actualInstance.ShouldBeOfType<CovariantHolder<Content>>();
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenCovariantConstraint()
+        {
+            // Given
+            using var container = Container.Create();
+            // When
+            using (container.Bind(typeof(ICovariantHolder<>)).To(typeof(CovariantHolder<Content>)))
+            {
+                // Then
+                var actualInstance = container.Resolve<ICovariantHolder<object>>();
+                actualInstance.ShouldBeOfType<CovariantHolder<Content>>();
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveWhenInvariantConstraint()
+        {
+            // Given
+            using var container = Container.Create();
+            // When
+            using (container.Bind(typeof(IInvariantHolder<>)).To(typeof(InvariantHolder<object>)))
+            {
+                // Then
+                var actualInstance = container.Resolve<IInvariantHolder<Content>>();
+                actualInstance.ShouldBeOfType<InvariantHolder<object>>();
             }
         }
 
@@ -293,13 +349,18 @@
         {
         }
 
-        public class Holder<T>
-            where T: class, new()
-        {
-        }
+        public class RefTypeHolder<T> where T : class { }
 
-        public class Content
-        {
-        }
+        public class DefaultCtorHolder<T> where T: new() { }
+
+        public interface ICovariantHolder<out T> { }
+
+        public class CovariantHolder<T> : ICovariantHolder<T> { }
+
+        public interface IInvariantHolder<in T> { }
+
+        public class InvariantHolder<T> : IInvariantHolder<T> { }
+
+        public class Content { }
     }
 }
