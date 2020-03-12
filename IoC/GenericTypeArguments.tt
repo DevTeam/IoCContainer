@@ -24,10 +24,22 @@ var baseTypes = new Dictionary<string, string> {
 #>
 <#for(int i = 0; i <= 32; i++) {#>
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT<#=i == 0 ? "" : i.ToString()#> { }
+    public abstract class TT<#=i == 0 ? "" : i.ToString()#> { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI<#=i == 0 ? "" : i.ToString()#> { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS<#=i == 0 ? "" : i.ToString()#> { }
 
 <#
     if (i > 8)

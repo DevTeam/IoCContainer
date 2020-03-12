@@ -83,6 +83,10 @@
         public Type[] GetGenericParameterConstraints() => Type.GetGenericParameterConstraints();
 
         [MethodImpl((MethodImplOptions)256)]
+        [Pure]
+        public GenericParameterAttributes GetGenericParameterAttributes() => Type.GenericParameterAttributes;
+
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         [Pure]
         public Type[] GetGenericTypeParameters() => Type.GetGenericArguments();
@@ -230,6 +234,10 @@
         [NotNull]
         [Pure]
         public Type[] GetGenericParameterConstraints() => _typeInfo.GetGenericParameterConstraints();
+
+        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
+        public GenericParameterAttributes GetGenericParameterAttributes() => _typeInfo.GenericParameterAttributes;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]

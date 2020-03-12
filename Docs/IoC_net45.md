@@ -571,6 +571,39 @@
 - [TTEquatable7\`1](#T-IoC-TTEquatable7`1 'IoC.TTEquatable7`1')
 - [TTEquatable8\`1](#T-IoC-TTEquatable8`1 'IoC.TTEquatable8`1')
 - [TTEquatable\`1](#T-IoC-TTEquatable`1 'IoC.TTEquatable`1')
+- [TTI](#T-IoC-TTI 'IoC.TTI')
+- [TTI1](#T-IoC-TTI1 'IoC.TTI1')
+- [TTI10](#T-IoC-TTI10 'IoC.TTI10')
+- [TTI11](#T-IoC-TTI11 'IoC.TTI11')
+- [TTI12](#T-IoC-TTI12 'IoC.TTI12')
+- [TTI13](#T-IoC-TTI13 'IoC.TTI13')
+- [TTI14](#T-IoC-TTI14 'IoC.TTI14')
+- [TTI15](#T-IoC-TTI15 'IoC.TTI15')
+- [TTI16](#T-IoC-TTI16 'IoC.TTI16')
+- [TTI17](#T-IoC-TTI17 'IoC.TTI17')
+- [TTI18](#T-IoC-TTI18 'IoC.TTI18')
+- [TTI19](#T-IoC-TTI19 'IoC.TTI19')
+- [TTI2](#T-IoC-TTI2 'IoC.TTI2')
+- [TTI20](#T-IoC-TTI20 'IoC.TTI20')
+- [TTI21](#T-IoC-TTI21 'IoC.TTI21')
+- [TTI22](#T-IoC-TTI22 'IoC.TTI22')
+- [TTI23](#T-IoC-TTI23 'IoC.TTI23')
+- [TTI24](#T-IoC-TTI24 'IoC.TTI24')
+- [TTI25](#T-IoC-TTI25 'IoC.TTI25')
+- [TTI26](#T-IoC-TTI26 'IoC.TTI26')
+- [TTI27](#T-IoC-TTI27 'IoC.TTI27')
+- [TTI28](#T-IoC-TTI28 'IoC.TTI28')
+- [TTI29](#T-IoC-TTI29 'IoC.TTI29')
+- [TTI3](#T-IoC-TTI3 'IoC.TTI3')
+- [TTI30](#T-IoC-TTI30 'IoC.TTI30')
+- [TTI31](#T-IoC-TTI31 'IoC.TTI31')
+- [TTI32](#T-IoC-TTI32 'IoC.TTI32')
+- [TTI4](#T-IoC-TTI4 'IoC.TTI4')
+- [TTI5](#T-IoC-TTI5 'IoC.TTI5')
+- [TTI6](#T-IoC-TTI6 'IoC.TTI6')
+- [TTI7](#T-IoC-TTI7 'IoC.TTI7')
+- [TTI8](#T-IoC-TTI8 'IoC.TTI8')
+- [TTI9](#T-IoC-TTI9 'IoC.TTI9')
 - [TTList1\`1](#T-IoC-TTList1`1 'IoC.TTList1`1')
 - [TTList2\`1](#T-IoC-TTList2`1 'IoC.TTList2`1')
 - [TTList3\`1](#T-IoC-TTList3`1 'IoC.TTList3`1')
@@ -598,6 +631,39 @@
 - [TTObserver7\`1](#T-IoC-TTObserver7`1 'IoC.TTObserver7`1')
 - [TTObserver8\`1](#T-IoC-TTObserver8`1 'IoC.TTObserver8`1')
 - [TTObserver\`1](#T-IoC-TTObserver`1 'IoC.TTObserver`1')
+- [TTS](#T-IoC-TTS 'IoC.TTS')
+- [TTS1](#T-IoC-TTS1 'IoC.TTS1')
+- [TTS10](#T-IoC-TTS10 'IoC.TTS10')
+- [TTS11](#T-IoC-TTS11 'IoC.TTS11')
+- [TTS12](#T-IoC-TTS12 'IoC.TTS12')
+- [TTS13](#T-IoC-TTS13 'IoC.TTS13')
+- [TTS14](#T-IoC-TTS14 'IoC.TTS14')
+- [TTS15](#T-IoC-TTS15 'IoC.TTS15')
+- [TTS16](#T-IoC-TTS16 'IoC.TTS16')
+- [TTS17](#T-IoC-TTS17 'IoC.TTS17')
+- [TTS18](#T-IoC-TTS18 'IoC.TTS18')
+- [TTS19](#T-IoC-TTS19 'IoC.TTS19')
+- [TTS2](#T-IoC-TTS2 'IoC.TTS2')
+- [TTS20](#T-IoC-TTS20 'IoC.TTS20')
+- [TTS21](#T-IoC-TTS21 'IoC.TTS21')
+- [TTS22](#T-IoC-TTS22 'IoC.TTS22')
+- [TTS23](#T-IoC-TTS23 'IoC.TTS23')
+- [TTS24](#T-IoC-TTS24 'IoC.TTS24')
+- [TTS25](#T-IoC-TTS25 'IoC.TTS25')
+- [TTS26](#T-IoC-TTS26 'IoC.TTS26')
+- [TTS27](#T-IoC-TTS27 'IoC.TTS27')
+- [TTS28](#T-IoC-TTS28 'IoC.TTS28')
+- [TTS29](#T-IoC-TTS29 'IoC.TTS29')
+- [TTS3](#T-IoC-TTS3 'IoC.TTS3')
+- [TTS30](#T-IoC-TTS30 'IoC.TTS30')
+- [TTS31](#T-IoC-TTS31 'IoC.TTS31')
+- [TTS32](#T-IoC-TTS32 'IoC.TTS32')
+- [TTS4](#T-IoC-TTS4 'IoC.TTS4')
+- [TTS5](#T-IoC-TTS5 'IoC.TTS5')
+- [TTS6](#T-IoC-TTS6 'IoC.TTS6')
+- [TTS7](#T-IoC-TTS7 'IoC.TTS7')
+- [TTS8](#T-IoC-TTS8 'IoC.TTS8')
+- [TTS9](#T-IoC-TTS9 'IoC.TTS9')
 - [TTSet1\`1](#T-IoC-TTSet1`1 'IoC.TTSet1`1')
 - [TTSet2\`1](#T-IoC-TTSet2`1 'IoC.TTSet2`1')
 - [TTSet3\`1](#T-IoC-TTSet3`1 'IoC.TTSet3`1')
@@ -8890,28 +8956,28 @@ The enumeration of well-known lifetimes.
 
 ##### Summary
 
-Singleton per container
+Singleton instance per container.
 
 <a name='F-IoC-Lifetime-ScopeSingleton'></a>
 ### ScopeSingleton `constants`
 
 ##### Summary
 
-Singleton per scope
+Singleton instance per scope.
 
 <a name='F-IoC-Lifetime-Singleton'></a>
 ### Singleton `constants`
 
 ##### Summary
 
-Singleton
+Single instance.
 
 <a name='F-IoC-Lifetime-Transient'></a>
 ### Transient `constants`
 
 ##### Summary
 
-It is default lifetime. A new instance wll be created each time.
+A new instance is creating each time (it's default).
 
 <a name='T-IoC-LinqTunnelAttribute'></a>
 ## LinqTunnelAttribute `type`
@@ -9449,7 +9515,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT1'></a>
 ## TT1 `type`
@@ -9460,7 +9526,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT10'></a>
 ## TT10 `type`
@@ -9471,7 +9537,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT11'></a>
 ## TT11 `type`
@@ -9482,7 +9548,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT12'></a>
 ## TT12 `type`
@@ -9493,7 +9559,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT13'></a>
 ## TT13 `type`
@@ -9504,7 +9570,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT14'></a>
 ## TT14 `type`
@@ -9515,7 +9581,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT15'></a>
 ## TT15 `type`
@@ -9526,7 +9592,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT16'></a>
 ## TT16 `type`
@@ -9537,7 +9603,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT17'></a>
 ## TT17 `type`
@@ -9548,7 +9614,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT18'></a>
 ## TT18 `type`
@@ -9559,7 +9625,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT19'></a>
 ## TT19 `type`
@@ -9570,7 +9636,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT2'></a>
 ## TT2 `type`
@@ -9581,7 +9647,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT20'></a>
 ## TT20 `type`
@@ -9592,7 +9658,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT21'></a>
 ## TT21 `type`
@@ -9603,7 +9669,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT22'></a>
 ## TT22 `type`
@@ -9614,7 +9680,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT23'></a>
 ## TT23 `type`
@@ -9625,7 +9691,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT24'></a>
 ## TT24 `type`
@@ -9636,7 +9702,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT25'></a>
 ## TT25 `type`
@@ -9647,7 +9713,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT26'></a>
 ## TT26 `type`
@@ -9658,7 +9724,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT27'></a>
 ## TT27 `type`
@@ -9669,7 +9735,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT28'></a>
 ## TT28 `type`
@@ -9680,7 +9746,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT29'></a>
 ## TT29 `type`
@@ -9691,7 +9757,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT3'></a>
 ## TT3 `type`
@@ -9702,7 +9768,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT30'></a>
 ## TT30 `type`
@@ -9713,7 +9779,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT31'></a>
 ## TT31 `type`
@@ -9724,7 +9790,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT32'></a>
 ## TT32 `type`
@@ -9735,7 +9801,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT4'></a>
 ## TT4 `type`
@@ -9746,7 +9812,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT5'></a>
 ## TT5 `type`
@@ -9757,7 +9823,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT6'></a>
 ## TT6 `type`
@@ -9768,7 +9834,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT7'></a>
 ## TT7 `type`
@@ -9779,7 +9845,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT8'></a>
 ## TT8 `type`
@@ -9790,7 +9856,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TT9'></a>
 ## TT9 `type`
@@ -9801,7 +9867,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type parameter marker for a reference type.
 
 <a name='T-IoC-TTCollection1`1'></a>
 ## TTCollection1\`1 `type`
@@ -10793,6 +10859,369 @@ IoC
 
 Represents the generic type parameter marker for `System.IEquatable[T]`.
 
+<a name='T-IoC-TTI'></a>
+## TTI `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI1'></a>
+## TTI1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI10'></a>
+## TTI10 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI11'></a>
+## TTI11 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI12'></a>
+## TTI12 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI13'></a>
+## TTI13 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI14'></a>
+## TTI14 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI15'></a>
+## TTI15 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI16'></a>
+## TTI16 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI17'></a>
+## TTI17 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI18'></a>
+## TTI18 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI19'></a>
+## TTI19 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI2'></a>
+## TTI2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI20'></a>
+## TTI20 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI21'></a>
+## TTI21 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI22'></a>
+## TTI22 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI23'></a>
+## TTI23 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI24'></a>
+## TTI24 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI25'></a>
+## TTI25 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI26'></a>
+## TTI26 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI27'></a>
+## TTI27 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI28'></a>
+## TTI28 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI29'></a>
+## TTI29 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI3'></a>
+## TTI3 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI30'></a>
+## TTI30 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI31'></a>
+## TTI31 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI32'></a>
+## TTI32 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI4'></a>
+## TTI4 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI5'></a>
+## TTI5 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI6'></a>
+## TTI6 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI7'></a>
+## TTI7 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI8'></a>
+## TTI8 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
+<a name='T-IoC-TTI9'></a>
+## TTI9 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for an interface.
+
 <a name='T-IoC-TTList1`1'></a>
 ## TTList1\`1 `type`
 
@@ -11089,6 +11518,369 @@ IoC
 ##### Summary
 
 Represents the generic type parameter marker for `System.IObserver[T]`.
+
+<a name='T-IoC-TTS'></a>
+## TTS `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS1'></a>
+## TTS1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS10'></a>
+## TTS10 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS11'></a>
+## TTS11 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS12'></a>
+## TTS12 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS13'></a>
+## TTS13 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS14'></a>
+## TTS14 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS15'></a>
+## TTS15 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS16'></a>
+## TTS16 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS17'></a>
+## TTS17 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS18'></a>
+## TTS18 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS19'></a>
+## TTS19 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS2'></a>
+## TTS2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS20'></a>
+## TTS20 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS21'></a>
+## TTS21 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS22'></a>
+## TTS22 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS23'></a>
+## TTS23 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS24'></a>
+## TTS24 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS25'></a>
+## TTS25 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS26'></a>
+## TTS26 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS27'></a>
+## TTS27 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS28'></a>
+## TTS28 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS29'></a>
+## TTS29 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS3'></a>
+## TTS3 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS30'></a>
+## TTS30 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS31'></a>
+## TTS31 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS32'></a>
+## TTS32 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS4'></a>
+## TTS4 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS5'></a>
+## TTS5 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS6'></a>
+## TTS6 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS7'></a>
+## TTS7 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS8'></a>
+## TTS8 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
+
+<a name='T-IoC-TTS9'></a>
+## TTS9 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type parameter marker for a value type.
 
 <a name='T-IoC-TTSet1`1'></a>
 ## TTSet1\`1 `type`

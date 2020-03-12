@@ -199,6 +199,20 @@
         }
 
         [Fact]
+        public void ContainerShouldResolveWhenGenericAutowiringWithNewConstraint()
+        {
+            // Given
+            using var container = Container.Create();
+            // When
+            using (container.Bind(typeof(Holder<>)).To(typeof(Holder<>)))
+            {
+                // Then
+                var actualInstance = container.Resolve<Holder<Content>>();
+                actualInstance.ShouldBeOfType<Holder<Content>>();
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveWhenGenericAutowiring_MT()
         {
             // Given
@@ -276,6 +290,15 @@
 
         public class MyGenericServiceWithConstraint<T1, T2>: IMyGenericServiceWithConstraint<T2, T1>
             where T2: IEnumerable<string>
+        {
+        }
+
+        public class Holder<T>
+            where T: class, new()
+        {
+        }
+
+        public class Content
         {
         }
     }

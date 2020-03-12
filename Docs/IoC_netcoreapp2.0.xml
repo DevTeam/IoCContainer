@@ -4039,7 +4039,17 @@
         </member>
         <member name="T:IoC.TT">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable">
@@ -4114,7 +4124,17 @@
         </member>
         <member name="T:IoC.TT1">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI1">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS1">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable1">
@@ -4189,7 +4209,17 @@
         </member>
         <member name="T:IoC.TT2">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI2">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS2">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable2">
@@ -4264,7 +4294,17 @@
         </member>
         <member name="T:IoC.TT3">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI3">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS3">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable3">
@@ -4339,7 +4379,17 @@
         </member>
         <member name="T:IoC.TT4">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI4">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS4">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable4">
@@ -4414,7 +4464,17 @@
         </member>
         <member name="T:IoC.TT5">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI5">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS5">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable5">
@@ -4489,7 +4549,17 @@
         </member>
         <member name="T:IoC.TT6">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI6">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS6">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable6">
@@ -4564,7 +4634,17 @@
         </member>
         <member name="T:IoC.TT7">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI7">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS7">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable7">
@@ -4639,7 +4719,17 @@
         </member>
         <member name="T:IoC.TT8">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI8">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS8">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable8">
@@ -4714,122 +4804,362 @@
         </member>
         <member name="T:IoC.TT9">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI9">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS9">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT10">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI10">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS10">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT11">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI11">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS11">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT12">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI12">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS12">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT13">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI13">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS13">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT14">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI14">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS14">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT15">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI15">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS15">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT16">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI16">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS16">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT17">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI17">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS17">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT18">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI18">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS18">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT19">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI19">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS19">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT20">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI20">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS20">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT21">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI21">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS21">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT22">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI22">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS22">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT23">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI23">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS23">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT24">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI24">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS24">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT25">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI25">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS25">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT26">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI26">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS26">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT27">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI27">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS27">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT28">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI28">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS28">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT29">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI29">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS29">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT30">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI30">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS30">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT31">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI31">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS31">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT32">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type parameter marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTI32">
+            <summary>
+            Represents the generic type parameter marker for an interface.
+            </summary>
+        </member>
+        <member name="T:IoC.TTS32">
+            <summary>
+            Represents the generic type parameter marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.IAutowiringStrategy">

@@ -5,6 +5,7 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
     using Issues;
 
     internal class FullAutowiringDependency: IDependency
@@ -63,7 +64,7 @@
                 }
 
                 var descriptor = genericType.Descriptor();
-                if (!descriptor.GetGenericParameterConstraints().Any())
+                if (descriptor.GetGenericParameterAttributes() == GenericParameterAttributes.None && !descriptor.GetGenericParameterConstraints().Any())
                 {
                     if (!typesMap.TryGetValue(genericType, out var curType))
                     {

@@ -4,10 +4,22 @@
 namespace IoC
 {
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT { }
+    public abstract class TT { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS { }
 
 /// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
@@ -94,10 +106,22 @@ namespace IoC
     public interface TTObserver<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT1 { }
+    public abstract class TT1 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI1 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS1 { }
 
 /// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
@@ -184,10 +208,22 @@ namespace IoC
     public interface TTObserver1<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT2 { }
+    public abstract class TT2 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI2 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS2 { }
 
 /// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
@@ -274,10 +310,22 @@ namespace IoC
     public interface TTObserver2<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT3 { }
+    public abstract class TT3 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI3 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS3 { }
 
 /// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
@@ -364,10 +412,22 @@ namespace IoC
     public interface TTObserver3<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT4 { }
+    public abstract class TT4 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI4 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS4 { }
 
 /// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
@@ -454,10 +514,22 @@ namespace IoC
     public interface TTObserver4<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT5 { }
+    public abstract class TT5 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI5 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS5 { }
 
 /// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
@@ -544,10 +616,22 @@ namespace IoC
     public interface TTObserver5<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT6 { }
+    public abstract class TT6 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI6 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS6 { }
 
 /// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
@@ -634,10 +718,22 @@ namespace IoC
     public interface TTObserver6<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT7 { }
+    public abstract class TT7 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI7 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS7 { }
 
 /// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
@@ -724,10 +820,22 @@ namespace IoC
     public interface TTObserver7<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT8 { }
+    public abstract class TT8 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI8 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS8 { }
 
 /// <summary>
     /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
@@ -814,148 +922,436 @@ namespace IoC
     public interface TTObserver8<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT9 { }
+    public abstract class TT9 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT10 { }
+    public interface TTI9 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT11 { }
+    public struct TTS9 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT12 { }
+    public abstract class TT10 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT13 { }
+    public interface TTI10 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT14 { }
+    public struct TTS10 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT15 { }
+    public abstract class TT11 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT16 { }
+    public interface TTI11 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT17 { }
+    public struct TTS11 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT18 { }
+    public abstract class TT12 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT19 { }
+    public interface TTI12 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT20 { }
+    public struct TTS12 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT21 { }
+    public abstract class TT13 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT22 { }
+    public interface TTI13 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT23 { }
+    public struct TTS13 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT24 { }
+    public abstract class TT14 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT25 { }
+    public interface TTI14 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT26 { }
+    public struct TTS14 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT27 { }
+    public abstract class TT15 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT28 { }
+    public interface TTI15 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT29 { }
+    public struct TTS15 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT30 { }
+    public abstract class TT16 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT31 { }
+    public interface TTI16 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type parameter marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
-    public class TT32 { }
+    public struct TTS16 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT17 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI17 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS17 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT18 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI18 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS18 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT19 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI19 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS19 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT20 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI20 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS20 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT21 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI21 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS21 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT22 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI22 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS22 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT23 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI23 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS23 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT24 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI24 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS24 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT25 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI25 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS25 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT26 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI26 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS26 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT27 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI27 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS27 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT28 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI28 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS28 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT29 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI29 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS29 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT30 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI30 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS30 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT31 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI31 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS31 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a reference type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public abstract class TT32 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for an interface.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public interface TTI32 { }
+
+    /// <summary>
+    /// Represents the generic type parameter marker for a value type.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public struct TTS32 { }
 
 
     internal class GenericTypeArguments
