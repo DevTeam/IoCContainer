@@ -12,7 +12,7 @@
         [NotNull] private readonly Type _type;
         [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;
         private readonly bool _hasGenericParamsWithConstraints;
-        private readonly Dictionary<int, TypeDescriptor> _genericParamsWithConstraints = new Dictionary<int, TypeDescriptor>();
+        private readonly List<GenericParamsWithConstraints> _genericParamsWithConstraints;
         private readonly Type[] _registeredGenericTypeParameters;
         private readonly TypeDescriptor _registeredTypeDescriptor;
         [NotNull] [ItemNotNull] private readonly Expression[] _statements;
@@ -51,6 +51,7 @@
                 throw new ArgumentException($"Too many generic type parameters in the type \"{type}\".", nameof(type));
             }
 
+            _genericParamsWithConstraints = new List<GenericParamsWithConstraints>(_registeredGenericTypeParameters.Length);
             var genericTypePos = 0;
             var typesMap = new Dictionary<Type, Type>();
             for (var position = 0; position < _registeredGenericTypeParameters.Length; position++)
@@ -81,7 +82,7 @@
                 }
                 else
                 {
-                    _genericParamsWithConstraints[position] = descriptor;
+                    _genericParamsWithConstraints.Add(new GenericParamsWithConstraints(descriptor, position));
                 }
             }
 
@@ -176,9 +177,7 @@
             var canBeResolved = true;
             foreach (var item in _genericParamsWithConstraints)
             {
-                var position = item.Key;
-                var descriptor = item.Value;
-                var constraints = descriptor.GetGenericParameterConstraints();
+                var constraints = item.TypeDescriptor.GetGenericParameterConstraints();
 
                 var isDefined = false;
                 foreach (var constraintsEntry in constraintsMap)
@@ -188,7 +187,7 @@
                         continue;
                     }
 
-                    registeredGenericTypeParameters[position] = constraintsEntry.Item1;
+                    registeredGenericTypeParameters[item.Position] = constraintsEntry.Item1;
                     isDefined = true;
                     break;
                 }
@@ -204,5 +203,17 @@
         }
 
         public override string ToString() => $"new {_type.Descriptor()}(...)";
+
+        private struct GenericParamsWithConstraints
+        {
+            public readonly TypeDescriptor TypeDescriptor;
+            public readonly int Position;
+
+            public GenericParamsWithConstraints(TypeDescriptor typeDescriptor, int position)
+            {
+                TypeDescriptor = typeDescriptor;
+                Position = position;
+            }
+        }
     }
 }
