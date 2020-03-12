@@ -116,20 +116,30 @@
                 if (typeDescriptor.IsConstructedGenericType())
                 {
                     buildContext.BindTypes(instanceType, buildContext.Key.Type);
-                    var genericArgs = typeDescriptor.GetGenericTypeArguments();
+                    var genericTypeArgs = typeDescriptor.GetGenericTypeArguments();
                     var isReplaced = false;
-                    for (var position = 0; position < genericArgs.Length; position++)
+                    for (var position = 0; position < genericTypeArgs.Length; position++)
                     {
-                        if (buildContext.TryReplaceType(genericArgs[position], out var type))
+                        var genericTypeArg = genericTypeArgs[position];
+                        var genericTypeArgDescriptor = genericTypeArg.Descriptor();
+                        if (genericTypeArgDescriptor.IsGenericTypeDefinition() || genericTypeArgDescriptor.IsGenericTypeArgument())
                         {
-                            genericArgs[position] = type;
-                            isReplaced = true;
+                            if (buildContext.TryReplaceType(genericTypeArg, out var type))
+                            {
+                                genericTypeArgs[position] = type;
+                                isReplaced = true;
+                            }
+                            else
+                            {
+                                genericTypeArgs[position] = buildContext.Container.Resolve<ICannotResolveGenericTypeArgument>().Resolve(buildContext, _registeredTypeDescriptor.Type, position, genericTypeArg);
+                                isReplaced = true;
+                            }
                         }
                     }
 
                     if (isReplaced)
                     {
-                        typeDescriptor = typeDescriptor.GetGenericTypeDefinition().MakeGenericType(genericArgs).Descriptor();
+                        typeDescriptor = typeDescriptor.GetGenericTypeDefinition().MakeGenericType(genericTypeArgs).Descriptor();
                     }
                 }
 

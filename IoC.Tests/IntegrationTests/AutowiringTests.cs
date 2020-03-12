@@ -199,6 +199,19 @@
         }
 
         [Fact]
+        public void ContainerShouldThrowInvalidOperationExceptionWhenCannotResolveGenericTypeArgument()
+        {
+            // Given
+            using var container = Container.Create();
+            // When
+            using (container.Bind(typeof(IMyGenericService1<>), typeof(IMyGenericService<,>)).To(typeof(MyGenericService<,>)))
+            {
+                // Then
+                Should.Throw<InvalidOperationException>(() => container.Resolve<IMyGenericService1<int>>());
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveWhenGenericAutowiringWithRefTypeConstraint()
         {
             // Given

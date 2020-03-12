@@ -5660,6 +5660,21 @@
             <param name="buildContext">The build context.</param>
             <returns>The pair of the dependency and of the lifetime.</returns>
         </member>
+        <member name="T:IoC.Issues.ICannotResolveGenericTypeArgument">
+            <summary>
+            Resolves the scenario when cannot resolve the generic type argument of an instance type.
+            </summary>
+        </member>
+        <member name="M:IoC.Issues.ICannotResolveGenericTypeArgument.Resolve(IoC.IBuildContext,System.Type,System.Int32,System.Type)">
+            <summary>
+            Resolves the generic type argument of an instance type.
+            </summary>
+            <param name="buildContext">The build context.</param>
+            <param name="type">Registered type.</param>
+            <param name="genericTypeArgPosition">The generic type argument position in the registered type.</param>
+            <param name="genericTypeArg">The generic type argument in the registered type.</param>
+            <returns>The resoled generic type argument.</returns>
+        </member>
         <member name="T:IoC.Issues.ICannotResolveType">
             <summary>
             Resolves the scenario when cannot resolve the instance type.

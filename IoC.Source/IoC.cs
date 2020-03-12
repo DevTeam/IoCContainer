@@ -8694,6 +8694,7 @@ namespace IoC.Features
             yield return container.Register(ctx => CannotResolveConstructor.Shared);
             yield return container.Register(ctx => CannotResolveDependency.Shared);
             yield return container.Register(ctx => CannotResolveType.Shared);
+            yield return container.Register(ctx => CannotResolveGenericTypeArgument.Shared);
 
             yield return container.Register(ctx => DefaultAutowiringStrategy.Shared);
             yield return container.Register(ctx => ctx.Container.GetResolver<TT>(ctx.Key.Tag.AsTag()), null, Feature.AnyTag);
@@ -9668,6 +9669,33 @@ namespace IoC.Issues
 
 
 #endregion
+#region ICannotResolveGenericTypeArgument
+
+namespace IoC.Issues
+{
+    using System;
+
+    /// <summary>
+    /// Resolves the scenario when cannot resolve the generic type argument of an instance type.
+    /// </summary>
+    [PublicAPI]
+
+    public interface ICannotResolveGenericTypeArgument
+    {
+        /// <summary>
+        /// Resolves the generic type argument of an instance type.
+        /// </summary>
+        /// <param name="buildContext">The build context.</param>
+        /// <param name="type">Registered type.</param>
+        /// <param name="genericTypeArgPosition">The generic type argument position in the registered type.</param>
+        /// <param name="genericTypeArg">The generic type argument in the registered type.</param>
+        /// <returns>The resoled generic type argument.</returns>
+        [NotNull] Type Resolve([NotNull] IBuildContext buildContext, [NotNull] Type type, int genericTypeArgPosition, [NotNull] Type genericTypeArg);
+    }
+}
+
+
+#endregion
 #region ICannotResolveType
 
 namespace IoC.Issues
@@ -10575,6 +10603,28 @@ namespace IoC.Core
         }
     }
 }
+
+#endregion
+#region CannotResolveGenericTypeArgument
+
+namespace IoC.Core
+{
+    using System;
+    using Issues;
+
+    internal class CannotResolveGenericTypeArgument: ICannotResolveGenericTypeArgument
+    {
+        public static readonly ICannotResolveGenericTypeArgument Shared = new CannotResolveGenericTypeArgument();
+
+        public Type Resolve(IBuildContext buildContext, Type type, int genericTypeArgPosition, Type genericTypeArg)
+        {
+            var typeDescriptor = type.Descriptor();
+            var genericTypeArgs = typeDescriptor.IsGenericTypeDefinition() ? typeDescriptor.GetGenericTypeParameters() : typeDescriptor.GetGenericTypeArguments();
+            throw new InvalidOperationException($"Cannot resolve the generic type argument \'{genericTypeArgs[genericTypeArgPosition]}\' at position {genericTypeArgPosition} of the type {typeDescriptor.Type}.");
+        }
+    }
+}
+
 
 #endregion
 #region CannotResolveType
@@ -11925,20 +11975,30 @@ namespace IoC.Core
                 if (typeDescriptor.IsConstructedGenericType())
                 {
                     buildContext.BindTypes(instanceType, buildContext.Key.Type);
-                    var genericArgs = typeDescriptor.GetGenericTypeArguments();
+                    var genericTypeArgs = typeDescriptor.GetGenericTypeArguments();
                     var isReplaced = false;
-                    for (var position = 0; position < genericArgs.Length; position++)
+                    for (var position = 0; position < genericTypeArgs.Length; position++)
                     {
-                        if (buildContext.TryReplaceType(genericArgs[position], out var type))
+                        var genericTypeArg = genericTypeArgs[position];
+                        var genericTypeArgDescriptor = genericTypeArg.Descriptor();
+                        if (genericTypeArgDescriptor.IsGenericTypeDefinition() || genericTypeArgDescriptor.IsGenericTypeArgument())
                         {
-                            genericArgs[position] = type;
-                            isReplaced = true;
+                            if (buildContext.TryReplaceType(genericTypeArg, out var type))
+                            {
+                                genericTypeArgs[position] = type;
+                                isReplaced = true;
+                            }
+                            else
+                            {
+                                genericTypeArgs[position] = buildContext.Container.Resolve<ICannotResolveGenericTypeArgument>().Resolve(buildContext, _registeredTypeDescriptor.Type, position, genericTypeArg);
+                                isReplaced = true;
+                            }
                         }
                     }
 
                     if (isReplaced)
                     {
-                        typeDescriptor = typeDescriptor.GetGenericTypeDefinition().MakeGenericType(genericArgs).Descriptor();
+                        typeDescriptor = typeDescriptor.GetGenericTypeDefinition().MakeGenericType(genericTypeArgs).Descriptor();
                     }
                 }
 

@@ -337,6 +337,8 @@
   - [Resolve(buildContext,constructors)](#M-IoC-Issues-ICannotResolveConstructor-Resolve-IoC-IBuildContext,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}}- 'IoC.Issues.ICannotResolveConstructor.Resolve(IoC.IBuildContext,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})')
 - [ICannotResolveDependency](#T-IoC-Issues-ICannotResolveDependency 'IoC.Issues.ICannotResolveDependency')
   - [Resolve(buildContext)](#M-IoC-Issues-ICannotResolveDependency-Resolve-IoC-IBuildContext- 'IoC.Issues.ICannotResolveDependency.Resolve(IoC.IBuildContext)')
+- [ICannotResolveGenericTypeArgument](#T-IoC-Issues-ICannotResolveGenericTypeArgument 'IoC.Issues.ICannotResolveGenericTypeArgument')
+  - [Resolve(buildContext,type,genericTypeArgPosition,genericTypeArg)](#M-IoC-Issues-ICannotResolveGenericTypeArgument-Resolve-IoC-IBuildContext,System-Type,System-Int32,System-Type- 'IoC.Issues.ICannotResolveGenericTypeArgument.Resolve(IoC.IBuildContext,System.Type,System.Int32,System.Type)')
 - [ICannotResolveType](#T-IoC-Issues-ICannotResolveType 'IoC.Issues.ICannotResolveType')
   - [Resolve(buildContext,registeredType,resolvingType)](#M-IoC-Issues-ICannotResolveType-Resolve-IoC-IBuildContext,System-Type,System-Type- 'IoC.Issues.ICannotResolveType.Resolve(IoC.IBuildContext,System.Type,System.Type)')
 - [ICompiler](#T-IoC-ICompiler 'IoC.ICompiler')
@@ -8001,6 +8003,37 @@ The pair of the dependency and of the lifetime.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context. |
+
+<a name='T-IoC-Issues-ICannotResolveGenericTypeArgument'></a>
+## ICannotResolveGenericTypeArgument `type`
+
+##### Namespace
+
+IoC.Issues
+
+##### Summary
+
+Resolves the scenario when cannot resolve the generic type argument of an instance type.
+
+<a name='M-IoC-Issues-ICannotResolveGenericTypeArgument-Resolve-IoC-IBuildContext,System-Type,System-Int32,System-Type-'></a>
+### Resolve(buildContext,type,genericTypeArgPosition,genericTypeArg) `method`
+
+##### Summary
+
+Resolves the generic type argument of an instance type.
+
+##### Returns
+
+The resoled generic type argument.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | Registered type. |
+| genericTypeArgPosition | [System.Int32](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Int32 'System.Int32') | The generic type argument position in the registered type. |
+| genericTypeArg | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The generic type argument in the registered type. |
 
 <a name='T-IoC-Issues-ICannotResolveType'></a>
 ## ICannotResolveType `type`
