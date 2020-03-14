@@ -91,12 +91,20 @@ public class Glue : IConfiguration
 // Creates an Inversion of Control container
 using var container = Container.Create().Using<Glue>();
 
-// Gets a cardboard box in the same way as the following expression:
+// This is the Composition Root. It gets a cardboard box in the same way as the following expression:
 // var box = new CardboardBox<ICat>(new ShroedingersCat(new Lazy<State>(() => (State)indeterminacy.Next(2))));
 var box = container.Resolve<IBox<ICat>>();
 // Checks the cat's state
 WriteLine(box.Content);
 ```
+
+Several aspects of the [Composition Root](https://blog.ploeh.dk/2011/07/28/CompositionRoot/):
+
+- **As close to Init or Entry Point as possible:** It should be as close as possible to the application's entry point.
+- **Single location for object construction:** A Composition Root is a (preferably) unique location in an application where modules are composed together.
+- **The Composition Root is an application infrastructure component:** Only applications should have Composition Roots. Libraries and frameworks shouldn't.
+- **A IoC Container should only be referenced from the Composition Root:** All other modules should have no reference to the container.
+- **Predictable Dependency Graph:** It is better to have a pre-constructed, pre-discovered dependency graph.
 
 Each dependency is resolved by a strongly-typed block of statements like the operator `new` which is compiled on the fly from the coresponding expression tree to create or to get a required dependency instance with minimal impact on performance or memory consumtion. For instance, the getting (or injecting) of a box looks like:
 
@@ -468,7 +476,7 @@ instance.ShouldBeOfType<InitializingNamedService>();
 instance.Name.ShouldBe("initialized !!!");
 ```
 
-
+:warning: It is not recommended because of it is a cause of hidden dependencies.
 
 ### Configuration class [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConfigurationClass.cs)
 
@@ -1208,7 +1216,7 @@ canBeResolved.ShouldBeTrue();
 
 ### Aspect Oriented [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AspectOrientedAutowiring.cs)
 
-This framework has no special attributes to support aspect oriented autowiring. The production code may not have a references to these special attributes. But this code may contain these attributes by itself. And it is quite easy to use these attributes for aspect oriented autowiring, see the sample below.
+This framework has no special attributes to support aspect oriented autowiring because of a production code should not have references to these special attributes. But this code may contain these attributes by itself. And it is quite easy to use these attributes for aspect oriented autowiring, see the sample below.
 
 ``` CSharp
 public void Run()
@@ -1683,7 +1691,7 @@ using var container = Container
 
 ### Method Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/MethodInjection.cs)
 
-
+:warning: Please try using the constructor injection instead. The method injection is not recommended because of it is a cause of hidden dependencies.
 
 ``` CSharp
 // Create and configure the container using full autowiring
@@ -1724,7 +1732,7 @@ otherInstance.Name.ShouldBe("beta");
 
 ### Property Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/PropertyInjection.cs)
 
-
+:warning: Please try using the constructor injection instead. The property injection is not recommended because of it is a cause of hidden dependencies.
 
 ``` CSharp
 // Create and configure the container
@@ -1786,7 +1794,7 @@ instance.State.ShouldBe("some state");
 
 ### Containers Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ContainersInjection.cs)
 
-
+:warning: Please avoid injecting containers in non-infrastructure code. Keep your general code in ignorance of a container.
 
 ``` CSharp
 public void Run()

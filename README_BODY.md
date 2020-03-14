@@ -87,12 +87,20 @@ public class Glue : IConfiguration
 // Creates an Inversion of Control container
 using var container = Container.Create().Using<Glue>();
 
-// Gets a cardboard box in the same way as the following expression:
+// This is the Composition Root. It gets a cardboard box in the same way as the following expression:
 // var box = new CardboardBox<ICat>(new ShroedingersCat(new Lazy<State>(() => (State)indeterminacy.Next(2))));
 var box = container.Resolve<IBox<ICat>>();
 // Checks the cat's state
 WriteLine(box.Content);
 ```
+
+Several aspects of the [Composition Root](https://blog.ploeh.dk/2011/07/28/CompositionRoot/):
+
+- **As close to Init or Entry Point as possible:** It should be as close as possible to the application's entry point.
+- **Single location for object construction:** A Composition Root is a (preferably) unique location in an application where modules are composed together.
+- **The Composition Root is an application infrastructure component:** Only applications should have Composition Roots. Libraries and frameworks shouldn't.
+- **A IoC Container should only be referenced from the Composition Root:** All other modules should have no reference to the container.
+- **Predictable Dependency Graph:** It is better to have a pre-constructed, pre-discovered dependency graph.
 
 Each dependency is resolved by a strongly-typed block of statements like the operator `new` which is compiled on the fly from the coresponding expression tree to create or to get a required dependency instance with minimal impact on performance or memory consumtion. For instance, the getting (or injecting) of a box looks like:
 

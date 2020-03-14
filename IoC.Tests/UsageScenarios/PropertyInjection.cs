@@ -13,6 +13,7 @@
             // $tag=injection
             // $priority=03
             // $description=Property Injection
+            // $header=:warning: Please try using the constructor injection instead. The property injection is not recommended because of it is a cause of hidden dependencies.
             // {
             // Create and configure the container
             using var container = Container

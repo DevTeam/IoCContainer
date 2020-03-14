@@ -13,6 +13,7 @@
             // $priority=00
             // $description=Autowiring with initialization
             // $header=Sometimes instances required some actions before you give them to use - some methods of initialization or fields which should be defined. You can solve these things easy.
+            // $footer=:warning: It is not recommended because of it is a cause of hidden dependencies.
             // {
             // Create the container and configure it using full autowiring
             using var container = Container

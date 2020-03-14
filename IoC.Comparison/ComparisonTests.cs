@@ -40,7 +40,7 @@ namespace IoC.Comparison
 
         private static readonly List<TestInfo> IoCGraphOf3ObjectsWithSingleton = new List<TestInfo>
         {
-            new TestInfo($"{ThisIocName} actual DI", ThisByFuncSingleton),
+            new TestInfo($"{ThisIocName} by the Composition Root", ThisByCompositionRootSingleton),
             new TestInfo(ThisIocName, ThisSingleton),
             new TestInfo("operators 'new'", CtorSingleton),
             new TestInfo("LightInject", LightInjectSingleton),
@@ -53,7 +53,7 @@ namespace IoC.Comparison
 
         private static readonly List<TestInfo> IoCGraphOf3Transient = new List<TestInfo>
         {
-            new TestInfo($"{ThisIocName} actual DI", ThisByFuncTransient),
+            new TestInfo($"{ThisIocName} by the Composition Root", ThisByCompositionRootTransient),
             new TestInfo(ThisIocName, ThisTransient),
             new TestInfo("operators 'new'", CtorTransient),
             new TestInfo("LightInject", LightInjectTransient),
@@ -66,7 +66,7 @@ namespace IoC.Comparison
 
         private static readonly List<TestInfo> IoCComplexGraphOf3Transient = new List<TestInfo>
         {
-            new TestInfo($"{ThisIocName} actual DI", ThisByFuncComplex),
+            new TestInfo($"{ThisIocName} by the Composition Root", ThisByCompositionRootComplex),
             new TestInfo(ThisIocName, ThisComplex),
             new TestInfo("LightInject", LightInjectComplex),
             new TestInfo("DryIoc", DryIocComplex),
@@ -272,7 +272,7 @@ namespace IoC.Comparison
             }
         }
 
-        private static void ThisByFuncSingleton(long series, IPerformanceCounter performanceCounter)
+        private static void ThisByCompositionRootSingleton(long series, IPerformanceCounter performanceCounter)
         {
             var emptyArgs = new object[0];
             using (var container = ThisContainer.CreateCore())
@@ -292,7 +292,7 @@ namespace IoC.Comparison
             }
         }
 
-        private static void ThisByFuncTransient(long series, IPerformanceCounter performanceCounter)
+        private static void ThisByCompositionRootTransient(long series, IPerformanceCounter performanceCounter)
         {
             var emptyArgs = new object[0];
             using (var container = ThisContainer.CreateCore())
@@ -312,7 +312,7 @@ namespace IoC.Comparison
             }
         }
 
-        private static void ThisByFuncComplex(long series, IPerformanceCounter performanceCounter)
+        private static void ThisByCompositionRootComplex(long series, IPerformanceCounter performanceCounter)
         {
             var emptyArgs = new object[0];
             using (var container = ThisContainer.CreateCore())

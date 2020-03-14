@@ -18,7 +18,7 @@ namespace IoC.Tests.UsageScenarios
         // $tag=binding
         // $priority=10
         // $description=Aspect Oriented 
-        // $header=This framework has no special attributes to support aspect oriented autowiring. The production code may not have a references to these special attributes. But this code may contain these attributes by itself. And it is quite easy to use these attributes for aspect oriented autowiring, see the sample below.
+        // $header=This framework has no special attributes to support aspect oriented autowiring because of a production code should not have references to these special attributes. But this code may contain these attributes by itself. And it is quite easy to use these attributes for aspect oriented autowiring, see the sample below.
         // $footer=Also you can specify your own aspect oriented autowiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
         // {
         public void Run()

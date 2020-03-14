@@ -13,6 +13,7 @@
             // $tag=injection
             // $priority=03
             // $description=Method Injection
+            // $header=:warning: Please try using the constructor injection instead. The method injection is not recommended because of it is a cause of hidden dependencies.
             // {
             // Create and configure the container using full autowiring
             using var container = Container
