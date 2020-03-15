@@ -17,6 +17,6 @@
         /// <param name="lifetime">The lifetime.</param>
         /// <param name="error">The error.</param>
         /// <returns>The resulting expression.</returns>
-        [NotNull] Expression Resolve([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, ILifetime lifetime, Exception error);
+        [NotNull] Expression Resolve([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, Exception error);
     }
 }

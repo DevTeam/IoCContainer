@@ -305,6 +305,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Func](#func-)
   - [Func With Arguments](#func-with-arguments-)
   - [Auto dispose a singleton during owning container's dispose](#auto-dispose-a-singleton-during-owning-containers-dispose-)
+  - [Optional Dependency](#optional-dependency-)
   - [Configuration via a text metadata](#configuration-via-a-text-metadata-)
   - [Tracing](#tracing-)
   - [Validation](#validation-)
@@ -375,7 +376,8 @@ public async void Run()
     using var container = Container.Create()
         // Bind some dependency
         .Bind<IDependency>().To<SomeDependency>()
-        .Bind<Consumer>().To<Consumer>().Container;
+        .Bind<Consumer>().To<Consumer>()
+        .Container;
 
     // Resolve an instance asynchronously using TaskScheduler.Current
     var instance = await container.Resolve<Task<Consumer>>();
@@ -421,7 +423,8 @@ public void Run()
         .Bind<CancellationToken>().To(ctx => ctx.Container.Inject<CancellationTokenSource>().Token)
         // Bind some dependency
         .Bind<IDependency>().To<SomeDependency>()
-        .Bind<Consumer>().To<Consumer>().Container;
+        .Bind<Consumer>().To<Consumer>()
+        .Container;
 
     // Resolve an instance asynchronously
     var instanceTask = container.Resolve<Task<Consumer>>();
@@ -560,7 +563,7 @@ public IEnumerable<IToken> Apply(IContainer container)
 
 ### Generic Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GenericAutowiring.cs)
 
-Auto-writing of generic types as simple as auto-writing of other types. Just use a generic parameters markers like _TT_, _TT1_, _TT2_ and etc. or other special markers like TTDisposable, TTDisposable1 and etc. TTList<>, TTDictionary<> ... or create your own generic parameters markers or bind open generic types.
+Auto-writing of generic types as simple as auto-writing of other types. Just use a generic parameters markers like _TT_, _TT1_, _TT2_ and etc. or TTI, TTI1, TTI2 ... for interfaces or TTS, TTS1, TTS2 ... for value types or other special markers like TTDisposable, TTDisposable1 and etc. TTList<>, TTDictionary<> ... or create your own generic parameters markers or bind open generic types.
 
 ``` CSharp
 public void Run()
@@ -1181,6 +1184,71 @@ disposableService.Verify(i => i.DisposeAsync(), Times.Once);
 
 
 
+### Optional Dependency [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/OptionalDependency.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    // Create the container and configure it
+    using var container = Container.Create()
+        .Using<OptionalFeature>()
+        .Bind<IDependency>().To<Dependency>()
+        .Bind<IService>().To<SomeService>()
+        .Container;
+
+    // Resolve an instance
+    var instance = container.Resolve<IService>();
+
+    // Check the optional dependency
+    instance.State.ShouldBe("empty");
+}
+
+public class OptionalFeature: IConfiguration
+{
+    public IEnumerable<IToken> Apply(IContainer container)
+    {
+        yield return container
+            // Bind factory for Optional for any tags
+            .Bind<Optional<TT>>().Tag(Key.AnyTag).To(ctx => Create<TT>(ctx));
+    }
+
+    private static Optional<T> Create<T>(Context ctx) => 
+        ctx.Container.TryGetResolver<T>(typeof(T), ctx.Key.Tag, out var resolver, out _)
+            ? new Optional<T>(resolver(ctx.Container, ctx.Args))
+            : Optional<T>.Empty;
+}
+
+public struct Optional<T>
+{
+    public static readonly Optional<T> Empty = new Optional<T>();
+    public readonly T Value;
+    public readonly bool HasValue;
+
+    public Optional(T value) : this()
+    {
+        Value = value;
+        HasValue = true;
+    }
+}
+
+public class SomeService: IService
+{
+    public SomeService(IDependency dependency, Optional<string> state)
+    {
+        Dependency = dependency;
+        State = state.HasValue ? state.Value : "empty";
+    }
+
+    public IDependency Dependency { get; }
+
+    public string State { get; }
+}
+```
+
+
+
 ### Configuration via a text metadata [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConfigurationText.cs)
 
 The container's configuration could be parsed and applied from simple text metadata.
@@ -1506,39 +1574,49 @@ public async void Run()
 {
     // Create the container and configure it
     using var container = Container.Create()
-        // Bind cancellation token source
-        .Bind<CancellationTokenSource>().To<CancellationTokenSource>()
-        // Bind the class responsible for tasks creation
-        .Bind<TaskFactory<TT>>().As(Singleton).To<TaskFactory<TT>>()
-        // Bind the task factory (for all tags)
-        .Bind<Task<TT>>().Tag(Key.AnyTag).To(ctx => ctx.Container.Inject<TaskFactory<TT>>(ctx.Key.Tag).Create())
+        .Using<CustomTasksFeature>()
         // Bind some dependency
         .Bind<IDependency>().To<SomeDependency>()
-        .Bind<Consumer>().To<Consumer>().Container;
+        .Bind<Consumer>().To<Consumer>()
+        .Container;
 
-    // Resolve an instance asynchronously using TaskScheduler.Current
+    // Resolve an instance asynchronously
     var instance = await container.Resolve<Task<Consumer>>();
 
     // Check the instance's type
     instance.ShouldBeOfType<Consumer>();
 }
 
-internal class TaskFactory<T>
+internal class CustomTasksFeature: IConfiguration
 {
-    private readonly Func<T> _factory;
-    private readonly CancellationTokenSource _cancellationTokenSource;
-
-    public TaskFactory(Func<T> factory, CancellationTokenSource cancellationTokenSource)
+    public IEnumerable<IToken> Apply(IContainer container)
     {
-        _factory = factory;
-        _cancellationTokenSource = cancellationTokenSource;
+        yield return container
+            // Bind cancellation token source
+            .Bind<CancellationTokenSource>().To<CancellationTokenSource>()
+            // Bind the class responsible for tasks creation
+            .Bind<TaskFactory<TT>>().As(Singleton).To<TaskFactory<TT>>()
+            // Bind the task factory for any tags
+            .Bind<Task<TT>>().Tag(Key.AnyTag).To(ctx => ctx.Container.Inject<TaskFactory<TT>>(ctx.Key.Tag).Create());
     }
 
-    public Task<T> Create()
+    internal class TaskFactory<T>
     {
-        var task = new Task<T>(_factory, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning);
-        task.Start(TaskScheduler.Default);
-        return task;
+        private readonly Func<T> _factory;
+        private readonly CancellationTokenSource _cancellationTokenSource;
+
+        public TaskFactory(Func<T> factory, CancellationTokenSource cancellationTokenSource)
+        {
+            _factory = factory;
+            _cancellationTokenSource = cancellationTokenSource;
+        }
+
+        public Task<T> Create()
+        {
+            var task = new Task<T>(_factory, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning);
+            task.Start(TaskScheduler.Default);
+            return task;
+        }
     }
 }
 

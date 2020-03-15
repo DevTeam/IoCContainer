@@ -32,7 +32,8 @@ namespace IoC.Tests.UsageScenarios
                 .Bind<CancellationToken>().To(ctx => ctx.Container.Inject<CancellationTokenSource>().Token)
                 // Bind some dependency
                 .Bind<IDependency>().To<SomeDependency>()
-                .Bind<Consumer>().To<Consumer>().Container;
+                .Bind<Consumer>().To<Consumer>()
+                .Container;
 
             // Resolve an instance asynchronously
             var instanceTask = container.Resolve<Task<Consumer>>();

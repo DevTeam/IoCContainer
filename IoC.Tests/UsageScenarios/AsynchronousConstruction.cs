@@ -24,7 +24,8 @@ namespace IoC.Tests.UsageScenarios
             using var container = Container.Create()
                 // Bind some dependency
                 .Bind<IDependency>().To<SomeDependency>()
-                .Bind<Consumer>().To<Consumer>().Container;
+                .Bind<Consumer>().To<Consumer>()
+                .Container;
 
             // Resolve an instance asynchronously using TaskScheduler.Current
             var instance = await container.Resolve<Task<Consumer>>();
