@@ -26,7 +26,7 @@ namespace IoC.Tests.UsageScenarios
                 .Bind<IDependency>().To<SomeDependency>()
                 .Bind<Consumer>().To<Consumer>().Container;
 
-            // Resolve an instance asynchronously
+            // Resolve an instance asynchronously using TaskScheduler.Current
             var instance = await container.Resolve<Task<Consumer>>();
 
             // Check the instance's type

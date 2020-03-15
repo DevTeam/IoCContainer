@@ -276,7 +276,6 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Property Injection](#property-injection-)
   - [Constructor Autowiring](#constructor-autowiring-)
   - [Containers Injection](#containers-injection-)
-  - [Active Object](#active-object-)
   - [Resolve instances as Array](#resolve-instances-as-array-)
   - [Resolve instances as ICollection](#resolve-instances-as-icollection-)
   - [Resolve instances as IEnumerable](#resolve-instances-as-ienumerable-)
@@ -314,6 +313,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Asynchronous resolve](#asynchronous-resolve-)
   - [Asynchronous lightweight resolve](#asynchronous-lightweight-resolve-)
   - [Asynchronous construction](#asynchronous-construction-)
+  - [Cancellation of asynchronous construction](#cancellation-of-asynchronous-construction-)
   - [Resolve instances via IAsyncEnumerable](#resolve-instances-via-iasyncenumerable-)
 - Fully Customizable
   - [Custom Builder](#custom-builder-)
@@ -376,7 +376,7 @@ public async void Run()
         .Bind<IDependency>().To<SomeDependency>()
         .Bind<Consumer>().To<Consumer>().Container;
 
-    // Resolve an instance asynchronously
+    // Resolve an instance asynchronously using TaskScheduler.Current
     var instance = await container.Resolve<Task<Consumer>>();
 
     // Check the instance's type
@@ -387,6 +387,58 @@ public class SomeDependency: IDependency
 {
     // Time-consuming logic constructor
     public SomeDependency() { }
+}
+
+public class Consumer
+{
+    public Consumer(Task<IDependency> dependency1, Task<IDependency> dependency2)
+    {
+        // Time-consuming logic
+        var dep1 = dependency1.Result;
+        var dep2 = dependency2.Result;
+    }
+}
+```
+
+
+
+### Cancellation of asynchronous construction [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousConstructionCancellation.cs)
+
+It is possible to inject dependencies in asynchronous style and to cancel their creations using default _CancellationTokenSource_.
+
+``` CSharp
+public void Run()
+{
+    // Create a cancellation token source
+    var cancellationTokenSource = new CancellationTokenSource();
+
+    // Create the container and configure it
+    using var container = Container.Create()
+        // Bind cancellation token source
+        .Bind<CancellationTokenSource>().To(ctx => cancellationTokenSource)
+        // Bind cancellation token
+        .Bind<CancellationToken>().To(ctx => ctx.Container.Inject<CancellationTokenSource>().Token)
+        // Bind some dependency
+        .Bind<IDependency>().To<SomeDependency>()
+        .Bind<Consumer>().To<Consumer>().Container;
+
+    // Resolve an instance asynchronously
+    var instanceTask = container.Resolve<Task<Consumer>>();
+
+    // Cancel tasks
+    cancellationTokenSource.Cancel();
+
+    // Get an instance
+    instanceTask.Result.ShouldBeOfType<Consumer>();
+}
+
+public class SomeDependency: IDependency
+{
+    // Time-consuming logic constructor with cancellation token
+    public SomeDependency(CancellationToken cancellationToken)
+    {
+        while (!cancellationToken.IsCancellationRequested) { }
+    }
 }
 
 public class Consumer
@@ -1829,53 +1881,6 @@ public class MyClass
     public IContainer ChildContainer { get; }
 
     public IContainer NamedChildContainer { get; }
-}
-```
-
-
-
-### Active Object [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ActiveObject.cs)
-
-In [object-oriented programming](https://en.wikipedia.org/wiki/Object-oriented_programming) an object is active when its state depends on clock. Usually an active object encapsulates a task that updates the object's state.
-
-``` CSharp
-public void Run()
-{
-    // Create the parent container
-    var container = Container
-        .Create()
-        // This singleton instance "Activation" of type "CancellationTokenSource" was registered as singleton and it implements "IDisposable"
-        // So it will be automatically disposed during container disposing
-        // And every related "Activation" tasks will be finished automatically
-        .Bind<CancellationTokenSource>().Tag("Activation").As(Singleton).To<CancellationTokenSource>()
-        // Bind some type of Active Object
-        .Bind<IAnotherService>().Bind<IActiveObject>().To<MyActiveObject>(ctx
-            // While resolving an Active Object the method "Activate" will be invoked for each instance
-            // And a singleton instance "Activation" of type "CancellationTokenSource" is passed as an argument to deactivate every Active Objects
-            => ctx.It.Activate(ctx.Container.Inject<CancellationTokenSource>("Activation")))
-        .Container;
-
-    using (container)
-    {
-        // Resolves an Active Object
-        container.Resolve<IAnotherService>();
-    }
-
-    // Every Active Objects will be deactivated here
-}
-
-public interface IActiveObject
-{
-     void Activate(CancellationTokenSource cancellationTokenSource);
-}
-
-public class MyActiveObject: IAnotherService, IActiveObject
-{
-    public void Activate(CancellationTokenSource cancellationTokenSource)
-    {
-        // Do some actions
-        Task.Delay(TimeSpan.FromDays(1), cancellationTokenSource.Token);
-    }
 }
 ```
 
