@@ -319,6 +319,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Custom Builder](#custom-builder-)
   - [Custom Child Container](#custom-child-container-)
   - [Custom Lifetime](#custom-lifetime-)
+  - [Custom Tasks](#custom-tasks-)
   - [Interception](#interception-)
   - [Replace Lifetime](#replace-lifetime-)
 - Other Samples
@@ -1491,6 +1492,70 @@ public class MyTransientLifetime : ILifetime
 
     // Disposes the instance of the Singleton lifetime
     public void Dispose() => _baseLifetime.Dispose();
+}
+```
+
+
+
+### Custom Tasks [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomTasks.cs)
+
+
+
+``` CSharp
+public async void Run()
+{
+    // Create the container and configure it
+    using var container = Container.Create()
+        // Bind cancellation token source
+        .Bind<CancellationTokenSource>().To<CancellationTokenSource>()
+        // Bind the class responsible for tasks creation
+        .Bind<TaskFactory<TT>>().As(Singleton).To<TaskFactory<TT>>()
+        // Bind the task factory (for all tags)
+        .Bind<Task<TT>>().Tag(Key.AnyTag).To(ctx => ctx.Container.Inject<TaskFactory<TT>>(ctx.Key.Tag).Create())
+        // Bind some dependency
+        .Bind<IDependency>().To<SomeDependency>()
+        .Bind<Consumer>().To<Consumer>().Container;
+
+    // Resolve an instance asynchronously using TaskScheduler.Current
+    var instance = await container.Resolve<Task<Consumer>>();
+
+    // Check the instance's type
+    instance.ShouldBeOfType<Consumer>();
+}
+
+internal class TaskFactory<T>
+{
+    private readonly Func<T> _factory;
+    private readonly CancellationTokenSource _cancellationTokenSource;
+
+    public TaskFactory(Func<T> factory, CancellationTokenSource cancellationTokenSource)
+    {
+        _factory = factory;
+        _cancellationTokenSource = cancellationTokenSource;
+    }
+
+    public Task<T> Create()
+    {
+        var task = new Task<T>(_factory, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning);
+        task.Start(TaskScheduler.Default);
+        return task;
+    }
+}
+
+public class SomeDependency: IDependency
+{
+    // Time-consuming logic constructor
+    public SomeDependency() { }
+}
+
+public class Consumer
+{
+    public Consumer(Task<IDependency> dependency1, Task<IDependency> dependency2)
+    {
+        // Time-consuming logic
+        var dep1 = dependency1.Result;
+        var dep2 = dependency2.Result;
+    }
 }
 ```
 
