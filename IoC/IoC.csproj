@@ -16,7 +16,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>ioc container di</PackageTags>
     <Product>IoC Container</Product>
-    <Copyright>Copyright (c) 2019 Nikolay Pianikov</Copyright>
+    <Copyright>Copyright © 2018-2020 Nikolay Pianikov</Copyright>
     <DocumentationFile>..\Docs\IoC_$(TargetFramework).xml</DocumentationFile>
     <WarningsAsErrors />
     <MSBuildNative>C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild</MSBuildNative>
