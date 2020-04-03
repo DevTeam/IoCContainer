@@ -1061,6 +1061,11 @@
         <member name="F:IoC.Features.TaskFeature.Default">
             The default instance.
         </member>
+        <member name="F:IoC.Features.TaskFeature.Tag">
+            <summary>
+            TaskFeature default tag
+            </summary>
+        </member>
         <member name="M:IoC.Features.TaskFeature.Apply(IoC.IContainer)">
             <inheritdoc />
         </member>

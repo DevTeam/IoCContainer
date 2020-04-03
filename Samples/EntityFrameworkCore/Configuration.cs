@@ -17,7 +17,7 @@ namespace EntityFrameworkCore
 
             // Configure services
             aspNetCoreFeature
-                .AddLogging()
+                .AddEntityFrameworkInMemoryDatabase()
                 .AddDbContext<Db>(options => options.UseInMemoryDatabase("Sample DB"), ServiceLifetime.Singleton);
 
             // Id generator

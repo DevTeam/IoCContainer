@@ -677,6 +677,7 @@
   - [ToString()](#M-IoC-Tag-ToString 'IoC.Tag.ToString')
 - [TaskFeature](#T-IoC-Features-TaskFeature 'IoC.Features.TaskFeature')
   - [Default](#F-IoC-Features-TaskFeature-Default 'IoC.Features.TaskFeature.Default')
+  - [Tag](#F-IoC-Features-TaskFeature-Tag 'IoC.Features.TaskFeature.Tag')
   - [Apply()](#M-IoC-Features-TaskFeature-Apply-IoC-IContainer- 'IoC.Features.TaskFeature.Apply(IoC.IContainer)')
 - [TerminatesProgramAttribute](#T-IoC-TerminatesProgramAttribute 'IoC.TerminatesProgramAttribute')
 - [TraceEvent](#T-IoC-TraceEvent 'IoC.TraceEvent')
@@ -12013,6 +12014,13 @@ Allows to resolve Tasks.
 
 <a name='F-IoC-Features-TaskFeature-Default'></a>
 ### Default `constants`
+
+<a name='F-IoC-Features-TaskFeature-Tag'></a>
+### Tag `constants`
+
+##### Summary
+
+TaskFeature default tag
 
 <a name='M-IoC-Features-TaskFeature-Apply-IoC-IContainer-'></a>
 ### Apply() `method`

@@ -31,7 +31,7 @@
             return new CompositeDisposable(disposables);
         }
 
-#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
         public static IDisposable ToDisposable([NotNull] this IAsyncDisposable asyncDisposable)
         {
 #if DEBUG

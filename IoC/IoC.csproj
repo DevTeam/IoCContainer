@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyName>$(AssemblyNamePrefix)IoC</AssemblyName>
     <TieredCompilation>false</TieredCompilation>
-    <TargetFrameworks>net40;net48;netstandard1.0;netstandard2.1;netcoreapp1.0;netcoreapp2.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net5.0;net40;net48;netstandard1.0;netstandard2.1;netcoreapp1.0;netcoreapp2.0;netcoreapp3.1</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
@@ -16,7 +16,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>ioc container di</PackageTags>
     <Product>IoC Container</Product>
-    <Copyright>Copyright © 2018-2020 Nikolay Pianikov</Copyright>
+    <Copyright>Copyright (C) 2018-2020 Nikolay Pianikov</Copyright>
     <DocumentationFile>..\Docs\IoC_$(TargetFramework).xml</DocumentationFile>
     <WarningsAsErrors />
     <MSBuildNative>C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild</MSBuildNative>
@@ -27,7 +27,7 @@
     <!--NullableContextOptions>enable</NullableContextOptions-->
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <TargetFrameworks>netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;netstandard2.1;net40;net45;net46;net47;net48;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;netcoreapp2.1;netcoreapp2.2;netcoreapp3.0;netcoreapp3.1;uap10.0</TargetFrameworks>
+    <TargetFrameworks>net5.0;netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;netstandard2.1;net40;net45;net46;net47;net48;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;netcoreapp2.1;netcoreapp2.2;netcoreapp3.0;netcoreapp3.1;uap10.0</TargetFrameworks>
     <Optimize>true</Optimize>
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>

@@ -125,7 +125,7 @@
 
             // Then
             mock.Verify(i => i.Dispose(), Times.Once);
-#if NETCOREAPP3_1
+#if NET5 || NETCOREAPP3_1
             mock.Verify(i => i.DisposeAsync(), Times.Once);
 #endif
         }

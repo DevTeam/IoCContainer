@@ -137,7 +137,7 @@ It allows you to take full advantage of dependency injection everywhere and ever
   dotnet add package IoC.AspNetCore
   ```
 
-### For ASP.NET Core 3 create the _IoC container_ and use the service provider factory based on this container at [Main](Samples/WebApplication3/Program.cs)
+### For ASP.NET Core 3+ create the _IoC container_ and use the service provider factory based on this container at [Main](Samples/WebApplication3/Program.cs)
 
 ```csharp
 public static void Main(string[] args)

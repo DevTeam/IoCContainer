@@ -568,7 +568,7 @@
         }
 #endif
 
-#if NETCOREAPP2_1 || NETCOREAPP3_1
+#if NET5 || NETCOREAPP2_1 || NETCOREAPP3_1
         [Fact]
         public void ContainerShouldResolveGenericWhenValueTuple()
         {
