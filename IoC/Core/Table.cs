@@ -13,7 +13,6 @@
         public readonly int Divisor;
         public readonly Bucket[] Buckets;
 
-        [MethodImpl((MethodImplOptions)256)]
         private Table(Bucket[] buckets, int divisor, int count)
         {
             Buckets = buckets;
@@ -52,7 +51,6 @@
             Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(new KeyValue(hashCode, key, value));
         }
 
-        [MethodImpl((MethodImplOptions)256)]
         [Pure]
         public IEnumerator<KeyValue> GetEnumerator()
         {
@@ -67,19 +65,14 @@
             }
         }
 
-        [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() =>
+            GetEnumerator();
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public Table<TKey, TValue> Set(int hashCode, TKey key, TValue value)
-        {
-            return new Table<TKey, TValue>(this, hashCode, key, value);
-        }
+        public Table<TKey, TValue> Set(int hashCode, TKey key, TValue value) =>
+            new Table<TKey, TValue>(this, hashCode, key, value);
 
         [Pure]
         public Table<TKey, TValue> Remove(int hashCode, TKey key, out bool removed)
@@ -120,7 +113,6 @@
             public readonly TKey Key;
             public readonly TValue Value;
 
-            [MethodImpl((MethodImplOptions)256)]
             public KeyValue(int hashCode, TKey key, TValue value)
             {
                 HashCode = hashCode;
@@ -134,30 +126,20 @@
             public static readonly Bucket EmptyBucket = new Bucket(0);
             public readonly KeyValue[] KeyValues;
 
-            [MethodImpl((MethodImplOptions)256)]
-            private Bucket(KeyValue[] keyValues)
-            {
+            private Bucket(KeyValue[] keyValues) =>
                 KeyValues = keyValues.Length == 0 ? CoreExtensions.EmptyArray<KeyValue>() : keyValues.Copy();
-            }
 
-            [MethodImpl((MethodImplOptions)256)]
-            private Bucket(int count)
-            {
+            private Bucket(int count) =>
                 KeyValues = CoreExtensions.CreateArray<KeyValue>(count);
-            }
 
             [MethodImpl((MethodImplOptions)256)]
-            public Bucket Copy()
-            {
-                return new Bucket(KeyValues);
-            }
+            public Bucket Copy() =>
+                new Bucket(KeyValues);
 
             [Pure]
             [MethodImpl((MethodImplOptions)256)]
-            public Bucket Add(KeyValue keyValue)
-            {
-                return new Bucket(KeyValues.Add(keyValue));
-            }
+            public Bucket Add(KeyValue keyValue) =>
+                new Bucket(KeyValues.Add(keyValue));
 
             [Pure]
             [MethodImpl((MethodImplOptions)256)]

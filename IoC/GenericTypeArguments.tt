@@ -58,7 +58,7 @@ var baseTypes = new Dictionary<string, string> {
     <#}#>
 <#}#>
 
-    internal sealed class GenericTypeArguments
+    internal static class GenericTypeArguments
     {
         internal static readonly System.Type[] Arguments =
         {

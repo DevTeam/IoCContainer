@@ -1354,7 +1354,7 @@ namespace IoC
     public struct TTS32 { }
 
 
-    internal sealed class GenericTypeArguments
+    internal static class GenericTypeArguments
     {
         internal static readonly System.Type[] Arguments =
         {

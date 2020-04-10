@@ -1344,7 +1344,7 @@ namespace IoC
                         }
                         else
                         {
-                            var hashCode = key.GetHashCode();
+                            var hashCode = key.HashCode;
                             isRegistered &= dependencies.Get(hashCode, key) == default(DependencyEntry);
                             if (isRegistered)
                             {
@@ -1411,7 +1411,7 @@ namespace IoC
             else
             {
                 key = new FullKey(type, tag);
-                hashCode = key.GetHashCode();
+                hashCode = key.HashCode;
                 resolver = (Resolver<T>)Resolvers.Get(hashCode, key);
                 if (resolver != default(Resolver<T>)) // found in resolvers
                 {
@@ -1477,7 +1477,7 @@ namespace IoC
         /// <inheritdoc />
         public bool TryGetDependency(FullKey key, out IDependency dependency, out ILifetime lifetime)
         {
-            if (!TryGetDependency(key, key.GetHashCode(), out var dependencyEntry))
+            if (!TryGetDependency(key, key.HashCode, out var dependencyEntry))
             {
                 return _parent.TryGetDependency(key, out dependency, out lifetime);
             }
@@ -1626,7 +1626,7 @@ namespace IoC
                     var genericType = typeDescriptor.GetGenericTypeDefinition();
                     var genericKey = new FullKey(genericType, key.Tag);
                     // For generic type
-                    dependencyEntry = _dependencies.Get(genericKey.GetHashCode(), genericKey);
+                    dependencyEntry = _dependencies.Get(genericKey.HashCode, genericKey);
                     if (dependencyEntry != default(DependencyEntry))
                     {
                         return true;
@@ -1652,7 +1652,7 @@ namespace IoC
                 {
                     var arrayKey = new FullKey(typeof(IArray), key.Tag);
                     // For generic type
-                    dependencyEntry = _dependencies.Get(arrayKey.GetHashCode(), arrayKey);
+                    dependencyEntry = _dependencies.Get(arrayKey.HashCode, arrayKey);
                     if (dependencyEntry != default(DependencyEntry))
                     {
                         return true;
@@ -5541,6 +5541,7 @@ namespace IoC
         /// <param name="token">The target container token.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class =>
@@ -5748,7 +5749,7 @@ namespace IoC
         public static T Resolve<T>([NotNull] this Container container, Tag tag)
         {
             var key = new Key(TypeDescriptor<T>.Type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
+            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
                     ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, EmptyArgs);
         }
 
@@ -5780,7 +5781,7 @@ namespace IoC
         public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
             var key = new Key(TypeDescriptor<T>.Type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
+            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
                     ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, args);
         }
 
@@ -5812,7 +5813,7 @@ namespace IoC
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
             var key = new Key(type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
+            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
                     ?? container.GetResolver<T>(type, tag))(container, EmptyArgs);
         }
 
@@ -5846,7 +5847,7 @@ namespace IoC
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
             var key = new Key(type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
+            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
                     ?? container.GetResolver<T>(type, tag))(container, args);
         }
     }
@@ -7463,7 +7464,7 @@ namespace IoC
     public struct TTS32 { }
 
 
-    internal sealed class GenericTypeArguments
+    internal static class GenericTypeArguments
     {
         internal static readonly System.Type[] Arguments =
         {
@@ -8106,7 +8107,6 @@ namespace IoC
 {
     using System;
     using System.Diagnostics;
-    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Represents a dependency key.
@@ -8130,7 +8130,7 @@ namespace IoC
         /// </summary>
         [CanBeNull] public readonly object Tag;
 
-        private readonly int _hashCode;
+        internal readonly int HashCode;
 
         /// <summary>
         /// Creates the instance of Key.
@@ -8143,27 +8143,29 @@ namespace IoC
             Tag = tag;
             unchecked
             {
-                _hashCode = (tag?.GetHashCode() * 397 ?? 0) ^ type.GetHashCode();
+                HashCode = (tag?.GetHashCode() * 397 ?? 0) ^ type.GetHashCode();
             }
         }
 
         /// <inheritdoc />
-        public override string ToString() => $"[Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {GetHashCode()}]";
+        public override string ToString() => $"[Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {HashCode}]";
 
         /// <inheritdoc />
-        [MethodImpl((MethodImplOptions)256)]
         // ReSharper disable once PossibleNullReferenceException
-        public override bool Equals(object obj) => Equals((Key)obj);
+        public override bool Equals(object obj)
+        {
+            // ReSharper disable once PossibleNullReferenceException
+            var other = (Key)obj;
+            return ReferenceEquals(Type, other.Type) && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
+        }
 
         /// <inheritdoc />
-        [MethodImpl((MethodImplOptions)256)]
         public bool Equals(Key other) => ReferenceEquals(Type, other.Type) && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
 
         /// <inheritdoc />
-        [MethodImpl((MethodImplOptions)256)]
-        public override int GetHashCode() => _hashCode;
+        public override int GetHashCode() => HashCode;
 
-        private struct AnyTagObject
+        private class AnyTagObject
         {
             public override string ToString() => "any";
         }
@@ -10062,9 +10064,11 @@ namespace IoC.Core
             return buildContext.InjectDependencies(baseExpression, contextItVar);
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         public static bool IsComplexType(TypeDescriptor typeDescriptor) => 
             typeDescriptor.IsConstructedGenericType() || typeDescriptor.IsGenericTypeDefinition() || typeDescriptor.IsArray();
 
+        [MethodImpl((MethodImplOptions)256)]
         public static T ReplaceTypes<T>(IBuildContext buildContext, bool isComplexType, T expression)
             where T : Expression =>
             isComplexType ? (T)buildContext.ReplaceTypes(expression) : expression;
@@ -10919,7 +10923,6 @@ namespace IoC.Core
         private DefaultAutowiringStrategy()
         { }
 
-        [MethodImpl((MethodImplOptions)256)]
         public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
         {
             instanceType = default(Type);
@@ -11087,7 +11090,7 @@ namespace IoC.Core
             }
 
             var lifetimeKey = new LifetimeKey(type.Descriptor().GetGenericTypeArguments());
-            var lifetimeHashCode = lifetimeKey.GetHashCode();
+            var lifetimeHashCode = lifetimeKey.HashCode;
 
             if (!hasLifetimes)
             {
@@ -11131,20 +11134,22 @@ namespace IoC.Core
         private struct LifetimeKey
         {
             private readonly Type[] _genericTypes;
-            private readonly int _hashCode;
+            internal readonly int HashCode;
 
             public LifetimeKey(Type[] genericTypes)
             {
                 _genericTypes = genericTypes;
-                _hashCode = genericTypes.GetHash();
+                HashCode = genericTypes.GetHash();
             }
 
             // ReSharper disable once PossibleNullReferenceException
-            public override bool Equals(object obj) => Equals((LifetimeKey)obj);
+            public override bool Equals(object obj)
+            {
+                var other = (LifetimeKey)obj;
+                return CoreExtensions.SequenceEqual(_genericTypes, other._genericTypes);
+            }
 
-            public override int GetHashCode() => _hashCode;
-
-            private bool Equals(LifetimeKey other) => CoreExtensions.SequenceEqual(_genericTypes, other._genericTypes);
+            public override int GetHashCode() => HashCode;
         }
     }
 }
@@ -11515,6 +11520,7 @@ namespace IoC.Core
         }
 
 #if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+        [MethodImpl((MethodImplOptions)256)]
         public static IDisposable ToDisposable([NotNull] this IAsyncDisposable asyncDisposable)
         {
 #if DEBUG
@@ -12770,7 +12776,6 @@ namespace IoC.Core
         public readonly int Divisor;
         public readonly Bucket[] Buckets;
 
-        [MethodImpl((MethodImplOptions)256)]
         private Table(Bucket[] buckets, int divisor, int count)
         {
             Buckets = buckets;
@@ -12809,7 +12814,6 @@ namespace IoC.Core
             Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(new KeyValue(hashCode, key, value));
         }
 
-        [MethodImpl((MethodImplOptions)256)]
         [Pure]
         public IEnumerator<KeyValue> GetEnumerator()
         {
@@ -12824,19 +12828,14 @@ namespace IoC.Core
             }
         }
 
-        [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return GetEnumerator();
-        }
+        IEnumerator IEnumerable.GetEnumerator() =>
+            GetEnumerator();
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public Table<TKey, TValue> Set(int hashCode, TKey key, TValue value)
-        {
-            return new Table<TKey, TValue>(this, hashCode, key, value);
-        }
+        public Table<TKey, TValue> Set(int hashCode, TKey key, TValue value) =>
+            new Table<TKey, TValue>(this, hashCode, key, value);
 
         [Pure]
         public Table<TKey, TValue> Remove(int hashCode, TKey key, out bool removed)
@@ -12877,7 +12876,6 @@ namespace IoC.Core
             public readonly TKey Key;
             public readonly TValue Value;
 
-            [MethodImpl((MethodImplOptions)256)]
             public KeyValue(int hashCode, TKey key, TValue value)
             {
                 HashCode = hashCode;
@@ -12891,30 +12889,20 @@ namespace IoC.Core
             public static readonly Bucket EmptyBucket = new Bucket(0);
             public readonly KeyValue[] KeyValues;
 
-            [MethodImpl((MethodImplOptions)256)]
-            private Bucket(KeyValue[] keyValues)
-            {
+            private Bucket(KeyValue[] keyValues) =>
                 KeyValues = keyValues.Length == 0 ? CoreExtensions.EmptyArray<KeyValue>() : keyValues.Copy();
-            }
 
-            [MethodImpl((MethodImplOptions)256)]
-            private Bucket(int count)
-            {
+            private Bucket(int count) =>
                 KeyValues = CoreExtensions.CreateArray<KeyValue>(count);
-            }
 
             [MethodImpl((MethodImplOptions)256)]
-            public Bucket Copy()
-            {
-                return new Bucket(KeyValues);
-            }
+            public Bucket Copy() =>
+                new Bucket(KeyValues);
 
             [Pure]
             [MethodImpl((MethodImplOptions)256)]
-            public Bucket Add(KeyValue keyValue)
-            {
-                return new Bucket(KeyValues.Add(keyValue));
-            }
+            public Bucket Add(KeyValue keyValue) =>
+                new Bucket(KeyValues.Add(keyValue));
 
             [Pure]
             [MethodImpl((MethodImplOptions)256)]
@@ -12946,7 +12934,6 @@ namespace IoC.Core
 namespace IoC.Core
 {
     using System;
-    using System.Runtime.CompilerServices;
 
     internal struct Token: IToken
     {
@@ -12960,7 +12947,6 @@ namespace IoC.Core
 
         public IContainer Container { get; }
 
-        [MethodImpl((MethodImplOptions)256)]
         public void Dispose() => _dependencyToken.Dispose();
     }
 }
@@ -12984,11 +12970,8 @@ namespace IoC.Core
         // ReSharper disable once MemberCanBePrivate.Global
         internal readonly Type Type;
 
-        [MethodImpl((MethodImplOptions)256)]
-        public TypeDescriptor([NotNull] Type type)
-        {
+        public TypeDescriptor([NotNull] Type type) =>
             Type = type ?? throw new ArgumentNullException(nameof(type));
-        }
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
@@ -13099,19 +13082,12 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public bool IsAssignableFrom(TypeDescriptor typeDescriptor)
-        {
-            return Type.IsAssignableFrom(typeDescriptor.Type);
-        }
+        public bool IsAssignableFrom(TypeDescriptor typeDescriptor) =>Type.IsAssignableFrom(typeDescriptor.Type);
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         [Pure]
-        public Type MakeGenericType([NotNull] params Type[] typeArguments)
-        {
-            if (typeArguments == null) throw new ArgumentNullException(nameof(typeArguments));
-            return Type.MakeGenericType(typeArguments);
-        }
+        public Type MakeGenericType([NotNull] params Type[] typeArguments) => Type.MakeGenericType(typeArguments ?? throw new ArgumentNullException(nameof(typeArguments)));
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
@@ -13120,25 +13096,13 @@ namespace IoC.Core
 
         public override string ToString() => TypeToStringConverter.Convert(Type);
 
-        public override bool Equals(object obj)
-        {
-            return obj is TypeDescriptor other && Equals(other);
-        }
+        public override bool Equals(object obj) => obj is TypeDescriptor other && Type == other.Type;
 
-        public override int GetHashCode()
-        {
-            return Type.GetHashCode();
-        }
-
-        private bool Equals(TypeDescriptor other)
-        {
-            return Type == other.Type;
-        }
+        public override int GetHashCode() => Type.GetHashCode();
 #else
         internal readonly Type Type;
         private readonly TypeInfo _typeInfo;
 
-        [MethodImpl((MethodImplOptions)256)]
         public TypeDescriptor([NotNull] Type type)
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
@@ -13256,19 +13220,12 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public bool IsAssignableFrom(TypeDescriptor typeDescriptor)
-        {
-            return _typeInfo.IsAssignableFrom(typeDescriptor._typeInfo);
-        }
+        public bool IsAssignableFrom(TypeDescriptor typeDescriptor) => _typeInfo.IsAssignableFrom(typeDescriptor._typeInfo);
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         [Pure]
-        public Type MakeGenericType([NotNull] params Type[] typeArguments)
-        {
-            if (typeArguments == null) throw new ArgumentNullException(nameof(typeArguments));
-            return Type.MakeGenericType(typeArguments);
-        }
+        public Type MakeGenericType([NotNull] params Type[] typeArguments) => Type.MakeGenericType(typeArguments ?? throw new ArgumentNullException(nameof(typeArguments)));
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
@@ -13277,20 +13234,9 @@ namespace IoC.Core
 
         public override string ToString() => TypeToStringConverter.Convert(Type);
 
-        public override bool Equals(object obj)
-        {
-            return obj is TypeDescriptor other && Equals(other);
-        }
+        public override bool Equals(object obj) => obj is TypeDescriptor other && Type == other.Type;
 
-        public override int GetHashCode()
-        {
-            return Type != null ? Type.GetHashCode() : 0;
-        }
-
-        private bool Equals(TypeDescriptor other)
-        {
-            return Type == other.Type;
-        }
+        public override int GetHashCode() => Type != null ? Type.GetHashCode() : 0;
 #endif
     }
 }

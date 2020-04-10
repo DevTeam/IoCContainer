@@ -61,6 +61,7 @@
         /// <param name="token">The target container token.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class =>

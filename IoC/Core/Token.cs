@@ -1,7 +1,6 @@
 ﻿namespace IoC.Core
 {
     using System;
-    using System.Runtime.CompilerServices;
 
     internal struct Token: IToken
     {
@@ -15,7 +14,6 @@
 
         public IContainer Container { get; }
 
-        [MethodImpl((MethodImplOptions)256)]
         public void Dispose() => _dependencyToken.Dispose();
     }
 }

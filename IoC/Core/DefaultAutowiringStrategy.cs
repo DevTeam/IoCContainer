@@ -13,7 +13,6 @@
         private DefaultAutowiringStrategy()
         { }
 
-        [MethodImpl((MethodImplOptions)256)]
         public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
         {
             instanceType = default(Type);

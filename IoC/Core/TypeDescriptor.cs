@@ -13,11 +13,8 @@
         // ReSharper disable once MemberCanBePrivate.Global
         internal readonly Type Type;
 
-        [MethodImpl((MethodImplOptions)256)]
-        public TypeDescriptor([NotNull] Type type)
-        {
+        public TypeDescriptor([NotNull] Type type) =>
             Type = type ?? throw new ArgumentNullException(nameof(type));
-        }
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
@@ -128,19 +125,12 @@
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public bool IsAssignableFrom(TypeDescriptor typeDescriptor)
-        {
-            return Type.IsAssignableFrom(typeDescriptor.Type);
-        }
+        public bool IsAssignableFrom(TypeDescriptor typeDescriptor) =>Type.IsAssignableFrom(typeDescriptor.Type);
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         [Pure]
-        public Type MakeGenericType([NotNull] params Type[] typeArguments)
-        {
-            if (typeArguments == null) throw new ArgumentNullException(nameof(typeArguments));
-            return Type.MakeGenericType(typeArguments);
-        }
+        public Type MakeGenericType([NotNull] params Type[] typeArguments) => Type.MakeGenericType(typeArguments ?? throw new ArgumentNullException(nameof(typeArguments)));
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
@@ -149,25 +139,13 @@
 
         public override string ToString() => TypeToStringConverter.Convert(Type);
 
-        public override bool Equals(object obj)
-        {
-            return obj is TypeDescriptor other && Equals(other);
-        }
+        public override bool Equals(object obj) => obj is TypeDescriptor other && Type == other.Type;
 
-        public override int GetHashCode()
-        {
-            return Type.GetHashCode();
-        }
-
-        private bool Equals(TypeDescriptor other)
-        {
-            return Type == other.Type;
-        }
+        public override int GetHashCode() => Type.GetHashCode();
 #else
         internal readonly Type Type;
         private readonly TypeInfo _typeInfo;
 
-        [MethodImpl((MethodImplOptions)256)]
         public TypeDescriptor([NotNull] Type type)
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
@@ -285,19 +263,12 @@
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public bool IsAssignableFrom(TypeDescriptor typeDescriptor)
-        {
-            return _typeInfo.IsAssignableFrom(typeDescriptor._typeInfo);
-        }
+        public bool IsAssignableFrom(TypeDescriptor typeDescriptor) => _typeInfo.IsAssignableFrom(typeDescriptor._typeInfo);
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         [Pure]
-        public Type MakeGenericType([NotNull] params Type[] typeArguments)
-        {
-            if (typeArguments == null) throw new ArgumentNullException(nameof(typeArguments));
-            return Type.MakeGenericType(typeArguments);
-        }
+        public Type MakeGenericType([NotNull] params Type[] typeArguments) => Type.MakeGenericType(typeArguments ?? throw new ArgumentNullException(nameof(typeArguments)));
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
@@ -306,20 +277,9 @@
 
         public override string ToString() => TypeToStringConverter.Convert(Type);
 
-        public override bool Equals(object obj)
-        {
-            return obj is TypeDescriptor other && Equals(other);
-        }
+        public override bool Equals(object obj) => obj is TypeDescriptor other && Type == other.Type;
 
-        public override int GetHashCode()
-        {
-            return Type != null ? Type.GetHashCode() : 0;
-        }
-
-        private bool Equals(TypeDescriptor other)
-        {
-            return Type == other.Type;
-        }
+        public override int GetHashCode() => Type != null ? Type.GetHashCode() : 0;
 #endif
     }
 }

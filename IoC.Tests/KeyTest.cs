@@ -32,7 +32,7 @@
             // When
             var hashCode1 = key1.GetHashCode();
             var hashCode2 = key1.GetHashCode();
-            var actualIsEqual = key1.Equals(key2);
+            var actualIsEqual = ReferenceEquals(key1.Type, key2.Type) && (ReferenceEquals(key1.Tag, key2.Tag) || Equals(key1.Tag, key2.Tag));
             
             // Then
             actualIsEqual.ShouldBe(expectedIsEqual);

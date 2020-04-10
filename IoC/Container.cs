@@ -145,7 +145,7 @@
                         }
                         else
                         {
-                            var hashCode = key.GetHashCode();
+                            var hashCode = key.HashCode;
                             isRegistered &= dependencies.Get(hashCode, key) == default(DependencyEntry);
                             if (isRegistered)
                             {
@@ -212,7 +212,7 @@
             else
             {
                 key = new FullKey(type, tag);
-                hashCode = key.GetHashCode();
+                hashCode = key.HashCode;
                 resolver = (Resolver<T>)Resolvers.Get(hashCode, key);
                 if (resolver != default(Resolver<T>)) // found in resolvers
                 {
@@ -278,7 +278,7 @@
         /// <inheritdoc />
         public bool TryGetDependency(FullKey key, out IDependency dependency, out ILifetime lifetime)
         {
-            if (!TryGetDependency(key, key.GetHashCode(), out var dependencyEntry))
+            if (!TryGetDependency(key, key.HashCode, out var dependencyEntry))
             {
                 return _parent.TryGetDependency(key, out dependency, out lifetime);
             }
@@ -427,7 +427,7 @@
                     var genericType = typeDescriptor.GetGenericTypeDefinition();
                     var genericKey = new FullKey(genericType, key.Tag);
                     // For generic type
-                    dependencyEntry = _dependencies.Get(genericKey.GetHashCode(), genericKey);
+                    dependencyEntry = _dependencies.Get(genericKey.HashCode, genericKey);
                     if (dependencyEntry != default(DependencyEntry))
                     {
                         return true;
@@ -453,7 +453,7 @@
                 {
                     var arrayKey = new FullKey(typeof(IArray), key.Tag);
                     // For generic type
-                    dependencyEntry = _dependencies.Get(arrayKey.GetHashCode(), arrayKey);
+                    dependencyEntry = _dependencies.Get(arrayKey.HashCode, arrayKey);
                     if (dependencyEntry != default(DependencyEntry))
                     {
                         return true;

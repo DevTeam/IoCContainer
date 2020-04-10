@@ -98,7 +98,7 @@
             }
 
             var lifetimeKey = new LifetimeKey(type.Descriptor().GetGenericTypeArguments());
-            var lifetimeHashCode = lifetimeKey.GetHashCode();
+            var lifetimeHashCode = lifetimeKey.HashCode;
 
             if (!hasLifetimes)
             {
@@ -142,20 +142,22 @@
         private struct LifetimeKey
         {
             private readonly Type[] _genericTypes;
-            private readonly int _hashCode;
+            internal readonly int HashCode;
 
             public LifetimeKey(Type[] genericTypes)
             {
                 _genericTypes = genericTypes;
-                _hashCode = genericTypes.GetHash();
+                HashCode = genericTypes.GetHash();
             }
 
             // ReSharper disable once PossibleNullReferenceException
-            public override bool Equals(object obj) => Equals((LifetimeKey)obj);
+            public override bool Equals(object obj)
+            {
+                var other = (LifetimeKey)obj;
+                return CoreExtensions.SequenceEqual(_genericTypes, other._genericTypes);
+            }
 
-            public override int GetHashCode() => _hashCode;
-
-            private bool Equals(LifetimeKey other) => CoreExtensions.SequenceEqual(_genericTypes, other._genericTypes);
+            public override int GetHashCode() => HashCode;
         }
     }
 }

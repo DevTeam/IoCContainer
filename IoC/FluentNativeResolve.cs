@@ -39,7 +39,7 @@
         public static T Resolve<T>([NotNull] this Container container, Tag tag)
         {
             var key = new Key(TypeDescriptor<T>.Type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
+            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
                     ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, EmptyArgs);
         }
 
@@ -71,7 +71,7 @@
         public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
             var key = new Key(TypeDescriptor<T>.Type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
+            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
                     ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, args);
         }
 
@@ -103,7 +103,7 @@
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
             var key = new Key(type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
+            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
                     ?? container.GetResolver<T>(type, tag))(container, EmptyArgs);
         }
 
@@ -137,7 +137,7 @@
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
             var key = new Key(type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.GetHashCode(), key)
+            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
                     ?? container.GetResolver<T>(type, tag))(container, args);
         }
     }

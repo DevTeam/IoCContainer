@@ -64,9 +64,11 @@
             return buildContext.InjectDependencies(baseExpression, contextItVar);
         }
 
+        [MethodImpl((MethodImplOptions)256)]
         public static bool IsComplexType(TypeDescriptor typeDescriptor) => 
             typeDescriptor.IsConstructedGenericType() || typeDescriptor.IsGenericTypeDefinition() || typeDescriptor.IsArray();
 
+        [MethodImpl((MethodImplOptions)256)]
         public static T ReplaceTypes<T>(IBuildContext buildContext, bool isComplexType, T expression)
             where T : Expression =>
             isComplexType ? (T)buildContext.ReplaceTypes(expression) : expression;
