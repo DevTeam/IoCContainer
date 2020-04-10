@@ -161,7 +161,7 @@ namespace IoC.Features
             var genericTypeDefinition = targetTypeInfo.GetGenericTypeDefinition();
             var curGenericTypeDefinition = interceptedTypeInfo.GetGenericTypeDefinition();
 #endif
-            return new Key(genericTypeDefinition, targetKey.Tag).Equals(new Key(curGenericTypeDefinition, key.Tag));
+            return Equals(new Key(genericTypeDefinition, targetKey.Tag), new Key(curGenericTypeDefinition, key.Tag));
         }
     }
 }

@@ -54,8 +54,8 @@
 
             // Then
             table.Count().ShouldBe(5);
-            table.GetByRef("c".GetHashCode(), "c").ShouldBe("c");
-            table.GetByRef("c".GetHashCode(), "Z").ShouldBe("Z");
+            table.Get("c".GetHashCode(), "c").ShouldBe("c");
+            table.Get("c".GetHashCode(), "Z").ShouldBe("Z");
         }
 
         [Fact]
@@ -74,7 +74,7 @@
 
             // Then
             removed.ShouldBe(true);
-            table.GetByRef("c".GetHashCode(), "c").ShouldBe(null);
+            table.Get("c".GetHashCode(), "c").ShouldBe(null);
             table.Count().ShouldBe(4);
             table.Count.ShouldBe(4);
         }

@@ -8,6 +8,7 @@ namespace IoC.Comparison
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
+    using System.Runtime.CompilerServices;
     using System.Text;
     using Autofac;
     using Castle.MicroKernel.Registration;
@@ -683,14 +684,11 @@ namespace IoC.Comparison
         {
             if (_service2 == null)
             {
-                if (_service2 == null)
+                lock (LockObject)
                 {
-                    lock (LockObject)
+                    if (_service2 == null)
                     {
-                        if (_service2 == null)
-                        {
-                            _service2 = new Service2(new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()));
-                        }
+                        _service2 = new Service2(new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()));
                     }
                 }
             }
@@ -709,10 +707,8 @@ namespace IoC.Comparison
             }
         }
 
-        private static Service1 CreateTransientService()
-        {
-            return new Service1(new Service2(new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4())), new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service4());
-        }
+        private static Service1 CreateTransientService() =>
+            new Service1(new Service2(new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4())), new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service3(new Service4(), new Service4(), new Service4(), new Service4(), new Service4()), new Service4());
 
         private static string GetBinDirectory()
         {

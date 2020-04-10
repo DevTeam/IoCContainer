@@ -1336,7 +1336,7 @@ namespace IoC
                         if (key.Tag == AnyTag)
                         {
                             var hashCode = key.Type.GetHashCode();
-                            isRegistered &= dependenciesForTagAny.GetByRef(hashCode, key.Type) == default(DependencyEntry);
+                            isRegistered &= dependenciesForTagAny.Get(hashCode, key.Type) == default(DependencyEntry);
                             if (isRegistered)
                             {
                                 dependenciesForTagAny = dependenciesForTagAny.Set(hashCode, key.Type, dependencyEntry);
@@ -1399,7 +1399,7 @@ namespace IoC
             if (tag == null)
             {
                 hashCode = type.GetHashCode();
-                resolver = (Resolver<T>)ResolversByType.GetByRef(hashCode, type);
+                resolver = (Resolver<T>)ResolversByType.Get(hashCode, type);
                 if (resolver != default(Resolver<T>)) // found in resolvers by type
                 {
                     error = default(Exception);
@@ -1606,7 +1606,6 @@ namespace IoC
         private void ApplyConfigurations(IEnumerable<IConfiguration> configurations) =>
             _resources.Add(this.Apply(configurations));
 
-        [MethodImpl((MethodImplOptions)256)]
         private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)
         {
             lock (_lockObject)
@@ -1633,7 +1632,7 @@ namespace IoC
                     }
 
                     // For generic type and Any tag
-                    dependencyEntry = _dependenciesForTagAny.GetByRef(genericType.GetHashCode(), genericType);
+                    dependencyEntry = _dependenciesForTagAny.Get(genericType.GetHashCode(), genericType);
                     if (dependencyEntry != default(DependencyEntry))
                     {
                         return true;
@@ -1641,7 +1640,7 @@ namespace IoC
                 }
 
                 // For Any tag
-                dependencyEntry = _dependenciesForTagAny.GetByRef(type.GetHashCode(), type);
+                dependencyEntry = _dependenciesForTagAny.Get(type.GetHashCode(), type);
                 if (dependencyEntry != default(DependencyEntry))
                 {
                     return true;
@@ -1659,7 +1658,7 @@ namespace IoC
                     }
 
                     // For generic type and Any tag
-                    dependencyEntry = _dependenciesForTagAny.GetByRef(typeof(IArray).GetHashCode(), typeof(IArray));
+                    dependencyEntry = _dependenciesForTagAny.Get(typeof(IArray).GetHashCode(), typeof(IArray));
                     if (dependencyEntry != default(DependencyEntry))
                     {
                         return true;
@@ -5733,7 +5732,7 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
+            return ((Resolver<T>)container.ResolversByType.Get(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
                     ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, EmptyArgs);
         }
 
@@ -5764,7 +5763,7 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
+            return ((Resolver<T>)container.ResolversByType.Get(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
                     ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, args);
         }
 
@@ -5796,7 +5795,7 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), type)
+            return ((Resolver<T>)container.ResolversByType.Get(type.GetHashCode(), type)
                     ?? container.GetResolver<T>(type))(container, EmptyArgs);
         }
 
@@ -5829,7 +5828,7 @@ namespace IoC
         [NotNull]
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), type)
+            return ((Resolver<T>)container.ResolversByType.Get(type.GetHashCode(), type)
                     ?? container.GetResolver<T>(type))(container, args);
         }
 
@@ -9163,7 +9162,7 @@ namespace IoC.Lifetimes
     {
         private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
         private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
-        private static readonly MethodInfo GetMethodInfo = typeof(CoreExtensions).Descriptor().GetDeclaredMethods().Single(i => i.Name == (TypeDescriptor<TKey>.Descriptor.IsValueType() ? nameof(CoreExtensions.Get) : nameof(CoreExtensions.GetByRef))).MakeGenericMethod(typeof(TKey), typeof(object));
+        private static readonly MethodInfo GetMethodInfo = typeof(CoreExtensions).Descriptor().GetDeclaredMethods().Single(i => i.Name == (TypeDescriptor<TKey>.Descriptor.IsValueType() ? nameof(CoreExtensions.Get) : nameof(CoreExtensions.Get))).MakeGenericMethod(typeof(TKey), typeof(object));
         private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
         private static readonly ParameterExpression KeyVar = Expression.Variable(TypeDescriptor<TKey>.Type, "key");
@@ -10860,35 +10859,13 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
         public static TValue Get<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
-            where TKey: struct
-            where TValue : class
         {
             var items = table.Buckets[hashCode & table.Divisor].KeyValues;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
-                if (item.Key.Equals(key))
-                {
-                    return item.Value;
-                }
-            }
-
-            return default(TValue);
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        [Pure]
-        public static TValue GetByRef<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
-            where TKey: class
-            where TValue : class
-        {
-            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < items.Length; index++)
-            {
-                var item = items[index];
-                if (item.Key == key)
+                if (Equals(key, item.Key))
                 {
                     return item.Value;
                 }
@@ -12544,7 +12521,7 @@ namespace IoC.Core
                 }
 
                 var hashCode = container.GetHashCode();
-                if (_map.GetByRef(hashCode, container) != null)
+                if (_map.Get(hashCode, container) != null)
                 {
                     return true;
                 }
@@ -12567,7 +12544,7 @@ namespace IoC.Core
                 }
 
                 var hashCode = container.GetHashCode();
-                var instance = _map.GetByRef(hashCode, container);
+                var instance = _map.Get(hashCode, container);
                 if (instance != null)
                 {
                     Items.Remove(instance);

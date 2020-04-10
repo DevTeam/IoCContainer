@@ -78,35 +78,13 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
         public static TValue Get<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
-            where TKey: struct
-            where TValue : class
         {
             var items = table.Buckets[hashCode & table.Divisor].KeyValues;
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
-                if (item.Key.Equals(key))
-                {
-                    return item.Value;
-                }
-            }
-
-            return default(TValue);
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        [Pure]
-        public static TValue GetByRef<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
-            where TKey: class
-            where TValue : class
-        {
-            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < items.Length; index++)
-            {
-                var item = items[index];
-                if (item.Key == key)
+                if (Equals(key, item.Key))
                 {
                     return item.Value;
                 }

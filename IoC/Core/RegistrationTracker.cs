@@ -104,7 +104,7 @@ namespace IoC.Core
                 }
 
                 var hashCode = container.GetHashCode();
-                if (_map.GetByRef(hashCode, container) != null)
+                if (_map.Get(hashCode, container) != null)
                 {
                     return true;
                 }
@@ -127,7 +127,7 @@ namespace IoC.Core
                 }
 
                 var hashCode = container.GetHashCode();
-                var instance = _map.GetByRef(hashCode, container);
+                var instance = _map.Get(hashCode, container);
                 if (instance != null)
                 {
                     Items.Remove(instance);

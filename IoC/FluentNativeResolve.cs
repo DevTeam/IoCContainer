@@ -23,7 +23,7 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
+            return ((Resolver<T>)container.ResolversByType.Get(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
                     ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, EmptyArgs);
         }
 
@@ -54,7 +54,7 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
+            return ((Resolver<T>)container.ResolversByType.Get(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
                     ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, args);
         }
 
@@ -86,7 +86,7 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), type)
+            return ((Resolver<T>)container.ResolversByType.Get(type.GetHashCode(), type)
                     ?? container.GetResolver<T>(type))(container, EmptyArgs);
         }
 
@@ -119,7 +119,7 @@
         [NotNull]
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByRef(type.GetHashCode(), type)
+            return ((Resolver<T>)container.ResolversByType.Get(type.GetHashCode(), type)
                     ?? container.GetResolver<T>(type))(container, args);
         }
 
