@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
 
-    internal class TypeMapper
+    internal sealed class TypeMapper
     {
         public static readonly TypeMapper Shared = new TypeMapper();
 

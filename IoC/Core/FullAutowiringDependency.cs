@@ -8,7 +8,7 @@
     using System.Reflection;
     using Issues;
 
-    internal class FullAutowiringDependency: IDependency
+    internal sealed class FullAutowiringDependency : IDependency
     {
         [NotNull] private readonly Type _type;
         [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;

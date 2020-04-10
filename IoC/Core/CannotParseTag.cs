@@ -3,7 +3,7 @@
     using System;
     using Issues;
 
-    internal class CannotParseTag : ICannotParseTag
+    internal sealed class CannotParseTag : ICannotParseTag
     {
         public static readonly ICannotParseTag Shared = new CannotParseTag();
 

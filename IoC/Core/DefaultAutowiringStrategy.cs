@@ -6,7 +6,7 @@
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
-    internal class DefaultAutowiringStrategy: IAutowiringStrategy
+    internal sealed class DefaultAutowiringStrategy : IAutowiringStrategy
     {
         public static readonly IAutowiringStrategy Shared = new DefaultAutowiringStrategy();
 

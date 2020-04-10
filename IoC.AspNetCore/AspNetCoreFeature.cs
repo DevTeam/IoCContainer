@@ -9,7 +9,7 @@
 
     /// <inheritdoc cref="IConfiguration" />
     [PublicAPI]
-    public class AspNetCoreFeature : Collection<ServiceDescriptor>, IServiceCollection, IConfiguration
+    public sealed class AspNetCoreFeature : Collection<ServiceDescriptor>, IServiceCollection, IConfiguration
     {
         /// <summary>
         /// Default constructor.

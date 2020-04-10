@@ -5,7 +5,7 @@
     using System.Linq;
     using Configuration;
 
-    internal class TypeToStringConverter: IConverter<Type, Type, string>
+    internal sealed class TypeToStringConverter : IConverter<Type, Type, string>
     {
         public static readonly IConverter<Type, Type, string> Shared = new TypeToStringConverter();
         private static readonly IDictionary<Type, string> PrimitiveTypes = StringToTypeConverter.PrimitiveTypes.ToDictionary(i => i.Value, i => i.Key);

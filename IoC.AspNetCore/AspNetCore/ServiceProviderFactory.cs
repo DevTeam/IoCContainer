@@ -6,7 +6,7 @@
     /// <summary>
     /// Creates a builder and an <see cref="T:System.IServiceProvider" />.
     /// </summary>
-    public class ServiceProviderFactory : IServiceProviderFactory<IContainer>, IDisposable
+    public sealed class ServiceProviderFactory : IServiceProviderFactory<IContainer>, IDisposable
     {
         private readonly IContainer _container;
 

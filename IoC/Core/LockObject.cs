@@ -1,4 +1,4 @@
 ﻿namespace IoC.Core
 {
-    internal class LockObject: ILockObject { }
+    internal sealed class LockObject : ILockObject { }
 }

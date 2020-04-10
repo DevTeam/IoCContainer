@@ -3,7 +3,7 @@
     using System;
     using Issues;
 
-    internal class CannotParseType : ICannotParseType
+    internal sealed class CannotParseType : ICannotParseType
     {
         public static readonly ICannotParseType Shared = new CannotParseType();
 

@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
 
-    internal class TypeReplacerExpressionBuilder : IExpressionBuilder<IDictionary<Type, Type>>
+    internal sealed class TypeReplacerExpressionBuilder : IExpressionBuilder<IDictionary<Type, Type>>
     {
         public static readonly IExpressionBuilder<IDictionary<Type, Type>> Shared = new TypeReplacerExpressionBuilder();
 

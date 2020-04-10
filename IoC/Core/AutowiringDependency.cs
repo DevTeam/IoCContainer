@@ -5,7 +5,7 @@
     using System.Linq;
     using System.Linq.Expressions;
 
-    internal class AutowiringDependency: IDependency
+    internal sealed class AutowiringDependency : IDependency
     {
         private readonly Expression _expression;
         [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;

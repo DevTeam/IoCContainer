@@ -2,7 +2,7 @@
 {
     using System;
 
-    internal class Holder<TInstance> : IHolder<TInstance>
+    internal sealed class Holder<TInstance> : IHolder<TInstance>
     {
         [NotNull] private readonly IToken _token;
 

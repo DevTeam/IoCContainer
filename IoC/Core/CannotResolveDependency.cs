@@ -3,7 +3,7 @@
     using System;
     using Issues;
 
-    internal class CannotResolveDependency : ICannotResolveDependency
+    internal sealed class CannotResolveDependency : ICannotResolveDependency
     {
         public static readonly ICannotResolveDependency Shared = new CannotResolveDependency();
 

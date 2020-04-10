@@ -46,7 +46,7 @@ namespace IoC.Features.AspNetCore
     using System.Diagnostics.CodeAnalysis;
 
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    internal class ServiceProvider: IServiceProvider
+    internal sealed class ServiceProvider : IServiceProvider
     {
         private readonly IContainer _container;
 
@@ -70,7 +70,7 @@ namespace IoC.Features.AspNetCore
     /// <summary>
     /// Creates a builder and an <see cref="T:System.IServiceProvider" />.
     /// </summary>
-    public class ServiceProviderFactory : IServiceProviderFactory<IContainer>, IDisposable
+    public sealed class ServiceProviderFactory : IServiceProviderFactory<IContainer>, IDisposable
     {
         private readonly IContainer _container;
 
@@ -101,7 +101,7 @@ namespace IoC.Features.AspNetCore
     using System;
     using Microsoft.Extensions.DependencyInjection;
 
-    internal class ServiceScope : IServiceScope, IServiceProvider
+    internal sealed class ServiceScope : IServiceScope, IServiceProvider
     {
         [NotNull] private readonly IScope _scope;
         [NotNull] private readonly IContainer _container;
@@ -137,7 +137,7 @@ namespace IoC.Features.AspNetCore
     using Microsoft.Extensions.DependencyInjection;
 
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    internal class ServiceScopeFactory : IServiceScopeFactory
+    internal sealed class ServiceScopeFactory : IServiceScopeFactory
     {
         [NotNull] private readonly Func<IServiceScope> _serviceScopeFactory;
 
@@ -169,7 +169,7 @@ namespace IoC.Features
 
     /// <inheritdoc cref="IConfiguration" />
     [PublicAPI]
-    public class AspNetCoreFeature : Collection<ServiceDescriptor>, IServiceCollection, IConfiguration
+    public sealed class AspNetCoreFeature : Collection<ServiceDescriptor>, IServiceCollection, IConfiguration
     {
         /// <summary>
         /// Default constructor.

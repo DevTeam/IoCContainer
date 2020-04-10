@@ -3,7 +3,7 @@
     using System;
     using Issues;
 
-    internal class FoundCyclicDependency : IFoundCyclicDependency
+    internal sealed class FoundCyclicDependency : IFoundCyclicDependency
     {
         public static readonly IFoundCyclicDependency Shared = new FoundCyclicDependency();
 

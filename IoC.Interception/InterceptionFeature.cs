@@ -6,7 +6,7 @@
 
     /// <inheritdoc cref="IConfiguration" />
     [PublicAPI]
-    public class InterceptionFeature: IConfiguration
+    public sealed class InterceptionFeature : IConfiguration
     {
         /// <inheritdoc />
         public IEnumerable<IToken> Apply(IContainer container)

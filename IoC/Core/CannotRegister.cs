@@ -4,7 +4,7 @@
     using System.Linq;
     using Issues;
 
-    internal class CannotRegister : ICannotRegister
+    internal sealed class CannotRegister : ICannotRegister
     {
         public static readonly ICannotRegister Shared = new CannotRegister();
 

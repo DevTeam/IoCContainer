@@ -5,7 +5,7 @@
     using Microsoft.Extensions.DependencyInjection;
 
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    internal class ServiceScopeFactory : IServiceScopeFactory
+    internal sealed class ServiceScopeFactory : IServiceScopeFactory
     {
         [NotNull] private readonly Func<IServiceScope> _serviceScopeFactory;
 

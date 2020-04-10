@@ -4,7 +4,7 @@ namespace IoC.Features.AspNetCore
     using System;
     using Microsoft.Extensions.DependencyInjection;
 
-    internal class ServiceScope : IServiceScope, IServiceProvider
+    internal sealed class ServiceScope : IServiceScope, IServiceProvider
     {
         [NotNull] private readonly IScope _scope;
         [NotNull] private readonly IContainer _container;

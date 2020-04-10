@@ -10,7 +10,7 @@
 // ReSharper disable once RedundantUsingDirective
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class InterceptorBuilder : IInterceptorRegistry, IBuilder
+    internal sealed class InterceptorBuilder : IInterceptorRegistry, IBuilder
     {
         private static readonly ProxyGenerator ProxyGenerator = new ProxyGenerator();
         private readonly List<InterceptorsInfo> _interceptors = new List<InterceptorsInfo>();
@@ -52,7 +52,7 @@
             }
         }
 
-        private class InterceptorsInfo
+        private sealed class InterceptorsInfo
         {
             private static readonly Type[] FuncTypes = {typeof(Type), typeof(Type[]), typeof(object), typeof(IInterceptor[])};
 #if NET40

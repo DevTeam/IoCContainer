@@ -45,7 +45,7 @@ namespace IoC.Features
 #endif
         }
 
-        internal class Observable<T>: IObservable<T>
+        internal sealed class Observable<T>: IObservable<T>
         {
             private readonly IEnumerable<T> _source;
 
@@ -63,7 +63,7 @@ namespace IoC.Features
             }
         }
 
-        private class Enumeration<T> : EnumerationBase<T>, IEnumerable<T>
+        private sealed class Enumeration<T> : EnumerationBase<T>, IEnumerable<T>
         {
             public Enumeration([NotNull] Context context, [NotNull] ILockObject lockObject)
             : base(context, lockObject)
@@ -85,7 +85,7 @@ namespace IoC.Features
         }
 
 #if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-        private class AsyncEnumeration<T> : EnumerationBase<T>, IAsyncEnumerable<T>
+        private sealed class AsyncEnumeration<T> : EnumerationBase<T>, IAsyncEnumerable<T>
         {
             public AsyncEnumeration([NotNull] Context context, [NotNull] ILockObject lockObject)
                 : base(context, lockObject)
@@ -95,7 +95,7 @@ namespace IoC.Features
                 new AsyncEnumerator<T>(this, cancellationToken);
         }
 
-        private class AsyncEnumerator<T> : IAsyncEnumerator<T>
+        private sealed class AsyncEnumerator<T> : IAsyncEnumerator<T>
         {
             private readonly AsyncEnumeration<T> _enumeration;
             private readonly CancellationToken _cancellationToken;

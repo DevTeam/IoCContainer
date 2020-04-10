@@ -5,7 +5,7 @@
     using System.Reflection;
     using static TypeDescriptorExtensions;
 
-    internal class ContainerEventToStringConverter: IConverter<ContainerEvent, IContainer, string>
+    internal sealed class ContainerEventToStringConverter : IConverter<ContainerEvent, IContainer, string>
     {
         private static readonly PropertyInfo PropertyInfo = Descriptor<Expression>().GetDeclaredProperties().SingleOrDefault(i => i.Name == "DebugView");
         public static readonly IConverter<ContainerEvent, IContainer, string> Shared = new ContainerEventToStringConverter();

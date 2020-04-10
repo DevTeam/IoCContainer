@@ -3,7 +3,7 @@
     using System;
     using System.Linq.Expressions;
 
-    internal class DependencyInjectionExpressionBuilder: IExpressionBuilder<Expression>
+    internal sealed class DependencyInjectionExpressionBuilder : IExpressionBuilder<Expression>
     {
         public static readonly IExpressionBuilder<Expression> Shared = new DependencyInjectionExpressionBuilder();
 

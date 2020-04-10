@@ -7,7 +7,7 @@
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
-    internal class TypeReplacerExpressionVisitor: ExpressionVisitor
+    internal sealed class TypeReplacerExpressionVisitor : ExpressionVisitor
     {
         [NotNull] private readonly IDictionary<Type, Type> _typesMap;
         [NotNull] private readonly Dictionary<string, ParameterExpression> _parameters = new Dictionary<string, ParameterExpression>();

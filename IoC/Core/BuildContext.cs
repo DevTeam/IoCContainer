@@ -13,7 +13,7 @@
     /// </summary>
     [SuppressMessage("ReSharper", "RedundantNameQualifier")]
     [PublicAPI]
-    internal class BuildContext : IBuildContext
+    internal sealed class BuildContext : IBuildContext
     {
         private static readonly ICollection<IBuilder> EmptyBuilders = new List<IBuilder>();
         [NotNull] private readonly IEnumerable<IBuilder> _builders;

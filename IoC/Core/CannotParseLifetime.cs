@@ -3,7 +3,7 @@
     using System;
     using Issues;
 
-    internal class CannotParseLifetime : ICannotParseLifetime
+    internal sealed class CannotParseLifetime : ICannotParseLifetime
     {
         public static readonly ICannotParseLifetime Shared = new CannotParseLifetime();
 

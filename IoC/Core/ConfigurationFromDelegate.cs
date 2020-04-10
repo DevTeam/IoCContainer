@@ -3,7 +3,7 @@
     using System;
     using System.Collections.Generic;
 
-    internal class ConfigurationFromDelegate: IConfiguration
+    internal sealed class ConfigurationFromDelegate : IConfiguration
     {
         [NotNull] private readonly Func<IContainer, IToken> _configurationFactory;
 

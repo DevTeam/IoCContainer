@@ -4,7 +4,7 @@ namespace IoC.Core
     using System;
     using System.Collections.Generic;
 
-    internal class RegistrationTracker : IRegistrationTracker
+    internal sealed class RegistrationTracker : IRegistrationTracker
     {
         private readonly Container _container;
         private readonly ITracker[] _trackers = new ITracker[3];
@@ -86,7 +86,7 @@ namespace IoC.Core
             bool Untrack(Key key, IContainer container);
         }
 
-        private class Tracker<T> : ITracker
+        private sealed class Tracker<T> : ITracker
             where T: class
         {
             private readonly Action<IList<T>, T> _updater;

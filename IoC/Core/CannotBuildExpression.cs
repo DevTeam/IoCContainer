@@ -4,7 +4,7 @@
     using System.Linq.Expressions;
     using Issues;
 
-    internal class CannotBuildExpression : ICannotBuildExpression
+    internal sealed class CannotBuildExpression : ICannotBuildExpression
     {
         public static readonly ICannotBuildExpression Shared = new CannotBuildExpression();
 

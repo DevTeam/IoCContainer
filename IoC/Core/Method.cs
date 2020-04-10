@@ -5,7 +5,7 @@
     using System.Linq.Expressions;
     using System.Reflection;
 
-    internal class Method<TMethodInfo>: IMethod<TMethodInfo> where TMethodInfo: MethodBase
+    internal sealed class Method<TMethodInfo>: IMethod<TMethodInfo> where TMethodInfo: MethodBase
     {
         private readonly Expression[] _parametersExpressions;
         private readonly ParameterInfo[] _parameters;

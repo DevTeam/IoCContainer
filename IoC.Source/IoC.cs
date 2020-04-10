@@ -6100,7 +6100,7 @@ namespace IoC
     /// </summary>
     [PublicAPI, AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct)]
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class GenericTypeArgumentAttribute : Attribute { }
+    public sealed class GenericTypeArgumentAttribute : Attribute { }
 }
 
 
@@ -7463,7 +7463,7 @@ namespace IoC
     public struct TTS32 { }
 
 
-    internal class GenericTypeArguments
+    internal sealed class GenericTypeArguments
     {
         internal static readonly System.Type[] Arguments =
         {
@@ -8382,12 +8382,12 @@ namespace IoC.Features
 #if !NET40
             yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<List<TT>>()));
 #endif
-#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), containerSingletonResolver(container));
 #endif
         }
 
-        internal class Observable<T>: IObservable<T>
+        internal sealed class Observable<T>: IObservable<T>
         {
             private readonly IEnumerable<T> _source;
 
@@ -8405,7 +8405,7 @@ namespace IoC.Features
             }
         }
 
-        private class Enumeration<T> : EnumerationBase<T>, IEnumerable<T>
+        private sealed class Enumeration<T> : EnumerationBase<T>, IEnumerable<T>
         {
             public Enumeration([NotNull] Context context, [NotNull] ILockObject lockObject)
             : base(context, lockObject)
@@ -8426,8 +8426,8 @@ namespace IoC.Features
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-        private class AsyncEnumeration<T> : EnumerationBase<T>, IAsyncEnumerable<T>
+#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+        private sealed class AsyncEnumeration<T> : EnumerationBase<T>, IAsyncEnumerable<T>
         {
             public AsyncEnumeration([NotNull] Context context, [NotNull] ILockObject lockObject)
                 : base(context, lockObject)
@@ -8437,7 +8437,7 @@ namespace IoC.Features
                 new AsyncEnumerator<T>(this, cancellationToken);
         }
 
-        private class AsyncEnumerator<T> : IAsyncEnumerator<T>
+        private sealed class AsyncEnumerator<T> : IAsyncEnumerator<T>
         {
             private readonly AsyncEnumeration<T> _enumeration;
             private readonly CancellationToken _cancellationToken;
@@ -8856,7 +8856,7 @@ namespace IoC.Features
     /// <summary>
     /// Allows to resolve Lazy.
     /// </summary>
-    public class LazyFeature : IConfiguration
+    public sealed class LazyFeature : IConfiguration
     {
         /// The default instance.
         public static readonly IConfiguration Default = new LazyFeature();
@@ -9107,7 +9107,7 @@ namespace IoC.Lifetimes
                 targetContainer.RegisterResource(disposable);
             }
 
-#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (newInstance is IAsyncDisposable asyncDisposable)
             {
                 targetContainer.RegisterResource(asyncDisposable.ToDisposable());
@@ -9126,7 +9126,7 @@ namespace IoC.Lifetimes
                 disposable.Dispose();
             }
 
-#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();
@@ -9316,7 +9316,7 @@ namespace IoC.Lifetimes
                 resourceRegistry.RegisterResource(disposable);
             }
 
-#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
                 if (newInstance is IAsyncDisposable asyncDisposable)
                 {
                     resourceRegistry.RegisterResource(asyncDisposable.ToDisposable());
@@ -9340,7 +9340,7 @@ namespace IoC.Lifetimes
                 disposable.Dispose();
             }
 
-#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();
@@ -9418,7 +9418,7 @@ namespace IoC.Lifetimes
 
             disposable?.Dispose();
 
-#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             IAsyncDisposable asyncDisposable;
             lock (_lockObject)
             {
@@ -9499,7 +9499,7 @@ namespace IoC.Issues
         /// <param name="lifetime">The lifetime.</param>
         /// <param name="error">The error.</param>
         /// <returns>The resulting expression.</returns>
-        [NotNull] Expression Resolve([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, ILifetime lifetime, Exception error);
+        [NotNull] Expression Resolve([NotNull] IBuildContext buildContext, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, Exception error);
     }
 }
 
@@ -9760,7 +9760,7 @@ namespace IoC.Core
     using System.Linq;
     using System.Reflection;
 
-    internal class AspectOrientedAutowiringStrategy: IAutowiringStrategy
+    internal sealed class AspectOrientedAutowiringStrategy: IAutowiringStrategy
     {
         [NotNull] private readonly IAspectOrientedMetadata _metadata;
 
@@ -10090,7 +10090,7 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
 
-    internal class AutowiringDependency: IDependency
+    internal sealed class AutowiringDependency : IDependency
     {
         private readonly Expression _expression;
         [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;
@@ -10286,7 +10286,7 @@ namespace IoC.Core
     /// </summary>
     [SuppressMessage("ReSharper", "RedundantNameQualifier")]
     [PublicAPI]
-    internal class BuildContext : IBuildContext
+    internal sealed class BuildContext : IBuildContext
     {
         private static readonly ICollection<IBuilder> EmptyBuilders = new List<IBuilder>();
         [NotNull] private readonly IEnumerable<IBuilder> _builders;
@@ -10423,7 +10423,7 @@ namespace IoC.Core
 #if !WINDOWS_UWP && !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETCOREAPP1_0 && !NETCOREAPP1_1
     [Serializable]
 #endif
-    internal class BuildExpressionException: InvalidOperationException
+    internal sealed class BuildExpressionException : InvalidOperationException
     {
         public BuildExpressionException(string message, [CanBeNull] Exception innerException)
             : base(message, innerException)
@@ -10441,7 +10441,7 @@ namespace IoC.Core
     using System.Linq.Expressions;
     using Issues;
 
-    internal class CannotBuildExpression : ICannotBuildExpression
+    internal sealed class CannotBuildExpression : ICannotBuildExpression
     {
         public static readonly ICannotBuildExpression Shared = new CannotBuildExpression();
 
@@ -10450,7 +10450,6 @@ namespace IoC.Core
         public Expression Resolve(IBuildContext buildContext, IDependency dependency, ILifetime lifetime, Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
             throw new InvalidOperationException($"Cannot build expression for the key {buildContext.Key} in the container {buildContext.Container}.\n{buildContext}", error);
         }
     }
@@ -10464,7 +10463,7 @@ namespace IoC.Core
     using System;
     using Issues;
 
-    internal class CannotGetResolver : ICannotGetResolver
+    internal sealed class CannotGetResolver : ICannotGetResolver
     {
         public static readonly ICannotGetResolver Shared = new CannotGetResolver();
 
@@ -10487,7 +10486,7 @@ namespace IoC.Core
     using System;
     using Issues;
 
-    internal class CannotParseLifetime : ICannotParseLifetime
+    internal sealed class CannotParseLifetime : ICannotParseLifetime
     {
         public static readonly ICannotParseLifetime Shared = new CannotParseLifetime();
 
@@ -10506,7 +10505,7 @@ namespace IoC.Core
     using System;
     using Issues;
 
-    internal class CannotParseTag : ICannotParseTag
+    internal sealed class CannotParseTag : ICannotParseTag
     {
         public static readonly ICannotParseTag Shared = new CannotParseTag();
 
@@ -10525,7 +10524,7 @@ namespace IoC.Core
     using System;
     using Issues;
 
-    internal class CannotParseType : ICannotParseType
+    internal sealed class CannotParseType : ICannotParseType
     {
         public static readonly ICannotParseType Shared = new CannotParseType();
 
@@ -10545,7 +10544,7 @@ namespace IoC.Core
     using System.Linq;
     using Issues;
 
-    internal class CannotRegister : ICannotRegister
+    internal sealed class CannotRegister : ICannotRegister
     {
         public static readonly ICannotRegister Shared = new CannotRegister();
 
@@ -10571,7 +10570,7 @@ namespace IoC.Core
     using System.Reflection;
     using Issues;
 
-    internal class CannotResolveConstructor : ICannotResolveConstructor
+    internal sealed class CannotResolveConstructor : ICannotResolveConstructor
     {
         public static readonly ICannotResolveConstructor Shared = new CannotResolveConstructor();
 
@@ -10594,7 +10593,7 @@ namespace IoC.Core
     using System;
     using Issues;
 
-    internal class CannotResolveDependency : ICannotResolveDependency
+    internal sealed class CannotResolveDependency : ICannotResolveDependency
     {
         public static readonly ICannotResolveDependency Shared = new CannotResolveDependency();
 
@@ -10616,7 +10615,7 @@ namespace IoC.Core
     using System;
     using Issues;
 
-    internal class CannotResolveGenericTypeArgument: ICannotResolveGenericTypeArgument
+    internal sealed class CannotResolveGenericTypeArgument : ICannotResolveGenericTypeArgument
     {
         public static readonly ICannotResolveGenericTypeArgument Shared = new CannotResolveGenericTypeArgument();
 
@@ -10638,7 +10637,7 @@ namespace IoC.Core
     using System;
     using Issues;
 
-    internal class CannotResolveType : ICannotResolveType
+    internal sealed class CannotResolveType : ICannotResolveType
     {
         public static readonly ICannotResolveType Shared = new CannotResolveType();
 
@@ -10661,7 +10660,7 @@ namespace IoC.Core
     using System;
     using System.Collections.Generic;
 
-    internal class ConfigurationFromDelegate: IConfiguration
+    internal sealed class ConfigurationFromDelegate : IConfiguration
     {
         [NotNull] private readonly Func<IContainer, IToken> _configurationFactory;
 
@@ -10686,7 +10685,7 @@ namespace IoC.Core
     using System.Reflection;
     using static TypeDescriptorExtensions;
 
-    internal class ContainerEventToStringConverter: IConverter<ContainerEvent, IContainer, string>
+    internal sealed class ContainerEventToStringConverter : IConverter<ContainerEvent, IContainer, string>
     {
         private static readonly PropertyInfo PropertyInfo = Descriptor<Expression>().GetDeclaredProperties().SingleOrDefault(i => i.Name == "DebugView");
         public static readonly IConverter<ContainerEvent, IContainer, string> Shared = new ContainerEventToStringConverter();
@@ -10913,7 +10912,7 @@ namespace IoC.Core
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
-    internal class DefaultAutowiringStrategy: IAutowiringStrategy
+    internal sealed class DefaultAutowiringStrategy : IAutowiringStrategy
     {
         public static readonly IAutowiringStrategy Shared = new DefaultAutowiringStrategy();
 
@@ -10965,7 +10964,7 @@ namespace IoC.Core
     using System;
     using System.Linq.Expressions;
 
-    internal class DefaultCompiler : ICompiler
+    internal sealed class DefaultCompiler : ICompiler
     {
         public static readonly ICompiler Shared = new DefaultCompiler();
 
@@ -11159,7 +11158,7 @@ namespace IoC.Core
     using System;
     using System.Linq.Expressions;
 
-    internal class DependencyInjectionExpressionBuilder: IExpressionBuilder<Expression>
+    internal sealed class DependencyInjectionExpressionBuilder : IExpressionBuilder<Expression>
     {
         public static readonly IExpressionBuilder<Expression> Shared = new DependencyInjectionExpressionBuilder();
 
@@ -11193,7 +11192,7 @@ namespace IoC.Core
     // ReSharper disable once RedundantNameQualifier
     using IContainer = IoC.IContainer;
 
-    internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
+    internal sealed class DependencyInjectionExpressionVisitor : ExpressionVisitor
     {
         private static readonly Key ContextKey = TypeDescriptor<Context>.Key;
         private static readonly TypeDescriptor ContextTypeDescriptor = TypeDescriptor<Context>.Descriptor;
@@ -11515,7 +11514,7 @@ namespace IoC.Core
             return new CompositeDisposable(disposables);
         }
 
-#if NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
         public static IDisposable ToDisposable([NotNull] this IAsyncDisposable asyncDisposable)
         {
 #if DEBUG
@@ -11571,7 +11570,7 @@ namespace IoC.Core
             }
         }
 
-        private class EmptyDisposable: IDisposable
+        private sealed class EmptyDisposable : IDisposable
         {
             [NotNull] public static readonly IDisposable Shared = new EmptyDisposable();
 
@@ -11840,7 +11839,7 @@ namespace IoC.Core
     using System;
     using Issues;
 
-    internal class FoundCyclicDependency : IFoundCyclicDependency
+    internal sealed class FoundCyclicDependency : IFoundCyclicDependency
     {
         public static readonly IFoundCyclicDependency Shared = new FoundCyclicDependency();
 
@@ -11871,7 +11870,7 @@ namespace IoC.Core
     using System.Reflection;
     using Issues;
 
-    internal class FullAutowiringDependency: IDependency
+    internal sealed class FullAutowiringDependency : IDependency
     {
         [NotNull] private readonly Type _type;
         [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;
@@ -12100,7 +12099,7 @@ namespace IoC.Core
 {
     using System;
 
-    internal class Holder<TInstance> : IHolder<TInstance>
+    internal sealed class Holder<TInstance> : IHolder<TInstance>
     {
         [NotNull] private readonly IToken _token;
 
@@ -12240,7 +12239,7 @@ namespace IoC.Core
     using System;
     using System.Linq.Expressions;
 
-    internal class LifetimeExpressionBuilder : IExpressionBuilder<ILifetime>
+    internal sealed class LifetimeExpressionBuilder : IExpressionBuilder<ILifetime>
     {
         public static readonly IExpressionBuilder<ILifetime> Shared = new LifetimeExpressionBuilder();
 
@@ -12260,7 +12259,7 @@ namespace IoC.Core
 
 namespace IoC.Core
 {
-    internal class LockObject: ILockObject { }
+    internal sealed class LockObject : ILockObject { }
 }
 
 
@@ -12274,7 +12273,7 @@ namespace IoC.Core
     using System.Linq.Expressions;
     using System.Reflection;
 
-    internal class Method<TMethodInfo>: IMethod<TMethodInfo> where TMethodInfo: MethodBase
+    internal sealed class Method<TMethodInfo>: IMethod<TMethodInfo> where TMethodInfo: MethodBase
     {
         private readonly Expression[] _parametersExpressions;
         private readonly ParameterInfo[] _parameters;
@@ -12398,7 +12397,7 @@ namespace IoC.Core
                 observer.OnError,
                 observer.OnCompleted));
 
-        private class InternalObservable<T>: IObservable<T>
+        private sealed class InternalObservable<T>: IObservable<T>
         {
             private readonly Func<IObserver<T>, IDisposable> _factory;
 
@@ -12407,7 +12406,7 @@ namespace IoC.Core
             public IDisposable Subscribe([NotNull] IObserver<T> observer) => _factory(observer ?? throw new ArgumentNullException(nameof(observer)));
         }
 
-        private class InternalObserver<T>: IObserver<T>
+        private sealed class InternalObserver<T>: IObserver<T>
         {
             private readonly Action<T> _onNext;
             private readonly Action<Exception> _onError;
@@ -12439,7 +12438,7 @@ namespace IoC.Core
     using System;
     using System.Collections.Generic;
 
-    internal class RegistrationTracker : IRegistrationTracker
+    internal sealed class RegistrationTracker : IRegistrationTracker
     {
         private readonly Container _container;
         private readonly ITracker[] _trackers = new ITracker[3];
@@ -12521,7 +12520,7 @@ namespace IoC.Core
             bool Untrack(Key key, IContainer container);
         }
 
-        private class Tracker<T> : ITracker
+        private sealed class Tracker<T> : ITracker
             where T: class
         {
             private readonly Action<IList<T>, T> _updater;
@@ -12691,7 +12690,7 @@ namespace IoC.Core
     using System.Diagnostics.CodeAnalysis;
 
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-    internal class Subject<T>: ISubject<T>
+    internal sealed class Subject<T>: ISubject<T>
     {
         private readonly ILockObject _lockObject;
         private readonly List<IObserver<T>> _observers = new List<IObserver<T>>();
@@ -12764,7 +12763,7 @@ namespace IoC.Core
     using System.Runtime.CompilerServices;
 
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-    internal class Table<TKey, TValue>: IEnumerable<Table<TKey, TValue>.KeyValue>
+    internal sealed class Table<TKey, TValue>: IEnumerable<Table<TKey, TValue>.KeyValue>
     {
         public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(4, Bucket.EmptyBucket), 3, 0);
         public readonly int Count;
@@ -13385,7 +13384,7 @@ namespace IoC.Core
     using System;
     using System.Collections.Generic;
 
-    internal class TypeMapper
+    internal sealed class TypeMapper
     {
         public static readonly TypeMapper Shared = new TypeMapper();
 
@@ -13462,7 +13461,7 @@ namespace IoC.Core
     using System.Collections.Generic;
     using System.Linq.Expressions;
 
-    internal class TypeReplacerExpressionBuilder : IExpressionBuilder<IDictionary<Type, Type>>
+    internal sealed class TypeReplacerExpressionBuilder : IExpressionBuilder<IDictionary<Type, Type>>
     {
         public static readonly IExpressionBuilder<IDictionary<Type, Type>> Shared = new TypeReplacerExpressionBuilder();
 
@@ -13505,7 +13504,7 @@ namespace IoC.Core
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
-    internal class TypeReplacerExpressionVisitor: ExpressionVisitor
+    internal sealed class TypeReplacerExpressionVisitor : ExpressionVisitor
     {
         [NotNull] private readonly IDictionary<Type, Type> _typesMap;
         [NotNull] private readonly Dictionary<string, ParameterExpression> _parameters = new Dictionary<string, ParameterExpression>();
@@ -13749,7 +13748,7 @@ namespace IoC.Core
     using System.Linq;
     using Configuration;
 
-    internal class TypeToStringConverter: IConverter<Type, Type, string>
+    internal sealed class TypeToStringConverter : IConverter<Type, Type, string>
     {
         public static readonly IConverter<Type, Type, string> Shared = new TypeToStringConverter();
         private static readonly IDictionary<Type, string> PrimitiveTypes = StringToTypeConverter.PrimitiveTypes.ToDictionary(i => i.Value, i => i.Key);

@@ -7,5 +7,5 @@
     /// </summary>
     [PublicAPI, AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct)]
     // ReSharper disable once ClassNeverInstantiated.Global
-    public class GenericTypeArgumentAttribute : Attribute { }
+    public sealed class GenericTypeArgumentAttribute : Attribute { }
 }

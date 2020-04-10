@@ -3,7 +3,7 @@
     using System;
     using Issues;
 
-    internal class CannotResolveType : ICannotResolveType
+    internal sealed class CannotResolveType : ICannotResolveType
     {
         public static readonly ICannotResolveType Shared = new CannotResolveType();
 

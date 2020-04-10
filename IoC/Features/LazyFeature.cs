@@ -7,7 +7,7 @@
     /// <summary>
     /// Allows to resolve Lazy.
     /// </summary>
-    public class LazyFeature : IConfiguration
+    public sealed class LazyFeature : IConfiguration
     {
         /// The default instance.
         public static readonly IConfiguration Default = new LazyFeature();

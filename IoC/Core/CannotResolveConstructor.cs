@@ -6,7 +6,7 @@
     using System.Reflection;
     using Issues;
 
-    internal class CannotResolveConstructor : ICannotResolveConstructor
+    internal sealed class CannotResolveConstructor : ICannotResolveConstructor
     {
         public static readonly ICannotResolveConstructor Shared = new CannotResolveConstructor();
 

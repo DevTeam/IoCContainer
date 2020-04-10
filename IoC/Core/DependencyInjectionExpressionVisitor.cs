@@ -10,7 +10,7 @@
     // ReSharper disable once RedundantNameQualifier
     using IContainer = IoC.IContainer;
 
-    internal class DependencyInjectionExpressionVisitor: ExpressionVisitor
+    internal sealed class DependencyInjectionExpressionVisitor : ExpressionVisitor
     {
         private static readonly Key ContextKey = TypeDescriptor<Context>.Key;
         private static readonly TypeDescriptor ContextTypeDescriptor = TypeDescriptor<Context>.Descriptor;

@@ -3,7 +3,7 @@
     using System;
     using System.Linq.Expressions;
 
-    internal class LifetimeExpressionBuilder : IExpressionBuilder<ILifetime>
+    internal sealed class LifetimeExpressionBuilder : IExpressionBuilder<ILifetime>
     {
         public static readonly IExpressionBuilder<ILifetime> Shared = new LifetimeExpressionBuilder();
 

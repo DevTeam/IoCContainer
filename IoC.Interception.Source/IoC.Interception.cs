@@ -105,7 +105,7 @@ namespace IoC.Features.Interception
 // ReSharper disable once RedundantUsingDirective
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class InterceptorBuilder : IInterceptorRegistry, IBuilder
+    internal sealed class InterceptorBuilder : IInterceptorRegistry, IBuilder
     {
         private static readonly ProxyGenerator ProxyGenerator = new ProxyGenerator();
         private readonly List<InterceptorsInfo> _interceptors = new List<InterceptorsInfo>();
@@ -147,7 +147,7 @@ namespace IoC.Features.Interception
             }
         }
 
-        private class InterceptorsInfo
+        private sealed class InterceptorsInfo
         {
             private static readonly Type[] FuncTypes = {typeof(Type), typeof(Type[]), typeof(object), typeof(IInterceptor[])};
 #if NET40
@@ -386,7 +386,7 @@ namespace IoC.Features
 
     /// <inheritdoc cref="IConfiguration" />
     [PublicAPI]
-    public class InterceptionFeature: IConfiguration
+    public sealed class InterceptionFeature : IConfiguration
     {
         /// <inheritdoc />
         public IEnumerable<IToken> Apply(IContainer container)

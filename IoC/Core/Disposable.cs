@@ -87,7 +87,7 @@
             }
         }
 
-        private class EmptyDisposable: IDisposable
+        private sealed class EmptyDisposable : IDisposable
         {
             [NotNull] public static readonly IDisposable Shared = new EmptyDisposable();
 

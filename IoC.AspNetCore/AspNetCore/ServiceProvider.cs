@@ -4,7 +4,7 @@
     using System.Diagnostics.CodeAnalysis;
 
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    internal class ServiceProvider: IServiceProvider
+    internal sealed class ServiceProvider : IServiceProvider
     {
         private readonly IContainer _container;
 

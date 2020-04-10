@@ -3,7 +3,7 @@
     using System;
     using System.Linq.Expressions;
 
-    internal class DefaultCompiler : ICompiler
+    internal sealed class DefaultCompiler : ICompiler
     {
         public static readonly ICompiler Shared = new DefaultCompiler();
 

@@ -3,7 +3,7 @@
     using System;
     using Issues;
 
-    internal class CannotResolveGenericTypeArgument: ICannotResolveGenericTypeArgument
+    internal sealed class CannotResolveGenericTypeArgument : ICannotResolveGenericTypeArgument
     {
         public static readonly ICannotResolveGenericTypeArgument Shared = new CannotResolveGenericTypeArgument();
 

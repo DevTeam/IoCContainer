@@ -27,7 +27,7 @@
                 observer.OnError,
                 observer.OnCompleted));
 
-        private class InternalObservable<T>: IObservable<T>
+        private sealed class InternalObservable<T>: IObservable<T>
         {
             private readonly Func<IObserver<T>, IDisposable> _factory;
 
@@ -36,7 +36,7 @@
             public IDisposable Subscribe([NotNull] IObserver<T> observer) => _factory(observer ?? throw new ArgumentNullException(nameof(observer)));
         }
 
-        private class InternalObserver<T>: IObserver<T>
+        private sealed class InternalObserver<T>: IObserver<T>
         {
             private readonly Action<T> _onNext;
             private readonly Action<Exception> _onError;

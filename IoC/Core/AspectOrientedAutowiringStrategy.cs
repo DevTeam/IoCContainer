@@ -6,7 +6,7 @@
     using System.Linq;
     using System.Reflection;
 
-    internal class AspectOrientedAutowiringStrategy: IAutowiringStrategy
+    internal sealed class AspectOrientedAutowiringStrategy: IAutowiringStrategy
     {
         [NotNull] private readonly IAspectOrientedMetadata _metadata;
 

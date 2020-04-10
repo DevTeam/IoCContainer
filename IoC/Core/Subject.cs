@@ -5,7 +5,7 @@
     using System.Diagnostics.CodeAnalysis;
 
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
-    internal class Subject<T>: ISubject<T>
+    internal sealed class Subject<T>: ISubject<T>
     {
         private readonly ILockObject _lockObject;
         private readonly List<IObserver<T>> _observers = new List<IObserver<T>>();
