@@ -141,7 +141,7 @@ It allows you to take full advantage of dependency injection everywhere and ever
   dotnet add package IoC.AspNetCore
   ```
 
-### For ASP.NET Core 3 create the _IoC container_ and use the service provider factory based on this container at [Main](Samples/WebApplication3/Program.cs)
+### For ASP.NET Core 3+ create the _IoC container_ and use the service provider factory based on this container at [Main](Samples/WebApplication3/Program.cs)
 
 ```csharp
 public static void Main(string[] args)
@@ -241,10 +241,10 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
 ![Cat](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/REPORT.jpg)
 ### Supported Platforms
 
-  - .NET 4.0+
-  - [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/) 1.0+
-  - [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) 1.0+
-  - [UWP](https://docs.microsoft.com/en-us/windows/uwp/index) 10+
+- .NET 4.0+
+- [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/) 1.0+
+- [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) 1.0+
+- [UWP](https://docs.microsoft.com/en-us/windows/uwp/index) 10+
 
 ### Class References
 
@@ -255,13 +255,13 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
 
 ### Easy Integration
 
-  - [ASP.NET Core](#aspnet-core)
-  - [Xamarin](https://github.com/DevTeam/IoCContainer/blob/master/Samples/XamarinXaml)
-  - [Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfApp)
-  - [.NET core Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfAppNetCore) 
-  - [Universal Windows Platform](https://github.com/DevTeam/IoCContainer/blob/master/Samples/UwpApp)
-  - [Windows Communication Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WcfServiceLibrary)
-  - [Entity Framework](https://github.com/DevTeam/IoCContainer/tree/master/Samples/EntityFrameworkCore)
+- [ASP.NET Core](#aspnet-core)
+- [Xamarin](https://github.com/DevTeam/IoCContainer/blob/master/Samples/XamarinXaml)
+- [Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfApp)
+- [.NET core Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfAppNetCore) 
+- [Universal Windows Platform](https://github.com/DevTeam/IoCContainer/blob/master/Samples/UwpApp)
+- [Windows Communication Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WcfServiceLibrary)
+- [Entity Framework](https://github.com/DevTeam/IoCContainer/tree/master/Samples/EntityFrameworkCore)
 
 
 ## Usage Scenarios
@@ -305,7 +305,9 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Func](#func-)
   - [Func With Arguments](#func-with-arguments-)
   - [Auto dispose a singleton during owning container's dispose](#auto-dispose-a-singleton-during-owning-containers-dispose-)
+  - [Nullable Reference Type Dependency](#nullable-reference-type-dependency-)
   - [Optional Dependency](#optional-dependency-)
+  - [Optional Injection](#optional-injection-)
   - [Configuration via a text metadata](#configuration-via-a-text-metadata-)
   - [Tracing](#tracing-)
   - [Validation](#validation-)
@@ -1184,6 +1186,47 @@ disposableService.Verify(i => i.DisposeAsync(), Times.Once);
 
 
 
+### Nullable Reference Type Dependency [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/NullableDependency.cs)
+
+
+
+``` CSharp
+e enable
+
+public void Run()
+{
+    // Create the container and configure it
+    using var container = Container.Create()
+        .Bind<IDependency>().To<Dependency>()
+        .Bind<IService>().To<SomeService>()
+        .Container;
+
+    // Resolve an instance
+    var instance = container.Resolve<IService>();
+
+    // Check the optional dependency
+    instance.State.ShouldBe("empty");
+}
+
+public class SomeService: IService
+{
+    // "state" dependency is not resolved here but will be null value because it has Nullable Reference Type
+    public SomeService(IDependency dependency, string? state)
+    {
+        Dependency = dependency;
+        State = state ?? "empty";
+    }
+
+    public IDependency Dependency { get; }
+
+    public string? State { get; }
+}
+
+#nullable restore
+```
+
+
+
 ### Optional Dependency [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/OptionalDependency.cs)
 
 
@@ -1239,6 +1282,43 @@ public class SomeService: IService
     {
         Dependency = dependency;
         State = state.HasValue ? state.Value : "empty";
+    }
+
+    public IDependency Dependency { get; }
+
+    public string State { get; }
+}
+```
+
+
+
+### Optional Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/OptionalInjection.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    // Create the container and configure it
+    using var container = Container.Create()
+        .Bind<IDependency>().To<Dependency>()
+        .Bind<IService>().To<SomeService>(ctx => new SomeService(ctx.Container.Inject<IDependency>(), ctx.Container.TryInject<string>()))
+        .Container;
+
+    // Resolve an instance
+    var instance = container.Resolve<IService>();
+
+    // Check the optional dependency
+    instance.State.ShouldBe("empty");
+}
+
+public class SomeService: IService
+{
+    // "state" dependency is not resolved here but will be null value because it was injected optional
+    public SomeService(IDependency dependency, string state)
+    {
+        Dependency = dependency;
+        State = state ?? "empty";
     }
 
     public IDependency Dependency { get; }
@@ -1410,8 +1490,6 @@ public interface IConsole { void WriteLine(string text); }
 
 public interface IClock { DateTimeOffset Now { get; } }
 
-public class Clock : IClock { public DateTimeOffset Now => DateTimeOffset.Now; }
-
 public interface ILogger { void Log(string message); }
 
 public class Logger : ILogger
@@ -1432,6 +1510,16 @@ public class Logger : ILogger
     // Adds current time and prefix before a message and writes it to console
     public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");
 }
+
+#nullable enable
+public class Clock : IClock
+{
+    // "timeZone" dependency is not resolved here but will be null value because it has Nullable Reference Type
+    public Clock([Type(typeof(TimeZoneInfo))] TimeZoneInfo? timeZone) { }
+
+    public DateTimeOffset Now => DateTimeOffset.Now;
+}
+#nullable restore
 ```
 
 Also you can specify your own aspect oriented autowiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
