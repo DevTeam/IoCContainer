@@ -305,6 +305,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Func](#func-)
   - [Func With Arguments](#func-with-arguments-)
   - [Auto dispose a singleton during owning container's dispose](#auto-dispose-a-singleton-during-owning-containers-dispose-)
+  - [Default Parameters Injection](#default-parameters-injection-)
   - [Nullable Reference Type Dependency](#nullable-reference-type-dependency-)
   - [Optional Dependency](#optional-dependency-)
   - [Optional Injection](#optional-injection-)
@@ -1182,6 +1183,43 @@ using (
 // Check the singleton was disposed after the container was disposed
 disposableService.Verify(i => i.Dispose(), Times.Once);
 disposableService.Verify(i => i.DisposeAsync(), Times.Once);
+```
+
+
+
+### Default Parameters Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/DefaultParamsInjection.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    // Create the container and configure it
+    using var container = Container.Create()
+        .Bind<IDependency>().To<Dependency>()
+        .Bind<IService>().To<SomeService>()
+        .Container;
+
+    // Resolve an instance
+    var instance = container.Resolve<IService>();
+
+    // Check the optional dependency
+    instance.State.ShouldBe("empty");
+}
+
+public class SomeService: IService
+{
+    // "state" dependency is not resolved here but it has the default value "empty"
+    public SomeService(IDependency dependency, string state = "empty")
+    {
+        Dependency = dependency;
+        State = state;
+    }
+
+    public IDependency Dependency { get; }
+
+    public string State { get; }
+}
 ```
 
 

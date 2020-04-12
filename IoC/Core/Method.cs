@@ -32,13 +32,25 @@
                 else
                 {
                     var param = _parameters[parameterPosition];
+                    Expression defaultExpression = null;
 #if !NET40
-                    var isNullable = param.CustomAttributes.Any(i => i.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
+                    if (param.HasDefaultValue)
+                    {
+                        defaultExpression = Expression.Constant(param.DefaultValue);
+                    }
+
+                    if (defaultExpression == null && param.CustomAttributes.Any(i => i.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute"))
+                    {
+                        defaultExpression = Expression.Default(param.ParameterType);
+                    }
 #else
-                    const bool isNullable = false;
+                    if (param.IsOptional)
+                    {
+                        defaultExpression = Expression.Constant(param.DefaultValue);
+                    }
 #endif
-                    var key = new Key(_parameters[parameterPosition].ParameterType);
-                    yield return buildContext.CreateChild(key, buildContext.Container).GetDependencyExpression(isNullable);
+                    var key = new Key(param.ParameterType);
+                    yield return buildContext.CreateChild(key, buildContext.Container).GetDependencyExpression(defaultExpression);
                 }
             }
         }

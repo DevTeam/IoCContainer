@@ -86,13 +86,13 @@
             return new BuildContext(this, key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
         }
 
-        public Expression GetDependencyExpression(bool isNullable)
+        public Expression GetDependencyExpression(Expression defaultExpression = null)
         {
             if (!Container.TryGetDependency(Key, out var dependency, out var lifetime))
             {
-                if (isNullable)
+                if (defaultExpression != null)
                 {
-                    return Expression.Default(Key.Type);
+                    return defaultExpression;
                 }
 
                 try

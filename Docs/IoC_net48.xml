@@ -5268,12 +5268,12 @@
             Autowiring strategy.
             </summary>
         </member>
-        <member name="M:IoC.IBuildContext.GetDependencyExpression(System.Boolean)">
+        <member name="M:IoC.IBuildContext.GetDependencyExpression(System.Linq.Expressions.Expression)">
             <summary>
             Get the dependency expression.
             </summary>
-            <param name="isNullable"></param>
-            <returns></returns>
+            <param name="defaultExpression">The default expression.</param>
+            <returns>The dependency expression.</returns>
         </member>
         <member name="M:IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)">
             <summary>

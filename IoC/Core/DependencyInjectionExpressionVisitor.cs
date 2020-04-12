@@ -50,7 +50,7 @@
                     var type = methodCall.Method.GetGenericArguments()[0];
 
                     var key = new Key(type);
-                    return CreateDependencyExpression(key, containerExpression, tryInject);
+                    return CreateDependencyExpression(key, containerExpression, tryInject ? Expression.Default(type) : null);
                 }
 
                 // container.Inject<T>(tag)
@@ -69,7 +69,7 @@
                     var tag = GetTag(tagExpression);
 
                     var key = new Key(type, tag);
-                    return CreateDependencyExpression(key, containerExpression, tryInject);
+                    return CreateDependencyExpression(key, containerExpression, tryInject ? Expression.Default(type) : null);
                 }
 
                 // container.Inject<T>(destination, source)
@@ -98,7 +98,7 @@
                     var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw new BuildExpressionException("Invalid argument", new ArgumentException("Invalid argument", "type"))).Value;
 
                     var key = new Key(type);
-                    return CreateDependencyExpression(key, containerExpression, tryInject);
+                    return CreateDependencyExpression(key, containerExpression, tryInject ? Expression.Default(type) : null);
                 }
 
                 // container.Inject(type, tag)
@@ -118,7 +118,7 @@
                     var tag = GetTag(tagExpression);
 
                     var key = new Key(type, tag);
-                    return CreateDependencyExpression(key, containerExpression, tryInject);
+                    return CreateDependencyExpression(key, containerExpression, tryInject ? Expression.Default(type) : null);
                 }
             }
 
@@ -243,7 +243,7 @@
         }
 
         [NotNull]
-        private Expression CreateDependencyExpression(Key key, [CanBeNull] Expression containerExpression, bool isNullable)
+        private Expression CreateDependencyExpression(Key key, [CanBeNull] Expression containerExpression, DefaultExpression defaultExpression)
         {
             if (Equals(key, ContextKey))
             {
@@ -251,7 +251,7 @@
             }
 
             var selectedContainer = containerExpression != null ? SelectedContainer(containerExpression) : _container;
-            return _buildContext.CreateChild(key, selectedContainer).GetDependencyExpression(isNullable);
+            return _buildContext.CreateChild(key, selectedContainer).GetDependencyExpression(defaultExpression);
         }
 
         private bool TryReplaceContextFields([CanBeNull] Type type, string name, out Expression expression)

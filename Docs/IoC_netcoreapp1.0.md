@@ -313,7 +313,7 @@
   - [AddLifetime(baseExpression,lifetime)](#M-IoC-IBuildContext-AddLifetime-System-Linq-Expressions-Expression,IoC-ILifetime- 'IoC.IBuildContext.AddLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)')
   - [BindTypes(type,targetType)](#M-IoC-IBuildContext-BindTypes-System-Type,System-Type- 'IoC.IBuildContext.BindTypes(System.Type,System.Type)')
   - [CreateChild(key,container)](#M-IoC-IBuildContext-CreateChild-IoC-Key,IoC-IContainer- 'IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)')
-  - [GetDependencyExpression(isNullable)](#M-IoC-IBuildContext-GetDependencyExpression-System-Boolean- 'IoC.IBuildContext.GetDependencyExpression(System.Boolean)')
+  - [GetDependencyExpression(defaultExpression)](#M-IoC-IBuildContext-GetDependencyExpression-System-Linq-Expressions-Expression- 'IoC.IBuildContext.GetDependencyExpression(System.Linq.Expressions.Expression)')
   - [InjectDependencies(baseExpression,instanceExpression)](#M-IoC-IBuildContext-InjectDependencies-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression- 'IoC.IBuildContext.InjectDependencies(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)')
   - [ReplaceTypes(baseExpression)](#M-IoC-IBuildContext-ReplaceTypes-System-Linq-Expressions-Expression- 'IoC.IBuildContext.ReplaceTypes(System.Linq.Expressions.Expression)')
   - [TryReplaceType(type,targetType)](#M-IoC-IBuildContext-TryReplaceType-System-Type,System-Type@- 'IoC.IBuildContext.TryReplaceType(System.Type,System.Type@)')
@@ -7638,8 +7638,8 @@ The new build context.
 | key | [IoC.Key](#T-IoC-Key 'IoC.Key') | The key |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The container. |
 
-<a name='M-IoC-IBuildContext-GetDependencyExpression-System-Boolean-'></a>
-### GetDependencyExpression(isNullable) `method`
+<a name='M-IoC-IBuildContext-GetDependencyExpression-System-Linq-Expressions-Expression-'></a>
+### GetDependencyExpression(defaultExpression) `method`
 
 ##### Summary
 
@@ -7647,13 +7647,13 @@ Get the dependency expression.
 
 ##### Returns
 
-
+The dependency expression.
 
 ##### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| isNullable | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') |  |
+| defaultExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The default expression. |
 
 <a name='M-IoC-IBuildContext-InjectDependencies-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression-'></a>
 ### InjectDependencies(baseExpression,instanceExpression) `method`

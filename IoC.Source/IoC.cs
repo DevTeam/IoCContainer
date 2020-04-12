@@ -7650,9 +7650,9 @@ namespace IoC
         /// <summary>
         /// Get the dependency expression.
         /// </summary>
-        /// <param name="isNullable"></param>
-        /// <returns></returns>
-        [NotNull] Expression GetDependencyExpression(bool isNullable);
+        /// <param name="defaultExpression">The default expression.</param>
+        /// <returns>The dependency expression.</returns>
+        [NotNull] Expression GetDependencyExpression([CanBeNull] Expression defaultExpression = null);
 
         /// <summary>
         /// Creates a child context.
@@ -10422,13 +10422,13 @@ namespace IoC.Core
             return new BuildContext(this, key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
         }
 
-        public Expression GetDependencyExpression(bool isNullable)
+        public Expression GetDependencyExpression(Expression defaultExpression = null)
         {
             if (!Container.TryGetDependency(Key, out var dependency, out var lifetime))
             {
-                if (isNullable)
+                if (defaultExpression != null)
                 {
-                    return Expression.Default(Key.Type);
+                    return defaultExpression;
                 }
 
                 try
@@ -11276,7 +11276,7 @@ namespace IoC.Core
                     var type = methodCall.Method.GetGenericArguments()[0];
 
                     var key = new Key(type);
-                    return CreateDependencyExpression(key, containerExpression, tryInject);
+                    return CreateDependencyExpression(key, containerExpression, tryInject ? Expression.Default(type) : null);
                 }
 
                 // container.Inject<T>(tag)
@@ -11295,7 +11295,7 @@ namespace IoC.Core
                     var tag = GetTag(tagExpression);
 
                     var key = new Key(type, tag);
-                    return CreateDependencyExpression(key, containerExpression, tryInject);
+                    return CreateDependencyExpression(key, containerExpression, tryInject ? Expression.Default(type) : null);
                 }
 
                 // container.Inject<T>(destination, source)
@@ -11324,7 +11324,7 @@ namespace IoC.Core
                     var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw new BuildExpressionException("Invalid argument", new ArgumentException("Invalid argument", "type"))).Value;
 
                     var key = new Key(type);
-                    return CreateDependencyExpression(key, containerExpression, tryInject);
+                    return CreateDependencyExpression(key, containerExpression, tryInject ? Expression.Default(type) : null);
                 }
 
                 // container.Inject(type, tag)
@@ -11344,7 +11344,7 @@ namespace IoC.Core
                     var tag = GetTag(tagExpression);
 
                     var key = new Key(type, tag);
-                    return CreateDependencyExpression(key, containerExpression, tryInject);
+                    return CreateDependencyExpression(key, containerExpression, tryInject ? Expression.Default(type) : null);
                 }
             }
 
@@ -11469,7 +11469,7 @@ namespace IoC.Core
         }
 
         [NotNull]
-        private Expression CreateDependencyExpression(Key key, [CanBeNull] Expression containerExpression, bool isNullable)
+        private Expression CreateDependencyExpression(Key key, [CanBeNull] Expression containerExpression, DefaultExpression defaultExpression)
         {
             if (Equals(key, ContextKey))
             {
@@ -11477,7 +11477,7 @@ namespace IoC.Core
             }
 
             var selectedContainer = containerExpression != null ? SelectedContainer(containerExpression) : _container;
-            return _buildContext.CreateChild(key, selectedContainer).GetDependencyExpression(isNullable);
+            return _buildContext.CreateChild(key, selectedContainer).GetDependencyExpression(defaultExpression);
         }
 
         private bool TryReplaceContextFields([CanBeNull] Type type, string name, out Expression expression)
@@ -12358,13 +12358,25 @@ namespace IoC.Core
                 else
                 {
                     var param = _parameters[parameterPosition];
+                    Expression defaultExpression = null;
 #if !NET40
-                    var isNullable = param.CustomAttributes.Any(i => i.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
+                    if (param.HasDefaultValue)
+                    {
+                        defaultExpression = Expression.Constant(param.DefaultValue);
+                    }
+
+                    if (defaultExpression == null && param.CustomAttributes.Any(i => i.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute"))
+                    {
+                        defaultExpression = Expression.Default(param.ParameterType);
+                    }
 #else
-                    const bool isNullable = false;
+                    if (param.IsOptional)
+                    {
+                        defaultExpression = Expression.Constant(param.DefaultValue);
+                    }
 #endif
-                    var key = new Key(_parameters[parameterPosition].ParameterType);
-                    yield return buildContext.CreateChild(key, buildContext.Container).GetDependencyExpression(isNullable);
+                    var key = new Key(param.ParameterType);
+                    yield return buildContext.CreateChild(key, buildContext.Container).GetDependencyExpression(defaultExpression);
                 }
             }
         }

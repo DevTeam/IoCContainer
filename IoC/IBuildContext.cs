@@ -38,9 +38,9 @@
         /// <summary>
         /// Get the dependency expression.
         /// </summary>
-        /// <param name="isNullable"></param>
-        /// <returns></returns>
-        [NotNull] Expression GetDependencyExpression(bool isNullable);
+        /// <param name="defaultExpression">The default expression.</param>
+        /// <returns>The dependency expression.</returns>
+        [NotNull] Expression GetDependencyExpression([CanBeNull] Expression defaultExpression = null);
 
         /// <summary>
         /// Creates a child context.
