@@ -10,6 +10,8 @@
     /// </summary>
     public static class FluentAutowiring
     {
+        private static readonly Expression ContainerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
+
         /// <summary>
         /// Injects dependency to parameter.
         /// </summary>
@@ -25,8 +27,7 @@
             if (method == null) throw new ArgumentNullException(nameof(method));
             if (dependencyType == null) throw new ArgumentNullException(nameof(dependencyType));
             if (parameterPosition < 0) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
-            var containerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
-            var parameterExpression = Expression.Call(Injections.InjectWithTagMethodInfo, containerExpression, Expression.Constant(dependencyType), Expression.Constant(dependencyTag)).Convert(dependencyType);
+            var parameterExpression = Expression.Call(Injections.InjectWithTagMethodInfo, ContainerExpression, Expression.Constant(dependencyType), Expression.Constant(dependencyTag)).Convert(dependencyType);
             method.SetParameterExpression(parameterPosition, parameterExpression);
             return true;
         }
