@@ -91,8 +91,6 @@ namespace IoC.Tests.UsageScenarios
 
         public interface IClock { DateTimeOffset Now { get; } }
 
-        public class Clock : IClock { public DateTimeOffset Now => DateTimeOffset.Now; }
-
         public interface ILogger { void Log(string message); }
 
         public class Logger : ILogger
@@ -113,6 +111,16 @@ namespace IoC.Tests.UsageScenarios
             // Adds current time and prefix before a message and writes it to console
             public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");
         }
+
+        #nullable enable
+        public class Clock : IClock
+        {
+            // "timeZone" dependency is not resolved here but will be null value because it has Nullable Reference Type
+            public Clock([Type(typeof(TimeZoneInfo))] TimeZoneInfo? timeZone) { }
+
+            public DateTimeOffset Now => DateTimeOffset.Now;
+        }
+        #nullable restore
         // }
     }
 }

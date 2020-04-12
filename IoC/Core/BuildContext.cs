@@ -86,36 +86,38 @@
             return new BuildContext(this, key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
         }
 
-        public Expression DependencyExpression
+        public Expression GetDependencyExpression(bool isNullable)
         {
-            get
+            if (!Container.TryGetDependency(Key, out var dependency, out var lifetime))
             {
-                if (!Container.TryGetDependency(Key, out var dependency, out var lifetime))
+                if (isNullable)
                 {
-                    try
-                    {
-                        var dependencyDescription = Container.Resolve<ICannotResolveDependency>().Resolve(this);
-                        dependency = dependencyDescription.Dependency;
-                        lifetime = dependencyDescription.Lifetime;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new BuildExpressionException(ex.Message, ex.InnerException);
-                    }
+                    return Expression.Default(Key.Type);
                 }
 
-                if (Depth >= 128)
+                try
                 {
-                    Container.Resolve<IFoundCyclicDependency>().Resolve(this);
+                    var dependencyDescription = Container.Resolve<ICannotResolveDependency>().Resolve(this);
+                    dependency = dependencyDescription.Dependency;
+                    lifetime = dependencyDescription.Lifetime;
                 }
-
-                if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
+                catch (Exception ex)
                 {
-                    return expression;
+                    throw new BuildExpressionException(ex.Message, ex.InnerException);
                 }
-
-                return Container.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
             }
+
+            if (Depth >= 128)
+            {
+                Container.Resolve<IFoundCyclicDependency>().Resolve(this);
+            }
+
+            if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
+            {
+                return expression;
+            }
+
+            return Container.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
         }
 
         public override string ToString()

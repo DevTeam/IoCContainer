@@ -307,13 +307,13 @@
 - [IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext')
   - [AutowiringStrategy](#P-IoC-IBuildContext-AutowiringStrategy 'IoC.IBuildContext.AutowiringStrategy')
   - [Container](#P-IoC-IBuildContext-Container 'IoC.IBuildContext.Container')
-  - [DependencyExpression](#P-IoC-IBuildContext-DependencyExpression 'IoC.IBuildContext.DependencyExpression')
   - [Depth](#P-IoC-IBuildContext-Depth 'IoC.IBuildContext.Depth')
   - [Key](#P-IoC-IBuildContext-Key 'IoC.IBuildContext.Key')
   - [Parent](#P-IoC-IBuildContext-Parent 'IoC.IBuildContext.Parent')
   - [AddLifetime(baseExpression,lifetime)](#M-IoC-IBuildContext-AddLifetime-System-Linq-Expressions-Expression,IoC-ILifetime- 'IoC.IBuildContext.AddLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)')
   - [BindTypes(type,targetType)](#M-IoC-IBuildContext-BindTypes-System-Type,System-Type- 'IoC.IBuildContext.BindTypes(System.Type,System.Type)')
   - [CreateChild(key,container)](#M-IoC-IBuildContext-CreateChild-IoC-Key,IoC-IContainer- 'IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)')
+  - [GetDependencyExpression(isNullable)](#M-IoC-IBuildContext-GetDependencyExpression-System-Boolean- 'IoC.IBuildContext.GetDependencyExpression(System.Boolean)')
   - [InjectDependencies(baseExpression,instanceExpression)](#M-IoC-IBuildContext-InjectDependencies-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression- 'IoC.IBuildContext.InjectDependencies(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)')
   - [ReplaceTypes(baseExpression)](#M-IoC-IBuildContext-ReplaceTypes-System-Linq-Expressions-Expression- 'IoC.IBuildContext.ReplaceTypes(System.Linq.Expressions.Expression)')
   - [TryReplaceType(type,targetType)](#M-IoC-IBuildContext-TryReplaceType-System-Type,System-Type@- 'IoC.IBuildContext.TryReplaceType(System.Type,System.Type@)')
@@ -385,6 +385,10 @@
   - [Inject\`\`1(container)](#M-IoC-Injections-Inject``1-IoC-IContainer- 'IoC.Injections.Inject``1(IoC.IContainer)')
   - [Inject\`\`1(container,tag)](#M-IoC-Injections-Inject``1-IoC-IContainer,System-Object- 'IoC.Injections.Inject``1(IoC.IContainer,System.Object)')
   - [Inject\`\`1(container,destination,source)](#M-IoC-Injections-Inject``1-IoC-IContainer,``0,``0- 'IoC.Injections.Inject``1(IoC.IContainer,``0,``0)')
+  - [TryInject(container,type)](#M-IoC-Injections-TryInject-IoC-IContainer,System-Type- 'IoC.Injections.TryInject(IoC.IContainer,System.Type)')
+  - [TryInject(container,type,tag)](#M-IoC-Injections-TryInject-IoC-IContainer,System-Type,System-Object- 'IoC.Injections.TryInject(IoC.IContainer,System.Type,System.Object)')
+  - [TryInject\`\`1(container)](#M-IoC-Injections-TryInject``1-IoC-IContainer- 'IoC.Injections.TryInject``1(IoC.IContainer)')
+  - [TryInject\`\`1(container,tag)](#M-IoC-Injections-TryInject``1-IoC-IContainer,System-Object- 'IoC.Injections.TryInject``1(IoC.IContainer,System.Object)')
 - [InstantHandleAttribute](#T-IoC-InstantHandleAttribute 'IoC.InstantHandleAttribute')
 - [InvokerParameterNameAttribute](#T-IoC-InvokerParameterNameAttribute 'IoC.InvokerParameterNameAttribute')
 - [ItemCanBeNullAttribute](#T-IoC-ItemCanBeNullAttribute 'IoC.ItemCanBeNullAttribute')
@@ -7563,13 +7567,6 @@ Autowiring strategy.
 
 The target container.
 
-<a name='P-IoC-IBuildContext-DependencyExpression'></a>
-### DependencyExpression `property`
-
-##### Summary
-
-The dependency expression.
-
 <a name='P-IoC-IBuildContext-Depth'></a>
 ### Depth `property`
 
@@ -7640,6 +7637,23 @@ The new build context.
 | ---- | ---- | ----------- |
 | key | [IoC.Key](#T-IoC-Key 'IoC.Key') | The key |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The container. |
+
+<a name='M-IoC-IBuildContext-GetDependencyExpression-System-Boolean-'></a>
+### GetDependencyExpression(isNullable) `method`
+
+##### Summary
+
+Get the dependency expression.
+
+##### Returns
+
+
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| isNullable | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') |  |
 
 <a name='M-IoC-IBuildContext-InjectDependencies-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression-'></a>
 ### InjectDependencies(baseExpression,instanceExpression) `method`
@@ -8549,7 +8563,7 @@ Injection extensions.
 
 ##### Summary
 
-Injects the dependency. Just an injection marker.
+Injects a dependency. Just an injection marker.
 
 ##### Returns
 
@@ -8567,7 +8581,7 @@ The injected instance.
 
 ##### Summary
 
-Injects the dependency. Just an injection marker.
+Injects a dependency. Just an injection marker.
 
 ##### Returns
 
@@ -8586,7 +8600,7 @@ The injected instance.
 
 ##### Summary
 
-Injects the dependency. Just an injection marker.
+Injects a dependency. Just an injection marker.
 
 ##### Returns
 
@@ -8609,7 +8623,7 @@ The injected instance.
 
 ##### Summary
 
-Injects the dependency. Just an injection marker.
+Injects a dependency. Just an injection marker.
 
 ##### Returns
 
@@ -8633,7 +8647,7 @@ The injected instance.
 
 ##### Summary
 
-Injects the dependency. Just an injection marker.
+Injects a dependency. Just an injection marker.
 
 ##### Parameters
 
@@ -8648,6 +8662,90 @@ Injects the dependency. Just an injection marker.
 | Name | Description |
 | ---- | ----------- |
 | T |  |
+
+<a name='M-IoC-Injections-TryInject-IoC-IContainer,System-Type-'></a>
+### TryInject(container,type) `method`
+
+##### Summary
+
+Tries to inject a dependency. Just an injection marker.
+
+##### Returns
+
+The injected instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The type of dependency. |
+
+<a name='M-IoC-Injections-TryInject-IoC-IContainer,System-Type,System-Object-'></a>
+### TryInject(container,type,tag) `method`
+
+##### Summary
+
+Tries to inject a dependency. Just an injection marker.
+
+##### Returns
+
+The injected instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The type of dependency. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag of dependency. |
+
+<a name='M-IoC-Injections-TryInject``1-IoC-IContainer-'></a>
+### TryInject\`\`1(container) `method`
+
+##### Summary
+
+Tries to inject a dependency. Just an injection marker.
+
+##### Returns
+
+The injected instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The type of dependency. |
+
+<a name='M-IoC-Injections-TryInject``1-IoC-IContainer,System-Object-'></a>
+### TryInject\`\`1(container,tag) `method`
+
+##### Summary
+
+Tries to inject a dependency. Just an injection marker.
+
+##### Returns
+
+The injected instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag of dependency. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The type of dependency. |
 
 <a name='T-IoC-InstantHandleAttribute'></a>
 ## InstantHandleAttribute `type`

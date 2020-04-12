@@ -5268,10 +5268,12 @@
             Autowiring strategy.
             </summary>
         </member>
-        <member name="P:IoC.IBuildContext.DependencyExpression">
+        <member name="M:IoC.IBuildContext.GetDependencyExpression(System.Boolean)">
             <summary>
-            The dependency expression.
+            Get the dependency expression.
             </summary>
+            <param name="isNullable"></param>
+            <returns></returns>
         </member>
         <member name="M:IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)">
             <summary>
@@ -5475,7 +5477,15 @@
         </member>
         <member name="M:IoC.Injections.Inject``1(IoC.IContainer)">
             <summary>
-            Injects the dependency. Just an injection marker.
+            Injects a dependency. Just an injection marker.
+            </summary>
+            <typeparam name="T">The type of dependency.</typeparam>
+            <param name="container">The resolving container.</param>
+            <returns>The injected instance.</returns>
+        </member>
+        <member name="M:IoC.Injections.TryInject``1(IoC.IContainer)">
+            <summary>
+            Tries to inject a dependency. Just an injection marker.
             </summary>
             <typeparam name="T">The type of dependency.</typeparam>
             <param name="container">The resolving container.</param>
@@ -5483,7 +5493,16 @@
         </member>
         <member name="M:IoC.Injections.Inject``1(IoC.IContainer,System.Object)">
             <summary>
-            Injects the dependency. Just an injection marker.
+            Injects a dependency. Just an injection marker.
+            </summary>
+            <typeparam name="T">The type of dependency.</typeparam>
+            <param name="container">The resolving container.</param>
+            <param name="tag">The tag of dependency.</param>
+            <returns>The injected instance.</returns>
+        </member>
+        <member name="M:IoC.Injections.TryInject``1(IoC.IContainer,System.Object)">
+            <summary>
+            Tries to inject a dependency. Just an injection marker.
             </summary>
             <typeparam name="T">The type of dependency.</typeparam>
             <param name="container">The resolving container.</param>
@@ -5492,7 +5511,7 @@
         </member>
         <member name="M:IoC.Injections.Inject``1(IoC.IContainer,``0,``0)">
             <summary>
-            Injects the dependency. Just an injection marker.
+            Injects a dependency. Just an injection marker.
             </summary>
             <typeparam name="T"></typeparam>
             <param name="container">The resolving container.</param>
@@ -5501,7 +5520,15 @@
         </member>
         <member name="M:IoC.Injections.Inject(IoC.IContainer,System.Type)">
             <summary>
-            Injects the dependency. Just an injection marker.
+            Injects a dependency. Just an injection marker.
+            </summary>
+            <param name="container">The resolving container.</param>
+            <param name="type">The type of dependency.</param>
+            <returns>The injected instance.</returns>
+        </member>
+        <member name="M:IoC.Injections.TryInject(IoC.IContainer,System.Type)">
+            <summary>
+            Tries to inject a dependency. Just an injection marker.
             </summary>
             <param name="container">The resolving container.</param>
             <param name="type">The type of dependency.</param>
@@ -5509,7 +5536,16 @@
         </member>
         <member name="M:IoC.Injections.Inject(IoC.IContainer,System.Type,System.Object)">
             <summary>
-            Injects the dependency. Just an injection marker.
+            Injects a dependency. Just an injection marker.
+            </summary>
+            <param name="container">The resolving container.</param>
+            <param name="type">The type of dependency.</param>
+            <param name="tag">The tag of dependency.</param>
+            <returns>The injected instance.</returns>
+        </member>
+        <member name="M:IoC.Injections.TryInject(IoC.IContainer,System.Type,System.Object)">
+            <summary>
+            Tries to inject a dependency. Just an injection marker.
             </summary>
             <param name="container">The resolving container.</param>
             <param name="type">The type of dependency.</param>

@@ -37,20 +37,26 @@
         {
             if (methodCall.Method.IsGenericMethod)
             {
+                var genericMethodDefinition = methodCall.Method.GetGenericMethodDefinition();
                 // container.Inject<T>()
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectGenericMethodInfo))
+                var inject = Equals(genericMethodDefinition, Injections.InjectGenericMethodInfo);
+                var tryInject = Equals(genericMethodDefinition, Injections.TryInjectGenericMethodInfo);
+                if (inject || tryInject)
                 {
                     // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
+
                     // type
                     var type = methodCall.Method.GetGenericArguments()[0];
 
                     var key = new Key(type);
-                    return CreateDependencyExpression(key, containerExpression);
+                    return CreateDependencyExpression(key, containerExpression, tryInject);
                 }
 
                 // container.Inject<T>(tag)
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectWithTagGenericMethodInfo))
+                inject = Equals(genericMethodDefinition, Injections.InjectWithTagGenericMethodInfo);
+                tryInject = Equals(genericMethodDefinition, Injections.TryInjectWithTagGenericMethodInfo);
+                if (inject || tryInject)
                 {
                     // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
@@ -63,11 +69,11 @@
                     var tag = GetTag(tagExpression);
 
                     var key = new Key(type, tag);
-                    return CreateDependencyExpression(key, containerExpression);
+                    return CreateDependencyExpression(key, containerExpression, tryInject);
                 }
 
                 // container.Inject<T>(destination, source)
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectingAssignmentGenericMethodInfo))
+                if (Equals(genericMethodDefinition, Injections.InjectingAssignmentGenericMethodInfo))
                 {
                     var dstExpression = Visit(methodCall.Arguments[1]);
                     var srcExpression = Visit(methodCall.Arguments[2]);
@@ -80,32 +86,39 @@
             else
             {
                 // container.Inject(type)
-                if (Equals(methodCall.Method, Injections.InjectMethodInfo))
+                var inject = Equals(methodCall.Method, Injections.InjectMethodInfo);
+                var tryInject = Equals(methodCall.Method, Injections.TryInjectMethodInfo);
+                if (inject || tryInject)
                 {
                     // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
+
                     // type
                     // ReSharper disable once NotResolvedInText
                     var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw new BuildExpressionException("Invalid argument", new ArgumentException("Invalid argument", "type"))).Value;
 
                     var key = new Key(type);
-                    return CreateDependencyExpression(key, containerExpression);
+                    return CreateDependencyExpression(key, containerExpression, tryInject);
                 }
 
                 // container.Inject(type, tag)
-                if (Equals(methodCall.Method, Injections.InjectWithTagMethodInfo))
+                inject = Equals(methodCall.Method, Injections.InjectWithTagMethodInfo);
+                tryInject = Equals(methodCall.Method, Injections.TryInjectWithTagMethodInfo);
+                if (inject || tryInject)
                 {
                     // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
+
                     // type
                     // ReSharper disable once NotResolvedInText
                     var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw new BuildExpressionException("Invalid argument", new ArgumentException("Invalid argument", "type"))).Value;
+
                     // tag
                     var tagExpression = methodCall.Arguments[2];
                     var tag = GetTag(tagExpression);
 
                     var key = new Key(type, tag);
-                    return CreateDependencyExpression(key, containerExpression);
+                    return CreateDependencyExpression(key, containerExpression, tryInject);
                 }
             }
 
@@ -230,7 +243,7 @@
         }
 
         [NotNull]
-        private Expression CreateDependencyExpression(Key key, [CanBeNull] Expression containerExpression)
+        private Expression CreateDependencyExpression(Key key, [CanBeNull] Expression containerExpression, bool isNullable)
         {
             if (Equals(key, ContextKey))
             {
@@ -238,7 +251,7 @@
             }
 
             var selectedContainer = containerExpression != null ? SelectedContainer(containerExpression) : _container;
-            return _buildContext.CreateChild(key, selectedContainer).DependencyExpression;
+            return _buildContext.CreateChild(key, selectedContainer).GetDependencyExpression(isNullable);
         }
 
         private bool TryReplaceContextFields([CanBeNull] Type type, string name, out Expression expression)

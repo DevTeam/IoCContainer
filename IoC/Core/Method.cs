@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
 
@@ -30,8 +31,14 @@
                 }
                 else
                 {
+                    var param = _parameters[parameterPosition];
+#if !NET40
+                    var isNullable = param.CustomAttributes.Any(i => i.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
+#else
+                    const bool isNullable = false;
+#endif
                     var key = new Key(_parameters[parameterPosition].ParameterType);
-                    yield return buildContext.CreateChild(key, buildContext.Container).DependencyExpression;
+                    yield return buildContext.CreateChild(key, buildContext.Container).GetDependencyExpression(isNullable);
                 }
             }
         }

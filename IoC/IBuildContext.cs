@@ -36,9 +36,11 @@
         [NotNull] IAutowiringStrategy AutowiringStrategy { get; }
 
         /// <summary>
-        /// The dependency expression.
+        /// Get the dependency expression.
         /// </summary>
-        [NotNull] Expression DependencyExpression { get; }
+        /// <param name="isNullable"></param>
+        /// <returns></returns>
+        [NotNull] Expression GetDependencyExpression(bool isNullable);
 
         /// <summary>
         /// Creates a child context.

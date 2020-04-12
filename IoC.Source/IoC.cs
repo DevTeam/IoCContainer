@@ -1884,6 +1884,8 @@ namespace IoC
     /// </summary>
     public static class FluentAutowiring
     {
+        private static readonly Expression ContainerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
+
         /// <summary>
         /// Injects dependency to parameter.
         /// </summary>
@@ -1899,8 +1901,7 @@ namespace IoC
             if (method == null) throw new ArgumentNullException(nameof(method));
             if (dependencyType == null) throw new ArgumentNullException(nameof(dependencyType));
             if (parameterPosition < 0) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
-            var containerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
-            var parameterExpression = Expression.Call(Injections.InjectWithTagMethodInfo, containerExpression, Expression.Constant(dependencyType), Expression.Constant(dependencyTag)).Convert(dependencyType);
+            var parameterExpression = Expression.Call(Injections.InjectWithTagMethodInfo, ContainerExpression, Expression.Constant(dependencyType), Expression.Constant(dependencyTag)).Convert(dependencyType);
             method.SetParameterExpression(parameterPosition, parameterExpression);
             return true;
         }
@@ -7647,9 +7648,11 @@ namespace IoC
         [NotNull] IAutowiringStrategy AutowiringStrategy { get; }
 
         /// <summary>
-        /// The dependency expression.
+        /// Get the dependency expression.
         /// </summary>
-        [NotNull] Expression DependencyExpression { get; }
+        /// <param name="isNullable"></param>
+        /// <returns></returns>
+        [NotNull] Expression GetDependencyExpression(bool isNullable);
 
         /// <summary>
         /// Creates a child context.
@@ -7956,18 +7959,28 @@ namespace IoC
     {
         internal static readonly string JustAMarkerError = $"The method `{nameof(Inject)}` is a marker method and has no implementation. It should be used to configure dependency injection via the constructor or initialization expressions only. In other cases please use `{nameof(FluentResolve.Resolve)}` method.";
         [NotNull] internal static readonly MethodInfo InjectGenericMethodInfo;
+        [NotNull] internal static readonly MethodInfo TryInjectGenericMethodInfo;
         [NotNull] internal static readonly MethodInfo InjectWithTagGenericMethodInfo;
+        [NotNull] internal static readonly MethodInfo TryInjectWithTagGenericMethodInfo;
         [NotNull] internal static readonly MethodInfo InjectingAssignmentGenericMethodInfo;
         [NotNull] internal static readonly MethodInfo InjectMethodInfo;
+        [NotNull] internal static readonly MethodInfo TryInjectMethodInfo;
         [NotNull] internal static readonly MethodInfo InjectWithTagMethodInfo;
+        [NotNull] internal static readonly MethodInfo TryInjectWithTagMethodInfo;
 
         static Injections()
         {
             Expression<Func<object>> injectGenExpression = () => Inject<object>(default(IContainer));
             InjectGenericMethodInfo = ((MethodCallExpression)injectGenExpression.Body).Method.GetGenericMethodDefinition();
 
+            Expression<Func<object>> tryInjectGenExpression = () => TryInject<object>(default(IContainer));
+            TryInjectGenericMethodInfo = ((MethodCallExpression)tryInjectGenExpression.Body).Method.GetGenericMethodDefinition();
+
             Expression<Func<object>> injectWithTagGenExpression = () => Inject<object>(default(IContainer), null);
             InjectWithTagGenericMethodInfo = ((MethodCallExpression)injectWithTagGenExpression.Body).Method.GetGenericMethodDefinition();
+
+            Expression<Func<object>> tryInjectWithTagGenExpression = () => Inject<object>(default(IContainer), null);
+            TryInjectWithTagGenericMethodInfo = ((MethodCallExpression)tryInjectWithTagGenExpression.Body).Method.GetGenericMethodDefinition();
 
             Expression<Action<object, object>> assignmentCallGenExpression = (item1, item2) => Inject<object>(default(IContainer), null, null);
             InjectingAssignmentGenericMethodInfo = ((MethodCallExpression)assignmentCallGenExpression.Body).Method.GetGenericMethodDefinition();
@@ -7975,12 +7988,18 @@ namespace IoC
             Expression<Func<object>> injectExpression = () => Inject(default(IContainer), typeof(object));
             InjectMethodInfo = ((MethodCallExpression)injectExpression.Body).Method;
 
+            Expression<Func<object>> tryInjectExpression = () => Inject(default(IContainer), typeof(object));
+            TryInjectMethodInfo = ((MethodCallExpression)tryInjectExpression.Body).Method;
+
             Expression<Func<object>> injectWithTagExpression = () => Inject(default(IContainer), typeof(object), (object)null);
             InjectWithTagMethodInfo = ((MethodCallExpression)injectWithTagExpression.Body).Method;
+
+            Expression<Func<object>> tryInjectWithTagExpression = () => Inject(default(IContainer), typeof(object), (object)null);
+            TryInjectWithTagMethodInfo = ((MethodCallExpression)tryInjectWithTagExpression.Body).Method;
         }
 
         /// <summary>
-        /// Injects the dependency. Just an injection marker.
+        /// Injects a dependency. Just an injection marker.
         /// </summary>
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
@@ -7988,8 +8007,19 @@ namespace IoC
         public static T Inject<T>([NotNull] this IContainer container) =>
             throw new NotImplementedException(JustAMarkerError);
 
+
         /// <summary>
-        /// Injects the dependency. Just an injection marker.
+        /// Tries to inject a dependency. Just an injection marker.
+        /// </summary>
+        /// <typeparam name="T">The type of dependency.</typeparam>
+        /// <param name="container">The resolving container.</param>
+        /// <returns>The injected instance.</returns>
+        [CanBeNull] public static T TryInject<T>([NotNull] this IContainer container)
+            where T : class
+            => throw new NotImplementedException(JustAMarkerError);
+
+        /// <summary>
+        /// Injects a dependency. Just an injection marker.
         /// </summary>
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
@@ -7999,7 +8029,18 @@ namespace IoC
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Injects the dependency. Just an injection marker.
+        /// Tries to inject a dependency. Just an injection marker.
+        /// </summary>
+        /// <typeparam name="T">The type of dependency.</typeparam>
+        /// <param name="container">The resolving container.</param>
+        /// <param name="tag">The tag of dependency.</param>
+        /// <returns>The injected instance.</returns>
+        [CanBeNull] public static T TryInject<T>([NotNull] this IContainer container, [CanBeNull] object tag) =>
+            throw new NotImplementedException(JustAMarkerError);
+
+
+        /// <summary>
+        /// Injects a dependency. Just an injection marker.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="container">The resolving container.</param>
@@ -8009,7 +8050,7 @@ namespace IoC
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Injects the dependency. Just an injection marker.
+        /// Injects a dependency. Just an injection marker.
         /// </summary>
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
@@ -8018,13 +8059,32 @@ namespace IoC
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Injects the dependency. Just an injection marker.
+        /// Tries to inject a dependency. Just an injection marker.
+        /// </summary>
+        /// <param name="container">The resolving container.</param>
+        /// <param name="type">The type of dependency.</param>
+        /// <returns>The injected instance.</returns>
+        [CanBeNull] public static object TryInject([NotNull] this IContainer container, [NotNull] Type type) =>
+            throw new NotImplementedException(JustAMarkerError);
+
+        /// <summary>
+        /// Injects a dependency. Just an injection marker.
         /// </summary>
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
         /// <param name="tag">The tag of dependency.</param>
         /// <returns>The injected instance.</returns>
         public static object Inject([NotNull] this IContainer container, [NotNull] Type type, [CanBeNull] object tag) =>
+            throw new NotImplementedException(JustAMarkerError);
+
+        /// <summary>
+        /// Tries to inject a dependency. Just an injection marker.
+        /// </summary>
+        /// <param name="container">The resolving container.</param>
+        /// <param name="type">The type of dependency.</param>
+        /// <param name="tag">The tag of dependency.</param>
+        /// <returns>The injected instance.</returns>
+        [CanBeNull] public static object TryInject([NotNull] this IContainer container, [NotNull] Type type, [CanBeNull] object tag) =>
             throw new NotImplementedException(JustAMarkerError);
     }
 }
@@ -10362,36 +10422,38 @@ namespace IoC.Core
             return new BuildContext(this, key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
         }
 
-        public Expression DependencyExpression
+        public Expression GetDependencyExpression(bool isNullable)
         {
-            get
+            if (!Container.TryGetDependency(Key, out var dependency, out var lifetime))
             {
-                if (!Container.TryGetDependency(Key, out var dependency, out var lifetime))
+                if (isNullable)
                 {
-                    try
-                    {
-                        var dependencyDescription = Container.Resolve<ICannotResolveDependency>().Resolve(this);
-                        dependency = dependencyDescription.Dependency;
-                        lifetime = dependencyDescription.Lifetime;
-                    }
-                    catch (Exception ex)
-                    {
-                        throw new BuildExpressionException(ex.Message, ex.InnerException);
-                    }
+                    return Expression.Default(Key.Type);
                 }
 
-                if (Depth >= 128)
+                try
                 {
-                    Container.Resolve<IFoundCyclicDependency>().Resolve(this);
+                    var dependencyDescription = Container.Resolve<ICannotResolveDependency>().Resolve(this);
+                    dependency = dependencyDescription.Dependency;
+                    lifetime = dependencyDescription.Lifetime;
                 }
-
-                if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
+                catch (Exception ex)
                 {
-                    return expression;
+                    throw new BuildExpressionException(ex.Message, ex.InnerException);
                 }
-
-                return Container.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
             }
+
+            if (Depth >= 128)
+            {
+                Container.Resolve<IFoundCyclicDependency>().Resolve(this);
+            }
+
+            if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
+            {
+                return expression;
+            }
+
+            return Container.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
         }
 
         public override string ToString()
@@ -11201,20 +11263,26 @@ namespace IoC.Core
         {
             if (methodCall.Method.IsGenericMethod)
             {
+                var genericMethodDefinition = methodCall.Method.GetGenericMethodDefinition();
                 // container.Inject<T>()
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectGenericMethodInfo))
+                var inject = Equals(genericMethodDefinition, Injections.InjectGenericMethodInfo);
+                var tryInject = Equals(genericMethodDefinition, Injections.TryInjectGenericMethodInfo);
+                if (inject || tryInject)
                 {
                     // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
+
                     // type
                     var type = methodCall.Method.GetGenericArguments()[0];
 
                     var key = new Key(type);
-                    return CreateDependencyExpression(key, containerExpression);
+                    return CreateDependencyExpression(key, containerExpression, tryInject);
                 }
 
                 // container.Inject<T>(tag)
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectWithTagGenericMethodInfo))
+                inject = Equals(genericMethodDefinition, Injections.InjectWithTagGenericMethodInfo);
+                tryInject = Equals(genericMethodDefinition, Injections.TryInjectWithTagGenericMethodInfo);
+                if (inject || tryInject)
                 {
                     // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
@@ -11227,11 +11295,11 @@ namespace IoC.Core
                     var tag = GetTag(tagExpression);
 
                     var key = new Key(type, tag);
-                    return CreateDependencyExpression(key, containerExpression);
+                    return CreateDependencyExpression(key, containerExpression, tryInject);
                 }
 
                 // container.Inject<T>(destination, source)
-                if (Equals(methodCall.Method.GetGenericMethodDefinition(), Injections.InjectingAssignmentGenericMethodInfo))
+                if (Equals(genericMethodDefinition, Injections.InjectingAssignmentGenericMethodInfo))
                 {
                     var dstExpression = Visit(methodCall.Arguments[1]);
                     var srcExpression = Visit(methodCall.Arguments[2]);
@@ -11244,32 +11312,39 @@ namespace IoC.Core
             else
             {
                 // container.Inject(type)
-                if (Equals(methodCall.Method, Injections.InjectMethodInfo))
+                var inject = Equals(methodCall.Method, Injections.InjectMethodInfo);
+                var tryInject = Equals(methodCall.Method, Injections.TryInjectMethodInfo);
+                if (inject || tryInject)
                 {
                     // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
+
                     // type
                     // ReSharper disable once NotResolvedInText
                     var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw new BuildExpressionException("Invalid argument", new ArgumentException("Invalid argument", "type"))).Value;
 
                     var key = new Key(type);
-                    return CreateDependencyExpression(key, containerExpression);
+                    return CreateDependencyExpression(key, containerExpression, tryInject);
                 }
 
                 // container.Inject(type, tag)
-                if (Equals(methodCall.Method, Injections.InjectWithTagMethodInfo))
+                inject = Equals(methodCall.Method, Injections.InjectWithTagMethodInfo);
+                tryInject = Equals(methodCall.Method, Injections.TryInjectWithTagMethodInfo);
+                if (inject || tryInject)
                 {
                     // container
                     var containerExpression = Visit(methodCall.Arguments[0]);
+
                     // type
                     // ReSharper disable once NotResolvedInText
                     var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw new BuildExpressionException("Invalid argument", new ArgumentException("Invalid argument", "type"))).Value;
+
                     // tag
                     var tagExpression = methodCall.Arguments[2];
                     var tag = GetTag(tagExpression);
 
                     var key = new Key(type, tag);
-                    return CreateDependencyExpression(key, containerExpression);
+                    return CreateDependencyExpression(key, containerExpression, tryInject);
                 }
             }
 
@@ -11394,7 +11469,7 @@ namespace IoC.Core
         }
 
         [NotNull]
-        private Expression CreateDependencyExpression(Key key, [CanBeNull] Expression containerExpression)
+        private Expression CreateDependencyExpression(Key key, [CanBeNull] Expression containerExpression, bool isNullable)
         {
             if (Equals(key, ContextKey))
             {
@@ -11402,7 +11477,7 @@ namespace IoC.Core
             }
 
             var selectedContainer = containerExpression != null ? SelectedContainer(containerExpression) : _container;
-            return _buildContext.CreateChild(key, selectedContainer).DependencyExpression;
+            return _buildContext.CreateChild(key, selectedContainer).GetDependencyExpression(isNullable);
         }
 
         private bool TryReplaceContextFields([CanBeNull] Type type, string name, out Expression expression)
@@ -12253,6 +12328,7 @@ namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
 
@@ -12281,8 +12357,14 @@ namespace IoC.Core
                 }
                 else
                 {
+                    var param = _parameters[parameterPosition];
+#if !NET40
+                    var isNullable = param.CustomAttributes.Any(i => i.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute");
+#else
+                    const bool isNullable = false;
+#endif
                     var key = new Key(_parameters[parameterPosition].ParameterType);
-                    yield return buildContext.CreateChild(key, buildContext.Container).DependencyExpression;
+                    yield return buildContext.CreateChild(key, buildContext.Container).GetDependencyExpression(isNullable);
                 }
             }
         }
