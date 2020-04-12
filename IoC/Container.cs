@@ -10,7 +10,6 @@
     using System.Runtime.CompilerServices;
     using System.Threading;
     using Core;
-    using Features;
     using static Key;
     using FullKey = Key;
     using ShortKey = System.Type;
@@ -25,68 +24,47 @@
     public sealed class Container: IContainer
     {
         private static long _containerId;
-        [NotNull] private static readonly Lazy<Container> CoreRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.CoreSet), true);
-        [NotNull] private static readonly Lazy<Container> DefaultRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.DefaultSet), true);
-        [NotNull] private static readonly Lazy<Container> LightRootContainer = new Lazy<Container>(() => CreateRootContainer(Feature.LightSet), true);
 
+        [NotNull] internal volatile Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
+        [NotNull] internal volatile Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
+        [NotNull] private Table<FullKey, DependencyEntry> _dependencies = Table<FullKey, DependencyEntry>.Empty;
+        [NotNull] private Table<ShortKey, DependencyEntry> _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
+
+        private bool _isDisposed;
+        private readonly bool _disposeParentContainer;
         [NotNull] private readonly IContainer _parent;
         [NotNull] private readonly string _name;
         [NotNull] private readonly ILockObject _lockObject;
         [NotNull] private readonly Subject<ContainerEvent> _eventSubject;
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
-        [NotNull] private Table<FullKey, DependencyEntry> _dependencies = Table<FullKey, DependencyEntry>.Empty;
-        [NotNull] private Table<ShortKey, DependencyEntry> _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
-        [NotNull] internal volatile Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
-        [NotNull] internal volatile Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
-        private readonly RegistrationTracker _registrationTracker;
+        [NotNull] private readonly RegistrationTracker _registrationTracker;
 
         /// <summary>
         /// Creates a root container with default features.
         /// </summary>
         /// <param name="name">The optional name of the container.</param>
+        /// <param name="configurations"></param>
         /// <returns>The root container.</returns>
+        [PublicAPI]
         [NotNull]
-        public static Container Create([NotNull] string name = "") => 
-            Create(name ?? throw new ArgumentNullException(nameof(name)), DefaultRootContainer.Value);
-
-        /// <summary>
-        /// Creates a root container with minimal set of features.
-        /// </summary>
-        /// <param name="name">The optional name of the container.</param>
-        /// <returns>The root container.</returns>
-        [NotNull]
-        public static Container CreateCore([NotNull] string name = "") => 
-            Create(name ?? throw new ArgumentNullException(nameof(name)), CoreRootContainer.Value);
-
-        /// <summary>
-        /// Creates a root container with minimalist default features.
-        /// </summary>
-        /// <param name="name">The optional name of the container.</param>
-        /// <returns>The root container.</returns>
-        [NotNull]
-        public static Container CreateLight([NotNull] string name = "") => 
-            Create(name ?? throw new ArgumentNullException(nameof(name)), LightRootContainer.Value);
-
-        [NotNull]
-        private static Container Create([NotNull] string name, [NotNull] IContainer parentContainer)
+        public static Container Create([NotNull] string name = "", [CanBeNull][ItemNotNull] IEnumerable<IConfiguration> configurations = null)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
-            if (parentContainer == null) throw new ArgumentNullException(nameof(parentContainer));
-            return new Container(CreateContainerName(name), parentContainer, parentContainer.Resolve<ILockObject>());
-        }
 
-        private static Container CreateRootContainer([NotNull][ItemNotNull] IEnumerable<IConfiguration> configurations)
-        {
+            // Create a root container
             var lockObject = new LockObject();
-            var container = new Container(string.Empty, NullContainer.Shared, lockObject);
-            container.ApplyConfigurations(configurations);
-            container.Register<ILockObject>(ctx => lockObject);
-            return container;
+            var rootContainer = new Container(string.Empty, NullContainer.Shared, lockObject, false);
+            rootContainer.Register<ILockObject>(ctx => lockObject);
+            rootContainer.ApplyConfigurations(configurations ?? Features.Set.Default);
+
+            // Create a target container
+            return new Container(CreateContainerName(name), rootContainer, lockObject, true);
         }
 
-        internal Container([NotNull] string name, [NotNull] IContainer parent, [NotNull] ILockObject lockObject)
+        internal Container([NotNull] string name, [NotNull] IContainer parent, [NotNull] ILockObject lockObject, bool disposeParentContainer)
         {
             _lockObject = lockObject;
+            _disposeParentContainer = disposeParentContainer;
             _name = $"{parent}/{name ?? throw new ArgumentNullException(nameof(name))}";
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
             _eventSubject = new Subject<ContainerEvent>(_lockObject);
@@ -122,11 +100,13 @@
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
 
             var isRegistered = true;
-            var registeredKeys = new List<FullKey>();
-            var dependencyEntry = new DependencyEntry(this, dependency, lifetime, Disposable.Create(() => UnregisterKeys(registeredKeys, dependency, lifetime)), registeredKeys);
-            try
+            lock (_lockObject)
             {
-                lock (_lockObject)
+                CheckState();
+
+                var registeredKeys = new List<FullKey>();
+                var dependencyEntry = new DependencyEntry(this, dependency, lifetime, Disposable.Create(() => UnregisterKeys(registeredKeys, dependency, lifetime)), registeredKeys);
+                try
                 {
                     var dependenciesForTagAny = _dependenciesForTagAny;
                     var dependencies = _dependencies;
@@ -165,26 +145,26 @@
                     {
                         _dependenciesForTagAny = dependenciesForTagAny;
                         _dependencies = dependencies;
-                        _eventSubject.OnNext(new ContainerEvent(this, EventType.RegisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime });
+                        _eventSubject.OnNext(new ContainerEvent(this, EventType.RegisterDependency) {Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime});
                     }
                 }
-            }
-            catch (Exception ex)
-            {
-                _eventSubject.OnNext(new ContainerEvent(this, EventType.RegisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime, Error = ex, IsSuccess = false });
-                isRegistered = false;
-                throw;
-            }
-            finally
-            {
-                if (isRegistered)
+                catch (Exception ex)
                 {
-                    dependencyToken = dependencyEntry;
+                    _eventSubject.OnNext(new ContainerEvent(this, EventType.RegisterDependency) {Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime, Error = ex, IsSuccess = false});
+                    isRegistered = false;
+                    throw;
                 }
-                else
+                finally
                 {
-                    dependencyEntry.Dispose();
-                    dependencyToken = default(IToken);
+                    if (isRegistered)
+                    {
+                        dependencyToken = dependencyEntry;
+                    }
+                    else
+                    {
+                        dependencyEntry.Dispose();
+                        dependencyToken = default(IToken);
+                    }
                 }
             }
 
@@ -222,10 +202,10 @@
             }
 
             // tries finding in dependencies
-            bool hasDependency;
             lock (_lockObject)
             {
-                hasDependency = TryGetDependency(key, hashCode, out var dependencyEntry);
+                CheckState();
+                var hasDependency = TryGetDependency(key, hashCode, out var dependencyEntry);
                 if (hasDependency)
                 {
                     // tries creating resolver
@@ -245,29 +225,27 @@
 
                     resolver = (Resolver<T>) resolverDelegate;
                 }
-            }
 
-            if (!hasDependency)
-            {
-                // tries finding in parent
-                if (!_parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer ?? this))
+                if (!hasDependency)
                 {
-                    resolver = default(Resolver<T>);
-                    return false;
+                    // tries finding in parent
+                    if (!_parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer ?? this))
+                    {
+                        resolver = default(Resolver<T>);
+                        return false;
+                    }
                 }
-            }
 
-            // If it is resolving container only
-            if (resolvingContainer == null || resolvingContainer == this)
-            {
-                // Add resolver to tables
-                lock (_lockObject)
+                // If it is resolving container only
+                if (resolvingContainer == null || resolvingContainer == this)
                 {
+                    // Add resolver to tables
                     Resolvers = Resolvers.Set(hashCode, key, resolver);
                     if (tag == null)
                     {
                         ResolversByType = ResolversByType.Set(hashCode, type, resolver);
                     }
+
                 }
             }
 
@@ -278,43 +256,64 @@
         /// <inheritdoc />
         public bool TryGetDependency(FullKey key, out IDependency dependency, out ILifetime lifetime)
         {
-            if (!TryGetDependency(key, key.HashCode, out var dependencyEntry))
+            lock (_lockObject)
             {
-                return _parent.TryGetDependency(key, out dependency, out lifetime);
-            }
+                CheckState();
 
-            dependency = dependencyEntry.Dependency;
-            lifetime = dependencyEntry.GetLifetime(key.Type);
-            return true;
+                if (!TryGetDependency(key, key.HashCode, out var dependencyEntry))
+                {
+                    return _parent.TryGetDependency(key, out dependency, out lifetime);
+                }
+
+                dependency = dependencyEntry.Dependency;
+                lifetime = dependencyEntry.GetLifetime(key.Type);
+                return true;
+            }
         }
 
         /// <inheritdoc />
         public void Dispose()
         {
-            // Notifies parent container about the child container disposing
-            (_parent as Container)?._eventSubject.OnNext(new ContainerEvent(this, EventType.DisposeContainer));
-
-            _parent.UnregisterResource(this);
-            List<IDisposable> entriesToDispose;
-            lock (_lockObject)
+            if (_isDisposed)
             {
-                entriesToDispose = new List<IDisposable>(_dependencies.Count + _dependenciesForTagAny.Count + _resources.Count);
-                entriesToDispose.AddRange(_dependencies.Select(i => i.Value));
-                entriesToDispose.AddRange(_dependenciesForTagAny.Select(i => i.Value));
-                entriesToDispose.AddRange(_resources);
-                _dependencies = Table<FullKey, DependencyEntry>.Empty;
-                _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
-                Reset();
-                _resources.Clear();
+                return;
             }
 
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < entriesToDispose.Count; index++)
+            try
             {
-                entriesToDispose[index].Dispose();
-            }
+                // Notifies parent container about the child container disposing
+                (_parent as Container)?._eventSubject.OnNext(new ContainerEvent(this, EventType.DisposeContainer));
 
-            _eventSubject.OnCompleted();
+                _parent.UnregisterResource(this);
+                List<IDisposable> entriesToDispose;
+                lock (_lockObject)
+                {
+                    entriesToDispose = new List<IDisposable>(_dependencies.Count + _dependenciesForTagAny.Count + _resources.Count);
+                    entriesToDispose.AddRange(_dependencies.Select(i => i.Value));
+                    entriesToDispose.AddRange(_dependenciesForTagAny.Select(i => i.Value));
+                    entriesToDispose.AddRange(_resources);
+                    _dependencies = Table<FullKey, DependencyEntry>.Empty;
+                    _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
+                    Reset();
+                    _resources.Clear();
+                }
+
+                // ReSharper disable once ForCanBeConvertedToForeach
+                for (var index = 0; index < entriesToDispose.Count; index++)
+                {
+                    entriesToDispose[index].Dispose();
+                }
+
+                _eventSubject.OnCompleted();
+                if (_disposeParentContainer)
+                {
+                    _parent.Dispose();
+                }
+            }
+            finally
+            {
+                _isDisposed = true;
+            }
         }
 
         /// <inheritdoc />
@@ -323,6 +322,7 @@
             if (resource == null) throw new ArgumentNullException(nameof(resource));
             lock (_lockObject)
             {
+                CheckState();
                 _resources.Add(resource);
             }
         }
@@ -345,8 +345,14 @@
             GetAllKeys().Concat(_parent).GetEnumerator();
 
         /// <inheritdoc />
-        public IDisposable Subscribe(IObserver<ContainerEvent> observer) =>
-            _eventSubject.Subscribe(observer ?? throw new ArgumentNullException(nameof(observer)));
+        public IDisposable Subscribe(IObserver<ContainerEvent> observer)
+        {
+            lock (_lockObject)
+            {
+                CheckState();
+                return _eventSubject.Subscribe(observer ?? throw new ArgumentNullException(nameof(observer)));
+            }
+        }
 
         internal void Reset()
         {
@@ -357,10 +363,21 @@
             }
         }
 
+        [MethodImpl((MethodImplOptions)256)]
+        private void CheckState()
+        {
+            if (_isDisposed)
+            {
+                throw new InvalidOperationException("The container is disposed.");
+            }
+        }
+
         private void UnregisterKeys(List<FullKey> registeredKeys, IDependency dependency, ILifetime lifetime)
         {
             lock (_lockObject)
             {
+                CheckState();
+
                 foreach (var curKey in registeredKeys)
                 {
                     if (curKey.Tag == AnyTag)
@@ -382,6 +399,7 @@
         {
             lock (_lockObject)
             {
+                CheckState();
                 return _dependencies.Select(i => i.Value.Keys).Concat(_dependenciesForTagAny.Select(i => i.Value.Keys)).Distinct();
             }
         }
@@ -409,65 +427,62 @@
 
         private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)
         {
-            lock (_lockObject)
+            dependencyEntry = _dependencies.Get(hashCode, key);
+            if (dependencyEntry != default(DependencyEntry))
             {
-                dependencyEntry = _dependencies.Get(hashCode, key);
-                if (dependencyEntry != default(DependencyEntry))
-                {
-                    return true;
-                }
-
-                var type = key.Type;
-                var typeDescriptor = type.Descriptor();
-
-                // Generic type
-                if (typeDescriptor.IsConstructedGenericType())
-                {
-                    var genericType = typeDescriptor.GetGenericTypeDefinition();
-                    var genericKey = new FullKey(genericType, key.Tag);
-                    // For generic type
-                    dependencyEntry = _dependencies.Get(genericKey.HashCode, genericKey);
-                    if (dependencyEntry != default(DependencyEntry))
-                    {
-                        return true;
-                    }
-
-                    // For generic type and Any tag
-                    dependencyEntry = _dependenciesForTagAny.Get(genericType.GetHashCode(), genericType);
-                    if (dependencyEntry != default(DependencyEntry))
-                    {
-                        return true;
-                    }
-                }
-
-                // For Any tag
-                dependencyEntry = _dependenciesForTagAny.Get(type.GetHashCode(), type);
-                if (dependencyEntry != default(DependencyEntry))
-                {
-                    return true;
-                }
-
-                // For array
-                if (typeDescriptor.IsArray())
-                {
-                    var arrayKey = new FullKey(typeof(IArray), key.Tag);
-                    // For generic type
-                    dependencyEntry = _dependencies.Get(arrayKey.HashCode, arrayKey);
-                    if (dependencyEntry != default(DependencyEntry))
-                    {
-                        return true;
-                    }
-
-                    // For generic type and Any tag
-                    dependencyEntry = _dependenciesForTagAny.Get(typeof(IArray).GetHashCode(), typeof(IArray));
-                    if (dependencyEntry != default(DependencyEntry))
-                    {
-                        return true;
-                    }
-                }
-
-                return false;
+                return true;
             }
+
+            var type = key.Type;
+            var typeDescriptor = type.Descriptor();
+
+            // Generic type
+            if (typeDescriptor.IsConstructedGenericType())
+            {
+                var genericType = typeDescriptor.GetGenericTypeDefinition();
+                var genericKey = new FullKey(genericType, key.Tag);
+                // For generic type
+                dependencyEntry = _dependencies.Get(genericKey.HashCode, genericKey);
+                if (dependencyEntry != default(DependencyEntry))
+                {
+                    return true;
+                }
+
+                // For generic type and Any tag
+                dependencyEntry = _dependenciesForTagAny.Get(genericType.GetHashCode(), genericType);
+                if (dependencyEntry != default(DependencyEntry))
+                {
+                    return true;
+                }
+            }
+
+            // For Any tag
+            dependencyEntry = _dependenciesForTagAny.Get(type.GetHashCode(), type);
+            if (dependencyEntry != default(DependencyEntry))
+            {
+                return true;
+            }
+
+            // For array
+            if (typeDescriptor.IsArray())
+            {
+                var arrayKey = new FullKey(typeof(IArray), key.Tag);
+                // For generic type
+                dependencyEntry = _dependencies.Get(arrayKey.HashCode, arrayKey);
+                if (dependencyEntry != default(DependencyEntry))
+                {
+                    return true;
+                }
+
+                // For generic type and Any tag
+                dependencyEntry = _dependenciesForTagAny.Get(typeof(IArray).GetHashCode(), typeof(IArray));
+                if (dependencyEntry != default(DependencyEntry))
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         [SuppressMessage("ReSharper", "UnusedMember.Local")]

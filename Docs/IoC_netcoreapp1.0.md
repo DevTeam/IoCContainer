@@ -55,9 +55,7 @@
   - [Apply()](#M-IoC-Features-ConfigurationFeature-Apply-IoC-IContainer- 'IoC.Features.ConfigurationFeature.Apply(IoC.IContainer)')
 - [Container](#T-IoC-Container 'IoC.Container')
   - [Parent](#P-IoC-Container-Parent 'IoC.Container.Parent')
-  - [Create(name)](#M-IoC-Container-Create-System-String- 'IoC.Container.Create(System.String)')
-  - [CreateCore(name)](#M-IoC-Container-CreateCore-System-String- 'IoC.Container.CreateCore(System.String)')
-  - [CreateLight(name)](#M-IoC-Container-CreateLight-System-String- 'IoC.Container.CreateLight(System.String)')
+  - [Create(name,configurations)](#M-IoC-Container-Create-System-String,System-Collections-Generic-IEnumerable{IoC-IConfiguration}- 'IoC.Container.Create(System.String,System.Collections.Generic.IEnumerable{IoC.IConfiguration})')
   - [Dispose()](#M-IoC-Container-Dispose 'IoC.Container.Dispose')
   - [GetEnumerator()](#M-IoC-Container-GetEnumerator 'IoC.Container.GetEnumerator')
   - [RegisterResource()](#M-IoC-Container-RegisterResource-System-IDisposable- 'IoC.Container.RegisterResource(System.IDisposable)')
@@ -105,10 +103,6 @@
   - [RegisterDependency](#F-IoC-EventType-RegisterDependency 'IoC.EventType.RegisterDependency')
   - [ResolverCompilation](#F-IoC-EventType-ResolverCompilation 'IoC.EventType.ResolverCompilation')
   - [UnregisterDependency](#F-IoC-EventType-UnregisterDependency 'IoC.EventType.UnregisterDependency')
-- [Feature](#T-IoC-Features-Feature 'IoC.Features.Feature')
-  - [CoreSet](#F-IoC-Features-Feature-CoreSet 'IoC.Features.Feature.CoreSet')
-  - [DefaultSet](#F-IoC-Features-Feature-DefaultSet 'IoC.Features.Feature.DefaultSet')
-  - [LightSet](#F-IoC-Features-Feature-LightSet 'IoC.Features.Feature.LightSet')
 - [FluentAutowiring](#T-IoC-FluentAutowiring 'IoC.FluentAutowiring')
   - [TryInjectDependency\`\`1(method,parameterPosition,dependencyType,dependencyTag)](#M-IoC-FluentAutowiring-TryInjectDependency``1-IoC-IMethod{``0},System-Int32,System-Type,System-Object- 'IoC.FluentAutowiring.TryInjectDependency``1(IoC.IMethod{``0},System.Int32,System.Type,System.Object)')
 - [FluentBind](#T-IoC-FluentBind 'IoC.FluentBind')
@@ -443,6 +437,10 @@
   - [OnInstanceReleased()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnInstanceReleased-System-Object,IoC-IScope- 'IoC.Lifetimes.ScopeSingletonLifetime.OnInstanceReleased(System.Object,IoC.IScope)')
   - [OnNewInstanceCreated\`\`1()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-IScope,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.IScope,IoC.IContainer,System.Object[])')
   - [ToString()](#M-IoC-Lifetimes-ScopeSingletonLifetime-ToString 'IoC.Lifetimes.ScopeSingletonLifetime.ToString')
+- [Set](#T-IoC-Features-Set 'IoC.Features.Set')
+  - [Core](#F-IoC-Features-Set-Core 'IoC.Features.Set.Core')
+  - [Default](#F-IoC-Features-Set-Default 'IoC.Features.Set.Default')
+  - [Light](#F-IoC-Features-Set-Light 'IoC.Features.Set.Light')
 - [SingletonLifetime](#T-IoC-Lifetimes-SingletonLifetime 'IoC.Lifetimes.SingletonLifetime')
   - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.SingletonLifetime.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
   - [Create()](#M-IoC-Lifetimes-SingletonLifetime-Create 'IoC.Lifetimes.SingletonLifetime.Create')
@@ -1343,8 +1341,8 @@ The IoC container implementation.
 
 *Inherit from parent.*
 
-<a name='M-IoC-Container-Create-System-String-'></a>
-### Create(name) `method`
+<a name='M-IoC-Container-Create-System-String,System-Collections-Generic-IEnumerable{IoC-IConfiguration}-'></a>
+### Create(name,configurations) `method`
 
 ##### Summary
 
@@ -1359,40 +1357,7 @@ The root container.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The optional name of the container. |
-
-<a name='M-IoC-Container-CreateCore-System-String-'></a>
-### CreateCore(name) `method`
-
-##### Summary
-
-Creates a root container with minimal set of features.
-
-##### Returns
-
-The root container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The optional name of the container. |
-
-<a name='M-IoC-Container-CreateLight-System-String-'></a>
-### CreateLight(name) `method`
-
-##### Summary
-
-Creates a root container with minimalist default features.
-
-##### Returns
-
-The root container.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The optional name of the container. |
+| configurations | [System.Collections.Generic.IEnumerable{IoC.IConfiguration}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IConfiguration}') |  |
 
 <a name='M-IoC-Container-Dispose'></a>
 ### Dispose() `method`
@@ -1830,38 +1795,6 @@ On resolver compilation
 ##### Summary
 
 On dependency unregistration.
-
-<a name='T-IoC-Features-Feature'></a>
-## Feature `type`
-
-##### Namespace
-
-IoC.Features
-
-##### Summary
-
-Provides defaults for features.
-
-<a name='F-IoC-Features-Feature-CoreSet'></a>
-### CoreSet `constants`
-
-##### Summary
-
-Core features.
-
-<a name='F-IoC-Features-Feature-DefaultSet'></a>
-### DefaultSet `constants`
-
-##### Summary
-
-Default features.
-
-<a name='F-IoC-Features-Feature-LightSet'></a>
-### LightSet `constants`
-
-##### Summary
-
-The light set of features.
 
 <a name='T-IoC-FluentAutowiring'></a>
 ## FluentAutowiring `type`
@@ -8672,7 +8605,7 @@ Tries to inject a dependency. Just an injection marker.
 
 ##### Returns
 
-The injected instance.
+The injected instance or default(Type).
 
 ##### Parameters
 
@@ -8690,7 +8623,7 @@ Tries to inject a dependency. Just an injection marker.
 
 ##### Returns
 
-The injected instance.
+The injected instance or default(Type).
 
 ##### Parameters
 
@@ -8709,7 +8642,7 @@ Tries to inject a dependency. Just an injection marker.
 
 ##### Returns
 
-The injected instance.
+The injected instance or default(T).
 
 ##### Parameters
 
@@ -8732,7 +8665,7 @@ Tries to inject a dependency. Just an injection marker.
 
 ##### Returns
 
-The injected instance.
+The injected instance or default(T).
 
 ##### Parameters
 
@@ -9469,6 +9402,38 @@ This method has no parameters.
 ##### Parameters
 
 This method has no parameters.
+
+<a name='T-IoC-Features-Set'></a>
+## Set `type`
+
+##### Namespace
+
+IoC.Features
+
+##### Summary
+
+Provides defaults for features.
+
+<a name='F-IoC-Features-Set-Core'></a>
+### Core `constants`
+
+##### Summary
+
+Core features.
+
+<a name='F-IoC-Features-Set-Default'></a>
+### Default `constants`
+
+##### Summary
+
+Default features.
+
+<a name='F-IoC-Features-Set-Light'></a>
+### Light `constants`
+
+##### Summary
+
+The light set of features.
 
 <a name='T-IoC-Lifetimes-SingletonLifetime'></a>
 ## SingletonLifetime `type`

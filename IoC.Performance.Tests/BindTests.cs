@@ -8,12 +8,12 @@ namespace IoC.Performance.Tests
 
         public BindTests()
         {
-            _containerComplex = Container.CreateCore();
-        }       
+            _containerComplex = Container.Create("Core", Features.Set.Core);
+        }
 
         [Fact]
         public void TestBind()
-        {          
+        {
             foreach (var type in TestTypeBuilder.Default.Types)
             {
                 _containerComplex.Bind(type).To(type);

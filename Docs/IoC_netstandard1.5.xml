@@ -638,25 +638,12 @@
             The IoC container implementation.
             </summary>
         </member>
-        <member name="M:IoC.Container.Create(System.String)">
+        <member name="M:IoC.Container.Create(System.String,System.Collections.Generic.IEnumerable{IoC.IConfiguration})">
             <summary>
             Creates a root container with default features.
             </summary>
             <param name="name">The optional name of the container.</param>
-            <returns>The root container.</returns>
-        </member>
-        <member name="M:IoC.Container.CreateCore(System.String)">
-            <summary>
-            Creates a root container with minimal set of features.
-            </summary>
-            <param name="name">The optional name of the container.</param>
-            <returns>The root container.</returns>
-        </member>
-        <member name="M:IoC.Container.CreateLight(System.String)">
-            <summary>
-            Creates a root container with minimalist default features.
-            </summary>
-            <param name="name">The optional name of the container.</param>
+            <param name="configurations"></param>
             <returns>The root container.</returns>
         </member>
         <member name="P:IoC.Container.Parent">
@@ -1008,26 +995,6 @@
         <member name="M:IoC.Features.CoreFeature.Apply(IoC.IContainer)">
             <inheritdoc />
         </member>
-        <member name="T:IoC.Features.Feature">
-            <summary>
-            Provides defaults for features.
-            </summary>
-        </member>
-        <member name="F:IoC.Features.Feature.CoreSet">
-            <summary>
-            Core features.
-            </summary>
-        </member>
-        <member name="F:IoC.Features.Feature.DefaultSet">
-            <summary>
-            Default features.
-            </summary>
-        </member>
-        <member name="F:IoC.Features.Feature.LightSet">
-            <summary>
-            The light set of features.
-            </summary>
-        </member>
         <member name="T:IoC.Features.FuncFeature">
             <summary>
             Allows to resolve Functions.
@@ -1052,6 +1019,26 @@
         </member>
         <member name="M:IoC.Features.LazyFeature.Apply(IoC.IContainer)">
             <inheritdoc />
+        </member>
+        <member name="T:IoC.Features.Set">
+            <summary>
+            Provides defaults for features.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.Set.Core">
+            <summary>
+            Core features.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.Set.Default">
+            <summary>
+            Default features.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.Set.Light">
+            <summary>
+            The light set of features.
+            </summary>
         </member>
         <member name="T:IoC.Features.TaskFeature">
             <summary>
@@ -5475,7 +5462,7 @@
             </summary>
             <typeparam name="T">The type of dependency.</typeparam>
             <param name="container">The resolving container.</param>
-            <returns>The injected instance.</returns>
+            <returns>The injected instance or default(T).</returns>
         </member>
         <member name="M:IoC.Injections.Inject``1(IoC.IContainer,System.Object)">
             <summary>
@@ -5493,7 +5480,7 @@
             <typeparam name="T">The type of dependency.</typeparam>
             <param name="container">The resolving container.</param>
             <param name="tag">The tag of dependency.</param>
-            <returns>The injected instance.</returns>
+            <returns>The injected instance or default(T).</returns>
         </member>
         <member name="M:IoC.Injections.Inject``1(IoC.IContainer,``0,``0)">
             <summary>
@@ -5518,7 +5505,7 @@
             </summary>
             <param name="container">The resolving container.</param>
             <param name="type">The type of dependency.</param>
-            <returns>The injected instance.</returns>
+            <returns>The injected instance or default(Type).</returns>
         </member>
         <member name="M:IoC.Injections.Inject(IoC.IContainer,System.Type,System.Object)">
             <summary>
@@ -5536,7 +5523,7 @@
             <param name="container">The resolving container.</param>
             <param name="type">The type of dependency.</param>
             <param name="tag">The tag of dependency.</param>
-            <returns>The injected instance.</returns>
+            <returns>The injected instance or default(Type).</returns>
         </member>
         <member name="T:IoC.IResourceRegistry">
             <summary>

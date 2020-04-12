@@ -85,7 +85,7 @@
         public void ContainerShouldGetResolver()
         {
             // Given
-            using var container = Container.CreateCore();
+            using var container = Container.Create("Core", Features.Set.Core);
             var expectedRef = Mock.Of<IMyService1>();
             Func<IMyService1> func = () => expectedRef;
 

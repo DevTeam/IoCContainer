@@ -468,7 +468,7 @@ It is easy to resolve an enumerator [IAsyncEnumerable<>](https://docs.microsoft.
 ``` CSharp
 // Create and configure the container
 using var container = Container
-    .CreateCore()
+    .Create()
     .Using(CollectionFeature.Default)
     .Bind<IDependency>().To<Dependency>()
     // Bind to the default implementation
