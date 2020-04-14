@@ -1220,7 +1220,7 @@ namespace IoC
     [PublicAPI]
     [DebuggerDisplay("Name = {" + nameof(ToString) + "()}")]
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
-    public sealed class Container: IContainer
+    public sealed class Container : IContainer
     {
         private static long _containerId;
 
@@ -1301,7 +1301,7 @@ namespace IoC
             var isRegistered = true;
             lock (_lockObject)
             {
-                CheckState();
+                CheckIsNotDisposed();
 
                 var registeredKeys = new List<FullKey>();
                 var dependencyEntry = new DependencyEntry(this, dependency, lifetime, Disposable.Create(() => UnregisterKeys(registeredKeys, dependency, lifetime)), registeredKeys);
@@ -1344,12 +1344,12 @@ namespace IoC
                     {
                         _dependenciesForTagAny = dependenciesForTagAny;
                         _dependencies = dependencies;
-                        _eventSubject.OnNext(new ContainerEvent(this, EventType.RegisterDependency) {Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime});
+                        _eventSubject.OnNext(new ContainerEvent(this, EventType.RegisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime });
                     }
                 }
                 catch (Exception ex)
                 {
-                    _eventSubject.OnNext(new ContainerEvent(this, EventType.RegisterDependency) {Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime, Error = ex, IsSuccess = false});
+                    _eventSubject.OnNext(new ContainerEvent(this, EventType.RegisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime, Error = ex, IsSuccess = false });
                     isRegistered = false;
                     throw;
                 }
@@ -1403,7 +1403,7 @@ namespace IoC
             // tries finding in dependencies
             lock (_lockObject)
             {
-                CheckState();
+                CheckIsNotDisposed();
                 var hasDependency = TryGetDependency(key, hashCode, out var dependencyEntry);
                 if (hasDependency)
                 {
@@ -1422,7 +1422,7 @@ namespace IoC
                         return false;
                     }
 
-                    resolver = (Resolver<T>) resolverDelegate;
+                    resolver = (Resolver<T>)resolverDelegate;
                 }
 
                 if (!hasDependency)
@@ -1436,7 +1436,7 @@ namespace IoC
                 }
 
                 // If it is resolving container only
-                if (resolvingContainer == null || resolvingContainer == this)
+                if (resolvingContainer == null || Equals(resolvingContainer, this))
                 {
                     // Add resolver to tables
                     Resolvers = Resolvers.Set(hashCode, key, resolver);
@@ -1457,7 +1457,7 @@ namespace IoC
         {
             lock (_lockObject)
             {
-                CheckState();
+                CheckIsNotDisposed();
 
                 if (!TryGetDependency(key, key.HashCode, out var dependencyEntry))
                 {
@@ -1521,7 +1521,7 @@ namespace IoC
             if (resource == null) throw new ArgumentNullException(nameof(resource));
             lock (_lockObject)
             {
-                CheckState();
+                CheckIsNotDisposed();
                 _resources.Add(resource);
             }
         }
@@ -1548,7 +1548,7 @@ namespace IoC
         {
             lock (_lockObject)
             {
-                CheckState();
+                CheckIsNotDisposed();
                 return _eventSubject.Subscribe(observer ?? throw new ArgumentNullException(nameof(observer)));
             }
         }
@@ -1563,11 +1563,11 @@ namespace IoC
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        private void CheckState()
+        private void CheckIsNotDisposed()
         {
             if (_isDisposed)
             {
-                throw new InvalidOperationException("The container is disposed.");
+                throw new ObjectDisposedException(ToString());
             }
         }
 
@@ -1575,7 +1575,7 @@ namespace IoC
         {
             lock (_lockObject)
             {
-                CheckState();
+                CheckIsNotDisposed();
 
                 foreach (var curKey in registeredKeys)
                 {
@@ -1593,17 +1593,17 @@ namespace IoC
             }
         }
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)256)]
         private IEnumerable<IEnumerable<FullKey>> GetAllKeys()
         {
             lock (_lockObject)
             {
-                CheckState();
+                CheckIsNotDisposed();
                 return _dependencies.Select(i => i.Value.Keys).Concat(_dependenciesForTagAny.Select(i => i.Value.Keys)).Distinct();
             }
         }
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)256)]
         private bool TryUnregister<TKey>(TKey key, [NotNull] ref Table<TKey, DependencyEntry> entries)
         {
             entries = entries.Remove(key.GetHashCode(), key, out var unregistered);
@@ -1615,12 +1615,12 @@ namespace IoC
             return true;
         }
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         internal static string CreateContainerName([CanBeNull] string name = "") =>
             !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)256)]
         private void ApplyConfigurations(IEnumerable<IConfiguration> configurations) =>
             _resources.Add(this.Apply(configurations));
 
