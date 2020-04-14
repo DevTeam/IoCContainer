@@ -22,7 +22,7 @@
         private bool _disposed;
 
         public DependencyEntry(
-            [NotNull] IContainer container,
+            [NotNull] IMutableContainer container,
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource,
@@ -35,7 +35,7 @@
             Keys = keys;
         }
 
-        public IContainer Container { get; }
+        public IMutableContainer Container { get; }
 
         public bool TryCreateResolver(
             Key key,

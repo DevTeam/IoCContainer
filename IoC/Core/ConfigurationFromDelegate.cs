@@ -10,7 +10,7 @@
         public ConfigurationFromDelegate([NotNull] Func<IContainer, IToken> configurationFactory) => 
             _configurationFactory = configurationFactory ?? throw new ArgumentNullException(nameof(configurationFactory));
 
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             yield return _configurationFactory(container);
         }

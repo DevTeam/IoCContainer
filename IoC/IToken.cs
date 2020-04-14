@@ -10,6 +10,6 @@
         /// <summary>
         /// The owner container.
         /// </summary>
-        IContainer Container { get; }
+        IMutableContainer Container { get; }
     }
 }

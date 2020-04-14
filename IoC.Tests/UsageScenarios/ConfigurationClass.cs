@@ -27,7 +27,7 @@
 
         public class Glue : IConfiguration
         {
-            public IEnumerable<IToken> Apply(IContainer container)
+            public IEnumerable<IToken> Apply(IMutableContainer container)
             {
                 // Bind using full autowiring
                 yield return container

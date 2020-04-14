@@ -35,7 +35,7 @@
         /// <param name="container">The target container to trace.</param>
         /// <param name="onTraceMessage">The trace handler.</param>
         /// <returns>The trace token.</returns>
-        public static IToken Trace([NotNull] this IContainer container, [NotNull] Action<string> onTraceMessage)
+        public static IToken Trace([NotNull] this IMutableContainer container, [NotNull] Action<string> onTraceMessage)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (onTraceMessage == null) throw new ArgumentNullException(nameof(onTraceMessage));
@@ -65,7 +65,7 @@
         /// </summary>
         /// <param name="container">The target container to trace.</param>
         /// <returns>The trace token.</returns>
-        public static IToken Trace([NotNull] this IContainer container) =>
+        public static IToken Trace([NotNull] this IMutableContainer container) =>
             (container ?? throw new ArgumentNullException(nameof(container))).Trace(message => System.Diagnostics.Trace.WriteLine(message));
 
         /// <summary>

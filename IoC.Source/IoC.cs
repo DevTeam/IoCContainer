@@ -1220,7 +1220,7 @@ namespace IoC
     [PublicAPI]
     [DebuggerDisplay("Name = {" + nameof(ToString) + "()}")]
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
-    public sealed class Container : IContainer
+    public sealed class Container : IMutableContainer
     {
         private static long _containerId;
 
@@ -1951,7 +1951,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<object> Bind([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Type[] types)
+        public static IBinding<object> Bind([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params Type[] types)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (types == null) throw new ArgumentNullException(nameof(types));
@@ -1983,7 +1983,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IBinding<T> Bind<T>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T>([NotNull] this IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             return new Binding<T>(container, TypeDescriptor<T>.Type);
@@ -2202,7 +2202,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1>([NotNull] this IMutableContainer container)
             where T: T1
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2251,7 +2251,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2>([NotNull] this IMutableContainer container)
             where T: T1, T2
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2303,7 +2303,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2358,7 +2358,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2416,7 +2416,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2477,7 +2477,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2541,7 +2541,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2608,7 +2608,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2678,7 +2678,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2751,7 +2751,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2827,7 +2827,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2906,7 +2906,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2988,7 +2988,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -3073,7 +3073,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -3161,7 +3161,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -3252,7 +3252,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -3346,7 +3346,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -3443,7 +3443,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -3543,7 +3543,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -3646,7 +3646,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -3752,7 +3752,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -3861,7 +3861,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -3973,7 +3973,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -4088,7 +4088,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -4206,7 +4206,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -4327,7 +4327,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -4451,7 +4451,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -4578,7 +4578,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -4708,7 +4708,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -4841,7 +4841,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -4977,7 +4977,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -5116,7 +5116,7 @@ namespace IoC
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -5256,7 +5256,7 @@ namespace IoC
         /// <returns></returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken AsTokenOf([NotNull] this IDisposable disposableToken, [NotNull] IContainer container) =>
+        public static IToken AsTokenOf([NotNull] this IDisposable disposableToken, [NotNull] IMutableContainer container) =>
             new Token(container ?? throw new ArgumentNullException(nameof(container)), disposableToken ?? throw new ArgumentNullException(nameof(disposableToken)));
 
         /// <summary>
@@ -5267,7 +5267,7 @@ namespace IoC
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
+        public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationText == null) throw new ArgumentNullException(nameof(configurationText));
@@ -5294,7 +5294,7 @@ namespace IoC
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
+        public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationStreams == null) throw new ArgumentNullException(nameof(configurationStreams));
@@ -5321,7 +5321,7 @@ namespace IoC
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
+        public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationReaders == null) throw new ArgumentNullException(nameof(configurationReaders));
@@ -5348,7 +5348,7 @@ namespace IoC
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations)
+        public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
@@ -5374,7 +5374,7 @@ namespace IoC
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
+        public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
@@ -5401,7 +5401,7 @@ namespace IoC
         /// <returns>The target container token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Apply<T>([NotNull] this IContainer container)
+        public static IToken Apply<T>([NotNull] this IMutableContainer container)
             where T : IConfiguration, new() =>
             (container ?? throw new ArgumentNullException(nameof(container))).Apply(new T());
 
@@ -5425,7 +5425,7 @@ namespace IoC
         /// <returns>The target container.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
+        public static IMutableContainer Using([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
@@ -5442,7 +5442,7 @@ namespace IoC
         /// <returns>The target container.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
+        public static IMutableContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
             return token.Container.Using(configurations);
@@ -5456,7 +5456,7 @@ namespace IoC
         /// <returns>The target container.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IContainer Using<T>([NotNull] this IContainer container)
+        public static IMutableContainer Using<T>([NotNull] this IMutableContainer container)
             where T : IConfiguration, new()
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -5471,7 +5471,7 @@ namespace IoC
         /// <returns>The target container.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IContainer Using<T>([NotNull] this IToken token)
+        public static IMutableContainer Using<T>([NotNull] this IToken token)
             where T : IConfiguration, new()
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
@@ -5480,7 +5480,7 @@ namespace IoC
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        private static IToken ApplyConfigurationFromData<T>([NotNull] this IContainer container, [NotNull] [ItemNotNull] params T[] configurationData)
+        private static IToken ApplyConfigurationFromData<T>([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params T[] configurationData)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationData == null) throw new ArgumentNullException(nameof(configurationData));
@@ -5513,11 +5513,11 @@ namespace IoC
         /// <returns>The child container.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IContainer Create([NotNull] this IContainer parentContainer, [NotNull] string name = "")
+        public static IMutableContainer Create([NotNull] this IContainer parentContainer, [NotNull] string name = "")
         {
             if (parentContainer == null) throw new ArgumentNullException(nameof(parentContainer));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return parentContainer.GetResolver<IContainer>(WellknownContainers.NewChild.AsTag())(parentContainer, name);
+            return parentContainer.GetResolver<IMutableContainer>(WellknownContainers.NewChild.AsTag())(parentContainer, name);
         }
 
         /// <summary>
@@ -5528,11 +5528,11 @@ namespace IoC
         /// <returns>The child container.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IContainer Create([NotNull] this IToken token, [NotNull] string name = "")
+        public static IMutableContainer Create([NotNull] this IToken token, [NotNull] string name = "")
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return token.Container.GetResolver<IContainer>(WellknownContainers.NewChild.AsTag())(token.Container, name);
+            return token.Container.GetResolver<IMutableContainer>(WellknownContainers.NewChild.AsTag())(token.Container, name);
         }
 
         /// <summary>
@@ -5571,7 +5571,7 @@ namespace IoC
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>
         [NotNull]
-        public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IContainer container, [NotNull] [ItemCanBeNull] params object[] args)
+        public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IMutableContainer container, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -6003,7 +6003,7 @@ namespace IoC
         /// <param name="container">The target container to trace.</param>
         /// <param name="onTraceMessage">The trace handler.</param>
         /// <returns>The trace token.</returns>
-        public static IToken Trace([NotNull] this IContainer container, [NotNull] Action<string> onTraceMessage)
+        public static IToken Trace([NotNull] this IMutableContainer container, [NotNull] Action<string> onTraceMessage)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (onTraceMessage == null) throw new ArgumentNullException(nameof(onTraceMessage));
@@ -6033,7 +6033,7 @@ namespace IoC
         /// </summary>
         /// <param name="container">The target container to trace.</param>
         /// <returns>The trace token.</returns>
-        public static IToken Trace([NotNull] this IContainer container) =>
+        public static IToken Trace([NotNull] this IMutableContainer container) =>
             (container ?? throw new ArgumentNullException(nameof(container))).Trace(message => System.Diagnostics.Trace.WriteLine(message));
 
         /// <summary>
@@ -7582,7 +7582,7 @@ namespace IoC
         /// <summary>
         /// The target container.
         /// </summary>
-        [NotNull] IContainer Container { get; }
+        [NotNull] IMutableContainer Container { get; }
 
         /// <summary>
         /// Binding tokens.
@@ -7616,9 +7616,7 @@ namespace IoC
     /// <typeparam name="T"></typeparam>
     [PublicAPI]
     // ReSharper disable once UnusedTypeParameter
-    public interface IBinding<in T> : IBinding
-    {
-    }
+    public interface IBinding<in T> : IBinding { }
 }
 
 
@@ -7784,7 +7782,7 @@ namespace IoC
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <returns>The enumeration of dependency tokens.</returns>
-        [NotNull][ItemNotNull] IEnumerable<IToken> Apply([NotNull] IContainer container);
+        [NotNull][ItemNotNull] IEnumerable<IToken> Apply([NotNull] IMutableContainer container);
     }
 }
 
@@ -7809,17 +7807,7 @@ namespace IoC
         [CanBeNull] IContainer Parent { get; }
 
         /// <summary>
-        /// Tries registering the dependency with lifetime.
-        /// </summary>
-        /// <param name="keys">The set of keys to register.</param>
-        /// <param name="dependency">The dependency.</param>
-        /// <param name="lifetime">The lifetime.</param>
-        /// <param name="dependencyToken">The dependency token.</param>
-        /// <returns>True if successful.</returns>
-        bool TryRegisterDependency([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IToken dependencyToken);
-
-        /// <summary>
-        /// Tries getting the dependency with lifetime.
+        /// Get the dependency with lifetime.
         /// </summary>
         /// <param name="key">The key to get a dependency.</param>
         /// <param name="dependency">The dependency.</param>
@@ -7828,7 +7816,7 @@ namespace IoC
         bool TryGetDependency(Key key, out IDependency dependency, [CanBeNull] out ILifetime lifetime);
 
         /// <summary>
-        /// Tries getting the resolver.
+        /// Get the resolver.
         /// </summary>
         /// <typeparam name="T">The type of instance producing by the resolver.</typeparam>
         /// <param name="type">The binding's type.</param>
@@ -7874,12 +7862,14 @@ namespace IoC
 
 namespace IoC
 {
+    using System;
+
     /// <summary>
     /// Represents a holder for a created instance.
     /// </summary>
     /// <typeparam name="TInstance"></typeparam>
     [PublicAPI]
-    public interface IHolder<out TInstance>: IToken
+    public interface IHolder<out TInstance>: IDisposable
     {
         /// <summary>
         /// The created instance.
@@ -7952,6 +7942,34 @@ namespace IoC
         /// <param name="parameterPosition">The parameter position.</param>
         /// <param name="parameterExpression">The parameter expression.</param>
         void SetParameterExpression(int parameterPosition, [NotNull] Expression parameterExpression);
+    }
+}
+
+
+#endregion
+#region IMutableContainer
+
+namespace IoC
+{
+    using System.Collections.Generic;
+
+    /// <summary>
+    /// The mutable Inversion of Control container.
+    /// </summary>
+    [PublicAPI]
+
+    public interface IMutableContainer: IContainer
+    {
+        /// <summary>
+        /// Register the dependency with lifetime.
+        /// </summary>
+        /// <param name="keys">The set of keys to register.</param>
+        /// <param name="dependency">The dependency.</param>
+        /// <param name="lifetime">The lifetime.</param>
+        /// <param name="dependencyToken">The dependency token.</param>
+        /// <returns>True if successful.</returns>
+        bool TryRegisterDependency([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IToken dependencyToken);
+
     }
 }
 
@@ -8137,7 +8155,7 @@ namespace IoC
         /// <summary>
         /// The owner container.
         /// </summary>
-        IContainer Container { get; }
+        IMutableContainer Container { get; }
     }
 }
 
@@ -8334,12 +8352,12 @@ namespace IoC
     public enum WellknownContainers
     {
         /// <summary>
-        /// Parent container.
+        /// Parent immutable container.
         /// </summary>
         Parent = 1,
 
         /// <summary>
-        /// Creates new child container.
+        /// Creates new child mutable container.
         /// </summary>
         NewChild = 2
     }
@@ -8414,7 +8432,7 @@ namespace IoC.Features
         { }
 
         /// <inheritdoc />
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var containerSingletonResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
@@ -8656,7 +8674,7 @@ namespace IoC.Features
         private ConfigurationFeature() { }
 
         /// <inheritdoc />
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var containerSingletonResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
@@ -8725,7 +8743,7 @@ namespace IoC.Features
         private CoreFeature() { }
 
         /// <inheritdoc />
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => FoundCyclicDependency.Shared);
@@ -8754,12 +8772,14 @@ namespace IoC.Features
             // ThreadLocal
             yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Set.AnyTag);
 
-            // Containers
+            // Containers:
+
             // Current
             yield return container.Register<IContainer, IResourceRegistry, IObservable<ContainerEvent>>(ctx => ctx.Container);
-            
+            yield return container.Register(ctx => (IMutableContainer)ctx.Container);
+
             // New child
-            yield return container.Register<IContainer>(
+            yield return container.Register<IMutableContainer, IContainer, IResourceRegistry, IObservable<ContainerEvent>>(
                 ctx => new Container(
                     ctx.Args.Length == 1
                         ? Container.CreateContainerName(ctx.Args[0] as string)
@@ -8772,9 +8792,11 @@ namespace IoC.Features
 
             yield return container.Register<Func<IContainer>>(ctx => () => ctx.Container.Inject<IContainer>(WellknownContainers.NewChild));
             yield return container.Register<Func<string, IContainer>>(ctx => name => ctx.Container.Resolve<IContainer>(WellknownContainers.NewChild.AsTag(), name));
+            yield return container.Register<Func<IMutableContainer>>(ctx => () => ctx.Container.Inject<IMutableContainer>(WellknownContainers.NewChild));
+            yield return container.Register<Func<string, IMutableContainer>>(ctx => name => ctx.Container.Resolve<IMutableContainer>(WellknownContainers.NewChild.AsTag(), name));
 
             // Parent
-            yield return container.Register(ctx => ctx.Container.Parent, null, new object[] { WellknownContainers.Parent });
+            yield return container.Register<IContainer, IResourceRegistry, IObservable<ContainerEvent>>(ctx => ctx.Container.Parent, null, new object[] { WellknownContainers.Parent });
 
             yield return container.Register(ctx => ContainerEventToStringConverter.Shared);
             yield return container.Register(ctx => TypeToStringConverter.Shared);
@@ -8808,7 +8830,7 @@ namespace IoC.Features
         private FuncFeature(bool light = false) => _light = light;
 
         /// <inheritdoc />
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register<Func<TT>>(ctx => () => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container), null, Set.AnyTag);
@@ -8848,7 +8870,7 @@ namespace IoC.Features
         private LazyFeature() { }
 
         /// <inheritdoc />
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => new Lazy<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag), true), null, Set.AnyTag);
@@ -8941,7 +8963,7 @@ namespace IoC.Features
         private TaskFeature() { }
 
         /// <inheritdoc />
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => TaskScheduler.Current);
@@ -8986,7 +9008,7 @@ namespace IoC.Features
         private TupleFeature(bool light = false) => _light = light;
 
         /// <inheritdoc />
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => new Tuple<TT>(ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Set.AnyTag);
@@ -10219,7 +10241,7 @@ namespace IoC.Core
     internal struct Binding<T>: IBinding<T>
     {
         // ReSharper disable once StaticMemberInGenericType
-        public Binding([NotNull] IContainer container, [NotNull][ItemNotNull] params Type[] types)
+        public Binding([NotNull] IMutableContainer container, [NotNull][ItemNotNull] params Type[] types)
         {
             Container = container ?? throw new ArgumentNullException(nameof(container));
             Tokens = Enumerable.Empty<IToken>();
@@ -10296,7 +10318,7 @@ namespace IoC.Core
             AutowiringStrategy = autowiringStrategy;
         }
 
-        public IContainer Container { get; }
+        public IMutableContainer Container { get; }
 
         public IEnumerable<IToken> Tokens { get; }
 
@@ -10712,7 +10734,7 @@ namespace IoC.Core
         public ConfigurationFromDelegate([NotNull] Func<IContainer, IToken> configurationFactory) => 
             _configurationFactory = configurationFactory ?? throw new ArgumentNullException(nameof(configurationFactory));
 
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             yield return _configurationFactory(container);
         }
@@ -11033,7 +11055,7 @@ namespace IoC.Core
         private bool _disposed;
 
         public DependencyEntry(
-            [NotNull] IContainer container,
+            [NotNull] IMutableContainer container,
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource,
@@ -11046,7 +11068,7 @@ namespace IoC.Core
             Keys = keys;
         }
 
-        public IContainer Container { get; }
+        public IMutableContainer Container { get; }
 
         public bool TryCreateResolver(
             Key key,
@@ -11701,7 +11723,7 @@ namespace IoC.Core
         /// <returns>The registration token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [IoC.NotNull]
-        public static IToken Register<T>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
+        public static IToken Register<T>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
             => container.Register(new[] { TypeDescriptor<T>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
@@ -11716,7 +11738,7 @@ namespace IoC.Core
         /// <returns>The registration token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [IoC.NotNull]
-        public static IToken Register<T>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
+        public static IToken Register<T>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             => container.Register(new[] { TypeDescriptor<T>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
 
         /// <summary>
@@ -11730,7 +11752,7 @@ namespace IoC.Core
         /// <returns>The registration token.</returns>
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         [IoC.NotNull]
-        public static IToken Register([NotNull] this IContainer container, [NotNull][ItemNotNull] IEnumerable<Type> types, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime = null, [CanBeNull][ItemCanBeNull] params object[] tags)
+        public static IToken Register([NotNull] this IMutableContainer container, [NotNull][ItemNotNull] IEnumerable<Type> types, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime = null, [CanBeNull][ItemCanBeNull] params object[] tags)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (types == null) throw new ArgumentNullException(nameof(types));
@@ -11772,7 +11794,7 @@ namespace IoC.Core
         /// <returns>The registration token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Register<T, T1>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
+        public static IToken Register<T, T1>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1
             => container.Register(new[] { TypeDescriptor<T1>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
@@ -11789,7 +11811,7 @@ namespace IoC.Core
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Register<T, T1>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
+        public static IToken Register<T, T1>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1
             // ReSharper disable once CoVariantArrayConversion
             => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
@@ -11806,7 +11828,7 @@ namespace IoC.Core
         /// <returns>The registration token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Register<T, T1, T2>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
+        public static IToken Register<T, T1, T2>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1, T2
             => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
@@ -11824,7 +11846,7 @@ namespace IoC.Core
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Register<T, T1, T2>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
+        public static IToken Register<T, T1, T2>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1, T2
             // ReSharper disable once CoVariantArrayConversion
             => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
@@ -11842,7 +11864,7 @@ namespace IoC.Core
         /// <returns>The registration token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Register<T, T1, T2, T3>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
+        public static IToken Register<T, T1, T2, T3>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1, T2, T3
             => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
@@ -11861,7 +11883,7 @@ namespace IoC.Core
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Register<T, T1, T2, T3>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
+        public static IToken Register<T, T1, T2, T3>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1, T2, T3
             // ReSharper disable once CoVariantArrayConversion
             => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
@@ -12147,8 +12169,6 @@ namespace IoC.Core
             Instance = instance;
         }
 
-        public IContainer Container => _token.Container;
-
         public TInstance Instance { get; }
 
         public void Dispose()
@@ -12379,7 +12399,7 @@ namespace IoC.Core
     using System.Collections.Generic;
     using System.Linq;
 
-    internal sealed class NullContainer : IContainer
+    internal sealed class NullContainer : IMutableContainer
     {
         public static readonly IContainer Shared = new NullContainer();
         private static readonly NotSupportedException NotSupportedException = new NotSupportedException();
@@ -12990,13 +13010,13 @@ namespace IoC.Core
     {
         [NotNull] private readonly IDisposable _dependencyToken;
 
-        public Token([NotNull] IContainer container, [NotNull] IDisposable dependencyToken)
+        public Token([NotNull] IMutableContainer container, [NotNull] IDisposable dependencyToken)
         {
             Container = container ?? throw new ArgumentNullException(nameof(container));
             _dependencyToken = dependencyToken ?? throw new ArgumentNullException(nameof(dependencyToken));
         }
 
-        public IContainer Container { get; }
+        public IMutableContainer Container { get; }
 
         public void Dispose() => _dependencyToken.Dispose();
     }
@@ -14636,7 +14656,7 @@ namespace IoC.Core.Configuration
             _statements = GetStatements(textReader ?? throw new ArgumentNullException(nameof(textReader)));
         }
 
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (_bindingsConverter.TryConvert(BindingContext.Empty, _statements, out var context))

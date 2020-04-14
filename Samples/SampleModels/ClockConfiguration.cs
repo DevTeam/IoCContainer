@@ -12,7 +12,7 @@
     /// </summary>
     public class ClockConfiguration: IConfiguration
     {
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             // View Models
             yield return container.Bind<IClockViewModel>().As(Singleton).To<ClockViewModel>();

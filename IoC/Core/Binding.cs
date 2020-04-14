@@ -7,7 +7,7 @@
     internal struct Binding<T>: IBinding<T>
     {
         // ReSharper disable once StaticMemberInGenericType
-        public Binding([NotNull] IContainer container, [NotNull][ItemNotNull] params Type[] types)
+        public Binding([NotNull] IMutableContainer container, [NotNull][ItemNotNull] params Type[] types)
         {
             Container = container ?? throw new ArgumentNullException(nameof(container));
             Tokens = Enumerable.Empty<IToken>();
@@ -84,7 +84,7 @@
             AutowiringStrategy = autowiringStrategy;
         }
 
-        public IContainer Container { get; }
+        public IMutableContainer Container { get; }
 
         public IEnumerable<IToken> Tokens { get; }
 

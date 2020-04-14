@@ -15,7 +15,7 @@
         private static readonly ProxyGenerator ProxyGenerator = new ProxyGenerator();
         private readonly List<InterceptorsInfo> _interceptors = new List<InterceptorsInfo>();
 
-        public IToken Register([NotNull] IContainer container, Predicate<Key> filter, params IInterceptor[] interceptors)
+        public IToken Register(IMutableContainer container, Predicate<Key> filter, params IInterceptor[] interceptors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (filter == null) throw new ArgumentNullException(nameof(filter));

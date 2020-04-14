@@ -15,17 +15,7 @@
         [CanBeNull] IContainer Parent { get; }
 
         /// <summary>
-        /// Tries registering the dependency with lifetime.
-        /// </summary>
-        /// <param name="keys">The set of keys to register.</param>
-        /// <param name="dependency">The dependency.</param>
-        /// <param name="lifetime">The lifetime.</param>
-        /// <param name="dependencyToken">The dependency token.</param>
-        /// <returns>True if successful.</returns>
-        bool TryRegisterDependency([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IToken dependencyToken);
-
-        /// <summary>
-        /// Tries getting the dependency with lifetime.
+        /// Get the dependency with lifetime.
         /// </summary>
         /// <param name="key">The key to get a dependency.</param>
         /// <param name="dependency">The dependency.</param>
@@ -34,7 +24,7 @@
         bool TryGetDependency(Key key, out IDependency dependency, [CanBeNull] out ILifetime lifetime);
 
         /// <summary>
-        /// Tries getting the resolver.
+        /// Get the resolver.
         /// </summary>
         /// <typeparam name="T">The type of instance producing by the resolver.</typeparam>
         /// <param name="type">The binding's type.</param>

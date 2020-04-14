@@ -38,7 +38,7 @@ namespace IoC.Tests.UsageScenarios
 
         public class OptionalFeature: IConfiguration
         {
-            public IEnumerable<IToken> Apply(IContainer container)
+            public IEnumerable<IToken> Apply(IMutableContainer container)
             {
                 yield return container
                     // Bind factory for Optional for any tags

@@ -21,7 +21,7 @@
     [PublicAPI]
     [DebuggerDisplay("Name = {" + nameof(ToString) + "()}")]
     [DebuggerTypeProxy(typeof(ContainerDebugView))]
-    public sealed class Container : IContainer
+    public sealed class Container : IMutableContainer
     {
         private static long _containerId;
 

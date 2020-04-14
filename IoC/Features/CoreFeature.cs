@@ -18,7 +18,7 @@
         private CoreFeature() { }
 
         /// <inheritdoc />
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => FoundCyclicDependency.Shared);
@@ -47,12 +47,14 @@
             // ThreadLocal
             yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Set.AnyTag);
 
-            // Containers
+            // Containers:
+
             // Current
             yield return container.Register<IContainer, IResourceRegistry, IObservable<ContainerEvent>>(ctx => ctx.Container);
-            
+            yield return container.Register(ctx => (IMutableContainer)ctx.Container);
+
             // New child
-            yield return container.Register<IContainer>(
+            yield return container.Register<IMutableContainer, IContainer, IResourceRegistry, IObservable<ContainerEvent>>(
                 ctx => new Container(
                     ctx.Args.Length == 1
                         ? Container.CreateContainerName(ctx.Args[0] as string)
@@ -65,9 +67,11 @@
 
             yield return container.Register<Func<IContainer>>(ctx => () => ctx.Container.Inject<IContainer>(WellknownContainers.NewChild));
             yield return container.Register<Func<string, IContainer>>(ctx => name => ctx.Container.Resolve<IContainer>(WellknownContainers.NewChild.AsTag(), name));
+            yield return container.Register<Func<IMutableContainer>>(ctx => () => ctx.Container.Inject<IMutableContainer>(WellknownContainers.NewChild));
+            yield return container.Register<Func<string, IMutableContainer>>(ctx => name => ctx.Container.Resolve<IMutableContainer>(WellknownContainers.NewChild.AsTag(), name));
 
             // Parent
-            yield return container.Register(ctx => ctx.Container.Parent, null, new object[] { WellknownContainers.Parent });
+            yield return container.Register<IContainer, IResourceRegistry, IObservable<ContainerEvent>>(ctx => ctx.Container.Parent, null, new object[] { WellknownContainers.Parent });
 
             yield return container.Register(ctx => ContainerEventToStringConverter.Shared);
             yield return container.Register(ctx => TypeToStringConverter.Shared);

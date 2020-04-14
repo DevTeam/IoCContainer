@@ -7,12 +7,12 @@
     public enum WellknownContainers
     {
         /// <summary>
-        /// Parent container.
+        /// Parent immutable container.
         /// </summary>
         Parent = 1,
 
         /// <summary>
-        /// Creates new child container.
+        /// Creates new child mutable container.
         /// </summary>
         NewChild = 2
     }

@@ -13,7 +13,7 @@
         /// <summary>
         /// The target container.
         /// </summary>
-        [NotNull] IContainer Container { get; }
+        [NotNull] IMutableContainer Container { get; }
 
         /// <summary>
         /// Binding tokens.
@@ -47,7 +47,5 @@
     /// <typeparam name="T"></typeparam>
     [PublicAPI]
     // ReSharper disable once UnusedTypeParameter
-    public interface IBinding<in T> : IBinding
-    {
-    }
+    public interface IBinding<in T> : IBinding { }
 }

@@ -49,10 +49,10 @@
   - [UpdatedContent](#F-IoC-CollectionAccessType-UpdatedContent 'IoC.CollectionAccessType.UpdatedContent')
 - [CollectionFeature](#T-IoC-Features-CollectionFeature 'IoC.Features.CollectionFeature')
   - [Default](#F-IoC-Features-CollectionFeature-Default 'IoC.Features.CollectionFeature.Default')
-  - [Apply()](#M-IoC-Features-CollectionFeature-Apply-IoC-IContainer- 'IoC.Features.CollectionFeature.Apply(IoC.IContainer)')
+  - [Apply()](#M-IoC-Features-CollectionFeature-Apply-IoC-IMutableContainer- 'IoC.Features.CollectionFeature.Apply(IoC.IMutableContainer)')
 - [ConfigurationFeature](#T-IoC-Features-ConfigurationFeature 'IoC.Features.ConfigurationFeature')
   - [Default](#F-IoC-Features-ConfigurationFeature-Default 'IoC.Features.ConfigurationFeature.Default')
-  - [Apply()](#M-IoC-Features-ConfigurationFeature-Apply-IoC-IContainer- 'IoC.Features.ConfigurationFeature.Apply(IoC.IContainer)')
+  - [Apply()](#M-IoC-Features-ConfigurationFeature-Apply-IoC-IMutableContainer- 'IoC.Features.ConfigurationFeature.Apply(IoC.IMutableContainer)')
 - [Container](#T-IoC-Container 'IoC.Container')
   - [Parent](#P-IoC-Container-Parent 'IoC.Container.Parent')
   - [Create(name,configurations)](#M-IoC-Container-Create-System-String,System-Collections-Generic-IEnumerable{IoC-IConfiguration}- 'IoC.Container.Create(System.String,System.Collections.Generic.IEnumerable{IoC.IConfiguration})')
@@ -90,7 +90,7 @@
 - [ContractAnnotationAttribute](#T-IoC-ContractAnnotationAttribute 'IoC.ContractAnnotationAttribute')
 - [CoreFeature](#T-IoC-Features-CoreFeature 'IoC.Features.CoreFeature')
   - [Default](#F-IoC-Features-CoreFeature-Default 'IoC.Features.CoreFeature.Default')
-  - [Apply()](#M-IoC-Features-CoreFeature-Apply-IoC-IContainer- 'IoC.Features.CoreFeature.Apply(IoC.IContainer)')
+  - [Apply()](#M-IoC-Features-CoreFeature-Apply-IoC-IMutableContainer- 'IoC.Features.CoreFeature.Apply(IoC.IMutableContainer)')
 - [DependencyDescription](#T-IoC-Issues-DependencyDescription 'IoC.Issues.DependencyDescription')
   - [#ctor(dependency,lifetime)](#M-IoC-Issues-DependencyDescription-#ctor-IoC-IDependency,IoC-ILifetime- 'IoC.Issues.DependencyDescription.#ctor(IoC.IDependency,IoC.ILifetime)')
   - [Dependency](#F-IoC-Issues-DependencyDescription-Dependency 'IoC.Issues.DependencyDescription.Dependency')
@@ -109,105 +109,105 @@
   - [AnyTag\`\`1(binding)](#M-IoC-FluentBind-AnyTag``1-IoC-IBinding{``0}- 'IoC.FluentBind.AnyTag``1(IoC.IBinding{``0})')
   - [As\`\`1(binding,lifetime)](#M-IoC-FluentBind-As``1-IoC-IBinding{``0},IoC-Lifetime- 'IoC.FluentBind.As``1(IoC.IBinding{``0},IoC.Lifetime)')
   - [Autowiring\`\`1(binding,autowiringStrategy)](#M-IoC-FluentBind-Autowiring``1-IoC-IBinding{``0},IoC-IAutowiringStrategy- 'IoC.FluentBind.Autowiring``1(IoC.IBinding{``0},IoC.IAutowiringStrategy)')
-  - [Bind(container,types)](#M-IoC-FluentBind-Bind-IoC-IContainer,System-Type[]- 'IoC.FluentBind.Bind(IoC.IContainer,System.Type[])')
+  - [Bind(container,types)](#M-IoC-FluentBind-Bind-IoC-IMutableContainer,System-Type[]- 'IoC.FluentBind.Bind(IoC.IMutableContainer,System.Type[])')
   - [Bind(token,types)](#M-IoC-FluentBind-Bind-IoC-IToken,System-Type[]- 'IoC.FluentBind.Bind(IoC.IToken,System.Type[])')
-  - [Bind\`\`1(container)](#M-IoC-FluentBind-Bind``1-IoC-IContainer- 'IoC.FluentBind.Bind``1(IoC.IContainer)')
+  - [Bind\`\`1(container)](#M-IoC-FluentBind-Bind``1-IoC-IMutableContainer- 'IoC.FluentBind.Bind``1(IoC.IMutableContainer)')
   - [Bind\`\`1(token)](#M-IoC-FluentBind-Bind``1-IoC-IToken- 'IoC.FluentBind.Bind``1(IoC.IToken)')
   - [Bind\`\`1(binding)](#M-IoC-FluentBind-Bind``1-IoC-IBinding- 'IoC.FluentBind.Bind``1(IoC.IBinding)')
-  - [Bind\`\`10(container)](#M-IoC-FluentBind-Bind``10-IoC-IContainer- 'IoC.FluentBind.Bind``10(IoC.IContainer)')
+  - [Bind\`\`10(container)](#M-IoC-FluentBind-Bind``10-IoC-IMutableContainer- 'IoC.FluentBind.Bind``10(IoC.IMutableContainer)')
   - [Bind\`\`10(binding)](#M-IoC-FluentBind-Bind``10-IoC-IBinding- 'IoC.FluentBind.Bind``10(IoC.IBinding)')
   - [Bind\`\`10(token)](#M-IoC-FluentBind-Bind``10-IoC-IToken- 'IoC.FluentBind.Bind``10(IoC.IToken)')
-  - [Bind\`\`11(container)](#M-IoC-FluentBind-Bind``11-IoC-IContainer- 'IoC.FluentBind.Bind``11(IoC.IContainer)')
+  - [Bind\`\`11(container)](#M-IoC-FluentBind-Bind``11-IoC-IMutableContainer- 'IoC.FluentBind.Bind``11(IoC.IMutableContainer)')
   - [Bind\`\`11(binding)](#M-IoC-FluentBind-Bind``11-IoC-IBinding- 'IoC.FluentBind.Bind``11(IoC.IBinding)')
   - [Bind\`\`11(token)](#M-IoC-FluentBind-Bind``11-IoC-IToken- 'IoC.FluentBind.Bind``11(IoC.IToken)')
-  - [Bind\`\`12(container)](#M-IoC-FluentBind-Bind``12-IoC-IContainer- 'IoC.FluentBind.Bind``12(IoC.IContainer)')
+  - [Bind\`\`12(container)](#M-IoC-FluentBind-Bind``12-IoC-IMutableContainer- 'IoC.FluentBind.Bind``12(IoC.IMutableContainer)')
   - [Bind\`\`12(binding)](#M-IoC-FluentBind-Bind``12-IoC-IBinding- 'IoC.FluentBind.Bind``12(IoC.IBinding)')
   - [Bind\`\`12(token)](#M-IoC-FluentBind-Bind``12-IoC-IToken- 'IoC.FluentBind.Bind``12(IoC.IToken)')
-  - [Bind\`\`13(container)](#M-IoC-FluentBind-Bind``13-IoC-IContainer- 'IoC.FluentBind.Bind``13(IoC.IContainer)')
+  - [Bind\`\`13(container)](#M-IoC-FluentBind-Bind``13-IoC-IMutableContainer- 'IoC.FluentBind.Bind``13(IoC.IMutableContainer)')
   - [Bind\`\`13(binding)](#M-IoC-FluentBind-Bind``13-IoC-IBinding- 'IoC.FluentBind.Bind``13(IoC.IBinding)')
   - [Bind\`\`13(token)](#M-IoC-FluentBind-Bind``13-IoC-IToken- 'IoC.FluentBind.Bind``13(IoC.IToken)')
-  - [Bind\`\`14(container)](#M-IoC-FluentBind-Bind``14-IoC-IContainer- 'IoC.FluentBind.Bind``14(IoC.IContainer)')
+  - [Bind\`\`14(container)](#M-IoC-FluentBind-Bind``14-IoC-IMutableContainer- 'IoC.FluentBind.Bind``14(IoC.IMutableContainer)')
   - [Bind\`\`14(binding)](#M-IoC-FluentBind-Bind``14-IoC-IBinding- 'IoC.FluentBind.Bind``14(IoC.IBinding)')
   - [Bind\`\`14(token)](#M-IoC-FluentBind-Bind``14-IoC-IToken- 'IoC.FluentBind.Bind``14(IoC.IToken)')
-  - [Bind\`\`15(container)](#M-IoC-FluentBind-Bind``15-IoC-IContainer- 'IoC.FluentBind.Bind``15(IoC.IContainer)')
+  - [Bind\`\`15(container)](#M-IoC-FluentBind-Bind``15-IoC-IMutableContainer- 'IoC.FluentBind.Bind``15(IoC.IMutableContainer)')
   - [Bind\`\`15(binding)](#M-IoC-FluentBind-Bind``15-IoC-IBinding- 'IoC.FluentBind.Bind``15(IoC.IBinding)')
   - [Bind\`\`15(token)](#M-IoC-FluentBind-Bind``15-IoC-IToken- 'IoC.FluentBind.Bind``15(IoC.IToken)')
-  - [Bind\`\`16(container)](#M-IoC-FluentBind-Bind``16-IoC-IContainer- 'IoC.FluentBind.Bind``16(IoC.IContainer)')
+  - [Bind\`\`16(container)](#M-IoC-FluentBind-Bind``16-IoC-IMutableContainer- 'IoC.FluentBind.Bind``16(IoC.IMutableContainer)')
   - [Bind\`\`16(binding)](#M-IoC-FluentBind-Bind``16-IoC-IBinding- 'IoC.FluentBind.Bind``16(IoC.IBinding)')
   - [Bind\`\`16(token)](#M-IoC-FluentBind-Bind``16-IoC-IToken- 'IoC.FluentBind.Bind``16(IoC.IToken)')
-  - [Bind\`\`17(container)](#M-IoC-FluentBind-Bind``17-IoC-IContainer- 'IoC.FluentBind.Bind``17(IoC.IContainer)')
+  - [Bind\`\`17(container)](#M-IoC-FluentBind-Bind``17-IoC-IMutableContainer- 'IoC.FluentBind.Bind``17(IoC.IMutableContainer)')
   - [Bind\`\`17(binding)](#M-IoC-FluentBind-Bind``17-IoC-IBinding- 'IoC.FluentBind.Bind``17(IoC.IBinding)')
   - [Bind\`\`17(token)](#M-IoC-FluentBind-Bind``17-IoC-IToken- 'IoC.FluentBind.Bind``17(IoC.IToken)')
-  - [Bind\`\`18(container)](#M-IoC-FluentBind-Bind``18-IoC-IContainer- 'IoC.FluentBind.Bind``18(IoC.IContainer)')
+  - [Bind\`\`18(container)](#M-IoC-FluentBind-Bind``18-IoC-IMutableContainer- 'IoC.FluentBind.Bind``18(IoC.IMutableContainer)')
   - [Bind\`\`18(binding)](#M-IoC-FluentBind-Bind``18-IoC-IBinding- 'IoC.FluentBind.Bind``18(IoC.IBinding)')
   - [Bind\`\`18(token)](#M-IoC-FluentBind-Bind``18-IoC-IToken- 'IoC.FluentBind.Bind``18(IoC.IToken)')
-  - [Bind\`\`19(container)](#M-IoC-FluentBind-Bind``19-IoC-IContainer- 'IoC.FluentBind.Bind``19(IoC.IContainer)')
+  - [Bind\`\`19(container)](#M-IoC-FluentBind-Bind``19-IoC-IMutableContainer- 'IoC.FluentBind.Bind``19(IoC.IMutableContainer)')
   - [Bind\`\`19(binding)](#M-IoC-FluentBind-Bind``19-IoC-IBinding- 'IoC.FluentBind.Bind``19(IoC.IBinding)')
   - [Bind\`\`19(token)](#M-IoC-FluentBind-Bind``19-IoC-IToken- 'IoC.FluentBind.Bind``19(IoC.IToken)')
-  - [Bind\`\`2(container)](#M-IoC-FluentBind-Bind``2-IoC-IContainer- 'IoC.FluentBind.Bind``2(IoC.IContainer)')
+  - [Bind\`\`2(container)](#M-IoC-FluentBind-Bind``2-IoC-IMutableContainer- 'IoC.FluentBind.Bind``2(IoC.IMutableContainer)')
   - [Bind\`\`2(binding)](#M-IoC-FluentBind-Bind``2-IoC-IBinding- 'IoC.FluentBind.Bind``2(IoC.IBinding)')
   - [Bind\`\`2(token)](#M-IoC-FluentBind-Bind``2-IoC-IToken- 'IoC.FluentBind.Bind``2(IoC.IToken)')
-  - [Bind\`\`20(container)](#M-IoC-FluentBind-Bind``20-IoC-IContainer- 'IoC.FluentBind.Bind``20(IoC.IContainer)')
+  - [Bind\`\`20(container)](#M-IoC-FluentBind-Bind``20-IoC-IMutableContainer- 'IoC.FluentBind.Bind``20(IoC.IMutableContainer)')
   - [Bind\`\`20(binding)](#M-IoC-FluentBind-Bind``20-IoC-IBinding- 'IoC.FluentBind.Bind``20(IoC.IBinding)')
   - [Bind\`\`20(token)](#M-IoC-FluentBind-Bind``20-IoC-IToken- 'IoC.FluentBind.Bind``20(IoC.IToken)')
-  - [Bind\`\`21(container)](#M-IoC-FluentBind-Bind``21-IoC-IContainer- 'IoC.FluentBind.Bind``21(IoC.IContainer)')
+  - [Bind\`\`21(container)](#M-IoC-FluentBind-Bind``21-IoC-IMutableContainer- 'IoC.FluentBind.Bind``21(IoC.IMutableContainer)')
   - [Bind\`\`21(binding)](#M-IoC-FluentBind-Bind``21-IoC-IBinding- 'IoC.FluentBind.Bind``21(IoC.IBinding)')
   - [Bind\`\`21(token)](#M-IoC-FluentBind-Bind``21-IoC-IToken- 'IoC.FluentBind.Bind``21(IoC.IToken)')
-  - [Bind\`\`22(container)](#M-IoC-FluentBind-Bind``22-IoC-IContainer- 'IoC.FluentBind.Bind``22(IoC.IContainer)')
+  - [Bind\`\`22(container)](#M-IoC-FluentBind-Bind``22-IoC-IMutableContainer- 'IoC.FluentBind.Bind``22(IoC.IMutableContainer)')
   - [Bind\`\`22(binding)](#M-IoC-FluentBind-Bind``22-IoC-IBinding- 'IoC.FluentBind.Bind``22(IoC.IBinding)')
   - [Bind\`\`22(token)](#M-IoC-FluentBind-Bind``22-IoC-IToken- 'IoC.FluentBind.Bind``22(IoC.IToken)')
-  - [Bind\`\`23(container)](#M-IoC-FluentBind-Bind``23-IoC-IContainer- 'IoC.FluentBind.Bind``23(IoC.IContainer)')
+  - [Bind\`\`23(container)](#M-IoC-FluentBind-Bind``23-IoC-IMutableContainer- 'IoC.FluentBind.Bind``23(IoC.IMutableContainer)')
   - [Bind\`\`23(binding)](#M-IoC-FluentBind-Bind``23-IoC-IBinding- 'IoC.FluentBind.Bind``23(IoC.IBinding)')
   - [Bind\`\`23(token)](#M-IoC-FluentBind-Bind``23-IoC-IToken- 'IoC.FluentBind.Bind``23(IoC.IToken)')
-  - [Bind\`\`24(container)](#M-IoC-FluentBind-Bind``24-IoC-IContainer- 'IoC.FluentBind.Bind``24(IoC.IContainer)')
+  - [Bind\`\`24(container)](#M-IoC-FluentBind-Bind``24-IoC-IMutableContainer- 'IoC.FluentBind.Bind``24(IoC.IMutableContainer)')
   - [Bind\`\`24(binding)](#M-IoC-FluentBind-Bind``24-IoC-IBinding- 'IoC.FluentBind.Bind``24(IoC.IBinding)')
   - [Bind\`\`24(token)](#M-IoC-FluentBind-Bind``24-IoC-IToken- 'IoC.FluentBind.Bind``24(IoC.IToken)')
-  - [Bind\`\`25(container)](#M-IoC-FluentBind-Bind``25-IoC-IContainer- 'IoC.FluentBind.Bind``25(IoC.IContainer)')
+  - [Bind\`\`25(container)](#M-IoC-FluentBind-Bind``25-IoC-IMutableContainer- 'IoC.FluentBind.Bind``25(IoC.IMutableContainer)')
   - [Bind\`\`25(binding)](#M-IoC-FluentBind-Bind``25-IoC-IBinding- 'IoC.FluentBind.Bind``25(IoC.IBinding)')
   - [Bind\`\`25(token)](#M-IoC-FluentBind-Bind``25-IoC-IToken- 'IoC.FluentBind.Bind``25(IoC.IToken)')
-  - [Bind\`\`26(container)](#M-IoC-FluentBind-Bind``26-IoC-IContainer- 'IoC.FluentBind.Bind``26(IoC.IContainer)')
+  - [Bind\`\`26(container)](#M-IoC-FluentBind-Bind``26-IoC-IMutableContainer- 'IoC.FluentBind.Bind``26(IoC.IMutableContainer)')
   - [Bind\`\`26(binding)](#M-IoC-FluentBind-Bind``26-IoC-IBinding- 'IoC.FluentBind.Bind``26(IoC.IBinding)')
   - [Bind\`\`26(token)](#M-IoC-FluentBind-Bind``26-IoC-IToken- 'IoC.FluentBind.Bind``26(IoC.IToken)')
-  - [Bind\`\`27(container)](#M-IoC-FluentBind-Bind``27-IoC-IContainer- 'IoC.FluentBind.Bind``27(IoC.IContainer)')
+  - [Bind\`\`27(container)](#M-IoC-FluentBind-Bind``27-IoC-IMutableContainer- 'IoC.FluentBind.Bind``27(IoC.IMutableContainer)')
   - [Bind\`\`27(binding)](#M-IoC-FluentBind-Bind``27-IoC-IBinding- 'IoC.FluentBind.Bind``27(IoC.IBinding)')
   - [Bind\`\`27(token)](#M-IoC-FluentBind-Bind``27-IoC-IToken- 'IoC.FluentBind.Bind``27(IoC.IToken)')
-  - [Bind\`\`28(container)](#M-IoC-FluentBind-Bind``28-IoC-IContainer- 'IoC.FluentBind.Bind``28(IoC.IContainer)')
+  - [Bind\`\`28(container)](#M-IoC-FluentBind-Bind``28-IoC-IMutableContainer- 'IoC.FluentBind.Bind``28(IoC.IMutableContainer)')
   - [Bind\`\`28(binding)](#M-IoC-FluentBind-Bind``28-IoC-IBinding- 'IoC.FluentBind.Bind``28(IoC.IBinding)')
   - [Bind\`\`28(token)](#M-IoC-FluentBind-Bind``28-IoC-IToken- 'IoC.FluentBind.Bind``28(IoC.IToken)')
-  - [Bind\`\`29(container)](#M-IoC-FluentBind-Bind``29-IoC-IContainer- 'IoC.FluentBind.Bind``29(IoC.IContainer)')
+  - [Bind\`\`29(container)](#M-IoC-FluentBind-Bind``29-IoC-IMutableContainer- 'IoC.FluentBind.Bind``29(IoC.IMutableContainer)')
   - [Bind\`\`29(binding)](#M-IoC-FluentBind-Bind``29-IoC-IBinding- 'IoC.FluentBind.Bind``29(IoC.IBinding)')
   - [Bind\`\`29(token)](#M-IoC-FluentBind-Bind``29-IoC-IToken- 'IoC.FluentBind.Bind``29(IoC.IToken)')
-  - [Bind\`\`3(container)](#M-IoC-FluentBind-Bind``3-IoC-IContainer- 'IoC.FluentBind.Bind``3(IoC.IContainer)')
+  - [Bind\`\`3(container)](#M-IoC-FluentBind-Bind``3-IoC-IMutableContainer- 'IoC.FluentBind.Bind``3(IoC.IMutableContainer)')
   - [Bind\`\`3(binding)](#M-IoC-FluentBind-Bind``3-IoC-IBinding- 'IoC.FluentBind.Bind``3(IoC.IBinding)')
   - [Bind\`\`3(token)](#M-IoC-FluentBind-Bind``3-IoC-IToken- 'IoC.FluentBind.Bind``3(IoC.IToken)')
-  - [Bind\`\`30(container)](#M-IoC-FluentBind-Bind``30-IoC-IContainer- 'IoC.FluentBind.Bind``30(IoC.IContainer)')
+  - [Bind\`\`30(container)](#M-IoC-FluentBind-Bind``30-IoC-IMutableContainer- 'IoC.FluentBind.Bind``30(IoC.IMutableContainer)')
   - [Bind\`\`30(binding)](#M-IoC-FluentBind-Bind``30-IoC-IBinding- 'IoC.FluentBind.Bind``30(IoC.IBinding)')
   - [Bind\`\`30(token)](#M-IoC-FluentBind-Bind``30-IoC-IToken- 'IoC.FluentBind.Bind``30(IoC.IToken)')
-  - [Bind\`\`31(container)](#M-IoC-FluentBind-Bind``31-IoC-IContainer- 'IoC.FluentBind.Bind``31(IoC.IContainer)')
+  - [Bind\`\`31(container)](#M-IoC-FluentBind-Bind``31-IoC-IMutableContainer- 'IoC.FluentBind.Bind``31(IoC.IMutableContainer)')
   - [Bind\`\`31(binding)](#M-IoC-FluentBind-Bind``31-IoC-IBinding- 'IoC.FluentBind.Bind``31(IoC.IBinding)')
   - [Bind\`\`31(token)](#M-IoC-FluentBind-Bind``31-IoC-IToken- 'IoC.FluentBind.Bind``31(IoC.IToken)')
-  - [Bind\`\`32(container)](#M-IoC-FluentBind-Bind``32-IoC-IContainer- 'IoC.FluentBind.Bind``32(IoC.IContainer)')
+  - [Bind\`\`32(container)](#M-IoC-FluentBind-Bind``32-IoC-IMutableContainer- 'IoC.FluentBind.Bind``32(IoC.IMutableContainer)')
   - [Bind\`\`32(binding)](#M-IoC-FluentBind-Bind``32-IoC-IBinding- 'IoC.FluentBind.Bind``32(IoC.IBinding)')
   - [Bind\`\`32(token)](#M-IoC-FluentBind-Bind``32-IoC-IToken- 'IoC.FluentBind.Bind``32(IoC.IToken)')
-  - [Bind\`\`33(container)](#M-IoC-FluentBind-Bind``33-IoC-IContainer- 'IoC.FluentBind.Bind``33(IoC.IContainer)')
+  - [Bind\`\`33(container)](#M-IoC-FluentBind-Bind``33-IoC-IMutableContainer- 'IoC.FluentBind.Bind``33(IoC.IMutableContainer)')
   - [Bind\`\`33(binding)](#M-IoC-FluentBind-Bind``33-IoC-IBinding- 'IoC.FluentBind.Bind``33(IoC.IBinding)')
   - [Bind\`\`33(token)](#M-IoC-FluentBind-Bind``33-IoC-IToken- 'IoC.FluentBind.Bind``33(IoC.IToken)')
-  - [Bind\`\`4(container)](#M-IoC-FluentBind-Bind``4-IoC-IContainer- 'IoC.FluentBind.Bind``4(IoC.IContainer)')
+  - [Bind\`\`4(container)](#M-IoC-FluentBind-Bind``4-IoC-IMutableContainer- 'IoC.FluentBind.Bind``4(IoC.IMutableContainer)')
   - [Bind\`\`4(binding)](#M-IoC-FluentBind-Bind``4-IoC-IBinding- 'IoC.FluentBind.Bind``4(IoC.IBinding)')
   - [Bind\`\`4(token)](#M-IoC-FluentBind-Bind``4-IoC-IToken- 'IoC.FluentBind.Bind``4(IoC.IToken)')
-  - [Bind\`\`5(container)](#M-IoC-FluentBind-Bind``5-IoC-IContainer- 'IoC.FluentBind.Bind``5(IoC.IContainer)')
+  - [Bind\`\`5(container)](#M-IoC-FluentBind-Bind``5-IoC-IMutableContainer- 'IoC.FluentBind.Bind``5(IoC.IMutableContainer)')
   - [Bind\`\`5(binding)](#M-IoC-FluentBind-Bind``5-IoC-IBinding- 'IoC.FluentBind.Bind``5(IoC.IBinding)')
   - [Bind\`\`5(token)](#M-IoC-FluentBind-Bind``5-IoC-IToken- 'IoC.FluentBind.Bind``5(IoC.IToken)')
-  - [Bind\`\`6(container)](#M-IoC-FluentBind-Bind``6-IoC-IContainer- 'IoC.FluentBind.Bind``6(IoC.IContainer)')
+  - [Bind\`\`6(container)](#M-IoC-FluentBind-Bind``6-IoC-IMutableContainer- 'IoC.FluentBind.Bind``6(IoC.IMutableContainer)')
   - [Bind\`\`6(binding)](#M-IoC-FluentBind-Bind``6-IoC-IBinding- 'IoC.FluentBind.Bind``6(IoC.IBinding)')
   - [Bind\`\`6(token)](#M-IoC-FluentBind-Bind``6-IoC-IToken- 'IoC.FluentBind.Bind``6(IoC.IToken)')
-  - [Bind\`\`7(container)](#M-IoC-FluentBind-Bind``7-IoC-IContainer- 'IoC.FluentBind.Bind``7(IoC.IContainer)')
+  - [Bind\`\`7(container)](#M-IoC-FluentBind-Bind``7-IoC-IMutableContainer- 'IoC.FluentBind.Bind``7(IoC.IMutableContainer)')
   - [Bind\`\`7(binding)](#M-IoC-FluentBind-Bind``7-IoC-IBinding- 'IoC.FluentBind.Bind``7(IoC.IBinding)')
   - [Bind\`\`7(token)](#M-IoC-FluentBind-Bind``7-IoC-IToken- 'IoC.FluentBind.Bind``7(IoC.IToken)')
-  - [Bind\`\`8(container)](#M-IoC-FluentBind-Bind``8-IoC-IContainer- 'IoC.FluentBind.Bind``8(IoC.IContainer)')
+  - [Bind\`\`8(container)](#M-IoC-FluentBind-Bind``8-IoC-IMutableContainer- 'IoC.FluentBind.Bind``8(IoC.IMutableContainer)')
   - [Bind\`\`8(binding)](#M-IoC-FluentBind-Bind``8-IoC-IBinding- 'IoC.FluentBind.Bind``8(IoC.IBinding)')
   - [Bind\`\`8(token)](#M-IoC-FluentBind-Bind``8-IoC-IToken- 'IoC.FluentBind.Bind``8(IoC.IToken)')
-  - [Bind\`\`9(container)](#M-IoC-FluentBind-Bind``9-IoC-IContainer- 'IoC.FluentBind.Bind``9(IoC.IContainer)')
+  - [Bind\`\`9(container)](#M-IoC-FluentBind-Bind``9-IoC-IMutableContainer- 'IoC.FluentBind.Bind``9(IoC.IMutableContainer)')
   - [Bind\`\`9(binding)](#M-IoC-FluentBind-Bind``9-IoC-IBinding- 'IoC.FluentBind.Bind``9(IoC.IBinding)')
   - [Bind\`\`9(token)](#M-IoC-FluentBind-Bind``9-IoC-IToken- 'IoC.FluentBind.Bind``9(IoC.IToken)')
   - [Lifetime\`\`1(binding,lifetime)](#M-IoC-FluentBind-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime- 'IoC.FluentBind.Lifetime``1(IoC.IBinding{``0},IoC.ILifetime)')
@@ -216,28 +216,28 @@
   - [To\`\`1(binding,statements)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
   - [To\`\`1(binding,factory,statements)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
 - [FluentConfiguration](#T-IoC-FluentConfiguration 'IoC.FluentConfiguration')
-  - [Apply(container,configurationText)](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-String[]- 'IoC.FluentConfiguration.Apply(IoC.IContainer,System.String[])')
+  - [Apply(container,configurationText)](#M-IoC-FluentConfiguration-Apply-IoC-IMutableContainer,System-String[]- 'IoC.FluentConfiguration.Apply(IoC.IMutableContainer,System.String[])')
   - [Apply(token,configurationText)](#M-IoC-FluentConfiguration-Apply-IoC-IToken,System-String[]- 'IoC.FluentConfiguration.Apply(IoC.IToken,System.String[])')
-  - [Apply(container,configurationStreams)](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-IO-Stream[]- 'IoC.FluentConfiguration.Apply(IoC.IContainer,System.IO.Stream[])')
+  - [Apply(container,configurationStreams)](#M-IoC-FluentConfiguration-Apply-IoC-IMutableContainer,System-IO-Stream[]- 'IoC.FluentConfiguration.Apply(IoC.IMutableContainer,System.IO.Stream[])')
   - [Apply(token,configurationStreams)](#M-IoC-FluentConfiguration-Apply-IoC-IToken,System-IO-Stream[]- 'IoC.FluentConfiguration.Apply(IoC.IToken,System.IO.Stream[])')
-  - [Apply(container,configurationReaders)](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-IO-TextReader[]- 'IoC.FluentConfiguration.Apply(IoC.IContainer,System.IO.TextReader[])')
+  - [Apply(container,configurationReaders)](#M-IoC-FluentConfiguration-Apply-IoC-IMutableContainer,System-IO-TextReader[]- 'IoC.FluentConfiguration.Apply(IoC.IMutableContainer,System.IO.TextReader[])')
   - [Apply(token,configurationReaders)](#M-IoC-FluentConfiguration-Apply-IoC-IToken,System-IO-TextReader[]- 'IoC.FluentConfiguration.Apply(IoC.IToken,System.IO.TextReader[])')
-  - [Apply(container,configurations)](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IConfiguration}- 'IoC.FluentConfiguration.Apply(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IConfiguration})')
+  - [Apply(container,configurations)](#M-IoC-FluentConfiguration-Apply-IoC-IMutableContainer,System-Collections-Generic-IEnumerable{IoC-IConfiguration}- 'IoC.FluentConfiguration.Apply(IoC.IMutableContainer,System.Collections.Generic.IEnumerable{IoC.IConfiguration})')
   - [Apply(token,configurations)](#M-IoC-FluentConfiguration-Apply-IoC-IToken,System-Collections-Generic-IEnumerable{IoC-IConfiguration}- 'IoC.FluentConfiguration.Apply(IoC.IToken,System.Collections.Generic.IEnumerable{IoC.IConfiguration})')
-  - [Apply(container,configurations)](#M-IoC-FluentConfiguration-Apply-IoC-IContainer,IoC-IConfiguration[]- 'IoC.FluentConfiguration.Apply(IoC.IContainer,IoC.IConfiguration[])')
+  - [Apply(container,configurations)](#M-IoC-FluentConfiguration-Apply-IoC-IMutableContainer,IoC-IConfiguration[]- 'IoC.FluentConfiguration.Apply(IoC.IMutableContainer,IoC.IConfiguration[])')
   - [Apply(token,configurations)](#M-IoC-FluentConfiguration-Apply-IoC-IToken,IoC-IConfiguration[]- 'IoC.FluentConfiguration.Apply(IoC.IToken,IoC.IConfiguration[])')
-  - [Apply\`\`1(container)](#M-IoC-FluentConfiguration-Apply``1-IoC-IContainer- 'IoC.FluentConfiguration.Apply``1(IoC.IContainer)')
+  - [Apply\`\`1(container)](#M-IoC-FluentConfiguration-Apply``1-IoC-IMutableContainer- 'IoC.FluentConfiguration.Apply``1(IoC.IMutableContainer)')
   - [Apply\`\`1(token)](#M-IoC-FluentConfiguration-Apply``1-IoC-IToken- 'IoC.FluentConfiguration.Apply``1(IoC.IToken)')
-  - [AsTokenOf(disposableToken,container)](#M-IoC-FluentConfiguration-AsTokenOf-System-IDisposable,IoC-IContainer- 'IoC.FluentConfiguration.AsTokenOf(System.IDisposable,IoC.IContainer)')
+  - [AsTokenOf(disposableToken,container)](#M-IoC-FluentConfiguration-AsTokenOf-System-IDisposable,IoC-IMutableContainer- 'IoC.FluentConfiguration.AsTokenOf(System.IDisposable,IoC.IMutableContainer)')
   - [Create(configurationFactory)](#M-IoC-FluentConfiguration-Create-System-Func{IoC-IContainer,IoC-IToken}- 'IoC.FluentConfiguration.Create(System.Func{IoC.IContainer,IoC.IToken})')
-  - [Using(container,configurations)](#M-IoC-FluentConfiguration-Using-IoC-IContainer,IoC-IConfiguration[]- 'IoC.FluentConfiguration.Using(IoC.IContainer,IoC.IConfiguration[])')
+  - [Using(container,configurations)](#M-IoC-FluentConfiguration-Using-IoC-IMutableContainer,IoC-IConfiguration[]- 'IoC.FluentConfiguration.Using(IoC.IMutableContainer,IoC.IConfiguration[])')
   - [Using(token,configurations)](#M-IoC-FluentConfiguration-Using-IoC-IToken,IoC-IConfiguration[]- 'IoC.FluentConfiguration.Using(IoC.IToken,IoC.IConfiguration[])')
-  - [Using\`\`1(container)](#M-IoC-FluentConfiguration-Using``1-IoC-IContainer- 'IoC.FluentConfiguration.Using``1(IoC.IContainer)')
+  - [Using\`\`1(container)](#M-IoC-FluentConfiguration-Using``1-IoC-IMutableContainer- 'IoC.FluentConfiguration.Using``1(IoC.IMutableContainer)')
   - [Using\`\`1(token)](#M-IoC-FluentConfiguration-Using``1-IoC-IToken- 'IoC.FluentConfiguration.Using``1(IoC.IToken)')
 - [FluentContainer](#T-IoC-FluentContainer 'IoC.FluentContainer')
   - [BuildUp\`\`1(configuration,args)](#M-IoC-FluentContainer-BuildUp``1-IoC-IConfiguration,System-Object[]- 'IoC.FluentContainer.BuildUp``1(IoC.IConfiguration,System.Object[])')
   - [BuildUp\`\`1(token,args)](#M-IoC-FluentContainer-BuildUp``1-IoC-IToken,System-Object[]- 'IoC.FluentContainer.BuildUp``1(IoC.IToken,System.Object[])')
-  - [BuildUp\`\`1(container,args)](#M-IoC-FluentContainer-BuildUp``1-IoC-IContainer,System-Object[]- 'IoC.FluentContainer.BuildUp``1(IoC.IContainer,System.Object[])')
+  - [BuildUp\`\`1(container,args)](#M-IoC-FluentContainer-BuildUp``1-IoC-IMutableContainer,System-Object[]- 'IoC.FluentContainer.BuildUp``1(IoC.IMutableContainer,System.Object[])')
   - [Create(parentContainer,name)](#M-IoC-FluentContainer-Create-IoC-IContainer,System-String- 'IoC.FluentContainer.Create(IoC.IContainer,System.String)')
   - [Create(token,name)](#M-IoC-FluentContainer-Create-IoC-IToken,System-String- 'IoC.FluentContainer.Create(IoC.IToken,System.String)')
 - [FluentGetResolver](#T-IoC-FluentGetResolver 'IoC.FluentGetResolver')
@@ -260,15 +260,15 @@
   - [Resolve\`\`1(container,type,args)](#M-IoC-FluentNativeResolve-Resolve``1-IoC-Container,System-Type,System-Object[]- 'IoC.FluentNativeResolve.Resolve``1(IoC.Container,System.Type,System.Object[])')
   - [Resolve\`\`1(container,type,tag,args)](#M-IoC-FluentNativeResolve-Resolve``1-IoC-Container,System-Type,IoC-Tag,System-Object[]- 'IoC.FluentNativeResolve.Resolve``1(IoC.Container,System.Type,IoC.Tag,System.Object[])')
 - [FluentRegister](#T-IoC-Core-FluentRegister 'IoC.Core.FluentRegister')
-  - [Register(container,types,dependency,lifetime,tags)](#M-IoC-Core-FluentRegister-Register-IoC-IContainer,System-Collections-Generic-IEnumerable{System-Type},IoC-IDependency,IoC-ILifetime,System-Object[]- 'IoC.Core.FluentRegister.Register(IoC.IContainer,System.Collections.Generic.IEnumerable{System.Type},IoC.IDependency,IoC.ILifetime,System.Object[])')
-  - [Register\`\`1(container,lifetime,tags)](#M-IoC-Core-FluentRegister-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.Core.FluentRegister.Register``1(IoC.IContainer,IoC.ILifetime,System.Object[])')
-  - [Register\`\`1(container,factory,lifetime,tags,statements)](#M-IoC-Core-FluentRegister-Register``1-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.Core.FluentRegister.Register``1(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
-  - [Register\`\`2(container,lifetime,tags)](#M-IoC-Core-FluentRegister-Register``2-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.Core.FluentRegister.Register``2(IoC.IContainer,IoC.ILifetime,System.Object[])')
-  - [Register\`\`2(container,factory,lifetime,tags,statements)](#M-IoC-Core-FluentRegister-Register``2-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.Core.FluentRegister.Register``2(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
-  - [Register\`\`3(container,lifetime,tags)](#M-IoC-Core-FluentRegister-Register``3-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.Core.FluentRegister.Register``3(IoC.IContainer,IoC.ILifetime,System.Object[])')
-  - [Register\`\`3(container,factory,lifetime,tags,statements)](#M-IoC-Core-FluentRegister-Register``3-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.Core.FluentRegister.Register``3(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
-  - [Register\`\`4(container,lifetime,tags)](#M-IoC-Core-FluentRegister-Register``4-IoC-IContainer,IoC-ILifetime,System-Object[]- 'IoC.Core.FluentRegister.Register``4(IoC.IContainer,IoC.ILifetime,System.Object[])')
-  - [Register\`\`4(container,factory,lifetime,tags,statements)](#M-IoC-Core-FluentRegister-Register``4-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.Core.FluentRegister.Register``4(IoC.IContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register(container,types,dependency,lifetime,tags)](#M-IoC-Core-FluentRegister-Register-IoC-IMutableContainer,System-Collections-Generic-IEnumerable{System-Type},IoC-IDependency,IoC-ILifetime,System-Object[]- 'IoC.Core.FluentRegister.Register(IoC.IMutableContainer,System.Collections.Generic.IEnumerable{System.Type},IoC.IDependency,IoC.ILifetime,System.Object[])')
+  - [Register\`\`1(container,lifetime,tags)](#M-IoC-Core-FluentRegister-Register``1-IoC-IMutableContainer,IoC-ILifetime,System-Object[]- 'IoC.Core.FluentRegister.Register``1(IoC.IMutableContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`1(container,factory,lifetime,tags,statements)](#M-IoC-Core-FluentRegister-Register``1-IoC-IMutableContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.Core.FluentRegister.Register``1(IoC.IMutableContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`2(container,lifetime,tags)](#M-IoC-Core-FluentRegister-Register``2-IoC-IMutableContainer,IoC-ILifetime,System-Object[]- 'IoC.Core.FluentRegister.Register``2(IoC.IMutableContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`2(container,factory,lifetime,tags,statements)](#M-IoC-Core-FluentRegister-Register``2-IoC-IMutableContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.Core.FluentRegister.Register``2(IoC.IMutableContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`3(container,lifetime,tags)](#M-IoC-Core-FluentRegister-Register``3-IoC-IMutableContainer,IoC-ILifetime,System-Object[]- 'IoC.Core.FluentRegister.Register``3(IoC.IMutableContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`3(container,factory,lifetime,tags,statements)](#M-IoC-Core-FluentRegister-Register``3-IoC-IMutableContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.Core.FluentRegister.Register``3(IoC.IMutableContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [Register\`\`4(container,lifetime,tags)](#M-IoC-Core-FluentRegister-Register``4-IoC-IMutableContainer,IoC-ILifetime,System-Object[]- 'IoC.Core.FluentRegister.Register``4(IoC.IMutableContainer,IoC.ILifetime,System.Object[])')
+  - [Register\`\`4(container,factory,lifetime,tags,statements)](#M-IoC-Core-FluentRegister-Register``4-IoC-IMutableContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.Core.FluentRegister.Register``4(IoC.IMutableContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
 - [FluentResolve](#T-IoC-FluentResolve 'IoC.FluentResolve')
   - [Resolve\`\`1(container,args)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Object[])')
   - [Resolve\`\`1(container,tag,args)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,IoC-Tag,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,IoC.Tag,System.Object[])')
@@ -278,14 +278,14 @@
   - [CreateScope(container)](#M-IoC-FluentScope-CreateScope-IoC-IContainer- 'IoC.FluentScope.CreateScope(IoC.IContainer)')
 - [FluentTrace](#T-IoC-FluentTrace 'IoC.FluentTrace')
   - [ToTraceSource(container)](#M-IoC-FluentTrace-ToTraceSource-IoC-IContainer- 'IoC.FluentTrace.ToTraceSource(IoC.IContainer)')
-  - [Trace(container,onTraceMessage)](#M-IoC-FluentTrace-Trace-IoC-IContainer,System-Action{System-String}- 'IoC.FluentTrace.Trace(IoC.IContainer,System.Action{System.String})')
+  - [Trace(container,onTraceMessage)](#M-IoC-FluentTrace-Trace-IoC-IMutableContainer,System-Action{System-String}- 'IoC.FluentTrace.Trace(IoC.IMutableContainer,System.Action{System.String})')
   - [Trace(token,onTraceMessage)](#M-IoC-FluentTrace-Trace-IoC-IToken,System-Action{System-String}- 'IoC.FluentTrace.Trace(IoC.IToken,System.Action{System.String})')
-  - [Trace(container)](#M-IoC-FluentTrace-Trace-IoC-IContainer- 'IoC.FluentTrace.Trace(IoC.IContainer)')
+  - [Trace(container)](#M-IoC-FluentTrace-Trace-IoC-IMutableContainer- 'IoC.FluentTrace.Trace(IoC.IMutableContainer)')
   - [Trace(token)](#M-IoC-FluentTrace-Trace-IoC-IToken- 'IoC.FluentTrace.Trace(IoC.IToken)')
 - [FuncFeature](#T-IoC-Features-FuncFeature 'IoC.Features.FuncFeature')
   - [Default](#F-IoC-Features-FuncFeature-Default 'IoC.Features.FuncFeature.Default')
   - [Light](#F-IoC-Features-FuncFeature-Light 'IoC.Features.FuncFeature.Light')
-  - [Apply()](#M-IoC-Features-FuncFeature-Apply-IoC-IContainer- 'IoC.Features.FuncFeature.Apply(IoC.IContainer)')
+  - [Apply()](#M-IoC-Features-FuncFeature-Apply-IoC-IMutableContainer- 'IoC.Features.FuncFeature.Apply(IoC.IMutableContainer)')
 - [GenericTypeArgumentAttribute](#T-IoC-GenericTypeArgumentAttribute 'IoC.GenericTypeArgumentAttribute')
 - [IArray](#T-IoC-Core-IArray 'IoC.Core.IArray')
 - [IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy')
@@ -338,12 +338,11 @@
 - [ICompiler](#T-IoC-ICompiler 'IoC.ICompiler')
   - [TryCompile(context,expression,resolver)](#M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@- 'IoC.ICompiler.TryCompile(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,System.Delegate@)')
 - [IConfiguration](#T-IoC-IConfiguration 'IoC.IConfiguration')
-  - [Apply(container)](#M-IoC-IConfiguration-Apply-IoC-IContainer- 'IoC.IConfiguration.Apply(IoC.IContainer)')
+  - [Apply(container)](#M-IoC-IConfiguration-Apply-IoC-IMutableContainer- 'IoC.IConfiguration.Apply(IoC.IMutableContainer)')
 - [IContainer](#T-IoC-IContainer 'IoC.IContainer')
   - [Parent](#P-IoC-IContainer-Parent 'IoC.IContainer.Parent')
   - [TryGetDependency(key,dependency,lifetime)](#M-IoC-IContainer-TryGetDependency-IoC-Key,IoC-IDependency@,IoC-ILifetime@- 'IoC.IContainer.TryGetDependency(IoC.Key,IoC.IDependency@,IoC.ILifetime@)')
   - [TryGetResolver\`\`1(type,tag,resolver,error,resolvingContainer)](#M-IoC-IContainer-TryGetResolver``1-System-Type,System-Object,IoC-Resolver{``0}@,System-Exception@,IoC-IContainer- 'IoC.IContainer.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,System.Exception@,IoC.IContainer)')
-  - [TryRegisterDependency(keys,dependency,lifetime,dependencyToken)](#M-IoC-IContainer-TryRegisterDependency-System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime,IoC-IToken@- 'IoC.IContainer.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,IoC.IToken@)')
 - [IDependency](#T-IoC-IDependency 'IoC.IDependency')
   - [TryBuildExpression(buildContext,lifetime,baseExpression,error)](#M-IoC-IDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.IDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
 - [IExpressionBuilder\`1](#T-IoC-Core-IExpressionBuilder`1 'IoC.Core.IExpressionBuilder`1')
@@ -359,6 +358,8 @@
   - [Info](#P-IoC-IMethod`1-Info 'IoC.IMethod`1.Info')
   - [GetParametersExpressions()](#M-IoC-IMethod`1-GetParametersExpressions-IoC-IBuildContext- 'IoC.IMethod`1.GetParametersExpressions(IoC.IBuildContext)')
   - [SetParameterExpression(parameterPosition,parameterExpression)](#M-IoC-IMethod`1-SetParameterExpression-System-Int32,System-Linq-Expressions-Expression- 'IoC.IMethod`1.SetParameterExpression(System.Int32,System.Linq.Expressions.Expression)')
+- [IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer')
+  - [TryRegisterDependency(keys,dependency,lifetime,dependencyToken)](#M-IoC-IMutableContainer-TryRegisterDependency-System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime,IoC-IToken@- 'IoC.IMutableContainer.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,IoC.IToken@)')
 - [IResourceRegistry](#T-IoC-IResourceRegistry 'IoC.IResourceRegistry')
   - [RegisterResource(resource)](#M-IoC-IResourceRegistry-RegisterResource-System-IDisposable- 'IoC.IResourceRegistry.RegisterResource(System.IDisposable)')
   - [UnregisterResource(resource)](#M-IoC-IResourceRegistry-UnregisterResource-System-IDisposable- 'IoC.IResourceRegistry.UnregisterResource(System.IDisposable)')
@@ -408,7 +409,7 @@
   - [SelectResolvingContainer()](#M-IoC-Lifetimes-KeyBasedLifetime`1-SelectResolvingContainer-IoC-IContainer,IoC-IContainer- 'IoC.Lifetimes.KeyBasedLifetime`1.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)')
 - [LazyFeature](#T-IoC-Features-LazyFeature 'IoC.Features.LazyFeature')
   - [Default](#F-IoC-Features-LazyFeature-Default 'IoC.Features.LazyFeature.Default')
-  - [Apply()](#M-IoC-Features-LazyFeature-Apply-IoC-IContainer- 'IoC.Features.LazyFeature.Apply(IoC.IContainer)')
+  - [Apply()](#M-IoC-Features-LazyFeature-Apply-IoC-IMutableContainer- 'IoC.Features.LazyFeature.Apply(IoC.IMutableContainer)')
 - [Lifetime](#T-IoC-Lifetime 'IoC.Lifetime')
   - [ContainerSingleton](#F-IoC-Lifetime-ContainerSingleton 'IoC.Lifetime.ContainerSingleton')
   - [ScopeSingleton](#F-IoC-Lifetime-ScopeSingleton 'IoC.Lifetime.ScopeSingleton')
@@ -682,7 +683,7 @@
 - [TaskFeature](#T-IoC-Features-TaskFeature 'IoC.Features.TaskFeature')
   - [Default](#F-IoC-Features-TaskFeature-Default 'IoC.Features.TaskFeature.Default')
   - [Tag](#F-IoC-Features-TaskFeature-Tag 'IoC.Features.TaskFeature.Tag')
-  - [Apply()](#M-IoC-Features-TaskFeature-Apply-IoC-IContainer- 'IoC.Features.TaskFeature.Apply(IoC.IContainer)')
+  - [Apply()](#M-IoC-Features-TaskFeature-Apply-IoC-IMutableContainer- 'IoC.Features.TaskFeature.Apply(IoC.IMutableContainer)')
 - [TerminatesProgramAttribute](#T-IoC-TerminatesProgramAttribute 'IoC.TerminatesProgramAttribute')
 - [TraceEvent](#T-IoC-TraceEvent 'IoC.TraceEvent')
   - [#ctor(containerEvent,message)](#M-IoC-TraceEvent-#ctor-IoC-ContainerEvent,System-String- 'IoC.TraceEvent.#ctor(IoC.ContainerEvent,System.String)')
@@ -691,7 +692,7 @@
 - [TupleFeature](#T-IoC-Features-TupleFeature 'IoC.Features.TupleFeature')
   - [Default](#F-IoC-Features-TupleFeature-Default 'IoC.Features.TupleFeature.Default')
   - [Light](#F-IoC-Features-TupleFeature-Light 'IoC.Features.TupleFeature.Light')
-  - [Apply()](#M-IoC-Features-TupleFeature-Apply-IoC-IContainer- 'IoC.Features.TupleFeature.Apply(IoC.IContainer)')
+  - [Apply()](#M-IoC-Features-TupleFeature-Apply-IoC-IMutableContainer- 'IoC.Features.TupleFeature.Apply(IoC.IMutableContainer)')
 - [UsedImplicitlyAttribute](#T-IoC-UsedImplicitlyAttribute 'IoC.UsedImplicitlyAttribute')
 - [ValueProviderAttribute](#T-IoC-ValueProviderAttribute 'IoC.ValueProviderAttribute')
 - [WellknownContainers](#T-IoC-WellknownContainers 'IoC.WellknownContainers')
@@ -1285,7 +1286,7 @@ Allows to resolve enumeration of all instances related to corresponding bindings
 <a name='F-IoC-Features-CollectionFeature-Default'></a>
 ### Default `constants`
 
-<a name='M-IoC-Features-CollectionFeature-Apply-IoC-IContainer-'></a>
+<a name='M-IoC-Features-CollectionFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
 
 ##### Summary
@@ -1314,7 +1315,7 @@ Allows to configure via a text metadata.
 
 The default instance.
 
-<a name='M-IoC-Features-ConfigurationFeature-Apply-IoC-IContainer-'></a>
+<a name='M-IoC-Features-ConfigurationFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
 
 ##### Summary
@@ -1688,7 +1689,7 @@ Adds the set of core features like lifetimes and default containers.
 <a name='F-IoC-Features-CoreFeature-Default'></a>
 ### Default `constants`
 
-<a name='M-IoC-Features-CoreFeature-Apply-IoC-IContainer-'></a>
+<a name='M-IoC-Features-CoreFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
 
 ##### Summary
@@ -1917,7 +1918,7 @@ The binding token.
 | ---- | ----------- |
 | T | The instance type. |
 
-<a name='M-IoC-FluentBind-Bind-IoC-IContainer,System-Type[]-'></a>
+<a name='M-IoC-FluentBind-Bind-IoC-IMutableContainer,System-Type[]-'></a>
 ### Bind(container,types) `method`
 
 ##### Summary
@@ -1932,7 +1933,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') |  |
 
 <a name='M-IoC-FluentBind-Bind-IoC-IToken,System-Type[]-'></a>
@@ -1953,7 +1954,7 @@ The binding token.
 | token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The container binding token. |
 | types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') |  |
 
-<a name='M-IoC-FluentBind-Bind``1-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``1-IoC-IMutableContainer-'></a>
 ### Bind\`\`1(container) `method`
 
 ##### Summary
@@ -1968,7 +1969,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -2022,7 +2023,7 @@ The binding token.
 | ---- | ----------- |
 | T | The contract type. |
 
-<a name='M-IoC-FluentBind-Bind``10-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``10-IoC-IMutableContainer-'></a>
 ### Bind\`\`10(container) `method`
 
 ##### Summary
@@ -2037,7 +2038,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -2118,7 +2119,7 @@ The binding token.
 | T8 | The contract type #8. |
 | T9 | The contract type #9. |
 
-<a name='M-IoC-FluentBind-Bind``11-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``11-IoC-IMutableContainer-'></a>
 ### Bind\`\`11(container) `method`
 
 ##### Summary
@@ -2133,7 +2134,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -2217,7 +2218,7 @@ The binding token.
 | T9 | The contract type #9. |
 | T10 | The contract type #10. |
 
-<a name='M-IoC-FluentBind-Bind``12-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``12-IoC-IMutableContainer-'></a>
 ### Bind\`\`12(container) `method`
 
 ##### Summary
@@ -2232,7 +2233,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -2319,7 +2320,7 @@ The binding token.
 | T10 | The contract type #10. |
 | T11 | The contract type #11. |
 
-<a name='M-IoC-FluentBind-Bind``13-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``13-IoC-IMutableContainer-'></a>
 ### Bind\`\`13(container) `method`
 
 ##### Summary
@@ -2334,7 +2335,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -2424,7 +2425,7 @@ The binding token.
 | T11 | The contract type #11. |
 | T12 | The contract type #12. |
 
-<a name='M-IoC-FluentBind-Bind``14-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``14-IoC-IMutableContainer-'></a>
 ### Bind\`\`14(container) `method`
 
 ##### Summary
@@ -2439,7 +2440,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -2532,7 +2533,7 @@ The binding token.
 | T12 | The contract type #12. |
 | T13 | The contract type #13. |
 
-<a name='M-IoC-FluentBind-Bind``15-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``15-IoC-IMutableContainer-'></a>
 ### Bind\`\`15(container) `method`
 
 ##### Summary
@@ -2547,7 +2548,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -2643,7 +2644,7 @@ The binding token.
 | T13 | The contract type #13. |
 | T14 | The contract type #14. |
 
-<a name='M-IoC-FluentBind-Bind``16-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``16-IoC-IMutableContainer-'></a>
 ### Bind\`\`16(container) `method`
 
 ##### Summary
@@ -2658,7 +2659,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -2757,7 +2758,7 @@ The binding token.
 | T14 | The contract type #14. |
 | T15 | The contract type #15. |
 
-<a name='M-IoC-FluentBind-Bind``17-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``17-IoC-IMutableContainer-'></a>
 ### Bind\`\`17(container) `method`
 
 ##### Summary
@@ -2772,7 +2773,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -2874,7 +2875,7 @@ The binding token.
 | T15 | The contract type #15. |
 | T16 | The contract type #16. |
 
-<a name='M-IoC-FluentBind-Bind``18-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``18-IoC-IMutableContainer-'></a>
 ### Bind\`\`18(container) `method`
 
 ##### Summary
@@ -2889,7 +2890,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -2994,7 +2995,7 @@ The binding token.
 | T16 | The contract type #16. |
 | T17 | The contract type #17. |
 
-<a name='M-IoC-FluentBind-Bind``19-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``19-IoC-IMutableContainer-'></a>
 ### Bind\`\`19(container) `method`
 
 ##### Summary
@@ -3009,7 +3010,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -3117,7 +3118,7 @@ The binding token.
 | T17 | The contract type #17. |
 | T18 | The contract type #18. |
 
-<a name='M-IoC-FluentBind-Bind``2-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``2-IoC-IMutableContainer-'></a>
 ### Bind\`\`2(container) `method`
 
 ##### Summary
@@ -3132,7 +3133,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -3189,7 +3190,7 @@ The binding token.
 | T | The instance type. |
 | T1 | The contract type #1. |
 
-<a name='M-IoC-FluentBind-Bind``20-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``20-IoC-IMutableContainer-'></a>
 ### Bind\`\`20(container) `method`
 
 ##### Summary
@@ -3204,7 +3205,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -3315,7 +3316,7 @@ The binding token.
 | T18 | The contract type #18. |
 | T19 | The contract type #19. |
 
-<a name='M-IoC-FluentBind-Bind``21-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``21-IoC-IMutableContainer-'></a>
 ### Bind\`\`21(container) `method`
 
 ##### Summary
@@ -3330,7 +3331,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -3444,7 +3445,7 @@ The binding token.
 | T19 | The contract type #19. |
 | T20 | The contract type #20. |
 
-<a name='M-IoC-FluentBind-Bind``22-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``22-IoC-IMutableContainer-'></a>
 ### Bind\`\`22(container) `method`
 
 ##### Summary
@@ -3459,7 +3460,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -3576,7 +3577,7 @@ The binding token.
 | T20 | The contract type #20. |
 | T21 | The contract type #21. |
 
-<a name='M-IoC-FluentBind-Bind``23-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``23-IoC-IMutableContainer-'></a>
 ### Bind\`\`23(container) `method`
 
 ##### Summary
@@ -3591,7 +3592,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -3711,7 +3712,7 @@ The binding token.
 | T21 | The contract type #21. |
 | T22 | The contract type #22. |
 
-<a name='M-IoC-FluentBind-Bind``24-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``24-IoC-IMutableContainer-'></a>
 ### Bind\`\`24(container) `method`
 
 ##### Summary
@@ -3726,7 +3727,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -3849,7 +3850,7 @@ The binding token.
 | T22 | The contract type #22. |
 | T23 | The contract type #23. |
 
-<a name='M-IoC-FluentBind-Bind``25-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``25-IoC-IMutableContainer-'></a>
 ### Bind\`\`25(container) `method`
 
 ##### Summary
@@ -3864,7 +3865,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -3990,7 +3991,7 @@ The binding token.
 | T23 | The contract type #23. |
 | T24 | The contract type #24. |
 
-<a name='M-IoC-FluentBind-Bind``26-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``26-IoC-IMutableContainer-'></a>
 ### Bind\`\`26(container) `method`
 
 ##### Summary
@@ -4005,7 +4006,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -4134,7 +4135,7 @@ The binding token.
 | T24 | The contract type #24. |
 | T25 | The contract type #25. |
 
-<a name='M-IoC-FluentBind-Bind``27-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``27-IoC-IMutableContainer-'></a>
 ### Bind\`\`27(container) `method`
 
 ##### Summary
@@ -4149,7 +4150,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -4281,7 +4282,7 @@ The binding token.
 | T25 | The contract type #25. |
 | T26 | The contract type #26. |
 
-<a name='M-IoC-FluentBind-Bind``28-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``28-IoC-IMutableContainer-'></a>
 ### Bind\`\`28(container) `method`
 
 ##### Summary
@@ -4296,7 +4297,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -4431,7 +4432,7 @@ The binding token.
 | T26 | The contract type #26. |
 | T27 | The contract type #27. |
 
-<a name='M-IoC-FluentBind-Bind``29-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``29-IoC-IMutableContainer-'></a>
 ### Bind\`\`29(container) `method`
 
 ##### Summary
@@ -4446,7 +4447,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -4584,7 +4585,7 @@ The binding token.
 | T27 | The contract type #27. |
 | T28 | The contract type #28. |
 
-<a name='M-IoC-FluentBind-Bind``3-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``3-IoC-IMutableContainer-'></a>
 ### Bind\`\`3(container) `method`
 
 ##### Summary
@@ -4599,7 +4600,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -4659,7 +4660,7 @@ The binding token.
 | T1 | The contract type #1. |
 | T2 | The contract type #2. |
 
-<a name='M-IoC-FluentBind-Bind``30-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``30-IoC-IMutableContainer-'></a>
 ### Bind\`\`30(container) `method`
 
 ##### Summary
@@ -4674,7 +4675,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -4815,7 +4816,7 @@ The binding token.
 | T28 | The contract type #28. |
 | T29 | The contract type #29. |
 
-<a name='M-IoC-FluentBind-Bind``31-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``31-IoC-IMutableContainer-'></a>
 ### Bind\`\`31(container) `method`
 
 ##### Summary
@@ -4830,7 +4831,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -4974,7 +4975,7 @@ The binding token.
 | T29 | The contract type #29. |
 | T30 | The contract type #30. |
 
-<a name='M-IoC-FluentBind-Bind``32-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``32-IoC-IMutableContainer-'></a>
 ### Bind\`\`32(container) `method`
 
 ##### Summary
@@ -4989,7 +4990,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -5136,7 +5137,7 @@ The binding token.
 | T30 | The contract type #30. |
 | T31 | The contract type #31. |
 
-<a name='M-IoC-FluentBind-Bind``33-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``33-IoC-IMutableContainer-'></a>
 ### Bind\`\`33(container) `method`
 
 ##### Summary
@@ -5151,7 +5152,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -5301,7 +5302,7 @@ The binding token.
 | T31 | The contract type #31. |
 | T32 | The contract type #32. |
 
-<a name='M-IoC-FluentBind-Bind``4-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``4-IoC-IMutableContainer-'></a>
 ### Bind\`\`4(container) `method`
 
 ##### Summary
@@ -5316,7 +5317,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -5379,7 +5380,7 @@ The binding token.
 | T2 | The contract type #2. |
 | T3 | The contract type #3. |
 
-<a name='M-IoC-FluentBind-Bind``5-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``5-IoC-IMutableContainer-'></a>
 ### Bind\`\`5(container) `method`
 
 ##### Summary
@@ -5394,7 +5395,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -5460,7 +5461,7 @@ The binding token.
 | T3 | The contract type #3. |
 | T4 | The contract type #4. |
 
-<a name='M-IoC-FluentBind-Bind``6-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``6-IoC-IMutableContainer-'></a>
 ### Bind\`\`6(container) `method`
 
 ##### Summary
@@ -5475,7 +5476,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -5544,7 +5545,7 @@ The binding token.
 | T4 | The contract type #4. |
 | T5 | The contract type #5. |
 
-<a name='M-IoC-FluentBind-Bind``7-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``7-IoC-IMutableContainer-'></a>
 ### Bind\`\`7(container) `method`
 
 ##### Summary
@@ -5559,7 +5560,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -5631,7 +5632,7 @@ The binding token.
 | T5 | The contract type #5. |
 | T6 | The contract type #6. |
 
-<a name='M-IoC-FluentBind-Bind``8-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``8-IoC-IMutableContainer-'></a>
 ### Bind\`\`8(container) `method`
 
 ##### Summary
@@ -5646,7 +5647,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -5721,7 +5722,7 @@ The binding token.
 | T6 | The contract type #6. |
 | T7 | The contract type #7. |
 
-<a name='M-IoC-FluentBind-Bind``9-IoC-IContainer-'></a>
+<a name='M-IoC-FluentBind-Bind``9-IoC-IMutableContainer-'></a>
 ### Bind\`\`9(container) `method`
 
 ##### Summary
@@ -5736,7 +5737,7 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -5941,7 +5942,7 @@ IoC
 
 Represents extensions to configure a container.
 
-<a name='M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-String[]-'></a>
+<a name='M-IoC-FluentConfiguration-Apply-IoC-IMutableContainer,System-String[]-'></a>
 ### Apply(container,configurationText) `method`
 
 ##### Summary
@@ -5956,7 +5957,7 @@ The dependency token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | configurationText | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') | The text configurations. |
 
 <a name='M-IoC-FluentConfiguration-Apply-IoC-IToken,System-String[]-'></a>
@@ -5977,7 +5978,7 @@ The dependency token.
 | token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The target container token. |
 | configurationText | [System.String[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String[] 'System.String[]') | The text configurations. |
 
-<a name='M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-IO-Stream[]-'></a>
+<a name='M-IoC-FluentConfiguration-Apply-IoC-IMutableContainer,System-IO-Stream[]-'></a>
 ### Apply(container,configurationStreams) `method`
 
 ##### Summary
@@ -5992,7 +5993,7 @@ The dependency token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | configurationStreams | [System.IO.Stream[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.Stream[] 'System.IO.Stream[]') | The set of streams with text configurations. |
 
 <a name='M-IoC-FluentConfiguration-Apply-IoC-IToken,System-IO-Stream[]-'></a>
@@ -6013,7 +6014,7 @@ The dependency token.
 | token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The target container token. |
 | configurationStreams | [System.IO.Stream[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.Stream[] 'System.IO.Stream[]') | The set of streams with text configurations. |
 
-<a name='M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-IO-TextReader[]-'></a>
+<a name='M-IoC-FluentConfiguration-Apply-IoC-IMutableContainer,System-IO-TextReader[]-'></a>
 ### Apply(container,configurationReaders) `method`
 
 ##### Summary
@@ -6028,7 +6029,7 @@ The dependency token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | configurationReaders | [System.IO.TextReader[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.TextReader[] 'System.IO.TextReader[]') | The set of text readers with text configurations. |
 
 <a name='M-IoC-FluentConfiguration-Apply-IoC-IToken,System-IO-TextReader[]-'></a>
@@ -6049,7 +6050,7 @@ The dependency token.
 | token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The target container token. |
 | configurationReaders | [System.IO.TextReader[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IO.TextReader[] 'System.IO.TextReader[]') | The set of text readers with text configurations. |
 
-<a name='M-IoC-FluentConfiguration-Apply-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IConfiguration}-'></a>
+<a name='M-IoC-FluentConfiguration-Apply-IoC-IMutableContainer,System-Collections-Generic-IEnumerable{IoC-IConfiguration}-'></a>
 ### Apply(container,configurations) `method`
 
 ##### Summary
@@ -6064,7 +6065,7 @@ The dependency token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | configurations | [System.Collections.Generic.IEnumerable{IoC.IConfiguration}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IConfiguration}') | The configurations. |
 
 <a name='M-IoC-FluentConfiguration-Apply-IoC-IToken,System-Collections-Generic-IEnumerable{IoC-IConfiguration}-'></a>
@@ -6085,7 +6086,7 @@ The dependency token.
 | token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The target container token. |
 | configurations | [System.Collections.Generic.IEnumerable{IoC.IConfiguration}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IConfiguration}') | The configurations. |
 
-<a name='M-IoC-FluentConfiguration-Apply-IoC-IContainer,IoC-IConfiguration[]-'></a>
+<a name='M-IoC-FluentConfiguration-Apply-IoC-IMutableContainer,IoC-IConfiguration[]-'></a>
 ### Apply(container,configurations) `method`
 
 ##### Summary
@@ -6100,7 +6101,7 @@ The dependency token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The configurations. |
 
 <a name='M-IoC-FluentConfiguration-Apply-IoC-IToken,IoC-IConfiguration[]-'></a>
@@ -6121,7 +6122,7 @@ The dependency token.
 | token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The target container token. |
 | configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The configurations. |
 
-<a name='M-IoC-FluentConfiguration-Apply``1-IoC-IContainer-'></a>
+<a name='M-IoC-FluentConfiguration-Apply``1-IoC-IMutableContainer-'></a>
 ### Apply\`\`1(container) `method`
 
 ##### Summary
@@ -6136,7 +6137,7 @@ The target container token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -6167,7 +6168,7 @@ The target container token.
 | ---- | ----------- |
 | T | The type of configuration. |
 
-<a name='M-IoC-FluentConfiguration-AsTokenOf-System-IDisposable,IoC-IContainer-'></a>
+<a name='M-IoC-FluentConfiguration-AsTokenOf-System-IDisposable,IoC-IMutableContainer-'></a>
 ### AsTokenOf(disposableToken,container) `method`
 
 ##### Summary
@@ -6183,7 +6184,7 @@ Converts a disposable resource to the container's token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | disposableToken | [System.IDisposable](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.IDisposable 'System.IDisposable') | A disposable resource. |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 <a name='M-IoC-FluentConfiguration-Create-System-Func{IoC-IContainer,IoC-IToken}-'></a>
 ### Create(configurationFactory) `method`
@@ -6202,7 +6203,7 @@ The configuration instance.
 | ---- | ---- | ----------- |
 | configurationFactory | [System.Func{IoC.IContainer,IoC.IToken}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Func 'System.Func{IoC.IContainer,IoC.IToken}') | The configuration factory. |
 
-<a name='M-IoC-FluentConfiguration-Using-IoC-IContainer,IoC-IConfiguration[]-'></a>
+<a name='M-IoC-FluentConfiguration-Using-IoC-IMutableContainer,IoC-IConfiguration[]-'></a>
 ### Using(container,configurations) `method`
 
 ##### Summary
@@ -6217,7 +6218,7 @@ The target container.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The configurations. |
 
 <a name='M-IoC-FluentConfiguration-Using-IoC-IToken,IoC-IConfiguration[]-'></a>
@@ -6238,7 +6239,7 @@ The target container.
 | token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The target container token. |
 | configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') | The configurations. |
 
-<a name='M-IoC-FluentConfiguration-Using``1-IoC-IContainer-'></a>
+<a name='M-IoC-FluentConfiguration-Using``1-IoC-IMutableContainer-'></a>
 ### Using\`\`1(container) `method`
 
 ##### Summary
@@ -6253,7 +6254,7 @@ The target container.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 ##### Generic Types
 
@@ -6344,7 +6345,7 @@ The disposable instance holder.
 | ---- | ----------- |
 | TInstance | The instance type. |
 
-<a name='M-IoC-FluentContainer-BuildUp``1-IoC-IContainer,System-Object[]-'></a>
+<a name='M-IoC-FluentContainer-BuildUp``1-IoC-IMutableContainer,System-Object[]-'></a>
 ### BuildUp\`\`1(container,args) `method`
 
 ##### Summary
@@ -6360,7 +6361,7 @@ The disposable instance holder.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
 
 ##### Generic Types
@@ -6847,7 +6848,7 @@ IoC.Core
 
 Represents extensions to register a dependency in the container.
 
-<a name='M-IoC-Core-FluentRegister-Register-IoC-IContainer,System-Collections-Generic-IEnumerable{System-Type},IoC-IDependency,IoC-ILifetime,System-Object[]-'></a>
+<a name='M-IoC-Core-FluentRegister-Register-IoC-IMutableContainer,System-Collections-Generic-IEnumerable{System-Type},IoC-IDependency,IoC-ILifetime,System-Object[]-'></a>
 ### Register(container,types,dependency,lifetime,tags) `method`
 
 ##### Summary
@@ -6862,13 +6863,13 @@ The registration token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | types | [System.Collections.Generic.IEnumerable{System.Type}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{System.Type}') | The set of types. |
 | dependency | [IoC.IDependency](#T-IoC-IDependency 'IoC.IDependency') | The dependency. |
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 | tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
 
-<a name='M-IoC-Core-FluentRegister-Register``1-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+<a name='M-IoC-Core-FluentRegister-Register``1-IoC-IMutableContainer,IoC-ILifetime,System-Object[]-'></a>
 ### Register\`\`1(container,lifetime,tags) `method`
 
 ##### Summary
@@ -6883,7 +6884,7 @@ The registration token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 | tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
 
@@ -6893,7 +6894,7 @@ The registration token.
 | ---- | ----------- |
 | T | The autowiring type. |
 
-<a name='M-IoC-Core-FluentRegister-Register``1-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+<a name='M-IoC-Core-FluentRegister-Register``1-IoC-IMutableContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
 ### Register\`\`1(container,factory,lifetime,tags,statements) `method`
 
 ##### Summary
@@ -6908,7 +6909,7 @@ The registration token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 | tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
@@ -6920,7 +6921,7 @@ The registration token.
 | ---- | ----------- |
 | T | The base type. |
 
-<a name='M-IoC-Core-FluentRegister-Register``2-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+<a name='M-IoC-Core-FluentRegister-Register``2-IoC-IMutableContainer,IoC-ILifetime,System-Object[]-'></a>
 ### Register\`\`2(container,lifetime,tags) `method`
 
 ##### Summary
@@ -6935,7 +6936,7 @@ The registration token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 | tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
 
@@ -6946,7 +6947,7 @@ The registration token.
 | T | The autowiring type. |
 | T1 | The contract type #1. |
 
-<a name='M-IoC-Core-FluentRegister-Register``2-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+<a name='M-IoC-Core-FluentRegister-Register``2-IoC-IMutableContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
 ### Register\`\`2(container,factory,lifetime,tags,statements) `method`
 
 ##### Summary
@@ -6961,7 +6962,7 @@ The dependency token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 | tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
@@ -6974,7 +6975,7 @@ The dependency token.
 | T | The base type. |
 | T1 | The contract type #1. |
 
-<a name='M-IoC-Core-FluentRegister-Register``3-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+<a name='M-IoC-Core-FluentRegister-Register``3-IoC-IMutableContainer,IoC-ILifetime,System-Object[]-'></a>
 ### Register\`\`3(container,lifetime,tags) `method`
 
 ##### Summary
@@ -6989,7 +6990,7 @@ The registration token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 | tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
 
@@ -7001,7 +7002,7 @@ The registration token.
 | T1 | The contract type #1. |
 | T2 | The contract type #2. |
 
-<a name='M-IoC-Core-FluentRegister-Register``3-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+<a name='M-IoC-Core-FluentRegister-Register``3-IoC-IMutableContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
 ### Register\`\`3(container,factory,lifetime,tags,statements) `method`
 
 ##### Summary
@@ -7016,7 +7017,7 @@ The dependency token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 | tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
@@ -7030,7 +7031,7 @@ The dependency token.
 | T1 | The contract type #1. |
 | T2 | The contract type #2. |
 
-<a name='M-IoC-Core-FluentRegister-Register``4-IoC-IContainer,IoC-ILifetime,System-Object[]-'></a>
+<a name='M-IoC-Core-FluentRegister-Register``4-IoC-IMutableContainer,IoC-ILifetime,System-Object[]-'></a>
 ### Register\`\`4(container,lifetime,tags) `method`
 
 ##### Summary
@@ -7045,7 +7046,7 @@ The registration token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 | tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
 
@@ -7058,7 +7059,7 @@ The registration token.
 | T2 | The contract type #2. |
 | T3 | The contract type #3. |
 
-<a name='M-IoC-Core-FluentRegister-Register``4-IoC-IContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
+<a name='M-IoC-Core-FluentRegister-Register``4-IoC-IMutableContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]-'></a>
 ### Register\`\`4(container,factory,lifetime,tags,statements) `method`
 
 ##### Summary
@@ -7073,7 +7074,7 @@ The dependency token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 | factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 | tags | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The tags. |
@@ -7255,7 +7256,7 @@ The race source.
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container to trace. |
 
-<a name='M-IoC-FluentTrace-Trace-IoC-IContainer,System-Action{System-String}-'></a>
+<a name='M-IoC-FluentTrace-Trace-IoC-IMutableContainer,System-Action{System-String}-'></a>
 ### Trace(container,onTraceMessage) `method`
 
 ##### Summary
@@ -7270,7 +7271,7 @@ The trace token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container to trace. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container to trace. |
 | onTraceMessage | [System.Action{System.String}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{System.String}') | The trace handler. |
 
 <a name='M-IoC-FluentTrace-Trace-IoC-IToken,System-Action{System-String}-'></a>
@@ -7291,7 +7292,7 @@ The trace token.
 | token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The token of target container to trace. |
 | onTraceMessage | [System.Action{System.String}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{System.String}') | The trace handler. |
 
-<a name='M-IoC-FluentTrace-Trace-IoC-IContainer-'></a>
+<a name='M-IoC-FluentTrace-Trace-IoC-IMutableContainer-'></a>
 ### Trace(container) `method`
 
 ##### Summary
@@ -7306,7 +7307,7 @@ The trace token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container to trace. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container to trace. |
 
 <a name='M-IoC-FluentTrace-Trace-IoC-IToken-'></a>
 ### Trace(token) `method`
@@ -7342,7 +7343,7 @@ Allows to resolve Functions.
 <a name='F-IoC-Features-FuncFeature-Light'></a>
 ### Light `constants`
 
-<a name='M-IoC-Features-FuncFeature-Apply-IoC-IContainer-'></a>
+<a name='M-IoC-Features-FuncFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
 
 ##### Summary
@@ -8054,7 +8055,7 @@ IoC
 
 The container's configuration.
 
-<a name='M-IoC-IConfiguration-Apply-IoC-IContainer-'></a>
+<a name='M-IoC-IConfiguration-Apply-IoC-IMutableContainer-'></a>
 ### Apply(container) `method`
 
 ##### Summary
@@ -8069,7 +8070,7 @@ The enumeration of dependency tokens.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
 
 <a name='T-IoC-IContainer'></a>
 ## IContainer `type`
@@ -8094,7 +8095,7 @@ The parent container or null if it has no a parent.
 
 ##### Summary
 
-Tries getting the dependency with lifetime.
+Get the dependency with lifetime.
 
 ##### Returns
 
@@ -8113,7 +8114,7 @@ True if successful.
 
 ##### Summary
 
-Tries getting the resolver.
+Get the resolver.
 
 ##### Returns
 
@@ -8134,26 +8135,6 @@ True if successful.
 | Name | Description |
 | ---- | ----------- |
 | T | The type of instance producing by the resolver. |
-
-<a name='M-IoC-IContainer-TryRegisterDependency-System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime,IoC-IToken@-'></a>
-### TryRegisterDependency(keys,dependency,lifetime,dependencyToken) `method`
-
-##### Summary
-
-Tries registering the dependency with lifetime.
-
-##### Returns
-
-True if successful.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| keys | [System.Collections.Generic.IEnumerable{IoC.Key}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.Key}') | The set of keys to register. |
-| dependency | [IoC.IDependency](#T-IoC-IDependency 'IoC.IDependency') | The dependency. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The lifetime. |
-| dependencyToken | [IoC.IToken@](#T-IoC-IToken@ 'IoC.IToken@') | The dependency token. |
 
 <a name='T-IoC-IDependency'></a>
 ## IDependency `type`
@@ -8360,6 +8341,37 @@ Sets the parameter expression at the position.
 | ---- | ---- | ----------- |
 | parameterPosition | [System.Int32](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Int32 'System.Int32') | The parameter position. |
 | parameterExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The parameter expression. |
+
+<a name='T-IoC-IMutableContainer'></a>
+## IMutableContainer `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+The mutable Inversion of Control container.
+
+<a name='M-IoC-IMutableContainer-TryRegisterDependency-System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime,IoC-IToken@-'></a>
+### TryRegisterDependency(keys,dependency,lifetime,dependencyToken) `method`
+
+##### Summary
+
+Register the dependency with lifetime.
+
+##### Returns
+
+True if successful.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| keys | [System.Collections.Generic.IEnumerable{IoC.Key}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.Key}') | The set of keys to register. |
+| dependency | [IoC.IDependency](#T-IoC-IDependency 'IoC.IDependency') | The dependency. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The lifetime. |
+| dependencyToken | [IoC.IToken@](#T-IoC-IToken@ 'IoC.IToken@') | The dependency token. |
 
 <a name='T-IoC-IResourceRegistry'></a>
 ## IResourceRegistry `type`
@@ -8994,7 +9006,7 @@ Allows to resolve Lazy.
 <a name='F-IoC-Features-LazyFeature-Default'></a>
 ### Default `constants`
 
-<a name='M-IoC-Features-LazyFeature-Apply-IoC-IContainer-'></a>
+<a name='M-IoC-Features-LazyFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
 
 ##### Summary
@@ -12121,7 +12133,7 @@ Allows to resolve Tasks.
 
 TaskFeature default tag
 
-<a name='M-IoC-Features-TaskFeature-Apply-IoC-IContainer-'></a>
+<a name='M-IoC-Features-TaskFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
 
 ##### Summary
@@ -12200,7 +12212,7 @@ Allows to resolve Tuples.
 <a name='F-IoC-Features-TupleFeature-Light'></a>
 ### Light `constants`
 
-<a name='M-IoC-Features-TupleFeature-Apply-IoC-IContainer-'></a>
+<a name='M-IoC-Features-TupleFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
 
 ##### Summary
@@ -12251,14 +12263,14 @@ The enumeration of well-known containers.
 
 ##### Summary
 
-Creates new child container.
+Creates new child mutable container.
 
 <a name='F-IoC-WellknownContainers-Parent'></a>
 ### Parent `constants`
 
 ##### Summary
 
-Parent container.
+Parent immutable container.
 
 <a name='T-IoC-WellknownExpressions'></a>
 ## WellknownExpressions `type`

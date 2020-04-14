@@ -86,7 +86,7 @@ namespace IoC.Features.Interception
     internal interface IInterceptorRegistry
     {
         [NotNull]
-        IToken Register([NotNull] IContainer container, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors);
+        IToken Register([NotNull] IMutableContainer container, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors);
     }
 }
 
@@ -110,7 +110,7 @@ namespace IoC.Features.Interception
         private static readonly ProxyGenerator ProxyGenerator = new ProxyGenerator();
         private readonly List<InterceptorsInfo> _interceptors = new List<InterceptorsInfo>();
 
-        public IToken Register([NotNull] IContainer container, Predicate<Key> filter, params IInterceptor[] interceptors)
+        public IToken Register(IMutableContainer container, Predicate<Key> filter, params IInterceptor[] interceptors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (filter == null) throw new ArgumentNullException(nameof(filter));
@@ -232,7 +232,7 @@ namespace IoC.Features
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Intercept([NotNull] this IContainer container, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        public static IToken Intercept([NotNull] this IMutableContainer container, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (filter == null) throw new ArgumentNullException(nameof(filter));
@@ -265,7 +265,7 @@ namespace IoC.Features
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Intercept<T>([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        public static IToken Intercept<T>([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
@@ -308,7 +308,7 @@ namespace IoC.Features
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Intercept([NotNull] this IContainer container, Key key, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        public static IToken Intercept([NotNull] this IMutableContainer container, Key key, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
@@ -389,7 +389,7 @@ namespace IoC.Features
     public sealed class InterceptionFeature : IConfiguration
     {
         /// <inheritdoc />
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Bind<InterceptorBuilder, IInterceptorRegistry, IBuilder>().As(Lifetime.Singleton).To();

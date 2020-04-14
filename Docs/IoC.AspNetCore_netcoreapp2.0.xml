@@ -18,7 +18,7 @@
             </summary>
             <param name="list"></param>
         </member>
-        <member name="M:IoC.Features.AspNetCoreFeature.Apply(IoC.IContainer)">
+        <member name="M:IoC.Features.AspNetCoreFeature.Apply(IoC.IMutableContainer)">
             <inheritdoc />
         </member>
         <member name="T:IoC.Features.AspNetCore.ServiceProviderFactory">

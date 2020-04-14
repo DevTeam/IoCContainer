@@ -65,7 +65,7 @@ _You can do this anywhere in your code, but collecting this information in one p
 ```csharp
 public class Glue : IConfiguration
 {
-  public IEnumerable<IToken> Apply(IContainer container)
+  public IEnumerable<IToken> Apply(IMutableContainer container)
   {
     yield return container
       // Represents a cardboard box with any content

@@ -18,7 +18,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1>([NotNull] this IMutableContainer container)
             where T: T1
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -67,7 +67,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2>([NotNull] this IMutableContainer container)
             where T: T1, T2
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -119,7 +119,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -174,7 +174,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -232,7 +232,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -293,7 +293,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -357,7 +357,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -424,7 +424,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -494,7 +494,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -567,7 +567,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -643,7 +643,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -722,7 +722,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -804,7 +804,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -889,7 +889,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -977,7 +977,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -1068,7 +1068,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -1162,7 +1162,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -1259,7 +1259,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -1359,7 +1359,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -1462,7 +1462,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -1568,7 +1568,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -1677,7 +1677,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -1789,7 +1789,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -1904,7 +1904,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2022,7 +2022,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2143,7 +2143,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2267,7 +2267,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2394,7 +2394,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2524,7 +2524,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2657,7 +2657,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2793,7 +2793,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -2932,7 +2932,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32
         {
             if (container == null) throw new ArgumentNullException(nameof(container));

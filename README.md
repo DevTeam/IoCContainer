@@ -69,7 +69,7 @@ _You can do this anywhere in your code, but collecting this information in one p
 ```csharp
 public class Glue : IConfiguration
 {
-  public IEnumerable<IToken> Apply(IContainer container)
+  public IEnumerable<IToken> Apply(IMutableContainer container)
   {
     yield return container
       // Represents a cardboard box with any content
@@ -552,7 +552,7 @@ public void Run()
 
 ic class Glue : IConfiguration
 {
-public IEnumerable<IToken> Apply(IContainer container)
+public IEnumerable<IToken> Apply(IMutableContainer container)
 {
     // Bind using full autowiring
     yield return container
@@ -1288,7 +1288,7 @@ public void Run()
 
 public class OptionalFeature: IConfiguration
 {
-    public IEnumerable<IToken> Apply(IContainer container)
+    public IEnumerable<IToken> Apply(IMutableContainer container)
     {
         yield return container
             // Bind factory for Optional for any tags
@@ -1619,7 +1619,7 @@ public void Run()
         .Create()
         .Bind<IService>().To<Service>()
         // Configure the root container to use a custom container during creating a child container
-        .Bind<IContainer>().Tag(WellknownContainers.NewChild).To<MyContainer>()
+        .Bind<IMutableContainer>().Tag(WellknownContainers.NewChild).To<MyContainer>()
         .Container;
 
     // Create and configure the custom child container
@@ -1636,7 +1636,7 @@ public void Run()
 }
 
 // Sample of transparent container implementation
-public class MyContainer: IContainer
+public class MyContainer: IMutableContainer
 {
     // some implementation here
 }
@@ -1715,7 +1715,7 @@ public async void Run()
 
 internal class CustomTasksFeature: IConfiguration
 {
-    public IEnumerable<IToken> Apply(IContainer container)
+    public IEnumerable<IToken> Apply(IMutableContainer container)
     {
         yield return container
             // Bind cancellation token source
@@ -2408,7 +2408,7 @@ public enum GeneratorType
 // Represents IoC configuration
 public class Generators: IConfiguration
 {
-    public IEnumerable<IToken> Apply(IContainer container)
+    public IEnumerable<IToken> Apply(IMutableContainer container)
     {
         var value = 0;
         // Define function to get sequential integer value
@@ -2454,7 +2454,7 @@ public void Run()
 
 public class InstantMessengerConfig: IConfiguration
 {
-    public IEnumerable<IToken> Apply(IContainer container)
+    public IEnumerable<IToken> Apply(IMutableContainer container)
     {
         // Let's suppose that the initial message ID is 33
         var id = 33;

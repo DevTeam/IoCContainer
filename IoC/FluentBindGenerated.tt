@@ -31,7 +31,7 @@ var args = String.Join(", ", range.Select(i => $"TypeDescriptor<T{i}>.Type"));
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<T> Bind<T, <#=types#>>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T, <#=types#>>([NotNull] this IMutableContainer container)
             where T: <#=types#>
         {
             if (container == null) throw new ArgumentNullException(nameof(container));

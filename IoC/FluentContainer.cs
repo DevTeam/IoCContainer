@@ -18,11 +18,11 @@
         /// <returns>The child container.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IContainer Create([NotNull] this IContainer parentContainer, [NotNull] string name = "")
+        public static IMutableContainer Create([NotNull] this IContainer parentContainer, [NotNull] string name = "")
         {
             if (parentContainer == null) throw new ArgumentNullException(nameof(parentContainer));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return parentContainer.GetResolver<IContainer>(WellknownContainers.NewChild.AsTag())(parentContainer, name);
+            return parentContainer.GetResolver<IMutableContainer>(WellknownContainers.NewChild.AsTag())(parentContainer, name);
         }
 
         /// <summary>
@@ -33,11 +33,11 @@
         /// <returns>The child container.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IContainer Create([NotNull] this IToken token, [NotNull] string name = "")
+        public static IMutableContainer Create([NotNull] this IToken token, [NotNull] string name = "")
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return token.Container.GetResolver<IContainer>(WellknownContainers.NewChild.AsTag())(token.Container, name);
+            return token.Container.GetResolver<IMutableContainer>(WellknownContainers.NewChild.AsTag())(token.Container, name);
         }
 
         /// <summary>
@@ -76,7 +76,7 @@
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>
         [NotNull]
-        public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IContainer container, [NotNull] [ItemCanBeNull] params object[] args)
+        public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IMutableContainer container, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class
         {
             if (container == null) throw new ArgumentNullException(nameof(container));

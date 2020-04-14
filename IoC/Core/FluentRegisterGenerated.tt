@@ -33,7 +33,7 @@ var args = String.Join(", ", range.Select(i => $"TypeDescriptor<T{i}>.Type"));
         /// <returns>The registration token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Register<T, <#=types#>>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
+        public static IToken Register<T, <#=types#>>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: <#=types#>
             => container.Register(new[] { <#=args#> }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
@@ -52,7 +52,7 @@ var args = String.Join(", ", range.Select(i => $"TypeDescriptor<T{i}>.Type"));
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Register<T, <#=types#>>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
+        public static IToken Register<T, <#=types#>>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: <#=types#>
             // ReSharper disable once CoVariantArrayConversion
             => container.Register(new[] { TypeDescriptor<T>.Type, <#=args#> }, new AutowiringDependency(factory, null, statements), lifetime, tags);

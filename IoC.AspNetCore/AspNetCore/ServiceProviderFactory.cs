@@ -8,7 +8,7 @@
     /// </summary>
     public sealed class ServiceProviderFactory : IServiceProviderFactory<IContainer>, IDisposable
     {
-        private readonly IContainer _container;
+        private readonly IMutableContainer _container;
 
         /// <summary>
         /// Creates a new instance of <c>IServiceProviderFactory</c>.

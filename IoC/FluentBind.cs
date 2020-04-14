@@ -22,7 +22,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static IBinding<object> Bind([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Type[] types)
+        public static IBinding<object> Bind([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params Type[] types)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (types == null) throw new ArgumentNullException(nameof(types));
@@ -54,7 +54,7 @@
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IBinding<T> Bind<T>([NotNull] this IContainer container)
+        public static IBinding<T> Bind<T>([NotNull] this IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             return new Binding<T>(container, TypeDescriptor<T>.Type);

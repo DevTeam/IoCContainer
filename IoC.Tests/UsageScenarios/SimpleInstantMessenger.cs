@@ -42,7 +42,7 @@ namespace IoC.Tests.UsageScenarios
 
         public class InstantMessengerConfig: IConfiguration
         {
-            public IEnumerable<IToken> Apply(IContainer container)
+            public IEnumerable<IToken> Apply(IMutableContainer container)
             {
                 // Let's suppose that the initial message ID is 33
                 var id = 33;

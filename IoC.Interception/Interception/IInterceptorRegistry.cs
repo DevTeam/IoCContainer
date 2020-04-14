@@ -6,6 +6,6 @@
     internal interface IInterceptorRegistry
     {
         [NotNull]
-        IToken Register([NotNull] IContainer container, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors);
+        IToken Register([NotNull] IMutableContainer container, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors);
     }
 }

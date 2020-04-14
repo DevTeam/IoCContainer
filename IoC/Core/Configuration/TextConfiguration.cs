@@ -19,7 +19,7 @@
             _statements = GetStatements(textReader ?? throw new ArgumentNullException(nameof(textReader)));
         }
 
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (_bindingsConverter.TryConvert(BindingContext.Empty, _statements, out var context))

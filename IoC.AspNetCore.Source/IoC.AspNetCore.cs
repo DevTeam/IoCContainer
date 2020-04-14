@@ -72,7 +72,7 @@ namespace IoC.Features.AspNetCore
     /// </summary>
     public sealed class ServiceProviderFactory : IServiceProviderFactory<IContainer>, IDisposable
     {
-        private readonly IContainer _container;
+        private readonly IMutableContainer _container;
 
         /// <summary>
         /// Creates a new instance of <c>IServiceProviderFactory</c>.
@@ -183,7 +183,7 @@ namespace IoC.Features
         public AspNetCoreFeature([NotNull] IList<ServiceDescriptor> list) : base(list) { }
 
         /// <inheritdoc />
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var singletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.Singleton.AsTag());

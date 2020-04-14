@@ -9,7 +9,7 @@
     /// </summary>
     public class ClockDesignTimeConfiguration: IConfiguration
     {
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             // Design time View Models
             yield return container

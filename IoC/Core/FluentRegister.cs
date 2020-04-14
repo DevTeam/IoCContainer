@@ -28,7 +28,7 @@ namespace IoC.Core
         /// <returns>The registration token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [IoC.NotNull]
-        public static IToken Register<T>([NotNull] this IContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
+        public static IToken Register<T>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
             => container.Register(new[] { TypeDescriptor<T>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
 
         /// <summary>
@@ -43,7 +43,7 @@ namespace IoC.Core
         /// <returns>The registration token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [IoC.NotNull]
-        public static IToken Register<T>([NotNull] this IContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
+        public static IToken Register<T>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             => container.Register(new[] { TypeDescriptor<T>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
 
         /// <summary>
@@ -57,7 +57,7 @@ namespace IoC.Core
         /// <returns>The registration token.</returns>
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         [IoC.NotNull]
-        public static IToken Register([NotNull] this IContainer container, [NotNull][ItemNotNull] IEnumerable<Type> types, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime = null, [CanBeNull][ItemCanBeNull] params object[] tags)
+        public static IToken Register([NotNull] this IMutableContainer container, [NotNull][ItemNotNull] IEnumerable<Type> types, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime = null, [CanBeNull][ItemCanBeNull] params object[] tags)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (types == null) throw new ArgumentNullException(nameof(types));

@@ -43,7 +43,7 @@ namespace IoC.Tests.UsageScenarios
 
         internal class CustomTasksFeature: IConfiguration
         {
-            public IEnumerable<IToken> Apply(IContainer container)
+            public IEnumerable<IToken> Apply(IMutableContainer container)
             {
                 yield return container
                     // Bind cancellation token source

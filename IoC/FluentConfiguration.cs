@@ -31,7 +31,7 @@
         /// <returns></returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken AsTokenOf([NotNull] this IDisposable disposableToken, [NotNull] IContainer container) =>
+        public static IToken AsTokenOf([NotNull] this IDisposable disposableToken, [NotNull] IMutableContainer container) =>
             new Token(container ?? throw new ArgumentNullException(nameof(container)), disposableToken ?? throw new ArgumentNullException(nameof(disposableToken)));
 
         /// <summary>
@@ -42,7 +42,7 @@
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
+        public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationText == null) throw new ArgumentNullException(nameof(configurationText));
@@ -69,7 +69,7 @@
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
+        public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationStreams == null) throw new ArgumentNullException(nameof(configurationStreams));
@@ -96,7 +96,7 @@
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
+        public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationReaders == null) throw new ArgumentNullException(nameof(configurationReaders));
@@ -123,7 +123,7 @@
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations)
+        public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
@@ -149,7 +149,7 @@
         /// <returns>The dependency token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Apply([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
+        public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
@@ -176,7 +176,7 @@
         /// <returns>The target container token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Apply<T>([NotNull] this IContainer container)
+        public static IToken Apply<T>([NotNull] this IMutableContainer container)
             where T : IConfiguration, new() =>
             (container ?? throw new ArgumentNullException(nameof(container))).Apply(new T());
 
@@ -200,7 +200,7 @@
         /// <returns>The target container.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IContainer Using([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
+        public static IMutableContainer Using([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurations == null) throw new ArgumentNullException(nameof(configurations));
@@ -217,7 +217,7 @@
         /// <returns>The target container.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
+        public static IMutableContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
             return token.Container.Using(configurations);
@@ -231,7 +231,7 @@
         /// <returns>The target container.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IContainer Using<T>([NotNull] this IContainer container)
+        public static IMutableContainer Using<T>([NotNull] this IMutableContainer container)
             where T : IConfiguration, new()
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -246,7 +246,7 @@
         /// <returns>The target container.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IContainer Using<T>([NotNull] this IToken token)
+        public static IMutableContainer Using<T>([NotNull] this IToken token)
             where T : IConfiguration, new()
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
@@ -255,7 +255,7 @@
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        private static IToken ApplyConfigurationFromData<T>([NotNull] this IContainer container, [NotNull] [ItemNotNull] params T[] configurationData)
+        private static IToken ApplyConfigurationFromData<T>([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params T[] configurationData)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (configurationData == null) throw new ArgumentNullException(nameof(configurationData));

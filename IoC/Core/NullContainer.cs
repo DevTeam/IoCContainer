@@ -5,7 +5,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    internal sealed class NullContainer : IContainer
+    internal sealed class NullContainer : IMutableContainer
     {
         public static readonly IContainer Shared = new NullContainer();
         private static readonly NotSupportedException NotSupportedException = new NotSupportedException();

@@ -54,7 +54,7 @@ namespace ShroedingersCat
 
     public class Glue : IConfiguration
     {
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             yield return container
                 // Represents a cardboard box with any content

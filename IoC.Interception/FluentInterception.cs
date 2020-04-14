@@ -24,7 +24,7 @@ namespace IoC.Features
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Intercept([NotNull] this IContainer container, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        public static IToken Intercept([NotNull] this IMutableContainer container, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (filter == null) throw new ArgumentNullException(nameof(filter));
@@ -57,7 +57,7 @@ namespace IoC.Features
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Intercept<T>([NotNull] this IContainer container, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        public static IToken Intercept<T>([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));
@@ -100,7 +100,7 @@ namespace IoC.Features
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IToken Intercept([NotNull] this IContainer container, Key key, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
+        public static IToken Intercept([NotNull] this IMutableContainer container, Key key, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (interceptors == null) throw new ArgumentNullException(nameof(interceptors));

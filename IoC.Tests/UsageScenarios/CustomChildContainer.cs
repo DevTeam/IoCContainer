@@ -23,7 +23,7 @@ namespace IoC.Tests.UsageScenarios
                 .Create()
                 .Bind<IService>().To<Service>()
                 // Configure the root container to use a custom container during creating a child container
-                .Bind<IContainer>().Tag(WellknownContainers.NewChild).To<MyContainer>()
+                .Bind<IMutableContainer>().Tag(WellknownContainers.NewChild).To<MyContainer>()
                 .Container;
 
             // Create and configure the custom child container
@@ -44,26 +44,28 @@ namespace IoC.Tests.UsageScenarios
         }
 
         // Sample of transparent container implementation
-        public class MyContainer: IContainer
+        public class MyContainer: IMutableContainer
         {
             // some implementation here
-        // }
+            // }
             // Stores the parent container to delegate all logic
-            public MyContainer(IContainer currentContainer) => Parent = currentContainer;
+            private IMutableContainer _parent;
 
-            public IContainer Parent { get; }
+            public MyContainer(IMutableContainer parent) => _parent = parent;
+
+            public IContainer Parent => _parent;
 
             // Registers dependencies
             public bool TryRegisterDependency(IEnumerable<Key> keys, IoC.IDependency dependency, ILifetime lifetime, out IToken dependencyToken) 
-                => Parent.TryRegisterDependency(keys, dependency, lifetime, out dependencyToken);
+                => _parent.TryRegisterDependency(keys, dependency, lifetime, out dependencyToken);
 
             // Gets registered dependencies and lifetimes
             public bool TryGetDependency(Key key, out IoC.IDependency dependency, out ILifetime lifetime)
-                => Parent.TryGetDependency(key, out dependency, out lifetime);
+                => _parent.TryGetDependency(key, out dependency, out lifetime);
 
             // Tries to get a resolver
             public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
-                => Parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer);
+                => _parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer);
 
             // Stores a token
             public void RegisterResource(IDisposable resource) { }
@@ -77,10 +79,10 @@ namespace IoC.Tests.UsageScenarios
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             // Creates the registered keys' strong-typed enumerator
-            public IEnumerator<IEnumerable<Key>> GetEnumerator() => Parent.GetEnumerator();
+            public IEnumerator<IEnumerable<Key>> GetEnumerator() => _parent.GetEnumerator();
 
             // Subscribes an observer to receive container events
-            public IDisposable Subscribe(IObserver<ContainerEvent> observer) => Parent.Subscribe(observer);
+            public IDisposable Subscribe(IObserver<ContainerEvent> observer) => _parent.Subscribe(observer);
         // {
         }
         // }

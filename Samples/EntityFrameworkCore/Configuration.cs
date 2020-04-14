@@ -10,7 +10,7 @@ namespace EntityFrameworkCore
 
     internal class Configuration: IConfiguration
     {
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             // Create ASP .NET core feature
             var aspNetCoreFeature = new AspNetCoreFeature();

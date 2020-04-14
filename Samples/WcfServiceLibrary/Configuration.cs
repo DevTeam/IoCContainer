@@ -6,7 +6,7 @@ namespace WcfServiceLibrary
 
     internal class Configuration: IConfiguration
     {
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             yield return container.Bind<Service, IService>().To<Service>();
         }

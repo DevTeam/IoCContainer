@@ -12,8 +12,6 @@
             Instance = instance;
         }
 
-        public IContainer Container => _token.Container;
-
         public TInstance Instance { get; }
 
         public void Dispose()
