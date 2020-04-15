@@ -1,28 +1,28 @@
 ﻿namespace IoC
 {
     /// <summary>
-    /// The enumeration of well-known lifetimes.
+    /// A set of well-known lifetimes.
     /// </summary>
     [PublicAPI]
     public enum Lifetime
     {
         /// <summary>
-        /// A new instance is creating each time (it's default).
+        /// For a new instance each time (default).
         /// </summary>
         Transient = 1,
 
         /// <summary>
-        /// Single instance.
+        /// For a singleton instance.
         /// </summary>
         Singleton = 2,
 
         /// <summary>
-        /// Singleton instance per container.
+        /// For a singleton instance per container.
         /// </summary>
         ContainerSingleton = 3,
 
         /// <summary>
-        /// Singleton instance per scope.
+        /// For a singleton instance per scope.
         /// </summary>
         ScopeSingleton = 4
     }

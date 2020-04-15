@@ -9,13 +9,13 @@
     public static class AutowiringStrategies
     {
         /// <summary>
-        /// Creates aspect oriented autowiring strategy.
+        /// Create an aspect oriented autowiring strategy.
         /// </summary>
         /// <returns>The instance of aspect oriented autowiring strategy.</returns>
         public static IAutowiringStrategy AspectOriented() => AspectOrientedMetadata.Empty;
 
         /// <summary>
-        /// Specifies type selector for aspect oriented autowiring strategy.
+        /// Specify a type selector for an aspect oriented autowiring strategy.
         /// </summary>
         /// <typeparam name="TTypeAttribute">The type metadata attribute.</typeparam>
         /// <param name="strategy">The base aspect oriented autowiring strategy.</param>
@@ -28,7 +28,7 @@
                 typeSelector ?? throw new ArgumentNullException(nameof(typeSelector)));
 
         /// <summary>
-        /// Specifies order selector for aspect oriented autowiring strategy.
+        /// Specify an order selector for an aspect oriented autowiring strategy.
         /// </summary>
         /// <typeparam name="TOrderAttribute">The order metadata attribute.</typeparam>
         /// <param name="strategy">The base aspect oriented autowiring strategy.</param>
@@ -41,7 +41,7 @@
                 orderSelector ?? throw new ArgumentNullException(nameof(orderSelector)));
 
         /// <summary>
-        /// Specifies tag selector for aspect oriented autowiring strategy.
+        /// Specify a tag selector for an aspect oriented autowiring strategy.
         /// </summary>
         /// <typeparam name="TTagAttribute">The tag metadata attribute.</typeparam>
         /// <param name="strategy">The base aspect oriented autowiring strategy.</param>

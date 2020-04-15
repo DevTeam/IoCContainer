@@ -1,4 +1,5 @@
-﻿namespace IoC.Features.AspNetCore
+﻿// ReSharper disable UnusedType.Global
+namespace IoC.Features.AspNetCore
 {
     using System;
     using Microsoft.Extensions.DependencyInjection;

@@ -1,6 +1,7 @@
 ﻿namespace IoC
 {
     using System;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Represents extensions dealing with scopes.
@@ -8,15 +9,13 @@
     public static class FluentScope
     {
         /// <summary>
-        /// Creates new resolving scope. Can be used with <c>ScopeSingleton</c>.
+        /// Creates a new resolving scope. Can be used with <c>ScopeSingleton</c>.
         /// </summary>
         /// <param name="container">A container to resolve a scope.</param>
         /// <returns>Tne new scope instance.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IScope CreateScope([NotNull] this IContainer container)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return container.Resolve<IScope>();
-        }
+        public static IScope CreateScope([NotNull] this IContainer container) =>
+            (container ?? throw new ArgumentNullException(nameof(container))).Resolve<IScope>();
     }
 }

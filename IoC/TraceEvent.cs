@@ -1,13 +1,13 @@
 ﻿namespace IoC
 {
     /// <summary>
-    /// Represents a trace event.
+    /// Represents a container trace event.
     /// </summary>
     [PublicAPI]
     public struct TraceEvent
     {
         /// <summary>
-        /// The origin container event.
+        /// The original container event.
         /// </summary>
         public readonly ContainerEvent ContainerEvent;
 
@@ -17,9 +17,9 @@
         [NotNull] public readonly string Message;
 
         /// <summary>
-        /// Creates new instance of trace event.
+        /// Creates new instance of a trace event.
         /// </summary>
-        /// <param name="containerEvent">The original instance of container event.</param>
+        /// <param name="containerEvent">The original container event.</param>
         /// <param name="message">The trace message.</param>
         internal TraceEvent(ContainerEvent containerEvent, [NotNull] string message)
         {

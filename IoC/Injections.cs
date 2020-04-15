@@ -6,7 +6,7 @@ namespace IoC
     using System.Reflection;
 
     /// <summary>
-    /// Injection extensions.
+    /// A set of injection markers.
     /// </summary>
     [PublicAPI]
     public static class Injections
@@ -23,7 +23,7 @@ namespace IoC
         [NotNull] internal static readonly MethodInfo TryInjectWithTagMethodInfo = ((MethodCallExpression)((Expression<Func<object>>) (() => Inject(default(IContainer), typeof(object), (object)null))).Body).Method;
 
         /// <summary>
-        /// Injects a dependency. Just an injection marker.
+        /// Injects a dependency. Just the injection marker.
         /// </summary>
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
@@ -32,16 +32,16 @@ namespace IoC
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Tries to inject a dependency. Just an injection marker.
+        /// Try to inject a dependency. Just the injection marker.
         /// </summary>
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
-        /// <returns>The injected instance or default(T).</returns>
+        /// <returns>The injected instance or <c>default(T)</c>.</returns>
         [CanBeNull] public static T TryInject<T>([NotNull] this IContainer container) =>
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Injects a dependency. Just an injection marker.
+        /// Injects a dependency. Just the injection marker.
         /// </summary>
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
@@ -51,18 +51,18 @@ namespace IoC
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Tries to inject a dependency. Just an injection marker.
+        /// Try to inject a dependency. Just the injection marker.
         /// </summary>
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
         /// <param name="tag">The tag of dependency.</param>
-        /// <returns>The injected instance or default(T).</returns>
+        /// <returns>The injected instance or <c>default(T)</c>.</returns>
         [CanBeNull] public static T TryInject<T>([NotNull] this IContainer container, [CanBeNull] object tag) =>
             throw new NotImplementedException(JustAMarkerError);
 
 
         /// <summary>
-        /// Injects a dependency. Just an injection marker.
+        /// Injects a dependency. Just the injection marker.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="container">The resolving container.</param>
@@ -72,7 +72,7 @@ namespace IoC
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Injects a dependency. Just an injection marker.
+        /// Injects a dependency. Just the injection marker.
         /// </summary>
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
@@ -81,16 +81,16 @@ namespace IoC
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Tries to inject a dependency. Just an injection marker.
+        /// Try to inject a dependency. Just the injection marker.
         /// </summary>
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
-        /// <returns>The injected instance or default(Type).</returns>
+        /// <returns>The injected instance or <c>default(T)</c>.</returns>
         [CanBeNull] public static object TryInject([NotNull] this IContainer container, [NotNull] Type type) =>
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Injects a dependency. Just an injection marker.
+        /// Injects a dependency. Just the injection marker.
         /// </summary>
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
@@ -100,12 +100,12 @@ namespace IoC
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Tries to inject a dependency. Just an injection marker.
+        /// Try to inject a dependency. Just the injection marker.
         /// </summary>
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
         /// <param name="tag">The tag of dependency.</param>
-        /// <returns>The injected instance or default(Type).</returns>
+        /// <returns>The injected instance or <c>default(T)</c>.</returns>
         [CanBeNull] public static object TryInject([NotNull] this IContainer container, [NotNull] Type type, [CanBeNull] object tag) =>
             throw new NotImplementedException(JustAMarkerError);
     }

@@ -1,4 +1,5 @@
-﻿namespace IoC.Core
+﻿// ReSharper disable RedundantNameQualifier
+namespace IoC.Core
 {
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;

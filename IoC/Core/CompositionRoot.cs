@@ -2,11 +2,11 @@
 {
     using System;
 
-    internal sealed class Holder<TInstance> : IHolder<TInstance>
+    internal sealed class CompositionRoot<TInstance> : ICompositionRoot<TInstance>
     {
         [NotNull] private readonly IToken _token;
 
-        public Holder([NotNull] IToken token, [NotNull] TInstance instance)
+        public CompositionRoot([NotNull] IToken token, [NotNull] TInstance instance)
         {
             _token = token ?? throw new ArgumentNullException(nameof(token));
             Instance = instance;

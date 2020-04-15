@@ -5,7 +5,9 @@
     </assembly>
     <members>
         <member name="T:IoC.Features.AspNetCoreFeature">
-            <inheritdoc cref="T:IoC.IConfiguration" />
+            <summary>
+            Allows to use ASP .NET and other related frameworks.
+            </summary>
         </member>
         <member name="M:IoC.Features.AspNetCoreFeature.#ctor">
             <summary>
@@ -14,7 +16,7 @@
         </member>
         <member name="M:IoC.Features.AspNetCoreFeature.#ctor(System.Collections.Generic.IList{Microsoft.Extensions.DependencyInjection.ServiceDescriptor})">
             <summary>
-            Creates an instance of feature based on a list of ServiceDescriptor.
+            Creates an instance of feature based on a list of <c>ServiceDescriptor</c>.
             </summary>
             <param name="list"></param>
         </member>

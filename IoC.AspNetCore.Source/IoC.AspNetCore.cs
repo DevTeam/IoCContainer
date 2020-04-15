@@ -62,6 +62,7 @@ namespace IoC.Features.AspNetCore
 #endregion
 #region ServiceProviderFactory
 
+// ReSharper disable UnusedType.Global
 namespace IoC.Features.AspNetCore
 {
     using System;
@@ -167,7 +168,9 @@ namespace IoC.Features
     using AspNetCore;
     using Microsoft.Extensions.DependencyInjection;
 
-    /// <inheritdoc cref="IConfiguration" />
+    /// <summary>
+    /// Allows to use ASP .NET and other related frameworks.
+    /// </summary>
     [PublicAPI]
     public sealed class AspNetCoreFeature : Collection<ServiceDescriptor>, IServiceCollection, IConfiguration
     {
@@ -177,7 +180,7 @@ namespace IoC.Features
         public AspNetCoreFeature() { }
 
         /// <summary>
-        /// Creates an instance of feature based on a list of ServiceDescriptor.
+        /// Creates an instance of feature based on a list of <c>ServiceDescriptor</c>.
         /// </summary>
         /// <param name="list"></param>
         public AspNetCoreFeature([NotNull] IList<ServiceDescriptor> list) : base(list) { }

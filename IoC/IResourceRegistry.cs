@@ -3,7 +3,7 @@
     using System;
 
     /// <summary>
-    /// Represents the resource's registry.
+    /// Represents an abstraction of the resource registry.
     /// </summary>
     [PublicAPI]
     public interface IResourceRegistry

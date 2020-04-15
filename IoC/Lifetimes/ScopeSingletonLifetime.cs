@@ -5,7 +5,7 @@
     using Core;
 
     /// <summary>
-    /// Represents singleton per scope lifetime.
+    /// For a singleton instance per scope.
     /// </summary>
     [PublicAPI]
     public sealed class ScopeSingletonLifetime: KeyBasedLifetime<IScope>

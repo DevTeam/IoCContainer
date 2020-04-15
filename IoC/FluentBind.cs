@@ -15,7 +15,7 @@
     public static partial class FluentBind
     {
         /// <summary>
-        /// Binds the type(s).
+        /// Binds types.
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="types"></param>
@@ -31,7 +31,7 @@
         }
 
         /// <summary>
-        /// Binds the type(s).
+        /// Binds types.
         /// </summary>
         /// <param name="token">The container binding token.</param>
         /// <param name="types"></param>

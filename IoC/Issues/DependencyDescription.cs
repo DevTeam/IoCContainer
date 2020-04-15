@@ -16,7 +16,7 @@
         [CanBeNull] public readonly ILifetime Lifetime;
 
         /// <summary>
-        /// Creates new instance.
+        /// Creates a new instance.
         /// </summary>
         /// <param name="dependency">The resolved dependency.</param>
         /// <param name="lifetime">The lifetime to use</param>

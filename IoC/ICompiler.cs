@@ -4,7 +4,7 @@
     using System.Linq.Expressions;
 
     /// <summary>
-    /// Represents a expression compiler.
+    /// Represents an abstract expression compiler.
     /// </summary>
     [PublicAPI]
     public interface ICompiler

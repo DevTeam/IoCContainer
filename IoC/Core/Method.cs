@@ -55,10 +55,26 @@
             }
         }
 
-        public void SetParameterExpression(int parameterPosition, Expression parameterExpression)
+        public void SetExpression(int parameterPosition, Expression parameterExpression)
         {
             if (parameterPosition < 0 || parameterPosition >= _parametersExpressions.Length) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
+
             _parametersExpressions[parameterPosition] = parameterExpression ?? throw new ArgumentNullException(nameof(parameterExpression));
+        }
+
+        public void SetDependency(int parameterPosition, Type dependencyType, object dependencyTag = null)
+        {
+            if (dependencyType == null) throw new ArgumentNullException(nameof(dependencyType));
+            if (parameterPosition < 0 || parameterPosition >= _parametersExpressions.Length) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
+
+            var parameterExpression = Expression.Call(
+                Injections.InjectWithTagMethodInfo,
+                ExpressionBuilderExtensions.ContainerExpression,
+                Expression.Constant(dependencyType),
+                Expression.Constant(dependencyTag))
+                .Convert(dependencyType);
+
+            SetExpression(parameterPosition, parameterExpression);
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿namespace IoC.Core
+﻿// ReSharper disable RedundantUsingDirective
+namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;

@@ -5,7 +5,7 @@
     using Core;
 
     /// <summary>
-    /// Represents singleton per container lifetime.
+    /// For a singleton instance per container.
     /// </summary>
     [PublicAPI]
     public sealed class ContainerSingletonLifetime: KeyBasedLifetime<IContainer>

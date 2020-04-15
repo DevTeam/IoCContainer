@@ -4,14 +4,14 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// The container's binding.
+    /// The an abstract containers binding.
     /// </summary>
     [PublicAPI]
     // ReSharper disable once UnusedTypeParameter
     public interface IBinding
     {
         /// <summary>
-        /// The target container.
+        /// The target container to configure.
         /// </summary>
         [NotNull] IMutableContainer Container { get; }
 
@@ -21,28 +21,28 @@
         [NotNull] IEnumerable<IToken> Tokens { get; }
 
         /// <summary>
-        /// The type to bind.
+        /// The contract type to bind.
         /// </summary>
         [NotNull] [ItemNotNull] IEnumerable<Type> Types { get; }
 
         /// <summary>
-        /// The tags to mark the binding.
+        /// The tags to mark this binding.
         /// </summary>
         [NotNull] [ItemCanBeNull] IEnumerable<object> Tags { get; }
 
         /// <summary>
-        /// The specified lifetime instance or null.
+        /// The lifetime instance or null by default.
         /// </summary>
         [CanBeNull] ILifetime Lifetime { get; }
 
         /// <summary>
-        /// The specified autowiring strategy or null.
+        /// The autowiring strategy or null by default.
         /// </summary>
         [CanBeNull] IAutowiringStrategy AutowiringStrategy { get; }
     }
 
     /// <summary>
-    /// The container's binding.
+    /// The containers binding.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [PublicAPI]

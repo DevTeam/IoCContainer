@@ -384,7 +384,9 @@ namespace IoC.Features
     using System.Collections.Generic;
     using Interception;
 
-    /// <inheritdoc cref="IConfiguration" />
+    /// <summary>
+    /// Allows to use interceptions for containers instances.
+    /// </summary>
     [PublicAPI]
     public sealed class InterceptionFeature : IConfiguration
     {

@@ -3,16 +3,16 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// The container's configuration.
+    /// Represents an abstract containers configuration.
     /// </summary>
     [PublicAPI]
     public interface IConfiguration
     {
         /// <summary>
-        /// Apply the configuration for the target container.
+        /// Applies a configuration to the target mutable container.
         /// </summary>
-        /// <param name="container">The target container.</param>
-        /// <returns>The enumeration of dependency tokens.</returns>
+        /// <param name="container">The target mutable container to configure.</param>
+        /// <returns>The enumeration of configuration tokens which allows to cancel that changes.</returns>
         [NotNull][ItemNotNull] IEnumerable<IToken> Apply([NotNull] IMutableContainer container);
     }
 }

@@ -3,14 +3,14 @@
     using System;
 
     /// <summary>
-    /// Represents a holder for a created instance.
+    /// Represents an abstract composition root.
     /// </summary>
     /// <typeparam name="TInstance"></typeparam>
     [PublicAPI]
-    public interface IHolder<out TInstance>: IDisposable
+    public interface ICompositionRoot<out TInstance>: IDisposable
     {
         /// <summary>
-        /// The created instance.
+        /// The composition root instance.
         /// </summary>
         [NotNull] TInstance Instance { get; }
     }

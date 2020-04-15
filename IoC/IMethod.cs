@@ -1,5 +1,6 @@
 ﻿namespace IoC
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -13,21 +14,29 @@
         where TMethodInfo: MethodBase
     {
         /// <summary>
-        /// The method's information.
+        /// The methods information.
         /// </summary>
         [NotNull] TMethodInfo Info { get; }
 
         /// <summary>
-        /// Provides parameters' expressions.
+        /// Provides a set of parameters expressions.
         /// </summary>
         /// <returns>Parameters' expressions</returns>
         [NotNull][ItemNotNull] IEnumerable<Expression> GetParametersExpressions([NotNull] IBuildContext buildContext);
 
         /// <summary>
-        /// Sets the parameter expression at the position.
+        /// Specifies the expression of method parameter at the position.
         /// </summary>
         /// <param name="parameterPosition">The parameter position.</param>
         /// <param name="parameterExpression">The parameter expression.</param>
-        void SetParameterExpression(int parameterPosition, [NotNull] Expression parameterExpression);
+        void SetExpression(int parameterPosition, [NotNull] Expression parameterExpression);
+
+        /// <summary>
+        /// Specifies the dependency type and tag for method parameter at the position.
+        /// </summary>
+        /// <param name="parameterPosition">The parameter position.</param>
+        /// <param name="dependencyType">The dependency type.</param>
+        /// <param name="dependencyTag">The optional dependency tag value.</param>
+        void SetDependency(int parameterPosition, [NotNull] Type dependencyType, [CanBeNull] object dependencyTag = null);
     }
 }

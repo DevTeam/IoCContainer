@@ -602,13 +602,13 @@
         </member>
         <member name="M:IoC.AutowiringStrategies.AspectOriented">
             <summary>
-            Creates aspect oriented autowiring strategy.
+            Create an aspect oriented autowiring strategy.
             </summary>
             <returns>The instance of aspect oriented autowiring strategy.</returns>
         </member>
         <member name="M:IoC.AutowiringStrategies.Type``1(IoC.IAutowiringStrategy,System.Func{``0,System.Type})">
             <summary>
-            Specifies type selector for aspect oriented autowiring strategy.
+            Specify a type selector for an aspect oriented autowiring strategy.
             </summary>
             <typeparam name="TTypeAttribute">The type metadata attribute.</typeparam>
             <param name="strategy">The base aspect oriented autowiring strategy.</param>
@@ -617,7 +617,7 @@
         </member>
         <member name="M:IoC.AutowiringStrategies.Order``1(IoC.IAutowiringStrategy,System.Func{``0,System.IComparable})">
             <summary>
-            Specifies order selector for aspect oriented autowiring strategy.
+            Specify an order selector for an aspect oriented autowiring strategy.
             </summary>
             <typeparam name="TOrderAttribute">The order metadata attribute.</typeparam>
             <param name="strategy">The base aspect oriented autowiring strategy.</param>
@@ -626,7 +626,7 @@
         </member>
         <member name="M:IoC.AutowiringStrategies.Tag``1(IoC.IAutowiringStrategy,System.Func{``0,System.Object})">
             <summary>
-            Specifies tag selector for aspect oriented autowiring strategy.
+            Specify a tag selector for an aspect oriented autowiring strategy.
             </summary>
             <typeparam name="TTagAttribute">The tag metadata attribute.</typeparam>
             <param name="strategy">The base aspect oriented autowiring strategy.</param>
@@ -635,7 +635,7 @@
         </member>
         <member name="T:IoC.Container">
             <summary>
-            The IoC container implementation.
+            The base IoC container implementation.
             </summary>
         </member>
         <member name="M:IoC.Container.Create(System.String,System.Collections.Generic.IEnumerable{IoC.IConfiguration})">
@@ -730,7 +730,7 @@
         </member>
         <member name="T:IoC.Context`1">
             <summary>
-            Represent the resolving context with an instance.
+            Represents the initializing context.
             </summary>
             <typeparam name="T"></typeparam>
         </member>
@@ -932,7 +932,7 @@
         </member>
         <member name="T:IoC.EventType">
             <summary>
-            The types of event.
+            Container event types.
             </summary>
         </member>
         <member name="F:IoC.EventType.CreateContainer">
@@ -942,7 +942,7 @@
         </member>
         <member name="F:IoC.EventType.DisposeContainer">
             <summary>
-            On container dispose.
+            On container disposing.
             </summary>
         </member>
         <member name="F:IoC.EventType.RegisterDependency">
@@ -957,7 +957,7 @@
         </member>
         <member name="F:IoC.EventType.ResolverCompilation">
             <summary>
-            On resolver compilation
+            On resolver compilation.
             </summary>
         </member>
         <member name="T:IoC.Features.CollectionFeature">
@@ -986,7 +986,7 @@
         </member>
         <member name="T:IoC.Features.CoreFeature">
             <summary>
-            Adds the set of core features like lifetimes and default containers.
+            Adds the set of core features like lifetimes and containers.
             </summary>
         </member>
         <member name="F:IoC.Features.CoreFeature.Default">
@@ -1022,7 +1022,7 @@
         </member>
         <member name="T:IoC.Features.Set">
             <summary>
-            Provides defaults for features.
+            Represents a feature sets.
             </summary>
         </member>
         <member name="F:IoC.Features.Set.Core">
@@ -1070,22 +1070,6 @@
         <member name="M:IoC.Features.TupleFeature.Apply(IoC.IMutableContainer)">
             <inheritdoc />
         </member>
-        <member name="T:IoC.FluentAutowiring">
-            <summary>
-            Represents extensions for autowiring.
-            </summary>
-        </member>
-        <member name="M:IoC.FluentAutowiring.TryInjectDependency``1(IoC.IMethod{``0},System.Int32,System.Type,System.Object)">
-            <summary>
-            Injects dependency to parameter.
-            </summary>
-            <typeparam name="TMethodInfo"></typeparam>
-            <param name="method">The target method or constructor.</param>
-            <param name="parameterPosition">The parameter's position.</param>
-            <param name="dependencyType">The dependency's type.</param>
-            <param name="dependencyTag">The optional dependency's tag value.</param>
-            <returns>True if success.</returns>
-        </member>
         <member name="T:IoC.FluentBind">
             <summary>
             Represents extensions to add bindings to the container.
@@ -1096,7 +1080,7 @@
         </member>
         <member name="M:IoC.FluentBind.Bind(IoC.IMutableContainer,System.Type[])">
             <summary>
-            Binds the type(s).
+            Binds types.
             </summary>
             <param name="container">The target container.</param>
             <param name="types"></param>
@@ -1104,7 +1088,7 @@
         </member>
         <member name="M:IoC.FluentBind.Bind(IoC.IToken,System.Type[])">
             <summary>
-            Binds the type(s).
+            Binds types.
             </summary>
             <param name="token">The container binding token.</param>
             <param name="types"></param>
@@ -3977,7 +3961,7 @@
         </member>
         <member name="M:IoC.FluentScope.CreateScope(IoC.IContainer)">
             <summary>
-            Creates new resolving scope. Can be used with <c>ScopeSingleton</c>.
+            Creates a new resolving scope. Can be used with <c>ScopeSingleton</c>.
             </summary>
             <param name="container">A container to resolve a scope.</param>
             <returns>Tne new scope instance.</returns>
@@ -3989,14 +3973,14 @@
         </member>
         <member name="M:IoC.FluentTrace.ToTraceSource(IoC.IContainer)">
             <summary>
-            Gets container trace source.
+            Gets a container trace source.
             </summary>
             <param name="container">The target container to trace.</param>
             <returns>The race source.</returns>
         </member>
         <member name="M:IoC.FluentTrace.Trace(IoC.IMutableContainer,System.Action{System.String})">
             <summary>
-            Trace container action by handler.
+            Traces container actions through a handler.
             </summary>
             <param name="container">The target container to trace.</param>
             <param name="onTraceMessage">The trace handler.</param>
@@ -4004,7 +3988,7 @@
         </member>
         <member name="M:IoC.FluentTrace.Trace(IoC.IToken,System.Action{System.String})">
             <summary>
-            Trace container action by handler.
+            Traces container actions through a handler.
             </summary>
             <param name="token">The token of target container to trace.</param>
             <param name="onTraceMessage">The trace handler.</param>
@@ -4012,1137 +3996,1137 @@
         </member>
         <member name="T:IoC.GenericTypeArgumentAttribute">
             <summary>
-            Represents the generic type parameter marker.
+            Represents the generic type arguments marker.
             </summary>
         </member>
         <member name="T:IoC.TT">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable">
             <summary>
-            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            Represents the generic type arguments marker for <c>System.IDisposable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            Represents the generic type arguments marker for <c>System.IComparable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEquatable`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerable`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerator`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTCollection`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTList`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTSet`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparer`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEqualityComparer`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTDictionary`2">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObservable`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObserver`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TT1">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI1">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS1">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            Represents the generic type arguments marker for <c>System.IDisposable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            Represents the generic type arguments marker for <c>System.IComparable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable1`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEquatable1`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerable1`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerator1`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTCollection1`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTList1`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTSet1`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparer1`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEqualityComparer1`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTDictionary1`2">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObservable1`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObserver1`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TT2">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI2">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS2">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable2">
             <summary>
-            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            Represents the generic type arguments marker for <c>System.IDisposable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable2">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            Represents the generic type arguments marker for <c>System.IComparable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable2`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEquatable2`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerable2`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerator2`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTCollection2`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTList2`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTSet2`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparer2`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEqualityComparer2`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTDictionary2`2">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObservable2`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObserver2`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TT3">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI3">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS3">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable3">
             <summary>
-            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            Represents the generic type arguments marker for <c>System.IDisposable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable3">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            Represents the generic type arguments marker for <c>System.IComparable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable3`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEquatable3`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerable3`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerator3`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTCollection3`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTList3`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTSet3`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparer3`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEqualityComparer3`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTDictionary3`2">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObservable3`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObserver3`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TT4">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI4">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS4">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable4">
             <summary>
-            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            Represents the generic type arguments marker for <c>System.IDisposable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable4">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            Represents the generic type arguments marker for <c>System.IComparable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable4`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEquatable4`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerable4`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerator4`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTCollection4`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTList4`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTSet4`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparer4`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEqualityComparer4`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTDictionary4`2">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObservable4`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObserver4`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TT5">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI5">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS5">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable5">
             <summary>
-            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            Represents the generic type arguments marker for <c>System.IDisposable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable5">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            Represents the generic type arguments marker for <c>System.IComparable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable5`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEquatable5`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerable5`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerator5`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTCollection5`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTList5`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTSet5`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparer5`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEqualityComparer5`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTDictionary5`2">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObservable5`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObserver5`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TT6">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI6">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS6">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable6">
             <summary>
-            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            Represents the generic type arguments marker for <c>System.IDisposable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable6">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            Represents the generic type arguments marker for <c>System.IComparable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable6`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEquatable6`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerable6`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerator6`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTCollection6`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTList6`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTSet6`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparer6`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEqualityComparer6`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTDictionary6`2">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObservable6`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObserver6`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TT7">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI7">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS7">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable7">
             <summary>
-            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            Represents the generic type arguments marker for <c>System.IDisposable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable7">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            Represents the generic type arguments marker for <c>System.IComparable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable7`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEquatable7`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerable7`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerator7`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTCollection7`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTList7`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTSet7`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparer7`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEqualityComparer7`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTDictionary7`2">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObservable7`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObserver7`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TT8">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI8">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS8">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TTDisposable8">
             <summary>
-            Represents the generic type parameter marker for <c>System.IDisposable</c>.
+            Represents the generic type arguments marker for <c>System.IDisposable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable8">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable</c>.
+            Represents the generic type arguments marker for <c>System.IComparable</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparable8`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEquatable8`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerable8`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEnumerator8`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTCollection8`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTList8`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTSet8`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTComparer8`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTEqualityComparer8`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTDictionary8`2">
             <summary>
-            Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+            Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObservable8`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TTObserver8`1">
             <summary>
-            Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+            Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
             </summary>
         </member>
         <member name="T:IoC.TT9">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI9">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS9">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT10">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI10">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS10">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT11">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI11">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS11">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT12">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI12">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS12">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT13">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI13">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS13">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT14">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI14">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS14">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT15">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI15">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS15">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT16">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI16">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS16">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT17">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI17">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS17">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT18">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI18">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS18">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT19">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI19">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS19">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT20">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI20">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS20">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT21">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI21">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS21">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT22">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI22">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS22">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT23">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI23">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS23">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT24">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI24">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS24">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT25">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI25">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS25">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT26">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI26">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS26">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT27">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI27">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS27">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT28">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI28">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS28">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT29">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI29">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS29">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT30">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI30">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS30">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT31">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI31">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS31">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.TT32">
             <summary>
-            Represents the generic type parameter marker for a reference type.
+            Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
         <member name="T:IoC.TTI32">
             <summary>
-            Represents the generic type parameter marker for an interface.
+            Represents the generic type arguments marker for an interface.
             </summary>
         </member>
         <member name="T:IoC.TTS32">
             <summary>
-            Represents the generic type parameter marker for a value type.
+            Represents the generic type arguments marker for a value type.
             </summary>
         </member>
         <member name="T:IoC.IAutowiringStrategy">
             <summary>
-            Represents an abstraction for an autowiring method.
+            Represents an abstraction for autowiring strategy.
             </summary>
         </member>
         <member name="M:IoC.IAutowiringStrategy.TryResolveType(System.Type,System.Type,System.Type@)">
@@ -5164,7 +5148,7 @@
         </member>
         <member name="M:IoC.IAutowiringStrategy.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
             <summary>
-            Resolves initializing methods from a set of available methods/setters in the order which will be used to invoke them.
+            Resolves initializing methods from a set of available methods/setters in the specific order which will be used to invoke them.
             </summary>
             <param name="methods">The set of available methods.</param>
             <param name="initializers">The set of initializing methods in the appropriate order.</param>
@@ -5172,12 +5156,12 @@
         </member>
         <member name="T:IoC.IBinding">
             <summary>
-            The container's binding.
+            The an abstract containers binding.
             </summary>
         </member>
         <member name="P:IoC.IBinding.Container">
             <summary>
-            The target container.
+            The target container to configure.
             </summary>
         </member>
         <member name="P:IoC.IBinding.Tokens">
@@ -5187,48 +5171,48 @@
         </member>
         <member name="P:IoC.IBinding.Types">
             <summary>
-            The type to bind.
+            The contract type to bind.
             </summary>
         </member>
         <member name="P:IoC.IBinding.Tags">
             <summary>
-            The tags to mark the binding.
+            The tags to mark this binding.
             </summary>
         </member>
         <member name="P:IoC.IBinding.Lifetime">
             <summary>
-            The specified lifetime instance or null.
+            The lifetime instance or null by default.
             </summary>
         </member>
         <member name="P:IoC.IBinding.AutowiringStrategy">
             <summary>
-            The specified autowiring strategy or null.
+            The autowiring strategy or null by default.
             </summary>
         </member>
         <member name="T:IoC.IBinding`1">
             <summary>
-            The container's binding.
+            The containers binding.
             </summary>
             <typeparam name="T"></typeparam>
         </member>
         <member name="T:IoC.IBuildContext">
             <summary>
-            Represents the abstraction for build context.
+            Represents an abstract build context.
             </summary>
         </member>
         <member name="P:IoC.IBuildContext.Parent">
             <summary>
-            The parent build context.
+            The parent of the current build context.
             </summary>
         </member>
         <member name="P:IoC.IBuildContext.Key">
             <summary>
-            The target key.
+            The target key to build resolver.
             </summary>
         </member>
         <member name="P:IoC.IBuildContext.Depth">
             <summary>
-            The depth of current context.
+            The depth of current context in the build tree.
             </summary>
         </member>
         <member name="P:IoC.IBuildContext.Container">
@@ -5238,49 +5222,49 @@
         </member>
         <member name="P:IoC.IBuildContext.AutowiringStrategy">
             <summary>
-            Autowiring strategy.
+            The current autowiring strategy.
             </summary>
         </member>
         <member name="M:IoC.IBuildContext.GetDependencyExpression(System.Linq.Expressions.Expression)">
             <summary>
-            Get the dependency expression.
+            Gets the dependency expression.
             </summary>
             <param name="defaultExpression">The default expression.</param>
             <returns>The dependency expression.</returns>
         </member>
         <member name="M:IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)">
             <summary>
-            Creates a child context.
+            Creates a child build context.
             </summary>
             <param name="key">The key</param>
             <param name="container">The container.</param>
             <returns>The new build context.</returns>
         </member>
-        <member name="M:IoC.IBuildContext.ReplaceTypes(System.Linq.Expressions.Expression)">
-            <summary>
-            Prepares base expression, replacing generic types' markers.
-            </summary>
-            <param name="baseExpression">The base expression.</param>
-            <returns>The resulting expression.</returns>
-        </member>
         <member name="M:IoC.IBuildContext.BindTypes(System.Type,System.Type)">
             <summary>
-            Bind a raw type to a target type.
+            Binds a raw type to a target type.
             </summary>
-            <param name="type">The type.</param>
+            <param name="originalType">The registered type.</param>
             <param name="targetType">The target type.</param>
         </member>
         <member name="M:IoC.IBuildContext.TryReplaceType(System.Type,System.Type@)">
             <summary>
-            Try replacing generic types' markers.
+            Tries to replace generic types' markers by related types.
             </summary>
-            <param name="type">The target raw type.</param>
+            <param name="originalType">The target raw type.</param>
             <param name="targetType">The replacing type.</param>
             <returns></returns>
         </member>
+        <member name="M:IoC.IBuildContext.ReplaceTypes(System.Linq.Expressions.Expression)">
+            <summary>
+            Prepares base expression replacing generic types' markers by related types.
+            </summary>
+            <param name="baseExpression">The base expression.</param>
+            <returns>The resulting expression.</returns>
+        </member>
         <member name="M:IoC.IBuildContext.InjectDependencies(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)">
             <summary>
-            Prepares base expression, injecting dependencies.
+            Prepares base expression injecting appropriate dependencies.
             </summary>
             <param name="baseExpression">The base expression.</param>
             <param name="instanceExpression">The instance expression.</param>
@@ -5288,7 +5272,7 @@
         </member>
         <member name="M:IoC.IBuildContext.AddLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)">
             <summary>
-            Prepares base expression, adding a lifetime.
+            Prepares base expression adding the appropriate lifetime.
             </summary>
             <param name="baseExpression">The base expression.</param>
             <param name="lifetime">The target lifetime.</param>
@@ -5296,20 +5280,20 @@
         </member>
         <member name="T:IoC.IBuilder">
             <summary>
-            Represents a builder for an instance.
+            Represents an abstract builder for an instance.
             </summary>
         </member>
         <member name="M:IoC.IBuilder.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)">
             <summary>
-            Builds the expression.
+            Builds the expression based on a build context.
             </summary>
-            <param name="context">Current context for building.</param>
-            <param name="bodyExpression">The expression body to get an instance.</param>
+            <param name="context">Current build context.</param>
+            <param name="bodyExpression">The expression body to build an instance resolver.</param>
             <returns>The new expression.</returns>
         </member>
         <member name="T:IoC.ICompiler">
             <summary>
-            Represents a expression compiler.
+            Represents an abstract expression compiler.
             </summary>
         </member>
         <member name="M:IoC.ICompiler.TryCompile(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,System.Delegate@)">
@@ -5321,31 +5305,42 @@
             <param name="resolver">The compiled resolver delegate.</param>
             <returns>True if success.</returns>
         </member>
+        <member name="T:IoC.ICompositionRoot`1">
+            <summary>
+            Represents an abstract composition root.
+            </summary>
+            <typeparam name="TInstance"></typeparam>
+        </member>
+        <member name="P:IoC.ICompositionRoot`1.Instance">
+            <summary>
+            The composition root instance.
+            </summary>
+        </member>
         <member name="T:IoC.IConfiguration">
             <summary>
-            The container's configuration.
+            Represents an abstract containers configuration.
             </summary>
         </member>
         <member name="M:IoC.IConfiguration.Apply(IoC.IMutableContainer)">
             <summary>
-            Apply the configuration for the target container.
+            Applies a configuration to the target mutable container.
             </summary>
-            <param name="container">The target container.</param>
-            <returns>The enumeration of dependency tokens.</returns>
+            <param name="container">The target mutable container to configure.</param>
+            <returns>The enumeration of configuration tokens which allows to cancel that changes.</returns>
         </member>
         <member name="T:IoC.IContainer">
             <summary>
-            The Inversion of Control container.
+            Represents an abstract Inversion of Control container.
             </summary>
         </member>
         <member name="P:IoC.IContainer.Parent">
             <summary>
-            The parent container or null if it has no a parent.
+            Provides a parent container or <c>null</c> if it does not have a parent.
             </summary>
         </member>
         <member name="M:IoC.IContainer.TryGetDependency(IoC.Key,IoC.IDependency@,IoC.ILifetime@)">
             <summary>
-            Get the dependency with lifetime.
+            Provides a dependency and a lifetime for the registered key.
             </summary>
             <param name="key">The key to get a dependency.</param>
             <param name="dependency">The dependency.</param>
@@ -5354,58 +5349,47 @@
         </member>
         <member name="M:IoC.IContainer.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,System.Exception@,IoC.IContainer)">
             <summary>
-            Get the resolver.
+            Provides a resolver for a specific type and tag or error if something goes wrong.
             </summary>
             <typeparam name="T">The type of instance producing by the resolver.</typeparam>
-            <param name="type">The binding's type.</param>
-            <param name="tag">The binding's tag or null if there is no tag.</param>
-            <param name="resolver">The resolver.</param>
-            <param name="error">The error occurring during resolving.</param>
-            <param name="resolvingContainer">The resolving container and null if it is the current container.</param>
-            <returns>True if successful.</returns>
+            <param name="type">The binding type.</param>
+            <param name="tag">The binding tag or null if there is no tag.</param>
+            <param name="resolver">The resolver to get an instance.</param>
+            <param name="error">Error that occurs when resolving.</param>
+            <param name="resolvingContainer">The resolving container and null if the resolving container is the current container.</param>
+            <returns><c>True</c> if successful and a resolver was provided.</returns>
         </member>
         <member name="T:IoC.IDependency">
             <summary>
-            Represents a IoC dependency.
+            Represents an abstract IoC dependency.
             </summary>
         </member>
         <member name="M:IoC.IDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)">
             <summary>
-            Builds an expression.
+            Builds an expression for dependency based on the current build context and specified lifetime.
             </summary>
-            <param name="buildContext">The build context,</param>
-            <param name="lifetime">The target lifetime,</param>
-            <param name="baseExpression">The resulting expression.</param>
-            <param name="error">The error.</param>
-            <returns>True if success.</returns>
-        </member>
-        <member name="T:IoC.IHolder`1">
-            <summary>
-            Represents a holder for a created instance.
-            </summary>
-            <typeparam name="TInstance"></typeparam>
-        </member>
-        <member name="P:IoC.IHolder`1.Instance">
-            <summary>
-            The created instance.
-            </summary>
+            <param name="buildContext">The build context.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <param name="baseExpression">The resulting expression for the current dependency.</param>
+            <param name="error">The error if something goes wrong.</param>
+            <returns><c>True</c> if successful and an expression was provided.</returns>
         </member>
         <member name="T:IoC.ILifetime">
             <summary>
-            Represents a lifetime for an instance.
+            Represents an abstraction of container lifetime.
             </summary>
         </member>
         <member name="M:IoC.ILifetime.Create">
             <summary>
             Creates the similar lifetime to use with generic instances.
             </summary>
-            <returns></returns>
+            <returns>The new lifetime instance.</returns>
         </member>
         <member name="M:IoC.ILifetime.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)">
             <summary>
-            Select default container to resolve dependencies.
+            Provides a container to resolve dependencies.
             </summary>
-            <param name="registrationContainer">The container where the entry was registered.</param>
+            <param name="registrationContainer">The container where a dependency was registered.</param>
             <param name="resolvingContainer">The container which is used to resolve an instance.</param>
             <returns>The selected container.</returns>
         </member>
@@ -5417,45 +5401,53 @@
         </member>
         <member name="P:IoC.IMethod`1.Info">
             <summary>
-            The method's information.
+            The methods information.
             </summary>
         </member>
         <member name="M:IoC.IMethod`1.GetParametersExpressions(IoC.IBuildContext)">
             <summary>
-            Provides parameters' expressions.
+            Provides a set of parameters expressions.
             </summary>
             <returns>Parameters' expressions</returns>
         </member>
-        <member name="M:IoC.IMethod`1.SetParameterExpression(System.Int32,System.Linq.Expressions.Expression)">
+        <member name="M:IoC.IMethod`1.SetExpression(System.Int32,System.Linq.Expressions.Expression)">
             <summary>
-            Sets the parameter expression at the position.
+            Specifies the expression of method parameter at the position.
             </summary>
             <param name="parameterPosition">The parameter position.</param>
             <param name="parameterExpression">The parameter expression.</param>
         </member>
+        <member name="M:IoC.IMethod`1.SetDependency(System.Int32,System.Type,System.Object)">
+            <summary>
+            Specifies the dependency type and tag for method parameter at the position.
+            </summary>
+            <param name="parameterPosition">The parameter position.</param>
+            <param name="dependencyType">The dependency type.</param>
+            <param name="dependencyTag">The optional dependency tag value.</param>
+        </member>
         <member name="T:IoC.IMutableContainer">
             <summary>
-            The configurable Inversion of Control container.
+            Represents an abstract of configurable Inversion of Control container.
             </summary>
         </member>
         <member name="M:IoC.IMutableContainer.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,IoC.IToken@)">
             <summary>
-            Register the dependency with lifetime.
+            Registers the dependency and the lifetime for the specified dependency key.
             </summary>
             <param name="keys">The set of keys to register.</param>
             <param name="dependency">The dependency.</param>
             <param name="lifetime">The lifetime.</param>
-            <param name="dependencyToken">The dependency token.</param>
-            <returns>True if successful.</returns>
+            <param name="dependencyToken">The dependency token to unregister this dependency key.</param>
+            <returns><c>True</c> if is registered successfully.</returns>
         </member>
         <member name="T:IoC.Injections">
             <summary>
-            Injection extensions.
+            A set of injection markers.
             </summary>
         </member>
         <member name="M:IoC.Injections.Inject``1(IoC.IContainer)">
             <summary>
-            Injects a dependency. Just an injection marker.
+            Injects a dependency. Just the injection marker.
             </summary>
             <typeparam name="T">The type of dependency.</typeparam>
             <param name="container">The resolving container.</param>
@@ -5463,15 +5455,15 @@
         </member>
         <member name="M:IoC.Injections.TryInject``1(IoC.IContainer)">
             <summary>
-            Tries to inject a dependency. Just an injection marker.
+            Try to inject a dependency. Just the injection marker.
             </summary>
             <typeparam name="T">The type of dependency.</typeparam>
             <param name="container">The resolving container.</param>
-            <returns>The injected instance or default(T).</returns>
+            <returns>The injected instance or <c>default(T)</c>.</returns>
         </member>
         <member name="M:IoC.Injections.Inject``1(IoC.IContainer,System.Object)">
             <summary>
-            Injects a dependency. Just an injection marker.
+            Injects a dependency. Just the injection marker.
             </summary>
             <typeparam name="T">The type of dependency.</typeparam>
             <param name="container">The resolving container.</param>
@@ -5480,16 +5472,16 @@
         </member>
         <member name="M:IoC.Injections.TryInject``1(IoC.IContainer,System.Object)">
             <summary>
-            Tries to inject a dependency. Just an injection marker.
+            Try to inject a dependency. Just the injection marker.
             </summary>
             <typeparam name="T">The type of dependency.</typeparam>
             <param name="container">The resolving container.</param>
             <param name="tag">The tag of dependency.</param>
-            <returns>The injected instance or default(T).</returns>
+            <returns>The injected instance or <c>default(T)</c>.</returns>
         </member>
         <member name="M:IoC.Injections.Inject``1(IoC.IContainer,``0,``0)">
             <summary>
-            Injects a dependency. Just an injection marker.
+            Injects a dependency. Just the injection marker.
             </summary>
             <typeparam name="T"></typeparam>
             <param name="container">The resolving container.</param>
@@ -5498,7 +5490,7 @@
         </member>
         <member name="M:IoC.Injections.Inject(IoC.IContainer,System.Type)">
             <summary>
-            Injects a dependency. Just an injection marker.
+            Injects a dependency. Just the injection marker.
             </summary>
             <param name="container">The resolving container.</param>
             <param name="type">The type of dependency.</param>
@@ -5506,15 +5498,15 @@
         </member>
         <member name="M:IoC.Injections.TryInject(IoC.IContainer,System.Type)">
             <summary>
-            Tries to inject a dependency. Just an injection marker.
+            Try to inject a dependency. Just the injection marker.
             </summary>
             <param name="container">The resolving container.</param>
             <param name="type">The type of dependency.</param>
-            <returns>The injected instance or default(Type).</returns>
+            <returns>The injected instance or <c>default(T)</c>.</returns>
         </member>
         <member name="M:IoC.Injections.Inject(IoC.IContainer,System.Type,System.Object)">
             <summary>
-            Injects a dependency. Just an injection marker.
+            Injects a dependency. Just the injection marker.
             </summary>
             <param name="container">The resolving container.</param>
             <param name="type">The type of dependency.</param>
@@ -5523,16 +5515,16 @@
         </member>
         <member name="M:IoC.Injections.TryInject(IoC.IContainer,System.Type,System.Object)">
             <summary>
-            Tries to inject a dependency. Just an injection marker.
+            Try to inject a dependency. Just the injection marker.
             </summary>
             <param name="container">The resolving container.</param>
             <param name="type">The type of dependency.</param>
             <param name="tag">The tag of dependency.</param>
-            <returns>The injected instance or default(Type).</returns>
+            <returns>The injected instance or <c>default(T)</c>.</returns>
         </member>
         <member name="T:IoC.IResourceRegistry">
             <summary>
-            Represents the resource's registry.
+            Represents an abstraction of the resource registry.
             </summary>
         </member>
         <member name="M:IoC.IResourceRegistry.RegisterResource(System.IDisposable)">
@@ -5549,14 +5541,14 @@
         </member>
         <member name="T:IoC.IScope">
             <summary>
-            Represents the scope which could be used with <c>Lifetime.ScopeSingleton</c>
+            Represents an abstraction of a scope which is used with <c>Lifetime.ScopeSingleton</c>.
             </summary>
         </member>
         <member name="M:IoC.IScope.Activate">
             <summary>
             Activate the scope.
             </summary>
-            <returns>The token to deactivate the scope.</returns>
+            <returns>The token to deactivate the activated scope.</returns>
         </member>
         <member name="T:IoC.Issues.DependencyDescription">
             <summary>
@@ -5575,7 +5567,7 @@
         </member>
         <member name="M:IoC.Issues.DependencyDescription.#ctor(IoC.IDependency,IoC.ILifetime)">
             <summary>
-            Creates new instance.
+            Creates a new instance.
             </summary>
             <param name="dependency">The resolved dependency.</param>
             <param name="lifetime">The lifetime to use</param>
@@ -5735,12 +5727,12 @@
         </member>
         <member name="T:IoC.IToken">
             <summary>
-            The binding token to manage binding lifetime.
+            Represents an abstraction of a binding token.
             </summary>
         </member>
         <member name="P:IoC.IToken.Container">
             <summary>
-            The owner container.
+            The configurable container owning the registered binding.
             </summary>
         </member>
         <member name="T:IoC.Key">
@@ -5784,32 +5776,32 @@
         </member>
         <member name="T:IoC.Lifetime">
             <summary>
-            The enumeration of well-known lifetimes.
+            A set of well-known lifetimes.
             </summary>
         </member>
         <member name="F:IoC.Lifetime.Transient">
             <summary>
-            A new instance is creating each time (it's default).
+            For a new instance each time (default).
             </summary>
         </member>
         <member name="F:IoC.Lifetime.Singleton">
             <summary>
-            Single instance.
+            For a singleton instance.
             </summary>
         </member>
         <member name="F:IoC.Lifetime.ContainerSingleton">
             <summary>
-            Singleton instance per container.
+            For a singleton instance per container.
             </summary>
         </member>
         <member name="F:IoC.Lifetime.ScopeSingleton">
             <summary>
-            Singleton instance per scope.
+            For a singleton instance per scope.
             </summary>
         </member>
         <member name="T:IoC.Lifetimes.ContainerSingletonLifetime">
             <summary>
-            Represents singleton per container lifetime.
+            For a singleton instance per container.
             </summary>
         </member>
         <member name="M:IoC.Lifetimes.ContainerSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])">
@@ -5872,7 +5864,7 @@
         </member>
         <member name="T:IoC.Lifetimes.ScopeSingletonLifetime">
             <summary>
-            Represents singleton per scope lifetime.
+            For a singleton instance per scope.
             </summary>
         </member>
         <member name="M:IoC.Lifetimes.ScopeSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])">
@@ -5892,7 +5884,7 @@
         </member>
         <member name="T:IoC.Lifetimes.SingletonLifetime">
             <summary>
-            Represents singleton lifetime.
+            For a singleton instance.
             </summary>
         </member>
         <member name="M:IoC.Lifetimes.SingletonLifetime.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)">
@@ -5912,7 +5904,7 @@
         </member>
         <member name="T:IoC.Resolver`1">
             <summary>
-            Represents the resolver delegate.
+            Represents an abstraction of instance resolver.
             </summary>
             <typeparam name="T">The type of resolving instance.</typeparam>
             <param name="container">The resolving container.</param>
@@ -5929,12 +5921,12 @@
         </member>
         <member name="T:IoC.TraceEvent">
             <summary>
-            Represents a trace event.
+            Represents a container trace event.
             </summary>
         </member>
         <member name="F:IoC.TraceEvent.ContainerEvent">
             <summary>
-            The origin container event.
+            The original container event.
             </summary>
         </member>
         <member name="F:IoC.TraceEvent.Message">
@@ -5944,9 +5936,9 @@
         </member>
         <member name="M:IoC.TraceEvent.#ctor(IoC.ContainerEvent,System.String)">
             <summary>
-            Creates new instance of trace event.
+            Creates new instance of a trace event.
             </summary>
-            <param name="containerEvent">The original instance of container event.</param>
+            <param name="containerEvent">The original container event.</param>
             <param name="message">The trace message.</param>
         </member>
         <member name="T:IoC.WellknownExpressions">

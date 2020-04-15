@@ -8,7 +8,7 @@
     using static Core.TypeDescriptorExtensions;
 
     /// <summary>
-    /// Represents singleton lifetime.
+    /// For a singleton instance.
     /// </summary>
     [PublicAPI]
     public sealed class SingletonLifetime : ILifetime

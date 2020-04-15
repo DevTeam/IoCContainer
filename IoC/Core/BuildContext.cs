@@ -51,11 +51,11 @@
         public Expression ReplaceTypes(Expression baseExpression) =>
             TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, _typesMap);
 
-        public void BindTypes(Type type, Type targetType) =>
-            TypeMapper.Shared.Map(type, targetType, _typesMap);
+        public void BindTypes(Type originalType, Type targetType) =>
+            TypeMapper.Shared.Map(originalType, targetType, _typesMap);
 
-        public bool TryReplaceType(Type type, out Type targetType) =>
-            _typesMap.TryGetValue(type, out targetType);
+        public bool TryReplaceType(Type originalType, out Type targetType) =>
+            _typesMap.TryGetValue(originalType, out targetType);
 
         public Expression InjectDependencies(Expression baseExpression, ParameterExpression instanceExpression = null) =>
             DependencyInjectionExpressionBuilder.Shared.Build(baseExpression, this, instanceExpression);

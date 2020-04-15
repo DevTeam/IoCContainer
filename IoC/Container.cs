@@ -16,7 +16,7 @@
     using ResolverDelegate = System.Delegate;
 
     /// <summary>
-    /// The IoC container implementation.
+    /// The base IoC container implementation.
     /// </summary>
     [PublicAPI]
     [DebuggerDisplay("Name = {" + nameof(ToString) + "()}")]

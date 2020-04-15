@@ -1,7 +1,7 @@
 ﻿namespace IoC
 {
     /// <summary>
-    /// Represents the resolver delegate.
+    /// Represents an abstraction of instance resolver.
     /// </summary>
     /// <typeparam name="T">The type of resolving instance.</typeparam>
     /// <param name="container">The resolving container.</param>

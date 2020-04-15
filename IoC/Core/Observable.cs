@@ -1,4 +1,5 @@
-﻿namespace IoC.Core
+﻿// ReSharper disable UnusedMember.Global
+namespace IoC.Core
 {
     using System;
 
@@ -33,7 +34,7 @@
 
             public InternalObservable(Func<IObserver<T>, IDisposable> factory) => _factory = factory;
 
-            public IDisposable Subscribe([NotNull] IObserver<T> observer) => _factory(observer ?? throw new ArgumentNullException(nameof(observer)));
+            public IDisposable Subscribe(IObserver<T> observer) => _factory(observer ?? throw new ArgumentNullException(nameof(observer)));
         }
 
         private sealed class InternalObserver<T>: IObserver<T>

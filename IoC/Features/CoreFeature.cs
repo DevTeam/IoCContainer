@@ -7,7 +7,7 @@
     using Lifetimes;
 
     /// <summary>
-    /// Adds the set of core features like lifetimes and default containers.
+    /// Adds the set of core features like lifetimes and containers.
     /// </summary>
     [PublicAPI]
     public sealed class CoreFeature : IConfiguration

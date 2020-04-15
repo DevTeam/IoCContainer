@@ -3,7 +3,7 @@
     using System.Collections.Generic;
 
     /// <summary>
-    /// Provides defaults for features.
+    /// Represents a feature sets.
     /// </summary>
     [PublicAPI]
     public static class Set

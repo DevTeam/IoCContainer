@@ -13,7 +13,7 @@
     public static class FluentTrace
     {
         /// <summary>
-        /// Gets container trace source.
+        /// Gets a container trace source.
         /// </summary>
         /// <param name="container">The target container to trace.</param>
         /// <returns>The race source.</returns>
@@ -30,7 +30,7 @@
         }
 
         /// <summary>
-        /// Trace container action by handler.
+        /// Traces container actions through a handler.
         /// </summary>
         /// <param name="container">The target container to trace.</param>
         /// <param name="onTraceMessage">The trace handler.</param>
@@ -51,7 +51,7 @@
         }
 
         /// <summary>
-        /// Trace container action by handler.
+        /// Traces container actions through a handler.
         /// </summary>
         /// <param name="token">The token of target container to trace.</param>
         /// <param name="onTraceMessage">The trace handler.</param>
@@ -61,7 +61,7 @@
 
 #if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETCOREAPP1_0&& !NETCOREAPP1_1 && !WINDOWS_UWP
         /// <summary>
-        /// Trace container action by handler.
+        /// Traces container actions through a <c>System.Diagnostics.Trace</c>.
         /// </summary>
         /// <param name="container">The target container to trace.</param>
         /// <returns>The trace token.</returns>
@@ -69,7 +69,7 @@
             (container ?? throw new ArgumentNullException(nameof(container))).Trace(message => System.Diagnostics.Trace.WriteLine(message));
 
         /// <summary>
-        /// Trace container action by handler.
+        /// Traces container actions through a <c>System.Diagnostics.Trace</c>.
         /// </summary>
         /// <param name="token">The token of target container to trace.</param>
         /// <returns>The trace token.</returns>

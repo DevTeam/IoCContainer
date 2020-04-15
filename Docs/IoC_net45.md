@@ -103,8 +103,6 @@
   - [RegisterDependency](#F-IoC-EventType-RegisterDependency 'IoC.EventType.RegisterDependency')
   - [ResolverCompilation](#F-IoC-EventType-ResolverCompilation 'IoC.EventType.ResolverCompilation')
   - [UnregisterDependency](#F-IoC-EventType-UnregisterDependency 'IoC.EventType.UnregisterDependency')
-- [FluentAutowiring](#T-IoC-FluentAutowiring 'IoC.FluentAutowiring')
-  - [TryInjectDependency\`\`1(method,parameterPosition,dependencyType,dependencyTag)](#M-IoC-FluentAutowiring-TryInjectDependency``1-IoC-IMethod{``0},System-Int32,System-Type,System-Object- 'IoC.FluentAutowiring.TryInjectDependency``1(IoC.IMethod{``0},System.Int32,System.Type,System.Object)')
 - [FluentBind](#T-IoC-FluentBind 'IoC.FluentBind')
   - [AnyTag\`\`1(binding)](#M-IoC-FluentBind-AnyTag``1-IoC-IBinding{``0}- 'IoC.FluentBind.AnyTag``1(IoC.IBinding{``0})')
   - [As\`\`1(binding,lifetime)](#M-IoC-FluentBind-As``1-IoC-IBinding{``0},IoC-Lifetime- 'IoC.FluentBind.As``1(IoC.IBinding{``0},IoC.Lifetime)')
@@ -307,12 +305,12 @@
   - [Key](#P-IoC-IBuildContext-Key 'IoC.IBuildContext.Key')
   - [Parent](#P-IoC-IBuildContext-Parent 'IoC.IBuildContext.Parent')
   - [AddLifetime(baseExpression,lifetime)](#M-IoC-IBuildContext-AddLifetime-System-Linq-Expressions-Expression,IoC-ILifetime- 'IoC.IBuildContext.AddLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)')
-  - [BindTypes(type,targetType)](#M-IoC-IBuildContext-BindTypes-System-Type,System-Type- 'IoC.IBuildContext.BindTypes(System.Type,System.Type)')
+  - [BindTypes(originalType,targetType)](#M-IoC-IBuildContext-BindTypes-System-Type,System-Type- 'IoC.IBuildContext.BindTypes(System.Type,System.Type)')
   - [CreateChild(key,container)](#M-IoC-IBuildContext-CreateChild-IoC-Key,IoC-IContainer- 'IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)')
   - [GetDependencyExpression(defaultExpression)](#M-IoC-IBuildContext-GetDependencyExpression-System-Linq-Expressions-Expression- 'IoC.IBuildContext.GetDependencyExpression(System.Linq.Expressions.Expression)')
   - [InjectDependencies(baseExpression,instanceExpression)](#M-IoC-IBuildContext-InjectDependencies-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression- 'IoC.IBuildContext.InjectDependencies(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)')
   - [ReplaceTypes(baseExpression)](#M-IoC-IBuildContext-ReplaceTypes-System-Linq-Expressions-Expression- 'IoC.IBuildContext.ReplaceTypes(System.Linq.Expressions.Expression)')
-  - [TryReplaceType(type,targetType)](#M-IoC-IBuildContext-TryReplaceType-System-Type,System-Type@- 'IoC.IBuildContext.TryReplaceType(System.Type,System.Type@)')
+  - [TryReplaceType(originalType,targetType)](#M-IoC-IBuildContext-TryReplaceType-System-Type,System-Type@- 'IoC.IBuildContext.TryReplaceType(System.Type,System.Type@)')
 - [IBuilder](#T-IoC-IBuilder 'IoC.IBuilder')
   - [Build(context,bodyExpression)](#M-IoC-IBuilder-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.IBuilder.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
 - [ICannotBuildExpression](#T-IoC-Issues-ICannotBuildExpression 'IoC.Issues.ICannotBuildExpression')
@@ -337,6 +335,8 @@
   - [Resolve(buildContext,registeredType,resolvingType)](#M-IoC-Issues-ICannotResolveType-Resolve-IoC-IBuildContext,System-Type,System-Type- 'IoC.Issues.ICannotResolveType.Resolve(IoC.IBuildContext,System.Type,System.Type)')
 - [ICompiler](#T-IoC-ICompiler 'IoC.ICompiler')
   - [TryCompile(context,expression,resolver)](#M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@- 'IoC.ICompiler.TryCompile(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,System.Delegate@)')
+- [ICompositionRoot\`1](#T-IoC-ICompositionRoot`1 'IoC.ICompositionRoot`1')
+  - [Instance](#P-IoC-ICompositionRoot`1-Instance 'IoC.ICompositionRoot`1.Instance')
 - [IConfiguration](#T-IoC-IConfiguration 'IoC.IConfiguration')
   - [Apply(container)](#M-IoC-IConfiguration-Apply-IoC-IMutableContainer- 'IoC.IConfiguration.Apply(IoC.IMutableContainer)')
 - [IContainer](#T-IoC-IContainer 'IoC.IContainer')
@@ -349,15 +349,14 @@
   - [Build(bodyExpression,buildContext,context)](#M-IoC-Core-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-IBuildContext,`0- 'IoC.Core.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext,`0)')
 - [IFoundCyclicDependency](#T-IoC-Issues-IFoundCyclicDependency 'IoC.Issues.IFoundCyclicDependency')
   - [Resolve(buildContext)](#M-IoC-Issues-IFoundCyclicDependency-Resolve-IoC-IBuildContext- 'IoC.Issues.IFoundCyclicDependency.Resolve(IoC.IBuildContext)')
-- [IHolder\`1](#T-IoC-IHolder`1 'IoC.IHolder`1')
-  - [Instance](#P-IoC-IHolder`1-Instance 'IoC.IHolder`1.Instance')
 - [ILifetime](#T-IoC-ILifetime 'IoC.ILifetime')
   - [Create()](#M-IoC-ILifetime-Create 'IoC.ILifetime.Create')
   - [SelectResolvingContainer(registrationContainer,resolvingContainer)](#M-IoC-ILifetime-SelectResolvingContainer-IoC-IContainer,IoC-IContainer- 'IoC.ILifetime.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)')
 - [IMethod\`1](#T-IoC-IMethod`1 'IoC.IMethod`1')
   - [Info](#P-IoC-IMethod`1-Info 'IoC.IMethod`1.Info')
   - [GetParametersExpressions()](#M-IoC-IMethod`1-GetParametersExpressions-IoC-IBuildContext- 'IoC.IMethod`1.GetParametersExpressions(IoC.IBuildContext)')
-  - [SetParameterExpression(parameterPosition,parameterExpression)](#M-IoC-IMethod`1-SetParameterExpression-System-Int32,System-Linq-Expressions-Expression- 'IoC.IMethod`1.SetParameterExpression(System.Int32,System.Linq.Expressions.Expression)')
+  - [SetDependency(parameterPosition,dependencyType,dependencyTag)](#M-IoC-IMethod`1-SetDependency-System-Int32,System-Type,System-Object- 'IoC.IMethod`1.SetDependency(System.Int32,System.Type,System.Object)')
+  - [SetExpression(parameterPosition,parameterExpression)](#M-IoC-IMethod`1-SetExpression-System-Int32,System-Linq-Expressions-Expression- 'IoC.IMethod`1.SetExpression(System.Int32,System.Linq.Expressions.Expression)')
 - [IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer')
   - [TryRegisterDependency(keys,dependency,lifetime,dependencyToken)](#M-IoC-IMutableContainer-TryRegisterDependency-System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime,IoC-IToken@- 'IoC.IMutableContainer.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,IoC.IToken@)')
 - [IResourceRegistry](#T-IoC-IResourceRegistry 'IoC.IResourceRegistry')
@@ -1056,7 +1055,7 @@ Provides autowiring strategies.
 
 ##### Summary
 
-Creates aspect oriented autowiring strategy.
+Create an aspect oriented autowiring strategy.
 
 ##### Returns
 
@@ -1071,7 +1070,7 @@ This method has no parameters.
 
 ##### Summary
 
-Specifies order selector for aspect oriented autowiring strategy.
+Specify an order selector for an aspect oriented autowiring strategy.
 
 ##### Returns
 
@@ -1095,7 +1094,7 @@ The instance of aspect oriented autowiring strategy.
 
 ##### Summary
 
-Specifies tag selector for aspect oriented autowiring strategy.
+Specify a tag selector for an aspect oriented autowiring strategy.
 
 ##### Returns
 
@@ -1119,7 +1118,7 @@ The instance of aspect oriented autowiring strategy.
 
 ##### Summary
 
-Specifies type selector for aspect oriented autowiring strategy.
+Specify a type selector for an aspect oriented autowiring strategy.
 
 ##### Returns
 
@@ -1332,7 +1331,7 @@ IoC
 
 ##### Summary
 
-The IoC container implementation.
+The base IoC container implementation.
 
 <a name='P-IoC-Container-Parent'></a>
 ### Parent `property`
@@ -1548,7 +1547,7 @@ IoC.Lifetimes
 
 ##### Summary
 
-Represents singleton per container lifetime.
+For a singleton instance per container.
 
 <a name='M-IoC-Lifetimes-ContainerSingletonLifetime-Create'></a>
 ### Create() `method`
@@ -1646,7 +1645,7 @@ IoC
 
 ##### Summary
 
-Represent the resolving context with an instance.
+Represents the initializing context.
 
 ##### Generic Types
 
@@ -1681,7 +1680,7 @@ IoC.Features
 
 ##### Summary
 
-Adds the set of core features like lifetimes and default containers.
+Adds the set of core features like lifetimes and containers.
 
 <a name='F-IoC-Features-CoreFeature-Default'></a>
 ### Default `constants`
@@ -1713,7 +1712,7 @@ Represents the dependency.
 
 ##### Summary
 
-Creates new instance.
+Creates a new instance.
 
 ##### Parameters
 
@@ -1759,7 +1758,7 @@ IoC
 
 ##### Summary
 
-The types of event.
+Container event types.
 
 <a name='F-IoC-EventType-CreateContainer'></a>
 ### CreateContainer `constants`
@@ -1773,7 +1772,7 @@ On container creation.
 
 ##### Summary
 
-On container dispose.
+On container disposing.
 
 <a name='F-IoC-EventType-RegisterDependency'></a>
 ### RegisterDependency `constants`
@@ -1787,7 +1786,7 @@ On dependency registration.
 
 ##### Summary
 
-On resolver compilation
+On resolver compilation.
 
 <a name='F-IoC-EventType-UnregisterDependency'></a>
 ### UnregisterDependency `constants`
@@ -1795,43 +1794,6 @@ On resolver compilation
 ##### Summary
 
 On dependency unregistration.
-
-<a name='T-IoC-FluentAutowiring'></a>
-## FluentAutowiring `type`
-
-##### Namespace
-
-IoC
-
-##### Summary
-
-Represents extensions for autowiring.
-
-<a name='M-IoC-FluentAutowiring-TryInjectDependency``1-IoC-IMethod{``0},System-Int32,System-Type,System-Object-'></a>
-### TryInjectDependency\`\`1(method,parameterPosition,dependencyType,dependencyTag) `method`
-
-##### Summary
-
-Injects dependency to parameter.
-
-##### Returns
-
-True if success.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| method | [IoC.IMethod{\`\`0}](#T-IoC-IMethod{``0} 'IoC.IMethod{``0}') | The target method or constructor. |
-| parameterPosition | [System.Int32](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Int32 'System.Int32') | The parameter's position. |
-| dependencyType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The dependency's type. |
-| dependencyTag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The optional dependency's tag value. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| TMethodInfo |  |
 
 <a name='T-IoC-FluentBind'></a>
 ## FluentBind `type`
@@ -1920,7 +1882,7 @@ The binding token.
 
 ##### Summary
 
-Binds the type(s).
+Binds types.
 
 ##### Returns
 
@@ -1938,7 +1900,7 @@ The binding token.
 
 ##### Summary
 
-Binds the type(s).
+Binds types.
 
 ##### Returns
 
@@ -7213,7 +7175,7 @@ Represents extensions dealing with scopes.
 
 ##### Summary
 
-Creates new resolving scope. Can be used with `ScopeSingleton`.
+Creates a new resolving scope. Can be used with `ScopeSingleton`.
 
 ##### Returns
 
@@ -7241,7 +7203,7 @@ Represents extensions to trace the container.
 
 ##### Summary
 
-Gets container trace source.
+Gets a container trace source.
 
 ##### Returns
 
@@ -7258,7 +7220,7 @@ The race source.
 
 ##### Summary
 
-Trace container action by handler.
+Traces container actions through a handler.
 
 ##### Returns
 
@@ -7276,7 +7238,7 @@ The trace token.
 
 ##### Summary
 
-Trace container action by handler.
+Traces container actions through a handler.
 
 ##### Returns
 
@@ -7294,7 +7256,7 @@ The trace token.
 
 ##### Summary
 
-Trace container action by handler.
+Traces container actions through a `System.Diagnostics.Trace`.
 
 ##### Returns
 
@@ -7311,7 +7273,7 @@ The trace token.
 
 ##### Summary
 
-Trace container action by handler.
+Traces container actions through a `System.Diagnostics.Trace`.
 
 ##### Returns
 
@@ -7360,7 +7322,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker.
+Represents the generic type arguments marker.
 
 <a name='T-IoC-Core-IArray'></a>
 ## IArray `type`
@@ -7382,7 +7344,7 @@ IoC
 
 ##### Summary
 
-Represents an abstraction for an autowiring method.
+Represents an abstraction for autowiring strategy.
 
 <a name='M-IoC-IAutowiringStrategy-TryResolveConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@-'></a>
 ### TryResolveConstructor(constructors,constructor) `method`
@@ -7407,7 +7369,7 @@ True if the constructor was resolved.
 
 ##### Summary
 
-Resolves initializing methods from a set of available methods/setters in the order which will be used to invoke them.
+Resolves initializing methods from a set of available methods/setters in the specific order which will be used to invoke them.
 
 ##### Returns
 
@@ -7448,35 +7410,35 @@ IoC
 
 ##### Summary
 
-The container's binding.
+The an abstract containers binding.
 
 <a name='P-IoC-IBinding-AutowiringStrategy'></a>
 ### AutowiringStrategy `property`
 
 ##### Summary
 
-The specified autowiring strategy or null.
+The autowiring strategy or null by default.
 
 <a name='P-IoC-IBinding-Container'></a>
 ### Container `property`
 
 ##### Summary
 
-The target container.
+The target container to configure.
 
 <a name='P-IoC-IBinding-Lifetime'></a>
 ### Lifetime `property`
 
 ##### Summary
 
-The specified lifetime instance or null.
+The lifetime instance or null by default.
 
 <a name='P-IoC-IBinding-Tags'></a>
 ### Tags `property`
 
 ##### Summary
 
-The tags to mark the binding.
+The tags to mark this binding.
 
 <a name='P-IoC-IBinding-Tokens'></a>
 ### Tokens `property`
@@ -7490,7 +7452,7 @@ Binding tokens.
 
 ##### Summary
 
-The type to bind.
+The contract type to bind.
 
 <a name='T-IoC-IBinding`1'></a>
 ## IBinding\`1 `type`
@@ -7501,7 +7463,7 @@ IoC
 
 ##### Summary
 
-The container's binding.
+The containers binding.
 
 ##### Generic Types
 
@@ -7518,14 +7480,14 @@ IoC
 
 ##### Summary
 
-Represents the abstraction for build context.
+Represents an abstract build context.
 
 <a name='P-IoC-IBuildContext-AutowiringStrategy'></a>
 ### AutowiringStrategy `property`
 
 ##### Summary
 
-Autowiring strategy.
+The current autowiring strategy.
 
 <a name='P-IoC-IBuildContext-Container'></a>
 ### Container `property`
@@ -7539,28 +7501,28 @@ The target container.
 
 ##### Summary
 
-The depth of current context.
+The depth of current context in the build tree.
 
 <a name='P-IoC-IBuildContext-Key'></a>
 ### Key `property`
 
 ##### Summary
 
-The target key.
+The target key to build resolver.
 
 <a name='P-IoC-IBuildContext-Parent'></a>
 ### Parent `property`
 
 ##### Summary
 
-The parent build context.
+The parent of the current build context.
 
 <a name='M-IoC-IBuildContext-AddLifetime-System-Linq-Expressions-Expression,IoC-ILifetime-'></a>
 ### AddLifetime(baseExpression,lifetime) `method`
 
 ##### Summary
 
-Prepares base expression, adding a lifetime.
+Prepares base expression adding the appropriate lifetime.
 
 ##### Returns
 
@@ -7574,17 +7536,17 @@ Prepares base expression, adding a lifetime.
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 
 <a name='M-IoC-IBuildContext-BindTypes-System-Type,System-Type-'></a>
-### BindTypes(type,targetType) `method`
+### BindTypes(originalType,targetType) `method`
 
 ##### Summary
 
-Bind a raw type to a target type.
+Binds a raw type to a target type.
 
 ##### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The type. |
+| originalType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The registered type. |
 | targetType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The target type. |
 
 <a name='M-IoC-IBuildContext-CreateChild-IoC-Key,IoC-IContainer-'></a>
@@ -7592,7 +7554,7 @@ Bind a raw type to a target type.
 
 ##### Summary
 
-Creates a child context.
+Creates a child build context.
 
 ##### Returns
 
@@ -7610,7 +7572,7 @@ The new build context.
 
 ##### Summary
 
-Get the dependency expression.
+Gets the dependency expression.
 
 ##### Returns
 
@@ -7627,7 +7589,7 @@ The dependency expression.
 
 ##### Summary
 
-Prepares base expression, injecting dependencies.
+Prepares base expression injecting appropriate dependencies.
 
 ##### Returns
 
@@ -7645,7 +7607,7 @@ The resulting expression.
 
 ##### Summary
 
-Prepares base expression, replacing generic types' markers.
+Prepares base expression replacing generic types' markers by related types.
 
 ##### Returns
 
@@ -7658,11 +7620,11 @@ The resulting expression.
 | baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
 
 <a name='M-IoC-IBuildContext-TryReplaceType-System-Type,System-Type@-'></a>
-### TryReplaceType(type,targetType) `method`
+### TryReplaceType(originalType,targetType) `method`
 
 ##### Summary
 
-Try replacing generic types' markers.
+Tries to replace generic types' markers by related types.
 
 ##### Returns
 
@@ -7672,7 +7634,7 @@ Try replacing generic types' markers.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The target raw type. |
+| originalType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The target raw type. |
 | targetType | [System.Type@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type@ 'System.Type@') | The replacing type. |
 
 <a name='T-IoC-IBuilder'></a>
@@ -7684,14 +7646,14 @@ IoC
 
 ##### Summary
 
-Represents a builder for an instance.
+Represents an abstract builder for an instance.
 
 <a name='M-IoC-IBuilder-Build-IoC-IBuildContext,System-Linq-Expressions-Expression-'></a>
 ### Build(context,bodyExpression) `method`
 
 ##### Summary
 
-Builds the expression.
+Builds the expression based on a build context.
 
 ##### Returns
 
@@ -7701,8 +7663,8 @@ The new expression.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| context | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | Current context for building. |
-| bodyExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The expression body to get an instance. |
+| context | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | Current build context. |
+| bodyExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The expression body to build an instance resolver. |
 
 <a name='T-IoC-Issues-ICannotBuildExpression'></a>
 ## ICannotBuildExpression `type`
@@ -8020,7 +7982,7 @@ IoC
 
 ##### Summary
 
-Represents a expression compiler.
+Represents an abstract expression compiler.
 
 <a name='M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@-'></a>
 ### TryCompile(context,expression,resolver) `method`
@@ -8041,6 +8003,30 @@ True if success.
 | expression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The lambda expression to compile. |
 | resolver | [System.Delegate@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Delegate@ 'System.Delegate@') | The compiled resolver delegate. |
 
+<a name='T-IoC-ICompositionRoot`1'></a>
+## ICompositionRoot\`1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents an abstract composition root.
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| TInstance |  |
+
+<a name='P-IoC-ICompositionRoot`1-Instance'></a>
+### Instance `property`
+
+##### Summary
+
+The composition root instance.
+
 <a name='T-IoC-IConfiguration'></a>
 ## IConfiguration `type`
 
@@ -8050,24 +8036,24 @@ IoC
 
 ##### Summary
 
-The container's configuration.
+Represents an abstract containers configuration.
 
 <a name='M-IoC-IConfiguration-Apply-IoC-IMutableContainer-'></a>
 ### Apply(container) `method`
 
 ##### Summary
 
-Apply the configuration for the target container.
+Applies a configuration to the target mutable container.
 
 ##### Returns
 
-The enumeration of dependency tokens.
+The enumeration of configuration tokens which allows to cancel that changes.
 
 ##### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
+| container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target mutable container to configure. |
 
 <a name='T-IoC-IContainer'></a>
 ## IContainer `type`
@@ -8078,21 +8064,21 @@ IoC
 
 ##### Summary
 
-The Inversion of Control container.
+Represents an abstract Inversion of Control container.
 
 <a name='P-IoC-IContainer-Parent'></a>
 ### Parent `property`
 
 ##### Summary
 
-The parent container or null if it has no a parent.
+Provides a parent container or `null` if it does not have a parent.
 
 <a name='M-IoC-IContainer-TryGetDependency-IoC-Key,IoC-IDependency@,IoC-ILifetime@-'></a>
 ### TryGetDependency(key,dependency,lifetime) `method`
 
 ##### Summary
 
-Get the dependency with lifetime.
+Provides a dependency and a lifetime for the registered key.
 
 ##### Returns
 
@@ -8111,21 +8097,21 @@ True if successful.
 
 ##### Summary
 
-Get the resolver.
+Provides a resolver for a specific type and tag or error if something goes wrong.
 
 ##### Returns
 
-True if successful.
+`True` if successful and a resolver was provided.
 
 ##### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The binding's type. |
-| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The binding's tag or null if there is no tag. |
-| resolver | [IoC.Resolver{\`\`0}@](#T-IoC-Resolver{``0}@ 'IoC.Resolver{``0}@') | The resolver. |
-| error | [System.Exception@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception@ 'System.Exception@') | The error occurring during resolving. |
-| resolvingContainer | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container and null if it is the current container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The binding type. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The binding tag or null if there is no tag. |
+| resolver | [IoC.Resolver{\`\`0}@](#T-IoC-Resolver{``0}@ 'IoC.Resolver{``0}@') | The resolver to get an instance. |
+| error | [System.Exception@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception@ 'System.Exception@') | Error that occurs when resolving. |
+| resolvingContainer | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container and null if the resolving container is the current container. |
 
 ##### Generic Types
 
@@ -8142,27 +8128,27 @@ IoC
 
 ##### Summary
 
-Represents a IoC dependency.
+Represents an abstract IoC dependency.
 
 <a name='M-IoC-IDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@-'></a>
 ### TryBuildExpression(buildContext,lifetime,baseExpression,error) `method`
 
 ##### Summary
 
-Builds an expression.
+Builds an expression for dependency based on the current build context and specified lifetime.
 
 ##### Returns
 
-True if success.
+`True` if successful and an expression was provided.
 
 ##### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context, |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime, |
-| baseExpression | [System.Linq.Expressions.Expression@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression@ 'System.Linq.Expressions.Expression@') | The resulting expression. |
-| error | [System.Exception@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception@ 'System.Exception@') | The error. |
+| buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
+| baseExpression | [System.Linq.Expressions.Expression@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression@ 'System.Linq.Expressions.Expression@') | The resulting expression for the current dependency. |
+| error | [System.Exception@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception@ 'System.Exception@') | The error if something goes wrong. |
 
 <a name='T-IoC-Core-IExpressionBuilder`1'></a>
 ## IExpressionBuilder\`1 `type`
@@ -8218,30 +8204,6 @@ Resolves the scenario when a cyclic dependency was detected.
 | ---- | ---- | ----------- |
 | buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context. |
 
-<a name='T-IoC-IHolder`1'></a>
-## IHolder\`1 `type`
-
-##### Namespace
-
-IoC
-
-##### Summary
-
-Represents a holder for a created instance.
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| TInstance |  |
-
-<a name='P-IoC-IHolder`1-Instance'></a>
-### Instance `property`
-
-##### Summary
-
-The created instance.
-
 <a name='T-IoC-ILifetime'></a>
 ## ILifetime `type`
 
@@ -8251,7 +8213,7 @@ IoC
 
 ##### Summary
 
-Represents a lifetime for an instance.
+Represents an abstraction of container lifetime.
 
 <a name='M-IoC-ILifetime-Create'></a>
 ### Create() `method`
@@ -8262,7 +8224,7 @@ Creates the similar lifetime to use with generic instances.
 
 ##### Returns
 
-
+The new lifetime instance.
 
 ##### Parameters
 
@@ -8273,7 +8235,7 @@ This method has no parameters.
 
 ##### Summary
 
-Select default container to resolve dependencies.
+Provides a container to resolve dependencies.
 
 ##### Returns
 
@@ -8283,7 +8245,7 @@ The selected container.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| registrationContainer | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The container where the entry was registered. |
+| registrationContainer | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The container where a dependency was registered. |
 | resolvingContainer | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The container which is used to resolve an instance. |
 
 <a name='T-IoC-IMethod`1'></a>
@@ -8308,14 +8270,14 @@ Represents an abstraction for autowiring method.
 
 ##### Summary
 
-The method's information.
+The methods information.
 
 <a name='M-IoC-IMethod`1-GetParametersExpressions-IoC-IBuildContext-'></a>
 ### GetParametersExpressions() `method`
 
 ##### Summary
 
-Provides parameters' expressions.
+Provides a set of parameters expressions.
 
 ##### Returns
 
@@ -8325,12 +8287,27 @@ Parameters' expressions
 
 This method has no parameters.
 
-<a name='M-IoC-IMethod`1-SetParameterExpression-System-Int32,System-Linq-Expressions-Expression-'></a>
-### SetParameterExpression(parameterPosition,parameterExpression) `method`
+<a name='M-IoC-IMethod`1-SetDependency-System-Int32,System-Type,System-Object-'></a>
+### SetDependency(parameterPosition,dependencyType,dependencyTag) `method`
 
 ##### Summary
 
-Sets the parameter expression at the position.
+Specifies the dependency type and tag for method parameter at the position.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| parameterPosition | [System.Int32](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Int32 'System.Int32') | The parameter position. |
+| dependencyType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The dependency type. |
+| dependencyTag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The optional dependency tag value. |
+
+<a name='M-IoC-IMethod`1-SetExpression-System-Int32,System-Linq-Expressions-Expression-'></a>
+### SetExpression(parameterPosition,parameterExpression) `method`
+
+##### Summary
+
+Specifies the expression of method parameter at the position.
 
 ##### Parameters
 
@@ -8348,18 +8325,18 @@ IoC
 
 ##### Summary
 
-The configurable Inversion of Control container.
+Represents an abstract of configurable Inversion of Control container.
 
 <a name='M-IoC-IMutableContainer-TryRegisterDependency-System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime,IoC-IToken@-'></a>
 ### TryRegisterDependency(keys,dependency,lifetime,dependencyToken) `method`
 
 ##### Summary
 
-Register the dependency with lifetime.
+Registers the dependency and the lifetime for the specified dependency key.
 
 ##### Returns
 
-True if successful.
+`True` if is registered successfully.
 
 ##### Parameters
 
@@ -8368,7 +8345,7 @@ True if successful.
 | keys | [System.Collections.Generic.IEnumerable{IoC.Key}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.Key}') | The set of keys to register. |
 | dependency | [IoC.IDependency](#T-IoC-IDependency 'IoC.IDependency') | The dependency. |
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The lifetime. |
-| dependencyToken | [IoC.IToken@](#T-IoC-IToken@ 'IoC.IToken@') | The dependency token. |
+| dependencyToken | [IoC.IToken@](#T-IoC-IToken@ 'IoC.IToken@') | The dependency token to unregister this dependency key. |
 
 <a name='T-IoC-IResourceRegistry'></a>
 ## IResourceRegistry `type`
@@ -8379,7 +8356,7 @@ IoC
 
 ##### Summary
 
-Represents the resource's registry.
+Represents an abstraction of the resource registry.
 
 <a name='M-IoC-IResourceRegistry-RegisterResource-System-IDisposable-'></a>
 ### RegisterResource(resource) `method`
@@ -8416,7 +8393,7 @@ IoC
 
 ##### Summary
 
-Represents the scope which could be used with `Lifetime.ScopeSingleton`
+Represents an abstraction of a scope which is used with `Lifetime.ScopeSingleton`.
 
 <a name='M-IoC-IScope-Activate'></a>
 ### Activate() `method`
@@ -8427,7 +8404,7 @@ Activate the scope.
 
 ##### Returns
 
-The token to deactivate the scope.
+The token to deactivate the activated scope.
 
 ##### Parameters
 
@@ -8442,14 +8419,14 @@ IoC
 
 ##### Summary
 
-The binding token to manage binding lifetime.
+Represents an abstraction of a binding token.
 
 <a name='P-IoC-IToken-Container'></a>
 ### Container `property`
 
 ##### Summary
 
-The owner container.
+The configurable container owning the registered binding.
 
 <a name='T-IoC-ImplicitNotNullAttribute'></a>
 ## ImplicitNotNullAttribute `type`
@@ -8534,14 +8511,14 @@ IoC
 
 ##### Summary
 
-Injection extensions.
+A set of injection markers.
 
 <a name='M-IoC-Injections-Inject-IoC-IContainer,System-Type-'></a>
 ### Inject(container,type) `method`
 
 ##### Summary
 
-Injects a dependency. Just an injection marker.
+Injects a dependency. Just the injection marker.
 
 ##### Returns
 
@@ -8559,7 +8536,7 @@ The injected instance.
 
 ##### Summary
 
-Injects a dependency. Just an injection marker.
+Injects a dependency. Just the injection marker.
 
 ##### Returns
 
@@ -8578,7 +8555,7 @@ The injected instance.
 
 ##### Summary
 
-Injects a dependency. Just an injection marker.
+Injects a dependency. Just the injection marker.
 
 ##### Returns
 
@@ -8601,7 +8578,7 @@ The injected instance.
 
 ##### Summary
 
-Injects a dependency. Just an injection marker.
+Injects a dependency. Just the injection marker.
 
 ##### Returns
 
@@ -8625,7 +8602,7 @@ The injected instance.
 
 ##### Summary
 
-Injects a dependency. Just an injection marker.
+Injects a dependency. Just the injection marker.
 
 ##### Parameters
 
@@ -8646,11 +8623,11 @@ Injects a dependency. Just an injection marker.
 
 ##### Summary
 
-Tries to inject a dependency. Just an injection marker.
+Try to inject a dependency. Just the injection marker.
 
 ##### Returns
 
-The injected instance or default(Type).
+The injected instance or `default(T)`.
 
 ##### Parameters
 
@@ -8664,11 +8641,11 @@ The injected instance or default(Type).
 
 ##### Summary
 
-Tries to inject a dependency. Just an injection marker.
+Try to inject a dependency. Just the injection marker.
 
 ##### Returns
 
-The injected instance or default(Type).
+The injected instance or `default(T)`.
 
 ##### Parameters
 
@@ -8683,11 +8660,11 @@ The injected instance or default(Type).
 
 ##### Summary
 
-Tries to inject a dependency. Just an injection marker.
+Try to inject a dependency. Just the injection marker.
 
 ##### Returns
 
-The injected instance or default(T).
+The injected instance or `default(T)`.
 
 ##### Parameters
 
@@ -8706,11 +8683,11 @@ The injected instance or default(T).
 
 ##### Summary
 
-Tries to inject a dependency. Just an injection marker.
+Try to inject a dependency. Just the injection marker.
 
 ##### Returns
 
-The injected instance or default(T).
+The injected instance or `default(T)`.
 
 ##### Parameters
 
@@ -9023,35 +9000,35 @@ IoC
 
 ##### Summary
 
-The enumeration of well-known lifetimes.
+A set of well-known lifetimes.
 
 <a name='F-IoC-Lifetime-ContainerSingleton'></a>
 ### ContainerSingleton `constants`
 
 ##### Summary
 
-Singleton instance per container.
+For a singleton instance per container.
 
 <a name='F-IoC-Lifetime-ScopeSingleton'></a>
 ### ScopeSingleton `constants`
 
 ##### Summary
 
-Singleton instance per scope.
+For a singleton instance per scope.
 
 <a name='F-IoC-Lifetime-Singleton'></a>
 ### Singleton `constants`
 
 ##### Summary
 
-Single instance.
+For a singleton instance.
 
 <a name='F-IoC-Lifetime-Transient'></a>
 ### Transient `constants`
 
 ##### Summary
 
-A new instance is creating each time (it's default).
+For a new instance each time (default).
 
 <a name='T-IoC-LinqTunnelAttribute'></a>
 ## LinqTunnelAttribute `type`
@@ -9364,7 +9341,7 @@ IoC
 
 ##### Summary
 
-Represents the resolver delegate.
+Represents an abstraction of instance resolver.
 
 ##### Returns
 
@@ -9391,7 +9368,7 @@ IoC.Lifetimes
 
 ##### Summary
 
-Represents singleton per scope lifetime.
+For a singleton instance per scope.
 
 <a name='M-IoC-Lifetimes-ScopeSingletonLifetime-Create'></a>
 ### Create() `method`
@@ -9457,7 +9434,7 @@ IoC.Features
 
 ##### Summary
 
-Provides defaults for features.
+Represents a feature sets.
 
 <a name='F-IoC-Features-Set-Core'></a>
 ### Core `constants`
@@ -9489,7 +9466,7 @@ IoC.Lifetimes
 
 ##### Summary
 
-Represents singleton lifetime.
+For a singleton instance.
 
 <a name='M-IoC-Lifetimes-SingletonLifetime-Build-IoC-IBuildContext,System-Linq-Expressions-Expression-'></a>
 ### Build() `method`
@@ -9621,7 +9598,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT1'></a>
 ## TT1 `type`
@@ -9632,7 +9609,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT10'></a>
 ## TT10 `type`
@@ -9643,7 +9620,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT11'></a>
 ## TT11 `type`
@@ -9654,7 +9631,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT12'></a>
 ## TT12 `type`
@@ -9665,7 +9642,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT13'></a>
 ## TT13 `type`
@@ -9676,7 +9653,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT14'></a>
 ## TT14 `type`
@@ -9687,7 +9664,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT15'></a>
 ## TT15 `type`
@@ -9698,7 +9675,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT16'></a>
 ## TT16 `type`
@@ -9709,7 +9686,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT17'></a>
 ## TT17 `type`
@@ -9720,7 +9697,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT18'></a>
 ## TT18 `type`
@@ -9731,7 +9708,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT19'></a>
 ## TT19 `type`
@@ -9742,7 +9719,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT2'></a>
 ## TT2 `type`
@@ -9753,7 +9730,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT20'></a>
 ## TT20 `type`
@@ -9764,7 +9741,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT21'></a>
 ## TT21 `type`
@@ -9775,7 +9752,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT22'></a>
 ## TT22 `type`
@@ -9786,7 +9763,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT23'></a>
 ## TT23 `type`
@@ -9797,7 +9774,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT24'></a>
 ## TT24 `type`
@@ -9808,7 +9785,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT25'></a>
 ## TT25 `type`
@@ -9819,7 +9796,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT26'></a>
 ## TT26 `type`
@@ -9830,7 +9807,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT27'></a>
 ## TT27 `type`
@@ -9841,7 +9818,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT28'></a>
 ## TT28 `type`
@@ -9852,7 +9829,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT29'></a>
 ## TT29 `type`
@@ -9863,7 +9840,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT3'></a>
 ## TT3 `type`
@@ -9874,7 +9851,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT30'></a>
 ## TT30 `type`
@@ -9885,7 +9862,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT31'></a>
 ## TT31 `type`
@@ -9896,7 +9873,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT32'></a>
 ## TT32 `type`
@@ -9907,7 +9884,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT4'></a>
 ## TT4 `type`
@@ -9918,7 +9895,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT5'></a>
 ## TT5 `type`
@@ -9929,7 +9906,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT6'></a>
 ## TT6 `type`
@@ -9940,7 +9917,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT7'></a>
 ## TT7 `type`
@@ -9951,7 +9928,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT8'></a>
 ## TT8 `type`
@@ -9962,7 +9939,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TT9'></a>
 ## TT9 `type`
@@ -9973,7 +9950,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a reference type.
+Represents the generic type arguments marker for a reference type.
 
 <a name='T-IoC-TTCollection1`1'></a>
 ## TTCollection1\`1 `type`
@@ -9984,7 +9961,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection2`1'></a>
 ## TTCollection2\`1 `type`
@@ -9995,7 +9972,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection3`1'></a>
 ## TTCollection3\`1 `type`
@@ -10006,7 +9983,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection4`1'></a>
 ## TTCollection4\`1 `type`
@@ -10017,7 +9994,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection5`1'></a>
 ## TTCollection5\`1 `type`
@@ -10028,7 +10005,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection6`1'></a>
 ## TTCollection6\`1 `type`
@@ -10039,7 +10016,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection7`1'></a>
 ## TTCollection7\`1 `type`
@@ -10050,7 +10027,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection8`1'></a>
 ## TTCollection8\`1 `type`
@@ -10061,7 +10038,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTCollection`1'></a>
 ## TTCollection\`1 `type`
@@ -10072,7 +10049,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ICollection[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ICollection[T]`.
 
 <a name='T-IoC-TTComparable'></a>
 ## TTComparable `type`
@@ -10083,7 +10060,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable`.
+Represents the generic type arguments marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable1'></a>
 ## TTComparable1 `type`
@@ -10094,7 +10071,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable`.
+Represents the generic type arguments marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable1`1'></a>
 ## TTComparable1\`1 `type`
@@ -10105,7 +10082,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable[T]`.
+Represents the generic type arguments marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable2'></a>
 ## TTComparable2 `type`
@@ -10116,7 +10093,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable`.
+Represents the generic type arguments marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable2`1'></a>
 ## TTComparable2\`1 `type`
@@ -10127,7 +10104,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable[T]`.
+Represents the generic type arguments marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable3'></a>
 ## TTComparable3 `type`
@@ -10138,7 +10115,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable`.
+Represents the generic type arguments marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable3`1'></a>
 ## TTComparable3\`1 `type`
@@ -10149,7 +10126,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable[T]`.
+Represents the generic type arguments marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable4'></a>
 ## TTComparable4 `type`
@@ -10160,7 +10137,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable`.
+Represents the generic type arguments marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable4`1'></a>
 ## TTComparable4\`1 `type`
@@ -10171,7 +10148,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable[T]`.
+Represents the generic type arguments marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable5'></a>
 ## TTComparable5 `type`
@@ -10182,7 +10159,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable`.
+Represents the generic type arguments marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable5`1'></a>
 ## TTComparable5\`1 `type`
@@ -10193,7 +10170,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable[T]`.
+Represents the generic type arguments marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable6'></a>
 ## TTComparable6 `type`
@@ -10204,7 +10181,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable`.
+Represents the generic type arguments marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable6`1'></a>
 ## TTComparable6\`1 `type`
@@ -10215,7 +10192,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable[T]`.
+Represents the generic type arguments marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable7'></a>
 ## TTComparable7 `type`
@@ -10226,7 +10203,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable`.
+Represents the generic type arguments marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable7`1'></a>
 ## TTComparable7\`1 `type`
@@ -10237,7 +10214,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable[T]`.
+Represents the generic type arguments marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable8'></a>
 ## TTComparable8 `type`
@@ -10248,7 +10225,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable`.
+Represents the generic type arguments marker for `System.IComparable`.
 
 <a name='T-IoC-TTComparable8`1'></a>
 ## TTComparable8\`1 `type`
@@ -10259,7 +10236,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable[T]`.
+Represents the generic type arguments marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparable`1'></a>
 ## TTComparable\`1 `type`
@@ -10270,7 +10247,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IComparable[T]`.
+Represents the generic type arguments marker for `System.IComparable[T]`.
 
 <a name='T-IoC-TTComparer1`1'></a>
 ## TTComparer1\`1 `type`
@@ -10281,7 +10258,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer2`1'></a>
 ## TTComparer2\`1 `type`
@@ -10292,7 +10269,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer3`1'></a>
 ## TTComparer3\`1 `type`
@@ -10303,7 +10280,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer4`1'></a>
 ## TTComparer4\`1 `type`
@@ -10314,7 +10291,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer5`1'></a>
 ## TTComparer5\`1 `type`
@@ -10325,7 +10302,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer6`1'></a>
 ## TTComparer6\`1 `type`
@@ -10336,7 +10313,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer7`1'></a>
 ## TTComparer7\`1 `type`
@@ -10347,7 +10324,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer8`1'></a>
 ## TTComparer8\`1 `type`
@@ -10358,7 +10335,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTComparer`1'></a>
 ## TTComparer\`1 `type`
@@ -10369,7 +10346,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IComparer[T]`.
 
 <a name='T-IoC-TTDictionary1`2'></a>
 ## TTDictionary1\`2 `type`
@@ -10380,7 +10357,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary2`2'></a>
 ## TTDictionary2\`2 `type`
@@ -10391,7 +10368,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary3`2'></a>
 ## TTDictionary3\`2 `type`
@@ -10402,7 +10379,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary4`2'></a>
 ## TTDictionary4\`2 `type`
@@ -10413,7 +10390,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary5`2'></a>
 ## TTDictionary5\`2 `type`
@@ -10424,7 +10401,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary6`2'></a>
 ## TTDictionary6\`2 `type`
@@ -10435,7 +10412,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary7`2'></a>
 ## TTDictionary7\`2 `type`
@@ -10446,7 +10423,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary8`2'></a>
 ## TTDictionary8\`2 `type`
@@ -10457,7 +10434,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDictionary`2'></a>
 ## TTDictionary\`2 `type`
@@ -10468,7 +10445,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IDictionary[TKey, TValue]`.
 
 <a name='T-IoC-TTDisposable'></a>
 ## TTDisposable `type`
@@ -10479,7 +10456,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IDisposable`.
+Represents the generic type arguments marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable1'></a>
 ## TTDisposable1 `type`
@@ -10490,7 +10467,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IDisposable`.
+Represents the generic type arguments marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable2'></a>
 ## TTDisposable2 `type`
@@ -10501,7 +10478,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IDisposable`.
+Represents the generic type arguments marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable3'></a>
 ## TTDisposable3 `type`
@@ -10512,7 +10489,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IDisposable`.
+Represents the generic type arguments marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable4'></a>
 ## TTDisposable4 `type`
@@ -10523,7 +10500,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IDisposable`.
+Represents the generic type arguments marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable5'></a>
 ## TTDisposable5 `type`
@@ -10534,7 +10511,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IDisposable`.
+Represents the generic type arguments marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable6'></a>
 ## TTDisposable6 `type`
@@ -10545,7 +10522,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IDisposable`.
+Represents the generic type arguments marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable7'></a>
 ## TTDisposable7 `type`
@@ -10556,7 +10533,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IDisposable`.
+Represents the generic type arguments marker for `System.IDisposable`.
 
 <a name='T-IoC-TTDisposable8'></a>
 ## TTDisposable8 `type`
@@ -10567,7 +10544,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IDisposable`.
+Represents the generic type arguments marker for `System.IDisposable`.
 
 <a name='T-IoC-TTEnumerable1`1'></a>
 ## TTEnumerable1\`1 `type`
@@ -10578,7 +10555,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable2`1'></a>
 ## TTEnumerable2\`1 `type`
@@ -10589,7 +10566,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable3`1'></a>
 ## TTEnumerable3\`1 `type`
@@ -10600,7 +10577,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable4`1'></a>
 ## TTEnumerable4\`1 `type`
@@ -10611,7 +10588,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable5`1'></a>
 ## TTEnumerable5\`1 `type`
@@ -10622,7 +10599,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable6`1'></a>
 ## TTEnumerable6\`1 `type`
@@ -10633,7 +10610,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable7`1'></a>
 ## TTEnumerable7\`1 `type`
@@ -10644,7 +10621,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable8`1'></a>
 ## TTEnumerable8\`1 `type`
@@ -10655,7 +10632,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerable`1'></a>
 ## TTEnumerable\`1 `type`
@@ -10666,7 +10643,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerable[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerable[T]`.
 
 <a name='T-IoC-TTEnumerator1`1'></a>
 ## TTEnumerator1\`1 `type`
@@ -10677,7 +10654,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator2`1'></a>
 ## TTEnumerator2\`1 `type`
@@ -10688,7 +10665,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator3`1'></a>
 ## TTEnumerator3\`1 `type`
@@ -10699,7 +10676,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator4`1'></a>
 ## TTEnumerator4\`1 `type`
@@ -10710,7 +10687,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator5`1'></a>
 ## TTEnumerator5\`1 `type`
@@ -10721,7 +10698,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator6`1'></a>
 ## TTEnumerator6\`1 `type`
@@ -10732,7 +10709,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator7`1'></a>
 ## TTEnumerator7\`1 `type`
@@ -10743,7 +10720,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator8`1'></a>
 ## TTEnumerator8\`1 `type`
@@ -10754,7 +10731,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEnumerator`1'></a>
 ## TTEnumerator\`1 `type`
@@ -10765,7 +10742,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEnumerator[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEnumerator[T]`.
 
 <a name='T-IoC-TTEqualityComparer1`1'></a>
 ## TTEqualityComparer1\`1 `type`
@@ -10776,7 +10753,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer2`1'></a>
 ## TTEqualityComparer2\`1 `type`
@@ -10787,7 +10764,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer3`1'></a>
 ## TTEqualityComparer3\`1 `type`
@@ -10798,7 +10775,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer4`1'></a>
 ## TTEqualityComparer4\`1 `type`
@@ -10809,7 +10786,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer5`1'></a>
 ## TTEqualityComparer5\`1 `type`
@@ -10820,7 +10797,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer6`1'></a>
 ## TTEqualityComparer6\`1 `type`
@@ -10831,7 +10808,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer7`1'></a>
 ## TTEqualityComparer7\`1 `type`
@@ -10842,7 +10819,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer8`1'></a>
 ## TTEqualityComparer8\`1 `type`
@@ -10853,7 +10830,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEqualityComparer`1'></a>
 ## TTEqualityComparer\`1 `type`
@@ -10864,7 +10841,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IEqualityComparer[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IEqualityComparer[T]`.
 
 <a name='T-IoC-TTEquatable1`1'></a>
 ## TTEquatable1\`1 `type`
@@ -10875,7 +10852,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IEquatable[T]`.
+Represents the generic type arguments marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable2`1'></a>
 ## TTEquatable2\`1 `type`
@@ -10886,7 +10863,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IEquatable[T]`.
+Represents the generic type arguments marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable3`1'></a>
 ## TTEquatable3\`1 `type`
@@ -10897,7 +10874,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IEquatable[T]`.
+Represents the generic type arguments marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable4`1'></a>
 ## TTEquatable4\`1 `type`
@@ -10908,7 +10885,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IEquatable[T]`.
+Represents the generic type arguments marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable5`1'></a>
 ## TTEquatable5\`1 `type`
@@ -10919,7 +10896,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IEquatable[T]`.
+Represents the generic type arguments marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable6`1'></a>
 ## TTEquatable6\`1 `type`
@@ -10930,7 +10907,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IEquatable[T]`.
+Represents the generic type arguments marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable7`1'></a>
 ## TTEquatable7\`1 `type`
@@ -10941,7 +10918,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IEquatable[T]`.
+Represents the generic type arguments marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable8`1'></a>
 ## TTEquatable8\`1 `type`
@@ -10952,7 +10929,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IEquatable[T]`.
+Represents the generic type arguments marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTEquatable`1'></a>
 ## TTEquatable\`1 `type`
@@ -10963,7 +10940,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IEquatable[T]`.
+Represents the generic type arguments marker for `System.IEquatable[T]`.
 
 <a name='T-IoC-TTI'></a>
 ## TTI `type`
@@ -10974,7 +10951,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI1'></a>
 ## TTI1 `type`
@@ -10985,7 +10962,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI10'></a>
 ## TTI10 `type`
@@ -10996,7 +10973,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI11'></a>
 ## TTI11 `type`
@@ -11007,7 +10984,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI12'></a>
 ## TTI12 `type`
@@ -11018,7 +10995,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI13'></a>
 ## TTI13 `type`
@@ -11029,7 +11006,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI14'></a>
 ## TTI14 `type`
@@ -11040,7 +11017,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI15'></a>
 ## TTI15 `type`
@@ -11051,7 +11028,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI16'></a>
 ## TTI16 `type`
@@ -11062,7 +11039,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI17'></a>
 ## TTI17 `type`
@@ -11073,7 +11050,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI18'></a>
 ## TTI18 `type`
@@ -11084,7 +11061,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI19'></a>
 ## TTI19 `type`
@@ -11095,7 +11072,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI2'></a>
 ## TTI2 `type`
@@ -11106,7 +11083,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI20'></a>
 ## TTI20 `type`
@@ -11117,7 +11094,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI21'></a>
 ## TTI21 `type`
@@ -11128,7 +11105,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI22'></a>
 ## TTI22 `type`
@@ -11139,7 +11116,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI23'></a>
 ## TTI23 `type`
@@ -11150,7 +11127,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI24'></a>
 ## TTI24 `type`
@@ -11161,7 +11138,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI25'></a>
 ## TTI25 `type`
@@ -11172,7 +11149,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI26'></a>
 ## TTI26 `type`
@@ -11183,7 +11160,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI27'></a>
 ## TTI27 `type`
@@ -11194,7 +11171,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI28'></a>
 ## TTI28 `type`
@@ -11205,7 +11182,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI29'></a>
 ## TTI29 `type`
@@ -11216,7 +11193,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI3'></a>
 ## TTI3 `type`
@@ -11227,7 +11204,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI30'></a>
 ## TTI30 `type`
@@ -11238,7 +11215,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI31'></a>
 ## TTI31 `type`
@@ -11249,7 +11226,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI32'></a>
 ## TTI32 `type`
@@ -11260,7 +11237,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI4'></a>
 ## TTI4 `type`
@@ -11271,7 +11248,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI5'></a>
 ## TTI5 `type`
@@ -11282,7 +11259,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI6'></a>
 ## TTI6 `type`
@@ -11293,7 +11270,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI7'></a>
 ## TTI7 `type`
@@ -11304,7 +11281,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI8'></a>
 ## TTI8 `type`
@@ -11315,7 +11292,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTI9'></a>
 ## TTI9 `type`
@@ -11326,7 +11303,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for an interface.
+Represents the generic type arguments marker for an interface.
 
 <a name='T-IoC-TTList1`1'></a>
 ## TTList1\`1 `type`
@@ -11337,7 +11314,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList2`1'></a>
 ## TTList2\`1 `type`
@@ -11348,7 +11325,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList3`1'></a>
 ## TTList3\`1 `type`
@@ -11359,7 +11336,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList4`1'></a>
 ## TTList4\`1 `type`
@@ -11370,7 +11347,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList5`1'></a>
 ## TTList5\`1 `type`
@@ -11381,7 +11358,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList6`1'></a>
 ## TTList6\`1 `type`
@@ -11392,7 +11369,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList7`1'></a>
 ## TTList7\`1 `type`
@@ -11403,7 +11380,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList8`1'></a>
 ## TTList8\`1 `type`
@@ -11414,7 +11391,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTList`1'></a>
 ## TTList\`1 `type`
@@ -11425,7 +11402,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.IList[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.IList[T]`.
 
 <a name='T-IoC-TTObservable1`1'></a>
 ## TTObservable1\`1 `type`
@@ -11436,7 +11413,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObservable[T]`.
+Represents the generic type arguments marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable2`1'></a>
 ## TTObservable2\`1 `type`
@@ -11447,7 +11424,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObservable[T]`.
+Represents the generic type arguments marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable3`1'></a>
 ## TTObservable3\`1 `type`
@@ -11458,7 +11435,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObservable[T]`.
+Represents the generic type arguments marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable4`1'></a>
 ## TTObservable4\`1 `type`
@@ -11469,7 +11446,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObservable[T]`.
+Represents the generic type arguments marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable5`1'></a>
 ## TTObservable5\`1 `type`
@@ -11480,7 +11457,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObservable[T]`.
+Represents the generic type arguments marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable6`1'></a>
 ## TTObservable6\`1 `type`
@@ -11491,7 +11468,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObservable[T]`.
+Represents the generic type arguments marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable7`1'></a>
 ## TTObservable7\`1 `type`
@@ -11502,7 +11479,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObservable[T]`.
+Represents the generic type arguments marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable8`1'></a>
 ## TTObservable8\`1 `type`
@@ -11513,7 +11490,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObservable[T]`.
+Represents the generic type arguments marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObservable`1'></a>
 ## TTObservable\`1 `type`
@@ -11524,7 +11501,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObservable[T]`.
+Represents the generic type arguments marker for `System.IObservable[T]`.
 
 <a name='T-IoC-TTObserver1`1'></a>
 ## TTObserver1\`1 `type`
@@ -11535,7 +11512,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObserver[T]`.
+Represents the generic type arguments marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver2`1'></a>
 ## TTObserver2\`1 `type`
@@ -11546,7 +11523,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObserver[T]`.
+Represents the generic type arguments marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver3`1'></a>
 ## TTObserver3\`1 `type`
@@ -11557,7 +11534,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObserver[T]`.
+Represents the generic type arguments marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver4`1'></a>
 ## TTObserver4\`1 `type`
@@ -11568,7 +11545,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObserver[T]`.
+Represents the generic type arguments marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver5`1'></a>
 ## TTObserver5\`1 `type`
@@ -11579,7 +11556,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObserver[T]`.
+Represents the generic type arguments marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver6`1'></a>
 ## TTObserver6\`1 `type`
@@ -11590,7 +11567,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObserver[T]`.
+Represents the generic type arguments marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver7`1'></a>
 ## TTObserver7\`1 `type`
@@ -11601,7 +11578,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObserver[T]`.
+Represents the generic type arguments marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver8`1'></a>
 ## TTObserver8\`1 `type`
@@ -11612,7 +11589,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObserver[T]`.
+Represents the generic type arguments marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTObserver`1'></a>
 ## TTObserver\`1 `type`
@@ -11623,7 +11600,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.IObserver[T]`.
+Represents the generic type arguments marker for `System.IObserver[T]`.
 
 <a name='T-IoC-TTS'></a>
 ## TTS `type`
@@ -11634,7 +11611,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS1'></a>
 ## TTS1 `type`
@@ -11645,7 +11622,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS10'></a>
 ## TTS10 `type`
@@ -11656,7 +11633,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS11'></a>
 ## TTS11 `type`
@@ -11667,7 +11644,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS12'></a>
 ## TTS12 `type`
@@ -11678,7 +11655,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS13'></a>
 ## TTS13 `type`
@@ -11689,7 +11666,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS14'></a>
 ## TTS14 `type`
@@ -11700,7 +11677,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS15'></a>
 ## TTS15 `type`
@@ -11711,7 +11688,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS16'></a>
 ## TTS16 `type`
@@ -11722,7 +11699,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS17'></a>
 ## TTS17 `type`
@@ -11733,7 +11710,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS18'></a>
 ## TTS18 `type`
@@ -11744,7 +11721,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS19'></a>
 ## TTS19 `type`
@@ -11755,7 +11732,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS2'></a>
 ## TTS2 `type`
@@ -11766,7 +11743,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS20'></a>
 ## TTS20 `type`
@@ -11777,7 +11754,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS21'></a>
 ## TTS21 `type`
@@ -11788,7 +11765,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS22'></a>
 ## TTS22 `type`
@@ -11799,7 +11776,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS23'></a>
 ## TTS23 `type`
@@ -11810,7 +11787,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS24'></a>
 ## TTS24 `type`
@@ -11821,7 +11798,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS25'></a>
 ## TTS25 `type`
@@ -11832,7 +11809,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS26'></a>
 ## TTS26 `type`
@@ -11843,7 +11820,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS27'></a>
 ## TTS27 `type`
@@ -11854,7 +11831,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS28'></a>
 ## TTS28 `type`
@@ -11865,7 +11842,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS29'></a>
 ## TTS29 `type`
@@ -11876,7 +11853,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS3'></a>
 ## TTS3 `type`
@@ -11887,7 +11864,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS30'></a>
 ## TTS30 `type`
@@ -11898,7 +11875,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS31'></a>
 ## TTS31 `type`
@@ -11909,7 +11886,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS32'></a>
 ## TTS32 `type`
@@ -11920,7 +11897,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS4'></a>
 ## TTS4 `type`
@@ -11931,7 +11908,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS5'></a>
 ## TTS5 `type`
@@ -11942,7 +11919,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS6'></a>
 ## TTS6 `type`
@@ -11953,7 +11930,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS7'></a>
 ## TTS7 `type`
@@ -11964,7 +11941,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS8'></a>
 ## TTS8 `type`
@@ -11975,7 +11952,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTS9'></a>
 ## TTS9 `type`
@@ -11986,7 +11963,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for a value type.
+Represents the generic type arguments marker for a value type.
 
 <a name='T-IoC-TTSet1`1'></a>
 ## TTSet1\`1 `type`
@@ -11997,7 +11974,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet2`1'></a>
 ## TTSet2\`1 `type`
@@ -12008,7 +11985,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet3`1'></a>
 ## TTSet3\`1 `type`
@@ -12019,7 +11996,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet4`1'></a>
 ## TTSet4\`1 `type`
@@ -12030,7 +12007,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet5`1'></a>
 ## TTSet5\`1 `type`
@@ -12041,7 +12018,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet6`1'></a>
 ## TTSet6\`1 `type`
@@ -12052,7 +12029,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet7`1'></a>
 ## TTSet7\`1 `type`
@@ -12063,7 +12040,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet8`1'></a>
 ## TTSet8\`1 `type`
@@ -12074,7 +12051,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-TTSet`1'></a>
 ## TTSet\`1 `type`
@@ -12085,7 +12062,7 @@ IoC
 
 ##### Summary
 
-Represents the generic type parameter marker for `System.Collections.Generic.ISet[T]`.
+Represents the generic type arguments marker for `System.Collections.Generic.ISet[T]`.
 
 <a name='T-IoC-Tag'></a>
 ## Tag `type`
@@ -12162,20 +12139,20 @@ IoC
 
 ##### Summary
 
-Represents a trace event.
+Represents a container trace event.
 
 <a name='M-IoC-TraceEvent-#ctor-IoC-ContainerEvent,System-String-'></a>
 ### #ctor(containerEvent,message) `constructor`
 
 ##### Summary
 
-Creates new instance of trace event.
+Creates new instance of a trace event.
 
 ##### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| containerEvent | [IoC.ContainerEvent](#T-IoC-ContainerEvent 'IoC.ContainerEvent') | The original instance of container event. |
+| containerEvent | [IoC.ContainerEvent](#T-IoC-ContainerEvent 'IoC.ContainerEvent') | The original container event. |
 | message | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The trace message. |
 
 <a name='F-IoC-TraceEvent-ContainerEvent'></a>
@@ -12183,7 +12160,7 @@ Creates new instance of trace event.
 
 ##### Summary
 
-The origin container event.
+The original container event.
 
 <a name='F-IoC-TraceEvent-Message'></a>
 ### Message `constants`

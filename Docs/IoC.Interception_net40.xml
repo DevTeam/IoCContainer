@@ -65,7 +65,9 @@
             <returns>The binding token.</returns>
         </member>
         <member name="T:IoC.Features.InterceptionFeature">
-            <inheritdoc cref="T:IoC.IConfiguration" />
+            <summary>
+            Allows to use interceptions for containers instances.
+            </summary>
         </member>
         <member name="M:IoC.Features.InterceptionFeature.Apply(IoC.IMutableContainer)">
             <inheritdoc />

@@ -1,4 +1,5 @@
-﻿namespace IoC.Core
+﻿// ReSharper disable ForCanBeConvertedToForeach
+namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
@@ -52,12 +53,21 @@
             let methodMetadata = new Metadata(_metadata, method.Info.GetCustomAttributes(true))
             where enforceSelection || !methodMetadata.IsEmpty
             orderby methodMetadata.Order
-            where (
-                    from parameter in method.Info.GetParameters()
-                    let parameterMetadata = new Metadata(_metadata, parameter.GetCustomAttributes(true))
-                    select method.TryInjectDependency(parameter.Position, parameterMetadata.Type ?? parameter.ParameterType, parameterMetadata.Tag ?? methodMetadata.Tag))
-                .All(isInjected => isInjected)
-            select method;
+            select SetDependencies(method, methodMetadata);
+
+        private IMethod<TMethodInfo> SetDependencies<TMethodInfo>(IMethod<TMethodInfo> method, Metadata methodMetadata)
+            where TMethodInfo : MethodBase
+        {
+            var parameters = method.Info.GetParameters();
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                var parameter = parameters[i];
+                var parameterMetadata = new Metadata(_metadata, parameter.GetCustomAttributes(true));
+                method.SetDependency(parameter.Position, parameterMetadata.Type ?? parameter.ParameterType, parameterMetadata.Tag ?? methodMetadata.Tag);
+            }
+
+            return method;
+        }
 
         private struct Metadata
         {

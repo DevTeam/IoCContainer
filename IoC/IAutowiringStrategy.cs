@@ -5,7 +5,7 @@
     using System.Reflection;
 
     /// <summary>
-    /// Represents an abstraction for an autowiring method.
+    /// Represents an abstraction for autowiring strategy.
     /// </summary>
     [PublicAPI]
     public interface IAutowiringStrategy
@@ -28,7 +28,7 @@
         bool TryResolveConstructor([NotNull][ItemNotNull] IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor);
 
         /// <summary>
-        /// Resolves initializing methods from a set of available methods/setters in the order which will be used to invoke them.
+        /// Resolves initializing methods from a set of available methods/setters in the specific order which will be used to invoke them.
         /// </summary>
         /// <param name="methods">The set of available methods.</param>
         /// <param name="initializers">The set of initializing methods in the appropriate order.</param>

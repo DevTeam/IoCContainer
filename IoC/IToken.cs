@@ -3,12 +3,12 @@
     using System;
 
     /// <summary>
-    /// The binding token to manage binding lifetime.
+    /// Represents an abstraction of a binding token.
     /// </summary>
     public interface IToken: IDisposable
     {
         /// <summary>
-        /// The owner container.
+        /// The configurable container owning the registered binding.
         /// </summary>
         IMutableContainer Container { get; }
     }

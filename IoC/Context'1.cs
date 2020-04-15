@@ -1,7 +1,7 @@
 ﻿namespace IoC
 {
     /// <summary>
-    /// Represent the resolving context with an instance.
+    /// Represents the initializing context.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [PublicAPI]

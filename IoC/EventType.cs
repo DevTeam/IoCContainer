@@ -1,7 +1,7 @@
 ﻿namespace IoC
 {
     /// <summary>
-    /// The types of event.
+    /// Container event types.
     /// </summary>
     public enum EventType
     {
@@ -11,7 +11,7 @@
         CreateContainer,
 
         /// <summary>
-        /// On container dispose.
+        /// On container disposing.
         /// </summary>
         DisposeContainer,
 
@@ -26,7 +26,7 @@
         UnregisterDependency,
 
         /// <summary>
-        /// On resolver compilation
+        /// On resolver compilation.
         /// </summary>
         ResolverCompilation
     }

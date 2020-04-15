@@ -1137,13 +1137,13 @@ namespace IoC
     public static class AutowiringStrategies
     {
         /// <summary>
-        /// Creates aspect oriented autowiring strategy.
+        /// Create an aspect oriented autowiring strategy.
         /// </summary>
         /// <returns>The instance of aspect oriented autowiring strategy.</returns>
         public static IAutowiringStrategy AspectOriented() => AspectOrientedMetadata.Empty;
 
         /// <summary>
-        /// Specifies type selector for aspect oriented autowiring strategy.
+        /// Specify a type selector for an aspect oriented autowiring strategy.
         /// </summary>
         /// <typeparam name="TTypeAttribute">The type metadata attribute.</typeparam>
         /// <param name="strategy">The base aspect oriented autowiring strategy.</param>
@@ -1156,7 +1156,7 @@ namespace IoC
                 typeSelector ?? throw new ArgumentNullException(nameof(typeSelector)));
 
         /// <summary>
-        /// Specifies order selector for aspect oriented autowiring strategy.
+        /// Specify an order selector for an aspect oriented autowiring strategy.
         /// </summary>
         /// <typeparam name="TOrderAttribute">The order metadata attribute.</typeparam>
         /// <param name="strategy">The base aspect oriented autowiring strategy.</param>
@@ -1169,7 +1169,7 @@ namespace IoC
                 orderSelector ?? throw new ArgumentNullException(nameof(orderSelector)));
 
         /// <summary>
-        /// Specifies tag selector for aspect oriented autowiring strategy.
+        /// Specify a tag selector for an aspect oriented autowiring strategy.
         /// </summary>
         /// <typeparam name="TTagAttribute">The tag metadata attribute.</typeparam>
         /// <param name="strategy">The base aspect oriented autowiring strategy.</param>
@@ -1215,7 +1215,7 @@ namespace IoC
     using ResolverDelegate = System.Delegate;
 
     /// <summary>
-    /// The IoC container implementation.
+    /// The base IoC container implementation.
     /// </summary>
     [PublicAPI]
     [DebuggerDisplay("Name = {" + nameof(ToString) + "()}")]
@@ -1782,7 +1782,7 @@ namespace IoC
 namespace IoC
 {
     /// <summary>
-    /// Represent the resolving context with an instance.
+    /// Represents the initializing context.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [PublicAPI]
@@ -1849,7 +1849,7 @@ namespace IoC
 namespace IoC
 {
     /// <summary>
-    /// The types of event.
+    /// Container event types.
     /// </summary>
     public enum EventType
     {
@@ -1859,7 +1859,7 @@ namespace IoC
         CreateContainer,
 
         /// <summary>
-        /// On container dispose.
+        /// On container disposing.
         /// </summary>
         DisposeContainer,
 
@@ -1874,51 +1874,11 @@ namespace IoC
         UnregisterDependency,
 
         /// <summary>
-        /// On resolver compilation
+        /// On resolver compilation.
         /// </summary>
         ResolverCompilation
     }
 }
-
-#endregion
-#region FluentAutowiring
-
-namespace IoC
-{
-    using System;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using Core;
-
-    /// <summary>
-    /// Represents extensions for autowiring.
-    /// </summary>
-    public static class FluentAutowiring
-    {
-        private static readonly Expression ContainerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
-
-        /// <summary>
-        /// Injects dependency to parameter.
-        /// </summary>
-        /// <typeparam name="TMethodInfo"></typeparam>
-        /// <param name="method">The target method or constructor.</param>
-        /// <param name="parameterPosition">The parameter's position.</param>
-        /// <param name="dependencyType">The dependency's type.</param>
-        /// <param name="dependencyTag">The optional dependency's tag value.</param>
-        /// <returns>True if success.</returns>
-        public static bool TryInjectDependency<TMethodInfo>([NotNull] this IMethod<TMethodInfo> method, int parameterPosition, [NotNull] Type dependencyType, [CanBeNull] object dependencyTag = null)
-            where TMethodInfo: MethodBase
-        {
-            if (method == null) throw new ArgumentNullException(nameof(method));
-            if (dependencyType == null) throw new ArgumentNullException(nameof(dependencyType));
-            if (parameterPosition < 0) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
-            var parameterExpression = Expression.Call(Injections.InjectWithTagMethodInfo, ContainerExpression, Expression.Constant(dependencyType), Expression.Constant(dependencyTag)).Convert(dependencyType);
-            method.SetParameterExpression(parameterPosition, parameterExpression);
-            return true;
-        }
-    }
-}
-
 
 #endregion
 #region FluentBind
@@ -1940,7 +1900,7 @@ namespace IoC
     public static partial class FluentBind
     {
         /// <summary>
-        /// Binds the type(s).
+        /// Binds types.
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="types"></param>
@@ -1956,7 +1916,7 @@ namespace IoC
         }
 
         /// <summary>
-        /// Binds the type(s).
+        /// Binds types.
         /// </summary>
         /// <param name="token">The container binding token.</param>
         /// <param name="types"></param>
@@ -5540,7 +5500,7 @@ namespace IoC
         /// <returns>The disposable instance holder.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IConfiguration configuration, [NotNull] [ItemCanBeNull] params object[] args)
+        public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IConfiguration configuration, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class
             => Container.Create().Using(configuration ?? throw new ArgumentNullException(nameof(configuration))).BuildUp<TInstance>(args ?? throw new ArgumentNullException(nameof(args)));
 
@@ -5554,7 +5514,7 @@ namespace IoC
         /// <returns>The disposable instance holder.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
+        public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class =>
             (token ?? throw new ArgumentNullException(nameof(token))).Container.BuildUp<TInstance>(args ?? throw new ArgumentNullException(nameof(args)));
 
@@ -5567,7 +5527,7 @@ namespace IoC
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>
         [NotNull]
-        public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IMutableContainer container, [NotNull] [ItemCanBeNull] params object[] args)
+        public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IMutableContainer container, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -5575,7 +5535,7 @@ namespace IoC
 
             if (container.TryGetResolver<TInstance>(typeof(TInstance), null, out var resolver, out _, container))
             {
-                return new Holder<TInstance>(new Token(container, Disposable.Empty), resolver(container, args));
+                return new CompositionRoot<TInstance>(new Token(container, Disposable.Empty), resolver(container, args));
             }
 
             var buildId = Guid.NewGuid();
@@ -5583,7 +5543,7 @@ namespace IoC
             try
             {
                 var instance = container.Resolve<TInstance>(buildId.AsTag(), args);
-                return new Holder<TInstance>(token, instance);
+                return new CompositionRoot<TInstance>(token, instance);
             }
             catch
             {
@@ -5938,6 +5898,7 @@ namespace IoC
 namespace IoC
 {
     using System;
+    using System.Runtime.CompilerServices;
 
     /// <summary>
     /// Represents extensions dealing with scopes.
@@ -5945,16 +5906,14 @@ namespace IoC
     public static class FluentScope
     {
         /// <summary>
-        /// Creates new resolving scope. Can be used with <c>ScopeSingleton</c>.
+        /// Creates a new resolving scope. Can be used with <c>ScopeSingleton</c>.
         /// </summary>
         /// <param name="container">A container to resolve a scope.</param>
         /// <returns>Tne new scope instance.</returns>
+        [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IScope CreateScope([NotNull] this IContainer container)
-        {
-            if (container == null) throw new ArgumentNullException(nameof(container));
-            return container.Resolve<IScope>();
-        }
+        public static IScope CreateScope([NotNull] this IContainer container) =>
+            (container ?? throw new ArgumentNullException(nameof(container))).Resolve<IScope>();
     }
 }
 
@@ -5977,7 +5936,7 @@ namespace IoC
     public static class FluentTrace
     {
         /// <summary>
-        /// Gets container trace source.
+        /// Gets a container trace source.
         /// </summary>
         /// <param name="container">The target container to trace.</param>
         /// <returns>The race source.</returns>
@@ -5994,7 +5953,7 @@ namespace IoC
         }
 
         /// <summary>
-        /// Trace container action by handler.
+        /// Traces container actions through a handler.
         /// </summary>
         /// <param name="container">The target container to trace.</param>
         /// <param name="onTraceMessage">The trace handler.</param>
@@ -6015,7 +5974,7 @@ namespace IoC
         }
 
         /// <summary>
-        /// Trace container action by handler.
+        /// Traces container actions through a handler.
         /// </summary>
         /// <param name="token">The token of target container to trace.</param>
         /// <param name="onTraceMessage">The trace handler.</param>
@@ -6025,7 +5984,7 @@ namespace IoC
 
 #if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETCOREAPP1_0&& !NETCOREAPP1_1 && !WINDOWS_UWP
         /// <summary>
-        /// Trace container action by handler.
+        /// Traces container actions through a <c>System.Diagnostics.Trace</c>.
         /// </summary>
         /// <param name="container">The target container to trace.</param>
         /// <returns>The trace token.</returns>
@@ -6033,7 +5992,7 @@ namespace IoC
             (container ?? throw new ArgumentNullException(nameof(container))).Trace(message => System.Diagnostics.Trace.WriteLine(message));
 
         /// <summary>
-        /// Trace container action by handler.
+        /// Traces container actions through a <c>System.Diagnostics.Trace</c>.
         /// </summary>
         /// <param name="token">The token of target container to trace.</param>
         /// <returns>The trace token.</returns>
@@ -6108,7 +6067,7 @@ namespace IoC
     using System;
 
     /// <summary>
-    /// Represents the generic type parameter marker.
+    /// Represents the generic type arguments marker.
     /// </summary>
     [PublicAPI, AttributeUsage(AttributeTargets.Class | AttributeTargets.Interface | AttributeTargets.Struct)]
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -6125,1351 +6084,1351 @@ namespace IoC
 namespace IoC
 {
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS { }
 
 /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
+    /// Represents the generic type arguments marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDisposable: System.IDisposable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable: System.IComparable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable<in T>: System.IComparable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEquatable<T>: System.IEquatable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerable<out T>: System.Collections.Generic.IEnumerable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerator<out T>: System.Collections.Generic.IEnumerator<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTCollection<T>: System.Collections.Generic.ICollection<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTList<T>: System.Collections.Generic.IList<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTSet<T>: System.Collections.Generic.ISet<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparer<in T>: System.Collections.Generic.IComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEqualityComparer<in T>: System.Collections.Generic.IEqualityComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDictionary<TKey, TValue>: System.Collections.Generic.IDictionary<TKey, TValue> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObservable<out T>: System.IObservable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObserver<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT1 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI1 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS1 { }
 
 /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
+    /// Represents the generic type arguments marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDisposable1: System.IDisposable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable1: System.IComparable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable1<in T>: System.IComparable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEquatable1<T>: System.IEquatable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerable1<out T>: System.Collections.Generic.IEnumerable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerator1<out T>: System.Collections.Generic.IEnumerator<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTCollection1<T>: System.Collections.Generic.ICollection<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTList1<T>: System.Collections.Generic.IList<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTSet1<T>: System.Collections.Generic.ISet<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparer1<in T>: System.Collections.Generic.IComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEqualityComparer1<in T>: System.Collections.Generic.IEqualityComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDictionary1<TKey, TValue>: System.Collections.Generic.IDictionary<TKey, TValue> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObservable1<out T>: System.IObservable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObserver1<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT2 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI2 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS2 { }
 
 /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
+    /// Represents the generic type arguments marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDisposable2: System.IDisposable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable2: System.IComparable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable2<in T>: System.IComparable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEquatable2<T>: System.IEquatable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerable2<out T>: System.Collections.Generic.IEnumerable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerator2<out T>: System.Collections.Generic.IEnumerator<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTCollection2<T>: System.Collections.Generic.ICollection<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTList2<T>: System.Collections.Generic.IList<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTSet2<T>: System.Collections.Generic.ISet<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparer2<in T>: System.Collections.Generic.IComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEqualityComparer2<in T>: System.Collections.Generic.IEqualityComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDictionary2<TKey, TValue>: System.Collections.Generic.IDictionary<TKey, TValue> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObservable2<out T>: System.IObservable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObserver2<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT3 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI3 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS3 { }
 
 /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
+    /// Represents the generic type arguments marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDisposable3: System.IDisposable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable3: System.IComparable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable3<in T>: System.IComparable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEquatable3<T>: System.IEquatable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerable3<out T>: System.Collections.Generic.IEnumerable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerator3<out T>: System.Collections.Generic.IEnumerator<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTCollection3<T>: System.Collections.Generic.ICollection<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTList3<T>: System.Collections.Generic.IList<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTSet3<T>: System.Collections.Generic.ISet<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparer3<in T>: System.Collections.Generic.IComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEqualityComparer3<in T>: System.Collections.Generic.IEqualityComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDictionary3<TKey, TValue>: System.Collections.Generic.IDictionary<TKey, TValue> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObservable3<out T>: System.IObservable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObserver3<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT4 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI4 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS4 { }
 
 /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
+    /// Represents the generic type arguments marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDisposable4: System.IDisposable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable4: System.IComparable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable4<in T>: System.IComparable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEquatable4<T>: System.IEquatable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerable4<out T>: System.Collections.Generic.IEnumerable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerator4<out T>: System.Collections.Generic.IEnumerator<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTCollection4<T>: System.Collections.Generic.ICollection<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTList4<T>: System.Collections.Generic.IList<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTSet4<T>: System.Collections.Generic.ISet<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparer4<in T>: System.Collections.Generic.IComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEqualityComparer4<in T>: System.Collections.Generic.IEqualityComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDictionary4<TKey, TValue>: System.Collections.Generic.IDictionary<TKey, TValue> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObservable4<out T>: System.IObservable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObserver4<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT5 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI5 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS5 { }
 
 /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
+    /// Represents the generic type arguments marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDisposable5: System.IDisposable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable5: System.IComparable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable5<in T>: System.IComparable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEquatable5<T>: System.IEquatable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerable5<out T>: System.Collections.Generic.IEnumerable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerator5<out T>: System.Collections.Generic.IEnumerator<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTCollection5<T>: System.Collections.Generic.ICollection<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTList5<T>: System.Collections.Generic.IList<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTSet5<T>: System.Collections.Generic.ISet<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparer5<in T>: System.Collections.Generic.IComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEqualityComparer5<in T>: System.Collections.Generic.IEqualityComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDictionary5<TKey, TValue>: System.Collections.Generic.IDictionary<TKey, TValue> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObservable5<out T>: System.IObservable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObserver5<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT6 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI6 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS6 { }
 
 /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
+    /// Represents the generic type arguments marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDisposable6: System.IDisposable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable6: System.IComparable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable6<in T>: System.IComparable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEquatable6<T>: System.IEquatable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerable6<out T>: System.Collections.Generic.IEnumerable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerator6<out T>: System.Collections.Generic.IEnumerator<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTCollection6<T>: System.Collections.Generic.ICollection<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTList6<T>: System.Collections.Generic.IList<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTSet6<T>: System.Collections.Generic.ISet<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparer6<in T>: System.Collections.Generic.IComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEqualityComparer6<in T>: System.Collections.Generic.IEqualityComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDictionary6<TKey, TValue>: System.Collections.Generic.IDictionary<TKey, TValue> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObservable6<out T>: System.IObservable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObserver6<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT7 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI7 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS7 { }
 
 /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
+    /// Represents the generic type arguments marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDisposable7: System.IDisposable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable7: System.IComparable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable7<in T>: System.IComparable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEquatable7<T>: System.IEquatable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerable7<out T>: System.Collections.Generic.IEnumerable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerator7<out T>: System.Collections.Generic.IEnumerator<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTCollection7<T>: System.Collections.Generic.ICollection<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTList7<T>: System.Collections.Generic.IList<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTSet7<T>: System.Collections.Generic.ISet<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparer7<in T>: System.Collections.Generic.IComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEqualityComparer7<in T>: System.Collections.Generic.IEqualityComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDictionary7<TKey, TValue>: System.Collections.Generic.IDictionary<TKey, TValue> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObservable7<out T>: System.IObservable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObserver7<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT8 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI8 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS8 { }
 
 /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IDisposable</c>.
+    /// Represents the generic type arguments marker for <c>System.IDisposable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDisposable8: System.IDisposable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable8: System.IComparable { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IComparable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IComparable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparable8<in T>: System.IComparable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IEquatable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IEquatable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEquatable8<T>: System.IEquatable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerable8<out T>: System.Collections.Generic.IEnumerable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEnumerator[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEnumerator8<out T>: System.Collections.Generic.IEnumerator<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ICollection[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ICollection[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTCollection8<T>: System.Collections.Generic.ICollection<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IList[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IList[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTList8<T>: System.Collections.Generic.IList<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.ISet[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.ISet[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTSet8<T>: System.Collections.Generic.ISet<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTComparer8<in T>: System.Collections.Generic.IComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IEqualityComparer[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTEqualityComparer8<in T>: System.Collections.Generic.IEqualityComparer<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
+    /// Represents the generic type arguments marker for <c>System.Collections.Generic.IDictionary[TKey, TValue]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTDictionary8<TKey, TValue>: System.Collections.Generic.IDictionary<TKey, TValue> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObservable[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObservable[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObservable8<out T>: System.IObservable<T> { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for <c>System.IObserver[T]</c>.
+    /// Represents the generic type arguments marker for <c>System.IObserver[T]</c>.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTObserver8<in T>: System.IObserver<T> { }
 
         /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT9 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI9 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS9 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT10 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI10 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS10 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT11 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI11 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS11 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT12 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI12 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS12 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT13 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI13 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS13 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT14 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI14 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS14 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT15 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI15 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS15 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT16 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI16 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS16 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT17 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI17 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS17 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT18 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI18 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS18 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT19 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI19 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS19 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT20 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI20 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS20 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT21 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI21 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS21 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT22 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI22 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS22 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT23 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI23 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS23 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT24 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI24 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS24 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT25 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI25 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS25 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT26 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI26 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS26 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT27 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI27 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS27 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT28 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI28 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS28 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT29 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI29 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS29 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT30 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI30 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS30 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT31 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI31 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS31 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a reference type.
+    /// Represents the generic type arguments marker for a reference type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT32 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for an interface.
+    /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public interface TTI32 { }
 
     /// <summary>
-    /// Represents the generic type parameter marker for a value type.
+    /// Represents the generic type arguments marker for a value type.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public struct TTS32 { }
@@ -7527,7 +7486,7 @@ namespace IoC
     using System.Reflection;
 
     /// <summary>
-    /// Represents an abstraction for an autowiring method.
+    /// Represents an abstraction for autowiring strategy.
     /// </summary>
     [PublicAPI]
     public interface IAutowiringStrategy
@@ -7550,7 +7509,7 @@ namespace IoC
         bool TryResolveConstructor([NotNull][ItemNotNull] IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor);
 
         /// <summary>
-        /// Resolves initializing methods from a set of available methods/setters in the order which will be used to invoke them.
+        /// Resolves initializing methods from a set of available methods/setters in the specific order which will be used to invoke them.
         /// </summary>
         /// <param name="methods">The set of available methods.</param>
         /// <param name="initializers">The set of initializing methods in the appropriate order.</param>
@@ -7569,14 +7528,14 @@ namespace IoC
     using System.Collections.Generic;
 
     /// <summary>
-    /// The container's binding.
+    /// The an abstract containers binding.
     /// </summary>
     [PublicAPI]
     // ReSharper disable once UnusedTypeParameter
     public interface IBinding
     {
         /// <summary>
-        /// The target container.
+        /// The target container to configure.
         /// </summary>
         [NotNull] IMutableContainer Container { get; }
 
@@ -7586,28 +7545,28 @@ namespace IoC
         [NotNull] IEnumerable<IToken> Tokens { get; }
 
         /// <summary>
-        /// The type to bind.
+        /// The contract type to bind.
         /// </summary>
         [NotNull] [ItemNotNull] IEnumerable<Type> Types { get; }
 
         /// <summary>
-        /// The tags to mark the binding.
+        /// The tags to mark this binding.
         /// </summary>
         [NotNull] [ItemCanBeNull] IEnumerable<object> Tags { get; }
 
         /// <summary>
-        /// The specified lifetime instance or null.
+        /// The lifetime instance or null by default.
         /// </summary>
         [CanBeNull] ILifetime Lifetime { get; }
 
         /// <summary>
-        /// The specified autowiring strategy or null.
+        /// The autowiring strategy or null by default.
         /// </summary>
         [CanBeNull] IAutowiringStrategy AutowiringStrategy { get; }
     }
 
     /// <summary>
-    /// The container's binding.
+    /// The containers binding.
     /// </summary>
     /// <typeparam name="T"></typeparam>
     [PublicAPI]
@@ -7625,24 +7584,23 @@ namespace IoC
     using System.Linq.Expressions;
 
     /// <summary>
-    /// Represents the abstraction for build context.
+    /// Represents an abstract build context.
     /// </summary>
     [PublicAPI]
     public interface IBuildContext
     {
-
         /// <summary>
-        /// The parent build context.
+        /// The parent of the current build context.
         /// </summary>
         [CanBeNull] IBuildContext Parent { get; }
 
         /// <summary>
-        /// The target key.
+        /// The target key to build resolver.
         /// </summary>
         Key Key { get; }
 
         /// <summary>
-        /// The depth of current context.
+        /// The depth of current context in the build tree.
         /// </summary>
         int Depth { get; }
 
@@ -7652,19 +7610,19 @@ namespace IoC
         [NotNull] IContainer Container { get; }
 
         /// <summary>
-        /// Autowiring strategy.
+        /// The current autowiring strategy.
         /// </summary>
         [NotNull] IAutowiringStrategy AutowiringStrategy { get; }
 
         /// <summary>
-        /// Get the dependency expression.
+        /// Gets the dependency expression.
         /// </summary>
         /// <param name="defaultExpression">The default expression.</param>
         /// <returns>The dependency expression.</returns>
         [NotNull] Expression GetDependencyExpression([CanBeNull] Expression defaultExpression = null);
 
         /// <summary>
-        /// Creates a child context.
+        /// Creates a child build context.
         /// </summary>
         /// <param name="key">The key</param>
         /// <param name="container">The container.</param>
@@ -7672,29 +7630,29 @@ namespace IoC
         [NotNull] IBuildContext CreateChild(Key key, [NotNull] IContainer container);
 
         /// <summary>
-        /// Prepares base expression, replacing generic types' markers.
+        /// Binds a raw type to a target type.
+        /// </summary>
+        /// <param name="originalType">The registered type.</param>
+        /// <param name="targetType">The target type.</param>
+        void BindTypes([NotNull] Type originalType, [NotNull]Type targetType);
+
+        /// <summary>
+        /// Tries to replace generic types' markers by related types.
+        /// </summary>
+        /// <param name="originalType">The target raw type.</param>
+        /// <param name="targetType">The replacing type.</param>
+        /// <returns></returns>
+        bool TryReplaceType([NotNull] Type originalType, out Type targetType);
+
+        /// <summary>
+        /// Prepares base expression replacing generic types' markers by related types.
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
         /// <returns>The resulting expression.</returns>
         [NotNull] Expression ReplaceTypes([NotNull] Expression baseExpression);
 
         /// <summary>
-        /// Bind a raw type to a target type.
-        /// </summary>
-        /// <param name="type">The type.</param>
-        /// <param name="targetType">The target type.</param>
-        void BindTypes([NotNull] Type type, [NotNull]Type targetType);
-
-        /// <summary>
-        /// Try replacing generic types' markers.
-        /// </summary>
-        /// <param name="type">The target raw type.</param>
-        /// <param name="targetType">The replacing type.</param>
-        /// <returns></returns>
-        bool TryReplaceType([NotNull] Type type, out Type targetType);
-
-        /// <summary>
-        /// Prepares base expression, injecting dependencies.
+        /// Prepares base expression injecting appropriate dependencies.
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
         /// <param name="instanceExpression">The instance expression.</param>
@@ -7702,7 +7660,7 @@ namespace IoC
         [NotNull] Expression InjectDependencies([NotNull] Expression baseExpression, [CanBeNull] ParameterExpression instanceExpression = null);
 
         /// <summary>
-        /// Prepares base expression, adding a lifetime.
+        /// Prepares base expression adding the appropriate lifetime.
         /// </summary>
         /// <param name="baseExpression">The base expression.</param>
         /// <param name="lifetime">The target lifetime.</param>
@@ -7719,15 +7677,15 @@ namespace IoC
     using System.Linq.Expressions;
 
     /// <summary>
-    /// Represents a builder for an instance.
+    /// Represents an abstract builder for an instance.
     /// </summary>
     public interface IBuilder
     {
         /// <summary>
-        /// Builds the expression.
+        /// Builds the expression based on a build context.
         /// </summary>
-        /// <param name="context">Current context for building.</param>
-        /// <param name="bodyExpression">The expression body to get an instance.</param>
+        /// <param name="context">Current build context.</param>
+        /// <param name="bodyExpression">The expression body to build an instance resolver.</param>
         /// <returns>The new expression.</returns>
         [NotNull] Expression Build([NotNull] IBuildContext context, [NotNull] Expression bodyExpression);
     }
@@ -7743,7 +7701,7 @@ namespace IoC
     using System.Linq.Expressions;
 
     /// <summary>
-    /// Represents a expression compiler.
+    /// Represents an abstract expression compiler.
     /// </summary>
     [PublicAPI]
     public interface ICompiler
@@ -7761,6 +7719,27 @@ namespace IoC
 
 
 #endregion
+#region ICompositionRoot
+
+namespace IoC
+{
+    using System;
+
+    /// <summary>
+    /// Represents an abstract composition root.
+    /// </summary>
+    /// <typeparam name="TInstance"></typeparam>
+    [PublicAPI]
+    public interface ICompositionRoot<out TInstance>: IDisposable
+    {
+        /// <summary>
+        /// The composition root instance.
+        /// </summary>
+        [NotNull] TInstance Instance { get; }
+    }
+}
+
+#endregion
 #region IConfiguration
 
 namespace IoC
@@ -7768,16 +7747,16 @@ namespace IoC
     using System.Collections.Generic;
 
     /// <summary>
-    /// The container's configuration.
+    /// Represents an abstract containers configuration.
     /// </summary>
     [PublicAPI]
     public interface IConfiguration
     {
         /// <summary>
-        /// Apply the configuration for the target container.
+        /// Applies a configuration to the target mutable container.
         /// </summary>
-        /// <param name="container">The target container.</param>
-        /// <returns>The enumeration of dependency tokens.</returns>
+        /// <param name="container">The target mutable container to configure.</param>
+        /// <returns>The enumeration of configuration tokens which allows to cancel that changes.</returns>
         [NotNull][ItemNotNull] IEnumerable<IToken> Apply([NotNull] IMutableContainer container);
     }
 }
@@ -7792,18 +7771,18 @@ namespace IoC
     using System.Collections.Generic;
 
     /// <summary>
-    /// The Inversion of Control container.
+    /// Represents an abstract Inversion of Control container.
     /// </summary>
     [PublicAPI]
     public interface IContainer: IEnumerable<IEnumerable<Key>>, IObservable<ContainerEvent>, IResourceRegistry
     {
         /// <summary>
-        /// The parent container or null if it has no a parent.
+        /// Provides a parent container or <c>null</c> if it does not have a parent.
         /// </summary>
         [CanBeNull] IContainer Parent { get; }
 
         /// <summary>
-        /// Get the dependency with lifetime.
+        /// Provides a dependency and a lifetime for the registered key.
         /// </summary>
         /// <param name="key">The key to get a dependency.</param>
         /// <param name="dependency">The dependency.</param>
@@ -7812,15 +7791,15 @@ namespace IoC
         bool TryGetDependency(Key key, out IDependency dependency, [CanBeNull] out ILifetime lifetime);
 
         /// <summary>
-        /// Get the resolver.
+        /// Provides a resolver for a specific type and tag or error if something goes wrong.
         /// </summary>
         /// <typeparam name="T">The type of instance producing by the resolver.</typeparam>
-        /// <param name="type">The binding's type.</param>
-        /// <param name="tag">The binding's tag or null if there is no tag.</param>
-        /// <param name="resolver">The resolver.</param>
-        /// <param name="error">The error occurring during resolving.</param>
-        /// <param name="resolvingContainer">The resolving container and null if it is the current container.</param>
-        /// <returns>True if successful.</returns>
+        /// <param name="type">The binding type.</param>
+        /// <param name="tag">The binding tag or null if there is no tag.</param>
+        /// <param name="resolver">The resolver to get an instance.</param>
+        /// <param name="error">Error that occurs when resolving.</param>
+        /// <param name="resolvingContainer">The resolving container and null if the resolving container is the current container.</param>
+        /// <returns><c>True</c> if successful and a resolver was provided.</returns>
         bool TryGetResolver<T>([NotNull] Type type, [CanBeNull] object tag, out Resolver<T> resolver, out Exception error, [CanBeNull] IContainer resolvingContainer = null);
     }
 }
@@ -7835,44 +7814,23 @@ namespace IoC
     using System.Linq.Expressions;
 
     /// <summary>
-    /// Represents a IoC dependency.
+    /// Represents an abstract IoC dependency.
     /// </summary>
     [PublicAPI]
     public interface IDependency
     {
         /// <summary>
-        /// Builds an expression.
+        /// Builds an expression for dependency based on the current build context and specified lifetime.
         /// </summary>
-        /// <param name="buildContext">The build context,</param>
-        /// <param name="lifetime">The target lifetime,</param>
-        /// <param name="baseExpression">The resulting expression.</param>
-        /// <param name="error">The error.</param>
-        /// <returns>True if success.</returns>
+        /// <param name="buildContext">The build context.</param>
+        /// <param name="lifetime">The target lifetime.</param>
+        /// <param name="baseExpression">The resulting expression for the current dependency.</param>
+        /// <param name="error">The error if something goes wrong.</param>
+        /// <returns><c>True</c> if successful and an expression was provided.</returns>
         bool TryBuildExpression([NotNull] IBuildContext buildContext, [CanBeNull] ILifetime lifetime, out Expression baseExpression, out Exception error);
     }
 }
 
-
-#endregion
-#region IHolder
-
-namespace IoC
-{
-    using System;
-
-    /// <summary>
-    /// Represents a holder for a created instance.
-    /// </summary>
-    /// <typeparam name="TInstance"></typeparam>
-    [PublicAPI]
-    public interface IHolder<out TInstance>: IDisposable
-    {
-        /// <summary>
-        /// The created instance.
-        /// </summary>
-        [NotNull] TInstance Instance { get; }
-    }
-}
 
 #endregion
 #region ILifetime
@@ -7882,7 +7840,7 @@ namespace IoC
     using System;
 
     /// <summary>
-    /// Represents a lifetime for an instance.
+    /// Represents an abstraction of container lifetime.
     /// </summary>
     [PublicAPI]
     public interface ILifetime: IBuilder, IDisposable
@@ -7890,13 +7848,13 @@ namespace IoC
         /// <summary>
         /// Creates the similar lifetime to use with generic instances.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>The new lifetime instance.</returns>
         ILifetime Create();
 
         /// <summary>
-        /// Select default container to resolve dependencies.
+        /// Provides a container to resolve dependencies.
         /// </summary>
-        /// <param name="registrationContainer">The container where the entry was registered.</param>
+        /// <param name="registrationContainer">The container where a dependency was registered.</param>
         /// <param name="resolvingContainer">The container which is used to resolve an instance.</param>
         /// <returns>The selected container.</returns>
         [NotNull] IContainer SelectResolvingContainer([NotNull] IContainer registrationContainer, [NotNull] IContainer resolvingContainer);
@@ -7909,6 +7867,7 @@ namespace IoC
 
 namespace IoC
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -7922,22 +7881,30 @@ namespace IoC
         where TMethodInfo: MethodBase
     {
         /// <summary>
-        /// The method's information.
+        /// The methods information.
         /// </summary>
         [NotNull] TMethodInfo Info { get; }
 
         /// <summary>
-        /// Provides parameters' expressions.
+        /// Provides a set of parameters expressions.
         /// </summary>
         /// <returns>Parameters' expressions</returns>
         [NotNull][ItemNotNull] IEnumerable<Expression> GetParametersExpressions([NotNull] IBuildContext buildContext);
 
         /// <summary>
-        /// Sets the parameter expression at the position.
+        /// Specifies the expression of method parameter at the position.
         /// </summary>
         /// <param name="parameterPosition">The parameter position.</param>
         /// <param name="parameterExpression">The parameter expression.</param>
-        void SetParameterExpression(int parameterPosition, [NotNull] Expression parameterExpression);
+        void SetExpression(int parameterPosition, [NotNull] Expression parameterExpression);
+
+        /// <summary>
+        /// Specifies the dependency type and tag for method parameter at the position.
+        /// </summary>
+        /// <param name="parameterPosition">The parameter position.</param>
+        /// <param name="dependencyType">The dependency type.</param>
+        /// <param name="dependencyTag">The optional dependency tag value.</param>
+        void SetDependency(int parameterPosition, [NotNull] Type dependencyType, [CanBeNull] object dependencyTag = null);
     }
 }
 
@@ -7951,20 +7918,20 @@ namespace IoC
     using System.Collections.Generic;
 
     /// <summary>
-    /// The configurable Inversion of Control container.
+    /// Represents an abstract of configurable Inversion of Control container.
     /// </summary>
     [PublicAPI]
 
     public interface IMutableContainer: IContainer, IDisposable
     {
         /// <summary>
-        /// Register the dependency with lifetime.
+        /// Registers the dependency and the lifetime for the specified dependency key.
         /// </summary>
         /// <param name="keys">The set of keys to register.</param>
         /// <param name="dependency">The dependency.</param>
         /// <param name="lifetime">The lifetime.</param>
-        /// <param name="dependencyToken">The dependency token.</param>
-        /// <returns>True if successful.</returns>
+        /// <param name="dependencyToken">The dependency token to unregister this dependency key.</param>
+        /// <returns><c>True</c> if is registered successfully.</returns>
         bool TryRegisterDependency([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IToken dependencyToken);
     }
 }
@@ -7981,7 +7948,7 @@ namespace IoC
     using System.Reflection;
 
     /// <summary>
-    /// Injection extensions.
+    /// A set of injection markers.
     /// </summary>
     [PublicAPI]
     public static class Injections
@@ -7998,7 +7965,7 @@ namespace IoC
         [NotNull] internal static readonly MethodInfo TryInjectWithTagMethodInfo = ((MethodCallExpression)((Expression<Func<object>>) (() => Inject(default(IContainer), typeof(object), (object)null))).Body).Method;
 
         /// <summary>
-        /// Injects a dependency. Just an injection marker.
+        /// Injects a dependency. Just the injection marker.
         /// </summary>
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
@@ -8007,16 +7974,16 @@ namespace IoC
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Tries to inject a dependency. Just an injection marker.
+        /// Try to inject a dependency. Just the injection marker.
         /// </summary>
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
-        /// <returns>The injected instance or default(T).</returns>
+        /// <returns>The injected instance or <c>default(T)</c>.</returns>
         [CanBeNull] public static T TryInject<T>([NotNull] this IContainer container) =>
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Injects a dependency. Just an injection marker.
+        /// Injects a dependency. Just the injection marker.
         /// </summary>
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
@@ -8026,18 +7993,18 @@ namespace IoC
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Tries to inject a dependency. Just an injection marker.
+        /// Try to inject a dependency. Just the injection marker.
         /// </summary>
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
         /// <param name="tag">The tag of dependency.</param>
-        /// <returns>The injected instance or default(T).</returns>
+        /// <returns>The injected instance or <c>default(T)</c>.</returns>
         [CanBeNull] public static T TryInject<T>([NotNull] this IContainer container, [CanBeNull] object tag) =>
             throw new NotImplementedException(JustAMarkerError);
 
 
         /// <summary>
-        /// Injects a dependency. Just an injection marker.
+        /// Injects a dependency. Just the injection marker.
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="container">The resolving container.</param>
@@ -8047,7 +8014,7 @@ namespace IoC
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Injects a dependency. Just an injection marker.
+        /// Injects a dependency. Just the injection marker.
         /// </summary>
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
@@ -8056,16 +8023,16 @@ namespace IoC
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Tries to inject a dependency. Just an injection marker.
+        /// Try to inject a dependency. Just the injection marker.
         /// </summary>
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
-        /// <returns>The injected instance or default(Type).</returns>
+        /// <returns>The injected instance or <c>default(T)</c>.</returns>
         [CanBeNull] public static object TryInject([NotNull] this IContainer container, [NotNull] Type type) =>
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Injects a dependency. Just an injection marker.
+        /// Injects a dependency. Just the injection marker.
         /// </summary>
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
@@ -8075,12 +8042,12 @@ namespace IoC
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
-        /// Tries to inject a dependency. Just an injection marker.
+        /// Try to inject a dependency. Just the injection marker.
         /// </summary>
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
         /// <param name="tag">The tag of dependency.</param>
-        /// <returns>The injected instance or default(Type).</returns>
+        /// <returns>The injected instance or <c>default(T)</c>.</returns>
         [CanBeNull] public static object TryInject([NotNull] this IContainer container, [NotNull] Type type, [CanBeNull] object tag) =>
             throw new NotImplementedException(JustAMarkerError);
     }
@@ -8095,7 +8062,7 @@ namespace IoC
     using System;
 
     /// <summary>
-    /// Represents the resource's registry.
+    /// Represents an abstraction of the resource registry.
     /// </summary>
     [PublicAPI]
     public interface IResourceRegistry
@@ -8123,7 +8090,7 @@ namespace IoC
     using System;
 
     /// <summary>
-    /// Represents the scope which could be used with <c>Lifetime.ScopeSingleton</c>
+    /// Represents an abstraction of a scope which is used with <c>Lifetime.ScopeSingleton</c>.
     /// </summary>
     [PublicAPI]
     public interface IScope : IDisposable
@@ -8131,7 +8098,7 @@ namespace IoC
         /// <summary>
         /// Activate the scope.
         /// </summary>
-        /// <returns>The token to deactivate the scope.</returns>
+        /// <returns>The token to deactivate the activated scope.</returns>
         IDisposable Activate();
     }
 }
@@ -8144,12 +8111,12 @@ namespace IoC
     using System;
 
     /// <summary>
-    /// The binding token to manage binding lifetime.
+    /// Represents an abstraction of a binding token.
     /// </summary>
     public interface IToken: IDisposable
     {
         /// <summary>
-        /// The owner container.
+        /// The configurable container owning the registered binding.
         /// </summary>
         IMutableContainer Container { get; }
     }
@@ -8235,28 +8202,28 @@ namespace IoC
 namespace IoC
 {
     /// <summary>
-    /// The enumeration of well-known lifetimes.
+    /// A set of well-known lifetimes.
     /// </summary>
     [PublicAPI]
     public enum Lifetime
     {
         /// <summary>
-        /// A new instance is creating each time (it's default).
+        /// For a new instance each time (default).
         /// </summary>
         Transient = 1,
 
         /// <summary>
-        /// Single instance.
+        /// For a singleton instance.
         /// </summary>
         Singleton = 2,
 
         /// <summary>
-        /// Singleton instance per container.
+        /// For a singleton instance per container.
         /// </summary>
         ContainerSingleton = 3,
 
         /// <summary>
-        /// Singleton instance per scope.
+        /// For a singleton instance per scope.
         /// </summary>
         ScopeSingleton = 4
     }
@@ -8269,7 +8236,7 @@ namespace IoC
 namespace IoC
 {
     /// <summary>
-    /// Represents the resolver delegate.
+    /// Represents an abstraction of instance resolver.
     /// </summary>
     /// <typeparam name="T">The type of resolving instance.</typeparam>
     /// <param name="container">The resolving container.</param>
@@ -8308,13 +8275,13 @@ namespace IoC
 namespace IoC
 {
     /// <summary>
-    /// Represents a trace event.
+    /// Represents a container trace event.
     /// </summary>
     [PublicAPI]
     public struct TraceEvent
     {
         /// <summary>
-        /// The origin container event.
+        /// The original container event.
         /// </summary>
         public readonly ContainerEvent ContainerEvent;
 
@@ -8324,9 +8291,9 @@ namespace IoC
         [NotNull] public readonly string Message;
 
         /// <summary>
-        /// Creates new instance of trace event.
+        /// Creates new instance of a trace event.
         /// </summary>
-        /// <param name="containerEvent">The original instance of container event.</param>
+        /// <param name="containerEvent">The original container event.</param>
         /// <param name="message">The trace message.</param>
         internal TraceEvent(ContainerEvent containerEvent, [NotNull] string message)
         {
@@ -8341,7 +8308,6 @@ namespace IoC
 
 namespace IoC
 {
-    using System.Collections.Generic;
     using System.Linq.Expressions;
     using Core;
 
@@ -8704,7 +8670,7 @@ namespace IoC.Features
     using Lifetimes;
 
     /// <summary>
-    /// Adds the set of core features like lifetimes and default containers.
+    /// Adds the set of core features like lifetimes and containers.
     /// </summary>
     [PublicAPI]
     public sealed class CoreFeature : IConfiguration
@@ -8846,7 +8812,7 @@ namespace IoC.Features
     using System.Collections.Generic;
 
     /// <summary>
-    /// Provides defaults for features.
+    /// Represents a feature sets.
     /// </summary>
     [PublicAPI]
     public static class Set
@@ -9107,7 +9073,7 @@ namespace IoC.Lifetimes
     using Core;
 
     /// <summary>
-    /// Represents singleton per container lifetime.
+    /// For a singleton instance per container.
     /// </summary>
     [PublicAPI]
     public sealed class ContainerSingletonLifetime: KeyBasedLifetime<IContainer>
@@ -9311,7 +9277,7 @@ namespace IoC.Lifetimes
     using Core;
 
     /// <summary>
-    /// Represents singleton per scope lifetime.
+    /// For a singleton instance per scope.
     /// </summary>
     [PublicAPI]
     public sealed class ScopeSingletonLifetime: KeyBasedLifetime<IScope>
@@ -9388,7 +9354,7 @@ namespace IoC.Lifetimes
     using static Core.TypeDescriptorExtensions;
 
     /// <summary>
-    /// Represents singleton lifetime.
+    /// For a singleton instance.
     /// </summary>
     [PublicAPI]
     public sealed class SingletonLifetime : ILifetime
@@ -9486,7 +9452,7 @@ namespace IoC.Issues
         [CanBeNull] public readonly ILifetime Lifetime;
 
         /// <summary>
-        /// Creates new instance.
+        /// Creates a new instance.
         /// </summary>
         /// <param name="dependency">The resolved dependency.</param>
         /// <param name="lifetime">The lifetime to use</param>
@@ -9774,6 +9740,7 @@ namespace IoC.Issues
 
 #region AspectOrientedAutowiringStrategy
 
+// ReSharper disable ForCanBeConvertedToForeach
 namespace IoC.Core
 {
     using System;
@@ -9828,12 +9795,21 @@ namespace IoC.Core
             let methodMetadata = new Metadata(_metadata, method.Info.GetCustomAttributes(true))
             where enforceSelection || !methodMetadata.IsEmpty
             orderby methodMetadata.Order
-            where (
-                    from parameter in method.Info.GetParameters()
-                    let parameterMetadata = new Metadata(_metadata, parameter.GetCustomAttributes(true))
-                    select method.TryInjectDependency(parameter.Position, parameterMetadata.Type ?? parameter.ParameterType, parameterMetadata.Tag ?? methodMetadata.Tag))
-                .All(isInjected => isInjected)
-            select method;
+            select SetDependencies(method, methodMetadata);
+
+        private IMethod<TMethodInfo> SetDependencies<TMethodInfo>(IMethod<TMethodInfo> method, Metadata methodMetadata)
+            where TMethodInfo : MethodBase
+        {
+            var parameters = method.Info.GetParameters();
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                var parameter = parameters[i];
+                var parameterMetadata = new Metadata(_metadata, parameter.GetCustomAttributes(true));
+                method.SetDependency(parameter.Position, parameterMetadata.Type ?? parameter.ParameterType, parameterMetadata.Tag ?? methodMetadata.Tag);
+            }
+
+            return method;
+        }
 
         private struct Metadata
         {
@@ -10018,6 +9994,7 @@ namespace IoC.Core
 #endregion
 #region Autowiring
 
+// ReSharper disable RedundantNameQualifier
 namespace IoC.Core
 {
     using System.Collections.Generic;
@@ -10348,11 +10325,11 @@ namespace IoC.Core
         public Expression ReplaceTypes(Expression baseExpression) =>
             TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, _typesMap);
 
-        public void BindTypes(Type type, Type targetType) =>
-            TypeMapper.Shared.Map(type, targetType, _typesMap);
+        public void BindTypes(Type originalType, Type targetType) =>
+            TypeMapper.Shared.Map(originalType, targetType, _typesMap);
 
-        public bool TryReplaceType(Type type, out Type targetType) =>
-            _typesMap.TryGetValue(type, out targetType);
+        public bool TryReplaceType(Type originalType, out Type targetType) =>
+            _typesMap.TryGetValue(originalType, out targetType);
 
         public Expression InjectDependencies(Expression baseExpression, ParameterExpression instanceExpression = null) =>
             DependencyInjectionExpressionBuilder.Shared.Build(baseExpression, this, instanceExpression);
@@ -10674,6 +10651,39 @@ namespace IoC.Core
             if (registeredType == null) throw new ArgumentNullException(nameof(registeredType));
             if (resolvingType == null) throw new ArgumentNullException(nameof(resolvingType));
             throw new InvalidOperationException($"Cannot resolve instance type based on the registered type {registeredType} for resolving type {registeredType}.\n{buildContext}");
+        }
+    }
+}
+
+#endregion
+#region CompositionRoot
+
+namespace IoC.Core
+{
+    using System;
+
+    internal sealed class CompositionRoot<TInstance> : ICompositionRoot<TInstance>
+    {
+        [NotNull] private readonly IToken _token;
+
+        public CompositionRoot([NotNull] IToken token, [NotNull] TInstance instance)
+        {
+            _token = token ?? throw new ArgumentNullException(nameof(token));
+            Instance = instance;
+        }
+
+        public TInstance Instance { get; }
+
+        public void Dispose()
+        {
+            using (_token.Container)
+            using (_token)
+            {
+                if (Instance is IDisposable disposable)
+                {
+                    disposable.Dispose();
+                }
+            }
         }
     }
 }
@@ -11499,6 +11509,7 @@ namespace IoC.Core
 #endregion
 #region Disposable
 
+// ReSharper disable RedundantUsingDirective
 namespace IoC.Core
 {
     using System;
@@ -11619,6 +11630,7 @@ namespace IoC.Core
         private static readonly TypeDescriptor ResolverGenericTypeDescriptor = typeof(Resolver<>).Descriptor();
         internal static readonly MethodInfo GetHashCodeMethodInfo = Descriptor<object>().GetDeclaredMethods().Single(i => i.Name == nameof(GetHashCode));
         internal static readonly Expression NullConst = Expression.Constant(null);
+        internal static readonly Expression ContainerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
         private static readonly MethodInfo EnterMethodInfo = typeof(Monitor).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Monitor.Enter) && i.GetParameters().Length == 1);
         private static readonly MethodInfo ExitMethodInfo = typeof(Monitor).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Monitor.Exit));
 
@@ -12112,39 +12124,6 @@ namespace IoC.Core
 
 
 #endregion
-#region Holder
-
-namespace IoC.Core
-{
-    using System;
-
-    internal sealed class Holder<TInstance> : IHolder<TInstance>
-    {
-        [NotNull] private readonly IToken _token;
-
-        public Holder([NotNull] IToken token, [NotNull] TInstance instance)
-        {
-            _token = token ?? throw new ArgumentNullException(nameof(token));
-            Instance = instance;
-        }
-
-        public TInstance Instance { get; }
-
-        public void Dispose()
-        {
-            using (_token.Container)
-            using (_token)
-            {
-                if (Instance is IDisposable disposable)
-                {
-                    disposable.Dispose();
-                }
-            }
-        }
-    }
-}
-
-#endregion
 #region IArray
 
 namespace IoC.Core
@@ -12340,10 +12319,26 @@ namespace IoC.Core
             }
         }
 
-        public void SetParameterExpression(int parameterPosition, Expression parameterExpression)
+        public void SetExpression(int parameterPosition, Expression parameterExpression)
         {
             if (parameterPosition < 0 || parameterPosition >= _parametersExpressions.Length) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
+
             _parametersExpressions[parameterPosition] = parameterExpression ?? throw new ArgumentNullException(nameof(parameterExpression));
+        }
+
+        public void SetDependency(int parameterPosition, Type dependencyType, object dependencyTag = null)
+        {
+            if (dependencyType == null) throw new ArgumentNullException(nameof(dependencyType));
+            if (parameterPosition < 0 || parameterPosition >= _parametersExpressions.Length) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
+
+            var parameterExpression = Expression.Call(
+                Injections.InjectWithTagMethodInfo,
+                ExpressionBuilderExtensions.ContainerExpression,
+                Expression.Constant(dependencyType),
+                Expression.Constant(dependencyTag))
+                .Convert(dependencyType);
+
+            SetExpression(parameterPosition, parameterExpression);
         }
     }
 }
@@ -12400,6 +12395,7 @@ namespace IoC.Core
 #endregion
 #region Observable
 
+// ReSharper disable UnusedMember.Global
 namespace IoC.Core
 {
     using System;
@@ -12435,7 +12431,7 @@ namespace IoC.Core
 
             public InternalObservable(Func<IObserver<T>, IDisposable> factory) => _factory = factory;
 
-            public IDisposable Subscribe([NotNull] IObserver<T> observer) => _factory(observer ?? throw new ArgumentNullException(nameof(observer)));
+            public IDisposable Subscribe(IObserver<T> observer) => _factory(observer ?? throw new ArgumentNullException(nameof(observer)));
         }
 
         private sealed class InternalObserver<T>: IObserver<T>
@@ -12981,6 +12977,8 @@ namespace IoC.Core
 #endregion
 #region TypeDescriptor
 
+// ReSharper disable RedundantUsingDirective
+// ReSharper disable UnusedMember.Global
 namespace IoC.Core
 {
     using System;

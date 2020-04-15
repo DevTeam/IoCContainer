@@ -49,7 +49,7 @@
         /// <returns>The disposable instance holder.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IConfiguration configuration, [NotNull] [ItemCanBeNull] params object[] args)
+        public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IConfiguration configuration, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class
             => Container.Create().Using(configuration ?? throw new ArgumentNullException(nameof(configuration))).BuildUp<TInstance>(args ?? throw new ArgumentNullException(nameof(args)));
 
@@ -63,7 +63,7 @@
         /// <returns>The disposable instance holder.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
+        public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class =>
             (token ?? throw new ArgumentNullException(nameof(token))).Container.BuildUp<TInstance>(args ?? throw new ArgumentNullException(nameof(args)));
 
@@ -76,7 +76,7 @@
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>
         [NotNull]
-        public static IHolder<TInstance> BuildUp<TInstance>([NotNull] this IMutableContainer container, [NotNull] [ItemCanBeNull] params object[] args)
+        public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IMutableContainer container, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
@@ -84,7 +84,7 @@
 
             if (container.TryGetResolver<TInstance>(typeof(TInstance), null, out var resolver, out _, container))
             {
-                return new Holder<TInstance>(new Token(container, Disposable.Empty), resolver(container, args));
+                return new CompositionRoot<TInstance>(new Token(container, Disposable.Empty), resolver(container, args));
             }
 
             var buildId = Guid.NewGuid();
@@ -92,7 +92,7 @@
             try
             {
                 var instance = container.Resolve<TInstance>(buildId.AsTag(), args);
-                return new Holder<TInstance>(token, instance);
+                return new CompositionRoot<TInstance>(token, instance);
             }
             catch
             {
