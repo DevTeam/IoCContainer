@@ -49,40 +49,38 @@ namespace IoC.Tests.UsageScenarios
             // some implementation here
             // }
             // Stores the parent container to delegate all logic
-            private IMutableContainer _parent;
+            public MyContainer(IContainer current) => Parent = current;
 
-            public MyContainer(IMutableContainer parent) => _parent = parent;
-
-            public IContainer Parent => _parent;
+            public IContainer Parent { get; }
 
             // Registers dependencies
             public bool TryRegisterDependency(IEnumerable<Key> keys, IoC.IDependency dependency, ILifetime lifetime, out IToken dependencyToken) 
-                => _parent.TryRegisterDependency(keys, dependency, lifetime, out dependencyToken);
+                => ((IMutableContainer)Parent).TryRegisterDependency(keys, dependency, lifetime, out dependencyToken);
 
             // Gets registered dependencies and lifetimes
             public bool TryGetDependency(Key key, out IoC.IDependency dependency, out ILifetime lifetime)
-                => _parent.TryGetDependency(key, out dependency, out lifetime);
+                => Parent.TryGetDependency(key, out dependency, out lifetime);
 
             // Tries to get a resolver
             public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
-                => _parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer);
+                => Parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer);
 
             // Stores a token
-            public void RegisterResource(IDisposable resource) { }
+            public void RegisterResource(IDisposable resource) => Parent.RegisterResource(resource);
 
             // Releases a token
-            public void UnregisterResource(IDisposable resource) { }
+            public void UnregisterResource(IDisposable resource) => Parent.UnregisterResource(resource);
 
-            public void Dispose() { }
+            public void Dispose() => Parent.Dispose();
 
             // Creates the registered keys' enumerator
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
             // Creates the registered keys' strong-typed enumerator
-            public IEnumerator<IEnumerable<Key>> GetEnumerator() => _parent.GetEnumerator();
+            public IEnumerator<IEnumerable<Key>> GetEnumerator() => Parent.GetEnumerator();
 
             // Subscribes an observer to receive container events
-            public IDisposable Subscribe(IObserver<ContainerEvent> observer) => _parent.Subscribe(observer);
+            public IDisposable Subscribe(IObserver<ContainerEvent> observer) => Parent.Subscribe(observer);
         // {
         }
         // }

@@ -51,7 +51,6 @@
 
             // Current
             yield return container.Register<IContainer, IResourceRegistry, IObservable<ContainerEvent>>(ctx => ctx.Container);
-            yield return container.Register(ctx => (IMutableContainer)ctx.Container);
 
             // New child
             yield return container.Register<IMutableContainer, IContainer, IResourceRegistry, IObservable<ContainerEvent>>(
