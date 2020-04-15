@@ -5435,7 +5435,7 @@
         </member>
         <member name="T:IoC.IMutableContainer">
             <summary>
-            The mutable Inversion of Control container.
+            The configurable Inversion of Control container.
             </summary>
         </member>
         <member name="M:IoC.IMutableContainer.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,IoC.IToken@)">
@@ -5948,21 +5948,6 @@
             </summary>
             <param name="containerEvent">The original instance of container event.</param>
             <param name="message">The trace message.</param>
-        </member>
-        <member name="T:IoC.WellknownContainers">
-            <summary>
-            The enumeration of well-known containers.
-            </summary>
-        </member>
-        <member name="F:IoC.WellknownContainers.Parent">
-            <summary>
-            Parent immutable container.
-            </summary>
-        </member>
-        <member name="F:IoC.WellknownContainers.NewChild">
-            <summary>
-            Creates new child mutable container.
-            </summary>
         </member>
         <member name="T:IoC.WellknownExpressions">
             <summary>

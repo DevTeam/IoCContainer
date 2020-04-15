@@ -6,7 +6,7 @@
     /// Represents the resource's registry.
     /// </summary>
     [PublicAPI]
-    public interface IResourceRegistry: IDisposable
+    public interface IResourceRegistry
     {
         /// <summary>
         /// Registers a resource to the registry.

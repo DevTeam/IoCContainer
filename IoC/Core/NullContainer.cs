@@ -5,7 +5,7 @@
     using System.Collections.Generic;
     using System.Linq;
 
-    internal sealed class NullContainer : IMutableContainer
+    internal sealed class NullContainer : IContainer
     {
         public static readonly IContainer Shared = new NullContainer();
         private static readonly NotSupportedException NotSupportedException = new NotSupportedException();
@@ -13,9 +13,6 @@
         private NullContainer() { }
 
         public IContainer Parent => throw new NotSupportedException();
-
-        public bool TryRegisterDependency(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IToken dependencyToken)
-            => throw NotSupportedException;
 
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
         {
@@ -30,7 +27,6 @@
             error = NotSupportedException;
             return false;
         }
-
 
         public void RegisterResource(IDisposable resource) { }
 

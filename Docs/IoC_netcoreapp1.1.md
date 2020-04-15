@@ -693,9 +693,6 @@
   - [Apply()](#M-IoC-Features-TupleFeature-Apply-IoC-IMutableContainer- 'IoC.Features.TupleFeature.Apply(IoC.IMutableContainer)')
 - [UsedImplicitlyAttribute](#T-IoC-UsedImplicitlyAttribute 'IoC.UsedImplicitlyAttribute')
 - [ValueProviderAttribute](#T-IoC-ValueProviderAttribute 'IoC.ValueProviderAttribute')
-- [WellknownContainers](#T-IoC-WellknownContainers 'IoC.WellknownContainers')
-  - [NewChild](#F-IoC-WellknownContainers-NewChild 'IoC.WellknownContainers.NewChild')
-  - [Parent](#F-IoC-WellknownContainers-Parent 'IoC.WellknownContainers.Parent')
 - [WellknownExpressions](#T-IoC-WellknownExpressions 'IoC.WellknownExpressions')
   - [ArgsParameter](#F-IoC-WellknownExpressions-ArgsParameter 'IoC.WellknownExpressions.ArgsParameter')
   - [ContainerParameter](#F-IoC-WellknownExpressions-ContainerParameter 'IoC.WellknownExpressions.ContainerParameter')
@@ -8315,7 +8312,7 @@ IoC
 
 ##### Summary
 
-The mutable Inversion of Control container.
+The configurable Inversion of Control container.
 
 <a name='M-IoC-IMutableContainer-TryRegisterDependency-System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime,IoC-IToken@-'></a>
 ### TryRegisterDependency(keys,dependency,lifetime,dependencyToken) `method`
@@ -12210,31 +12207,6 @@ IoC
 
 For a parameter that is expected to be one of the limited set of values.
 Specify fields of which type should be used as values for this parameter.
-
-<a name='T-IoC-WellknownContainers'></a>
-## WellknownContainers `type`
-
-##### Namespace
-
-IoC
-
-##### Summary
-
-The enumeration of well-known containers.
-
-<a name='F-IoC-WellknownContainers-NewChild'></a>
-### NewChild `constants`
-
-##### Summary
-
-Creates new child mutable container.
-
-<a name='F-IoC-WellknownContainers-Parent'></a>
-### Parent `constants`
-
-##### Summary
-
-Parent immutable container.
 
 <a name='T-IoC-WellknownExpressions'></a>
 ## WellknownExpressions `type`

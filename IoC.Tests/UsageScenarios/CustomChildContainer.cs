@@ -22,8 +22,8 @@ namespace IoC.Tests.UsageScenarios
             using var container = Container
                 .Create()
                 .Bind<IService>().To<Service>()
-                // Configure the root container to use a custom container during creating a child container
-                .Bind<IMutableContainer>().Tag(WellknownContainers.NewChild).To<MyContainer>()
+                // Configure the root container to use a custom container as a child container
+                .Bind<IMutableContainer>().To<MyContainer>()
                 .Container;
 
             // Create and configure the custom child container
@@ -54,8 +54,16 @@ namespace IoC.Tests.UsageScenarios
             public IContainer Parent { get; }
 
             // Registers dependencies
-            public bool TryRegisterDependency(IEnumerable<Key> keys, IoC.IDependency dependency, ILifetime lifetime, out IToken dependencyToken) 
-                => ((IMutableContainer)Parent).TryRegisterDependency(keys, dependency, lifetime, out dependencyToken);
+            public bool TryRegisterDependency(IEnumerable<Key> keys, IoC.IDependency dependency, ILifetime lifetime, out IToken dependencyToken)
+            {
+                if(Parent is IMutableContainer mutableContainer)
+                {
+                    return mutableContainer.TryRegisterDependency(keys, dependency, lifetime, out dependencyToken);
+                }
+
+                dependencyToken = default;
+                return false;
+            }
 
             // Gets registered dependencies and lifetimes
             public bool TryGetDependency(Key key, out IoC.IDependency dependency, out ILifetime lifetime)
@@ -71,7 +79,7 @@ namespace IoC.Tests.UsageScenarios
             // Releases a token
             public void UnregisterResource(IDisposable resource) => Parent.UnregisterResource(resource);
 
-            public void Dispose() => Parent.Dispose();
+            public void Dispose() => (Parent as IMutableContainer)?.Dispose();
 
             // Creates the registered keys' enumerator
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

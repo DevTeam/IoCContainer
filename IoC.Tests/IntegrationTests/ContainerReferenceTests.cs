@@ -15,38 +15,26 @@
 
             // When
             using (container.Bind<IMyService>().As(Lifetime.Transient).To(ctx => expectedInstance))
-            using (var childContainer = container.Resolve<IContainer>(WellknownContainers.NewChild.AsTag()))
             {
+                using var childContainer = container.Resolve<IMutableContainer>();
+
                 // Then
                 var actualInstance = childContainer.Resolve<IMyService>();
                 actualInstance.ShouldBe(expectedInstance);
             }
         }
 
-#if !NET40
-        [Theory]
-        [InlineData(null)]
-        public void ContainerShouldResolveCurrentContainer(WellknownContainers? wellknownContainer)
+        [Fact]
+        public void ContainerShouldResolveCurrentContainer()
         {
             // Given
             using var container = Container.Create();
+
             // When
-            using var curContainer = wellknownContainer.HasValue ? container.Resolve<IContainer>(wellknownContainer.Value.AsTag()) : container.Resolve<IContainer>();
+            var curContainer = container.Resolve<IContainer>();
+
             // Then
             curContainer.ShouldBe(container);
-        }
-#endif
-
-        [Fact]
-        public void ContainerShouldResolveParentContainer()
-        {
-            // Given
-            using var container = Container.Create();
-            // When
-            var curContainer = container.Resolve<IContainer>(WellknownContainers.Parent.AsTag());
-
-            // Then
-            curContainer.ShouldBe(container.Parent);
         }
     }
 }

@@ -1230,7 +1230,6 @@ namespace IoC
         [NotNull] private Table<ShortKey, DependencyEntry> _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
 
         private bool _isDisposed;
-        private readonly bool _disposeParentContainer;
         [NotNull] private readonly IContainer _parent;
         [NotNull] private readonly string _name;
         [NotNull] private readonly ILockObject _lockObject;
@@ -1252,18 +1251,19 @@ namespace IoC
 
             // Create a root container
             var lockObject = new LockObject();
-            var rootContainer = new Container(string.Empty, NullContainer.Shared, lockObject, false);
+            var rootContainer = new Container(string.Empty, NullContainer.Shared, lockObject);
             rootContainer.Register<ILockObject>(ctx => lockObject);
             rootContainer.ApplyConfigurations(configurations ?? Features.Set.Default);
 
             // Create a target container
-            return new Container(CreateContainerName(name), rootContainer, lockObject, true);
+            var container = new Container(CreateContainerName(name), rootContainer, lockObject);
+            container.RegisterResource(rootContainer);
+            return container;
         }
 
-        internal Container([NotNull] string name, [NotNull] IContainer parent, [NotNull] ILockObject lockObject, bool disposeParentContainer)
+        internal Container([NotNull] string name, [NotNull] IContainer parent, [NotNull] ILockObject lockObject)
         {
-            _lockObject = lockObject;
-            _disposeParentContainer = disposeParentContainer;
+            _lockObject = lockObject ?? throw new ArgumentNullException(nameof(parent));
             _name = $"{parent}/{name ?? throw new ArgumentNullException(nameof(name))}";
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
             _eventSubject = new Subject<ContainerEvent>(_lockObject);
@@ -1504,10 +1504,6 @@ namespace IoC
                 }
 
                 _eventSubject.OnCompleted();
-                if (_disposeParentContainer)
-                {
-                    _parent.Dispose();
-                }
             }
             finally
             {
@@ -5517,7 +5513,7 @@ namespace IoC
         {
             if (parentContainer == null) throw new ArgumentNullException(nameof(parentContainer));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return parentContainer.GetResolver<IMutableContainer>(WellknownContainers.NewChild.AsTag())(parentContainer, name);
+            return parentContainer.GetResolver<IMutableContainer>()(parentContainer, name);
         }
 
         /// <summary>
@@ -5532,7 +5528,7 @@ namespace IoC
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return token.Container.GetResolver<IMutableContainer>(WellknownContainers.NewChild.AsTag())(token.Container, name);
+            return token.Container.GetResolver<IMutableContainer>()(token.Container, name);
         }
 
         /// <summary>
@@ -7951,14 +7947,15 @@ namespace IoC
 
 namespace IoC
 {
+    using System;
     using System.Collections.Generic;
 
     /// <summary>
-    /// The mutable Inversion of Control container.
+    /// The configurable Inversion of Control container.
     /// </summary>
     [PublicAPI]
 
-    public interface IMutableContainer: IContainer
+    public interface IMutableContainer: IContainer, IDisposable
     {
         /// <summary>
         /// Register the dependency with lifetime.
@@ -7969,7 +7966,6 @@ namespace IoC
         /// <param name="dependencyToken">The dependency token.</param>
         /// <returns>True if successful.</returns>
         bool TryRegisterDependency([NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime, out IToken dependencyToken);
-
     }
 }
 
@@ -8102,7 +8098,7 @@ namespace IoC
     /// Represents the resource's registry.
     /// </summary>
     [PublicAPI]
-    public interface IResourceRegistry: IDisposable
+    public interface IResourceRegistry
     {
         /// <summary>
         /// Registers a resource to the registry.
@@ -8339,30 +8335,6 @@ namespace IoC
         }
     }
 }
-
-#endregion
-#region WellknownContainers
-
-namespace IoC
-{
-    /// <summary>
-    /// The enumeration of well-known containers.
-    /// </summary>
-    [PublicAPI]
-    public enum WellknownContainers
-    {
-        /// <summary>
-        /// Parent immutable container.
-        /// </summary>
-        Parent = 1,
-
-        /// <summary>
-        /// Creates new child mutable container.
-        /// </summary>
-        NewChild = 2
-    }
-}
-
 
 #endregion
 #region WellknownExpressions
@@ -8772,30 +8744,18 @@ namespace IoC.Features
             // ThreadLocal
             yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Set.AnyTag);
 
-            // Containers:
-
-            // Current
+            // Current container
             yield return container.Register<IContainer, IResourceRegistry, IObservable<ContainerEvent>>(ctx => ctx.Container);
 
-            // New child
-            yield return container.Register<IMutableContainer, IContainer, IResourceRegistry, IObservable<ContainerEvent>>(
+            // New child container
+            yield return container.Register<IMutableContainer>(
                 ctx => new Container(
-                    ctx.Args.Length == 1
-                        ? Container.CreateContainerName(ctx.Args[0] as string)
-                        : Container.CreateContainerName(string.Empty),
+                    ctx.Args.Length == 1 ? Container.CreateContainerName(ctx.Args[0] as string) : Container.CreateContainerName(string.Empty),
                     ctx.Container,
-                    ctx.Container.Inject<ILockObject>(),
-                    false),
-                null,
-                new object[] { WellknownContainers.NewChild });
+                    ctx.Container.Inject<ILockObject>()));
 
-            yield return container.Register<Func<IContainer>>(ctx => () => ctx.Container.Inject<IContainer>(WellknownContainers.NewChild));
-            yield return container.Register<Func<string, IContainer>>(ctx => name => ctx.Container.Resolve<IContainer>(WellknownContainers.NewChild.AsTag(), name));
-            yield return container.Register<Func<IMutableContainer>>(ctx => () => ctx.Container.Inject<IMutableContainer>(WellknownContainers.NewChild));
-            yield return container.Register<Func<string, IMutableContainer>>(ctx => name => ctx.Container.Resolve<IMutableContainer>(WellknownContainers.NewChild.AsTag(), name));
-
-            // Parent
-            yield return container.Register<IContainer, IResourceRegistry, IObservable<ContainerEvent>>(ctx => ctx.Container.Parent, null, new object[] { WellknownContainers.Parent });
+            yield return container.Register<Func<IMutableContainer>>(ctx => () => ctx.Container.Inject<IMutableContainer>());
+            yield return container.Register<Func<string, IMutableContainer>>(ctx => name => ctx.Container.Resolve<IMutableContainer>(name));
 
             yield return container.Register(ctx => ContainerEventToStringConverter.Shared);
             yield return container.Register(ctx => TypeToStringConverter.Shared);
@@ -12398,7 +12358,7 @@ namespace IoC.Core
     using System.Collections.Generic;
     using System.Linq;
 
-    internal sealed class NullContainer : IMutableContainer
+    internal sealed class NullContainer : IContainer
     {
         public static readonly IContainer Shared = new NullContainer();
         private static readonly NotSupportedException NotSupportedException = new NotSupportedException();
@@ -12406,9 +12366,6 @@ namespace IoC.Core
         private NullContainer() { }
 
         public IContainer Parent => throw new NotSupportedException();
-
-        public bool TryRegisterDependency(IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime, out IToken dependencyToken)
-            => throw NotSupportedException;
 
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
         {
@@ -12423,7 +12380,6 @@ namespace IoC.Core
             error = NotSupportedException;
             return false;
         }
-
 
         public void RegisterResource(IDisposable resource) { }
 

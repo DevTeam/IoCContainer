@@ -27,7 +27,8 @@ namespace IoC.Tests.UsageScenarios
 
             var instance = currentContainer.Resolve<MyClass>();
             instance.CurrentContainer.ShouldBe(currentContainer);
-            instance.ChildContainer.Parent.ShouldBe(currentContainer);
+            instance.ChildContainer1.Parent.ShouldBe(currentContainer);
+            instance.ChildContainer2.Parent.ShouldBe(currentContainer);
             instance.NamedChildContainer.Parent.ShouldBe(currentContainer);
             instance.NamedChildContainer.ToString().ShouldBe("//root/Some name");
         }
@@ -36,17 +37,21 @@ namespace IoC.Tests.UsageScenarios
         {
             public MyClass(
                 IContainer currentContainer,
-                Func<IContainer> childContainerFactory,
-                Func<string, IContainer> nameChildContainerFactory)
+                IMutableContainer newChildContainerFactory,
+                Func<IMutableContainer> childContainerFactory,
+                Func<string, IMutableContainer> nameChildContainerFactory)
             {
                 CurrentContainer = currentContainer;
-                ChildContainer = childContainerFactory();
+                ChildContainer1 = newChildContainerFactory;
+                ChildContainer2 = childContainerFactory();
                 NamedChildContainer = nameChildContainerFactory("Some name");
             }
 
             public IContainer CurrentContainer { get; }
 
-            public IContainer ChildContainer { get; }
+            public IContainer ChildContainer1 { get; }
+
+            public IContainer ChildContainer2 { get; }
 
             public IContainer NamedChildContainer { get; }
         }

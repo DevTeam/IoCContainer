@@ -22,7 +22,7 @@
         {
             if (parentContainer == null) throw new ArgumentNullException(nameof(parentContainer));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return parentContainer.GetResolver<IMutableContainer>(WellknownContainers.NewChild.AsTag())(parentContainer, name);
+            return parentContainer.GetResolver<IMutableContainer>()(parentContainer, name);
         }
 
         /// <summary>
@@ -37,7 +37,7 @@
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return token.Container.GetResolver<IMutableContainer>(WellknownContainers.NewChild.AsTag())(token.Container, name);
+            return token.Container.GetResolver<IMutableContainer>()(token.Container, name);
         }
 
         /// <summary>

@@ -31,7 +31,6 @@
         [NotNull] private Table<ShortKey, DependencyEntry> _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
 
         private bool _isDisposed;
-        private readonly bool _disposeParentContainer;
         [NotNull] private readonly IContainer _parent;
         [NotNull] private readonly string _name;
         [NotNull] private readonly ILockObject _lockObject;
@@ -53,18 +52,19 @@
 
             // Create a root container
             var lockObject = new LockObject();
-            var rootContainer = new Container(string.Empty, NullContainer.Shared, lockObject, false);
+            var rootContainer = new Container(string.Empty, NullContainer.Shared, lockObject);
             rootContainer.Register<ILockObject>(ctx => lockObject);
             rootContainer.ApplyConfigurations(configurations ?? Features.Set.Default);
 
             // Create a target container
-            return new Container(CreateContainerName(name), rootContainer, lockObject, true);
+            var container = new Container(CreateContainerName(name), rootContainer, lockObject);
+            container.RegisterResource(rootContainer);
+            return container;
         }
 
-        internal Container([NotNull] string name, [NotNull] IContainer parent, [NotNull] ILockObject lockObject, bool disposeParentContainer)
+        internal Container([NotNull] string name, [NotNull] IContainer parent, [NotNull] ILockObject lockObject)
         {
-            _lockObject = lockObject;
-            _disposeParentContainer = disposeParentContainer;
+            _lockObject = lockObject ?? throw new ArgumentNullException(nameof(parent));
             _name = $"{parent}/{name ?? throw new ArgumentNullException(nameof(name))}";
             _parent = parent ?? throw new ArgumentNullException(nameof(parent));
             _eventSubject = new Subject<ContainerEvent>(_lockObject);
@@ -305,10 +305,6 @@
                 }
 
                 _eventSubject.OnCompleted();
-                if (_disposeParentContainer)
-                {
-                    _parent.Dispose();
-                }
             }
             finally
             {
