@@ -1,4 +1,5 @@
 ﻿// ReSharper disable RedundantTypeArgumentsOfMethod
+// ReSharper disable RedundantAssignment
 namespace IoC.Tests.IntegrationTests
 {
     using System;
@@ -110,10 +111,14 @@ namespace IoC.Tests.IntegrationTests
 
             // Method injection
             [Order(1)]
-            public bool Initialize([Type(typeof(Clock))] IClock clock, out Exception error)
+            public bool Initialize(
+                [Type(typeof(Clock))] IClock clock,
+                out Exception error,
+                [Type(typeof(Clock))] ref IClock clockRef)
             {
                 _clock = clock;
                 error = new Exception("Some error");
+                clockRef = null;
                 return false;
             }
 
