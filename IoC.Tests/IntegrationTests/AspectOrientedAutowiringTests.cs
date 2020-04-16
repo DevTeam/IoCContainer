@@ -110,10 +110,11 @@ namespace IoC.Tests.IntegrationTests
 
             // Method injection
             [Order(1)]
-            public void Initialize([Type(typeof(Clock))] IClock clock, out Exception error)
+            public bool Initialize([Type(typeof(Clock))] IClock clock, out Exception error)
             {
                 _clock = clock;
                 error = new Exception("Some error");
+                return false;
             }
 
             // Property injection
