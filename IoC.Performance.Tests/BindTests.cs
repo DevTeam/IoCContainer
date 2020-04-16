@@ -8,7 +8,7 @@ namespace IoC.Performance.Tests
 
         public BindTests()
         {
-            _containerComplex = Container.Create("Core", Features.Set.Core);
+            _containerComplex = Container.Create("Core", Features.Sets.Core);
         }
 
         [Fact]

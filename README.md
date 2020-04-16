@@ -267,6 +267,7 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
 ## Usage Scenarios
 
 - Powerful Injection
+  - [Nullable Value Type Resolving](#nullable-value-type-resolving-)
   - [Resolve Func](#resolve-func-)
   - [Resolve Lazy](#resolve-lazy-)
   - [Resolve ThreadLocal](#resolve-threadlocal-)
@@ -306,7 +307,6 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Func With Arguments](#func-with-arguments-)
   - [Auto dispose a singleton during owning container's dispose](#auto-dispose-a-singleton-during-owning-containers-dispose-)
   - [Default Parameters Injection](#default-parameters-injection-)
-  - [Nullable Reference Type Dependency](#nullable-reference-type-dependency-)
   - [Optional Dependency](#optional-dependency-)
   - [Optional Injection](#optional-injection-)
   - [Configuration via a text metadata](#configuration-via-a-text-metadata-)
@@ -1224,47 +1224,6 @@ public class SomeService: IService
 
 
 
-### Nullable Reference Type Dependency [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/NullableDependency.cs)
-
-
-
-``` CSharp
-e enable
-
-public void Run()
-{
-    // Create the container and configure it
-    using var container = Container.Create()
-        .Bind<IDependency>().To<Dependency>()
-        .Bind<IService>().To<SomeService>()
-        .Container;
-
-    // Resolve an instance
-    var instance = container.Resolve<IService>();
-
-    // Check the optional dependency
-    instance.State.ShouldBe("empty");
-}
-
-public class SomeService: IService
-{
-    // "state" dependency is not resolved here but will be null value because it has Nullable Reference Type
-    public SomeService(IDependency dependency, string? state)
-    {
-        Dependency = dependency;
-        State = state ?? "empty";
-    }
-
-    public IDependency Dependency { get; }
-
-    public string? State { get; }
-}
-
-#nullable restore
-```
-
-
-
 ### Optional Dependency [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/OptionalDependency.cs)
 
 
@@ -1549,15 +1508,13 @@ public class Logger : ILogger
     public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");
 }
 
-#nullable enable
 public class Clock : IClock
 {
-    // "timeZone" dependency is not resolved here but will be null value because it has Nullable Reference Type
-    public Clock([Type(typeof(TimeZoneInfo))] TimeZoneInfo? timeZone) { }
+    // "clockName" dependency is not resolved here but has default value
+    public Clock([Type(typeof(string)), Tag("ClockName")] string clockName = "SPb") { }
 
     public DateTimeOffset Now => DateTimeOffset.Now;
 }
-#nullable restore
 ```
 
 Also you can specify your own aspect oriented autowiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
@@ -1900,6 +1857,32 @@ public class MySingletonLifetime : ILifetime
 
     // Just counts the number of calls
     internal void IncrementCounter() => _counter.Increment();
+}
+```
+
+
+
+### Nullable Value Type Resolving [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/NullableValueTypeResolving.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    // Create the container and configure it
+    using var container = Container.Create()
+        .Bind<int>().Tag(1).To(ctx => 1)
+        .Container;
+
+    // Resolve an instance
+    var val1 = container.Resolve<int?>(1.AsTag());
+    var val2 = container.Resolve<int?>(2.AsTag());
+    var val3 = container.Resolve<int?>();
+
+    // Check the optional dependency
+    val1.Value.ShouldBe(1);
+    val2.HasValue.ShouldBeFalse();
+    val3.HasValue.ShouldBeFalse();
 }
 ```
 

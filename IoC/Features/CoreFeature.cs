@@ -34,7 +34,7 @@
             yield return container.Register(ctx => CannotResolveGenericTypeArgument.Shared);
 
             yield return container.Register(ctx => DefaultAutowiringStrategy.Shared);
-            yield return container.Register(ctx => ctx.Container.GetResolver<TT>(ctx.Key.Tag.AsTag()), null, Set.AnyTag);
+            yield return container.Register(ctx => ctx.Container.GetResolver<TT>(ctx.Key.Tag.AsTag()), null, Sets.AnyTag);
 
             // Lifetimes
             yield return container.Register<ILifetime>(ctx => new SingletonLifetime(), null, new object[] { Lifetime.Singleton });
@@ -45,7 +45,7 @@
             yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Inject<ILockObject>()));
 
             // ThreadLocal
-            yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Set.AnyTag);
+            yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Sets.AnyTag);
 
             // Current container
             yield return container.Register<IContainer, IResourceRegistry, IObservable<ContainerEvent>>(ctx => ctx.Container);

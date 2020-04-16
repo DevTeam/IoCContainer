@@ -2,11 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
 
-    internal sealed class Method<TMethodInfo>: IMethod<TMethodInfo> where TMethodInfo: MethodBase
+    internal sealed class Method<TMethodInfo> : IMethod<TMethodInfo> where TMethodInfo : MethodBase
     {
         private readonly Expression[] _parametersExpressions;
         private readonly ParameterInfo[] _parameters;
@@ -24,6 +23,22 @@
         {
             for (var parameterPosition = 0; parameterPosition < _parametersExpressions.Length; parameterPosition++)
             {
+                var param = _parameters[parameterPosition];
+                if (param.IsOut)
+                {
+                    if (param.ParameterType.HasElementType)
+                    {
+                        var type = param.ParameterType.GetElementType();
+                        if (type != null)
+                        {
+                            var outParam = Expression.Parameter(type);
+                            buildContext.AddParameter(outParam);
+                            yield return outParam;
+                            continue;
+                        }
+                    }
+                }
+
                 var expression = _parametersExpressions[parameterPosition];
                 if (expression != null)
                 {
@@ -31,25 +46,8 @@
                 }
                 else
                 {
-                    var param = _parameters[parameterPosition];
-                    Expression defaultExpression = null;
-#if !NET40
-                    if (param.HasDefaultValue)
-                    {
-                        defaultExpression = Expression.Constant(param.DefaultValue);
-                    }
-
-                    if (defaultExpression == null && param.CustomAttributes.Any(i => i.AttributeType.FullName == "System.Runtime.CompilerServices.NullableAttribute"))
-                    {
-                        defaultExpression = Expression.Default(param.ParameterType);
-                    }
-#else
-                    if (param.IsOptional)
-                    {
-                        defaultExpression = Expression.Constant(param.DefaultValue);
-                    }
-#endif
                     var key = new Key(param.ParameterType);
+                    var defaultExpression = param.IsOptional ? Expression.Constant(param.DefaultValue) : null;
                     yield return buildContext.CreateChild(key, buildContext.Container).GetDependencyExpression(defaultExpression);
                 }
             }
@@ -62,19 +60,20 @@
             _parametersExpressions[parameterPosition] = parameterExpression ?? throw new ArgumentNullException(nameof(parameterExpression));
         }
 
-        public void SetDependency(int parameterPosition, Type dependencyType, object dependencyTag = null)
+        public void SetDependency(int parameterPosition, Type dependencyType, object dependencyTag = null, bool isOptional = false)
         {
             if (dependencyType == null) throw new ArgumentNullException(nameof(dependencyType));
             if (parameterPosition < 0 || parameterPosition >= _parametersExpressions.Length) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
 
+            var injectMethod = isOptional ? Injections.TryInjectWithTagMethodInfo : Injections.InjectWithTagMethodInfo;
             var parameterExpression = Expression.Call(
-                Injections.InjectWithTagMethodInfo,
-                ExpressionBuilderExtensions.ContainerExpression,
-                Expression.Constant(dependencyType),
-                Expression.Constant(dependencyTag))
+                    injectMethod,
+                    ExpressionBuilderExtensions.ContainerExpression,
+                    Expression.Constant(dependencyType),
+                    Expression.Constant(dependencyTag))
                 .Convert(dependencyType);
 
-            SetExpression(parameterPosition, parameterExpression);
+            SetExpression(parameterPosition, parameterExpression.Convert(dependencyType));
         }
     }
 }

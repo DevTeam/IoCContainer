@@ -77,7 +77,7 @@
         public void ContainerShouldResolveWhenInherited()
         {
             // Given
-            using var container = Container.Create("Core", Features.Set.Core);
+            using var container = Container.Create("Core", Features.Sets.Core);
 
             // When
             using (container.Bind<MyService, IMyService>().To(ctx => new MyService("abc", null)))

@@ -37,6 +37,7 @@
         /// <param name="parameterPosition">The parameter position.</param>
         /// <param name="dependencyType">The dependency type.</param>
         /// <param name="dependencyTag">The optional dependency tag value.</param>
-        void SetDependency(int parameterPosition, [NotNull] Type dependencyType, [CanBeNull] object dependencyTag = null);
+        /// <param name="isOptional"><c>True</c> if it is optional dependency.</param>
+        void SetDependency(int parameterPosition, [NotNull] Type dependencyType, [CanBeNull] object dependencyTag = null, bool isOptional = false);
     }
 }

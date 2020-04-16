@@ -971,6 +971,17 @@
         <member name="M:IoC.Features.CollectionFeature.Apply(IoC.IMutableContainer)">
             <inheritdoc />
         </member>
+        <member name="T:IoC.Features.CommonTypesFeature">
+            <summary>
+            Allows to resolve common types like a <c>Lazy</c>.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.CommonTypesFeature.Default">
+            The default instance.
+        </member>
+        <member name="M:IoC.Features.CommonTypesFeature.Apply(IoC.IMutableContainer)">
+            <inheritdoc />
+        </member>
         <member name="T:IoC.Features.ConfigurationFeature">
             <summary>
             Allows to configure via a text metadata.
@@ -1009,33 +1020,22 @@
         <member name="M:IoC.Features.FuncFeature.Apply(IoC.IMutableContainer)">
             <inheritdoc />
         </member>
-        <member name="T:IoC.Features.LazyFeature">
-            <summary>
-            Allows to resolve Lazy.
-            </summary>
-        </member>
-        <member name="F:IoC.Features.LazyFeature.Default">
-            The default instance.
-        </member>
-        <member name="M:IoC.Features.LazyFeature.Apply(IoC.IMutableContainer)">
-            <inheritdoc />
-        </member>
-        <member name="T:IoC.Features.Set">
+        <member name="T:IoC.Features.Sets">
             <summary>
             Represents a feature sets.
             </summary>
         </member>
-        <member name="F:IoC.Features.Set.Core">
+        <member name="F:IoC.Features.Sets.Core">
             <summary>
             Core features.
             </summary>
         </member>
-        <member name="F:IoC.Features.Set.Default">
+        <member name="F:IoC.Features.Sets.Default">
             <summary>
             Default features.
             </summary>
         </member>
-        <member name="F:IoC.Features.Set.Light">
+        <member name="F:IoC.Features.Sets.Light">
             <summary>
             The light set of features.
             </summary>
@@ -5292,6 +5292,19 @@
             <param name="lifetime">The target lifetime.</param>
             <returns></returns>
         </member>
+        <member name="M:IoC.IBuildContext.AddParameter(System.Linq.Expressions.ParameterExpression)">
+            <summary>
+            Adds a parameter.
+            </summary>
+            <param name="parameterExpression">The parameters expression to add.</param>
+        </member>
+        <member name="M:IoC.IBuildContext.DeclareParameters(System.Linq.Expressions.Expression)">
+            <summary>
+            Declares all added parameters.
+            </summary>
+            <param name="baseExpression">The base expression.</param>
+            <returns>The base expression with parameters.</returns>
+        </member>
         <member name="T:IoC.IBuilder">
             <summary>
             Represents an abstract builder for an instance.
@@ -5431,13 +5444,14 @@
             <param name="parameterPosition">The parameter position.</param>
             <param name="parameterExpression">The parameter expression.</param>
         </member>
-        <member name="M:IoC.IMethod`1.SetDependency(System.Int32,System.Type,System.Object)">
+        <member name="M:IoC.IMethod`1.SetDependency(System.Int32,System.Type,System.Object,System.Boolean)">
             <summary>
             Specifies the dependency type and tag for method parameter at the position.
             </summary>
             <param name="parameterPosition">The parameter position.</param>
             <param name="dependencyType">The dependency type.</param>
             <param name="dependencyTag">The optional dependency tag value.</param>
+            <param name="isOptional"><c>True</c> if it is optional dependency.</param>
         </member>
         <member name="T:IoC.IMutableContainer">
             <summary>
@@ -5475,6 +5489,14 @@
             <param name="container">The resolving container.</param>
             <returns>The injected instance or <c>default(T)</c>.</returns>
         </member>
+        <member name="M:IoC.Injections.TryInjectValue``1(IoC.IContainer)">
+            <summary>
+            Try to inject a value type dependency. Just the injection marker.
+            </summary>
+            <typeparam name="T">The type of dependency.</typeparam>
+            <param name="container">The resolving container.</param>
+            <returns>The injected instance or <c>default(T)</c>.</returns>
+        </member>
         <member name="M:IoC.Injections.Inject``1(IoC.IContainer,System.Object)">
             <summary>
             Injects a dependency. Just the injection marker.
@@ -5487,6 +5509,15 @@
         <member name="M:IoC.Injections.TryInject``1(IoC.IContainer,System.Object)">
             <summary>
             Try to inject a dependency. Just the injection marker.
+            </summary>
+            <typeparam name="T">The type of dependency.</typeparam>
+            <param name="container">The resolving container.</param>
+            <param name="tag">The tag of dependency.</param>
+            <returns>The injected instance or <c>default(T)</c>.</returns>
+        </member>
+        <member name="M:IoC.Injections.TryInjectValue``1(IoC.IContainer,System.Object)">
+            <summary>
+            Try to inject a value type dependency. Just the injection marker.
             </summary>
             <typeparam name="T">The type of dependency.</typeparam>
             <param name="container">The resolving container.</param>

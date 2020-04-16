@@ -50,6 +50,9 @@
 - [CollectionFeature](#T-IoC-Features-CollectionFeature 'IoC.Features.CollectionFeature')
   - [Default](#F-IoC-Features-CollectionFeature-Default 'IoC.Features.CollectionFeature.Default')
   - [Apply()](#M-IoC-Features-CollectionFeature-Apply-IoC-IMutableContainer- 'IoC.Features.CollectionFeature.Apply(IoC.IMutableContainer)')
+- [CommonTypesFeature](#T-IoC-Features-CommonTypesFeature 'IoC.Features.CommonTypesFeature')
+  - [Default](#F-IoC-Features-CommonTypesFeature-Default 'IoC.Features.CommonTypesFeature.Default')
+  - [Apply()](#M-IoC-Features-CommonTypesFeature-Apply-IoC-IMutableContainer- 'IoC.Features.CommonTypesFeature.Apply(IoC.IMutableContainer)')
 - [ConfigurationFeature](#T-IoC-Features-ConfigurationFeature 'IoC.Features.ConfigurationFeature')
   - [Default](#F-IoC-Features-ConfigurationFeature-Default 'IoC.Features.ConfigurationFeature.Default')
   - [Apply()](#M-IoC-Features-ConfigurationFeature-Apply-IoC-IMutableContainer- 'IoC.Features.ConfigurationFeature.Apply(IoC.IMutableContainer)')
@@ -303,8 +306,10 @@
   - [Key](#P-IoC-IBuildContext-Key 'IoC.IBuildContext.Key')
   - [Parent](#P-IoC-IBuildContext-Parent 'IoC.IBuildContext.Parent')
   - [AddLifetime(baseExpression,lifetime)](#M-IoC-IBuildContext-AddLifetime-System-Linq-Expressions-Expression,IoC-ILifetime- 'IoC.IBuildContext.AddLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)')
+  - [AddParameter(parameterExpression)](#M-IoC-IBuildContext-AddParameter-System-Linq-Expressions-ParameterExpression- 'IoC.IBuildContext.AddParameter(System.Linq.Expressions.ParameterExpression)')
   - [BindTypes(originalType,targetType)](#M-IoC-IBuildContext-BindTypes-System-Type,System-Type- 'IoC.IBuildContext.BindTypes(System.Type,System.Type)')
   - [CreateChild(key,container)](#M-IoC-IBuildContext-CreateChild-IoC-Key,IoC-IContainer- 'IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)')
+  - [DeclareParameters(baseExpression)](#M-IoC-IBuildContext-DeclareParameters-System-Linq-Expressions-Expression- 'IoC.IBuildContext.DeclareParameters(System.Linq.Expressions.Expression)')
   - [GetDependencyExpression(defaultExpression)](#M-IoC-IBuildContext-GetDependencyExpression-System-Linq-Expressions-Expression- 'IoC.IBuildContext.GetDependencyExpression(System.Linq.Expressions.Expression)')
   - [InjectDependencies(baseExpression,instanceExpression)](#M-IoC-IBuildContext-InjectDependencies-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression- 'IoC.IBuildContext.InjectDependencies(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)')
   - [ReplaceTypes(baseExpression)](#M-IoC-IBuildContext-ReplaceTypes-System-Linq-Expressions-Expression- 'IoC.IBuildContext.ReplaceTypes(System.Linq.Expressions.Expression)')
@@ -353,7 +358,7 @@
 - [IMethod\`1](#T-IoC-IMethod`1 'IoC.IMethod`1')
   - [Info](#P-IoC-IMethod`1-Info 'IoC.IMethod`1.Info')
   - [GetParametersExpressions()](#M-IoC-IMethod`1-GetParametersExpressions-IoC-IBuildContext- 'IoC.IMethod`1.GetParametersExpressions(IoC.IBuildContext)')
-  - [SetDependency(parameterPosition,dependencyType,dependencyTag)](#M-IoC-IMethod`1-SetDependency-System-Int32,System-Type,System-Object- 'IoC.IMethod`1.SetDependency(System.Int32,System.Type,System.Object)')
+  - [SetDependency(parameterPosition,dependencyType,dependencyTag,isOptional)](#M-IoC-IMethod`1-SetDependency-System-Int32,System-Type,System-Object,System-Boolean- 'IoC.IMethod`1.SetDependency(System.Int32,System.Type,System.Object,System.Boolean)')
   - [SetExpression(parameterPosition,parameterExpression)](#M-IoC-IMethod`1-SetExpression-System-Int32,System-Linq-Expressions-Expression- 'IoC.IMethod`1.SetExpression(System.Int32,System.Linq.Expressions.Expression)')
 - [IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer')
   - [TryRegisterDependency(keys,dependency,lifetime,dependencyToken)](#M-IoC-IMutableContainer-TryRegisterDependency-System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime,IoC-IToken@- 'IoC.IMutableContainer.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,IoC.IToken@)')
@@ -381,6 +386,8 @@
   - [Inject\`\`1(container,destination,source)](#M-IoC-Injections-Inject``1-IoC-IContainer,``0,``0- 'IoC.Injections.Inject``1(IoC.IContainer,``0,``0)')
   - [TryInject(container,type)](#M-IoC-Injections-TryInject-IoC-IContainer,System-Type- 'IoC.Injections.TryInject(IoC.IContainer,System.Type)')
   - [TryInject(container,type,tag)](#M-IoC-Injections-TryInject-IoC-IContainer,System-Type,System-Object- 'IoC.Injections.TryInject(IoC.IContainer,System.Type,System.Object)')
+  - [TryInjectValue\`\`1(container)](#M-IoC-Injections-TryInjectValue``1-IoC-IContainer- 'IoC.Injections.TryInjectValue``1(IoC.IContainer)')
+  - [TryInjectValue\`\`1(container,tag)](#M-IoC-Injections-TryInjectValue``1-IoC-IContainer,System-Object- 'IoC.Injections.TryInjectValue``1(IoC.IContainer,System.Object)')
   - [TryInject\`\`1(container)](#M-IoC-Injections-TryInject``1-IoC-IContainer- 'IoC.Injections.TryInject``1(IoC.IContainer)')
   - [TryInject\`\`1(container,tag)](#M-IoC-Injections-TryInject``1-IoC-IContainer,System-Object- 'IoC.Injections.TryInject``1(IoC.IContainer,System.Object)')
 - [InstantHandleAttribute](#T-IoC-InstantHandleAttribute 'IoC.InstantHandleAttribute')
@@ -404,9 +411,6 @@
   - [OnInstanceReleased(releasedInstance,key)](#M-IoC-Lifetimes-KeyBasedLifetime`1-OnInstanceReleased-System-Object,`0- 'IoC.Lifetimes.KeyBasedLifetime`1.OnInstanceReleased(System.Object,`0)')
   - [OnNewInstanceCreated\`\`1(newInstance,key,container,args)](#M-IoC-Lifetimes-KeyBasedLifetime`1-OnNewInstanceCreated``1-``0,`0,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.KeyBasedLifetime`1.OnNewInstanceCreated``1(``0,`0,IoC.IContainer,System.Object[])')
   - [SelectResolvingContainer()](#M-IoC-Lifetimes-KeyBasedLifetime`1-SelectResolvingContainer-IoC-IContainer,IoC-IContainer- 'IoC.Lifetimes.KeyBasedLifetime`1.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)')
-- [LazyFeature](#T-IoC-Features-LazyFeature 'IoC.Features.LazyFeature')
-  - [Default](#F-IoC-Features-LazyFeature-Default 'IoC.Features.LazyFeature.Default')
-  - [Apply()](#M-IoC-Features-LazyFeature-Apply-IoC-IMutableContainer- 'IoC.Features.LazyFeature.Apply(IoC.IMutableContainer)')
 - [Lifetime](#T-IoC-Lifetime 'IoC.Lifetime')
   - [ContainerSingleton](#F-IoC-Lifetime-ContainerSingleton 'IoC.Lifetime.ContainerSingleton')
   - [ScopeSingleton](#F-IoC-Lifetime-ScopeSingleton 'IoC.Lifetime.ScopeSingleton')
@@ -437,10 +441,10 @@
   - [OnInstanceReleased()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnInstanceReleased-System-Object,IoC-IScope- 'IoC.Lifetimes.ScopeSingletonLifetime.OnInstanceReleased(System.Object,IoC.IScope)')
   - [OnNewInstanceCreated\`\`1()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-IScope,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.IScope,IoC.IContainer,System.Object[])')
   - [ToString()](#M-IoC-Lifetimes-ScopeSingletonLifetime-ToString 'IoC.Lifetimes.ScopeSingletonLifetime.ToString')
-- [Set](#T-IoC-Features-Set 'IoC.Features.Set')
-  - [Core](#F-IoC-Features-Set-Core 'IoC.Features.Set.Core')
-  - [Default](#F-IoC-Features-Set-Default 'IoC.Features.Set.Default')
-  - [Light](#F-IoC-Features-Set-Light 'IoC.Features.Set.Light')
+- [Sets](#T-IoC-Features-Sets 'IoC.Features.Sets')
+  - [Core](#F-IoC-Features-Sets-Core 'IoC.Features.Sets.Core')
+  - [Default](#F-IoC-Features-Sets-Default 'IoC.Features.Sets.Default')
+  - [Light](#F-IoC-Features-Sets-Light 'IoC.Features.Sets.Light')
 - [SingletonLifetime](#T-IoC-Lifetimes-SingletonLifetime 'IoC.Lifetimes.SingletonLifetime')
   - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.SingletonLifetime.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
   - [Create()](#M-IoC-Lifetimes-SingletonLifetime-Create 'IoC.Lifetimes.SingletonLifetime.Create')
@@ -1281,6 +1285,31 @@ Allows to resolve enumeration of all instances related to corresponding bindings
 ### Default `constants`
 
 <a name='M-IoC-Features-CollectionFeature-Apply-IoC-IMutableContainer-'></a>
+### Apply() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='T-IoC-Features-CommonTypesFeature'></a>
+## CommonTypesFeature `type`
+
+##### Namespace
+
+IoC.Features
+
+##### Summary
+
+Allows to resolve common types like a `Lazy`.
+
+<a name='F-IoC-Features-CommonTypesFeature-Default'></a>
+### Default `constants`
+
+<a name='M-IoC-Features-CommonTypesFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
 
 ##### Summary
@@ -7499,6 +7528,19 @@ Prepares base expression adding the appropriate lifetime.
 | baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 
+<a name='M-IoC-IBuildContext-AddParameter-System-Linq-Expressions-ParameterExpression-'></a>
+### AddParameter(parameterExpression) `method`
+
+##### Summary
+
+Adds a parameter.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| parameterExpression | [System.Linq.Expressions.ParameterExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.ParameterExpression 'System.Linq.Expressions.ParameterExpression') | The parameters expression to add. |
+
 <a name='M-IoC-IBuildContext-BindTypes-System-Type,System-Type-'></a>
 ### BindTypes(originalType,targetType) `method`
 
@@ -7530,6 +7572,23 @@ The new build context.
 | ---- | ---- | ----------- |
 | key | [IoC.Key](#T-IoC-Key 'IoC.Key') | The key |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The container. |
+
+<a name='M-IoC-IBuildContext-DeclareParameters-System-Linq-Expressions-Expression-'></a>
+### DeclareParameters(baseExpression) `method`
+
+##### Summary
+
+Declares all added parameters.
+
+##### Returns
+
+The base expression with parameters.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
 
 <a name='M-IoC-IBuildContext-GetDependencyExpression-System-Linq-Expressions-Expression-'></a>
 ### GetDependencyExpression(defaultExpression) `method`
@@ -8251,8 +8310,8 @@ Parameters' expressions
 
 This method has no parameters.
 
-<a name='M-IoC-IMethod`1-SetDependency-System-Int32,System-Type,System-Object-'></a>
-### SetDependency(parameterPosition,dependencyType,dependencyTag) `method`
+<a name='M-IoC-IMethod`1-SetDependency-System-Int32,System-Type,System-Object,System-Boolean-'></a>
+### SetDependency(parameterPosition,dependencyType,dependencyTag,isOptional) `method`
 
 ##### Summary
 
@@ -8265,6 +8324,7 @@ Specifies the dependency type and tag for method parameter at the position.
 | parameterPosition | [System.Int32](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Int32 'System.Int32') | The parameter position. |
 | dependencyType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The dependency type. |
 | dependencyTag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The optional dependency tag value. |
+| isOptional | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | `True` if it is optional dependency. |
 
 <a name='M-IoC-IMethod`1-SetExpression-System-Int32,System-Linq-Expressions-Expression-'></a>
 ### SetExpression(parameterPosition,parameterExpression) `method`
@@ -8619,6 +8679,53 @@ The injected instance or `default(T)`.
 | type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The type of dependency. |
 | tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag of dependency. |
 
+<a name='M-IoC-Injections-TryInjectValue``1-IoC-IContainer-'></a>
+### TryInjectValue\`\`1(container) `method`
+
+##### Summary
+
+Try to inject a value type dependency. Just the injection marker.
+
+##### Returns
+
+The injected instance or `default(T)`.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The type of dependency. |
+
+<a name='M-IoC-Injections-TryInjectValue``1-IoC-IContainer,System-Object-'></a>
+### TryInjectValue\`\`1(container,tag) `method`
+
+##### Summary
+
+Try to inject a value type dependency. Just the injection marker.
+
+##### Returns
+
+The injected instance or `default(T)`.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag of dependency. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The type of dependency. |
+
 <a name='M-IoC-Injections-TryInject``1-IoC-IContainer-'></a>
 ### TryInject\`\`1(container) `method`
 
@@ -8921,31 +9028,6 @@ The created instance.
 
 <a name='M-IoC-Lifetimes-KeyBasedLifetime`1-SelectResolvingContainer-IoC-IContainer,IoC-IContainer-'></a>
 ### SelectResolvingContainer() `method`
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='T-IoC-Features-LazyFeature'></a>
-## LazyFeature `type`
-
-##### Namespace
-
-IoC.Features
-
-##### Summary
-
-Allows to resolve Lazy.
-
-<a name='F-IoC-Features-LazyFeature-Default'></a>
-### Default `constants`
-
-<a name='M-IoC-Features-LazyFeature-Apply-IoC-IMutableContainer-'></a>
-### Apply() `method`
 
 ##### Summary
 
@@ -9389,8 +9471,8 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='T-IoC-Features-Set'></a>
-## Set `type`
+<a name='T-IoC-Features-Sets'></a>
+## Sets `type`
 
 ##### Namespace
 
@@ -9400,21 +9482,21 @@ IoC.Features
 
 Represents a feature sets.
 
-<a name='F-IoC-Features-Set-Core'></a>
+<a name='F-IoC-Features-Sets-Core'></a>
 ### Core `constants`
 
 ##### Summary
 
 Core features.
 
-<a name='F-IoC-Features-Set-Default'></a>
+<a name='F-IoC-Features-Sets-Default'></a>
 ### Default `constants`
 
 ##### Summary
 
 Default features.
 
-<a name='F-IoC-Features-Set-Light'></a>
+<a name='F-IoC-Features-Sets-Light'></a>
 ### Light `constants`
 
 ##### Summary

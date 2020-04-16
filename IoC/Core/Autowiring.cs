@@ -51,7 +51,7 @@ namespace IoC.Core
 
             if (statements.Length == 0)
             {
-                return baseExpression;
+                return buildContext.DeclareParameters(baseExpression);
             }
 
             var contextItVar = ReplaceTypes(buildContext, isComplexType, Expression.Variable(baseExpression.Type, "ctx.It"));
@@ -62,6 +62,7 @@ namespace IoC.Core
                 contextItVar
             );
 
+            baseExpression = buildContext.DeclareParameters(baseExpression);
             return buildContext.InjectDependencies(baseExpression, contextItVar);
         }
 

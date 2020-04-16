@@ -54,7 +54,7 @@
             var lockObject = new LockObject();
             var rootContainer = new Container(string.Empty, NullContainer.Shared, lockObject);
             rootContainer.Register<ILockObject>(ctx => lockObject);
-            rootContainer.ApplyConfigurations(configurations ?? Features.Set.Default);
+            rootContainer.ApplyConfigurations(configurations ?? Features.Sets.Default);
 
             // Create a target container
             var container = new Container(CreateContainerName(name), rootContainer, lockObject);

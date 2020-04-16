@@ -61,9 +61,14 @@ namespace IoC.Core
             var parameters = method.Info.GetParameters();
             for (var i = 0; i < parameters.Length; i++)
             {
-                var parameter = parameters[i];
-                var parameterMetadata = new Metadata(_metadata, parameter.GetCustomAttributes(true));
-                method.SetDependency(parameter.Position, parameterMetadata.Type ?? parameter.ParameterType, parameterMetadata.Tag ?? methodMetadata.Tag);
+                var param = parameters[i];
+                if (param.IsOut)
+                {
+                    continue;
+                }
+
+                var parameterMetadata = new Metadata(_metadata, param.GetCustomAttributes(true));
+                method.SetDependency(param.Position, parameterMetadata.Type ?? param.ParameterType, parameterMetadata.Tag ?? methodMetadata.Tag, param.IsOptional);
             }
 
             return method;

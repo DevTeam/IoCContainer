@@ -86,5 +86,18 @@
         /// <param name="lifetime">The target lifetime.</param>
         /// <returns></returns>
         [NotNull] Expression AddLifetime([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
+
+        /// <summary>
+        /// Adds a parameter.
+        /// </summary>
+        /// <param name="parameterExpression">The parameters expression to add.</param>
+        void AddParameter([NotNull] ParameterExpression parameterExpression);
+
+        /// <summary>
+        /// Declares all added parameters.
+        /// </summary>
+        /// <param name="baseExpression">The base expression.</param>
+        /// <returns>The base expression with parameters.</returns>
+        [NotNull] Expression DeclareParameters([NotNull] Expression baseExpression);
     }
 }

@@ -65,7 +65,7 @@ namespace IoC.Tests.IntegrationTests
             // The order to be used to invoke a method
             public readonly int Order;
 
-            public OrderAttribute(int order = 0) => Order = order;            
+            public OrderAttribute(int order = 0) => Order = order;
         }
 
         // Represents the tag attribute to specify `tag` for injection.
@@ -75,7 +75,7 @@ namespace IoC.Tests.IntegrationTests
             // The tag, which will be used during an injection
             [CanBeNull] public readonly object Tag;
 
-            public TagAttribute([CanBeNull] object tag) => Tag = tag;            
+            public TagAttribute([CanBeNull] object tag) => Tag = tag;
         }
         
         public interface IConsole
@@ -91,7 +91,7 @@ namespace IoC.Tests.IntegrationTests
         }
 
         public class Clock : IClock
-        {            
+        {
             public DateTimeOffset Now => DateTimeOffset.Now;
         }
 
@@ -110,7 +110,11 @@ namespace IoC.Tests.IntegrationTests
 
             // Method injection
             [Order(1)]
-            public void Initialize([Type(typeof(Clock))] IClock clock) => _clock = clock;
+            public void Initialize([Type(typeof(Clock))] IClock clock, out Exception error)
+            {
+                _clock = clock;
+                error = new Exception("Some error");
+            }
 
             // Property injection
             public string Prefix { get; [Order(2), Tag("Prefix")] set; }

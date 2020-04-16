@@ -1,4 +1,5 @@
 ﻿// ReSharper disable RedundantTypeArgumentsOfMethod
+// ReSharper disable UnusedParameter.Local
 namespace IoC.Tests.UsageScenarios
 {
     using System;
@@ -112,15 +113,13 @@ namespace IoC.Tests.UsageScenarios
             public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");
         }
 
-        #nullable enable
         public class Clock : IClock
         {
-            // "timeZone" dependency is not resolved here but will be null value because it has Nullable Reference Type
-            public Clock([Type(typeof(TimeZoneInfo))] TimeZoneInfo? timeZone) { }
+            // "clockName" dependency is not resolved here but has default value
+            public Clock([Type(typeof(string)), Tag("ClockName")] string clockName = "SPb") { }
 
             public DateTimeOffset Now => DateTimeOffset.Now;
         }
-        #nullable restore
         // }
     }
 }

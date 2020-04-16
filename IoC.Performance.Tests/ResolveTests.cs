@@ -19,13 +19,13 @@ namespace IoC.Performance.Tests
                 _series = 10000000;
             }
 
-            _containerComplex = Container.Create("Core", Features.Set.Core);
+            _containerComplex = Container.Create("Core", Features.Sets.Core);
             foreach (var type in TestTypeBuilder.Default.Types)
             {
                 _containerComplex.Bind(type).To(type);
             }
 
-            _containerCore = Container.Create("Core", Features.Set.Core);
+            _containerCore = Container.Create("Core", Features.Sets.Core);
             _containerCore.Bind<IService1>().To<Service1>();
             _containerCore.Bind<IService2>().As(Singleton).To<Service2>();
             _containerCore.Bind<IService3>().To<Service3>();

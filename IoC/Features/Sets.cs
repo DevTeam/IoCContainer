@@ -6,7 +6,7 @@
     /// Represents a feature sets.
     /// </summary>
     [PublicAPI]
-    public static class Set
+    public static class Sets
     {
         internal static readonly object[] AnyTag = { Key.AnyTag };
 
@@ -30,7 +30,7 @@
             FuncFeature.Default,
             TaskFeature.Default,
             TupleFeature.Default,
-            LazyFeature.Default,
+            CommonTypesFeature.Default,
             ConfigurationFeature.Default
         };
 
@@ -45,7 +45,7 @@
             FuncFeature.Light,
             TaskFeature.Default,
             TupleFeature.Light,
-            LazyFeature.Default,
+            CommonTypesFeature.Default,
             ConfigurationFeature.Default
         };
     }

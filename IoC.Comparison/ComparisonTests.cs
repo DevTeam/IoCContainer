@@ -165,7 +165,7 @@ namespace IoC.Comparison
         [Trait("Category", "Performance")]
         public void ComplexGraphPerformanceTest()
         {
-            using (var container = ThisContainer.Create("Core", Features.Set.Core))
+            using (var container = ThisContainer.Create("Core", Features.Sets.Core))
             {
                 foreach (var type in TestTypeBuilder.Types)
                 {
@@ -220,7 +220,7 @@ namespace IoC.Comparison
 
         private static void ThisSingleton(long series, IPerformanceCounter performanceCounter)
         {
-            using (var container = ThisContainer.Create("Core", Features.Set.Core))
+            using (var container = ThisContainer.Create("Core", Features.Sets.Core))
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().As(Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
@@ -238,7 +238,7 @@ namespace IoC.Comparison
 
         private static void ThisTransient(long series, IPerformanceCounter performanceCounter)
         {
-            using (var container = ThisContainer.Create("Core", Features.Set.Core))
+            using (var container = ThisContainer.Create("Core", Features.Sets.Core))
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
@@ -256,7 +256,7 @@ namespace IoC.Comparison
 
         private static void ThisComplex(long series, IPerformanceCounter performanceCounter)
         {
-            using (var container = ThisContainer.Create("Core", Features.Set.Core))
+            using (var container = ThisContainer.Create("Core", Features.Sets.Core))
             {
                 foreach (var type in TestTypeBuilder.Types)
                 {
@@ -276,7 +276,7 @@ namespace IoC.Comparison
         private static void ThisByCompositionRootSingleton(long series, IPerformanceCounter performanceCounter)
         {
             var emptyArgs = new object[0];
-            using (var container = ThisContainer.Create("Core", Features.Set.Core))
+            using (var container = ThisContainer.Create("Core", Features.Sets.Core))
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().As(Singleton).To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
@@ -296,7 +296,7 @@ namespace IoC.Comparison
         private static void ThisByCompositionRootTransient(long series, IPerformanceCounter performanceCounter)
         {
             var emptyArgs = new object[0];
-            using (var container = ThisContainer.Create("Core", Features.Set.Core))
+            using (var container = ThisContainer.Create("Core", Features.Sets.Core))
             using (container.Bind<IService1>().To<Service1>())
             using (container.Bind<IService2>().To<Service2>())
             using (container.Bind<IService3>().To<Service3>())
@@ -316,7 +316,7 @@ namespace IoC.Comparison
         private static void ThisByCompositionRootComplex(long series, IPerformanceCounter performanceCounter)
         {
             var emptyArgs = new object[0];
-            using (var container = ThisContainer.Create("Core", Features.Set.Core))
+            using (var container = ThisContainer.Create("Core", Features.Sets.Core))
             {
                 foreach (var type in TestTypeBuilder.Types)
                 {

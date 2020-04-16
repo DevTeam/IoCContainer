@@ -18,6 +18,7 @@
         private static readonly ICollection<IBuilder> EmptyBuilders = new List<IBuilder>();
         [NotNull] private readonly IEnumerable<IBuilder> _builders;
         private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
+        private readonly IList<ParameterExpression> _parameters = new List<ParameterExpression>();
 
         internal BuildContext(
             [CanBeNull] IBuildContext parent,
@@ -56,6 +57,19 @@
 
         public bool TryReplaceType(Type originalType, out Type targetType) =>
             _typesMap.TryGetValue(originalType, out targetType);
+
+        public void AddParameter([NotNull] ParameterExpression parameterExpression)
+            => _parameters.Add(parameterExpression ?? throw new ArgumentNullException(nameof(parameterExpression)));
+
+        public Expression DeclareParameters(Expression baseExpression)
+        {
+            if (_parameters.Count > 0)
+            {
+                return Expression.Block(baseExpression.Type, _parameters, baseExpression);
+            }
+
+            return baseExpression;
+        }
 
         public Expression InjectDependencies(Expression baseExpression, ParameterExpression instanceExpression = null) =>
             DependencyInjectionExpressionBuilder.Shared.Build(baseExpression, this, instanceExpression);
