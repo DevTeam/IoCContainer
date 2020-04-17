@@ -1,4 +1,5 @@
-﻿namespace IoC.Core
+﻿// ReSharper disable ConstantNullCoalescingCondition
+namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
@@ -45,14 +46,6 @@
                 if (methodCall.Method.IsGenericMethod)
                 {
                     var genericMethodDefinition = methodCall.Method.GetGenericMethodDefinition();
-
-                    // container.Inject<T>(destination, source)
-                    if (Equals(genericMethodDefinition, Injections.InjectingAssignmentGenericMethodInfo))
-                    {
-                        var dstExpression = Visit(methodCall.Arguments[1]);
-                        var srcExpression = Visit(methodCall.Arguments[2]);
-                        return Expression.Assign(dstExpression ?? throw InvalidExpressionError, srcExpression ?? throw InvalidExpressionError);
-                    }
 
                     // container.Inject<T>()
                     if (Equals(genericMethodDefinition, Injections.InjectGenericMethodInfo))
@@ -125,6 +118,17 @@
 
                             var ctor = methodCall.Method.ReturnType.Descriptor().GetDeclaredConstructors().First(i => i.GetParameters().Length == 1);
                             return Expression.New(ctor, expression);
+                        }
+
+                        if (argumentsCount > 2)
+                        {
+                            // container.Inject<T>(destination, source)
+                            if (Equals(genericMethodDefinition, Injections.InjectingAssignmentGenericMethodInfo))
+                            {
+                                var dstExpression = Visit(methodCall.Arguments[1]);
+                                var srcExpression = Visit(methodCall.Arguments[2]);
+                                return Expression.Assign(dstExpression ?? throw InvalidExpressionError, srcExpression ?? throw InvalidExpressionError);
+                            }
                         }
                     }
                 }
@@ -205,9 +209,7 @@
                 switch (unaryExpression.NodeType)
                 {
                     case ExpressionType.Convert:
-                        var baseType = unaryExpression.Type.Descriptor();
-                        var type = unaryExpression.Operand.Type.Descriptor();
-                        if (baseType.IsValueType() == type.IsValueType() && baseType.IsAssignableFrom(type))
+                        if (unaryExpression.Type == unaryExpression.Operand.Type)
                         {
                             return unaryExpression.Operand;
                         }

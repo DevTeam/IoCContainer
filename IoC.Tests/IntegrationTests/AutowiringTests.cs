@@ -15,6 +15,144 @@
     public class AutowiringTests
     {
         [Fact]
+        public void AutowiringWhenHasDefaultRefValue()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassRefDef>().To()
+                .Bind<string>().To(ctx => "xyz")
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassRefDef>();
+
+                instance.Val.ShouldBe("xyz");
+            }
+        }
+
+        [Fact]
+        public void AutowiringWhenHasDefaultRefValueAndHasNoDependency()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassRefDef>().To()
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassRefDef>();
+
+                instance.Val.ShouldBe("abc");
+            }
+        }
+
+        [Fact]
+        public void AutowiringWhenHasDefaultValue()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassValDef>().To()
+                .Bind<int>().To(ctx => 33)
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassValDef>();
+
+                instance.Val.ShouldBe(33);
+            }
+        }
+
+        [Fact]
+        public void AutowiringWhenHasDefaultValueAndHasNoDependency()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassValDef>().To()
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassValDef>();
+
+                instance.Val.ShouldBe(99);
+            }
+        }
+
+        [Fact]
+        public void AutowiringWhenNullableValue()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassNullableValDef>().To()
+                .Bind<int>().To(ctx => 33)
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassNullableValDef>();
+
+                instance.Val.ShouldBe(33);
+            }
+        }
+
+        [Fact]
+        public void AutowiringWhenNullableValueAndHasNoDependency()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassNullableValDef>().To()
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassNullableValDef>();
+
+                instance.Val.HasValue.ShouldBeFalse();
+            }
+        }
+
+        public class MyClassRefDef
+        {
+            public string Val { get; }
+
+            public MyClassRefDef(string val = "abc") => Val = val;
+        }
+
+        public class MyClassValDef
+        {
+            public int Val { get; }
+
+            public MyClassValDef(int val = 99) => Val = val;
+        }
+
+        public class MyClassNullableValDef
+        {
+            public int? Val { get; }
+
+            public MyClassNullableValDef(int? val) => Val = val;
+        }
+
+        [Fact]
         public void ContainerShouldResolveWhenHasTag()
         {
             // Given

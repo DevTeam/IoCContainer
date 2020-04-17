@@ -24,23 +24,31 @@ namespace IoC.Tests.UsageScenarios
             // Create the container and configure it
             using var container = Container.Create()
                 .Bind<IDependency>().To<Dependency>()
-                .Bind<IService>().To<SomeService>(ctx => new SomeService(ctx.Container.Inject<IDependency>(), ctx.Container.TryInject<string>()))
+                .Bind<IService>().To<SomeService>(ctx => 
+                    new SomeService(
+                        ctx.Container.Inject<IDependency>(),
+                        // injects default(string) if the dependency cannot be resolved
+                        ctx.Container.TryInject<string>(),
+                        // injects default(int) if the dependency cannot be resolved
+                        ctx.Container.TryInject<int>(),
+                        // injects int?, it has no value if the dependency cannot be resolved
+                        ctx.Container.TryInjectValue<int>()))
                 .Container;
 
             // Resolve an instance
             var instance = container.Resolve<IService>();
 
             // Check the optional dependency
-            instance.State.ShouldBe("empty");
+            instance.State.ShouldBe("empty,True,False");
         }
 
         public class SomeService: IService
         {
             // "state" dependency is not resolved here but will be null value because it was injected optional
-            public SomeService(IDependency dependency, string state)
+            public SomeService(IDependency dependency, string state, int? val1, int? val2)
             {
                 Dependency = dependency;
-                State = state ?? "empty";
+                State = state ?? $"empty,{val1.HasValue},{val2.HasValue}";
             }
 
             public IDependency Dependency { get; }

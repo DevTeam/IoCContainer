@@ -12,6 +12,249 @@
     public class InjectionsTests
     {
         [Fact]
+        public void InjectWhenRef()
+        {
+            // Given
+            using var container = Container
+                .Create() 
+            // When
+                .Bind<MyClassRef>().To(ctx => new MyClassRef(ctx.Container.Inject<string>()))
+                .Bind<string>().To(ctx => "abc")
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassRef>();
+
+                instance.Val.ShouldBe("abc");
+            }
+        }
+
+        [Fact]
+        public void TryInjectWhenRef()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassRef>().To(ctx => new MyClassRef(ctx.Container.TryInject<string>()))
+                .Bind<string>().To(ctx => "abc")
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassRef>();
+
+                instance.Val.ShouldBe("abc");
+            }
+        }
+
+        [Fact]
+        public void TryInjectWhenRefAndHasNoDependency()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassRef>().To(ctx => new MyClassRef(ctx.Container.TryInject<string>()))
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassRef>();
+
+                instance.Val.ShouldBe(null);
+            }
+        }
+
+        [Fact]
+        public void TryInjectWhenRefAndHasNoDependencyAndHasDefaultValue()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassRefDef>().To(ctx => new MyClassRefDef(ctx.Container.TryInject<string>()))
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassRefDef>();
+
+                instance.Val.ShouldBe(null);
+            }
+        }
+
+        [Fact]
+        public void InjectWhenVal()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassVal>().To(ctx => new MyClassVal(ctx.Container.Inject<int>()))
+                .Bind<int>().To(ctx => 99)
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassVal>();
+
+                instance.Val.ShouldBe(99);
+            }
+        }
+
+        [Fact]
+        public void TryInjectWhenVal()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassVal>().To(ctx => new MyClassVal(ctx.Container.TryInject<int>()))
+                .Bind<int>().To(ctx => 99)
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassVal>();
+
+                instance.Val.ShouldBe(99);
+            }
+        }
+
+        [Fact]
+        public void TryInjectWhenValAndNoDependency()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassVal>().To(ctx => new MyClassVal(ctx.Container.TryInject<int>()))
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassVal>();
+
+                instance.Val.ShouldBe(0);
+            }
+        }
+
+        [Fact]
+        public void TryInjectValueWhensNullableVal()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassNullableVal>().To(ctx => new MyClassNullableVal(ctx.Container.TryInjectValue<int>()))
+                .Bind<int>().To(ctx => 99)
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassNullableVal>();
+
+                instance.Val.ShouldBe(99);
+            }
+        }
+
+        [Fact]
+        public void TryInjectValueWhensNullableValAndNoDependency()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassNullableVal>().To(ctx => new MyClassNullableVal(ctx.Container.TryInjectValue<int>()))
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassNullableVal>();
+
+                instance.Val.HasValue.ShouldBeFalse();
+            }
+        }
+
+        [Fact]
+        public void TryInjectWhensNullableVal()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassNullableVal>().To(ctx => new MyClassNullableVal(ctx.Container.TryInject<int>()))
+                .Bind<int>().To(ctx => 99)
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassNullableVal>();
+
+                instance.Val.ShouldBe(99);
+            }
+        }
+
+        [Fact]
+        public void TryInjectWhensNullableValAndNoDependency()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassNullableVal>().To(ctx => new MyClassNullableVal(ctx.Container.TryInject<int>()))
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassNullableVal>();
+
+                instance.Val.ShouldBe(0);
+            }
+        }
+
+        public class MyClassRef
+        {
+            public string Val { get; }
+
+            public MyClassRef(string val) => Val = val;
+        }
+
+        public class MyClassRefDef
+        {
+            public string Val { get; }
+
+            public MyClassRefDef(string val = "abc") => Val = val;
+        }
+
+        public class MyClassVal
+        {
+            public int Val { get; }
+
+            public MyClassVal(int val) => Val = val;
+        }
+
+        public class MyClassNullableVal
+        {
+            public int? Val { get; }
+
+            public MyClassNullableVal(int? val) => Val = val;
+        }
+
+        [Fact]
         public void ContainerShouldResolveWhenHasInitializerMethod()
         {
             // Given
