@@ -267,13 +267,14 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
 ## Usage Scenarios
 
 - Powerful Injection
-  - [Nullable Value Type Resolving](#nullable-value-type-resolving-)
+  - [Composition Root](#composition-root-)
   - [Resolve Func](#resolve-func-)
   - [Resolve Lazy](#resolve-lazy-)
   - [Resolve ThreadLocal](#resolve-threadlocal-)
   - [Resolve Tuple](#resolve-tuple-)
   - [Resolve ValueTuple](#resolve-valuetuple-)
   - [Method Injection](#method-injection-)
+  - [Nullable Value Type Resolving](#nullable-value-type-resolving-)
   - [Property Injection](#property-injection-)
   - [Constructor Autowiring](#constructor-autowiring-)
   - [Containers Injection](#containers-injection-)
@@ -307,7 +308,6 @@ The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for som
   - [Func With Arguments](#func-with-arguments-)
   - [Auto dispose a singleton during owning container's dispose](#auto-dispose-a-singleton-during-owning-containers-dispose-)
   - [Default Parameters Injection](#default-parameters-injection-)
-  - [Optional Dependency](#optional-dependency-)
   - [Optional Injection](#optional-injection-)
   - [Configuration via a text metadata](#configuration-via-a-text-metadata-)
   - [Tracing](#tracing-)
@@ -1224,71 +1224,6 @@ public class SomeService: IService
 
 
 
-### Optional Dependency [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/OptionalDependency.cs)
-
-
-
-``` CSharp
-public void Run()
-{
-    // Create the container and configure it
-    using var container = Container.Create()
-        .Using<OptionalFeature>()
-        .Bind<IDependency>().To<Dependency>()
-        .Bind<IService>().To<SomeService>()
-        .Container;
-
-    // Resolve an instance
-    var instance = container.Resolve<IService>();
-
-    // Check the optional dependency
-    instance.State.ShouldBe("empty");
-}
-
-public class OptionalFeature: IConfiguration
-{
-    public IEnumerable<IToken> Apply(IMutableContainer container)
-    {
-        yield return container
-            // Bind factory for Optional for any tags
-            .Bind<Optional<TT>>().Tag(Key.AnyTag).To(ctx => Create<TT>(ctx));
-    }
-
-    private static Optional<T> Create<T>(Context ctx) => 
-        ctx.Container.TryGetResolver<T>(typeof(T), ctx.Key.Tag, out var resolver, out _)
-            ? new Optional<T>(resolver(ctx.Container, ctx.Args))
-            : Optional<T>.Empty;
-}
-
-public struct Optional<T>
-{
-    public static readonly Optional<T> Empty = new Optional<T>();
-    public readonly T Value;
-    public readonly bool HasValue;
-
-    public Optional(T value) : this()
-    {
-        Value = value;
-        HasValue = true;
-    }
-}
-
-public class SomeService: IService
-{
-    public SomeService(IDependency dependency, Optional<string> state)
-    {
-        Dependency = dependency;
-        State = state.HasValue ? state.Value : "empty";
-    }
-
-    public IDependency Dependency { get; }
-
-    public string State { get; }
-}
-```
-
-
-
 ### Optional Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/OptionalInjection.cs)
 
 
@@ -1299,23 +1234,31 @@ public void Run()
     // Create the container and configure it
     using var container = Container.Create()
         .Bind<IDependency>().To<Dependency>()
-        .Bind<IService>().To<SomeService>(ctx => new SomeService(ctx.Container.Inject<IDependency>(), ctx.Container.TryInject<string>()))
+        .Bind<IService>().To<SomeService>(ctx => 
+            new SomeService(
+                ctx.Container.Inject<IDependency>(),
+                // injects default(string) if the dependency cannot be resolved
+                ctx.Container.TryInject<string>(),
+                // injects default(int) if the dependency cannot be resolved
+                ctx.Container.TryInject<int>(),
+                // injects int?, it has no value if the dependency cannot be resolved
+                ctx.Container.TryInjectValue<int>()))
         .Container;
 
     // Resolve an instance
     var instance = container.Resolve<IService>();
 
     // Check the optional dependency
-    instance.State.ShouldBe("empty");
+    instance.State.ShouldBe("empty,True,False");
 }
 
 public class SomeService: IService
 {
     // "state" dependency is not resolved here but will be null value because it was injected optional
-    public SomeService(IDependency dependency, string state)
+    public SomeService(IDependency dependency, string state, int? val1, int? val2)
     {
         Dependency = dependency;
-        State = state ?? "empty";
+        State = state ?? $"empty,{val1.HasValue},{val2.HasValue}";
     }
 
     public IDependency Dependency { get; }
@@ -1862,27 +1805,57 @@ public class MySingletonLifetime : ILifetime
 
 
 
-### Nullable Value Type Resolving [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/NullableValueTypeResolving.cs)
+### Composition Root [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CompositionRoot.cs)
 
 
 
 ``` CSharp
 public void Run()
 {
-    // Create the container and configure it
-    using var container = Container.Create()
-        .Bind<int>().Tag(1).To(ctx => 1)
-        .Container;
+    // Host runs a program
+    Program.TestMain();
+}
 
-    // Resolve an instance
-    var val1 = container.Resolve<int?>(1.AsTag());
-    var val2 = container.Resolve<int?>(2.AsTag());
-    var val3 = container.Resolve<int?>();
+class Program
+{
+    // The application's entry point
+    public static void TestMain()
+    {
+        // The Composition Root is an application infrastructure component
+        // It should be as close as possible to the application's entry point
+        using var compositionRoot = Container
+            // Creates the IoC container: a IoC Container should only be referenced to build a Composition Root
+            .Create()
+            // Configures the container
+            .Using<IoCConfig>()
+            // Creates the composition root: single location for object construction
+            .BuildUp<Program>();
 
-    // Check the optional dependency
-    val1.Value.ShouldBe(1);
-    val2.HasValue.ShouldBeFalse();
-    val3.HasValue.ShouldBeFalse();
+        // Runs a logic
+        compositionRoot.Instance.Run();
+    }
+
+    // Injects dependencies via a constructor
+    internal Program(IService service)
+    {
+         // Saves dependencies as internal fields
+    }
+
+    private void Run()
+    {
+        // Implements a logic using dependencies
+    }
+}
+
+// Represents the IoC container configuration
+class IoCConfig: IConfiguration
+{
+    public IEnumerable<IToken> Apply(IMutableContainer container)
+    {
+        yield return container
+            .Bind<IDependency>().To<Dependency>()
+            .Bind<IService>().To<Service>();
+    }
 }
 ```
 
@@ -2030,6 +2003,29 @@ var otherInstance = func("beta");
 // Check the injected dependency
 otherInstance.Name.ShouldBe("beta");
 
+```
+
+
+
+### Nullable Value Type Resolving [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/NullableValueTypeResolving.cs)
+
+
+
+``` CSharp
+// Create the container and configure it
+using var container = Container.Create()
+    .Bind<int>().Tag(1).To(ctx => 1)
+    .Container;
+
+// Resolve an instance
+var val1 = container.Resolve<int?>(1.AsTag());
+var val2 = container.Resolve<int?>(2.AsTag());
+var val3 = container.Resolve<int?>();
+
+// Check the optional dependency
+val1.Value.ShouldBe(1);
+val2.HasValue.ShouldBeFalse();
+val3.HasValue.ShouldBeFalse();
 ```
 
 

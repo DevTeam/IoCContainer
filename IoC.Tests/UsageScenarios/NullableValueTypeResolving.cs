@@ -2,7 +2,6 @@
 // ReSharper disable RedundantTypeArgumentsOfMethod
 // ReSharper disable EmptyConstructor
 // ReSharper disable UnusedVariable
-#if !NET40
 namespace IoC.Tests.UsageScenarios
 {
     using System.Diagnostics.CodeAnalysis;
@@ -16,11 +15,11 @@ namespace IoC.Tests.UsageScenarios
         [Fact]
         // $visible=true
         // $tag=injection
-        // $priority=01
+        // $priority=03
         // $description=Nullable Value Type Resolving
-        // {
         public void Run()
         {
+            // {
             // Create the container and configure it
             using var container = Container.Create()
                 .Bind<int>().Tag(1).To(ctx => 1)
@@ -35,8 +34,7 @@ namespace IoC.Tests.UsageScenarios
             val1.Value.ShouldBe(1);
             val2.HasValue.ShouldBeFalse();
             val3.HasValue.ShouldBeFalse();
+            // }
         }
-        // }
     }
 }
-#endif
