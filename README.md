@@ -1827,7 +1827,7 @@ class Program
             // Creates the IoC container: a IoC Container should only be referenced to build a Composition Root
             .Create()
             // Configures the container
-            .Using<IoCConfig>()
+            .Using<Configuration>()
             // Creates the composition root: single location for object construction
             .BuildUp<Program>();
 
@@ -1848,7 +1848,7 @@ class Program
 }
 
 // Represents the IoC container configuration
-class IoCConfig: IConfiguration
+class Configuration: IConfiguration
 {
     public IEnumerable<IToken> Apply(IMutableContainer container)
     {
