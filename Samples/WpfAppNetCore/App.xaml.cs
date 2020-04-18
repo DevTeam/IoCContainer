@@ -10,7 +10,7 @@
     /// </summary>
     public partial class App
     {
-        internal readonly IContainer Container = IoC.Container
+        internal readonly IMutableContainer Container = IoC.Container
             .Create()
             .Using<ClockConfiguration>()
             .Using<AppConfiguration>();
