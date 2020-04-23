@@ -721,13 +721,6 @@
             Related lifetime.
             </summary>
         </member>
-        <member name="M:IoC.ContainerEvent.#ctor(IoC.IContainer,IoC.EventType)">
-            <summary>
-            Creates new instance of container event.
-            </summary>
-            <param name="container">The origin container.</param>
-            <param name="eventType">The event type.</param>
-        </member>
         <member name="T:IoC.Context`1">
             <summary>
             Represents the initializing context.

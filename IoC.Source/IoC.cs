@@ -1279,10 +1279,10 @@ namespace IoC
             _parent.RegisterResource(this);
 
             // Notifies parent container about the child container creation
-            (_parent as Container)?._eventSubject.OnNext(new ContainerEvent(this, EventType.CreateContainer));
+            (_parent as Container)?._eventSubject.OnNext(ContainerEvent.NewContainer(this));
 
             // Notifies about existing registrations in parent containers
-            _eventSubject.OnNext(new ContainerEvent(_parent, EventType.RegisterDependency) { Keys = _parent.SelectMany(i => i) });
+            _eventSubject.OnNext(ContainerEvent.RegisterDependency(_parent, _parent.SelectMany(i => i)));
         }
 
         /// <inheritdoc />
@@ -1344,12 +1344,12 @@ namespace IoC
                     {
                         _dependenciesForTagAny = dependenciesForTagAny;
                         _dependencies = dependencies;
-                        _eventSubject.OnNext(new ContainerEvent(this, EventType.RegisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime });
+                        _eventSubject.OnNext(ContainerEvent.RegisterDependency(this, registeredKeys, dependency, lifetime));
                     }
                 }
-                catch (Exception ex)
+                catch (Exception error)
                 {
-                    _eventSubject.OnNext(new ContainerEvent(this, EventType.RegisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime, Error = ex, IsSuccess = false });
+                    _eventSubject.OnNext(ContainerEvent.RegisterDependencyFailed(this, registeredKeys, dependency, lifetime, error));
                     isRegistered = false;
                     throw;
                 }
@@ -1481,7 +1481,7 @@ namespace IoC
             try
             {
                 // Notifies parent container about the child container disposing
-                (_parent as Container)?._eventSubject.OnNext(new ContainerEvent(this, EventType.DisposeContainer));
+                (_parent as Container)?._eventSubject.OnNext(ContainerEvent.DisposeContainer(this));
 
                 _parent.UnregisterResource(this);
                 List<IDisposable> entriesToDispose;
@@ -1585,7 +1585,7 @@ namespace IoC
                     }
                 }
 
-                _eventSubject.OnNext(new ContainerEvent(this, EventType.UnregisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime });
+                _eventSubject.OnNext(ContainerEvent.UnregisterDependency(this, registeredKeys, dependency, lifetime));
             }
         }
 
@@ -1729,48 +1729,168 @@ namespace IoC
         /// <summary>
         /// True if it is success.
         /// </summary>
-        public bool IsSuccess;
+        public readonly bool IsSuccess;
 
         /// <summary>
         /// Error during operation.
         /// </summary>
-        [CanBeNull] public Exception Error;
+        [CanBeNull] public readonly Exception Error;
 
         /// <summary>
         /// The changed keys.
         /// </summary>
-        [CanBeNull] public IEnumerable<Key> Keys;
+        [CanBeNull] public readonly IEnumerable<Key> Keys;
 
         /// <summary>
         /// Related dependency.
         /// </summary>
-        [CanBeNull] public IDependency Dependency;
+        [CanBeNull] public readonly IDependency Dependency;
 
         /// <summary>
         /// Related lifetime.
         /// </summary>
-        [CanBeNull] public ILifetime Lifetime;
+        [CanBeNull] public readonly ILifetime Lifetime;
 
         /// <summary>
         /// Related lifetime.
         /// </summary>
-        [CanBeNull] public LambdaExpression ResolverExpression;
+        [CanBeNull] public readonly LambdaExpression ResolverExpression;
 
-        /// <summary>
-        /// Creates new instance of container event.
-        /// </summary>
-        /// <param name="container">The origin container.</param>
-        /// <param name="eventType">The event type.</param>
-        internal ContainerEvent([NotNull] IContainer container, EventType eventType)
+        internal ContainerEvent(
+            [NotNull] IContainer container,
+            EventType eventType,
+            bool isSuccess,
+            [CanBeNull] Exception error,
+            [CanBeNull] IEnumerable<Key> keys,
+            [CanBeNull] IDependency dependency,
+            [CanBeNull] ILifetime lifetime,
+            [CanBeNull] LambdaExpression resolverExpression)
         {
             Container = container;
             EventType = eventType;
-            IsSuccess = true;
-            Error = default(Exception);
-            Keys = default(IEnumerable<Key>);
-            Dependency = default(IDependency);
-            Lifetime = default(ILifetime);
-            ResolverExpression = default(LambdaExpression);
+            IsSuccess = isSuccess;
+            Error = error;
+            Keys = keys;
+            Dependency = dependency;
+            Lifetime = lifetime;
+            ResolverExpression = resolverExpression;
+        }
+
+        internal static ContainerEvent NewContainer(
+            [NotNull] IContainer newContainer)
+        {
+            return new ContainerEvent(
+                newContainer,
+                EventType.CreateContainer,
+                true,
+                default(Exception),
+                default(IEnumerable<Key>),
+                default(IDependency),
+                default(ILifetime),
+                default(LambdaExpression));
+        }
+
+        internal static ContainerEvent DisposeContainer(
+            [NotNull] IContainer disposingContainer)
+        {
+            return new ContainerEvent(
+                disposingContainer,
+                EventType.DisposeContainer,
+                true,
+                default(Exception),
+                default(IEnumerable<Key>),
+                default(IDependency),
+                default(ILifetime),
+                default(LambdaExpression));
+        }
+
+        internal static ContainerEvent RegisterDependency(
+            [NotNull] IContainer registeringContainer,
+            [NotNull] IEnumerable<Key> keys,
+            [CanBeNull] IDependency dependency = default(IDependency),
+            [CanBeNull] ILifetime lifetime = default(ILifetime))
+        {
+            return new ContainerEvent(
+                registeringContainer,
+                EventType.RegisterDependency,
+                true,
+                default(Exception),
+                keys,
+                dependency,
+                lifetime,
+                default(LambdaExpression));
+        }
+
+        internal static ContainerEvent RegisterDependencyFailed(
+            [NotNull] IContainer registeringContainer,
+            [NotNull] IEnumerable<Key> keys,
+            [NotNull] IDependency dependency,
+            [CanBeNull] ILifetime lifetime,
+            [NotNull] Exception error)
+        {
+            return new ContainerEvent(
+                registeringContainer,
+                EventType.RegisterDependency,
+                false,
+                error,
+                keys,
+                dependency,
+                lifetime,
+                default(LambdaExpression));
+        }
+
+        internal static ContainerEvent UnregisterDependency(
+            [NotNull] IContainer registeringContainer,
+            [NotNull] IEnumerable<Key> keys,
+            [NotNull] IDependency dependency,
+            [CanBeNull] ILifetime lifetime)
+        {
+            return new ContainerEvent(
+                registeringContainer,
+                EventType.UnregisterDependency,
+                true,
+                default(Exception),
+                keys,
+                dependency,
+                lifetime,
+                default(LambdaExpression));
+        }
+
+        internal static ContainerEvent ResolverCompilation(
+            [NotNull] IContainer registeringContainer,
+            [NotNull] IEnumerable<Key> keys,
+            [NotNull] IDependency dependency,
+            [CanBeNull] ILifetime lifetime,
+            [NotNull] LambdaExpression resolverExpression)
+        {
+            return new ContainerEvent(
+                registeringContainer,
+                EventType.ResolverCompilation,
+                true,
+                default(Exception),
+                keys,
+                dependency,
+                lifetime,
+                resolverExpression);
+        }
+
+        internal static ContainerEvent ResolverCompilationFailed(
+            [NotNull] IContainer registeringContainer,
+            [NotNull] IEnumerable<Key> keys,
+            [NotNull] IDependency dependency,
+            [CanBeNull] ILifetime lifetime,
+            [NotNull] LambdaExpression resolverExpression,
+            [NotNull] Exception error)
+        {
+            return new ContainerEvent(
+                registeringContainer,
+                EventType.ResolverCompilation,
+                false,
+                error,
+                keys,
+                dependency,
+                lifetime,
+                resolverExpression);
         }
     }
 }
@@ -11125,15 +11245,15 @@ namespace IoC.Core
                 {
                     if (compiler.TryCompile(buildContext, resolverExpression, out resolver))
                     {
-                        eventObserver.OnNext(new ContainerEvent(Container, EventType.ResolverCompilation) {Keys = Enumerable.Repeat(key, 1), Dependency = Dependency, Lifetime = lifetime, ResolverExpression = resolverExpression });
+                        eventObserver.OnNext(ContainerEvent.ResolverCompilation(Container, Enumerable.Repeat(key, 1), Dependency, lifetime, resolverExpression ));
                         break;
                     }
                 }
             }
             catch (Exception ex)
             {
-                eventObserver.OnNext(new ContainerEvent(Container, EventType.ResolverCompilation) { Keys = Enumerable.Repeat(key, 1), Dependency = Dependency, Lifetime = lifetime, ResolverExpression = resolverExpression, IsSuccess = false, Error = ex });
                 error = ex;
+                eventObserver.OnNext(ContainerEvent.ResolverCompilationFailed(Container, Enumerable.Repeat(key, 1), Dependency, lifetime, resolverExpression, error));
                 return false;
             }
 

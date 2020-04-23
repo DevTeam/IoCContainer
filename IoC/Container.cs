@@ -80,10 +80,10 @@
             _parent.RegisterResource(this);
 
             // Notifies parent container about the child container creation
-            (_parent as Container)?._eventSubject.OnNext(new ContainerEvent(this, EventType.CreateContainer));
+            (_parent as Container)?._eventSubject.OnNext(ContainerEvent.NewContainer(this));
 
             // Notifies about existing registrations in parent containers
-            _eventSubject.OnNext(new ContainerEvent(_parent, EventType.RegisterDependency) { Keys = _parent.SelectMany(i => i) });
+            _eventSubject.OnNext(ContainerEvent.RegisterDependency(_parent, _parent.SelectMany(i => i)));
         }
 
         /// <inheritdoc />
@@ -145,12 +145,12 @@
                     {
                         _dependenciesForTagAny = dependenciesForTagAny;
                         _dependencies = dependencies;
-                        _eventSubject.OnNext(new ContainerEvent(this, EventType.RegisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime });
+                        _eventSubject.OnNext(ContainerEvent.RegisterDependency(this, registeredKeys, dependency, lifetime));
                     }
                 }
-                catch (Exception ex)
+                catch (Exception error)
                 {
-                    _eventSubject.OnNext(new ContainerEvent(this, EventType.RegisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime, Error = ex, IsSuccess = false });
+                    _eventSubject.OnNext(ContainerEvent.RegisterDependencyFailed(this, registeredKeys, dependency, lifetime, error));
                     isRegistered = false;
                     throw;
                 }
@@ -282,7 +282,7 @@
             try
             {
                 // Notifies parent container about the child container disposing
-                (_parent as Container)?._eventSubject.OnNext(new ContainerEvent(this, EventType.DisposeContainer));
+                (_parent as Container)?._eventSubject.OnNext(ContainerEvent.DisposeContainer(this));
 
                 _parent.UnregisterResource(this);
                 List<IDisposable> entriesToDispose;
@@ -386,7 +386,7 @@
                     }
                 }
 
-                _eventSubject.OnNext(new ContainerEvent(this, EventType.UnregisterDependency) { Keys = registeredKeys, Dependency = dependency, Lifetime = lifetime });
+                _eventSubject.OnNext(ContainerEvent.UnregisterDependency(this, registeredKeys, dependency, lifetime));
             }
         }
 

@@ -69,7 +69,6 @@
   - [TryRegisterDependency()](#M-IoC-Container-TryRegisterDependency-System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime,IoC-IToken@- 'IoC.Container.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,IoC.IToken@)')
   - [UnregisterResource()](#M-IoC-Container-UnregisterResource-System-IDisposable- 'IoC.Container.UnregisterResource(System.IDisposable)')
 - [ContainerEvent](#T-IoC-ContainerEvent 'IoC.ContainerEvent')
-  - [#ctor(container,eventType)](#M-IoC-ContainerEvent-#ctor-IoC-IContainer,IoC-EventType- 'IoC.ContainerEvent.#ctor(IoC.IContainer,IoC.EventType)')
   - [Container](#F-IoC-ContainerEvent-Container 'IoC.ContainerEvent.Container')
   - [Dependency](#F-IoC-ContainerEvent-Dependency 'IoC.ContainerEvent.Dependency')
   - [Error](#F-IoC-ContainerEvent-Error 'IoC.ContainerEvent.Error')
@@ -1494,20 +1493,6 @@ IoC
 ##### Summary
 
 Provides information about changes in the container.
-
-<a name='M-IoC-ContainerEvent-#ctor-IoC-IContainer,IoC-EventType-'></a>
-### #ctor(container,eventType) `constructor`
-
-##### Summary
-
-Creates new instance of container event.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The origin container. |
-| eventType | [IoC.EventType](#T-IoC-EventType 'IoC.EventType') | The event type. |
 
 <a name='F-IoC-ContainerEvent-Container'></a>
 ### Container `constants`
