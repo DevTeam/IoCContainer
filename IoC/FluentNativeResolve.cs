@@ -23,23 +23,8 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            var items = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor].KeyValues;
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < items.Length; index++)
-            {
-                var item = items[index];
-#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
-                if (ReferenceEquals(TypeDescriptor<T>.Type, item.Key))
-#else
-                // ReSharper disable once PossibleUnintendedReferenceComparison
-                if (TypeDescriptor<T>.Type == item.Key)
-#endif
-                {
-                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
-                }
-            }
-
-            return container.GetResolver<T>(TypeDescriptor<T>.Type)(container, EmptyArgs);
+            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
+                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, EmptyArgs);
         }
 
         /// <summary>
