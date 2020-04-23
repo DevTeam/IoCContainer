@@ -23,8 +23,23 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            return ((Resolver<T>)container.ResolversByType.Get(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
-                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, EmptyArgs);
+            var items = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor].KeyValues;
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
+                if (ReferenceEquals(TypeDescriptor<T>.Type, item.Key))
+#else
+                // ReSharper disable once PossibleUnintendedReferenceComparison
+                if (TypeDescriptor<T>.Type == item.Key)
+#endif
+                {
+                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
+                }
+            }
+
+            return container.GetResolver<T>(TypeDescriptor<T>.Type)(container, EmptyArgs);
         }
 
         /// <summary>
@@ -39,7 +54,7 @@
         public static T Resolve<T>([NotNull] this Container container, Tag tag)
         {
             var key = new Key(TypeDescriptor<T>.Type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
+            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
                     ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, EmptyArgs);
         }
 
@@ -54,7 +69,7 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.Get(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
+            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
                     ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, args);
         }
 
@@ -71,7 +86,7 @@
         public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
             var key = new Key(TypeDescriptor<T>.Type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
+            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
                     ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, args);
         }
 
@@ -86,7 +101,7 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type)
         {
-            return ((Resolver<T>)container.ResolversByType.Get(type.GetHashCode(), type)
+            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(type.GetHashCode(), type)
                     ?? container.GetResolver<T>(type))(container, EmptyArgs);
         }
 
@@ -103,7 +118,7 @@
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
             var key = new Key(type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
+            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
                     ?? container.GetResolver<T>(type, tag))(container, EmptyArgs);
         }
 
@@ -119,7 +134,7 @@
         [NotNull]
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.Get(type.GetHashCode(), type)
+            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(type.GetHashCode(), type)
                     ?? container.GetResolver<T>(type))(container, args);
         }
 
@@ -137,7 +152,7 @@
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
             var key = new Key(type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
+            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
                     ?? container.GetResolver<T>(type, tag))(container, args);
         }
     }

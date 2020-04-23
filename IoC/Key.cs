@@ -55,7 +55,13 @@
         }
 
         /// <inheritdoc />
-        public bool Equals(Key other) => ReferenceEquals(Type, other.Type) && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
+        public bool Equals(Key other) =>
+#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
+            ReferenceEquals(Type, other.Type)
+#else
+            Type == other.Type
+#endif
+            && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
 
         /// <inheritdoc />
         public override int GetHashCode() => HashCode;

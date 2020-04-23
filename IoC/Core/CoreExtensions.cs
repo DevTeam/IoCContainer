@@ -93,6 +93,49 @@ namespace IoC.Core
             return default(TValue);
         }
 
+        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
+        public static TValue GetByTypeKey<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
+            where TKey : Type
+        {
+            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
+                if (ReferenceEquals(key, item.Key))
+#else
+                // ReSharper disable once PossibleUnintendedReferenceComparison
+                if (key == item.Key)
+#endif
+                {
+                    return item.Value;
+                }
+            }
+
+            return default(TValue);
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
+        public static TValue GetByEquatableKey<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
+            where TKey : IEquatable<TKey>
+        {
+            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (key.Equals(item.Key))
+                {
+                    return item.Value;
+                }
+            }
+
+            return default(TValue);
+        }
+
         private static class Empty<T>
         {
             public static readonly T[] Array = new T[0];

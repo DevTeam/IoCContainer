@@ -117,7 +117,7 @@
                         if (key.Tag == AnyTag)
                         {
                             var hashCode = key.Type.GetHashCode();
-                            isRegistered &= dependenciesForTagAny.Get(hashCode, key.Type) == default(DependencyEntry);
+                            isRegistered &= dependenciesForTagAny.GetByTypeKey(hashCode, key.Type) == default(DependencyEntry);
                             if (isRegistered)
                             {
                                 dependenciesForTagAny = dependenciesForTagAny.Set(hashCode, key.Type, dependencyEntry);
@@ -126,7 +126,7 @@
                         else
                         {
                             var hashCode = key.HashCode;
-                            isRegistered &= dependencies.Get(hashCode, key) == default(DependencyEntry);
+                            isRegistered &= dependencies.GetByEquatableKey(hashCode, key) == default(DependencyEntry);
                             if (isRegistered)
                             {
                                 dependencies = dependencies.Set(hashCode, key, dependencyEntry);
@@ -180,7 +180,7 @@
             if (tag == null)
             {
                 hashCode = type.GetHashCode();
-                resolver = (Resolver<T>)ResolversByType.Get(hashCode, type);
+                resolver = (Resolver<T>)ResolversByType.GetByTypeKey(hashCode, type);
                 if (resolver != default(Resolver<T>)) // found in resolvers by type
                 {
                     error = default(Exception);
@@ -193,7 +193,7 @@
             {
                 key = new FullKey(type, tag);
                 hashCode = key.HashCode;
-                resolver = (Resolver<T>)Resolvers.Get(hashCode, key);
+                resolver = (Resolver<T>)Resolvers.GetByEquatableKey(hashCode, key);
                 if (resolver != default(Resolver<T>)) // found in resolvers
                 {
                     error = default(Exception);
@@ -423,7 +423,7 @@
 
         private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)
         {
-            dependencyEntry = _dependencies.Get(hashCode, key);
+            dependencyEntry = _dependencies.GetByEquatableKey(hashCode, key);
             if (dependencyEntry != default(DependencyEntry))
             {
                 return true;
@@ -438,14 +438,14 @@
                 var genericType = typeDescriptor.GetGenericTypeDefinition();
                 var genericKey = new FullKey(genericType, key.Tag);
                 // For generic type
-                dependencyEntry = _dependencies.Get(genericKey.HashCode, genericKey);
+                dependencyEntry = _dependencies.GetByEquatableKey(genericKey.HashCode, genericKey);
                 if (dependencyEntry != default(DependencyEntry))
                 {
                     return true;
                 }
 
                 // For generic type and Any tag
-                dependencyEntry = _dependenciesForTagAny.Get(genericType.GetHashCode(), genericType);
+                dependencyEntry = _dependenciesForTagAny.GetByTypeKey(genericType.GetHashCode(), genericType);
                 if (dependencyEntry != default(DependencyEntry))
                 {
                     return true;
@@ -453,7 +453,7 @@
             }
 
             // For Any tag
-            dependencyEntry = _dependenciesForTagAny.Get(type.GetHashCode(), type);
+            dependencyEntry = _dependenciesForTagAny.GetByTypeKey(type.GetHashCode(), type);
             if (dependencyEntry != default(DependencyEntry))
             {
                 return true;
@@ -464,14 +464,14 @@
             {
                 var arrayKey = new FullKey(typeof(IArray), key.Tag);
                 // For generic type
-                dependencyEntry = _dependencies.Get(arrayKey.HashCode, arrayKey);
+                dependencyEntry = _dependencies.GetByEquatableKey(arrayKey.HashCode, arrayKey);
                 if (dependencyEntry != default(DependencyEntry))
                 {
                     return true;
                 }
 
                 // For generic type and Any tag
-                dependencyEntry = _dependenciesForTagAny.Get(typeof(IArray).GetHashCode(), typeof(IArray));
+                dependencyEntry = _dependenciesForTagAny.GetByTypeKey(typeof(IArray).GetHashCode(), typeof(IArray));
                 if (dependencyEntry != default(DependencyEntry))
                 {
                     return true;

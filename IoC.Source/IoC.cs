@@ -1316,7 +1316,7 @@ namespace IoC
                         if (key.Tag == AnyTag)
                         {
                             var hashCode = key.Type.GetHashCode();
-                            isRegistered &= dependenciesForTagAny.Get(hashCode, key.Type) == default(DependencyEntry);
+                            isRegistered &= dependenciesForTagAny.GetByTypeKey(hashCode, key.Type) == default(DependencyEntry);
                             if (isRegistered)
                             {
                                 dependenciesForTagAny = dependenciesForTagAny.Set(hashCode, key.Type, dependencyEntry);
@@ -1325,7 +1325,7 @@ namespace IoC
                         else
                         {
                             var hashCode = key.HashCode;
-                            isRegistered &= dependencies.Get(hashCode, key) == default(DependencyEntry);
+                            isRegistered &= dependencies.GetByEquatableKey(hashCode, key) == default(DependencyEntry);
                             if (isRegistered)
                             {
                                 dependencies = dependencies.Set(hashCode, key, dependencyEntry);
@@ -1379,7 +1379,7 @@ namespace IoC
             if (tag == null)
             {
                 hashCode = type.GetHashCode();
-                resolver = (Resolver<T>)ResolversByType.Get(hashCode, type);
+                resolver = (Resolver<T>)ResolversByType.GetByTypeKey(hashCode, type);
                 if (resolver != default(Resolver<T>)) // found in resolvers by type
                 {
                     error = default(Exception);
@@ -1392,7 +1392,7 @@ namespace IoC
             {
                 key = new FullKey(type, tag);
                 hashCode = key.HashCode;
-                resolver = (Resolver<T>)Resolvers.Get(hashCode, key);
+                resolver = (Resolver<T>)Resolvers.GetByEquatableKey(hashCode, key);
                 if (resolver != default(Resolver<T>)) // found in resolvers
                 {
                     error = default(Exception);
@@ -1622,7 +1622,7 @@ namespace IoC
 
         private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)
         {
-            dependencyEntry = _dependencies.Get(hashCode, key);
+            dependencyEntry = _dependencies.GetByEquatableKey(hashCode, key);
             if (dependencyEntry != default(DependencyEntry))
             {
                 return true;
@@ -1637,14 +1637,14 @@ namespace IoC
                 var genericType = typeDescriptor.GetGenericTypeDefinition();
                 var genericKey = new FullKey(genericType, key.Tag);
                 // For generic type
-                dependencyEntry = _dependencies.Get(genericKey.HashCode, genericKey);
+                dependencyEntry = _dependencies.GetByEquatableKey(genericKey.HashCode, genericKey);
                 if (dependencyEntry != default(DependencyEntry))
                 {
                     return true;
                 }
 
                 // For generic type and Any tag
-                dependencyEntry = _dependenciesForTagAny.Get(genericType.GetHashCode(), genericType);
+                dependencyEntry = _dependenciesForTagAny.GetByTypeKey(genericType.GetHashCode(), genericType);
                 if (dependencyEntry != default(DependencyEntry))
                 {
                     return true;
@@ -1652,7 +1652,7 @@ namespace IoC
             }
 
             // For Any tag
-            dependencyEntry = _dependenciesForTagAny.Get(type.GetHashCode(), type);
+            dependencyEntry = _dependenciesForTagAny.GetByTypeKey(type.GetHashCode(), type);
             if (dependencyEntry != default(DependencyEntry))
             {
                 return true;
@@ -1663,14 +1663,14 @@ namespace IoC
             {
                 var arrayKey = new FullKey(typeof(IArray), key.Tag);
                 // For generic type
-                dependencyEntry = _dependencies.Get(arrayKey.HashCode, arrayKey);
+                dependencyEntry = _dependencies.GetByEquatableKey(arrayKey.HashCode, arrayKey);
                 if (dependencyEntry != default(DependencyEntry))
                 {
                     return true;
                 }
 
                 // For generic type and Any tag
-                dependencyEntry = _dependenciesForTagAny.Get(typeof(IArray).GetHashCode(), typeof(IArray));
+                dependencyEntry = _dependenciesForTagAny.GetByTypeKey(typeof(IArray).GetHashCode(), typeof(IArray));
                 if (dependencyEntry != default(DependencyEntry))
                 {
                     return true;
@@ -5824,8 +5824,23 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            return ((Resolver<T>)container.ResolversByType.Get(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
-                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, EmptyArgs);
+            var items = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor].KeyValues;
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
+                if (ReferenceEquals(TypeDescriptor<T>.Type, item.Key))
+#else
+                // ReSharper disable once PossibleUnintendedReferenceComparison
+                if (TypeDescriptor<T>.Type == item.Key)
+#endif
+                {
+                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
+                }
+            }
+
+            return container.GetResolver<T>(TypeDescriptor<T>.Type)(container, EmptyArgs);
         }
 
         /// <summary>
@@ -5840,7 +5855,7 @@ namespace IoC
         public static T Resolve<T>([NotNull] this Container container, Tag tag)
         {
             var key = new Key(TypeDescriptor<T>.Type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
+            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
                     ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, EmptyArgs);
         }
 
@@ -5855,7 +5870,7 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.Get(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
+            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
                     ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, args);
         }
 
@@ -5872,7 +5887,7 @@ namespace IoC
         public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
             var key = new Key(TypeDescriptor<T>.Type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
+            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
                     ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, args);
         }
 
@@ -5887,7 +5902,7 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type)
         {
-            return ((Resolver<T>)container.ResolversByType.Get(type.GetHashCode(), type)
+            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(type.GetHashCode(), type)
                     ?? container.GetResolver<T>(type))(container, EmptyArgs);
         }
 
@@ -5904,7 +5919,7 @@ namespace IoC
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
             var key = new Key(type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
+            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
                     ?? container.GetResolver<T>(type, tag))(container, EmptyArgs);
         }
 
@@ -5920,7 +5935,7 @@ namespace IoC
         [NotNull]
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.Get(type.GetHashCode(), type)
+            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(type.GetHashCode(), type)
                     ?? container.GetResolver<T>(type))(container, args);
         }
 
@@ -5938,7 +5953,7 @@ namespace IoC
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
             var key = new Key(type, tag);
-            return ((Resolver<T>)container.Resolvers.Get(key.HashCode, key)
+            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
                     ?? container.GetResolver<T>(type, tag))(container, args);
         }
     }
@@ -8339,7 +8354,13 @@ namespace IoC
         }
 
         /// <inheritdoc />
-        public bool Equals(Key other) => ReferenceEquals(Type, other.Type) && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
+        public bool Equals(Key other) =>
+#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
+            ReferenceEquals(Type, other.Type)
+#else
+            Type == other.Type
+#endif
+            && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
 
         /// <inheritdoc />
         public override int GetHashCode() => HashCode;
@@ -9306,7 +9327,7 @@ namespace IoC.Lifetimes
     {
         private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
         private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
-        private static readonly MethodInfo GetMethodInfo = typeof(CoreExtensions).Descriptor().GetDeclaredMethods().Single(i => i.Name == (TypeDescriptor<TKey>.Descriptor.IsValueType() ? nameof(CoreExtensions.Get) : nameof(CoreExtensions.Get))).MakeGenericMethod(typeof(TKey), typeof(object));
+        private static readonly MethodInfo GetMethodInfo = typeof(CoreExtensions).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(CoreExtensions.Get)).MakeGenericMethod(typeof(TKey), typeof(object));
         private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
         private static readonly ParameterExpression KeyVar = Expression.Variable(TypeDescriptor<TKey>.Type, "key");
@@ -11084,6 +11105,49 @@ namespace IoC.Core
             return default(TValue);
         }
 
+        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
+        public static TValue GetByTypeKey<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
+            where TKey : Type
+        {
+            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
+                if (ReferenceEquals(key, item.Key))
+#else
+                // ReSharper disable once PossibleUnintendedReferenceComparison
+                if (key == item.Key)
+#endif
+                {
+                    return item.Value;
+                }
+            }
+
+            return default(TValue);
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
+        public static TValue GetByEquatableKey<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
+            where TKey : IEquatable<TKey>
+        {
+            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (key.Equals(item.Key))
+                {
+                    return item.Value;
+                }
+            }
+
+            return default(TValue);
+        }
+
         private static class Empty<T>
         {
             public static readonly T[] Array = new T[0];
@@ -11285,7 +11349,7 @@ namespace IoC.Core
                 return Lifetime;
             }
 
-            var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
+            var lifetime = _lifetimes.GetByEquatableKey(lifetimeHashCode, lifetimeKey);
             if (lifetime != default(ILifetime))
             {
                 return lifetime;
@@ -11318,7 +11382,7 @@ namespace IoC.Core
         public override string ToString() => 
             $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
 
-        private struct LifetimeKey
+        private struct LifetimeKey: IEquatable<LifetimeKey>
         {
             private readonly Type[] _genericTypes;
             internal readonly int HashCode;
@@ -11329,12 +11393,12 @@ namespace IoC.Core
                 HashCode = genericTypes.GetHash();
             }
 
+            public bool Equals(LifetimeKey other) =>
+                CoreExtensions.SequenceEqual(_genericTypes, other._genericTypes);
+
             // ReSharper disable once PossibleNullReferenceException
-            public override bool Equals(object obj)
-            {
-                var other = (LifetimeKey)obj;
-                return CoreExtensions.SequenceEqual(_genericTypes, other._genericTypes);
-            }
+            public override bool Equals(object obj) =>
+                CoreExtensions.SequenceEqual(_genericTypes, ((LifetimeKey)obj)._genericTypes);
 
             public override int GetHashCode() => HashCode;
         }

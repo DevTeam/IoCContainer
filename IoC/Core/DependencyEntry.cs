@@ -106,7 +106,7 @@
                 return Lifetime;
             }
 
-            var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
+            var lifetime = _lifetimes.GetByEquatableKey(lifetimeHashCode, lifetimeKey);
             if (lifetime != default(ILifetime))
             {
                 return lifetime;
@@ -139,7 +139,7 @@
         public override string ToString() => 
             $"{string.Join(", ", Keys.Select(i => i.ToString()))} as {Lifetime?.ToString() ?? IoC.Lifetime.Transient.ToString()}";
 
-        private struct LifetimeKey
+        private struct LifetimeKey: IEquatable<LifetimeKey>
         {
             private readonly Type[] _genericTypes;
             internal readonly int HashCode;
@@ -150,12 +150,12 @@
                 HashCode = genericTypes.GetHash();
             }
 
+            public bool Equals(LifetimeKey other) =>
+                CoreExtensions.SequenceEqual(_genericTypes, other._genericTypes);
+
             // ReSharper disable once PossibleNullReferenceException
-            public override bool Equals(object obj)
-            {
-                var other = (LifetimeKey)obj;
-                return CoreExtensions.SequenceEqual(_genericTypes, other._genericTypes);
-            }
+            public override bool Equals(object obj) =>
+                CoreExtensions.SequenceEqual(_genericTypes, ((LifetimeKey)obj)._genericTypes);
 
             public override int GetHashCode() => HashCode;
         }
