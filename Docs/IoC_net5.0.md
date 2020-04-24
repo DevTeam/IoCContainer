@@ -270,9 +270,13 @@
   - [Register\`\`4(container,lifetime,tags)](#M-IoC-Core-FluentRegister-Register``4-IoC-IMutableContainer,IoC-ILifetime,System-Object[]- 'IoC.Core.FluentRegister.Register``4(IoC.IMutableContainer,IoC.ILifetime,System.Object[])')
   - [Register\`\`4(container,factory,lifetime,tags,statements)](#M-IoC-Core-FluentRegister-Register``4-IoC-IMutableContainer,System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},IoC-ILifetime,System-Object[],System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.Core.FluentRegister.Register``4(IoC.IMutableContainer,System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},IoC.ILifetime,System.Object[],System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
 - [FluentResolve](#T-IoC-FluentResolve 'IoC.FluentResolve')
+  - [Resolve\`\`1(container)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer- 'IoC.FluentResolve.Resolve``1(IoC.IContainer)')
   - [Resolve\`\`1(container,args)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Object[])')
+  - [Resolve\`\`1(container,tag)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,IoC-Tag- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,IoC.Tag)')
   - [Resolve\`\`1(container,tag,args)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,IoC-Tag,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,IoC.Tag,System.Object[])')
+  - [Resolve\`\`1(container,type)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Type- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type)')
   - [Resolve\`\`1(container,type,args)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Type,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type,System.Object[])')
+  - [Resolve\`\`1(container,type,tag)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Type,IoC-Tag- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type,IoC.Tag)')
   - [Resolve\`\`1(container,type,tag,args)](#M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Type,IoC-Tag,System-Object[]- 'IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type,IoC.Tag,System.Object[])')
 - [FluentScope](#T-IoC-FluentScope 'IoC.FluentScope')
   - [CreateScope(container)](#M-IoC-FluentScope-CreateScope-IoC-IContainer- 'IoC.FluentScope.CreateScope(IoC.IContainer)')
@@ -7073,6 +7077,29 @@ IoC
 
 Represents extensions to resolve from the container.
 
+<a name='M-IoC-FluentResolve-Resolve``1-IoC-IContainer-'></a>
+### Resolve\`\`1(container) `method`
+
+##### Summary
+
+Resolves an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
 <a name='M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Object[]-'></a>
 ### Resolve\`\`1(container,args) `method`
 
@@ -7090,6 +7117,30 @@ The instance.
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
 | args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentResolve-Resolve``1-IoC-IContainer,IoC-Tag-'></a>
+### Resolve\`\`1(container,tag) `method`
+
+##### Summary
+
+Resolves an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| tag | [IoC.Tag](#T-IoC-Tag 'IoC.Tag') | The tag. |
 
 ##### Generic Types
 
@@ -7122,6 +7173,30 @@ The instance.
 | ---- | ----------- |
 | T | The instance type. |
 
+<a name='M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Type-'></a>
+### Resolve\`\`1(container,type) `method`
+
+##### Summary
+
+Resolves an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The resolving instance type. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
 <a name='M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Type,System-Object[]-'></a>
 ### Resolve\`\`1(container,type,args) `method`
 
@@ -7140,6 +7215,31 @@ The instance.
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
 | type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The resolving instance type. |
 | args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentResolve-Resolve``1-IoC-IContainer,System-Type,IoC-Tag-'></a>
+### Resolve\`\`1(container,type,tag) `method`
+
+##### Summary
+
+Resolves an instance.
+
+##### Returns
+
+The instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The resolving instance type. |
+| tag | [IoC.Tag](#T-IoC-Tag 'IoC.Tag') | The tag. |
 
 ##### Generic Types
 

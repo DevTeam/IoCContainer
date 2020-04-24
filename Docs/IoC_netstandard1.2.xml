@@ -721,13 +721,6 @@
             Related lifetime.
             </summary>
         </member>
-        <member name="M:IoC.ContainerEvent.#ctor(IoC.IContainer,IoC.EventType)">
-            <summary>
-            Creates new instance of container event.
-            </summary>
-            <param name="container">The origin container.</param>
-            <param name="eventType">The event type.</param>
-        </member>
         <member name="T:IoC.Context`1">
             <summary>
             Represents the initializing context.
@@ -3914,6 +3907,14 @@
             Represents extensions to resolve from the container.
             </summary>
         </member>
+        <member name="M:IoC.FluentResolve.Resolve``1(IoC.IContainer)">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The instance.</returns>
+        </member>
         <member name="M:IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Object[])">
             <summary>
             Resolves an instance.
@@ -3921,6 +3922,15 @@
             <typeparam name="T">The instance type.</typeparam>
             <param name="container">The target container.</param>
             <param name="args">The optional arguments.</param>
+            <returns>The instance.</returns>
+        </member>
+        <member name="M:IoC.FluentResolve.Resolve``1(IoC.IContainer,IoC.Tag)">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="tag">The tag.</param>
             <returns>The instance.</returns>
         </member>
         <member name="M:IoC.FluentResolve.Resolve``1(IoC.IContainer,IoC.Tag,System.Object[])">
@@ -3933,6 +3943,15 @@
             <param name="args">The optional arguments.</param>
             <returns>The instance.</returns>
         </member>
+        <member name="M:IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type)">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="type">The resolving instance type.</param>
+            <returns>The instance.</returns>
+        </member>
         <member name="M:IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type,System.Object[])">
             <summary>
             Resolves an instance.
@@ -3941,6 +3960,16 @@
             <param name="container">The target container.</param>
             <param name="type">The resolving instance type.</param>
             <param name="args">The optional arguments.</param>
+            <returns>The instance.</returns>
+        </member>
+        <member name="M:IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type,IoC.Tag)">
+            <summary>
+            Resolves an instance.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="type">The resolving instance type.</param>
+            <param name="tag">The tag.</param>
             <returns>The instance.</returns>
         </member>
         <member name="M:IoC.FluentResolve.Resolve``1(IoC.IContainer,System.Type,IoC.Tag,System.Object[])">
