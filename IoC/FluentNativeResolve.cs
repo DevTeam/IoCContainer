@@ -11,7 +11,7 @@
     public static class FluentNativeResolve
     {
         // ReSharper disable once RedundantNameQualifier
-        internal static readonly object[] EmptyArgs = CoreExtensions.EmptyArray<object>();
+        private static readonly object[] EmptyArgs = CoreExtensions.EmptyArray<object>();
 
         /// <summary>
         /// Resolves an instance.

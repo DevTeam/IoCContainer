@@ -5812,7 +5812,7 @@ namespace IoC
     public static class FluentNativeResolve
     {
         // ReSharper disable once RedundantNameQualifier
-        internal static readonly object[] EmptyArgs = CoreExtensions.EmptyArray<object>();
+        private static readonly object[] EmptyArgs = CoreExtensions.EmptyArray<object>();
 
         /// <summary>
         /// Resolves an instance.
@@ -5951,6 +5951,7 @@ namespace IoC
 {
     using System;
     using System.Runtime.CompilerServices;
+    using Core;
 
     /// <summary>
     /// Represents extensions to resolve from the container.
@@ -5958,6 +5959,9 @@ namespace IoC
     [PublicAPI]
     public static class FluentResolve
     {
+        // ReSharper disable once RedundantNameQualifier
+        private static readonly object[] EmptyArgs = CoreExtensions.EmptyArray<object>();
+
         /// <summary>
         /// Resolves an instance.
         /// </summary>
@@ -5967,7 +5971,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container)
-            => container.GetResolver<T>()(container);
+            => container.GetResolver<T>()(container, EmptyArgs);
 
         /// <summary>
         /// Resolves an instance.
@@ -5991,7 +5995,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, Tag tag)
-            => container.GetResolver<T>(tag)(container);
+            => container.GetResolver<T>(tag)(container, EmptyArgs);
 
         /// <summary>
         /// Resolves an instance.
@@ -6016,7 +6020,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, [NotNull] Type type)
-            => container.GetResolver<T>(type)(container);
+            => container.GetResolver<T>(type)(container, EmptyArgs);
 
         /// <summary>
         /// Resolves an instance.
@@ -6042,7 +6046,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag)
-            => container.GetResolver<T>(type, tag)(container);
+            => container.GetResolver<T>(type, tag)(container, EmptyArgs);
 
         /// <summary>
         /// Resolves an instance.
