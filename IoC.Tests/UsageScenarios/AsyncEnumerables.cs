@@ -21,7 +21,7 @@ namespace IoC.Tests.UsageScenarios
             // Create and configure the container
             using var container = Container
                 .Create()
-                .Using(CollectionFeature.Default)
+                .Using(CollectionFeature.Set)
                 .Bind<IDependency>().To<Dependency>()
                 // Bind to the default implementation
                 .Bind<IService>().To<Service>()

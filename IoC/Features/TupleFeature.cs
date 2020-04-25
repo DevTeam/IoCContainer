@@ -13,7 +13,7 @@
         /// The default instance.
         public static readonly IConfiguration Default = new TupleFeature();
         /// The high-performance instance.
-        public static readonly IConfiguration Light = new TupleFeature(true);
+        public static readonly IConfiguration LightSet = new TupleFeature(true);
 
         private readonly bool _light;
 

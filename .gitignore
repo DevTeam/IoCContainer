@@ -14,3 +14,4 @@ IoC.xml
 IoC/IoC_*.xml
 .idea/
 Samples/UwpApp/AppPackages/
+BenchmarkDotNet.Artifacts/

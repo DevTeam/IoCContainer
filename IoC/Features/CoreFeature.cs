@@ -13,7 +13,7 @@
     public sealed class CoreFeature : IConfiguration
     {
         /// The default instance.
-        public static readonly IConfiguration Default = new CoreFeature();
+        public static readonly IConfiguration Set = new CoreFeature();
 
         private CoreFeature() { }
 

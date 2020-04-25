@@ -22,10 +22,9 @@ namespace IoC.Features
     public sealed class CollectionFeature : IConfiguration
     {
         /// The default instance.
-        public static readonly IConfiguration Default = new CollectionFeature();
+        public static readonly IConfiguration Set = new CollectionFeature();
 
-        private CollectionFeature()
-        { }
+        private CollectionFeature() { }
 
         /// <inheritdoc />
         public IEnumerable<IToken> Apply(IMutableContainer container)

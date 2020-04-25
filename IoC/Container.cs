@@ -41,20 +41,38 @@
         /// <summary>
         /// Creates a root container with default features.
         /// </summary>
+        /// <param name="configurations"></param>
+        /// <returns>The root container.</returns>
+        [PublicAPI]
+        [NotNull]
+        public static Container Create([NotNull] [ItemNotNull] params IConfiguration[] configurations) =>
+            Create(string.Empty, configurations ?? throw new ArgumentNullException(nameof(configurations)));
+
+        /// <summary>
+        /// Creates a root container with default features.
+        /// </summary>
         /// <param name="name">The optional name of the container.</param>
         /// <param name="configurations"></param>
         /// <returns>The root container.</returns>
         [PublicAPI]
         [NotNull]
-        public static Container Create([NotNull] string name = "", [CanBeNull][ItemNotNull] IEnumerable<IConfiguration> configurations = null)
+        public static Container Create([NotNull] string name = "", [NotNull][ItemNotNull] params IConfiguration[] configurations)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
+            if (configurations == null) throw new ArgumentNullException(nameof(configurations));
 
             // Create a root container
             var lockObject = new LockObject();
             var rootContainer = new Container(string.Empty, NullContainer.Shared, lockObject);
             rootContainer.Register<ILockObject>(ctx => lockObject);
-            rootContainer.ApplyConfigurations(configurations ?? Features.Sets.Default);
+            if (configurations.Length > 0)
+            {
+                rootContainer.ApplyConfigurations(configurations);
+            }
+            else
+            {
+                rootContainer.ApplyConfigurations(Features.CoreFeature.Set);
+            }
 
             // Create a target container
             var container = new Container(CreateContainerName(name), rootContainer, lockObject);
@@ -418,7 +436,7 @@
             !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
 
         [MethodImpl((MethodImplOptions)256)]
-        private void ApplyConfigurations(IEnumerable<IConfiguration> configurations) =>
+        private void ApplyConfigurations(params IConfiguration[] configurations) =>
             _resources.Add(this.Apply(configurations));
 
         private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)

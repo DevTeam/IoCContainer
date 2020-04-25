@@ -1240,20 +1240,38 @@ namespace IoC
         /// <summary>
         /// Creates a root container with default features.
         /// </summary>
+        /// <param name="configurations"></param>
+        /// <returns>The root container.</returns>
+        [PublicAPI]
+        [NotNull]
+        public static Container Create([NotNull] [ItemNotNull] params IConfiguration[] configurations) =>
+            Create(string.Empty, configurations ?? throw new ArgumentNullException(nameof(configurations)));
+
+        /// <summary>
+        /// Creates a root container with default features.
+        /// </summary>
         /// <param name="name">The optional name of the container.</param>
         /// <param name="configurations"></param>
         /// <returns>The root container.</returns>
         [PublicAPI]
         [NotNull]
-        public static Container Create([NotNull] string name = "", [CanBeNull][ItemNotNull] IEnumerable<IConfiguration> configurations = null)
+        public static Container Create([NotNull] string name = "", [NotNull][ItemNotNull] params IConfiguration[] configurations)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
+            if (configurations == null) throw new ArgumentNullException(nameof(configurations));
 
             // Create a root container
             var lockObject = new LockObject();
             var rootContainer = new Container(string.Empty, NullContainer.Shared, lockObject);
             rootContainer.Register<ILockObject>(ctx => lockObject);
-            rootContainer.ApplyConfigurations(configurations ?? Features.Sets.Default);
+            if (configurations.Length > 0)
+            {
+                rootContainer.ApplyConfigurations(configurations);
+            }
+            else
+            {
+                rootContainer.ApplyConfigurations(Features.CoreFeature.Set);
+            }
 
             // Create a target container
             var container = new Container(CreateContainerName(name), rootContainer, lockObject);
@@ -1617,7 +1635,7 @@ namespace IoC
             !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
 
         [MethodImpl((MethodImplOptions)256)]
-        private void ApplyConfigurations(IEnumerable<IConfiguration> configurations) =>
+        private void ApplyConfigurations(params IConfiguration[] configurations) =>
             _resources.Add(this.Apply(configurations));
 
         private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)
@@ -8578,10 +8596,9 @@ namespace IoC.Features
     public sealed class CollectionFeature : IConfiguration
     {
         /// The default instance.
-        public static readonly IConfiguration Default = new CollectionFeature();
+        public static readonly IConfiguration Set = new CollectionFeature();
 
-        private CollectionFeature()
-        { }
+        private CollectionFeature() { }
 
         /// <inheritdoc />
         public IEnumerable<IToken> Apply(IMutableContainer container)
@@ -8816,7 +8833,7 @@ namespace IoC.Features
     public sealed class CommonTypesFeature : IConfiguration
     {
         /// The default instance.
-        public static readonly IConfiguration Default = new CommonTypesFeature();
+        public static readonly IConfiguration Set = new CommonTypesFeature();
 
         private CommonTypesFeature() { }
 
@@ -8851,7 +8868,7 @@ namespace IoC.Features
         /// <summary>
         /// The default instance.
         /// </summary>
-        public static readonly IConfiguration Default = new ConfigurationFeature();
+        public static readonly IConfiguration Set = new ConfigurationFeature();
 
         private ConfigurationFeature() { }
 
@@ -8920,7 +8937,7 @@ namespace IoC.Features
     public sealed class CoreFeature : IConfiguration
     {
         /// The default instance.
-        public static readonly IConfiguration Default = new CoreFeature();
+        public static readonly IConfiguration Set = new CoreFeature();
 
         private CoreFeature() { }
 
@@ -8975,6 +8992,45 @@ namespace IoC.Features
 
 
 #endregion
+#region DefaultFeature
+
+namespace IoC.Features
+{
+    using System;
+    using System.Collections.Generic;
+
+    /// <summary>
+    /// Adds a set of all bundled features.
+    /// </summary>
+    [PublicAPI]
+    public class DefaultFeature: IConfiguration
+    {
+        /// The default instance.
+        public static readonly IConfiguration Set = new DefaultFeature();
+
+        private static readonly IEnumerable<IConfiguration> Features = new[]
+        {
+            CoreFeature.Set,
+            CollectionFeature.Set,
+            FuncFeature.Set,
+            TaskFeature.Set,
+            TupleFeature.Default,
+            CommonTypesFeature.Set,
+            ConfigurationFeature.Set
+        };
+
+        private DefaultFeature() { }
+
+        /// <inheritdoc />
+        public IEnumerable<IToken> Apply(IMutableContainer container)
+        {
+            yield return (container ?? throw new ArgumentNullException(nameof(container))).Apply(Features);
+        }
+    }
+}
+
+
+#endregion
 #region FuncFeature
 
 namespace IoC.Features
@@ -8990,9 +9046,10 @@ namespace IoC.Features
     public sealed  class FuncFeature : IConfiguration
     {
         /// The default instance.
-        public static readonly IConfiguration Default = new FuncFeature();
+        public static readonly IConfiguration Set = new FuncFeature();
+
         /// The high-performance instance.
-        public static readonly IConfiguration Light = new FuncFeature(true);
+        public static readonly IConfiguration LightSet = new FuncFeature(true);
 
         private readonly bool _light;
 
@@ -9020,12 +9077,49 @@ namespace IoC.Features
 
 
 #endregion
+#region LightFeature
+
+namespace IoC.Features
+{
+    using System;
+    using System.Collections.Generic;
+
+    /// <summary>
+    /// Adds a set of all bundled features.
+    /// </summary>
+    [PublicAPI]
+    public class LightFeature : IConfiguration
+    {
+        /// The default instance.
+        public static readonly IConfiguration Set = new LightFeature();
+
+        private static readonly IEnumerable<IConfiguration> Features = new[]
+        {
+            CoreFeature.Set,
+            CollectionFeature.Set,
+            FuncFeature.LightSet,
+            TaskFeature.Set,
+            TupleFeature.LightSet,
+            CommonTypesFeature.Set,
+            ConfigurationFeature.Set
+        };
+
+        private LightFeature() { }
+
+        /// <inheritdoc />
+        public IEnumerable<IToken> Apply(IMutableContainer container)
+        {
+            yield return (container ?? throw new ArgumentNullException(nameof(container))).Apply(Features);
+        }
+    }
+}
+
+
+#endregion
 #region Sets
 
 namespace IoC.Features
 {
-    using System.Collections.Generic;
-
     /// <summary>
     /// Represents a feature sets.
     /// </summary>
@@ -9033,45 +9127,6 @@ namespace IoC.Features
     public static class Sets
     {
         internal static readonly object[] AnyTag = { Key.AnyTag };
-
-        /// <summary>
-        /// Core features.
-        /// </summary>
-        [PublicAPI]
-        public static readonly IEnumerable<IConfiguration> Core = new[]
-        {
-            CoreFeature.Default
-        };
-
-        /// <summary>
-        /// Default features.
-        /// </summary>
-        [PublicAPI]
-        public static readonly IEnumerable<IConfiguration> Default = new[]
-        {
-            CoreFeature.Default,
-            CollectionFeature.Default,
-            FuncFeature.Default,
-            TaskFeature.Default,
-            TupleFeature.Default,
-            CommonTypesFeature.Default,
-            ConfigurationFeature.Default
-        };
-
-        /// <summary>
-        /// The light set of features.
-        /// </summary>
-        [PublicAPI]
-        public static readonly IEnumerable<IConfiguration> Light = new[]
-        {
-            CoreFeature.Default,
-            CollectionFeature.Default,
-            FuncFeature.Light,
-            TaskFeature.Default,
-            TupleFeature.Light,
-            CommonTypesFeature.Default,
-            ConfigurationFeature.Default
-        };
     }
 }
 
@@ -9093,7 +9148,7 @@ namespace IoC.Features
     public sealed  class TaskFeature : IConfiguration
     {
         /// The default instance.
-        public static readonly IConfiguration Default = new TaskFeature();
+        public static readonly IConfiguration Set = new TaskFeature();
 
         /// <summary>
         /// TaskFeature default tag
@@ -9141,7 +9196,7 @@ namespace IoC.Features
         /// The default instance.
         public static readonly IConfiguration Default = new TupleFeature();
         /// The high-performance instance.
-        public static readonly IConfiguration Light = new TupleFeature(true);
+        public static readonly IConfiguration LightSet = new TupleFeature(true);
 
         private readonly bool _light;
 

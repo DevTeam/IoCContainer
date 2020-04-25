@@ -10,7 +10,7 @@
         public void ContainerShouldResolveFromInstanceWhenPureContainer()
         {
             // Given
-            using var container = Container.Create("Core", Features.Sets.Core);
+            using var container = Container.Create(Features.CoreFeature.Set);
             var expectedInstance = Mock.Of<IMyService>();
 
             // When
@@ -26,7 +26,7 @@
         public void ContainerShouldResolveAutowiringWhenPureContainer()
         {
             // Given
-            using var container = Container.Create("Core", Features.Sets.Core);
+            using var container = Container.Create(Features.CoreFeature.Set);
 
             // When
             using (container.Bind<MySimpleClass>().To())
@@ -41,7 +41,7 @@
         public void ContainerShouldResolveAutowiringSingletonWhenPureContainer()
         {
             // Given
-            using var container = Container.Create("Core", Features.Sets.Core);
+            using var container = Container.Create(Features.CoreFeature.Set);
 
             // When
             using (container.Bind<MySimpleClass>().As(Lifetime.Singleton).To())

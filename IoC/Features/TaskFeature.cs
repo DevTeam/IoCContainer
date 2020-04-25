@@ -12,7 +12,7 @@
     public sealed  class TaskFeature : IConfiguration
     {
         /// The default instance.
-        public static readonly IConfiguration Default = new TaskFeature();
+        public static readonly IConfiguration Set = new TaskFeature();
 
         /// <summary>
         /// TaskFeature default tag

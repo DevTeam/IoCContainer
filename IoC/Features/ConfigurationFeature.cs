@@ -15,7 +15,7 @@
         /// <summary>
         /// The default instance.
         /// </summary>
-        public static readonly IConfiguration Default = new ConfigurationFeature();
+        public static readonly IConfiguration Set = new ConfigurationFeature();
 
         private ConfigurationFeature() { }
 

@@ -10,7 +10,7 @@
     public sealed class CommonTypesFeature : IConfiguration
     {
         /// The default instance.
-        public static readonly IConfiguration Default = new CommonTypesFeature();
+        public static readonly IConfiguration Set = new CommonTypesFeature();
 
         private CommonTypesFeature() { }
 

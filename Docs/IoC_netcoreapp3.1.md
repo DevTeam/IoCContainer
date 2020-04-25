@@ -48,17 +48,18 @@
   - [Read](#F-IoC-CollectionAccessType-Read 'IoC.CollectionAccessType.Read')
   - [UpdatedContent](#F-IoC-CollectionAccessType-UpdatedContent 'IoC.CollectionAccessType.UpdatedContent')
 - [CollectionFeature](#T-IoC-Features-CollectionFeature 'IoC.Features.CollectionFeature')
-  - [Default](#F-IoC-Features-CollectionFeature-Default 'IoC.Features.CollectionFeature.Default')
+  - [Set](#F-IoC-Features-CollectionFeature-Set 'IoC.Features.CollectionFeature.Set')
   - [Apply()](#M-IoC-Features-CollectionFeature-Apply-IoC-IMutableContainer- 'IoC.Features.CollectionFeature.Apply(IoC.IMutableContainer)')
 - [CommonTypesFeature](#T-IoC-Features-CommonTypesFeature 'IoC.Features.CommonTypesFeature')
-  - [Default](#F-IoC-Features-CommonTypesFeature-Default 'IoC.Features.CommonTypesFeature.Default')
+  - [Set](#F-IoC-Features-CommonTypesFeature-Set 'IoC.Features.CommonTypesFeature.Set')
   - [Apply()](#M-IoC-Features-CommonTypesFeature-Apply-IoC-IMutableContainer- 'IoC.Features.CommonTypesFeature.Apply(IoC.IMutableContainer)')
 - [ConfigurationFeature](#T-IoC-Features-ConfigurationFeature 'IoC.Features.ConfigurationFeature')
-  - [Default](#F-IoC-Features-ConfigurationFeature-Default 'IoC.Features.ConfigurationFeature.Default')
+  - [Set](#F-IoC-Features-ConfigurationFeature-Set 'IoC.Features.ConfigurationFeature.Set')
   - [Apply()](#M-IoC-Features-ConfigurationFeature-Apply-IoC-IMutableContainer- 'IoC.Features.ConfigurationFeature.Apply(IoC.IMutableContainer)')
 - [Container](#T-IoC-Container 'IoC.Container')
   - [Parent](#P-IoC-Container-Parent 'IoC.Container.Parent')
-  - [Create(name,configurations)](#M-IoC-Container-Create-System-String,System-Collections-Generic-IEnumerable{IoC-IConfiguration}- 'IoC.Container.Create(System.String,System.Collections.Generic.IEnumerable{IoC.IConfiguration})')
+  - [Create(configurations)](#M-IoC-Container-Create-IoC-IConfiguration[]- 'IoC.Container.Create(IoC.IConfiguration[])')
+  - [Create(name,configurations)](#M-IoC-Container-Create-System-String,IoC-IConfiguration[]- 'IoC.Container.Create(System.String,IoC.IConfiguration[])')
   - [Dispose()](#M-IoC-Container-Dispose 'IoC.Container.Dispose')
   - [GetEnumerator()](#M-IoC-Container-GetEnumerator 'IoC.Container.GetEnumerator')
   - [RegisterResource()](#M-IoC-Container-RegisterResource-System-IDisposable- 'IoC.Container.RegisterResource(System.IDisposable)')
@@ -91,8 +92,11 @@
   - [It](#F-IoC-Context`1-It 'IoC.Context`1.It')
 - [ContractAnnotationAttribute](#T-IoC-ContractAnnotationAttribute 'IoC.ContractAnnotationAttribute')
 - [CoreFeature](#T-IoC-Features-CoreFeature 'IoC.Features.CoreFeature')
-  - [Default](#F-IoC-Features-CoreFeature-Default 'IoC.Features.CoreFeature.Default')
+  - [Set](#F-IoC-Features-CoreFeature-Set 'IoC.Features.CoreFeature.Set')
   - [Apply()](#M-IoC-Features-CoreFeature-Apply-IoC-IMutableContainer- 'IoC.Features.CoreFeature.Apply(IoC.IMutableContainer)')
+- [DefaultFeature](#T-IoC-Features-DefaultFeature 'IoC.Features.DefaultFeature')
+  - [Set](#F-IoC-Features-DefaultFeature-Set 'IoC.Features.DefaultFeature.Set')
+  - [Apply()](#M-IoC-Features-DefaultFeature-Apply-IoC-IMutableContainer- 'IoC.Features.DefaultFeature.Apply(IoC.IMutableContainer)')
 - [DependencyDescription](#T-IoC-Issues-DependencyDescription 'IoC.Issues.DependencyDescription')
   - [#ctor(dependency,lifetime)](#M-IoC-Issues-DependencyDescription-#ctor-IoC-IDependency,IoC-ILifetime- 'IoC.Issues.DependencyDescription.#ctor(IoC.IDependency,IoC.ILifetime)')
   - [Dependency](#F-IoC-Issues-DependencyDescription-Dependency 'IoC.Issues.DependencyDescription.Dependency')
@@ -287,8 +291,8 @@
   - [Trace(container)](#M-IoC-FluentTrace-Trace-IoC-IMutableContainer- 'IoC.FluentTrace.Trace(IoC.IMutableContainer)')
   - [Trace(token)](#M-IoC-FluentTrace-Trace-IoC-IToken- 'IoC.FluentTrace.Trace(IoC.IToken)')
 - [FuncFeature](#T-IoC-Features-FuncFeature 'IoC.Features.FuncFeature')
-  - [Default](#F-IoC-Features-FuncFeature-Default 'IoC.Features.FuncFeature.Default')
-  - [Light](#F-IoC-Features-FuncFeature-Light 'IoC.Features.FuncFeature.Light')
+  - [LightSet](#F-IoC-Features-FuncFeature-LightSet 'IoC.Features.FuncFeature.LightSet')
+  - [Set](#F-IoC-Features-FuncFeature-Set 'IoC.Features.FuncFeature.Set')
   - [Apply()](#M-IoC-Features-FuncFeature-Apply-IoC-IMutableContainer- 'IoC.Features.FuncFeature.Apply(IoC.IMutableContainer)')
 - [GenericTypeArgumentAttribute](#T-IoC-GenericTypeArgumentAttribute 'IoC.GenericTypeArgumentAttribute')
 - [IArray](#T-IoC-Core-IArray 'IoC.Core.IArray')
@@ -421,6 +425,9 @@
   - [ScopeSingleton](#F-IoC-Lifetime-ScopeSingleton 'IoC.Lifetime.ScopeSingleton')
   - [Singleton](#F-IoC-Lifetime-Singleton 'IoC.Lifetime.Singleton')
   - [Transient](#F-IoC-Lifetime-Transient 'IoC.Lifetime.Transient')
+- [LightFeature](#T-IoC-Features-LightFeature 'IoC.Features.LightFeature')
+  - [Set](#F-IoC-Features-LightFeature-Set 'IoC.Features.LightFeature.Set')
+  - [Apply()](#M-IoC-Features-LightFeature-Apply-IoC-IMutableContainer- 'IoC.Features.LightFeature.Apply(IoC.IMutableContainer)')
 - [LinqTunnelAttribute](#T-IoC-LinqTunnelAttribute 'IoC.LinqTunnelAttribute')
 - [LocalizationRequiredAttribute](#T-IoC-LocalizationRequiredAttribute 'IoC.LocalizationRequiredAttribute')
 - [MacroAttribute](#T-IoC-MacroAttribute 'IoC.MacroAttribute')
@@ -447,9 +454,6 @@
   - [OnNewInstanceCreated\`\`1()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-IScope,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.IScope,IoC.IContainer,System.Object[])')
   - [ToString()](#M-IoC-Lifetimes-ScopeSingletonLifetime-ToString 'IoC.Lifetimes.ScopeSingletonLifetime.ToString')
 - [Sets](#T-IoC-Features-Sets 'IoC.Features.Sets')
-  - [Core](#F-IoC-Features-Sets-Core 'IoC.Features.Sets.Core')
-  - [Default](#F-IoC-Features-Sets-Default 'IoC.Features.Sets.Default')
-  - [Light](#F-IoC-Features-Sets-Light 'IoC.Features.Sets.Light')
 - [SingletonLifetime](#T-IoC-Lifetimes-SingletonLifetime 'IoC.Lifetimes.SingletonLifetime')
   - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.SingletonLifetime.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
   - [Create()](#M-IoC-Lifetimes-SingletonLifetime-Create 'IoC.Lifetimes.SingletonLifetime.Create')
@@ -687,7 +691,7 @@
 - [Tag](#T-IoC-Tag 'IoC.Tag')
   - [ToString()](#M-IoC-Tag-ToString 'IoC.Tag.ToString')
 - [TaskFeature](#T-IoC-Features-TaskFeature 'IoC.Features.TaskFeature')
-  - [Default](#F-IoC-Features-TaskFeature-Default 'IoC.Features.TaskFeature.Default')
+  - [Set](#F-IoC-Features-TaskFeature-Set 'IoC.Features.TaskFeature.Set')
   - [Tag](#F-IoC-Features-TaskFeature-Tag 'IoC.Features.TaskFeature.Tag')
   - [Apply()](#M-IoC-Features-TaskFeature-Apply-IoC-IMutableContainer- 'IoC.Features.TaskFeature.Apply(IoC.IMutableContainer)')
 - [TerminatesProgramAttribute](#T-IoC-TerminatesProgramAttribute 'IoC.TerminatesProgramAttribute')
@@ -697,7 +701,7 @@
   - [Message](#F-IoC-TraceEvent-Message 'IoC.TraceEvent.Message')
 - [TupleFeature](#T-IoC-Features-TupleFeature 'IoC.Features.TupleFeature')
   - [Default](#F-IoC-Features-TupleFeature-Default 'IoC.Features.TupleFeature.Default')
-  - [Light](#F-IoC-Features-TupleFeature-Light 'IoC.Features.TupleFeature.Light')
+  - [LightSet](#F-IoC-Features-TupleFeature-LightSet 'IoC.Features.TupleFeature.LightSet')
   - [Apply()](#M-IoC-Features-TupleFeature-Apply-IoC-IMutableContainer- 'IoC.Features.TupleFeature.Apply(IoC.IMutableContainer)')
 - [UsedImplicitlyAttribute](#T-IoC-UsedImplicitlyAttribute 'IoC.UsedImplicitlyAttribute')
 - [ValueProviderAttribute](#T-IoC-ValueProviderAttribute 'IoC.ValueProviderAttribute')
@@ -1286,8 +1290,8 @@ IoC.Features
 
 Allows to resolve enumeration of all instances related to corresponding bindings.
 
-<a name='F-IoC-Features-CollectionFeature-Default'></a>
-### Default `constants`
+<a name='F-IoC-Features-CollectionFeature-Set'></a>
+### Set `constants`
 
 <a name='M-IoC-Features-CollectionFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
@@ -1311,8 +1315,8 @@ IoC.Features
 
 Allows to resolve common types like a `Lazy`.
 
-<a name='F-IoC-Features-CommonTypesFeature-Default'></a>
-### Default `constants`
+<a name='F-IoC-Features-CommonTypesFeature-Set'></a>
+### Set `constants`
 
 <a name='M-IoC-Features-CommonTypesFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
@@ -1336,8 +1340,8 @@ IoC.Features
 
 Allows to configure via a text metadata.
 
-<a name='F-IoC-Features-ConfigurationFeature-Default'></a>
-### Default `constants`
+<a name='F-IoC-Features-ConfigurationFeature-Set'></a>
+### Set `constants`
 
 ##### Summary
 
@@ -1372,7 +1376,24 @@ The base IoC container implementation.
 
 *Inherit from parent.*
 
-<a name='M-IoC-Container-Create-System-String,System-Collections-Generic-IEnumerable{IoC-IConfiguration}-'></a>
+<a name='M-IoC-Container-Create-IoC-IConfiguration[]-'></a>
+### Create(configurations) `method`
+
+##### Summary
+
+Creates a root container with default features.
+
+##### Returns
+
+The root container.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') |  |
+
+<a name='M-IoC-Container-Create-System-String,IoC-IConfiguration[]-'></a>
 ### Create(name,configurations) `method`
 
 ##### Summary
@@ -1388,7 +1409,7 @@ The root container.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | name | [System.String](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.String 'System.String') | The optional name of the container. |
-| configurations | [System.Collections.Generic.IEnumerable{IoC.IConfiguration}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IConfiguration}') |  |
+| configurations | [IoC.IConfiguration[]](#T-IoC-IConfiguration[] 'IoC.IConfiguration[]') |  |
 
 <a name='M-IoC-Container-Dispose'></a>
 ### Dispose() `method`
@@ -1700,10 +1721,35 @@ IoC.Features
 
 Adds the set of core features like lifetimes and containers.
 
-<a name='F-IoC-Features-CoreFeature-Default'></a>
-### Default `constants`
+<a name='F-IoC-Features-CoreFeature-Set'></a>
+### Set `constants`
 
 <a name='M-IoC-Features-CoreFeature-Apply-IoC-IMutableContainer-'></a>
+### Apply() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='T-IoC-Features-DefaultFeature'></a>
+## DefaultFeature `type`
+
+##### Namespace
+
+IoC.Features
+
+##### Summary
+
+Adds a set of all bundled features.
+
+<a name='F-IoC-Features-DefaultFeature-Set'></a>
+### Set `constants`
+
+<a name='M-IoC-Features-DefaultFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
 
 ##### Summary
@@ -7410,11 +7456,11 @@ IoC.Features
 
 Allows to resolve Functions.
 
-<a name='F-IoC-Features-FuncFeature-Default'></a>
-### Default `constants`
+<a name='F-IoC-Features-FuncFeature-LightSet'></a>
+### LightSet `constants`
 
-<a name='F-IoC-Features-FuncFeature-Light'></a>
-### Light `constants`
+<a name='F-IoC-Features-FuncFeature-Set'></a>
+### Set `constants`
 
 <a name='M-IoC-Features-FuncFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
@@ -9197,6 +9243,31 @@ For a singleton instance.
 
 For a new instance each time (default).
 
+<a name='T-IoC-Features-LightFeature'></a>
+## LightFeature `type`
+
+##### Namespace
+
+IoC.Features
+
+##### Summary
+
+Adds a set of all bundled features.
+
+<a name='F-IoC-Features-LightFeature-Set'></a>
+### Set `constants`
+
+<a name='M-IoC-Features-LightFeature-Apply-IoC-IMutableContainer-'></a>
+### Apply() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
 <a name='T-IoC-LinqTunnelAttribute'></a>
 ## LinqTunnelAttribute `type`
 
@@ -9602,27 +9673,6 @@ IoC.Features
 ##### Summary
 
 Represents a feature sets.
-
-<a name='F-IoC-Features-Sets-Core'></a>
-### Core `constants`
-
-##### Summary
-
-Core features.
-
-<a name='F-IoC-Features-Sets-Default'></a>
-### Default `constants`
-
-##### Summary
-
-Default features.
-
-<a name='F-IoC-Features-Sets-Light'></a>
-### Light `constants`
-
-##### Summary
-
-The light set of features.
 
 <a name='T-IoC-Lifetimes-SingletonLifetime'></a>
 ## SingletonLifetime `type`
@@ -12264,8 +12314,8 @@ IoC.Features
 
 Allows to resolve Tasks.
 
-<a name='F-IoC-Features-TaskFeature-Default'></a>
-### Default `constants`
+<a name='F-IoC-Features-TaskFeature-Set'></a>
+### Set `constants`
 
 <a name='F-IoC-Features-TaskFeature-Tag'></a>
 ### Tag `constants`
@@ -12350,8 +12400,8 @@ Allows to resolve Tuples.
 <a name='F-IoC-Features-TupleFeature-Default'></a>
 ### Default `constants`
 
-<a name='F-IoC-Features-TupleFeature-Light'></a>
-### Light `constants`
+<a name='F-IoC-Features-TupleFeature-LightSet'></a>
+### LightSet `constants`
 
 <a name='M-IoC-Features-TupleFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`

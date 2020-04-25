@@ -11,9 +11,10 @@
     public sealed  class FuncFeature : IConfiguration
     {
         /// The default instance.
-        public static readonly IConfiguration Default = new FuncFeature();
+        public static readonly IConfiguration Set = new FuncFeature();
+
         /// The high-performance instance.
-        public static readonly IConfiguration Light = new FuncFeature(true);
+        public static readonly IConfiguration LightSet = new FuncFeature(true);
 
         private readonly bool _light;
 
