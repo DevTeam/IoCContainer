@@ -13,7 +13,7 @@ namespace IoC.Benchmark
     using Model;
 
     [BenchmarkCategory("singleton", " 20 instances and 1 singleton")]
-    public sealed class Singleton
+    public class Singleton
     {
         [Benchmark(Description = "new", OperationsPerInvoke = Configs.Series * 1000)]
         public void New()

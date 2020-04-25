@@ -8,7 +8,7 @@ namespace IoC.Benchmark
     using global::Unity;
 
     [BenchmarkCategory("complex", " 364 instances of unique type")]
-    public sealed class Complex
+    public class Complex
     {
         [Benchmark(Description = "IoC.Container", OperationsPerInvoke = Configs.ComplexSeries * 1000)]
         public void This()

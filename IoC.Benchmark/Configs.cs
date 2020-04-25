@@ -44,7 +44,7 @@ namespace IoC.Benchmark
         public static readonly UnityContainer UnitySingleton = Unity.Singleton();
         public static readonly UnityContainer UnityComplex = Unity.Complex();
 
-        public const int Series = 1000;
-        public const int ComplexSeries = 1000;
+        public const int Series = 10000;
+        public const int ComplexSeries = 10000;
     }
 }

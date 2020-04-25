@@ -13,7 +13,7 @@ namespace IoC.Benchmark
     using Model;
 
     [BenchmarkCategory("transient", " 27 instances")]
-    public sealed class Transient
+    public class Transient
     {
         [Benchmark(Description = "new", OperationsPerInvoke = Configs.Series * 1000)]
         public void New()

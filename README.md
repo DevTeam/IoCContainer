@@ -236,9 +236,17 @@ For details please see [this sample](IoC.Tests/UsageScenarios/Interception.cs).
 
 ## Why this one?
 
-The results of the [comparison tests](IoC.Comparison/ComparisonTests.cs) for some popular IoC containers like Castle Windsor, Autofac, Unity, Ninject ...
+![Transient](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/BenchmarkDotNet.Artifacts/results/IoC.Benchmark.Transient-report.jpg)
 
-![Cat](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/REPORT.jpg)
+![Singleton](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/BenchmarkDotNet.Artifacts/results/IoC.Benchmark.Singleton-report.jpg)
+
+![Complex](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/BenchmarkDotNet.Artifacts/results/IoC.Benchmark.Complex-report.jpg)
+
+- __Mean__ - arithmetic mean of root instances resolved per Nanosecond
+- __Error__ - half of 99.9% confidence interval
+- __StdDev__ - standard deviation of all measurements
+- __Median__ - value separating the higher half of all measurements (50th percentile)
+- __1 ns__ - 1 Nanosecond (0.000000001 sec)
 ### Supported Platforms
 
 - .NET 4.0+
