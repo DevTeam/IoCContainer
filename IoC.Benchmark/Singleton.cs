@@ -20,16 +20,16 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
-                NewSingleton();
-                NewSingleton();
-                NewSingleton();
-                NewSingleton();
-                NewSingleton();
-                NewSingleton();
-                NewSingleton();
-                NewSingleton();
-                NewSingleton();
-                NewSingleton();
+                NewSingleton().DoSomething();
+                NewSingleton().DoSomething();
+                NewSingleton().DoSomething();
+                NewSingleton().DoSomething();
+                NewSingleton().DoSomething();
+                NewSingleton().DoSomething();
+                NewSingleton().DoSomething();
+                NewSingleton().DoSomething();
+                NewSingleton().DoSomething();
+                NewSingleton().DoSomething();
             }
         }
 
@@ -38,16 +38,16 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
-                Configs.IoCContainerSingleton.Resolve<IService1>();
-                Configs.IoCContainerSingleton.Resolve<IService1>();
-                Configs.IoCContainerSingleton.Resolve<IService1>();
-                Configs.IoCContainerSingleton.Resolve<IService1>();
-                Configs.IoCContainerSingleton.Resolve<IService1>();
-                Configs.IoCContainerSingleton.Resolve<IService1>();
-                Configs.IoCContainerSingleton.Resolve<IService1>();
-                Configs.IoCContainerSingleton.Resolve<IService1>();
-                Configs.IoCContainerSingleton.Resolve<IService1>();
-                Configs.IoCContainerSingleton.Resolve<IService1>();
+                Configs.IoCContainerSingleton.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerSingleton.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerSingleton.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerSingleton.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerSingleton.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerSingleton.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerSingleton.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerSingleton.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerSingleton.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerSingleton.Resolve<IService1>().DoSomething();
             }
         }
 
@@ -56,16 +56,16 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
-                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs);
-                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs);
-                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs);
-                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs);
-                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs);
-                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs);
-                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs);
-                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs);
-                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs);
-                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs);
+                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs).DoSomething();
             }
         }
 
@@ -74,7 +74,7 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count * 10; i++)
             {
-                Configs.AutofacSingleton.Resolve<IService1>();
+                Configs.AutofacSingleton.Resolve<IService1>().DoSomething();
             }
         }
 
@@ -83,7 +83,7 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count; i++)
             {
-                Configs.CastleWindsorSingleton.Resolve<IService1>();
+                Configs.CastleWindsorSingleton.Resolve<IService1>().DoSomething();
             }
         }
 
@@ -92,16 +92,16 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
-                Configs.DryIocSingleton.Resolve<IService1>();
-                Configs.DryIocSingleton.Resolve<IService1>();
-                Configs.DryIocSingleton.Resolve<IService1>();
-                Configs.DryIocSingleton.Resolve<IService1>();
-                Configs.DryIocSingleton.Resolve<IService1>();
-                Configs.DryIocSingleton.Resolve<IService1>();
-                Configs.DryIocSingleton.Resolve<IService1>();
-                Configs.DryIocSingleton.Resolve<IService1>();
-                Configs.DryIocSingleton.Resolve<IService1>();
-                Configs.DryIocSingleton.Resolve<IService1>();
+                Configs.DryIocSingleton.Resolve<IService1>().DoSomething();
+                Configs.DryIocSingleton.Resolve<IService1>().DoSomething();
+                Configs.DryIocSingleton.Resolve<IService1>().DoSomething();
+                Configs.DryIocSingleton.Resolve<IService1>().DoSomething();
+                Configs.DryIocSingleton.Resolve<IService1>().DoSomething();
+                Configs.DryIocSingleton.Resolve<IService1>().DoSomething();
+                Configs.DryIocSingleton.Resolve<IService1>().DoSomething();
+                Configs.DryIocSingleton.Resolve<IService1>().DoSomething();
+                Configs.DryIocSingleton.Resolve<IService1>().DoSomething();
+                Configs.DryIocSingleton.Resolve<IService1>().DoSomething();
             }
         }
 
@@ -110,16 +110,16 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
-                Configs.LightInjectSingleton.GetInstance<IService1>();
-                Configs.LightInjectSingleton.GetInstance<IService1>();
-                Configs.LightInjectSingleton.GetInstance<IService1>();
-                Configs.LightInjectSingleton.GetInstance<IService1>();
-                Configs.LightInjectSingleton.GetInstance<IService1>();
-                Configs.LightInjectSingleton.GetInstance<IService1>();
-                Configs.LightInjectSingleton.GetInstance<IService1>();
-                Configs.LightInjectSingleton.GetInstance<IService1>();
-                Configs.LightInjectSingleton.GetInstance<IService1>();
-                Configs.LightInjectSingleton.GetInstance<IService1>();
+                Configs.LightInjectSingleton.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectSingleton.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectSingleton.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectSingleton.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectSingleton.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectSingleton.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectSingleton.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectSingleton.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectSingleton.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectSingleton.GetInstance<IService1>().DoSomething();
             }
         }
 
@@ -128,7 +128,7 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count; i++)
             {
-                Configs.NinjectSingleton.Get<IService1>();
+                Configs.NinjectSingleton.Get<IService1>().DoSomething();
             }
         }
 
@@ -137,7 +137,7 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count; i++)
             {
-                Configs.UnitySingleton.Resolve<IService1>();
+                Configs.UnitySingleton.Resolve<IService1>().DoSomething();
             }
         }
 

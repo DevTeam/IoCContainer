@@ -46,6 +46,6 @@ namespace IoC.Benchmark
 
         public const int Count = 100;
         public const int ComplexCount = 100;
-        public const int FastK = 1000;
+        public const int FastK = 10000;
     }
 }

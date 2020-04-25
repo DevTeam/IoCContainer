@@ -20,16 +20,16 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
-                NewTransient();
-                NewTransient();
-                NewTransient();
-                NewTransient();
-                NewTransient();
-                NewTransient();
-                NewTransient();
-                NewTransient();
-                NewTransient();
-                NewTransient();
+                NewTransient().DoSomething();
+                NewTransient().DoSomething();
+                NewTransient().DoSomething();
+                NewTransient().DoSomething();
+                NewTransient().DoSomething();
+                NewTransient().DoSomething();
+                NewTransient().DoSomething();
+                NewTransient().DoSomething();
+                NewTransient().DoSomething();
+                NewTransient().DoSomething();
             }
         }
 
@@ -38,16 +38,16 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
-                Configs.IoCContainerTransient.Resolve<IService1>();
-                Configs.IoCContainerTransient.Resolve<IService1>();
-                Configs.IoCContainerTransient.Resolve<IService1>();
-                Configs.IoCContainerTransient.Resolve<IService1>();
-                Configs.IoCContainerTransient.Resolve<IService1>();
-                Configs.IoCContainerTransient.Resolve<IService1>();
-                Configs.IoCContainerTransient.Resolve<IService1>();
-                Configs.IoCContainerTransient.Resolve<IService1>();
-                Configs.IoCContainerTransient.Resolve<IService1>();
-                Configs.IoCContainerTransient.Resolve<IService1>();
+                Configs.IoCContainerTransient.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerTransient.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerTransient.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerTransient.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerTransient.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerTransient.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerTransient.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerTransient.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerTransient.Resolve<IService1>().DoSomething();
+                Configs.IoCContainerTransient.Resolve<IService1>().DoSomething();
             }
         }
 
@@ -56,16 +56,16 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
-                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs);
-                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs);
-                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs);
-                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs);
-                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs);
-                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs);
-                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs);
-                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs);
-                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs);
-                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs);
+                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs).DoSomething();
+                Configs.IoCContainerTransientResolve(Configs.IoCContainerTransient, Configs.EmptyArgs).DoSomething();
             }
         }
 
@@ -74,7 +74,7 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count * 10; i++)
             {
-                Configs.AutofacTransient.Resolve<IService1>();
+                Configs.AutofacTransient.Resolve<IService1>().DoSomething();
             }
         }
 
@@ -83,7 +83,7 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count; i++)
             {
-                Configs.CastleWindsorTransient.Resolve<IService1>();
+                Configs.CastleWindsorTransient.Resolve<IService1>().DoSomething();
             }
         }
 
@@ -92,16 +92,16 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
-                Configs.DryIocTransient.Resolve<IService1>();
-                Configs.DryIocTransient.Resolve<IService1>();
-                Configs.DryIocTransient.Resolve<IService1>();
-                Configs.DryIocTransient.Resolve<IService1>();
-                Configs.DryIocTransient.Resolve<IService1>();
-                Configs.DryIocTransient.Resolve<IService1>();
-                Configs.DryIocTransient.Resolve<IService1>();
-                Configs.DryIocTransient.Resolve<IService1>();
-                Configs.DryIocTransient.Resolve<IService1>();
-                Configs.DryIocTransient.Resolve<IService1>();
+                Configs.DryIocTransient.Resolve<IService1>().DoSomething();
+                Configs.DryIocTransient.Resolve<IService1>().DoSomething();
+                Configs.DryIocTransient.Resolve<IService1>().DoSomething();
+                Configs.DryIocTransient.Resolve<IService1>().DoSomething();
+                Configs.DryIocTransient.Resolve<IService1>().DoSomething();
+                Configs.DryIocTransient.Resolve<IService1>().DoSomething();
+                Configs.DryIocTransient.Resolve<IService1>().DoSomething();
+                Configs.DryIocTransient.Resolve<IService1>().DoSomething();
+                Configs.DryIocTransient.Resolve<IService1>().DoSomething();
+                Configs.DryIocTransient.Resolve<IService1>().DoSomething();
             }
         }
 
@@ -110,16 +110,16 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
-                Configs.LightInjectTransient.GetInstance<IService1>();
-                Configs.LightInjectTransient.GetInstance<IService1>();
-                Configs.LightInjectTransient.GetInstance<IService1>();
-                Configs.LightInjectTransient.GetInstance<IService1>();
-                Configs.LightInjectTransient.GetInstance<IService1>();
-                Configs.LightInjectTransient.GetInstance<IService1>();
-                Configs.LightInjectTransient.GetInstance<IService1>();
-                Configs.LightInjectTransient.GetInstance<IService1>();
-                Configs.LightInjectTransient.GetInstance<IService1>();
-                Configs.LightInjectTransient.GetInstance<IService1>();
+                Configs.LightInjectTransient.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectTransient.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectTransient.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectTransient.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectTransient.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectTransient.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectTransient.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectTransient.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectTransient.GetInstance<IService1>().DoSomething();
+                Configs.LightInjectTransient.GetInstance<IService1>().DoSomething();
             }
         }
 
@@ -128,7 +128,7 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count; i++)
             {
-                Configs.NinjectTransient.Get<IService1>();
+                Configs.NinjectTransient.Get<IService1>().DoSomething();
             }
         }
 
@@ -137,7 +137,7 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < Configs.Count; i++)
             {
-                Configs.UnityTransient.Resolve<IService1>();
+                Configs.UnityTransient.Resolve<IService1>().DoSomething();
             }
         }
 
