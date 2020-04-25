@@ -32,7 +32,7 @@
                 var lifetimeName = match.Groups[1].Value.Replace(" ", string.Empty).Replace($"{nameof(Lifetime)}.", string.Empty).Trim();
                 try
                 {
-                    dst = (Lifetime) Enum.Parse(TypeDescriptor<Lifetime>.Type, lifetimeName, true);
+                    dst = (Lifetime) Enum.Parse(typeof(Lifetime), lifetimeName, true);
                 }
                 catch (Exception)
                 {

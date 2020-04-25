@@ -13,12 +13,12 @@
         /// The container parameter.
         /// </summary>
         [NotNull]
-        public static readonly ParameterExpression ContainerParameter = Expression.Parameter(TypeDescriptor<IContainer>.Type, nameof(Context.Container));
+        public static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer), nameof(Context.Container));
 
         /// <summary>
         /// The args parameters.
         /// </summary>
         [NotNull]
-        public static readonly ParameterExpression ArgsParameter = Expression.Parameter(TypeDescriptor<object[]>.Type, nameof(Context.Args));
+        public static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]), nameof(Context.Args));
     }
 }

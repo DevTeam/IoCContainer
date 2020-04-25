@@ -47,7 +47,7 @@
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, Tag tag)
-            => container.GetResolver<T>(TypeDescriptor<T>.Type, tag);
+            => container.GetResolver<T>(typeof(T), tag);
 
         /// <summary>
         /// Tries getting the resolver.
@@ -59,7 +59,7 @@
         /// <returns>True if success.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, Tag tag, [NotNull] out Resolver<T> resolver)
-            => container.TryGetResolver(TypeDescriptor<T>.Type, tag, out resolver);
+            => container.TryGetResolver(typeof(T), tag, out resolver);
 
         /// <summary>
         /// Gets the resolver.
@@ -94,7 +94,7 @@
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container)
-            => container.GetResolver<T>(TypeDescriptor<T>.Type);
+            => container.GetResolver<T>(typeof(T));
 
         /// <summary>
         /// Tries getting the resolver.
@@ -105,7 +105,7 @@
         /// <returns>True if success.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, [NotNull] out Resolver<T> resolver)
-            => container.TryGetResolver(TypeDescriptor<T>.Type, out resolver);
+            => container.TryGetResolver(typeof(T), out resolver);
 
         /// <summary>
         /// Creates tag.

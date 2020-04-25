@@ -6,12 +6,10 @@
     [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
     internal static class TypeDescriptor<T>
     {
-        [NotNull] public static readonly Type Type = typeof(T);
+        public static readonly int HashCode = typeof(T).GetHashCode();
 
-        public static readonly int HashCode = Type.GetHashCode();
+        public static readonly TypeDescriptor Descriptor = new TypeDescriptor(typeof(T));
 
-        public static readonly TypeDescriptor Descriptor = new TypeDescriptor(Type);
-
-        public static readonly Key Key = new Key(Type);
+        public static readonly Key Key = new Key(typeof(T));
     }
 }

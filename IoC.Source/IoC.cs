@@ -1270,7 +1270,7 @@ namespace IoC
             }
             else
             {
-                rootContainer.ApplyConfigurations(Features.CoreFeature.Set);
+                rootContainer.ApplyConfigurations(Features.DefaultFeature.Set);
             }
 
             // Create a target container
@@ -2080,7 +2080,7 @@ namespace IoC
         public static IBinding<T> Bind<T>([NotNull] this IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type);
+            return new Binding<T>(container, typeof(T));
         }
 
         /// <summary>
@@ -2094,7 +2094,7 @@ namespace IoC
         public static IBinding<T> Bind<T>([NotNull] this IToken token)
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type);
+            return new Binding<T>(token, typeof(T));
         }
 
         /// <summary>
@@ -2108,7 +2108,7 @@ namespace IoC
         public static IBinding<T> Bind<T>([NotNull] this IBinding binding)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type);
+            return new Binding<T>(binding, typeof(T));
         }
 
         /// <summary>
@@ -2221,7 +2221,7 @@ namespace IoC
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return CreateDependencyToken(binding, CreateDependency(binding, new FullAutowiringDependency(TypeDescriptor<T>.Type, binding.AutowiringStrategy, statements)));
+            return CreateDependencyToken(binding, CreateDependency(binding, new FullAutowiringDependency(typeof(T), binding.AutowiringStrategy, statements)));
         }
 
         /// <summary>
@@ -2300,7 +2300,7 @@ namespace IoC
             where T: T1
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1));
         }
 
         
@@ -2317,7 +2317,7 @@ namespace IoC
             where T: T1
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1));
         }
 
         /// <summary>
@@ -2333,7 +2333,7 @@ namespace IoC
             where T: T1
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1));
         }
         /// <summary>
         /// Binds multiple types.
@@ -2349,7 +2349,7 @@ namespace IoC
             where T: T1, T2
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2));
         }
 
         
@@ -2367,7 +2367,7 @@ namespace IoC
             where T: T1, T2
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2));
         }
 
         /// <summary>
@@ -2384,7 +2384,7 @@ namespace IoC
             where T: T1, T2
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2));
         }
         /// <summary>
         /// Binds multiple types.
@@ -2401,7 +2401,7 @@ namespace IoC
             where T: T1, T2, T3
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3));
         }
 
         
@@ -2420,7 +2420,7 @@ namespace IoC
             where T: T1, T2, T3
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3));
         }
 
         /// <summary>
@@ -2438,7 +2438,7 @@ namespace IoC
             where T: T1, T2, T3
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3));
         }
         /// <summary>
         /// Binds multiple types.
@@ -2456,7 +2456,7 @@ namespace IoC
             where T: T1, T2, T3, T4
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
         }
 
         
@@ -2476,7 +2476,7 @@ namespace IoC
             where T: T1, T2, T3, T4
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
         }
 
         /// <summary>
@@ -2495,7 +2495,7 @@ namespace IoC
             where T: T1, T2, T3, T4
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4));
         }
         /// <summary>
         /// Binds multiple types.
@@ -2514,7 +2514,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
         }
 
         
@@ -2535,7 +2535,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
         }
 
         /// <summary>
@@ -2555,7 +2555,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5));
         }
         /// <summary>
         /// Binds multiple types.
@@ -2575,7 +2575,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
         }
 
         
@@ -2597,7 +2597,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
         }
 
         /// <summary>
@@ -2618,7 +2618,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6));
         }
         /// <summary>
         /// Binds multiple types.
@@ -2639,7 +2639,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
         }
 
         
@@ -2662,7 +2662,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
         }
 
         /// <summary>
@@ -2684,7 +2684,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7));
         }
         /// <summary>
         /// Binds multiple types.
@@ -2706,7 +2706,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8));
         }
 
         
@@ -2730,7 +2730,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8));
         }
 
         /// <summary>
@@ -2753,7 +2753,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8));
         }
         /// <summary>
         /// Binds multiple types.
@@ -2776,7 +2776,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9));
         }
 
         
@@ -2801,7 +2801,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9));
         }
 
         /// <summary>
@@ -2825,7 +2825,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9));
         }
         /// <summary>
         /// Binds multiple types.
@@ -2849,7 +2849,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10));
         }
 
         
@@ -2875,7 +2875,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10));
         }
 
         /// <summary>
@@ -2900,7 +2900,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10));
         }
         /// <summary>
         /// Binds multiple types.
@@ -2925,7 +2925,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11));
         }
 
         
@@ -2952,7 +2952,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11));
         }
 
         /// <summary>
@@ -2978,7 +2978,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11));
         }
         /// <summary>
         /// Binds multiple types.
@@ -3004,7 +3004,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12));
         }
 
         
@@ -3032,7 +3032,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12));
         }
 
         /// <summary>
@@ -3059,7 +3059,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12));
         }
         /// <summary>
         /// Binds multiple types.
@@ -3086,7 +3086,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13));
         }
 
         
@@ -3115,7 +3115,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13));
         }
 
         /// <summary>
@@ -3143,7 +3143,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13));
         }
         /// <summary>
         /// Binds multiple types.
@@ -3171,7 +3171,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14));
         }
 
         
@@ -3201,7 +3201,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14));
         }
 
         /// <summary>
@@ -3230,7 +3230,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14));
         }
         /// <summary>
         /// Binds multiple types.
@@ -3259,7 +3259,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15));
         }
 
         
@@ -3290,7 +3290,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15));
         }
 
         /// <summary>
@@ -3320,7 +3320,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15));
         }
         /// <summary>
         /// Binds multiple types.
@@ -3350,7 +3350,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16));
         }
 
         
@@ -3382,7 +3382,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16));
         }
 
         /// <summary>
@@ -3413,7 +3413,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16));
         }
         /// <summary>
         /// Binds multiple types.
@@ -3444,7 +3444,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17));
         }
 
         
@@ -3477,7 +3477,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17));
         }
 
         /// <summary>
@@ -3509,7 +3509,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17));
         }
         /// <summary>
         /// Binds multiple types.
@@ -3541,7 +3541,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18));
         }
 
         
@@ -3575,7 +3575,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18));
         }
 
         /// <summary>
@@ -3608,7 +3608,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18));
         }
         /// <summary>
         /// Binds multiple types.
@@ -3641,7 +3641,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19));
         }
 
         
@@ -3676,7 +3676,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19));
         }
 
         /// <summary>
@@ -3710,7 +3710,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19));
         }
         /// <summary>
         /// Binds multiple types.
@@ -3744,7 +3744,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20));
         }
 
         
@@ -3780,7 +3780,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20));
         }
 
         /// <summary>
@@ -3815,7 +3815,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20));
         }
         /// <summary>
         /// Binds multiple types.
@@ -3850,7 +3850,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21));
         }
 
         
@@ -3887,7 +3887,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21));
         }
 
         /// <summary>
@@ -3923,7 +3923,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21));
         }
         /// <summary>
         /// Binds multiple types.
@@ -3959,7 +3959,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22));
         }
 
         
@@ -3997,7 +3997,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22));
         }
 
         /// <summary>
@@ -4034,7 +4034,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22));
         }
         /// <summary>
         /// Binds multiple types.
@@ -4071,7 +4071,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23));
         }
 
         
@@ -4110,7 +4110,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23));
         }
 
         /// <summary>
@@ -4148,7 +4148,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23));
         }
         /// <summary>
         /// Binds multiple types.
@@ -4186,7 +4186,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24));
         }
 
         
@@ -4226,7 +4226,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24));
         }
 
         /// <summary>
@@ -4265,7 +4265,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24));
         }
         /// <summary>
         /// Binds multiple types.
@@ -4304,7 +4304,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25));
         }
 
         
@@ -4345,7 +4345,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25));
         }
 
         /// <summary>
@@ -4385,7 +4385,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25));
         }
         /// <summary>
         /// Binds multiple types.
@@ -4425,7 +4425,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26));
         }
 
         
@@ -4467,7 +4467,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26));
         }
 
         /// <summary>
@@ -4508,7 +4508,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26));
         }
         /// <summary>
         /// Binds multiple types.
@@ -4549,7 +4549,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27));
         }
 
         
@@ -4592,7 +4592,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27));
         }
 
         /// <summary>
@@ -4634,7 +4634,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27));
         }
         /// <summary>
         /// Binds multiple types.
@@ -4676,7 +4676,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28));
         }
 
         
@@ -4720,7 +4720,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28));
         }
 
         /// <summary>
@@ -4763,7 +4763,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28));
         }
         /// <summary>
         /// Binds multiple types.
@@ -4806,7 +4806,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28), typeof(T29));
         }
 
         
@@ -4851,7 +4851,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28), typeof(T29));
         }
 
         /// <summary>
@@ -4895,7 +4895,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28), typeof(T29));
         }
         /// <summary>
         /// Binds multiple types.
@@ -4939,7 +4939,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28), typeof(T29), typeof(T30));
         }
 
         
@@ -4985,7 +4985,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28), typeof(T29), typeof(T30));
         }
 
         /// <summary>
@@ -5030,7 +5030,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28), typeof(T29), typeof(T30));
         }
         /// <summary>
         /// Binds multiple types.
@@ -5075,7 +5075,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type, TypeDescriptor<T31>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28), typeof(T29), typeof(T30), typeof(T31));
         }
 
         
@@ -5122,7 +5122,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type, TypeDescriptor<T31>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28), typeof(T29), typeof(T30), typeof(T31));
         }
 
         /// <summary>
@@ -5168,7 +5168,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type, TypeDescriptor<T31>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28), typeof(T29), typeof(T30), typeof(T31));
         }
         /// <summary>
         /// Binds multiple types.
@@ -5214,7 +5214,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type, TypeDescriptor<T31>.Type, TypeDescriptor<T32>.Type);
+            return new Binding<T>(container, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28), typeof(T29), typeof(T30), typeof(T31), typeof(T32));
         }
 
         
@@ -5262,7 +5262,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type, TypeDescriptor<T31>.Type, TypeDescriptor<T32>.Type);
+            return new Binding<T>(binding, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28), typeof(T29), typeof(T30), typeof(T31), typeof(T32));
         }
 
         /// <summary>
@@ -5309,7 +5309,7 @@ namespace IoC
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type, TypeDescriptor<T4>.Type, TypeDescriptor<T5>.Type, TypeDescriptor<T6>.Type, TypeDescriptor<T7>.Type, TypeDescriptor<T8>.Type, TypeDescriptor<T9>.Type, TypeDescriptor<T10>.Type, TypeDescriptor<T11>.Type, TypeDescriptor<T12>.Type, TypeDescriptor<T13>.Type, TypeDescriptor<T14>.Type, TypeDescriptor<T15>.Type, TypeDescriptor<T16>.Type, TypeDescriptor<T17>.Type, TypeDescriptor<T18>.Type, TypeDescriptor<T19>.Type, TypeDescriptor<T20>.Type, TypeDescriptor<T21>.Type, TypeDescriptor<T22>.Type, TypeDescriptor<T23>.Type, TypeDescriptor<T24>.Type, TypeDescriptor<T25>.Type, TypeDescriptor<T26>.Type, TypeDescriptor<T27>.Type, TypeDescriptor<T28>.Type, TypeDescriptor<T29>.Type, TypeDescriptor<T30>.Type, TypeDescriptor<T31>.Type, TypeDescriptor<T32>.Type);
+            return new Binding<T>(token, typeof(T), typeof(T1), typeof(T2), typeof(T3), typeof(T4), typeof(T5), typeof(T6), typeof(T7), typeof(T8), typeof(T9), typeof(T10), typeof(T11), typeof(T12), typeof(T13), typeof(T14), typeof(T15), typeof(T16), typeof(T17), typeof(T18), typeof(T19), typeof(T20), typeof(T21), typeof(T22), typeof(T23), typeof(T24), typeof(T25), typeof(T26), typeof(T27), typeof(T28), typeof(T29), typeof(T30), typeof(T31), typeof(T32));
         }
     }
 }
@@ -5744,7 +5744,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, Tag tag)
-            => container.GetResolver<T>(TypeDescriptor<T>.Type, tag);
+            => container.GetResolver<T>(typeof(T), tag);
 
         /// <summary>
         /// Tries getting the resolver.
@@ -5756,7 +5756,7 @@ namespace IoC
         /// <returns>True if success.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, Tag tag, [NotNull] out Resolver<T> resolver)
-            => container.TryGetResolver(TypeDescriptor<T>.Type, tag, out resolver);
+            => container.TryGetResolver(typeof(T), tag, out resolver);
 
         /// <summary>
         /// Gets the resolver.
@@ -5791,7 +5791,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container)
-            => container.GetResolver<T>(TypeDescriptor<T>.Type);
+            => container.GetResolver<T>(typeof(T));
 
         /// <summary>
         /// Tries getting the resolver.
@@ -5802,7 +5802,7 @@ namespace IoC
         /// <returns>True if success.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, [NotNull] out Resolver<T> resolver)
-            => container.TryGetResolver(TypeDescriptor<T>.Type, out resolver);
+            => container.TryGetResolver(typeof(T), out resolver);
 
         /// <summary>
         /// Creates tag.
@@ -5842,8 +5842,24 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
-                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, EmptyArgs);
+            var table = container.ResolversByType;
+            var items = table.Buckets[TypeDescriptor<T>.HashCode & table.Divisor].KeyValues;
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
+                if (ReferenceEquals(typeof(T), item.Key))
+#else
+                // ReSharper disable once PossibleUnintendedReferenceComparison
+                if (typeof(T) == item.Key)
+#endif
+                {
+                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
+                }
+            }
+
+            return container.GetResolver<T>(typeof(T))(container, EmptyArgs);
         }
 
         /// <summary>
@@ -5857,9 +5873,9 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, Tag tag)
         {
-            var key = new Key(TypeDescriptor<T>.Type, tag);
+            var key = new Key(typeof(T), tag);
             return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
-                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, EmptyArgs);
+                    ?? container.GetResolver<T>(typeof(T), tag))(container, EmptyArgs);
         }
 
         /// <summary>
@@ -5873,8 +5889,8 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(TypeDescriptor<T>.HashCode, TypeDescriptor<T>.Type)
-                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type))(container, args);
+            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(TypeDescriptor<T>.HashCode, typeof(T))
+                    ?? container.GetResolver<T>(typeof(T)))(container, args);
         }
 
         /// <summary>
@@ -5889,9 +5905,9 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            var key = new Key(TypeDescriptor<T>.Type, tag);
+            var key = new Key(typeof(T), tag);
             return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
-                    ?? container.GetResolver<T>(TypeDescriptor<T>.Type, tag))(container, args);
+                    ?? container.GetResolver<T>(typeof(T), tag))(container, args);
         }
 
         /// <summary>
@@ -5989,7 +6005,9 @@ namespace IoC
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container)
-            => container.GetResolver<T>()(container, EmptyArgs);
+        {
+            return container.GetResolver<T>()(container, EmptyArgs);
+        }
 
         /// <summary>
         /// Resolves an instance.
@@ -7628,39 +7646,39 @@ namespace IoC
     {
         internal static readonly System.Type[] Arguments =
         {
-            Core.TypeDescriptor<TT>.Type,
-            Core.TypeDescriptor<TT1>.Type,
-            Core.TypeDescriptor<TT2>.Type,
-            Core.TypeDescriptor<TT3>.Type,
-            Core.TypeDescriptor<TT4>.Type,
-            Core.TypeDescriptor<TT5>.Type,
-            Core.TypeDescriptor<TT6>.Type,
-            Core.TypeDescriptor<TT7>.Type,
-            Core.TypeDescriptor<TT8>.Type,
-            Core.TypeDescriptor<TT9>.Type,
-            Core.TypeDescriptor<TT10>.Type,
-            Core.TypeDescriptor<TT11>.Type,
-            Core.TypeDescriptor<TT12>.Type,
-            Core.TypeDescriptor<TT13>.Type,
-            Core.TypeDescriptor<TT14>.Type,
-            Core.TypeDescriptor<TT15>.Type,
-            Core.TypeDescriptor<TT16>.Type,
-            Core.TypeDescriptor<TT17>.Type,
-            Core.TypeDescriptor<TT18>.Type,
-            Core.TypeDescriptor<TT19>.Type,
-            Core.TypeDescriptor<TT20>.Type,
-            Core.TypeDescriptor<TT21>.Type,
-            Core.TypeDescriptor<TT22>.Type,
-            Core.TypeDescriptor<TT23>.Type,
-            Core.TypeDescriptor<TT24>.Type,
-            Core.TypeDescriptor<TT25>.Type,
-            Core.TypeDescriptor<TT26>.Type,
-            Core.TypeDescriptor<TT27>.Type,
-            Core.TypeDescriptor<TT28>.Type,
-            Core.TypeDescriptor<TT29>.Type,
-            Core.TypeDescriptor<TT30>.Type,
-            Core.TypeDescriptor<TT31>.Type,
-            Core.TypeDescriptor<TT32>.Type,
+            typeof(TT),
+            typeof(TT1),
+            typeof(TT2),
+            typeof(TT3),
+            typeof(TT4),
+            typeof(TT5),
+            typeof(TT6),
+            typeof(TT7),
+            typeof(TT8),
+            typeof(TT9),
+            typeof(TT10),
+            typeof(TT11),
+            typeof(TT12),
+            typeof(TT13),
+            typeof(TT14),
+            typeof(TT15),
+            typeof(TT16),
+            typeof(TT17),
+            typeof(TT18),
+            typeof(TT19),
+            typeof(TT20),
+            typeof(TT21),
+            typeof(TT22),
+            typeof(TT23),
+            typeof(TT24),
+            typeof(TT25),
+            typeof(TT26),
+            typeof(TT27),
+            typeof(TT28),
+            typeof(TT29),
+            typeof(TT30),
+            typeof(TT31),
+            typeof(TT32),
         };
     }
 }
@@ -8405,7 +8423,13 @@ namespace IoC
         {
             // ReSharper disable once PossibleNullReferenceException
             var other = (Key)obj;
-            return ReferenceEquals(Type, other.Type) && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
+            return
+#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
+                ReferenceEquals(Type, other.Type)
+#else
+                Type == other.Type
+#endif
+                && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
         }
 
         /// <inheritdoc />
@@ -8553,13 +8577,13 @@ namespace IoC
         /// The container parameter.
         /// </summary>
         [NotNull]
-        public static readonly ParameterExpression ContainerParameter = Expression.Parameter(TypeDescriptor<IContainer>.Type, nameof(Context.Container));
+        public static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer), nameof(Context.Container));
 
         /// <summary>
         /// The args parameters.
         /// </summary>
         [NotNull]
-        public static readonly ParameterExpression ArgsParameter = Expression.Parameter(TypeDescriptor<object[]>.Type, nameof(Context.Args));
+        public static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]), nameof(Context.Args));
     }
 }
 
@@ -9422,7 +9446,7 @@ namespace IoC.Lifetimes
         private static readonly MethodInfo GetMethodInfo = typeof(CoreExtensions).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(CoreExtensions.Get)).MakeGenericMethod(typeof(TKey), typeof(object));
         private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
-        private static readonly ParameterExpression KeyVar = Expression.Variable(TypeDescriptor<TKey>.Type, "key");
+        private static readonly ParameterExpression KeyVar = Expression.Variable(typeof(TKey), "key");
 
         [NotNull] private readonly ILockObject _lockObject = new LockObject();
         private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
@@ -9532,7 +9556,7 @@ namespace IoC.Lifetimes
 
     internal static class SingletonBasedLifetimeShared
     {
-        internal static readonly ParameterExpression HashCodeVar = Expression.Variable(TypeDescriptor<int>.Type, "hashCode");
+        internal static readonly ParameterExpression HashCodeVar = Expression.Variable(typeof(int), "hashCode");
     }
 }
 
@@ -11321,7 +11345,7 @@ namespace IoC.Core
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (expression.CanReduce)
             {
-                expression = (LambdaExpression)expression.Reduce();
+                expression = (LambdaExpression)expression.Reduce().ReduceExtensions();
             }
 
             resolver = expression.Compile();
@@ -11763,7 +11787,7 @@ namespace IoC.Core
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            if (node.Type == TypeDescriptor<Context>.Type)
+            if (node.Type == typeof(Context))
             {
                 return CreateNewContextExpression();
             }
@@ -11821,7 +11845,7 @@ namespace IoC.Core
 
         private IContainer SelectedContainer([NotNull] Expression containerExpression)
         {
-            if (containerExpression is ParameterExpression parameterExpression && parameterExpression.Type == TypeDescriptor<IContainer>.Type)
+            if (containerExpression is ParameterExpression parameterExpression && parameterExpression.Type == typeof(IContainer))
             {
                 return _container;
             }
@@ -12021,7 +12045,7 @@ namespace IoC.Core
         private static readonly TypeDescriptor ResolverGenericTypeDescriptor = typeof(Resolver<>).Descriptor();
         internal static readonly MethodInfo GetHashCodeMethodInfo = Descriptor<object>().GetDeclaredMethods().Single(i => i.Name == nameof(GetHashCode));
         internal static readonly Expression NullConst = Expression.Constant(null);
-        internal static readonly Expression ContainerExpression = Expression.Field(Expression.Constant(null, TypeDescriptor<Context>.Type), nameof(Context.Container));
+        internal static readonly Expression ContainerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
         private static readonly MethodInfo EnterMethodInfo = typeof(Monitor).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Monitor.Enter) && i.GetParameters().Length == 1);
         private static readonly MethodInfo ExitMethodInfo = typeof(Monitor).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Monitor.Exit));
 
@@ -12086,7 +12110,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         [IoC.NotNull]
         public static IToken Register<T>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
-            => container.Register(new[] { TypeDescriptor<T>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { typeof(T)}, new FullAutowiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -12101,7 +12125,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         [IoC.NotNull]
         public static IToken Register<T>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            => container.Register(new[] { TypeDescriptor<T>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+            => container.Register(new[] { typeof(T) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -12158,7 +12182,7 @@ namespace IoC.Core
         [NotNull]
         public static IToken Register<T, T1>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1
-            => container.Register(new[] { TypeDescriptor<T1>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { typeof(T1) }, new FullAutowiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -12176,7 +12200,7 @@ namespace IoC.Core
         public static IToken Register<T, T1>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1
             // ReSharper disable once CoVariantArrayConversion
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+            => container.Register(new[] { typeof(T), typeof(T1) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -12192,7 +12216,7 @@ namespace IoC.Core
         [NotNull]
         public static IToken Register<T, T1, T2>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1, T2
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2) }, new FullAutowiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -12211,7 +12235,7 @@ namespace IoC.Core
         public static IToken Register<T, T1, T2>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1, T2
             // ReSharper disable once CoVariantArrayConversion
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -12228,7 +12252,7 @@ namespace IoC.Core
         [NotNull]
         public static IToken Register<T, T1, T2, T3>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1, T2, T3
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3) }, new FullAutowiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -12248,7 +12272,7 @@ namespace IoC.Core
         public static IToken Register<T, T1, T2, T3>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1, T2, T3
             // ReSharper disable once CoVariantArrayConversion
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2), typeof(T3) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
 
     }
 }
@@ -13438,7 +13462,7 @@ namespace IoC.Core
         [Pure]
         public bool IsGenericTypeDefinition() => Type.IsGenericTypeDefinition;
 
-        public bool IsGenericTypeArgument() => Type.GetCustomAttributes(TypeDescriptor<GenericTypeArgumentAttribute>.Type, true).Length > 0;
+        public bool IsGenericTypeArgument() => Type.GetCustomAttributes(typeof(GenericTypeArgumentAttribute), true).Length > 0;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
@@ -13725,13 +13749,11 @@ namespace IoC.Core
     [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
     internal static class TypeDescriptor<T>
     {
-        [NotNull] public static readonly Type Type = typeof(T);
+        public static readonly int HashCode = typeof(T).GetHashCode();
 
-        public static readonly int HashCode = Type.GetHashCode();
+        public static readonly TypeDescriptor Descriptor = new TypeDescriptor(typeof(T));
 
-        public static readonly TypeDescriptor Descriptor = new TypeDescriptor(Type);
-
-        public static readonly Key Key = new Key(Type);
+        public static readonly Key Key = new Key(typeof(T));
     }
 }
 
@@ -14511,7 +14533,7 @@ namespace IoC.Core.Configuration
                 var lifetimeName = match.Groups[1].Value.Replace(" ", string.Empty).Replace($"{nameof(Lifetime)}.", string.Empty).Trim();
                 try
                 {
-                    dst = (Lifetime) Enum.Parse(TypeDescriptor<Lifetime>.Type, lifetimeName, true);
+                    dst = (Lifetime) Enum.Parse(typeof(Lifetime), lifetimeName, true);
                 }
                 catch (Exception)
                 {
@@ -14631,20 +14653,20 @@ namespace IoC.Core.Configuration
         // ReSharper disable StringLiteralTypo
         internal static readonly IDictionary<string, Type> PrimitiveTypes = new Dictionary<string, Type>
         {
-            {"byte", TypeDescriptor<byte>.Type},
-            {"sbyte", TypeDescriptor<sbyte>.Type},
-            {"int", TypeDescriptor<int>.Type},
-            {"uint", TypeDescriptor<uint>.Type},
-            {"short", TypeDescriptor<short>.Type},
-            {"ushort", TypeDescriptor<ushort>.Type},
-            {"long", TypeDescriptor<long>.Type},
-            {"ulong", TypeDescriptor<ulong>.Type},
-            {"float", TypeDescriptor<float>.Type},
-            {"double", TypeDescriptor<double>.Type},
-            {"char", TypeDescriptor<char>.Type},
-            {"object", TypeDescriptor<object>.Type},
-            {"string", TypeDescriptor<string>.Type},
-            {"decimal", TypeDescriptor<decimal>.Type}
+            {"byte", typeof(byte)},
+            {"sbyte", typeof(sbyte)},
+            {"int", typeof(int)},
+            {"uint", typeof(uint)},
+            {"short", typeof(short)},
+            {"ushort", typeof(ushort)},
+            {"long", typeof(long)},
+            {"ulong", typeof(ulong)},
+            {"float", typeof(float)},
+            {"double", typeof(double)},
+            {"char", typeof(char)},
+            {"object", typeof(object)},
+            {"string", typeof(string)},
+            {"decimal", typeof(decimal)}
         };
 
         public bool TryConvert(BindingContext context, string typeName, out Type dst)

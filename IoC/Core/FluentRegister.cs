@@ -29,7 +29,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         [IoC.NotNull]
         public static IToken Register<T>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
-            => container.Register(new[] { TypeDescriptor<T>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { typeof(T)}, new FullAutowiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -44,7 +44,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)256)]
         [IoC.NotNull]
         public static IToken Register<T>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            => container.Register(new[] { TypeDescriptor<T>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+            => container.Register(new[] { typeof(T) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.

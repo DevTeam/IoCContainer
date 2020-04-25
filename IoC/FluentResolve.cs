@@ -22,7 +22,9 @@
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container)
-            => container.GetResolver<T>()(container, EmptyArgs);
+        {
+            return container.GetResolver<T>()(container, EmptyArgs);
+        }
 
         /// <summary>
         /// Resolves an instance.

@@ -20,7 +20,7 @@
         private static readonly MethodInfo GetMethodInfo = typeof(CoreExtensions).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(CoreExtensions.Get)).MakeGenericMethod(typeof(TKey), typeof(object));
         private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
-        private static readonly ParameterExpression KeyVar = Expression.Variable(TypeDescriptor<TKey>.Type, "key");
+        private static readonly ParameterExpression KeyVar = Expression.Variable(typeof(TKey), "key");
 
         [NotNull] private readonly ILockObject _lockObject = new LockObject();
         private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
@@ -130,6 +130,6 @@
 
     internal static class SingletonBasedLifetimeShared
     {
-        internal static readonly ParameterExpression HashCodeVar = Expression.Variable(TypeDescriptor<int>.Type, "hashCode");
+        internal static readonly ParameterExpression HashCodeVar = Expression.Variable(typeof(int), "hashCode");
     }
 }

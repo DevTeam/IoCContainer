@@ -14,7 +14,7 @@
             if (expression == null) throw new ArgumentNullException(nameof(expression));
             if (expression.CanReduce)
             {
-                expression = (LambdaExpression)expression.Reduce();
+                expression = (LambdaExpression)expression.Reduce().ReduceExtensions();
             }
 
             resolver = expression.Compile();

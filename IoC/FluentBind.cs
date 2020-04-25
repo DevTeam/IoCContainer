@@ -57,7 +57,7 @@
         public static IBinding<T> Bind<T>([NotNull] this IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type);
+            return new Binding<T>(container, typeof(T));
         }
 
         /// <summary>
@@ -71,7 +71,7 @@
         public static IBinding<T> Bind<T>([NotNull] this IToken token)
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type);
+            return new Binding<T>(token, typeof(T));
         }
 
         /// <summary>
@@ -85,7 +85,7 @@
         public static IBinding<T> Bind<T>([NotNull] this IBinding binding)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type);
+            return new Binding<T>(binding, typeof(T));
         }
 
         /// <summary>
@@ -198,7 +198,7 @@
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return CreateDependencyToken(binding, CreateDependency(binding, new FullAutowiringDependency(TypeDescriptor<T>.Type, binding.AutowiringStrategy, statements)));
+            return CreateDependencyToken(binding, CreateDependency(binding, new FullAutowiringDependency(typeof(T), binding.AutowiringStrategy, statements)));
         }
 
         /// <summary>

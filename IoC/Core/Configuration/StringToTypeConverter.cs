@@ -12,20 +12,20 @@
         // ReSharper disable StringLiteralTypo
         internal static readonly IDictionary<string, Type> PrimitiveTypes = new Dictionary<string, Type>
         {
-            {"byte", TypeDescriptor<byte>.Type},
-            {"sbyte", TypeDescriptor<sbyte>.Type},
-            {"int", TypeDescriptor<int>.Type},
-            {"uint", TypeDescriptor<uint>.Type},
-            {"short", TypeDescriptor<short>.Type},
-            {"ushort", TypeDescriptor<ushort>.Type},
-            {"long", TypeDescriptor<long>.Type},
-            {"ulong", TypeDescriptor<ulong>.Type},
-            {"float", TypeDescriptor<float>.Type},
-            {"double", TypeDescriptor<double>.Type},
-            {"char", TypeDescriptor<char>.Type},
-            {"object", TypeDescriptor<object>.Type},
-            {"string", TypeDescriptor<string>.Type},
-            {"decimal", TypeDescriptor<decimal>.Type}
+            {"byte", typeof(byte)},
+            {"sbyte", typeof(sbyte)},
+            {"int", typeof(int)},
+            {"uint", typeof(uint)},
+            {"short", typeof(short)},
+            {"ushort", typeof(ushort)},
+            {"long", typeof(long)},
+            {"ulong", typeof(ulong)},
+            {"float", typeof(float)},
+            {"double", typeof(double)},
+            {"char", typeof(char)},
+            {"object", typeof(object)},
+            {"string", typeof(string)},
+            {"decimal", typeof(decimal)}
         };
 
         public bool TryConvert(BindingContext context, string typeName, out Type dst)

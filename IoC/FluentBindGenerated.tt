@@ -18,7 +18,7 @@ namespace IoC
 <#for(int num = 1; num <= 32; num++) {
 var range = Enumerable.Range(1, num);
 var types = String.Join(", ", range.Select(i => $"T{i}"));
-var args = String.Join(", ", range.Select(i => $"TypeDescriptor<T{i}>.Type"));
+var args = String.Join(", ", range.Select(i => $"typeof(T{i})"));
 #>
         /// <summary>
         /// Binds multiple types.
@@ -35,7 +35,7 @@ var args = String.Join(", ", range.Select(i => $"TypeDescriptor<T{i}>.Type"));
             where T: <#=types#>
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            return new Binding<T>(container, TypeDescriptor<T>.Type, <#=args#>);
+            return new Binding<T>(container, typeof(T), <#=args#>);
         }
 
         
@@ -54,7 +54,7 @@ var args = String.Join(", ", range.Select(i => $"TypeDescriptor<T{i}>.Type"));
             where T: <#=types#>
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
-            return new Binding<T>(binding, TypeDescriptor<T>.Type, <#=args#>);
+            return new Binding<T>(binding, typeof(T), <#=args#>);
         }
 
         /// <summary>
@@ -72,7 +72,7 @@ var args = String.Join(", ", range.Select(i => $"TypeDescriptor<T{i}>.Type"));
             where T: <#=types#>
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
-            return new Binding<T>(token, TypeDescriptor<T>.Type, <#=args#>);
+            return new Binding<T>(token, typeof(T), <#=args#>);
         }
 <#}#>
     }

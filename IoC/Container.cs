@@ -71,7 +71,7 @@
             }
             else
             {
-                rootContainer.ApplyConfigurations(Features.CoreFeature.Set);
+                rootContainer.ApplyConfigurations(Features.DefaultFeature.Set);
             }
 
             // Create a target container

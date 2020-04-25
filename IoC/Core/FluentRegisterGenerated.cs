@@ -22,7 +22,7 @@
         [NotNull]
         public static IToken Register<T, T1>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1
-            => container.Register(new[] { TypeDescriptor<T1>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { typeof(T1) }, new FullAutowiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -40,7 +40,7 @@
         public static IToken Register<T, T1>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1
             // ReSharper disable once CoVariantArrayConversion
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+            => container.Register(new[] { typeof(T), typeof(T1) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -56,7 +56,7 @@
         [NotNull]
         public static IToken Register<T, T1, T2>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1, T2
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2) }, new FullAutowiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -75,7 +75,7 @@
         public static IToken Register<T, T1, T2>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1, T2
             // ReSharper disable once CoVariantArrayConversion
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -92,7 +92,7 @@
         [NotNull]
         public static IToken Register<T, T1, T2, T3>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1, T2, T3
-            => container.Register(new[] { TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type }, new FullAutowiringDependency(TypeDescriptor<T>.Type), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3) }, new FullAutowiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -112,7 +112,7 @@
         public static IToken Register<T, T1, T2, T3>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1, T2, T3
             // ReSharper disable once CoVariantArrayConversion
-            => container.Register(new[] { TypeDescriptor<T>.Type, TypeDescriptor<T1>.Type, TypeDescriptor<T2>.Type, TypeDescriptor<T3>.Type }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2), typeof(T3) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
 
     }
 }

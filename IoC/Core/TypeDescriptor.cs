@@ -69,7 +69,7 @@ namespace IoC.Core
         [Pure]
         public bool IsGenericTypeDefinition() => Type.IsGenericTypeDefinition;
 
-        public bool IsGenericTypeArgument() => Type.GetCustomAttributes(TypeDescriptor<GenericTypeArgumentAttribute>.Type, true).Length > 0;
+        public bool IsGenericTypeArgument() => Type.GetCustomAttributes(typeof(GenericTypeArgumentAttribute), true).Length > 0;
 
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]

@@ -233,7 +233,7 @@ namespace IoC.Core
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            if (node.Type == TypeDescriptor<Context>.Type)
+            if (node.Type == typeof(Context))
             {
                 return CreateNewContextExpression();
             }
@@ -291,7 +291,7 @@ namespace IoC.Core
 
         private IContainer SelectedContainer([NotNull] Expression containerExpression)
         {
-            if (containerExpression is ParameterExpression parameterExpression && parameterExpression.Type == TypeDescriptor<IContainer>.Type)
+            if (containerExpression is ParameterExpression parameterExpression && parameterExpression.Type == typeof(IContainer))
             {
                 return _container;
             }
