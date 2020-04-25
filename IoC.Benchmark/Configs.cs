@@ -45,7 +45,7 @@ namespace IoC.Benchmark
         public static readonly UnityContainer UnityComplex = Unity.Complex();
 
         public const int Count = 100;
-        public const int ComplexCount = 100;
+        public const int ComplexCount = 10;
         public const int FastK = 100000;
     }
 }

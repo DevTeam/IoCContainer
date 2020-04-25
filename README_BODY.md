@@ -232,14 +232,24 @@ For details please see [this sample](IoC.Tests/UsageScenarios/Interception.cs).
 
 ## Why this one?
 
-![Transient](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/BenchmarkDotNet.Artifacts/results/IoC.Benchmark.Transient-report.jpg)
+### Graph of 27 transient instances
 
-![Singleton](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/BenchmarkDotNet.Artifacts/results/IoC.Benchmark.Singleton-report.jpg)
+![Transient](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/IoC.Benchmark.Transient-report.jpg)
 
-![Complex](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/BenchmarkDotNet.Artifacts/results/IoC.Benchmark.Complex-report.jpg)
+### Graph of 20 transient instances and 1 singleton instance
 
-- __Mean__ - arithmetic mean of root instances resolved per Nanosecond
+![Singleton](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/IoC.Benchmark.Singleton-report.jpg)
+
+### Graph of 364 transient instances of unique type
+
+![Complex](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/IoC.Benchmark.Complex-report.jpg)
+
+- __new__ - _Method_ when the graph of objects was constructed by operators _new_ only
+- __Mean__ - arithmetic mean of the root instances resolved per nanosecond
 - __Error__ - half of 99.9% confidence interval
 - __StdDev__ - standard deviation of all measurements
 - __Median__ - value separating the higher half of all measurements (50th percentile)
 - __1 ns__ - 1 Nanosecond (0.000000001 sec)
+
+_[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measure and analyze these results._
+

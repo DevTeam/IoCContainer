@@ -638,7 +638,14 @@
             The base IoC container implementation.
             </summary>
         </member>
-        <member name="M:IoC.Container.Create(System.String,System.Collections.Generic.IEnumerable{IoC.IConfiguration})">
+        <member name="M:IoC.Container.Create(IoC.IConfiguration[])">
+            <summary>
+            Creates a root container with default features.
+            </summary>
+            <param name="configurations"></param>
+            <returns>The root container.</returns>
+        </member>
+        <member name="M:IoC.Container.Create(System.String,IoC.IConfiguration[])">
             <summary>
             Creates a root container with default features.
             </summary>
@@ -958,7 +965,7 @@
             Allows to resolve enumeration of all instances related to corresponding bindings.
             </summary>
         </member>
-        <member name="F:IoC.Features.CollectionFeature.Default">
+        <member name="F:IoC.Features.CollectionFeature.Set">
             The default instance.
         </member>
         <member name="M:IoC.Features.CollectionFeature.Apply(IoC.IMutableContainer)">
@@ -969,7 +976,7 @@
             Allows to resolve common types like a <c>Lazy</c>.
             </summary>
         </member>
-        <member name="F:IoC.Features.CommonTypesFeature.Default">
+        <member name="F:IoC.Features.CommonTypesFeature.Set">
             The default instance.
         </member>
         <member name="M:IoC.Features.CommonTypesFeature.Apply(IoC.IMutableContainer)">
@@ -980,7 +987,7 @@
             Allows to configure via a text metadata.
             </summary>
         </member>
-        <member name="F:IoC.Features.ConfigurationFeature.Default">
+        <member name="F:IoC.Features.ConfigurationFeature.Set">
             <summary>
             The default instance.
             </summary>
@@ -993,10 +1000,21 @@
             Adds the set of core features like lifetimes and containers.
             </summary>
         </member>
-        <member name="F:IoC.Features.CoreFeature.Default">
+        <member name="F:IoC.Features.CoreFeature.Set">
             The default instance.
         </member>
         <member name="M:IoC.Features.CoreFeature.Apply(IoC.IMutableContainer)">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Features.DefaultFeature">
+            <summary>
+            Adds a set of all bundled features.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.DefaultFeature.Set">
+            The default instance.
+        </member>
+        <member name="M:IoC.Features.DefaultFeature.Apply(IoC.IMutableContainer)">
             <inheritdoc />
         </member>
         <member name="T:IoC.Features.FuncFeature">
@@ -1004,13 +1022,24 @@
             Allows to resolve Functions.
             </summary>
         </member>
-        <member name="F:IoC.Features.FuncFeature.Default">
+        <member name="F:IoC.Features.FuncFeature.Set">
             The default instance.
         </member>
-        <member name="F:IoC.Features.FuncFeature.Light">
+        <member name="F:IoC.Features.FuncFeature.LightSet">
             The high-performance instance.
         </member>
         <member name="M:IoC.Features.FuncFeature.Apply(IoC.IMutableContainer)">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Features.LightFeature">
+            <summary>
+            Adds a set of all bundled features.
+            </summary>
+        </member>
+        <member name="F:IoC.Features.LightFeature.Set">
+            The default instance.
+        </member>
+        <member name="M:IoC.Features.LightFeature.Apply(IoC.IMutableContainer)">
             <inheritdoc />
         </member>
         <member name="T:IoC.Features.Sets">
@@ -1018,27 +1047,12 @@
             Represents a feature sets.
             </summary>
         </member>
-        <member name="F:IoC.Features.Sets.Core">
-            <summary>
-            Core features.
-            </summary>
-        </member>
-        <member name="F:IoC.Features.Sets.Default">
-            <summary>
-            Default features.
-            </summary>
-        </member>
-        <member name="F:IoC.Features.Sets.Light">
-            <summary>
-            The light set of features.
-            </summary>
-        </member>
         <member name="T:IoC.Features.TaskFeature">
             <summary>
             Allows to resolve Tasks.
             </summary>
         </member>
-        <member name="F:IoC.Features.TaskFeature.Default">
+        <member name="F:IoC.Features.TaskFeature.Set">
             The default instance.
         </member>
         <member name="F:IoC.Features.TaskFeature.Tag">
@@ -1057,7 +1071,7 @@
         <member name="F:IoC.Features.TupleFeature.Default">
             The default instance.
         </member>
-        <member name="F:IoC.Features.TupleFeature.Light">
+        <member name="F:IoC.Features.TupleFeature.LightSet">
             The high-performance instance.
         </member>
         <member name="M:IoC.Features.TupleFeature.Apply(IoC.IMutableContainer)">
