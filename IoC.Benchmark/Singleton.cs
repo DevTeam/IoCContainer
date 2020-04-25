@@ -15,10 +15,10 @@ namespace IoC.Benchmark
     [BenchmarkCategory("singleton", " 20 instances and 1 singleton")]
     public class Singleton
     {
-        [Benchmark(Description = "new", OperationsPerInvoke = Configs.Series * 1000)]
+        [Benchmark(Description = "new", OperationsPerInvoke = Configs.Count * Configs.FastK * 10)]
         public void New()
         {
-            for (var i = 0; i < Configs.Series * 100; i++)
+            for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
                 NewSingleton();
                 NewSingleton();
@@ -33,10 +33,10 @@ namespace IoC.Benchmark
             }
         }
 
-        [Benchmark(Description = "IoC.Container", OperationsPerInvoke = Configs.Series * 1000)]
+        [Benchmark(Description = "IoC.Container", OperationsPerInvoke = Configs.Count * Configs.FastK * 10)]
         public void This()
         {
-            for (var i = 0; i < Configs.Series * 100; i++)
+            for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
                 Configs.IoCContainerSingleton.Resolve<IService1>();
                 Configs.IoCContainerSingleton.Resolve<IService1>();
@@ -51,10 +51,10 @@ namespace IoC.Benchmark
             }
         }
 
-        [Benchmark(Description = "IoC.Container composition root", OperationsPerInvoke = Configs.Series * 1000)]
+        [Benchmark(Description = "IoC.Container composition root", OperationsPerInvoke = Configs.Count * Configs.FastK * 10)]
         public void ThisByCR()
         {
-            for (var i = 0; i < Configs.Series * 100; i++)
+            for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
                 Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs);
                 Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs);
@@ -69,28 +69,28 @@ namespace IoC.Benchmark
             }
         }
 
-        [Benchmark(OperationsPerInvoke = Configs.Series * 10)]
+        [Benchmark(OperationsPerInvoke = Configs.Count * 10)]
         public void Autofac()
         {
-            for (var i = 0; i < Configs.Series * 10; i++)
+            for (var i = 0; i < Configs.Count * 10; i++)
             {
                 Configs.AutofacSingleton.Resolve<IService1>();
             }
         }
 
-        [Benchmark(OperationsPerInvoke = Configs.Series)]
+        [Benchmark(OperationsPerInvoke = Configs.Count)]
         public void CastleWindsor()
         {
-            for (var i = 0; i < Configs.Series; i++)
+            for (var i = 0; i < Configs.Count; i++)
             {
                 Configs.CastleWindsorSingleton.Resolve<IService1>();
             }
         }
 
-        [Benchmark(OperationsPerInvoke = Configs.Series * 1000)]
+        [Benchmark(OperationsPerInvoke = Configs.Count * Configs.FastK * 10)]
         public void DryIoc()
         {
-            for (var i = 0; i < Configs.Series * 100; i++)
+            for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
                 Configs.DryIocSingleton.Resolve<IService1>();
                 Configs.DryIocSingleton.Resolve<IService1>();
@@ -105,10 +105,10 @@ namespace IoC.Benchmark
             }
         }
 
-        [Benchmark(OperationsPerInvoke = Configs.Series * 1000)]
+        [Benchmark(OperationsPerInvoke = Configs.Count * Configs.FastK * 10)]
         public void LightInject()
         {
-            for (var i = 0; i < Configs.Series * 100; i++)
+            for (var i = 0; i < Configs.Count * Configs.FastK; i++)
             {
                 Configs.LightInjectSingleton.GetInstance<IService1>();
                 Configs.LightInjectSingleton.GetInstance<IService1>();
@@ -123,19 +123,19 @@ namespace IoC.Benchmark
             }
         }
 
-        [Benchmark(OperationsPerInvoke = Configs.Series)]
+        [Benchmark(OperationsPerInvoke = Configs.Count)]
         public void Ninject()
         {
-            for (var i = 0; i < Configs.Series; i++)
+            for (var i = 0; i < Configs.Count; i++)
             {
                 Configs.NinjectSingleton.Get<IService1>();
             }
         }
 
-        [Benchmark(OperationsPerInvoke = Configs.Series)]
+        [Benchmark(OperationsPerInvoke = Configs.Count)]
         public void Unity()
         {
-            for (var i = 0; i < Configs.Series; i++)
+            for (var i = 0; i < Configs.Count; i++)
             {
                 Configs.UnitySingleton.Resolve<IService1>();
             }
