@@ -42,7 +42,7 @@ class ShroedingersCat : ICat
 }
 ```
 
-_**It is important to note that our abstraction and our implementation do not know anything about any IoC containers at all**_
+_It is important to note that our abstraction and our implementation do not know anything about any IoC containers at all._
 
 ### Let's glue all together
 
@@ -62,15 +62,16 @@ _Using NuGet packages allows you to optimize your application to include only th
   dotnet add package IoC.Container
   ```
 
-Declare the required dependencies in a dedicated class _Glue_.
+Declare the required dependencies in a dedicated class *__Glue__*. You can do this anywhere in your code, but locating this information in one place is often the best solution to maintain order.
 
-_You can do this anywhere in your code, but collecting this information in one place is often the best solution to maintain order._
+Also presented below is the concept of mutable containers (_IMutableContainer_). Any binding is not irreversible, thus the owner of a binding [can cancel this binding](#change-configuration-on-the-fly-) using the related binding token (_IToken_).
 
 ```csharp
 public class Glue : IConfiguration
 {
   public IEnumerable<IToken> Apply(IMutableContainer container)
   {
+    // Returns single token for 2 bindings
     yield return container
       // Represents a cardboard box with any content
       .Bind<IBox<TT>>().To<CardboardBox<TT>>()
@@ -79,11 +80,14 @@ public class Glue : IConfiguration
 
     // Models a random subatomic event that may or may not occur
     var indeterminacy = new Random();
+
     // Represents a quantum superposition of 2 states: Alive or Dead
     yield return container.Bind<State>().To(ctx => (State)indeterminacy.Next(2));
   }
 }
 ```
+
+_Defining generic type arguments using special marker types like [*__TT__*](#generic-autowiring-) in the sample above is one of the distinguishing features of this library. So there is an easy way to bind complex generic types with nested generic types and with any type constraints._
 
 ### Time to open boxes!
 
@@ -98,7 +102,11 @@ var box = container.Resolve<IBox<ICat>>();
 WriteLine(box.Content);
 ```
 
-Several aspects of the [Composition Root](https://blog.ploeh.dk/2011/07/28/CompositionRoot/):
+There is a place where we create our object graphs and it is better to concentrate this creation into a single area of your application. This place is called the [*__Composition Root__*]((https://blog.ploeh.dk/2011/07/28/CompositionRoot/)).
+
+#### Few aspects of the Composition Root
+
+The Composition Root is the single place in your application where the composition of the object graphs for your application take place, using the IoC container, but we can delay the creation of some instances or create a set of instances by injecting instance factories like *__Func&lt;T&gt;__* instead of the instances themselves.
 
 - **As close to Init or Entry Point as possible:** It should be as close as possible to the application's entry point.
 - **Single location for object construction:** A Composition Root is a (preferably) unique location in an application where modules are composed together.
@@ -113,7 +121,7 @@ var indeterminacy = new Random();
 var box = new CardboardBox<ICat>(new ShroedingersCat(new Lazy<State>(() => (State)indeterminacy.Next(2))));
 ```
 
-It allows you to take full advantage of dependency injection everywhere and every time without any compromises - in the same way as just a `new` keyword to create any instances.
+It allows you to take full advantage of dependency injection everywhere and every time without any compromises in the same way as just a *__new__* keyword to create any instances.
 
 ## NuGet packages
 
@@ -584,7 +592,7 @@ public IEnumerable<IToken> Apply(IMutableContainer container)
 
 ### Generic Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GenericAutowiring.cs)
 
-Auto-writing of generic types as simple as auto-writing of other types. Just use a generic parameters markers like _TT_, _TT1_, _TT2_ and etc. or TTI, TTI1, TTI2 ... for interfaces or TTS, TTS1, TTS2 ... for value types or other special markers like TTDisposable, TTDisposable1 and etc. TTList<>, TTDictionary<> ... or create your own generic parameters markers or bind open generic types.
+Autowiring of generic types as simple as autowiring of other simple types. Just use a generic parameters markers like _TT_, _TT1_, _TT2_ and etc. or TTI, TTI1, TTI2 ... for interfaces or TTS, TTS1, TTS2 ... for value types or other special markers like TTDisposable, TTDisposable1 and etc. TTList<>, TTDictionary<> ... or create your own generic parameters markers or bind open generic types.
 
 ``` CSharp
 public void Run()

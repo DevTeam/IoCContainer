@@ -56,6 +56,7 @@ namespace ShroedingersCat
     {
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
+            // Returns single token for 2 bindings
             yield return container
                 // Represents a cardboard box with any content
                 .Bind<IBox<TT>>().To<CardboardBox<TT>>()
@@ -64,6 +65,7 @@ namespace ShroedingersCat
 
             // Models a random subatomic event that may or may not occur
             var indeterminacy = new Random();
+
             // Represents a quantum superposition of 2 states: Alive or Dead
             yield return container.Bind<State>().To(ctx => (State)indeterminacy.Next(2));
         }
