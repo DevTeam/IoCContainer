@@ -106,7 +106,7 @@
                 return Lifetime;
             }
 
-            var lifetime = _lifetimes.GetByEquatableKey(lifetimeHashCode, lifetimeKey);
+            var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
             if (lifetime != default(ILifetime))
             {
                 return lifetime;

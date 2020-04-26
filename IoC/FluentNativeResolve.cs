@@ -1,4 +1,5 @@
-﻿namespace IoC
+﻿// ReSharper disable ForCanBeConvertedToForeach
+namespace IoC
 {
     using System;
     using System.Runtime.CompilerServices;
@@ -10,7 +11,6 @@
     [PublicAPI]
     public static class FluentNativeResolve
     {
-        // ReSharper disable once RedundantNameQualifier
         private static readonly object[] EmptyArgs = CoreExtensions.EmptyArray<object>();
 
         /// <summary>
@@ -23,18 +23,11 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            var table = container.ResolversByType;
-            var items = table.Buckets[TypeDescriptor<T>.HashCode & table.Divisor].KeyValues;
-            // ReSharper disable once ForCanBeConvertedToForeach
+            var items = container.ResolversByType.GetBucket(TypeDescriptor<T>.HashCode);
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
-#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
-                if (ReferenceEquals(typeof(T), item.Key))
-#else
-                // ReSharper disable once PossibleUnintendedReferenceComparison
                 if (typeof(T) == item.Key)
-#endif
                 {
                     return ((Resolver<T>)item.Value)(container, EmptyArgs);
                 }
@@ -55,8 +48,17 @@
         public static T Resolve<T>([NotNull] this Container container, Tag tag)
         {
             var key = new Key(typeof(T), tag);
-            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
-                    ?? container.GetResolver<T>(typeof(T), tag))(container, EmptyArgs);
+            var items = container.Resolvers.GetBucket(key.HashCode);
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (CoreExtensions.Equals(key, item.Key))
+                {
+                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
+                }
+            }
+
+            return container.GetResolver<T>(typeof(T), tag)(container, EmptyArgs);
         }
 
         /// <summary>
@@ -70,8 +72,17 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(TypeDescriptor<T>.HashCode, typeof(T))
-                    ?? container.GetResolver<T>(typeof(T)))(container, args);
+            var items = container.ResolversByType.GetBucket(TypeDescriptor<T>.HashCode);
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (typeof(T) == item.Key)
+                {
+                    return ((Resolver<T>)item.Value)(container, args);
+                }
+            }
+
+            return container.GetResolver<T>(typeof(T))(container, args);
         }
 
         /// <summary>
@@ -87,8 +98,17 @@
         public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
             var key = new Key(typeof(T), tag);
-            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
-                    ?? container.GetResolver<T>(typeof(T), tag))(container, args);
+            var items = container.Resolvers.GetBucket(key.HashCode);
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (CoreExtensions.Equals(key, item.Key))
+                {
+                    return ((Resolver<T>)item.Value)(container, args);
+                }
+            }
+
+            return container.GetResolver<T>(typeof(T), tag)(container, args);
         }
 
         /// <summary>
@@ -102,8 +122,17 @@
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(type.GetHashCode(), type)
-                    ?? container.GetResolver<T>(type))(container, EmptyArgs);
+            var items = container.ResolversByType.GetBucket(type.GetHashCode());
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (type == item.Key)
+                {
+                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
+                }
+            }
+
+            return container.GetResolver<T>(type)(container, EmptyArgs);
         }
 
         /// <summary>
@@ -119,8 +148,17 @@
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
             var key = new Key(type, tag);
-            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
-                    ?? container.GetResolver<T>(type, tag))(container, EmptyArgs);
+            var items = container.Resolvers.GetBucket(key.HashCode);
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (CoreExtensions.Equals(key, item.Key))
+                {
+                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
+                }
+            }
+
+            return container.GetResolver<T>(type, tag)(container, EmptyArgs);
         }
 
         /// <summary>
@@ -135,8 +173,17 @@
         [NotNull]
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(type.GetHashCode(), type)
-                    ?? container.GetResolver<T>(type))(container, args);
+            var items = container.ResolversByType.GetBucket(type.GetHashCode());
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (type == item.Key)
+                {
+                    return ((Resolver<T>)item.Value)(container, args);
+                }
+            }
+
+            return container.GetResolver<T>(type)(container, args);
         }
 
         /// <summary>
@@ -153,8 +200,17 @@
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
             var key = new Key(type, tag);
-            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
-                    ?? container.GetResolver<T>(type, tag))(container, args);
+            var items = container.Resolvers.GetBucket(key.HashCode);
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (CoreExtensions.Equals(key, item.Key))
+                {
+                    return ((Resolver<T>)item.Value)(container, args);
+                }
+            }
+
+            return container.GetResolver<T>(type, tag)(container, args);
         }
     }
 }

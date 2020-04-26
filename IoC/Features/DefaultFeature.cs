@@ -18,7 +18,7 @@
             CollectionFeature.Set,
             FuncFeature.Set,
             TaskFeature.Set,
-            TupleFeature.Default,
+            TupleFeature.Set,
             CommonTypesFeature.Set,
             ConfigurationFeature.Set
         };

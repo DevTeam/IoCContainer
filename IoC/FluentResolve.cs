@@ -10,7 +10,6 @@
     [PublicAPI]
     public static class FluentResolve
     {
-        // ReSharper disable once RedundantNameQualifier
         private static readonly object[] EmptyArgs = CoreExtensions.EmptyArray<object>();
 
         /// <summary>

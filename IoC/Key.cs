@@ -2,6 +2,7 @@
 {
     using System;
     using System.Diagnostics;
+    using Core;
 
     /// <summary>
     /// Represents a dependency key.
@@ -43,37 +44,25 @@
         }
 
         /// <inheritdoc />
+        [Pure]
         public override string ToString() => $"[Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {HashCode}]";
 
         /// <inheritdoc />
+        [Pure]
         // ReSharper disable once PossibleNullReferenceException
-        public override bool Equals(object obj)
-        {
-            // ReSharper disable once PossibleNullReferenceException
-            var other = (Key)obj;
-            return
-#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
-                ReferenceEquals(Type, other.Type)
-#else
-                Type == other.Type
-#endif
-                && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
-        }
+        public override bool Equals(object obj) => CoreExtensions.Equals(this, (Key)obj);
 
         /// <inheritdoc />
-        public bool Equals(Key other) =>
-#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
-            ReferenceEquals(Type, other.Type)
-#else
-            Type == other.Type
-#endif
-            && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
+        [Pure]
+        public bool Equals(Key other) => CoreExtensions.Equals(this, other);
 
         /// <inheritdoc />
+        [Pure]
         public override int GetHashCode() => HashCode;
 
         private class AnyTagObject
         {
+            [Pure]
             public override string ToString() => "any";
         }
     }

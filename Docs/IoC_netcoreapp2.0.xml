@@ -1068,7 +1068,7 @@
             Allows to resolve Tuples.
             </summary>
         </member>
-        <member name="F:IoC.Features.TupleFeature.Default">
+        <member name="F:IoC.Features.TupleFeature.Set">
             The default instance.
         </member>
         <member name="F:IoC.Features.TupleFeature.LightSet">

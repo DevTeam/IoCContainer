@@ -1334,7 +1334,7 @@ namespace IoC
                         if (key.Tag == AnyTag)
                         {
                             var hashCode = key.Type.GetHashCode();
-                            isRegistered &= dependenciesForTagAny.GetByTypeKey(hashCode, key.Type) == default(DependencyEntry);
+                            isRegistered &= !dependenciesForTagAny.TryGetByType(hashCode, key.Type, out _);
                             if (isRegistered)
                             {
                                 dependenciesForTagAny = dependenciesForTagAny.Set(hashCode, key.Type, dependencyEntry);
@@ -1343,7 +1343,7 @@ namespace IoC
                         else
                         {
                             var hashCode = key.HashCode;
-                            isRegistered &= dependencies.GetByEquatableKey(hashCode, key) == default(DependencyEntry);
+                            isRegistered &= !dependencies.TryGetByKey(hashCode, key, out _);
                             if (isRegistered)
                             {
                                 dependencies = dependencies.Set(hashCode, key, dependencyEntry);
@@ -1397,9 +1397,9 @@ namespace IoC
             if (tag == null)
             {
                 hashCode = type.GetHashCode();
-                resolver = (Resolver<T>)ResolversByType.GetByTypeKey(hashCode, type);
-                if (resolver != default(Resolver<T>)) // found in resolvers by type
+                if (ResolversByType.TryGetByType(hashCode, type, out var curResolver)) // found in resolvers by type
                 {
+                    resolver = (Resolver<T>) curResolver;
                     error = default(Exception);
                     return true;
                 }
@@ -1410,9 +1410,9 @@ namespace IoC
             {
                 key = new FullKey(type, tag);
                 hashCode = key.HashCode;
-                resolver = (Resolver<T>)Resolvers.GetByEquatableKey(hashCode, key);
-                if (resolver != default(Resolver<T>)) // found in resolvers
+                if (Resolvers.TryGetByKey(hashCode, key, out var curResolver)) // found in resolvers
                 {
+                    resolver = (Resolver<T>) curResolver;
                     error = default(Exception);
                     return true;
                 }
@@ -1442,8 +1442,7 @@ namespace IoC
 
                     resolver = (Resolver<T>)resolverDelegate;
                 }
-
-                if (!hasDependency)
+                else
                 {
                     // tries finding in parent
                     if (!_parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer ?? this))
@@ -1640,8 +1639,7 @@ namespace IoC
 
         private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)
         {
-            dependencyEntry = _dependencies.GetByEquatableKey(hashCode, key);
-            if (dependencyEntry != default(DependencyEntry))
+            if (_dependencies.TryGetByKey(hashCode, key, out dependencyEntry))
             {
                 return true;
             }
@@ -1655,23 +1653,20 @@ namespace IoC
                 var genericType = typeDescriptor.GetGenericTypeDefinition();
                 var genericKey = new FullKey(genericType, key.Tag);
                 // For generic type
-                dependencyEntry = _dependencies.GetByEquatableKey(genericKey.HashCode, genericKey);
-                if (dependencyEntry != default(DependencyEntry))
+                if (_dependencies.TryGetByKey(genericKey.HashCode, genericKey, out dependencyEntry))
                 {
                     return true;
                 }
 
                 // For generic type and Any tag
-                dependencyEntry = _dependenciesForTagAny.GetByTypeKey(genericType.GetHashCode(), genericType);
-                if (dependencyEntry != default(DependencyEntry))
+                if (_dependenciesForTagAny.TryGetByType(genericType.GetHashCode(), genericType, out dependencyEntry))
                 {
                     return true;
                 }
             }
 
             // For Any tag
-            dependencyEntry = _dependenciesForTagAny.GetByTypeKey(type.GetHashCode(), type);
-            if (dependencyEntry != default(DependencyEntry))
+            if (_dependenciesForTagAny.TryGetByType(type.GetHashCode(), type, out dependencyEntry))
             {
                 return true;
             }
@@ -1681,15 +1676,13 @@ namespace IoC
             {
                 var arrayKey = new FullKey(typeof(IArray), key.Tag);
                 // For generic type
-                dependencyEntry = _dependencies.GetByEquatableKey(arrayKey.HashCode, arrayKey);
-                if (dependencyEntry != default(DependencyEntry))
+                if (_dependencies.TryGetByKey(arrayKey.HashCode, arrayKey, out dependencyEntry))
                 {
                     return true;
                 }
 
                 // For generic type and Any tag
-                dependencyEntry = _dependenciesForTagAny.GetByTypeKey(typeof(IArray).GetHashCode(), typeof(IArray));
-                if (dependencyEntry != default(DependencyEntry))
+                if (_dependenciesForTagAny.TryGetByType(typeof(IArray).GetHashCode(), typeof(IArray), out dependencyEntry))
                 {
                     return true;
                 }
@@ -5817,6 +5810,7 @@ namespace IoC
 #endregion
 #region FluentNativeResolve
 
+// ReSharper disable ForCanBeConvertedToForeach
 namespace IoC
 {
     using System;
@@ -5829,7 +5823,6 @@ namespace IoC
     [PublicAPI]
     public static class FluentNativeResolve
     {
-        // ReSharper disable once RedundantNameQualifier
         private static readonly object[] EmptyArgs = CoreExtensions.EmptyArray<object>();
 
         /// <summary>
@@ -5842,18 +5835,11 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            var table = container.ResolversByType;
-            var items = table.Buckets[TypeDescriptor<T>.HashCode & table.Divisor].KeyValues;
-            // ReSharper disable once ForCanBeConvertedToForeach
+            var items = container.ResolversByType.GetBucket(TypeDescriptor<T>.HashCode);
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
-#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
-                if (ReferenceEquals(typeof(T), item.Key))
-#else
-                // ReSharper disable once PossibleUnintendedReferenceComparison
                 if (typeof(T) == item.Key)
-#endif
                 {
                     return ((Resolver<T>)item.Value)(container, EmptyArgs);
                 }
@@ -5874,8 +5860,17 @@ namespace IoC
         public static T Resolve<T>([NotNull] this Container container, Tag tag)
         {
             var key = new Key(typeof(T), tag);
-            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
-                    ?? container.GetResolver<T>(typeof(T), tag))(container, EmptyArgs);
+            var items = container.Resolvers.GetBucket(key.HashCode);
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (CoreExtensions.Equals(key, item.Key))
+                {
+                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
+                }
+            }
+
+            return container.GetResolver<T>(typeof(T), tag)(container, EmptyArgs);
         }
 
         /// <summary>
@@ -5889,8 +5884,17 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(TypeDescriptor<T>.HashCode, typeof(T))
-                    ?? container.GetResolver<T>(typeof(T)))(container, args);
+            var items = container.ResolversByType.GetBucket(TypeDescriptor<T>.HashCode);
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (typeof(T) == item.Key)
+                {
+                    return ((Resolver<T>)item.Value)(container, args);
+                }
+            }
+
+            return container.GetResolver<T>(typeof(T))(container, args);
         }
 
         /// <summary>
@@ -5906,8 +5910,17 @@ namespace IoC
         public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
             var key = new Key(typeof(T), tag);
-            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
-                    ?? container.GetResolver<T>(typeof(T), tag))(container, args);
+            var items = container.Resolvers.GetBucket(key.HashCode);
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (CoreExtensions.Equals(key, item.Key))
+                {
+                    return ((Resolver<T>)item.Value)(container, args);
+                }
+            }
+
+            return container.GetResolver<T>(typeof(T), tag)(container, args);
         }
 
         /// <summary>
@@ -5921,8 +5934,17 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(type.GetHashCode(), type)
-                    ?? container.GetResolver<T>(type))(container, EmptyArgs);
+            var items = container.ResolversByType.GetBucket(type.GetHashCode());
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (type == item.Key)
+                {
+                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
+                }
+            }
+
+            return container.GetResolver<T>(type)(container, EmptyArgs);
         }
 
         /// <summary>
@@ -5938,8 +5960,17 @@ namespace IoC
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
             var key = new Key(type, tag);
-            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
-                    ?? container.GetResolver<T>(type, tag))(container, EmptyArgs);
+            var items = container.Resolvers.GetBucket(key.HashCode);
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (CoreExtensions.Equals(key, item.Key))
+                {
+                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
+                }
+            }
+
+            return container.GetResolver<T>(type, tag)(container, EmptyArgs);
         }
 
         /// <summary>
@@ -5954,8 +5985,17 @@ namespace IoC
         [NotNull]
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args)
         {
-            return ((Resolver<T>)container.ResolversByType.GetByTypeKey(type.GetHashCode(), type)
-                    ?? container.GetResolver<T>(type))(container, args);
+            var items = container.ResolversByType.GetBucket(type.GetHashCode());
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (type == item.Key)
+                {
+                    return ((Resolver<T>)item.Value)(container, args);
+                }
+            }
+
+            return container.GetResolver<T>(type)(container, args);
         }
 
         /// <summary>
@@ -5972,8 +6012,17 @@ namespace IoC
         public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
         {
             var key = new Key(type, tag);
-            return ((Resolver<T>)container.Resolvers.GetByEquatableKey(key.HashCode, key)
-                    ?? container.GetResolver<T>(type, tag))(container, args);
+            var items = container.Resolvers.GetBucket(key.HashCode);
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (CoreExtensions.Equals(key, item.Key))
+                {
+                    return ((Resolver<T>)item.Value)(container, args);
+                }
+            }
+
+            return container.GetResolver<T>(type, tag)(container, args);
         }
     }
 }
@@ -5993,7 +6042,6 @@ namespace IoC
     [PublicAPI]
     public static class FluentResolve
     {
-        // ReSharper disable once RedundantNameQualifier
         private static readonly object[] EmptyArgs = CoreExtensions.EmptyArray<object>();
 
         /// <summary>
@@ -8374,6 +8422,7 @@ namespace IoC
 {
     using System;
     using System.Diagnostics;
+    using Core;
 
     /// <summary>
     /// Represents a dependency key.
@@ -8415,37 +8464,25 @@ namespace IoC
         }
 
         /// <inheritdoc />
+        [Pure]
         public override string ToString() => $"[Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {HashCode}]";
 
         /// <inheritdoc />
+        [Pure]
         // ReSharper disable once PossibleNullReferenceException
-        public override bool Equals(object obj)
-        {
-            // ReSharper disable once PossibleNullReferenceException
-            var other = (Key)obj;
-            return
-#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
-                ReferenceEquals(Type, other.Type)
-#else
-                Type == other.Type
-#endif
-                && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
-        }
+        public override bool Equals(object obj) => CoreExtensions.Equals(this, (Key)obj);
 
         /// <inheritdoc />
-        public bool Equals(Key other) =>
-#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
-            ReferenceEquals(Type, other.Type)
-#else
-            Type == other.Type
-#endif
-            && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
+        [Pure]
+        public bool Equals(Key other) => CoreExtensions.Equals(this, other);
 
         /// <inheritdoc />
+        [Pure]
         public override int GetHashCode() => HashCode;
 
         private class AnyTagObject
         {
+            [Pure]
             public override string ToString() => "any";
         }
     }
@@ -9038,7 +9075,7 @@ namespace IoC.Features
             CollectionFeature.Set,
             FuncFeature.Set,
             TaskFeature.Set,
-            TupleFeature.Default,
+            TupleFeature.Set,
             CommonTypesFeature.Set,
             ConfigurationFeature.Set
         };
@@ -9218,7 +9255,7 @@ namespace IoC.Features
     public sealed  class TupleFeature : IConfiguration
     {
         /// The default instance.
-        public static readonly IConfiguration Default = new TupleFeature();
+        public static readonly IConfiguration Set = new TupleFeature();
         /// The high-performance instance.
         public static readonly IConfiguration LightSet = new TupleFeature(true);
 
@@ -9443,7 +9480,7 @@ namespace IoC.Lifetimes
     {
         private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
         private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
-        private static readonly MethodInfo GetMethodInfo = typeof(CoreExtensions).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(CoreExtensions.Get)).MakeGenericMethod(typeof(TKey), typeof(object));
+        private static readonly MethodInfo GetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Get));
         private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
         private static readonly ParameterExpression KeyVar = Expression.Variable(typeof(TKey), "key");
@@ -9462,7 +9499,7 @@ namespace IoC.Lifetimes
             var instancesField = Expression.Field(thisConst, InstancesFieldInfo);
             var lockObjectConst = Expression.Constant(_lockObject);
             var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
-            var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(null, GetMethodInfo, instancesField, SingletonBasedLifetimeShared.HashCodeVar, KeyVar).Convert(returnType));
+            var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, SingletonBasedLifetimeShared.HashCodeVar, KeyVar).Convert(returnType));
             var isNullExpression = Expression.ReferenceEqual(instanceVar, ExpressionBuilderExtensions.NullConst);
 
             return Expression.Block(
@@ -11156,15 +11193,14 @@ namespace IoC.Core
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        public static T[] EmptyArray<T>() =>
-            Empty<T>.Array;
+        public static T[] EmptyArray<T>() => Empty<T>.Array;
 
         [MethodImpl((MethodImplOptions) 256)]
         public static T[] CreateArray<T>(int size = 0, T value = default(T))
         {
             if (size == 0)
             {
-                return EmptyArray<T>();
+                return Empty<T>.Array;
             }
 
             var array = new T[size];
@@ -11193,8 +11229,8 @@ namespace IoC.Core
             return destination;
         }
 
-        [MethodImpl((MethodImplOptions) 256)]
         [Pure]
+        [MethodImpl((MethodImplOptions)256)]
         public static T[] Copy<T>([NotNull] this T[] previous)
         {
             var length = previous.Length;
@@ -11203,66 +11239,16 @@ namespace IoC.Core
             return result;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public static TValue Get<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
-        {
-            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < items.Length; index++)
-            {
-                var item = items[index];
-                if (Equals(key, item.Key))
-                {
-                    return item.Value;
-                }
-            }
-
-            return default(TValue);
-        }
-
         [MethodImpl((MethodImplOptions)256)]
-        [Pure]
-        public static TValue GetByTypeKey<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
-            where TKey : Type
-        {
-            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < items.Length; index++)
-            {
-                var item = items[index];
+        public static bool Equals(this Key that, Key other) =>
 #if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
-                if (ReferenceEquals(key, item.Key))
+            ReferenceEquals(that.Type, other.Type)
 #else
-                // ReSharper disable once PossibleUnintendedReferenceComparison
-                if (key == item.Key)
+            that.Type == other.Type
 #endif
-                {
-                    return item.Value;
-                }
-            }
+            && (ReferenceEquals(that.Tag, other.Tag) || Equals(that.Tag, other.Tag));
 
-            return default(TValue);
-        }
-
-        [MethodImpl((MethodImplOptions)256)]
-        [Pure]
-        public static TValue GetByEquatableKey<TKey, TValue>(this Table<TKey, TValue> table, int hashCode, TKey key)
-            where TKey : IEquatable<TKey>
-        {
-            var items = table.Buckets[hashCode & table.Divisor].KeyValues;
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < items.Length; index++)
-            {
-                var item = items[index];
-                if (key.Equals(item.Key))
-                {
-                    return item.Value;
-                }
-            }
-
-            return default(TValue);
-        }
 
         private static class Empty<T>
         {
@@ -11465,7 +11451,7 @@ namespace IoC.Core
                 return Lifetime;
             }
 
-            var lifetime = _lifetimes.GetByEquatableKey(lifetimeHashCode, lifetimeKey);
+            var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
             if (lifetime != default(ILifetime))
             {
                 return lifetime;
@@ -13203,16 +13189,17 @@ namespace IoC.Core
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Runtime.CompilerServices;
-
+    
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
     internal sealed class Table<TKey, TValue>: IEnumerable<Table<TKey, TValue>.KeyValue>
     {
-        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(4, Bucket.EmptyBucket), 3, 0);
+        private static readonly KeyValue[] EmptyBucket = CoreExtensions.EmptyArray<KeyValue>();
+        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(4, EmptyBucket), 3, 0);
         public readonly int Count;
         public readonly int Divisor;
-        public readonly Bucket[] Buckets;
+        public readonly KeyValue[][] Buckets;
 
-        private Table(Bucket[] buckets, int divisor, int count)
+        private Table(KeyValue[][] buckets, int divisor, int count)
         {
             Buckets = buckets;
             Divisor = divisor;
@@ -13227,11 +13214,11 @@ namespace IoC.Core
             if (origin.Count > origin.Divisor)
             {
                 Divisor = (origin.Divisor + 1) << 2 - 1;
-                Buckets = CoreExtensions.CreateArray(Divisor + 1, Bucket.EmptyBucket);
+                Buckets = CoreExtensions.CreateArray(Divisor + 1, EmptyBucket);
                 var originBuckets = origin.Buckets;
                 for (var originBucketIndex = 0; originBucketIndex < originBuckets.Length; originBucketIndex++)
                 {
-                    var originKeyValues = originBuckets[originBucketIndex].KeyValues;
+                    var originKeyValues = originBuckets[originBucketIndex];
                     for (var index = 0; index < originKeyValues.Length; index++)
                     {
                         var keyValue = originKeyValues[index];
@@ -13250,12 +13237,30 @@ namespace IoC.Core
             Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(new KeyValue(hashCode, key, value));
         }
 
+        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
+        public TValue Get(int hashCode, TKey key)
+        {
+            var items = this.GetBucket(hashCode);
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (Equals(key, item.Key))
+                {
+                    return item.Value;
+                }
+            }
+
+            return default(TValue);
+        }
+
         [Pure]
         public IEnumerator<KeyValue> GetEnumerator()
         {
             for (var bucketIndex = 0; bucketIndex < Buckets.Length; bucketIndex++)
             {
-                var keyValues = Buckets[bucketIndex].KeyValues;
+                var keyValues = Buckets[bucketIndex];
                 for (var index = 0; index < keyValues.Length; index++)
                 {
                     var keyValue = keyValues[index];
@@ -13277,33 +13282,52 @@ namespace IoC.Core
         public Table<TKey, TValue> Remove(int hashCode, TKey key, out bool removed)
         {
             removed = false;
-            var newBuckets = CoreExtensions.CreateArray(Divisor + 1, Bucket.EmptyBucket);
+            var newBuckets = CoreExtensions.CreateArray(Divisor + 1, EmptyBucket);
             var newBucketsArray = newBuckets;
             var bucketIndex = hashCode & Divisor;
             for (var curBucketIndex = 0; curBucketIndex < Buckets.Length; curBucketIndex++)
             {
+                var bucket = Buckets[curBucketIndex];
                 if (curBucketIndex != bucketIndex)
                 {
-                    newBucketsArray[curBucketIndex] = Buckets[curBucketIndex].Copy();
+                    newBucketsArray[curBucketIndex] = bucket.Length == 0 ? EmptyBucket : bucket.Copy();
                     continue;
                 }
 
                 // Bucket to remove an element
-                var bucket = Buckets[bucketIndex];
-                var keyValues = bucket.KeyValues;
-                for (var index = 0; index < keyValues.Length; index++)
+                for (var index = 0; index < bucket.Length; index++)
                 {
-                    var keyValue = keyValues[index];
+                    var keyValue = bucket[index];
                     // Remove the element
                     if (keyValue.HashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
                     {
-                        newBucketsArray[bucketIndex] = bucket.Remove(index);
+                        newBucketsArray[bucketIndex] = Remove(bucket, index);
                         removed = true;
                     }
                 }
             }
 
             return new Table<TKey, TValue>(newBuckets, Divisor, removed ? Count - 1: Count);
+        }
+
+        [Pure]
+        [MethodImpl((MethodImplOptions)256)]
+        private static KeyValue[] Remove(KeyValue[] bucket, int index)
+        {
+            var count = bucket.Length;
+            var newBucket = new KeyValue[count - 1];
+            var keyValues = bucket;
+            for (var newIndex = 0; newIndex < index; newIndex++)
+            {
+                newBucket[newIndex] = keyValues[newIndex];
+            }
+
+            for (var newIndex = index + 1; newIndex < count; newIndex++)
+            {
+                newBucket[newIndex - 1] = keyValues[newIndex];
+            }
+
+            return newBucket;
         }
 
         internal struct KeyValue
@@ -13319,47 +13343,62 @@ namespace IoC.Core
                 Value = value;
             }
         }
+    }
+}
 
-        internal struct Bucket
+#endregion
+#region TableExtensions
+
+namespace IoC.Core
+{
+    using System;
+    using System.Runtime.CompilerServices;
+
+    internal static class TableExtensions
+    {
+        [MethodImpl((MethodImplOptions) 256)]
+        [Pure]
+        public static Table<TKey, TValue>.KeyValue[] GetBucket<TKey, TValue>(this Table<TKey, TValue> table, int hashCode) =>
+            table.Buckets[hashCode & table.Divisor];
+
+        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
+        public static bool TryGetByType<TValue>(this Table<Type, TValue> table, int hashCode, Type key, out TValue value)
         {
-            public static readonly Bucket EmptyBucket = new Bucket(0);
-            public readonly KeyValue[] KeyValues;
-
-            private Bucket(KeyValue[] keyValues) =>
-                KeyValues = keyValues.Length == 0 ? CoreExtensions.EmptyArray<KeyValue>() : keyValues.Copy();
-
-            private Bucket(int count) =>
-                KeyValues = CoreExtensions.CreateArray<KeyValue>(count);
-
-            [MethodImpl((MethodImplOptions)256)]
-            public Bucket Copy() =>
-                new Bucket(KeyValues);
-
-            [Pure]
-            [MethodImpl((MethodImplOptions)256)]
-            public Bucket Add(KeyValue keyValue) =>
-                new Bucket(KeyValues.Add(keyValue));
-
-            [Pure]
-            [MethodImpl((MethodImplOptions)256)]
-            public Bucket Remove(int index)
+            var items = table.GetBucket(hashCode);
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 0; index < items.Length; index++)
             {
-                var count = KeyValues.Length;
-                var newBucket = new Bucket(count - 1);
-                var newKeyValues = newBucket.KeyValues;
-                var keyValues = KeyValues;
-                for (var newIndex = 0; newIndex < index; newIndex++)
+                var item = items[index];
+                if (key == item.Key)
                 {
-                    newKeyValues[newIndex] = keyValues[newIndex];
+                    value = item.Value;
+                    return true;
                 }
-
-                for (var newIndex = index + 1; newIndex < count; newIndex++)
-                {
-                    newKeyValues[newIndex - 1] = keyValues[newIndex];
-                }
-
-                return newBucket;
             }
+
+            value = default(TValue);
+            return false;
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        [Pure]
+        public static bool TryGetByKey<TValue>(this Table<Key, TValue> table, int hashCode, Key key, out TValue value)
+        {
+            var items = table.GetBucket(hashCode);
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (CoreExtensions.Equals(key, item.Key))
+                {
+                    value = item.Value;
+                    return true;
+                }
+            }
+
+            value = default(TValue);
+            return false;
         }
     }
 }

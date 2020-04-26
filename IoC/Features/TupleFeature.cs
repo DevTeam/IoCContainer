@@ -11,7 +11,7 @@
     public sealed  class TupleFeature : IConfiguration
     {
         /// The default instance.
-        public static readonly IConfiguration Default = new TupleFeature();
+        public static readonly IConfiguration Set = new TupleFeature();
         /// The high-performance instance.
         public static readonly IConfiguration LightSet = new TupleFeature(true);
 

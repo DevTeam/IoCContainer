@@ -698,8 +698,8 @@
   - [ContainerEvent](#F-IoC-TraceEvent-ContainerEvent 'IoC.TraceEvent.ContainerEvent')
   - [Message](#F-IoC-TraceEvent-Message 'IoC.TraceEvent.Message')
 - [TupleFeature](#T-IoC-Features-TupleFeature 'IoC.Features.TupleFeature')
-  - [Default](#F-IoC-Features-TupleFeature-Default 'IoC.Features.TupleFeature.Default')
   - [LightSet](#F-IoC-Features-TupleFeature-LightSet 'IoC.Features.TupleFeature.LightSet')
+  - [Set](#F-IoC-Features-TupleFeature-Set 'IoC.Features.TupleFeature.Set')
   - [Apply()](#M-IoC-Features-TupleFeature-Apply-IoC-IMutableContainer- 'IoC.Features.TupleFeature.Apply(IoC.IMutableContainer)')
 - [UsedImplicitlyAttribute](#T-IoC-UsedImplicitlyAttribute 'IoC.UsedImplicitlyAttribute')
 - [ValueProviderAttribute](#T-IoC-ValueProviderAttribute 'IoC.ValueProviderAttribute')
@@ -12361,11 +12361,11 @@ IoC.Features
 
 Allows to resolve Tuples.
 
-<a name='F-IoC-Features-TupleFeature-Default'></a>
-### Default `constants`
-
 <a name='F-IoC-Features-TupleFeature-LightSet'></a>
 ### LightSet `constants`
+
+<a name='F-IoC-Features-TupleFeature-Set'></a>
+### Set `constants`
 
 <a name='M-IoC-Features-TupleFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
