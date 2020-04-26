@@ -7,8 +7,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC", "IoC\IoC.csproj", "{F
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC.Tests", "IoC.Tests\IoC.Tests.csproj", "{4EE6C872-A10B-44C9-8118-1B1791DDC2E4}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC.Comparison", "IoC.Comparison\IoC.Comparison.csproj", "{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC.AspNetCore", "IoC.AspNetCore\IoC.AspNetCore.csproj", "{B79F70D5-259D-464D-ADEE-9452A83B26FC}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC.Source", "IoC.Source\IoC.Source.csproj", "{F4DD922D-AC6B-4E48-995F-9F00AE29C075}"
@@ -29,7 +27,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC.Interception.Source", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC.Performance.Tests", "IoC.Performance.Tests\IoC.Performance.Tests.csproj", "{E1E5F348-4934-4EFA-B488-896F93B59AB5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IoC.Benchmark", "IoC.Benchmark\IoC.Benchmark.csproj", "{084A7943-A898-48EF-B30C-16807E8ED62B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IoC.Benchmark", "IoC.Benchmark\IoC.Benchmark.csproj", "{084A7943-A898-48EF-B30C-16807E8ED62B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -75,22 +73,6 @@ Global
 		{4EE6C872-A10B-44C9-8118-1B1791DDC2E4}.Release|x64.Build.0 = Release|Any CPU
 		{4EE6C872-A10B-44C9-8118-1B1791DDC2E4}.Release|x86.ActiveCfg = Release|Any CPU
 		{4EE6C872-A10B-44C9-8118-1B1791DDC2E4}.Release|x86.Build.0 = Release|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Debug|ARM.ActiveCfg = Debug|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Debug|ARM.Build.0 = Debug|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Debug|x64.Build.0 = Debug|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Debug|x86.Build.0 = Debug|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Release|ARM.ActiveCfg = Release|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Release|ARM.Build.0 = Release|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Release|x64.ActiveCfg = Release|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Release|x64.Build.0 = Release|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Release|x86.ActiveCfg = Release|Any CPU
-		{7DF474D7-E49E-467B-9CFF-5BEC8FB2AE0E}.Release|x86.Build.0 = Release|Any CPU
 		{B79F70D5-259D-464D-ADEE-9452A83B26FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B79F70D5-259D-464D-ADEE-9452A83B26FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B79F70D5-259D-464D-ADEE-9452A83B26FC}.Debug|ARM.ActiveCfg = Debug|Any CPU
