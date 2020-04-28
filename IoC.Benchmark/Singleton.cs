@@ -10,15 +10,16 @@ namespace IoC.Benchmark
     using global::LightInject;
     using global::Ninject;
     using global::Unity;
+    using Microsoft.Extensions.DependencyInjection;
     using Model;
 
     [BenchmarkCategory("singleton", " 20 instances and 1 singleton")]
     public class Singleton
     {
-        [Benchmark(Description = "new", OperationsPerInvoke = Configs.Count * Configs.FastK * 10)]
+        [Benchmark(Description = "new", OperationsPerInvoke = 10000000)]
         public void New()
         {
-            for (var i = 0; i < Configs.Count * Configs.FastK; i++)
+            for (var i = 0; i < 1000000; i++)
             {
                 NewSingleton().DoSomething();
                 NewSingleton().DoSomething();
@@ -33,10 +34,10 @@ namespace IoC.Benchmark
             }
         }
 
-        [Benchmark(Description = "IoC.Container", OperationsPerInvoke = Configs.Count * Configs.FastK * 10)]
+        [Benchmark(Description = "IoC.Container", OperationsPerInvoke = 10000000)]
         public void This()
         {
-            for (var i = 0; i < Configs.Count * Configs.FastK; i++)
+            for (var i = 0; i < 1000000; i++)
             {
                 Configs.IoCContainerSingleton.Resolve<IService1>().DoSomething();
                 Configs.IoCContainerSingleton.Resolve<IService1>().DoSomething();
@@ -51,10 +52,10 @@ namespace IoC.Benchmark
             }
         }
 
-        [Benchmark(Description = "IoC.Container composition root", OperationsPerInvoke = Configs.Count * Configs.FastK * 10)]
+        [Benchmark(Description = "IoC.Container composition root", OperationsPerInvoke = 10000000)]
         public void ThisByCR()
         {
-            for (var i = 0; i < Configs.Count * Configs.FastK; i++)
+            for (var i = 0; i < 1000000; i++)
             {
                 Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs).DoSomething();
                 Configs.IoCContainerSingletonResolve(Configs.IoCContainerSingleton, Configs.EmptyArgs).DoSomething();
@@ -69,28 +70,28 @@ namespace IoC.Benchmark
             }
         }
 
-        [Benchmark(OperationsPerInvoke = Configs.Count * 10)]
+        [Benchmark(OperationsPerInvoke = 10000)]
         public void Autofac()
         {
-            for (var i = 0; i < Configs.Count * 10; i++)
+            for (var i = 0; i < 10000; i++)
             {
                 Configs.AutofacSingleton.Resolve<IService1>().DoSomething();
             }
         }
 
-        [Benchmark(OperationsPerInvoke = Configs.Count)]
+        [Benchmark(OperationsPerInvoke = 1000)]
         public void CastleWindsor()
         {
-            for (var i = 0; i < Configs.Count; i++)
+            for (var i = 0; i < 1000; i++)
             {
                 Configs.CastleWindsorSingleton.Resolve<IService1>().DoSomething();
             }
         }
 
-        [Benchmark(OperationsPerInvoke = Configs.Count * Configs.FastK * 10)]
+        [Benchmark(OperationsPerInvoke = 10000000)]
         public void DryIoc()
         {
-            for (var i = 0; i < Configs.Count * Configs.FastK; i++)
+            for (var i = 0; i < 1000000; i++)
             {
                 Configs.DryIocSingleton.Resolve<IService1>().DoSomething();
                 Configs.DryIocSingleton.Resolve<IService1>().DoSomething();
@@ -105,10 +106,10 @@ namespace IoC.Benchmark
             }
         }
 
-        [Benchmark(OperationsPerInvoke = Configs.Count * Configs.FastK * 10)]
+        [Benchmark(OperationsPerInvoke = 10000000)]
         public void LightInject()
         {
-            for (var i = 0; i < Configs.Count * Configs.FastK; i++)
+            for (var i = 0; i < 1000000; i++)
             {
                 Configs.LightInjectSingleton.GetInstance<IService1>().DoSomething();
                 Configs.LightInjectSingleton.GetInstance<IService1>().DoSomething();
@@ -123,21 +124,39 @@ namespace IoC.Benchmark
             }
         }
 
-        [Benchmark(OperationsPerInvoke = Configs.Count)]
+        [Benchmark(OperationsPerInvoke = 1000)]
         public void Ninject()
         {
-            for (var i = 0; i < Configs.Count; i++)
+            for (var i = 0; i < 1000; i++)
             {
                 Configs.NinjectSingleton.Get<IService1>().DoSomething();
             }
         }
 
-        [Benchmark(OperationsPerInvoke = Configs.Count)]
+        [Benchmark(OperationsPerInvoke = 10000)]
         public void Unity()
         {
-            for (var i = 0; i < Configs.Count; i++)
+            for (var i = 0; i < 10000; i++)
             {
                 Configs.UnitySingleton.Resolve<IService1>().DoSomething();
+            }
+        }
+
+        [Benchmark(OperationsPerInvoke = 10000000)]
+        public void MicrosoftDependencyInjection()
+        {
+            for (var i = 0; i < 1000000; i++)
+            {
+                Configs.MicrosoftDependencyInjectionSingleton.GetService<IService1>().DoSomething();
+                Configs.MicrosoftDependencyInjectionSingleton.GetService<IService1>().DoSomething();
+                Configs.MicrosoftDependencyInjectionSingleton.GetService<IService1>().DoSomething();
+                Configs.MicrosoftDependencyInjectionSingleton.GetService<IService1>().DoSomething();
+                Configs.MicrosoftDependencyInjectionSingleton.GetService<IService1>().DoSomething();
+                Configs.MicrosoftDependencyInjectionSingleton.GetService<IService1>().DoSomething();
+                Configs.MicrosoftDependencyInjectionSingleton.GetService<IService1>().DoSomething();
+                Configs.MicrosoftDependencyInjectionSingleton.GetService<IService1>().DoSomething();
+                Configs.MicrosoftDependencyInjectionSingleton.GetService<IService1>().DoSomething();
+                Configs.MicrosoftDependencyInjectionSingleton.GetService<IService1>().DoSomething();
             }
         }
 

@@ -6,6 +6,7 @@ namespace IoC.Benchmark
     using global::LightInject;
     using global::Ninject;
     using global::Unity;
+    using Microsoft.Extensions.DependencyInjection;
     using Model;
 
     public static class Configs
@@ -44,8 +45,8 @@ namespace IoC.Benchmark
         public static readonly UnityContainer UnitySingleton = Unity.Singleton();
         public static readonly UnityContainer UnityComplex = Unity.Complex();
 
-        public const int Count = 100;
-        public const int ComplexCount = 10;
-        public const int FastK = 100000;
+        public static readonly ServiceProvider MicrosoftDependencyInjectionTransient = MicrosoftDependencyInjection.Transient();
+        public static readonly ServiceProvider MicrosoftDependencyInjectionSingleton = MicrosoftDependencyInjection.Singleton();
+        public static readonly ServiceProvider MicrosoftDependencyInjectionComplex = MicrosoftDependencyInjection.Complex();
     }
 }
