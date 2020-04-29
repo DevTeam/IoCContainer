@@ -3835,6 +3835,47 @@
             <param name="tagValue">The tag value.</param>
             <returns>The tag.</returns>
         </member>
+        <member name="T:IoC.FluentNativeGetResolver">
+            <summary>
+            Represents extensions to resolve from the native container.
+            </summary>
+        </member>
+        <member name="M:IoC.FluentNativeGetResolver.GetResolver``1(IoC.Container)">
+            <summary>
+            Gets the resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentNativeGetResolver.GetResolver``1(IoC.Container,IoC.Tag)">
+            <summary>
+            Gets the resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="tag">The tag.</param>
+            <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentNativeGetResolver.GetResolver``1(IoC.Container,System.Type)">
+            <summary>
+            Gets the resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="type">The resolving instance type.</param>
+            <returns>The resolver.</returns>
+        </member>
+        <member name="M:IoC.FluentNativeGetResolver.GetResolver``1(IoC.Container,System.Type,IoC.Tag)">
+            <summary>
+            Gets the resolver.
+            </summary>
+            <typeparam name="T">The instance type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="type">The resolving instance type.</param>
+            <param name="tag">The tag.</param>
+            <returns>The resolver.</returns>
+        </member>
         <member name="T:IoC.FluentNativeResolve">
             <summary>
             Represents extensions to resolve from the native container.

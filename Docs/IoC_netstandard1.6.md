@@ -254,6 +254,11 @@
   - [TryGetResolver\`\`1(tag,container,resolver)](#M-IoC-FluentGetResolver-TryGetResolver``1-IoC-IContainer,IoC-Tag,IoC-Resolver{``0}@- 'IoC.FluentGetResolver.TryGetResolver``1(IoC.IContainer,IoC.Tag,IoC.Resolver{``0}@)')
   - [TryGetResolver\`\`1(type,container,resolver)](#M-IoC-FluentGetResolver-TryGetResolver``1-IoC-IContainer,System-Type,IoC-Resolver{``0}@- 'IoC.FluentGetResolver.TryGetResolver``1(IoC.IContainer,System.Type,IoC.Resolver{``0}@)')
   - [TryGetResolver\`\`1(container,resolver)](#M-IoC-FluentGetResolver-TryGetResolver``1-IoC-IContainer,IoC-Resolver{``0}@- 'IoC.FluentGetResolver.TryGetResolver``1(IoC.IContainer,IoC.Resolver{``0}@)')
+- [FluentNativeGetResolver](#T-IoC-FluentNativeGetResolver 'IoC.FluentNativeGetResolver')
+  - [GetResolver\`\`1(container)](#M-IoC-FluentNativeGetResolver-GetResolver``1-IoC-Container- 'IoC.FluentNativeGetResolver.GetResolver``1(IoC.Container)')
+  - [GetResolver\`\`1(container,tag)](#M-IoC-FluentNativeGetResolver-GetResolver``1-IoC-Container,IoC-Tag- 'IoC.FluentNativeGetResolver.GetResolver``1(IoC.Container,IoC.Tag)')
+  - [GetResolver\`\`1(container,type)](#M-IoC-FluentNativeGetResolver-GetResolver``1-IoC-Container,System-Type- 'IoC.FluentNativeGetResolver.GetResolver``1(IoC.Container,System.Type)')
+  - [GetResolver\`\`1(container,type,tag)](#M-IoC-FluentNativeGetResolver-GetResolver``1-IoC-Container,System-Type,IoC-Tag- 'IoC.FluentNativeGetResolver.GetResolver``1(IoC.Container,System.Type,IoC.Tag)')
 - [FluentNativeResolve](#T-IoC-FluentNativeResolve 'IoC.FluentNativeResolve')
   - [Resolve\`\`1(container)](#M-IoC-FluentNativeResolve-Resolve``1-IoC-Container- 'IoC.FluentNativeResolve.Resolve``1(IoC.Container)')
   - [Resolve\`\`1(container,tag)](#M-IoC-FluentNativeResolve-Resolve``1-IoC-Container,IoC-Tag- 'IoC.FluentNativeResolve.Resolve``1(IoC.Container,IoC.Tag)')
@@ -6644,6 +6649,113 @@ True if success.
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
 | resolver | [IoC.Resolver{\`\`0}@](#T-IoC-Resolver{``0}@ 'IoC.Resolver{``0}@') |  |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='T-IoC-FluentNativeGetResolver'></a>
+## FluentNativeGetResolver `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents extensions to resolve from the native container.
+
+<a name='M-IoC-FluentNativeGetResolver-GetResolver``1-IoC-Container-'></a>
+### GetResolver\`\`1(container) `method`
+
+##### Summary
+
+Gets the resolver.
+
+##### Returns
+
+The resolver.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.Container](#T-IoC-Container 'IoC.Container') | The target container. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentNativeGetResolver-GetResolver``1-IoC-Container,IoC-Tag-'></a>
+### GetResolver\`\`1(container,tag) `method`
+
+##### Summary
+
+Gets the resolver.
+
+##### Returns
+
+The resolver.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.Container](#T-IoC-Container 'IoC.Container') | The target container. |
+| tag | [IoC.Tag](#T-IoC-Tag 'IoC.Tag') | The tag. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentNativeGetResolver-GetResolver``1-IoC-Container,System-Type-'></a>
+### GetResolver\`\`1(container,type) `method`
+
+##### Summary
+
+Gets the resolver.
+
+##### Returns
+
+The resolver.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.Container](#T-IoC-Container 'IoC.Container') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The resolving instance type. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentNativeGetResolver-GetResolver``1-IoC-Container,System-Type,IoC-Tag-'></a>
+### GetResolver\`\`1(container,type,tag) `method`
+
+##### Summary
+
+Gets the resolver.
+
+##### Returns
+
+The resolver.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.Container](#T-IoC-Container 'IoC.Container') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The resolving instance type. |
+| tag | [IoC.Tag](#T-IoC-Tag 'IoC.Tag') | The tag. |
 
 ##### Generic Types
 

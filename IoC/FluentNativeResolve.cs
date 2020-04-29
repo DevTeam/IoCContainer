@@ -21,20 +21,8 @@ namespace IoC
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static T Resolve<T>([NotNull] this Container container)
-        {
-            var items = container.ResolversByType.GetBucket(TypeDescriptor<T>.HashCode);
-            for (var index = 0; index < items.Length; index++)
-            {
-                var item = items[index];
-                if (typeof(T) == item.Key)
-                {
-                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
-                }
-            }
-
-            return container.GetResolver<T>(typeof(T))(container, EmptyArgs);
-        }
+        public static T Resolve<T>([NotNull] this Container container) => 
+            container.GetResolver<T>()(container, EmptyArgs);
 
         /// <summary>
         /// Resolves an instance.
@@ -45,21 +33,8 @@ namespace IoC
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static T Resolve<T>([NotNull] this Container container, Tag tag)
-        {
-            var key = new Key(typeof(T), tag);
-            var items = container.Resolvers.GetBucket(key.HashCode);
-            for (var index = 0; index < items.Length; index++)
-            {
-                var item = items[index];
-                if (CoreExtensions.Equals(key, item.Key))
-                {
-                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
-                }
-            }
-
-            return container.GetResolver<T>(typeof(T), tag)(container, EmptyArgs);
-        }
+        public static T Resolve<T>([NotNull] this Container container, Tag tag) =>
+            container.GetResolver<T>(tag)(container, EmptyArgs);
 
         /// <summary>
         /// Resolves an instance.
@@ -70,20 +45,8 @@ namespace IoC
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args)
-        {
-            var items = container.ResolversByType.GetBucket(TypeDescriptor<T>.HashCode);
-            for (var index = 0; index < items.Length; index++)
-            {
-                var item = items[index];
-                if (typeof(T) == item.Key)
-                {
-                    return ((Resolver<T>)item.Value)(container, args);
-                }
-            }
-
-            return container.GetResolver<T>(typeof(T))(container, args);
-        }
+        public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args) =>
+            container.GetResolver<T>()(container, args);
 
         /// <summary>
         /// Resolves an instance.
@@ -95,21 +58,8 @@ namespace IoC
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
-        {
-            var key = new Key(typeof(T), tag);
-            var items = container.Resolvers.GetBucket(key.HashCode);
-            for (var index = 0; index < items.Length; index++)
-            {
-                var item = items[index];
-                if (CoreExtensions.Equals(key, item.Key))
-                {
-                    return ((Resolver<T>)item.Value)(container, args);
-                }
-            }
-
-            return container.GetResolver<T>(typeof(T), tag)(container, args);
-        }
+        public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args) =>
+            container.GetResolver<T>(tag)(container, args);
 
         /// <summary>
         /// Resolves an instance.
@@ -120,20 +70,8 @@ namespace IoC
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type)
-        {
-            var items = container.ResolversByType.GetBucket(type.GetHashCode());
-            for (var index = 0; index < items.Length; index++)
-            {
-                var item = items[index];
-                if (type == item.Key)
-                {
-                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
-                }
-            }
-
-            return container.GetResolver<T>(type)(container, EmptyArgs);
-        }
+        public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type) =>
+            container.GetResolver<T>(type)(container, EmptyArgs);
 
         /// <summary>
         /// Resolves an instance.
@@ -145,21 +83,8 @@ namespace IoC
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
-        {
-            var key = new Key(type, tag);
-            var items = container.Resolvers.GetBucket(key.HashCode);
-            for (var index = 0; index < items.Length; index++)
-            {
-                var item = items[index];
-                if (CoreExtensions.Equals(key, item.Key))
-                {
-                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
-                }
-            }
-
-            return container.GetResolver<T>(type, tag)(container, EmptyArgs);
-        }
+        public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag) =>
+            container.GetResolver<T>(type, tag)(container, EmptyArgs);
 
         /// <summary>
         /// Resolves an instance.
@@ -171,20 +96,8 @@ namespace IoC
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args)
-        {
-            var items = container.ResolversByType.GetBucket(type.GetHashCode());
-            for (var index = 0; index < items.Length; index++)
-            {
-                var item = items[index];
-                if (type == item.Key)
-                {
-                    return ((Resolver<T>)item.Value)(container, args);
-                }
-            }
-
-            return container.GetResolver<T>(type)(container, args);
-        }
+        public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args) =>
+            container.GetResolver<T>(type)(container, args);
 
         /// <summary>
         /// Resolves an instance.
@@ -197,20 +110,7 @@ namespace IoC
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)256)]
         [NotNull]
-        public static object Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag, [NotNull] [ItemCanBeNull] params object[] args)
-        {
-            var key = new Key(type, tag);
-            var items = container.Resolvers.GetBucket(key.HashCode);
-            for (var index = 0; index < items.Length; index++)
-            {
-                var item = items[index];
-                if (CoreExtensions.Equals(key, item.Key))
-                {
-                    return ((Resolver<T>)item.Value)(container, args);
-                }
-            }
-
-            return container.GetResolver<T>(type, tag)(container, args);
-        }
+        public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag, [NotNull] [ItemCanBeNull] params object[] args) =>
+            container.GetResolver<T>(type, tag)(container, args);
     }
 }

@@ -2,7 +2,6 @@
 {
     using System;
     using System.Runtime.CompilerServices;
-    using Core;
     using Issues;
 
     /// <summary>
@@ -21,8 +20,10 @@
         /// <returns>The resolver.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag)
-            => container.TryGetResolver<T>(type, tag.Value, out var resolver, out var error) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(type, tag), error);
+        public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag) =>
+            container is Container nativeContainer 
+                ? nativeContainer.GetResolver<T>(type, tag)
+                : container.TryGetResolver<T>(type, tag.Value, out var resolver, out var error) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(type, tag), error);
 
         /// <summary>
         /// Tries getting the resolver.
@@ -46,8 +47,10 @@
         /// <returns>The resolver.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, Tag tag)
-            => container.GetResolver<T>(typeof(T), tag);
+        public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, Tag tag) =>
+            container is Container nativeContainer
+                ? nativeContainer.GetResolver<T>(typeof(T), tag)
+                : container.GetResolver<T>(typeof(T), tag);
 
         /// <summary>
         /// Tries getting the resolver.
@@ -70,8 +73,10 @@
         /// <returns>The resolver.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type)
-            => container.TryGetResolver<T>(type, null, out var resolver, out var error) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(type), error);
+        public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type) =>
+            container is Container nativeContainer
+                ? nativeContainer.GetResolver<T>(type)
+                : container.TryGetResolver<T>(type, null, out var resolver, out var error) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(type), error);
 
         /// <summary>
         /// Tries getting the resolver.
@@ -93,8 +98,10 @@
         /// <returns>The resolver.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static Resolver<T> GetResolver<T>([NotNull] this IContainer container)
-            => container.GetResolver<T>(typeof(T));
+        public static Resolver<T> GetResolver<T>([NotNull] this IContainer container) =>
+            container is Container nativeContainer
+                ? nativeContainer.GetResolver<T>()
+                : container.GetResolver<T>(typeof(T));
 
         /// <summary>
         /// Tries getting the resolver.
