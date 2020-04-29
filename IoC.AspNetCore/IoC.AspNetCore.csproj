@@ -24,7 +24,7 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <TargetFrameworks>net5.0;netstandard1.0;netstandard2.0;net45;netcoreapp1.0;netcoreapp2.0;netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>netstandard1.0;netstandard2.0;net45;netcoreapp1.0;netcoreapp2.0;netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
     <Optimize>true</Optimize>
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
@@ -48,14 +48,14 @@
   </ItemGroup>  
 
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.0'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.0.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.0.3" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.0" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.3" />
   </ItemGroup>
 
-  <ItemGroup Condition="'$(TargetFramework)'=='net5.0'">
+  <ItemGroup Condition="'$(TargetFramework)'=='net5.0' AND '$(Configuration)'=='Debug'">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0-preview.2.20160.3" />
   </ItemGroup>
 
