@@ -4,6 +4,7 @@ namespace IoC
     using System;
     using System.Runtime.CompilerServices;
     using Core;
+    using Issues;
 
     /// <summary>
     /// Represents extensions to resolve from the native container.
@@ -21,8 +22,24 @@ namespace IoC
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static T Resolve<T>([NotNull] this Container container) => 
-            container.GetResolver<T>()(container, EmptyArgs);
+        public static T Resolve<T>([NotNull] this Container container)
+        {
+            var items = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor];
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (typeof(T) == item.Key)
+                {
+                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
+                }
+            }
+
+            return (
+                container.TryGetResolver<T>(new Key(typeof(T)), out var resolver, out var error, container)
+                    ? resolver
+                    : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(typeof(T)), error)
+            )(container, EmptyArgs);
+        }
 
         /// <summary>
         /// Resolves an instance.

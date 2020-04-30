@@ -1418,11 +1418,17 @@ namespace IoC
                 }
             }
 
+            return TryGetResolver(key, out resolver, out error, resolvingContainer);
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        internal bool TryGetResolver<T>(FullKey key, out Resolver<T> resolver, out Exception error, [CanBeNull] IContainer resolvingContainer)
+        {
             // tries finding in dependencies
             lock (_lockObject)
             {
                 CheckIsNotDisposed();
-                var hasDependency = TryGetDependency(key, hashCode, out var dependencyEntry);
+                var hasDependency = TryGetDependency(key, key.HashCode, out var dependencyEntry);
                 if (hasDependency)
                 {
                     // tries creating resolver
@@ -1440,12 +1446,12 @@ namespace IoC
                         return false;
                     }
 
-                    resolver = (Resolver<T>)resolverDelegate;
+                    resolver = (Resolver<T>) resolverDelegate;
                 }
                 else
                 {
                     // tries finding in parent
-                    if (!_parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer ?? this))
+                    if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, out error, resolvingContainer ?? this))
                     {
                         resolver = default(Resolver<T>);
                         return false;
@@ -1456,12 +1462,11 @@ namespace IoC
                 if (resolvingContainer == null || Equals(resolvingContainer, this))
                 {
                     // Add resolver to tables
-                    Resolvers = Resolvers.Set(hashCode, key, resolver);
-                    if (tag == null)
+                    Resolvers = Resolvers.Set(key.HashCode, key, resolver);
+                    if (key.Tag == null)
                     {
-                        ResolversByType = ResolversByType.Set(hashCode, type, resolver);
+                        ResolversByType = ResolversByType.Set(key.HashCode, key.Type, resolver);
                     }
-
                 }
             }
 
@@ -5841,7 +5846,7 @@ namespace IoC
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container)
         {
-            var items = container.ResolversByType.GetBucket(TypeDescriptor<T>.HashCode);
+            var items = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor];
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
@@ -5851,7 +5856,7 @@ namespace IoC
                 }
             }
 
-            return container.TryGetResolver<T>(typeof(T), null, out var resolver, out var error) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(typeof(T)), error);
+            return container.TryGetResolver<T>(new Key(typeof(T)), out var resolver, out var error, container) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(typeof(T)), error);
         }
 
         /// <summary>
@@ -5866,7 +5871,7 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, Tag tag)
         {
             var key = new Key(typeof(T), tag);
-            var items = container.Resolvers.GetBucket(key.HashCode);
+            var items = container.Resolvers.Buckets[key.HashCode & container.Resolvers.Divisor];
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
@@ -5876,7 +5881,7 @@ namespace IoC
                 }
             }
 
-            return container.TryGetResolver<T>(typeof(T), tag.Value, out var resolver, out var error) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(typeof(T), tag), error);
+            return container.TryGetResolver<T>(new Key(typeof(T), tag.Value), out var resolver, out var error, container) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(typeof(T), tag), error);
         }
 
         /// <summary>
@@ -5890,7 +5895,7 @@ namespace IoC
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type)
         {
-            var items = container.ResolversByType.GetBucket(type.GetHashCode());
+            var items = container.ResolversByType.Buckets[type.GetHashCode() & container.ResolversByType.Divisor];
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
@@ -5900,7 +5905,7 @@ namespace IoC
                 }
             }
 
-            return container.TryGetResolver<T>(type, null, out var resolver, out var error) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(type), error);
+            return container.TryGetResolver<T>(new Key(type), out var resolver, out var error, container) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(type), error);
         }
 
         /// <summary>
@@ -5916,7 +5921,7 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
             var key = new Key(type, tag);
-            var items = container.Resolvers.GetBucket(key.HashCode);
+            var items = container.Resolvers.Buckets[key.HashCode & container.Resolvers.Divisor];
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
@@ -5926,7 +5931,7 @@ namespace IoC
                 }
             }
 
-            return container.TryGetResolver<T>(type, tag.Value, out var resolver, out var error) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(type, tag), error);
+            return container.TryGetResolver<T>(new Key(type, tag.Value), out var resolver, out var error, container) ? resolver : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(type, tag), error);
         }
     }
 }
@@ -5940,6 +5945,7 @@ namespace IoC
     using System;
     using System.Runtime.CompilerServices;
     using Core;
+    using Issues;
 
     /// <summary>
     /// Represents extensions to resolve from the native container.
@@ -5957,8 +5963,24 @@ namespace IoC
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions) 256)]
         [NotNull]
-        public static T Resolve<T>([NotNull] this Container container) => 
-            container.GetResolver<T>()(container, EmptyArgs);
+        public static T Resolve<T>([NotNull] this Container container)
+        {
+            var items = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor];
+            for (var index = 0; index < items.Length; index++)
+            {
+                var item = items[index];
+                if (typeof(T) == item.Key)
+                {
+                    return ((Resolver<T>)item.Value)(container, EmptyArgs);
+                }
+            }
+
+            return (
+                container.TryGetResolver<T>(new Key(typeof(T)), out var resolver, out var error, container)
+                    ? resolver
+                    : container.Resolve<ICannotGetResolver>().Resolve<T>(container, new Key(typeof(T)), error)
+            )(container, EmptyArgs);
+        }
 
         /// <summary>
         /// Resolves an instance.
@@ -13265,7 +13287,7 @@ namespace IoC.Core
         [Pure]
         public TValue Get(int hashCode, TKey key)
         {
-            var items = this.GetBucket(hashCode);
+            var items = this.Buckets[hashCode & this.Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
@@ -13380,16 +13402,11 @@ namespace IoC.Core
 
     internal static class TableExtensions
     {
-        [MethodImpl((MethodImplOptions) 256)]
-        [Pure]
-        public static Table<TKey, TValue>.KeyValue[] GetBucket<TKey, TValue>(this Table<TKey, TValue> table, int hashCode) =>
-            table.Buckets[hashCode & table.Divisor];
-
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
         public static bool TryGetByType<TValue>(this Table<Type, TValue> table, int hashCode, Type key, out TValue value)
         {
-            var items = table.GetBucket(hashCode);
+            var items = table.Buckets[hashCode & table.Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
@@ -13409,7 +13426,7 @@ namespace IoC.Core
         [Pure]
         public static bool TryGetByKey<TValue>(this Table<Key, TValue> table, int hashCode, Key key, out TValue value)
         {
-            var items = table.GetBucket(hashCode);
+            var items = table.Buckets[hashCode & table.Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {

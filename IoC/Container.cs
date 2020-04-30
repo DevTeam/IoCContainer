@@ -219,11 +219,17 @@
                 }
             }
 
+            return TryGetResolver(key, out resolver, out error, resolvingContainer);
+        }
+
+        [MethodImpl((MethodImplOptions)256)]
+        internal bool TryGetResolver<T>(FullKey key, out Resolver<T> resolver, out Exception error, [CanBeNull] IContainer resolvingContainer)
+        {
             // tries finding in dependencies
             lock (_lockObject)
             {
                 CheckIsNotDisposed();
-                var hasDependency = TryGetDependency(key, hashCode, out var dependencyEntry);
+                var hasDependency = TryGetDependency(key, key.HashCode, out var dependencyEntry);
                 if (hasDependency)
                 {
                     // tries creating resolver
@@ -241,12 +247,12 @@
                         return false;
                     }
 
-                    resolver = (Resolver<T>)resolverDelegate;
+                    resolver = (Resolver<T>) resolverDelegate;
                 }
                 else
                 {
                     // tries finding in parent
-                    if (!_parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer ?? this))
+                    if (!_parent.TryGetResolver(key.Type, key.Tag, out resolver, out error, resolvingContainer ?? this))
                     {
                         resolver = default(Resolver<T>);
                         return false;
@@ -257,12 +263,11 @@
                 if (resolvingContainer == null || Equals(resolvingContainer, this))
                 {
                     // Add resolver to tables
-                    Resolvers = Resolvers.Set(hashCode, key, resolver);
-                    if (tag == null)
+                    Resolvers = Resolvers.Set(key.HashCode, key, resolver);
+                    if (key.Tag == null)
                     {
-                        ResolversByType = ResolversByType.Set(hashCode, type, resolver);
+                        ResolversByType = ResolversByType.Set(key.HashCode, key.Type, resolver);
                     }
-
                 }
             }
 

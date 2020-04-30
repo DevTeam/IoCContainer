@@ -5,16 +5,11 @@
 
     internal static class TableExtensions
     {
-        [MethodImpl((MethodImplOptions) 256)]
-        [Pure]
-        public static Table<TKey, TValue>.KeyValue[] GetBucket<TKey, TValue>(this Table<TKey, TValue> table, int hashCode) =>
-            table.Buckets[hashCode & table.Divisor];
-
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
         public static bool TryGetByType<TValue>(this Table<Type, TValue> table, int hashCode, Type key, out TValue value)
         {
-            var items = table.GetBucket(hashCode);
+            var items = table.Buckets[hashCode & table.Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
@@ -34,7 +29,7 @@
         [Pure]
         public static bool TryGetByKey<TValue>(this Table<Key, TValue> table, int hashCode, Key key, out TValue value)
         {
-            var items = table.GetBucket(hashCode);
+            var items = table.Buckets[hashCode & table.Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {

@@ -56,7 +56,7 @@
         [Pure]
         public TValue Get(int hashCode, TKey key)
         {
-            var items = this.GetBucket(hashCode);
+            var items = this.Buckets[hashCode & this.Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
