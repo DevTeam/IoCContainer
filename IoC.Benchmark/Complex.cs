@@ -2,11 +2,13 @@
 namespace IoC.Benchmark
 {
     using BenchmarkDotNet.Attributes;
+    using BenchmarkDotNet.Order;
     using global::Autofac;
     using global::DryIoc;
     using global::Ninject;
     using global::Unity;
 
+    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     [BenchmarkCategory("complex", " 364 instances of unique type")]
     public class Complex
     {

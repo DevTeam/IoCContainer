@@ -5,6 +5,7 @@ namespace IoC.Benchmark
 {
     using System.Runtime.CompilerServices;
     using BenchmarkDotNet.Attributes;
+    using BenchmarkDotNet.Order;
     using global::Autofac;
     using global::DryIoc;
     using global::LightInject;
@@ -13,6 +14,7 @@ namespace IoC.Benchmark
     using Microsoft.Extensions.DependencyInjection;
     using Model;
 
+    [Orderer(SummaryOrderPolicy.FastestToSlowest)]
     [BenchmarkCategory("singleton", " 20 instances and 1 singleton")]
     public class Singleton
     {
