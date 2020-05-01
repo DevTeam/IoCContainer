@@ -351,6 +351,7 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Custom Lifetime](#custom-lifetime-)
   - [Custom Tasks](#custom-tasks-)
   - [Interception](#interception-)
+  - [Override Autowiring Strategy](#override-autowiring-strategy-)
   - [Replace Lifetime](#replace-lifetime-)
 - Other Samples
   - [Cyclic Dependency](#cyclic-dependency-)
@@ -1737,6 +1738,65 @@ public class MyInterceptor : IInterceptor
 
     // Intercepts the invocations and appends the called method name to the collection
     public void Intercept(IInvocation invocation) => _methods.Add(invocation.Method.Name);
+}
+```
+
+
+
+### Override Autowiring Strategy [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/OverrideAutowiringStrategy.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    using var container = Container
+        .Create()
+        .Bind<IDependency>().To<Dependency>()
+        // Additionally NamedService requires name in the constructor
+        .Bind<INamedService>().To<NamedService>()
+        // Overrides the previous autowiring strategy for the current and children containers
+        .Bind<IAutowiringStrategy>().To<CustomAutowiringStrategy>()
+        .Container;
+
+    var service = container.Resolve<INamedService>();
+
+    service.Name.ShouldBe("default name");
+}
+
+class CustomAutowiringStrategy : IAutowiringStrategy
+{
+    private readonly IAutowiringStrategy _baseAutowiringStrategy;
+
+    public CustomAutowiringStrategy(IAutowiringStrategy baseAutowiringStrategy) =>
+        // Saves the previous autowiring strategy
+        _baseAutowiringStrategy = baseAutowiringStrategy;
+
+    public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType) =>
+        // Just uses a logic from the previous autowiring strategy as is
+        _baseAutowiringStrategy.TryResolveType(registeredType, resolvingType, out instanceType);
+
+    // Overrides a logic to inject the constant "default name" to every constructors parameters named "name" of type String
+    public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
+    {
+        if (!_baseAutowiringStrategy.TryResolveConstructor(constructors, out constructor))
+        {
+            return false;
+        }
+
+        var selectedConstructor = constructor;
+        selectedConstructor.Info.GetParameters()
+            // Filters constructor parameters
+            .Where(p => p.Name == "name" && p.ParameterType == typeof(string)).ToList()
+            // Overrides every parameters expression by the constant "default name"
+            .ForEach(p => selectedConstructor.SetExpression(p.Position, Expression.Constant("default name")));
+
+        return true;
+    }
+
+    public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
+        // Just uses a logic from the previous autowiring strategy as is
+        => _baseAutowiringStrategy.TryResolveInitializers(methods, out initializers);
 }
 ```
 
