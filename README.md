@@ -341,7 +341,7 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Aspect Oriented](#aspect-oriented-)
 - Asynchronous
   - [Asynchronous resolve](#asynchronous-resolve-)
-  - [Asynchronous lightweight resolve](#asynchronous-lightweight-resolve-)
+  - [Pseudo asynchronous resolve](#pseudo-asynchronous-resolve-)
   - [Asynchronous construction](#asynchronous-construction-)
   - [Cancellation of asynchronous construction](#cancellation-of-asynchronous-construction-)
   - [Resolve instances via IAsyncEnumerable](#resolve-instances-via-iasyncenumerable-)
@@ -360,14 +360,17 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
 
 ### Asynchronous resolve [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousResolve.cs)
 
-Do you want to receive instances asynchronously? It's simple ...
+Do you want to resolve instances asynchronously? It's simple ...
 
 ``` CSharp
 // Create the container and configure it
 using var container = Container.Create()
     // Bind some dependency
     .Bind<IDependency>().To<Dependency>()
-    .Bind<IService>().To<Service>().Container;
+    .Bind<IService>().To<Service>()
+    // Override _TaskScheduler if it is required, TaskScheduler.Current will be used by default
+    .Bind<TaskScheduler>().To(ctx => TaskScheduler.Default)
+    .Container;
 
 // Resolve an instance asynchronously
 var instance = await container.Resolve<Task<IService>>();
@@ -375,9 +378,9 @@ var instance = await container.Resolve<Task<IService>>();
 
 
 
-### Asynchronous lightweight resolve [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousValueResolve.cs)
+### Pseudo asynchronous resolve [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousValueResolve.cs)
 
-Asynchronously and economically. Why load a GC?
+Pseudo asynchronous resolve. Why load a GC when we can resolve an instance right now? In this scenario ValueTask just wrap a resolved instance.
 
 ``` CSharp
 // Create a container
@@ -2568,13 +2571,11 @@ public void Run()
 
     // Create and configure the child container
     using var childContainer = rootContainer
-        .Create("Some child container")
-        .Bind<IConsole>().To(ctx => console.Object)
+        .Create("child")
         .Bind<IClock>().To(ctx => clock.Object)
         // Bind 'ILogger' to the instance creation, actually represented as an expression tree
-        .Bind<ILogger>().To<TimeLogger>(
-            // Inject the base logger from the parent container and the clock from the current container
-            ctx => new TimeLogger(ctx.Container.Parent.Inject<ILogger>(), ctx.Container.Inject<IClock>()))
+        // injecting the base logger from the parent container "root" and the clock from the current container "child"
+        .Bind<ILogger>().To<TimeLogger>()
         .Container;
 
     // Create a logger
@@ -2626,7 +2627,7 @@ public class TimeLogger: ILogger
         _clock = clock;
     }
 
-    // Adds current time before a message and writes it to console
+    // Adds current time as a message prefix and writes it to the console
     public void Log(string message) => _baseLogger.Log($"{_clock.Now}: {message}");
 }
 ```

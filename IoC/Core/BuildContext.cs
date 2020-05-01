@@ -102,7 +102,17 @@
 
         public Expression GetDependencyExpression(Expression defaultExpression = null)
         {
-            if (!Container.TryGetDependency(Key, out var dependency, out var lifetime))
+            var selectedContainer = Container;
+            if (
+                Parent != null
+                && selectedContainer.Parent != null
+                && Key.Equals(Parent.Key)
+                && Equals(Parent.Container, selectedContainer))
+            {
+                selectedContainer = selectedContainer.Parent;
+            }
+
+            if (!selectedContainer.TryGetDependency(Key, out var dependency, out var lifetime))
             {
                 if (defaultExpression != null)
                 {
@@ -123,7 +133,7 @@
 
             if (Depth >= 128)
             {
-                Container.Resolve<IFoundCyclicDependency>().Resolve(this);
+                selectedContainer.Resolve<IFoundCyclicDependency>().Resolve(this);
             }
 
             if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
@@ -131,7 +141,7 @@
                 return expression;
             }
 
-            return Container.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
+            return selectedContainer.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
         }
 
         public override string ToString()

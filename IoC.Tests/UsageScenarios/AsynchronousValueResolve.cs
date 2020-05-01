@@ -16,8 +16,8 @@ namespace IoC.Tests.UsageScenarios
             // $visible=true
             // $tag=async
             // $priority=02
-            // $description=Asynchronous lightweight resolve
-            // $header=Asynchronously and economically. Why load a GC?
+            // $description=Pseudo asynchronous resolve
+            // $header=Pseudo asynchronous resolve. Why load a GC when we can resolve an instance right now? In this scenario ValueTask just wrap a resolved instance.
             // {
             // Create a container
             using var container = Container

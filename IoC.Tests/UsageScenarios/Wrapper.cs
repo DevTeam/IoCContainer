@@ -31,13 +31,11 @@
 
             // Create and configure the child container
             using var childContainer = rootContainer
-                .Create("Some child container")
-                .Bind<IConsole>().To(ctx => console.Object)
+                .Create("child")
                 .Bind<IClock>().To(ctx => clock.Object)
                 // Bind 'ILogger' to the instance creation, actually represented as an expression tree
-                .Bind<ILogger>().To<TimeLogger>(
-                    // Inject the base logger from the parent container and the clock from the current container
-                    ctx => new TimeLogger(ctx.Container.Parent.Inject<ILogger>(), ctx.Container.Inject<IClock>()))
+                // injecting the base logger from the parent container "root" and the clock from the current container "child"
+                .Bind<ILogger>().To<TimeLogger>()
                 .Container;
 
             // Create a logger
@@ -89,7 +87,7 @@
                 _clock = clock;
             }
 
-            // Adds current time before a message and writes it to console
+            // Adds current time as a message prefix and writes it to the console
             public void Log(string message) => _baseLogger.Log($"{_clock.Now}: {message}");
         }
         // }

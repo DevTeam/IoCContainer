@@ -282,7 +282,7 @@
         }
 
         [Fact]
-        public void ContainerShouldSupportWrapping()
+        public void ContainerShouldSupportExplicitWrappingUsingParentContainer()
         {
             // Given
             using var container = Container.Create();
@@ -291,6 +291,25 @@
                 // When
                 using var childContainer = container.Create();
                 using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Parent.Inject<IMyWrapper>())))
+                {
+                    // Then
+                    var actualInstance = childContainer.Resolve<IMyWrapper>();
+                    actualInstance.ShouldBeOfType<Wrapper>();
+                    actualInstance.Wrapped.ShouldBeOfType<Wrappered>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldSupportImplicitWrappingUsingCurrentContainer()
+        {
+            // Given
+            using var container = Container.Create();
+            using (container.Bind<IMyWrapper>().To<Wrappered>())
+            {
+                // When
+                using var childContainer = container.Create();
+                using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Inject<IMyWrapper>())))
                 {
                     // Then
                     var actualInstance = childContainer.Resolve<IMyWrapper>();
