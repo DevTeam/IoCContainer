@@ -295,6 +295,7 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
 - Powerful Injection
   - [Composition Root](#composition-root-)
   - [Resolve Func](#resolve-func-)
+  - [Simple Wrapper](#simple-wrapper-)
   - [Resolve Lazy](#resolve-lazy-)
   - [Resolve ThreadLocal](#resolve-threadlocal-)
   - [Resolve Tuple](#resolve-tuple-)
@@ -1969,6 +1970,47 @@ var factory = container.Resolve<Func<IService>>();
 // Resolve instances
 var instance1 = factory();
 var instance2 = factory();
+```
+
+
+
+### Simple Wrapper [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SimpleWrapper.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    // Create and configure the root container
+    using var rootContainer = Container
+        .Create("root")
+        .Bind<string>().To(ctx => "abc")
+        // Binds the service to wrap
+        .Bind<INamedService>().To<NamedService>()
+        .Container;
+
+    // Create and configure the child container
+    using var childContainer = rootContainer
+        .Create("child")
+        .Bind<IDependency>().To<Dependency>()
+        // Binds wrapper, injecting the base INamedService from the parent container "root" via constructor
+        .Bind<INamedService>().To<Wrapper>()
+        .Container;
+
+    var service = childContainer.Resolve<INamedService>();
+
+    service.Name.ShouldBe("Wrapper abc");
+}
+
+public class Wrapper : INamedService
+{
+    private readonly INamedService _wrapping;
+    
+    public Wrapper(INamedService wrapping) => _wrapping = wrapping;
+
+    public string Name => $"Wrapper {_wrapping.Name}";
+}
+
 ```
 
 
