@@ -18,7 +18,7 @@ namespace IoC
         [NotNull] internal static readonly MethodInfo InjectWithTagGenericMethodInfo = ((MethodCallExpression)((Expression<Func<object>>) (() => Inject<object>(default(IContainer), null))).Body).Method.GetGenericMethodDefinition();
         [NotNull] internal static readonly MethodInfo TryInjectWithTagGenericMethodInfo = ((MethodCallExpression)((Expression<Func<object>>) (() => TryInject<object>(default(IContainer), null))).Body).Method.GetGenericMethodDefinition();
         [NotNull] internal static readonly MethodInfo TryInjectValueWithTagGenericMethodInfo = ((MethodCallExpression)((Expression<Func<TTS?>>)(() => TryInjectValue<TTS>(default(IContainer), null))).Body).Method.GetGenericMethodDefinition();
-        [NotNull] internal static readonly MethodInfo InjectingAssignmentGenericMethodInfo = ((MethodCallExpression)((Expression<Action<object, object>>) ((item1, item2) => Inject<object>(default(IContainer), null, null))).Body).Method.GetGenericMethodDefinition();
+        [NotNull] internal static readonly MethodInfo AssignGenericMethodInfo = ((MethodCallExpression)((Expression<Action<object, object>>) ((item1, item2) => Assign<object>(default(IContainer), null, null))).Body).Method.GetGenericMethodDefinition();
         [NotNull] internal static readonly MethodInfo InjectMethodInfo = ((MethodCallExpression)((Expression<Func<object>>) (() => Inject(default(IContainer), typeof(object)))).Body).Method;
         [NotNull] internal static readonly MethodInfo TryInjectMethodInfo = ((MethodCallExpression)((Expression<Func<object>>) (() => TryInject(default(IContainer), typeof(object)))).Body).Method;
         [NotNull] internal static readonly MethodInfo InjectWithTagMethodInfo = ((MethodCallExpression)((Expression<Func<object>>) (() => Inject(default(IContainer), typeof(object), (object)null))).Body).Method;
@@ -58,8 +58,9 @@ namespace IoC
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
         /// <param name="tag">The tag of dependency.</param>
+        /// <param name="args">The optional arguments.</param>
         /// <returns>The injected instance.</returns>
-        public static T Inject<T>([NotNull] this IContainer container, [CanBeNull] object tag) =>
+        public static T Inject<T>([NotNull] this IContainer container, [CanBeNull] object tag, params object[] args) =>
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
@@ -68,8 +69,9 @@ namespace IoC
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
         /// <param name="tag">The tag of dependency.</param>
+        /// <param name="args">The optional arguments.</param>
         /// <returns>The injected instance or <c>default(T)</c>.</returns>
-        [CanBeNull] public static T TryInject<T>([NotNull] this IContainer container, [CanBeNull] object tag) =>
+        [CanBeNull] public static T TryInject<T>([NotNull] this IContainer container, [CanBeNull] object tag, params object[] args) =>
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
@@ -78,9 +80,10 @@ namespace IoC
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
         /// <param name="tag">The tag of dependency.</param>
+        /// <param name="args">The optional arguments.</param>
         /// <returns>The injected instance or <c>default(T)</c>.</returns>
         [CanBeNull]
-        public static T? TryInjectValue<T>([NotNull] this IContainer container, [CanBeNull] object tag) where T : struct =>
+        public static T? TryInjectValue<T>([NotNull] this IContainer container, [CanBeNull] object tag, params object[] args) where T : struct =>
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
@@ -90,7 +93,7 @@ namespace IoC
         /// <param name="container">The resolving container.</param>
         /// <param name="destination">The destination member for injection.</param>
         /// <param name="source">The source of injection.</param>
-        public static void Inject<T>([NotNull] this IContainer container, [NotNull] T destination, [CanBeNull] T source) =>
+        public static IContainer Assign<T>([NotNull] this IContainer container, [NotNull] T destination, [CanBeNull] T source) =>
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
@@ -117,8 +120,9 @@ namespace IoC
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
         /// <param name="tag">The tag of dependency.</param>
+        /// <param name="args">The optional arguments.</param>
         /// <returns>The injected instance.</returns>
-        public static object Inject([NotNull] this IContainer container, [NotNull] Type type, [CanBeNull] object tag) =>
+        public static object Inject([NotNull] this IContainer container, [NotNull] Type type, [CanBeNull] object tag, params object[] args) =>
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
@@ -127,8 +131,9 @@ namespace IoC
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
         /// <param name="tag">The tag of dependency.</param>
+        /// <param name="args">The optional arguments.</param>
         /// <returns>The injected instance or <c>default(T)</c>.</returns>
-        [CanBeNull] public static object TryInject([NotNull] this IContainer container, [NotNull] Type type, [CanBeNull] object tag) =>
+        [CanBeNull] public static object TryInject([NotNull] this IContainer container, [NotNull] Type type, [CanBeNull] object tag, params object[] args) =>
             throw new NotImplementedException(JustAMarkerError);
     }
 }

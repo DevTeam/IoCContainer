@@ -26,6 +26,8 @@
             [NotNull] IContainer resolvingContainer,
             [NotNull] IEnumerable<IBuilder> builders,
             [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
+            [NotNull] ParameterExpression argsParameter,
+            [NotNull] ParameterExpression containerParameter,
             int depth = 0)
         {
             Parent = parent;
@@ -33,6 +35,8 @@
             Container = resolvingContainer ?? throw new ArgumentNullException(nameof(resolvingContainer));
             _builders = builders ?? throw new ArgumentNullException(nameof(builders));
             AutowiringStrategy = defaultAutowiringStrategy ?? throw new ArgumentNullException(nameof(defaultAutowiringStrategy));
+            ArgsParameter = argsParameter ?? throw new ArgumentNullException(nameof(argsParameter));
+            ContainerParameter = containerParameter ?? throw new ArgumentNullException(nameof(containerParameter));
             Depth = depth;
         }
 
@@ -46,6 +50,24 @@
 
         public int Depth { get; }
 
+        public ParameterExpression ArgsParameter { get; private set; }
+
+        public ParameterExpression ContainerParameter { get; private set; }
+        
+        public IDisposable OverrideArgsParameter(ParameterExpression argsParameter)
+        {
+            var origin = ArgsParameter;
+            ArgsParameter = argsParameter;
+            return Disposable.Create(() => { ArgsParameter = origin; });
+        }
+
+        public IDisposable OverrideContainerParameter(ParameterExpression containerParameter)
+        {
+            var origin = ContainerParameter;
+            ContainerParameter = containerParameter;
+            return Disposable.Create(() => { ContainerParameter = origin; });
+        }
+
         public IBuildContext CreateChild(Key key, IContainer container) => 
             CreateChildInternal(key, container ?? throw new ArgumentNullException(nameof(container)));
 
@@ -58,7 +80,7 @@
         public bool TryReplaceType(Type originalType, out Type targetType) =>
             _typesMap.TryGetValue(originalType, out targetType);
 
-        public void AddParameter([NotNull] ParameterExpression parameterExpression)
+        public void AddParameter(ParameterExpression parameterExpression)
             => _parameters.Add(parameterExpression ?? throw new ArgumentNullException(nameof(parameterExpression)));
 
         public Expression DeclareParameters(Expression baseExpression)
@@ -97,43 +119,54 @@
                 key = new Key(type, key.Tag);
             }
 
-            return new BuildContext(this, key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
+            return new BuildContext(this, key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, ArgsParameter, ContainerParameter, Depth + 1);
         }
 
         public Expression GetDependencyExpression(Expression defaultExpression = null)
         {
             var selectedContainer = Container;
-            if (
-                Parent != null
-                && selectedContainer.Parent != null
-                && Key.Equals(Parent.Key)
-                && Equals(Parent.Container, selectedContainer))
+            if (selectedContainer.Parent != null)
             {
-                selectedContainer = selectedContainer.Parent;
+                var parent = Parent;
+                while (parent != null)
+                {
+                    if (
+                        Key.Equals(parent.Key)
+                        && Equals(parent.Container, selectedContainer))
+                    {
+                        selectedContainer = selectedContainer.Parent;
+                        break;
+                    }
+
+                    parent = parent.Parent;
+                }
             }
 
             if (!selectedContainer.TryGetDependency(Key, out var dependency, out var lifetime))
             {
-                if (defaultExpression != null)
+                if (Container == selectedContainer || !Container.TryGetDependency(Key, out dependency, out lifetime))
                 {
-                    return defaultExpression;
-                }
+                    if (defaultExpression != null)
+                    {
+                        return defaultExpression;
+                    }
 
-                try
-                {
-                    var dependencyDescription = Container.Resolve<ICannotResolveDependency>().Resolve(this);
-                    dependency = dependencyDescription.Dependency;
-                    lifetime = dependencyDescription.Lifetime;
-                }
-                catch (Exception ex)
-                {
-                    throw new BuildExpressionException(ex.Message, ex.InnerException);
+                    try
+                    {
+                        var dependencyDescription = Container.Resolve<ICannotResolveDependency>().Resolve(this);
+                        dependency = dependencyDescription.Dependency;
+                        lifetime = dependencyDescription.Lifetime;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new BuildExpressionException(ex.Message, ex.InnerException);
+                    }
                 }
             }
 
             if (Depth >= 128)
             {
-                selectedContainer.Resolve<IFoundCyclicDependency>().Resolve(this);
+                Container.Resolve<IFoundCyclicDependency>().Resolve(this);
             }
 
             if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
@@ -141,7 +174,7 @@
                 return expression;
             }
 
-            return selectedContainer.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
+            return Container.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
         }
 
         public override string ToString()

@@ -2133,7 +2133,7 @@ using var container = Container
         // Select the constructor and inject the dependency
         ctx => new InitializingNamedService(ctx.Container.Inject<IDependency>()),
         // Select the property to inject after the instance creation and inject the value from arguments at index 0
-        ctx => ctx.Container.Inject(ctx.It.Name, (string) ctx.Args[0]))
+        ctx => ctx.Container.Assign(ctx.It.Name, (string) ctx.Args[0]))
     .Container;
 
 // Resolve the instance using the argument "alpha"

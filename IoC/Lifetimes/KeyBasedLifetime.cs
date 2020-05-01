@@ -6,7 +6,6 @@
     using System.Reflection;
     using Core;
     using static Core.TypeDescriptorExtensions;
-    using static WellknownExpressions;
 
     /// <summary>
     /// Represents the abstraction for singleton based lifetimes.
@@ -45,7 +44,7 @@
                 // T instance;
                 new[] { KeyVar, SingletonBasedLifetimeShared.HashCodeVar, instanceVar },
                 // var key = CreateKey(container, args);
-                Expression.Assign(KeyVar, Expression.Call(thisConst, CreateKeyMethodInfo, ContainerParameter, ArgsParameter)),
+                Expression.Assign(KeyVar, Expression.Call(thisConst, CreateKeyMethodInfo, context.ContainerParameter, context.ArgsParameter)),
                 // var hashCode = key.GetHashCode();
                 Expression.Assign(SingletonBasedLifetimeShared.HashCodeVar, Expression.Call(KeyVar, ExpressionBuilderExtensions.GetHashCodeMethodInfo)),
                 // var instance = (T)_instances.Get(hashCode, key);
@@ -70,7 +69,7 @@
                             )
                         ).Lock(lockObjectConst),
                         // OnNewInstanceCreated(instance, key, container, args);
-                        Expression.Call(thisConst, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, ContainerParameter, ArgsParameter)),
+                        Expression.Call(thisConst, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, context.ContainerParameter, context.ArgsParameter)),
                         // else {
                         // return instance;
                         instanceVar

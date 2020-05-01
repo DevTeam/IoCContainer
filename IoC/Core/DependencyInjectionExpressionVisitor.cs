@@ -7,7 +7,6 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using static WellknownExpressions;
     using static TypeDescriptorExtensions;
     // ReSharper disable once RedundantNameQualifier
     using IContainer = IoC.IContainer;
@@ -78,17 +77,18 @@ namespace IoC.Core
                         return Expression.New(ctor, expression);
                     }
 
-                    if (argumentsCount > 1)
+                    if (argumentsCount > 2)
                     {
-                        // container.Inject<T>(tag)
+                        // container.Inject<T>(tag, args)
                         if (Equals(genericMethodDefinition, Injections.InjectWithTagGenericMethodInfo))
                         {
                             var containerExpression = methodCall.Arguments[0];
                             var tagExpression = methodCall.Arguments[1];
                             var tag = GetTag(tagExpression);
+                            var argsExpression = Visit(methodCall.Arguments[2]);
 
                             var key = new Key(methodCall.Method.ReturnType, tag);
-                            return CreateDependencyExpression(key, containerExpression, null);
+                            return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, null);
                         }
 
                         if (Equals(genericMethodDefinition, Injections.TryInjectWithTagGenericMethodInfo))
@@ -96,9 +96,10 @@ namespace IoC.Core
                             var containerExpression = methodCall.Arguments[0];
                             var tagExpression = methodCall.Arguments[1];
                             var tag = GetTag(tagExpression);
+                            var argsExpression = Visit(methodCall.Arguments[2]);
 
                             var key = new Key(methodCall.Method.ReturnType, tag);
-                            return CreateDependencyExpression(key, containerExpression, Expression.Default(methodCall.Method.ReturnType));
+                            return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, Expression.Default(methodCall.Method.ReturnType));
                         }
 
                         if (Equals(genericMethodDefinition, Injections.TryInjectValueWithTagGenericMethodInfo))
@@ -106,11 +107,12 @@ namespace IoC.Core
                             var containerExpression = methodCall.Arguments[0];
                             var tagExpression = methodCall.Arguments[1];
                             var tag = GetTag(tagExpression);
+                            var argsExpression = Visit(methodCall.Arguments[2]);
 
                             var keyType = methodCall.Method.GetGenericArguments()[0];
                             var key = new Key(keyType, tag);
                             var defaultExpression = Expression.Default(methodCall.Method.ReturnType);
-                            var expression = CreateDependencyExpression(key, containerExpression, defaultExpression);
+                            var expression = OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, defaultExpression);
                             if (expression == defaultExpression)
                             {
                                 return defaultExpression;
@@ -120,14 +122,19 @@ namespace IoC.Core
                             return Expression.New(ctor, expression);
                         }
 
-                        if (argumentsCount > 2)
+                        if (argumentsCount == 3)
                         {
                             // container.Inject<T>(destination, source)
-                            if (Equals(genericMethodDefinition, Injections.InjectingAssignmentGenericMethodInfo))
+                            if (Equals(genericMethodDefinition, Injections.AssignGenericMethodInfo))
                             {
                                 var dstExpression = Visit(methodCall.Arguments[1]);
                                 var srcExpression = Visit(methodCall.Arguments[2]);
-                                return Expression.Assign(dstExpression ?? throw InvalidExpressionError, srcExpression ?? throw InvalidExpressionError);
+                                var containerVar = Expression.Variable(typeof(IContainer));
+                                return Expression.Block(
+                                    new [] { containerVar },
+                                    Expression.Assign(containerVar, Visit(methodCall.Arguments[0])),
+                                    Expression.Assign(dstExpression ?? throw InvalidExpressionError, srcExpression ?? throw InvalidExpressionError),
+                                    containerVar);
                             }
                         }
                     }
@@ -153,18 +160,19 @@ namespace IoC.Core
                             return CreateDependencyExpression(key, containerExpression, Expression.Default(type));
                         }
 
-                        if (argumentsCount > 2)
+                        if (argumentsCount > 3)
                         {
-                            // container.Inject(type, tag)
+                            // container.Inject(type, tag, args)
                             if (Equals(methodCall.Method, Injections.InjectWithTagMethodInfo))
                             {
                                 var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw InvalidExpressionError).Value ?? throw InvalidExpressionError;
                                 var containerExpression = methodCall.Arguments[0];
                                 var tagExpression = methodCall.Arguments[2];
                                 var tag = GetTag(tagExpression);
+                                var argsExpression = Visit(methodCall.Arguments[3]);
 
                                 var key = new Key(type, tag);
-                                return CreateDependencyExpression(key, containerExpression, null);
+                                return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, null);
                             }
 
                             if (Equals(methodCall.Method, Injections.TryInjectWithTagMethodInfo))
@@ -173,9 +181,10 @@ namespace IoC.Core
                                 var containerExpression = methodCall.Arguments[0];
                                 var tagExpression = methodCall.Arguments[2];
                                 var tag = GetTag(tagExpression);
+                                var argsExpression = Visit(methodCall.Arguments[3]);
 
                                 var key = new Key(type, tag);
-                                return CreateDependencyExpression(key, containerExpression, Expression.Default(type));
+                                return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, Expression.Default(type));
                             }
                         }
                     }
@@ -198,6 +207,25 @@ namespace IoC.Core
             }
 
             return Expression.Call(Visit(methodCall.Object), methodCall.Method, InjectAll(methodCall.Arguments));
+        }
+
+        private Expression OverrideArgsAndCreateDependencyExpression(Expression argsExpression, Key key, Expression containerExpression, DefaultExpression defaultExpression)
+        {
+            if (argsExpression is NewArrayExpression newArrayExpression && newArrayExpression.Expressions.Count == 0)
+            {
+                return CreateDependencyExpression(key, containerExpression, defaultExpression);
+            }
+
+            var argsVar = Expression.Variable(_buildContext.ArgsParameter.Type);
+            return Expression.Block(
+                new[] { argsVar },
+                Expression.TryFinally(
+                    Expression.Block(
+                        Expression.Assign(argsVar, _buildContext.ArgsParameter),
+                        Expression.Assign(_buildContext.ArgsParameter, argsExpression),
+                        CreateDependencyExpression(key, containerExpression, defaultExpression)),
+                    Expression.Assign(_buildContext.ArgsParameter, argsVar))
+            );
         }
 
         protected override Expression VisitUnary(UnaryExpression node)
@@ -249,8 +277,8 @@ namespace IoC.Core
                         ctor,
                         _thisExpression,
                         Expression.Constant(_buildContext.Key),
-                        ContainerParameter,
-                        ArgsParameter);
+                        _buildContext.ContainerParameter,
+                        _buildContext.ArgsParameter);
                 }
             }
 
@@ -261,8 +289,8 @@ namespace IoC.Core
             Expression.New(
                 ContextConstructor,
                 Expression.Constant(_buildContext.Key),
-                ContainerParameter,
-                ArgsParameter);
+                _buildContext.ContainerParameter,
+                _buildContext.ArgsParameter);
 
         [CanBeNull]
         private object GetTag([NotNull] Expression tagExpression)
@@ -296,7 +324,7 @@ namespace IoC.Core
                 return _container;
             }
 
-            var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, ContainerParameter);
+            var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, _buildContext.ContainerParameter);
             var selectContainer = containerSelectorExpression.Compile();
             return selectContainer(_container);
         }
@@ -333,14 +361,14 @@ namespace IoC.Core
                 // ctx.Container
                 if (name == nameof(Context.Container))
                 {
-                    expression = ContainerParameter;
+                    expression = _buildContext.ContainerParameter;
                     return true;
                 }
 
                 // ctx.Args
                 if (name == nameof(Context.Args))
                 {
-                    expression = ArgsParameter;
+                    expression = _buildContext.ArgsParameter;
                     return true;
                 }
             }

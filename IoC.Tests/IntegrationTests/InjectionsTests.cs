@@ -32,6 +32,46 @@
         }
 
         [Fact]
+        public void InjectWhenArgs()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassWithDep>().To(ctx => new MyClassWithDep(ctx.Container.Inject<MyClassRef>(null, "arg1")))
+                .Bind<MyClassRef>().To(ctx => new MyClassRef((string)ctx.Args[0]))
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassWithDep>();
+
+                instance.Val.ShouldBe("arg1");
+            }
+        }
+
+        [Fact]
+        public void InjectWhenEmptyArgs()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassWithDep>().To(ctx => new MyClassWithDep(ctx.Container.Inject<MyClassRef>(null)))
+                .Bind<MyClassRef>().To(ctx => new MyClassRef(ctx.Args.Length.ToString()))
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassWithDep>();
+
+                instance.Val.ShouldBe("0");
+            }
+        }
+
+        [Fact]
         public void TryInjectWhenRef()
         {
             // Given
@@ -50,6 +90,7 @@
                 instance.Val.ShouldBe("abc");
             }
         }
+
 
         [Fact]
         public void TryInjectWhenRefAndHasNoDependency()
@@ -233,6 +274,13 @@
             public MyClassRef(string val) => Val = val;
         }
 
+        public class MyClassWithDep
+        {
+            public string Val { get; }
+
+            public MyClassWithDep(MyClassRef myClassRef) => Val = myClassRef.Val;
+        }
+
         public class MyClassRefDef
         {
             public string Val { get; }
@@ -313,53 +361,16 @@
             using (container.Bind<IMyService1>().As(Lifetime.Transient).To(ctx => func()))
             using (container.Bind<IMyService>().As(Lifetime.Transient).To(
                 ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>()),
-                ctx => ctx.Container.Inject(ctx.It.Name, (string) ctx.Args[1])))
+                ctx => ctx.Container
+                    .Assign(ctx.It.Name, (string) ctx.Args[1])
+                    .Assign(ctx.It.Name, (string)ctx.Args[1] + "2")))
             {
                 // Then
                 var actualInstance = container.Resolve<IMyService>("abc", "xyz");
 
                 actualInstance.ShouldBeOfType<MyService>();
-                ((MyService) actualInstance).Name.ShouldBe("xyz");
+                ((MyService) actualInstance).Name.ShouldBe("xyz2");
                 ((MyService) actualInstance).SomeRef.ShouldBe(expectedRef);
-            }
-        }
-
-        [Fact]
-        public void ContainerShouldGetResolver()
-        {
-            // Given
-            using var container = Container.Create(Features.CoreFeature.Set);
-            var expectedRef = Mock.Of<IMyService1>();
-            Func<IMyService1> func = () => expectedRef;
-
-            // When
-            using (container.Bind<IMyService1>().To(ctx => func()))
-            {
-                // Then
-                var resolver = container.Resolve<Resolver<IMyService1>>();
-                resolver.ShouldBeOfType<Resolver<IMyService1>>();
-                var actualInstance = resolver(container);
-                actualInstance.ShouldBe(expectedRef);
-            }
-        }
-
-        [Fact]
-        public void ContainerShouldInjectResolver()
-        {
-            // Given
-            using var container = Container.Create();
-            var expectedRef = Mock.Of<IMyService1>();
-            Func<IMyService1> func = () => expectedRef;
-
-            // When
-            using (container.Bind<IMyService1>().To(ctx => func()))
-            using (container.Bind<Func<IMyService1>>().To(ctx => (() => ctx.Container.Inject<Resolver<IMyService1>>()(ctx.Container))))
-            {
-                // Then
-                var funcInstance = container.Resolve<Func<IMyService1>>();
-                funcInstance.ShouldBeOfType<Func<IMyService1>>();
-                var actualInstance = funcInstance();
-                actualInstance.ShouldBe(expectedRef);
             }
         }
 

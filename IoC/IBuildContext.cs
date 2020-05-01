@@ -35,6 +35,16 @@
         [NotNull] IAutowiringStrategy AutowiringStrategy { get; }
 
         /// <summary>
+        /// The args parameters.
+        /// </summary>
+        [NotNull] ParameterExpression ArgsParameter { get; }
+
+        /// <summary>
+        /// The container parameter.
+        /// </summary>
+        [NotNull] ParameterExpression ContainerParameter { get; }
+
+        /// <summary>
         /// Gets the dependency expression.
         /// </summary>
         /// <param name="defaultExpression">The default expression.</param>

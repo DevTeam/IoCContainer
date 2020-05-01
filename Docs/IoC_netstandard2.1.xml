@@ -787,6 +787,16 @@
             Represents build context.
             </summary>
         </member>
+        <member name="F:IoC.Core.DependencyEntry.ContainerParameter">
+            <summary>
+            The container parameter.
+            </summary>
+        </member>
+        <member name="F:IoC.Core.DependencyEntry.ArgsParameter">
+            <summary>
+            The args parameters.
+            </summary>
+        </member>
         <member name="F:IoC.Core.DependencyEntry.ResolverParameters">
             <summary>
             All resolvers parameters.
@@ -5323,6 +5333,16 @@
             The current autowiring strategy.
             </summary>
         </member>
+        <member name="P:IoC.IBuildContext.ArgsParameter">
+            <summary>
+            The args parameters.
+            </summary>
+        </member>
+        <member name="P:IoC.IBuildContext.ContainerParameter">
+            <summary>
+            The container parameter.
+            </summary>
+        </member>
         <member name="M:IoC.IBuildContext.GetDependencyExpression(System.Linq.Expressions.Expression)">
             <summary>
             Gets the dependency expression.
@@ -5528,7 +5548,7 @@
             <param name="parameterPosition">The parameter position.</param>
             <param name="parameterExpression">The parameter expression.</param>
         </member>
-        <member name="M:IoC.IMethod`1.SetDependency(System.Int32,System.Type,System.Object,System.Boolean)">
+        <member name="M:IoC.IMethod`1.SetDependency(System.Int32,System.Type,System.Object,System.Boolean,System.Object[])">
             <summary>
             Specifies the dependency type and tag for method parameter at the position.
             </summary>
@@ -5536,6 +5556,7 @@
             <param name="dependencyType">The dependency type.</param>
             <param name="dependencyTag">The optional dependency tag value.</param>
             <param name="isOptional"><c>True</c> if it is optional dependency.</param>
+            <param name="args">The optional arguments.</param>
         </member>
         <member name="T:IoC.IMutableContainer">
             <summary>
@@ -5581,34 +5602,37 @@
             <param name="container">The resolving container.</param>
             <returns>The injected instance or <c>default(T)</c>.</returns>
         </member>
-        <member name="M:IoC.Injections.Inject``1(IoC.IContainer,System.Object)">
+        <member name="M:IoC.Injections.Inject``1(IoC.IContainer,System.Object,System.Object[])">
             <summary>
             Injects a dependency. Just the injection marker.
             </summary>
             <typeparam name="T">The type of dependency.</typeparam>
             <param name="container">The resolving container.</param>
             <param name="tag">The tag of dependency.</param>
+            <param name="args">The optional arguments.</param>
             <returns>The injected instance.</returns>
         </member>
-        <member name="M:IoC.Injections.TryInject``1(IoC.IContainer,System.Object)">
+        <member name="M:IoC.Injections.TryInject``1(IoC.IContainer,System.Object,System.Object[])">
             <summary>
             Try to inject a dependency. Just the injection marker.
             </summary>
             <typeparam name="T">The type of dependency.</typeparam>
             <param name="container">The resolving container.</param>
             <param name="tag">The tag of dependency.</param>
+            <param name="args">The optional arguments.</param>
             <returns>The injected instance or <c>default(T)</c>.</returns>
         </member>
-        <member name="M:IoC.Injections.TryInjectValue``1(IoC.IContainer,System.Object)">
+        <member name="M:IoC.Injections.TryInjectValue``1(IoC.IContainer,System.Object,System.Object[])">
             <summary>
             Try to inject a value type dependency. Just the injection marker.
             </summary>
             <typeparam name="T">The type of dependency.</typeparam>
             <param name="container">The resolving container.</param>
             <param name="tag">The tag of dependency.</param>
+            <param name="args">The optional arguments.</param>
             <returns>The injected instance or <c>default(T)</c>.</returns>
         </member>
-        <member name="M:IoC.Injections.Inject``1(IoC.IContainer,``0,``0)">
+        <member name="M:IoC.Injections.Assign``1(IoC.IContainer,``0,``0)">
             <summary>
             Injects a dependency. Just the injection marker.
             </summary>
@@ -5633,22 +5657,24 @@
             <param name="type">The type of dependency.</param>
             <returns>The injected instance or <c>default(T)</c>.</returns>
         </member>
-        <member name="M:IoC.Injections.Inject(IoC.IContainer,System.Type,System.Object)">
+        <member name="M:IoC.Injections.Inject(IoC.IContainer,System.Type,System.Object,System.Object[])">
             <summary>
             Injects a dependency. Just the injection marker.
             </summary>
             <param name="container">The resolving container.</param>
             <param name="type">The type of dependency.</param>
             <param name="tag">The tag of dependency.</param>
+            <param name="args">The optional arguments.</param>
             <returns>The injected instance.</returns>
         </member>
-        <member name="M:IoC.Injections.TryInject(IoC.IContainer,System.Type,System.Object)">
+        <member name="M:IoC.Injections.TryInject(IoC.IContainer,System.Type,System.Object,System.Object[])">
             <summary>
             Try to inject a dependency. Just the injection marker.
             </summary>
             <param name="container">The resolving container.</param>
             <param name="type">The type of dependency.</param>
             <param name="tag">The tag of dependency.</param>
+            <param name="args">The optional arguments.</param>
             <returns>The injected instance or <c>default(T)</c>.</returns>
         </member>
         <member name="T:IoC.IResourceRegistry">
@@ -6069,21 +6095,6 @@
             </summary>
             <param name="containerEvent">The original container event.</param>
             <param name="message">The trace message.</param>
-        </member>
-        <member name="T:IoC.WellknownExpressions">
-            <summary>
-            The list of well-known expressions.
-            </summary>
-        </member>
-        <member name="F:IoC.WellknownExpressions.ContainerParameter">
-            <summary>
-            The container parameter.
-            </summary>
-        </member>
-        <member name="F:IoC.WellknownExpressions.ArgsParameter">
-            <summary>
-            The args parameters.
-            </summary>
         </member>
     </members>
 </doc>

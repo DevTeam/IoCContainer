@@ -9,9 +9,21 @@
     internal sealed class DependencyEntry : IToken
     {
         /// <summary>
+        /// The container parameter.
+        /// </summary>
+        [NotNull]
+        internal static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer), nameof(Context.Container));
+
+        /// <summary>
+        /// The args parameters.
+        /// </summary>
+        [NotNull]
+        internal static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]), nameof(Context.Args));
+
+        /// <summary>
         /// All resolvers parameters.
         /// </summary>
-        [NotNull] [ItemNotNull] internal static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression> { WellknownExpressions.ContainerParameter, WellknownExpressions.ArgsParameter };
+        [NotNull] [ItemNotNull] internal static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression> { ContainerParameter, ArgsParameter };
 
         [CanBeNull] internal readonly ILifetime Lifetime;
         [NotNull] private readonly IDisposable _resource;
@@ -50,7 +62,7 @@
                 throw new ObjectDisposedException(nameof(DependencyEntry));
             }
 
-            var buildContext = new BuildContext(null, key, resolvingContainer, registrationTracker.Builders, registrationTracker.AutowiringStrategy);
+            var buildContext = new BuildContext(null, key, resolvingContainer, registrationTracker.Builders, registrationTracker.AutowiringStrategy, ArgsParameter, ContainerParameter);
             var lifetime = GetLifetime(key.Type);
             if (!Dependency.TryBuildExpression(buildContext, lifetime, out var expression, out error))
             {

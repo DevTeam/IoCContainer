@@ -19,8 +19,8 @@
             // When
             using (container.Bind<IMyService>().To<MyService>(
                 ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>()),
-                ctx => ctx.Container.Inject(ctx.It.SomeRef2, ctx.Container.Inject<IMyService1>()),
-                ctx => ctx.Container.Inject(ctx.It.SomeRef3, ctx.Container.Inject<IMyService1>())))
+                ctx => ctx.Container.Assign(ctx.It.SomeRef2, ctx.Container.Inject<IMyService1>()),
+                ctx => ctx.Container.Assign(ctx.It.SomeRef3, ctx.Container.Inject<IMyService1>())))
             using (container.Bind<IMyService1>().As(Lifetime.ScopeSingleton).To(ctx => func()))
             {
                 // Default resolving scope
@@ -55,8 +55,8 @@
             // When
             using (container.Bind<IMyService>().To<MyService>(
                 ctx => new MyService((string) ctx.Args[0], ctx.Container.Inject<IMyService1>()),
-                ctx => ctx.Container.Inject(ctx.It.SomeRef2, ctx.Container.Inject<IMyService1>()),
-                ctx => ctx.Container.Inject(ctx.It.SomeRef3, ctx.Container.Inject<IMyService1>())))
+                ctx => ctx.Container.Assign(ctx.It.SomeRef2, ctx.Container.Inject<IMyService1>()),
+                ctx => ctx.Container.Assign(ctx.It.SomeRef3, ctx.Container.Inject<IMyService1>())))
             using (container.Bind<IMyService1>().As(Lifetime.ScopeSingleton).To(ctx => func()))
             {
                 TestsExtensions.Parallelize(() =>

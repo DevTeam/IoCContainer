@@ -137,7 +137,11 @@ namespace IoC.Tests.IntegrationTests
 
     public class Wrapper : IMyWrapper
     {
-        public Wrapper(IMyWrapper wrapped) => Wrapped = wrapped;
+        public Wrapper(IMyWrapper wrapped, Func<string, IMyWrapper> wrappedFunc)
+        {
+            Wrapped = wrapped;
+            Wrapped = wrappedFunc("aa");
+        }
 
         public IMyWrapper Wrapped { get; }
     }

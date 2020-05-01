@@ -7917,6 +7917,16 @@ namespace IoC
         [NotNull] IAutowiringStrategy AutowiringStrategy { get; }
 
         /// <summary>
+        /// The args parameters.
+        /// </summary>
+        [NotNull] ParameterExpression ArgsParameter { get; }
+
+        /// <summary>
+        /// The container parameter.
+        /// </summary>
+        [NotNull] ParameterExpression ContainerParameter { get; }
+
+        /// <summary>
         /// Gets the dependency expression.
         /// </summary>
         /// <param name="defaultExpression">The default expression.</param>
@@ -8220,7 +8230,8 @@ namespace IoC
         /// <param name="dependencyType">The dependency type.</param>
         /// <param name="dependencyTag">The optional dependency tag value.</param>
         /// <param name="isOptional"><c>True</c> if it is optional dependency.</param>
-        void SetDependency(int parameterPosition, [NotNull] Type dependencyType, [CanBeNull] object dependencyTag = null, bool isOptional = false);
+        /// <param name="args">The optional arguments.</param>
+        void SetDependency(int parameterPosition, [NotNull] Type dependencyType, [CanBeNull] object dependencyTag = null, bool isOptional = false, params object[] args);
     }
 }
 
@@ -8276,7 +8287,7 @@ namespace IoC
         [NotNull] internal static readonly MethodInfo InjectWithTagGenericMethodInfo = ((MethodCallExpression)((Expression<Func<object>>) (() => Inject<object>(default(IContainer), null))).Body).Method.GetGenericMethodDefinition();
         [NotNull] internal static readonly MethodInfo TryInjectWithTagGenericMethodInfo = ((MethodCallExpression)((Expression<Func<object>>) (() => TryInject<object>(default(IContainer), null))).Body).Method.GetGenericMethodDefinition();
         [NotNull] internal static readonly MethodInfo TryInjectValueWithTagGenericMethodInfo = ((MethodCallExpression)((Expression<Func<TTS?>>)(() => TryInjectValue<TTS>(default(IContainer), null))).Body).Method.GetGenericMethodDefinition();
-        [NotNull] internal static readonly MethodInfo InjectingAssignmentGenericMethodInfo = ((MethodCallExpression)((Expression<Action<object, object>>) ((item1, item2) => Inject<object>(default(IContainer), null, null))).Body).Method.GetGenericMethodDefinition();
+        [NotNull] internal static readonly MethodInfo AssignGenericMethodInfo = ((MethodCallExpression)((Expression<Action<object, object>>) ((item1, item2) => Assign<object>(default(IContainer), null, null))).Body).Method.GetGenericMethodDefinition();
         [NotNull] internal static readonly MethodInfo InjectMethodInfo = ((MethodCallExpression)((Expression<Func<object>>) (() => Inject(default(IContainer), typeof(object)))).Body).Method;
         [NotNull] internal static readonly MethodInfo TryInjectMethodInfo = ((MethodCallExpression)((Expression<Func<object>>) (() => TryInject(default(IContainer), typeof(object)))).Body).Method;
         [NotNull] internal static readonly MethodInfo InjectWithTagMethodInfo = ((MethodCallExpression)((Expression<Func<object>>) (() => Inject(default(IContainer), typeof(object), (object)null))).Body).Method;
@@ -8316,8 +8327,9 @@ namespace IoC
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
         /// <param name="tag">The tag of dependency.</param>
+        /// <param name="args">The optional arguments.</param>
         /// <returns>The injected instance.</returns>
-        public static T Inject<T>([NotNull] this IContainer container, [CanBeNull] object tag) =>
+        public static T Inject<T>([NotNull] this IContainer container, [CanBeNull] object tag, params object[] args) =>
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
@@ -8326,8 +8338,9 @@ namespace IoC
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
         /// <param name="tag">The tag of dependency.</param>
+        /// <param name="args">The optional arguments.</param>
         /// <returns>The injected instance or <c>default(T)</c>.</returns>
-        [CanBeNull] public static T TryInject<T>([NotNull] this IContainer container, [CanBeNull] object tag) =>
+        [CanBeNull] public static T TryInject<T>([NotNull] this IContainer container, [CanBeNull] object tag, params object[] args) =>
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
@@ -8336,9 +8349,10 @@ namespace IoC
         /// <typeparam name="T">The type of dependency.</typeparam>
         /// <param name="container">The resolving container.</param>
         /// <param name="tag">The tag of dependency.</param>
+        /// <param name="args">The optional arguments.</param>
         /// <returns>The injected instance or <c>default(T)</c>.</returns>
         [CanBeNull]
-        public static T? TryInjectValue<T>([NotNull] this IContainer container, [CanBeNull] object tag) where T : struct =>
+        public static T? TryInjectValue<T>([NotNull] this IContainer container, [CanBeNull] object tag, params object[] args) where T : struct =>
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
@@ -8348,7 +8362,7 @@ namespace IoC
         /// <param name="container">The resolving container.</param>
         /// <param name="destination">The destination member for injection.</param>
         /// <param name="source">The source of injection.</param>
-        public static void Inject<T>([NotNull] this IContainer container, [NotNull] T destination, [CanBeNull] T source) =>
+        public static IContainer Assign<T>([NotNull] this IContainer container, [NotNull] T destination, [CanBeNull] T source) =>
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
@@ -8375,8 +8389,9 @@ namespace IoC
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
         /// <param name="tag">The tag of dependency.</param>
+        /// <param name="args">The optional arguments.</param>
         /// <returns>The injected instance.</returns>
-        public static object Inject([NotNull] this IContainer container, [NotNull] Type type, [CanBeNull] object tag) =>
+        public static object Inject([NotNull] this IContainer container, [NotNull] Type type, [CanBeNull] object tag, params object[] args) =>
             throw new NotImplementedException(JustAMarkerError);
 
         /// <summary>
@@ -8385,8 +8400,9 @@ namespace IoC
         /// <param name="container">The resolving container.</param>
         /// <param name="type">The type of dependency.</param>
         /// <param name="tag">The tag of dependency.</param>
+        /// <param name="args">The optional arguments.</param>
         /// <returns>The injected instance or <c>default(T)</c>.</returns>
-        [CanBeNull] public static object TryInject([NotNull] this IContainer container, [NotNull] Type type, [CanBeNull] object tag) =>
+        [CanBeNull] public static object TryInject([NotNull] this IContainer container, [NotNull] Type type, [CanBeNull] object tag, params object[] args) =>
             throw new NotImplementedException(JustAMarkerError);
     }
 }
@@ -8641,35 +8657,6 @@ namespace IoC
         }
     }
 }
-
-#endregion
-#region WellknownExpressions
-
-namespace IoC
-{
-    using System.Linq.Expressions;
-    using Core;
-
-    /// <summary>
-    /// The list of well-known expressions.
-    /// </summary>
-    [PublicAPI]
-    public static class WellknownExpressions
-    {
-        /// <summary>
-        /// The container parameter.
-        /// </summary>
-        [NotNull]
-        public static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer), nameof(Context.Container));
-
-        /// <summary>
-        /// The args parameters.
-        /// </summary>
-        [NotNull]
-        public static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]), nameof(Context.Args));
-    }
-}
-
 
 #endregion
 
@@ -9065,7 +9052,6 @@ namespace IoC.Features
             yield return container.Register(ctx => CannotResolveGenericTypeArgument.Shared);
 
             yield return container.Register(ctx => DefaultAutowiringStrategy.Shared);
-            yield return container.Register(ctx => ctx.Container.GetResolver<TT>(ctx.Key.Tag.AsTag()), null, Sets.AnyTag);
 
             // Lifetimes
             yield return container.Register<ILifetime>(ctx => new SingletonLifetime(), null, new object[] { Lifetime.Singleton });
@@ -9166,18 +9152,18 @@ namespace IoC.Features
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register<Func<TT>>(ctx => () => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container), null, Sets.AnyTag);
-            yield return container.Register<Func<TT1, TT>>(ctx => arg1 => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1), null, Sets.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT>>(ctx => (arg1, arg2) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2), null, Sets.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT>>(ctx => (arg1, arg2, arg3) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3), null, Sets.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT>>(ctx => (arg1, arg2, arg3, arg4) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4), null, Sets.AnyTag);
+            yield return container.Register<Func<TT>>(ctx => () => ctx.Container.Inject<TT>(ctx.Key.Tag), null, Sets.AnyTag);
+            yield return container.Register<Func<TT1, TT>>(ctx => arg1 => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1), null, Sets.AnyTag);
+            yield return container.Register<Func<TT1, TT2, TT>>(ctx => (arg1, arg2) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2), null, Sets.AnyTag);
+            yield return container.Register<Func<TT1, TT2, TT3, TT>>(ctx => (arg1, arg2, arg3) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3), null, Sets.AnyTag);
+            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT>>(ctx => (arg1, arg2, arg3, arg4) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3, arg4), null, Sets.AnyTag);
 
             if (_light) yield break;
 
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5), null, Sets.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6), null, Sets.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6, arg7) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7), null, Sets.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => ctx.Container.Inject<Resolver<TT>>(ctx.Key.Tag)(ctx.Container, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8), null, Sets.AnyTag);
+            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3, arg4, arg5), null, Sets.AnyTag);
+            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3, arg4, arg5, arg6), null, Sets.AnyTag);
+            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6, arg7) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3, arg4, arg5, arg6, arg7), null, Sets.AnyTag);
+            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8), null, Sets.AnyTag);
         }
     }
 }
@@ -9515,7 +9501,6 @@ namespace IoC.Lifetimes
     using System.Reflection;
     using Core;
     using static Core.TypeDescriptorExtensions;
-    using static WellknownExpressions;
 
     /// <summary>
     /// Represents the abstraction for singleton based lifetimes.
@@ -9554,7 +9539,7 @@ namespace IoC.Lifetimes
                 // T instance;
                 new[] { KeyVar, SingletonBasedLifetimeShared.HashCodeVar, instanceVar },
                 // var key = CreateKey(container, args);
-                Expression.Assign(KeyVar, Expression.Call(thisConst, CreateKeyMethodInfo, ContainerParameter, ArgsParameter)),
+                Expression.Assign(KeyVar, Expression.Call(thisConst, CreateKeyMethodInfo, context.ContainerParameter, context.ArgsParameter)),
                 // var hashCode = key.GetHashCode();
                 Expression.Assign(SingletonBasedLifetimeShared.HashCodeVar, Expression.Call(KeyVar, ExpressionBuilderExtensions.GetHashCodeMethodInfo)),
                 // var instance = (T)_instances.Get(hashCode, key);
@@ -9579,7 +9564,7 @@ namespace IoC.Lifetimes
                             )
                         ).Lock(lockObjectConst),
                         // OnNewInstanceCreated(instance, key, container, args);
-                        Expression.Call(thisConst, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, ContainerParameter, ArgsParameter)),
+                        Expression.Call(thisConst, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, context.ContainerParameter, context.ArgsParameter)),
                         // else {
                         // return instance;
                         instanceVar
@@ -10683,6 +10668,8 @@ namespace IoC.Core
             [NotNull] IContainer resolvingContainer,
             [NotNull] IEnumerable<IBuilder> builders,
             [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
+            [NotNull] ParameterExpression argsParameter,
+            [NotNull] ParameterExpression containerParameter,
             int depth = 0)
         {
             Parent = parent;
@@ -10690,6 +10677,8 @@ namespace IoC.Core
             Container = resolvingContainer ?? throw new ArgumentNullException(nameof(resolvingContainer));
             _builders = builders ?? throw new ArgumentNullException(nameof(builders));
             AutowiringStrategy = defaultAutowiringStrategy ?? throw new ArgumentNullException(nameof(defaultAutowiringStrategy));
+            ArgsParameter = argsParameter ?? throw new ArgumentNullException(nameof(argsParameter));
+            ContainerParameter = containerParameter ?? throw new ArgumentNullException(nameof(containerParameter));
             Depth = depth;
         }
 
@@ -10703,6 +10692,24 @@ namespace IoC.Core
 
         public int Depth { get; }
 
+        public ParameterExpression ArgsParameter { get; private set; }
+
+        public ParameterExpression ContainerParameter { get; private set; }
+        
+        public IDisposable OverrideArgsParameter(ParameterExpression argsParameter)
+        {
+            var origin = ArgsParameter;
+            ArgsParameter = argsParameter;
+            return Disposable.Create(() => { ArgsParameter = origin; });
+        }
+
+        public IDisposable OverrideContainerParameter(ParameterExpression containerParameter)
+        {
+            var origin = ContainerParameter;
+            ContainerParameter = containerParameter;
+            return Disposable.Create(() => { ContainerParameter = origin; });
+        }
+
         public IBuildContext CreateChild(Key key, IContainer container) => 
             CreateChildInternal(key, container ?? throw new ArgumentNullException(nameof(container)));
 
@@ -10715,7 +10722,7 @@ namespace IoC.Core
         public bool TryReplaceType(Type originalType, out Type targetType) =>
             _typesMap.TryGetValue(originalType, out targetType);
 
-        public void AddParameter([NotNull] ParameterExpression parameterExpression)
+        public void AddParameter(ParameterExpression parameterExpression)
             => _parameters.Add(parameterExpression ?? throw new ArgumentNullException(nameof(parameterExpression)));
 
         public Expression DeclareParameters(Expression baseExpression)
@@ -10754,43 +10761,54 @@ namespace IoC.Core
                 key = new Key(type, key.Tag);
             }
 
-            return new BuildContext(this, key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, Depth + 1);
+            return new BuildContext(this, key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, ArgsParameter, ContainerParameter, Depth + 1);
         }
 
         public Expression GetDependencyExpression(Expression defaultExpression = null)
         {
             var selectedContainer = Container;
-            if (
-                Parent != null
-                && selectedContainer.Parent != null
-                && Key.Equals(Parent.Key)
-                && Equals(Parent.Container, selectedContainer))
+            if (selectedContainer.Parent != null)
             {
-                selectedContainer = selectedContainer.Parent;
+                var parent = Parent;
+                while (parent != null)
+                {
+                    if (
+                        Key.Equals(parent.Key)
+                        && Equals(parent.Container, selectedContainer))
+                    {
+                        selectedContainer = selectedContainer.Parent;
+                        break;
+                    }
+
+                    parent = parent.Parent;
+                }
             }
 
             if (!selectedContainer.TryGetDependency(Key, out var dependency, out var lifetime))
             {
-                if (defaultExpression != null)
+                if (Container == selectedContainer || !Container.TryGetDependency(Key, out dependency, out lifetime))
                 {
-                    return defaultExpression;
-                }
+                    if (defaultExpression != null)
+                    {
+                        return defaultExpression;
+                    }
 
-                try
-                {
-                    var dependencyDescription = Container.Resolve<ICannotResolveDependency>().Resolve(this);
-                    dependency = dependencyDescription.Dependency;
-                    lifetime = dependencyDescription.Lifetime;
-                }
-                catch (Exception ex)
-                {
-                    throw new BuildExpressionException(ex.Message, ex.InnerException);
+                    try
+                    {
+                        var dependencyDescription = Container.Resolve<ICannotResolveDependency>().Resolve(this);
+                        dependency = dependencyDescription.Dependency;
+                        lifetime = dependencyDescription.Lifetime;
+                    }
+                    catch (Exception ex)
+                    {
+                        throw new BuildExpressionException(ex.Message, ex.InnerException);
+                    }
                 }
             }
 
             if (Depth >= 128)
             {
-                selectedContainer.Resolve<IFoundCyclicDependency>().Resolve(this);
+                Container.Resolve<IFoundCyclicDependency>().Resolve(this);
             }
 
             if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
@@ -10798,7 +10816,7 @@ namespace IoC.Core
                 return expression;
             }
 
-            return selectedContainer.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
+            return Container.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
         }
 
         public override string ToString()
@@ -11410,9 +11428,21 @@ namespace IoC.Core
     internal sealed class DependencyEntry : IToken
     {
         /// <summary>
+        /// The container parameter.
+        /// </summary>
+        [NotNull]
+        internal static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer), nameof(Context.Container));
+
+        /// <summary>
+        /// The args parameters.
+        /// </summary>
+        [NotNull]
+        internal static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]), nameof(Context.Args));
+
+        /// <summary>
         /// All resolvers parameters.
         /// </summary>
-        [NotNull] [ItemNotNull] internal static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression> { WellknownExpressions.ContainerParameter, WellknownExpressions.ArgsParameter };
+        [NotNull] [ItemNotNull] internal static readonly IEnumerable<ParameterExpression> ResolverParameters = new List<ParameterExpression> { ContainerParameter, ArgsParameter };
 
         [CanBeNull] internal readonly ILifetime Lifetime;
         [NotNull] private readonly IDisposable _resource;
@@ -11451,7 +11481,7 @@ namespace IoC.Core
                 throw new ObjectDisposedException(nameof(DependencyEntry));
             }
 
-            var buildContext = new BuildContext(null, key, resolvingContainer, registrationTracker.Builders, registrationTracker.AutowiringStrategy);
+            var buildContext = new BuildContext(null, key, resolvingContainer, registrationTracker.Builders, registrationTracker.AutowiringStrategy, ArgsParameter, ContainerParameter);
             var lifetime = GetLifetime(key.Type);
             if (!Dependency.TryBuildExpression(buildContext, lifetime, out var expression, out error))
             {
@@ -11603,7 +11633,6 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using static WellknownExpressions;
     using static TypeDescriptorExtensions;
     // ReSharper disable once RedundantNameQualifier
     using IContainer = IoC.IContainer;
@@ -11674,17 +11703,18 @@ namespace IoC.Core
                         return Expression.New(ctor, expression);
                     }
 
-                    if (argumentsCount > 1)
+                    if (argumentsCount > 2)
                     {
-                        // container.Inject<T>(tag)
+                        // container.Inject<T>(tag, args)
                         if (Equals(genericMethodDefinition, Injections.InjectWithTagGenericMethodInfo))
                         {
                             var containerExpression = methodCall.Arguments[0];
                             var tagExpression = methodCall.Arguments[1];
                             var tag = GetTag(tagExpression);
+                            var argsExpression = Visit(methodCall.Arguments[2]);
 
                             var key = new Key(methodCall.Method.ReturnType, tag);
-                            return CreateDependencyExpression(key, containerExpression, null);
+                            return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, null);
                         }
 
                         if (Equals(genericMethodDefinition, Injections.TryInjectWithTagGenericMethodInfo))
@@ -11692,9 +11722,10 @@ namespace IoC.Core
                             var containerExpression = methodCall.Arguments[0];
                             var tagExpression = methodCall.Arguments[1];
                             var tag = GetTag(tagExpression);
+                            var argsExpression = Visit(methodCall.Arguments[2]);
 
                             var key = new Key(methodCall.Method.ReturnType, tag);
-                            return CreateDependencyExpression(key, containerExpression, Expression.Default(methodCall.Method.ReturnType));
+                            return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, Expression.Default(methodCall.Method.ReturnType));
                         }
 
                         if (Equals(genericMethodDefinition, Injections.TryInjectValueWithTagGenericMethodInfo))
@@ -11702,11 +11733,12 @@ namespace IoC.Core
                             var containerExpression = methodCall.Arguments[0];
                             var tagExpression = methodCall.Arguments[1];
                             var tag = GetTag(tagExpression);
+                            var argsExpression = Visit(methodCall.Arguments[2]);
 
                             var keyType = methodCall.Method.GetGenericArguments()[0];
                             var key = new Key(keyType, tag);
                             var defaultExpression = Expression.Default(methodCall.Method.ReturnType);
-                            var expression = CreateDependencyExpression(key, containerExpression, defaultExpression);
+                            var expression = OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, defaultExpression);
                             if (expression == defaultExpression)
                             {
                                 return defaultExpression;
@@ -11716,14 +11748,19 @@ namespace IoC.Core
                             return Expression.New(ctor, expression);
                         }
 
-                        if (argumentsCount > 2)
+                        if (argumentsCount == 3)
                         {
                             // container.Inject<T>(destination, source)
-                            if (Equals(genericMethodDefinition, Injections.InjectingAssignmentGenericMethodInfo))
+                            if (Equals(genericMethodDefinition, Injections.AssignGenericMethodInfo))
                             {
                                 var dstExpression = Visit(methodCall.Arguments[1]);
                                 var srcExpression = Visit(methodCall.Arguments[2]);
-                                return Expression.Assign(dstExpression ?? throw InvalidExpressionError, srcExpression ?? throw InvalidExpressionError);
+                                var containerVar = Expression.Variable(typeof(IContainer));
+                                return Expression.Block(
+                                    new [] { containerVar },
+                                    Expression.Assign(containerVar, Visit(methodCall.Arguments[0])),
+                                    Expression.Assign(dstExpression ?? throw InvalidExpressionError, srcExpression ?? throw InvalidExpressionError),
+                                    containerVar);
                             }
                         }
                     }
@@ -11749,18 +11786,19 @@ namespace IoC.Core
                             return CreateDependencyExpression(key, containerExpression, Expression.Default(type));
                         }
 
-                        if (argumentsCount > 2)
+                        if (argumentsCount > 3)
                         {
-                            // container.Inject(type, tag)
+                            // container.Inject(type, tag, args)
                             if (Equals(methodCall.Method, Injections.InjectWithTagMethodInfo))
                             {
                                 var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw InvalidExpressionError).Value ?? throw InvalidExpressionError;
                                 var containerExpression = methodCall.Arguments[0];
                                 var tagExpression = methodCall.Arguments[2];
                                 var tag = GetTag(tagExpression);
+                                var argsExpression = Visit(methodCall.Arguments[3]);
 
                                 var key = new Key(type, tag);
-                                return CreateDependencyExpression(key, containerExpression, null);
+                                return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, null);
                             }
 
                             if (Equals(methodCall.Method, Injections.TryInjectWithTagMethodInfo))
@@ -11769,9 +11807,10 @@ namespace IoC.Core
                                 var containerExpression = methodCall.Arguments[0];
                                 var tagExpression = methodCall.Arguments[2];
                                 var tag = GetTag(tagExpression);
+                                var argsExpression = Visit(methodCall.Arguments[3]);
 
                                 var key = new Key(type, tag);
-                                return CreateDependencyExpression(key, containerExpression, Expression.Default(type));
+                                return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, Expression.Default(type));
                             }
                         }
                     }
@@ -11794,6 +11833,25 @@ namespace IoC.Core
             }
 
             return Expression.Call(Visit(methodCall.Object), methodCall.Method, InjectAll(methodCall.Arguments));
+        }
+
+        private Expression OverrideArgsAndCreateDependencyExpression(Expression argsExpression, Key key, Expression containerExpression, DefaultExpression defaultExpression)
+        {
+            if (argsExpression is NewArrayExpression newArrayExpression && newArrayExpression.Expressions.Count == 0)
+            {
+                return CreateDependencyExpression(key, containerExpression, defaultExpression);
+            }
+
+            var argsVar = Expression.Variable(_buildContext.ArgsParameter.Type);
+            return Expression.Block(
+                new[] { argsVar },
+                Expression.TryFinally(
+                    Expression.Block(
+                        Expression.Assign(argsVar, _buildContext.ArgsParameter),
+                        Expression.Assign(_buildContext.ArgsParameter, argsExpression),
+                        CreateDependencyExpression(key, containerExpression, defaultExpression)),
+                    Expression.Assign(_buildContext.ArgsParameter, argsVar))
+            );
         }
 
         protected override Expression VisitUnary(UnaryExpression node)
@@ -11845,8 +11903,8 @@ namespace IoC.Core
                         ctor,
                         _thisExpression,
                         Expression.Constant(_buildContext.Key),
-                        ContainerParameter,
-                        ArgsParameter);
+                        _buildContext.ContainerParameter,
+                        _buildContext.ArgsParameter);
                 }
             }
 
@@ -11857,8 +11915,8 @@ namespace IoC.Core
             Expression.New(
                 ContextConstructor,
                 Expression.Constant(_buildContext.Key),
-                ContainerParameter,
-                ArgsParameter);
+                _buildContext.ContainerParameter,
+                _buildContext.ArgsParameter);
 
         [CanBeNull]
         private object GetTag([NotNull] Expression tagExpression)
@@ -11892,7 +11950,7 @@ namespace IoC.Core
                 return _container;
             }
 
-            var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, ContainerParameter);
+            var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, _buildContext.ContainerParameter);
             var selectContainer = containerSelectorExpression.Compile();
             return selectContainer(_container);
         }
@@ -11929,14 +11987,14 @@ namespace IoC.Core
                 // ctx.Container
                 if (name == nameof(Context.Container))
                 {
-                    expression = ContainerParameter;
+                    expression = _buildContext.ContainerParameter;
                     return true;
                 }
 
                 // ctx.Args
                 if (name == nameof(Context.Args))
                 {
-                    expression = ArgsParameter;
+                    expression = _buildContext.ArgsParameter;
                     return true;
                 }
             }
@@ -12723,6 +12781,7 @@ namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
 
@@ -12781,7 +12840,7 @@ namespace IoC.Core
             _parametersExpressions[parameterPosition] = parameterExpression ?? throw new ArgumentNullException(nameof(parameterExpression));
         }
 
-        public void SetDependency(int parameterPosition, Type dependencyType, object dependencyTag = null, bool isOptional = false)
+        public void SetDependency(int parameterPosition, Type dependencyType, object dependencyTag = null, bool isOptional = false, params object[] args)
         {
             if (dependencyType == null) throw new ArgumentNullException(nameof(dependencyType));
             if (parameterPosition < 0 || parameterPosition >= _parametersExpressions.Length) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
@@ -12791,7 +12850,8 @@ namespace IoC.Core
                     injectMethod,
                     ExpressionBuilderExtensions.ContainerExpression,
                     Expression.Constant(dependencyType),
-                    Expression.Constant(dependencyTag))
+                    Expression.Constant(dependencyTag),
+                    Expression.NewArrayInit(typeof(object), args.Select(Expression.Constant)))
                 .Convert(dependencyType);
 
             SetExpression(parameterPosition, parameterExpression.Convert(dependencyType));

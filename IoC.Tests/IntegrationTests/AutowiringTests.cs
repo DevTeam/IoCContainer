@@ -290,7 +290,7 @@
             {
                 // When
                 using var childContainer = container.Create();
-                using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Parent.Inject<IMyWrapper>())))
+                using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Parent.Inject<IMyWrapper>(), ctx.Container.Parent.Inject<Func<string, IMyWrapper>>())))
                 {
                     // Then
                     var actualInstance = childContainer.Resolve<IMyWrapper>();
@@ -309,7 +309,26 @@
             {
                 // When
                 using var childContainer = container.Create();
-                using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Inject<IMyWrapper>())))
+                using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Inject<IMyWrapper>(), ctx.Container.Inject<Func<string, IMyWrapper>>())))
+                {
+                    // Then
+                    var actualInstance = childContainer.Resolve<IMyWrapper>();
+                    actualInstance.ShouldBeOfType<Wrapper>();
+                    actualInstance.Wrapped.ShouldBeOfType<Wrappered>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldSupportImplicitWrappingUsingCurrentContainerWhenAutowiring()
+        {
+            // Given
+            using var container = Container.Create();
+            using (container.Bind<IMyWrapper>().To<Wrappered>())
+            {
+                // When
+                using var childContainer = container.Create();
+                using (childContainer.Bind<IMyWrapper>().To<Wrapper>())
                 {
                     // Then
                     var actualInstance = childContainer.Resolve<IMyWrapper>();
@@ -330,7 +349,7 @@
                 {
                     // When
                     using var childContainer = container.Create();
-                    using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Parent.Inject<IMyWrapper>())))
+                    using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Parent.Inject<IMyWrapper>(), ctx.Container.Parent.Inject<Func<string, IMyWrapper>>())))
                     {
                         // Then
                         var actualInstance = childContainer.Resolve<IMyWrapper>();

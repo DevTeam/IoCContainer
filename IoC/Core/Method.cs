@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
 
@@ -60,7 +61,7 @@
             _parametersExpressions[parameterPosition] = parameterExpression ?? throw new ArgumentNullException(nameof(parameterExpression));
         }
 
-        public void SetDependency(int parameterPosition, Type dependencyType, object dependencyTag = null, bool isOptional = false)
+        public void SetDependency(int parameterPosition, Type dependencyType, object dependencyTag = null, bool isOptional = false, params object[] args)
         {
             if (dependencyType == null) throw new ArgumentNullException(nameof(dependencyType));
             if (parameterPosition < 0 || parameterPosition >= _parametersExpressions.Length) throw new ArgumentOutOfRangeException(nameof(parameterPosition));
@@ -70,7 +71,8 @@
                     injectMethod,
                     ExpressionBuilderExtensions.ContainerExpression,
                     Expression.Constant(dependencyType),
-                    Expression.Constant(dependencyTag))
+                    Expression.Constant(dependencyTag),
+                    Expression.NewArrayInit(typeof(object), args.Select(Expression.Constant)))
                 .Convert(dependencyType);
 
             SetExpression(parameterPosition, parameterExpression.Convert(dependencyType));
