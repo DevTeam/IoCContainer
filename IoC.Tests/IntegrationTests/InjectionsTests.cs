@@ -52,6 +52,26 @@
         }
 
         [Fact]
+        public void InjectWhenArgsWhenSingletonDep()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassWithDep>().To(ctx => new MyClassWithDep(ctx.Container.Inject<MyClassRef>(null, "arg1")))
+                .Bind<MyClassRef>().As(Lifetime.Singleton).To(ctx => new MyClassRef((string)ctx.Args[0]))
+                .Container;
+
+            using (container)
+            {
+                // Then
+                var instance = container.Resolve<MyClassWithDep>();
+
+                instance.Val.ShouldBe("arg1");
+            }
+        }
+
+        [Fact]
         public void InjectWhenEmptyArgs()
         {
             // Given

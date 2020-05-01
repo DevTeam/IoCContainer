@@ -2,7 +2,9 @@
 namespace IoC.Tests.IntegrationTests
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
 
     public interface IMyService : IMyService1
     {
@@ -130,14 +132,14 @@ namespace IoC.Tests.IntegrationTests
         IMyWrapper Wrapped { get; }
     }
 
-    public class Wrappered : IMyWrapper
+    public class Wrappering : IMyWrapper
     {
         public IMyWrapper Wrapped => null;
     }
 
     public class Wrapper : IMyWrapper
     {
-        public Wrapper(IMyWrapper wrapped, Func<string, IMyWrapper> wrappedFunc)
+        public Wrapper(IMyWrapper wrapped, Func<string, IMyWrapper> wrappedFunc, Tuple<IMyWrapper> wrapperTuple)
         {
             Wrapped = wrapped;
             Wrapped = wrappedFunc("aa");

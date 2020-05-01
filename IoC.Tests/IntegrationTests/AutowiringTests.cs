@@ -286,16 +286,16 @@
         {
             // Given
             using var container = Container.Create();
-            using (container.Bind<IMyWrapper>().To<Wrappered>())
+            using (container.Bind<IMyWrapper>().To<Wrappering>())
             {
                 // When
                 using var childContainer = container.Create();
-                using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Parent.Inject<IMyWrapper>(), ctx.Container.Parent.Inject<Func<string, IMyWrapper>>())))
+                using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Parent.Inject<IMyWrapper>(), ctx.Container.Parent.Inject<Func<string, IMyWrapper>>(), ctx.Container.Parent.Inject<Tuple<IMyWrapper>>())))
                 {
                     // Then
                     var actualInstance = childContainer.Resolve<IMyWrapper>();
                     actualInstance.ShouldBeOfType<Wrapper>();
-                    actualInstance.Wrapped.ShouldBeOfType<Wrappered>();
+                    actualInstance.Wrapped.ShouldBeOfType<Wrappering>();
                 }
             }
         }
@@ -305,16 +305,16 @@
         {
             // Given
             using var container = Container.Create();
-            using (container.Bind<IMyWrapper>().To<Wrappered>())
+            using (container.Bind<IMyWrapper>().To<Wrappering>())
             {
                 // When
                 using var childContainer = container.Create();
-                using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Inject<IMyWrapper>(), ctx.Container.Inject<Func<string, IMyWrapper>>())))
+                using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Inject<IMyWrapper>(), ctx.Container.Inject<Func<string, IMyWrapper>>(), ctx.Container.Inject<Tuple<IMyWrapper>>())))
                 {
                     // Then
                     var actualInstance = childContainer.Resolve<IMyWrapper>();
                     actualInstance.ShouldBeOfType<Wrapper>();
-                    actualInstance.Wrapped.ShouldBeOfType<Wrappered>();
+                    actualInstance.Wrapped.ShouldBeOfType<Wrappering>();
                 }
             }
         }
@@ -324,7 +324,7 @@
         {
             // Given
             using var container = Container.Create();
-            using (container.Bind<IMyWrapper>().To<Wrappered>())
+            using (container.Bind<IMyWrapper>().To<Wrappering>())
             {
                 // When
                 using var childContainer = container.Create();
@@ -333,7 +333,49 @@
                     // Then
                     var actualInstance = childContainer.Resolve<IMyWrapper>();
                     actualInstance.ShouldBeOfType<Wrapper>();
-                    actualInstance.Wrapped.ShouldBeOfType<Wrappered>();
+                    actualInstance.Wrapped.ShouldBeOfType<Wrappering>();
+                }
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldSupportImplicitWrappingUsingCurrentContainerWhenAutowiringWhenChainOfContainers()
+        {
+            // Given
+            using var container = Container.Create();
+            using (container.Bind<IMyWrapper>().To<Wrappering>())
+            {
+                // When
+                using var childContainer3 = container.Create();
+                using var childContainer2 = childContainer3.Create();
+                using var childContainer1 = childContainer2.Create();
+                using var childContainer = childContainer1.Create();
+                using (childContainer.Bind<IMyWrapper>().To<Wrapper>())
+                {
+                    // Then
+                    var actualInstance = childContainer.Resolve<IMyWrapper>();
+                    actualInstance.ShouldBeOfType<Wrapper>();
+                    actualInstance.Wrapped.ShouldBeOfType<Wrappering>();
+                }
+            }
+        }
+
+
+        [Fact]
+        public void ContainerShouldSupportImplicitWrappingUsingCurrentContainerWhenAutowiringWhenSingleton()
+        {
+            // Given
+            using var container = Container.Create();
+            using (container.Bind<IMyWrapper>().As(Lifetime.Singleton).To<Wrappering>())
+            {
+                // When
+                using var childContainer = container.Create();
+                using (childContainer.Bind<IMyWrapper>().To<Wrapper>())
+                {
+                    // Then
+                    var actualInstance1 = childContainer.Resolve<IMyWrapper>();
+                    var actualInstance2 = childContainer.Resolve<IMyWrapper>();
+                    actualInstance1.Wrapped.ShouldBe(actualInstance2.Wrapped);
                 }
             }
         }
@@ -343,18 +385,18 @@
         {
             // Given
             using var container = Container.Create();
-            using (container.Bind<IMyWrapper>().To<Wrappered>())
+            using (container.Bind<IMyWrapper>().To<Wrappering>())
             {
                 TestsExtensions.Parallelize(() =>
                 {
                     // When
                     using var childContainer = container.Create();
-                    using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Parent.Inject<IMyWrapper>(), ctx.Container.Parent.Inject<Func<string, IMyWrapper>>())))
+                    using (childContainer.Bind<IMyWrapper>().To<Wrapper>(ctx => new Wrapper(ctx.Container.Parent.Inject<IMyWrapper>(), ctx.Container.Parent.Inject<Func<string, IMyWrapper>>(), ctx.Container.Parent.Inject<Tuple<IMyWrapper>>())))
                     {
                         // Then
                         var actualInstance = childContainer.Resolve<IMyWrapper>();
                         actualInstance.ShouldBeOfType<Wrapper>();
-                        actualInstance.Wrapped.ShouldBeOfType<Wrappered>();
+                        actualInstance.Wrapped.ShouldBeOfType<Wrappering>();
                     }
                 });
             }
