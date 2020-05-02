@@ -15,8 +15,8 @@
             var table = Table<string, string>.Empty;
 
             // When
-            table = table.Set("c".GetHashCode(), "c", "c");
-            table = table.Set("c".GetHashCode(), "Z", "Z");
+            table = table.Set("c", "c");
+            table = table.Set("Z", "Z");
             
             // Then
             table.Count().ShouldBe(2);
@@ -29,8 +29,8 @@
             var table = Table<string, string>.Empty;
 
             // When
-            table = table.Set("c".GetHashCode(), "c", "c");
-            table = table.Set("Z".GetHashCode(), "Z", "Z");
+            table = table.Set("c", "c");
+            table = table.Set("Z", "Z");
             var dict = table.ToDictionary(i => i.Key, i => i.Value).ToList();
 
             // Then
@@ -46,16 +46,16 @@
             var table = Table<string, string>.Empty;
 
             // When
-            table = table.Set("a".GetHashCode(), "a", "a");
-            table = table.Set("b".GetHashCode(), "b", "b");
-            table = table.Set("c".GetHashCode(), "c", "c");
-            table = table.Set("d".GetHashCode(), "d", "d");
-            table = table.Set("c".GetHashCode(), "Z", "Z");
+            table = table.Set("a", "a");
+            table = table.Set("b", "b");
+            table = table.Set("c", "c");
+            table = table.Set("d", "d");
+            table = table.Set("Z", "Z");
 
             // Then
             table.Count().ShouldBe(5);
-            table.Get("c".GetHashCode(), "c").ShouldBe("c");
-            table.Get("c".GetHashCode(), "Z").ShouldBe("Z");
+            table.Get("c").ShouldBe("c");
+            table.Get("Z").ShouldBe("Z");
         }
 
         [Fact]
@@ -63,18 +63,18 @@
         {
             // Given
             var table = Table<string, string>.Empty;
-            table = table.Set("a".GetHashCode(), "a", "a");
-            table = table.Set("b".GetHashCode(), "b", "b");
-            table = table.Set("c".GetHashCode(), "Z", "Z");
-            table = table.Set("c".GetHashCode(), "c", "c");
-            table = table.Set("d".GetHashCode(), "d", "d");
+            table = table.Set("a", "a");
+            table = table.Set("b", "b");
+            table = table.Set("Z", "Z");
+            table = table.Set("c", "c");
+            table = table.Set("d", "d");
 
             // When
-            table = table.Remove("c".GetHashCode(), "c", out var removed);
+            table = table.Remove("c", out var removed);
 
             // Then
             removed.ShouldBe(true);
-            table.Get("c".GetHashCode(), "c").ShouldBe(null);
+            table.Get("c").ShouldBe(null);
             table.Count().ShouldBe(4);
             table.Count.ShouldBe(4);
         }

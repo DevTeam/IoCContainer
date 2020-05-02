@@ -103,8 +103,7 @@ namespace IoC.Core
                     return false;
                 }
 
-                var hashCode = container.GetHashCode();
-                if (_map.Get(hashCode, container) != null)
+                if (_map.Get(container) != null)
                 {
                     return true;
                 }
@@ -112,7 +111,7 @@ namespace IoC.Core
                 if (container.TryGetResolver<T>(key.Type, key.Tag, out var resolver, out _, container))
                 {
                     var instance = resolver(container);
-                    _map = _map.Set(hashCode, container, instance);
+                    _map = _map.Set(container, instance);
                     _updater(Items, instance);
                 }
 
@@ -126,8 +125,7 @@ namespace IoC.Core
                     return false;
                 }
 
-                var hashCode = container.GetHashCode();
-                var instance = _map.Get(hashCode, container);
+                var instance = _map.Get(container);
                 if (instance != null)
                 {
                     Items.Remove(instance);

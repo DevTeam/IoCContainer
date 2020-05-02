@@ -134,20 +134,18 @@
                         var key = type != curKey.Type ? new FullKey(type, curKey.Tag) : curKey;
                         if (key.Tag == AnyTag)
                         {
-                            var hashCode = key.Type.GetHashCode();
-                            isRegistered &= !dependenciesForTagAny.TryGetByType(hashCode, key.Type, out _);
+                            isRegistered &= !dependenciesForTagAny.TryGetByType(key.Type, out _);
                             if (isRegistered)
                             {
-                                dependenciesForTagAny = dependenciesForTagAny.Set(hashCode, key.Type, dependencyEntry);
+                                dependenciesForTagAny = dependenciesForTagAny.Set(key.Type, dependencyEntry);
                             }
                         }
                         else
                         {
-                            var hashCode = key.HashCode;
-                            isRegistered &= !dependencies.TryGetByKey(hashCode, key, out _);
+                            isRegistered &= !dependencies.TryGetByKey(key, out _);
                             if (isRegistered)
                             {
-                                dependencies = dependencies.Set(hashCode, key, dependencyEntry);
+                                dependencies = dependencies.Set(key, dependencyEntry);
                             }
                         }
 
@@ -194,11 +192,9 @@
         public bool TryGetResolver<T>(ShortKey type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
         {
             FullKey key;
-            int hashCode;
             if (tag == null)
             {
-                hashCode = type.GetHashCode();
-                if (ResolversByType.TryGetByType(hashCode, type, out var curResolver)) // found in resolvers by type
+                if (ResolversByType.TryGetByType(type, out var curResolver)) // found in resolvers by type
                 {
                     resolver = (Resolver<T>) curResolver;
                     error = default(Exception);
@@ -210,8 +206,7 @@
             else
             {
                 key = new FullKey(type, tag);
-                hashCode = key.HashCode;
-                if (Resolvers.TryGetByKey(hashCode, key, out var curResolver)) // found in resolvers
+                if (Resolvers.TryGetByKey(key, out var curResolver)) // found in resolvers
                 {
                     resolver = (Resolver<T>) curResolver;
                     error = default(Exception);
@@ -229,7 +224,7 @@
             lock (_lockObject)
             {
                 CheckIsNotDisposed();
-                var hasDependency = TryGetDependency(key, key.HashCode, out var dependencyEntry);
+                var hasDependency = TryGetDependency(key, key.GetHashCode(), out var dependencyEntry);
                 if (hasDependency)
                 {
                     // tries creating resolver
@@ -263,10 +258,10 @@
                 if (resolvingContainer == null || Equals(resolvingContainer, this))
                 {
                     // Add resolver to tables
-                    Resolvers = Resolvers.Set(key.HashCode, key, resolver);
+                    Resolvers = Resolvers.Set(key, resolver);
                     if (key.Tag == null)
                     {
-                        ResolversByType = ResolversByType.Set(key.HashCode, key.Type, resolver);
+                        ResolversByType = ResolversByType.Set(key.Type, resolver);
                     }
                 }
             }
@@ -282,7 +277,7 @@
             {
                 CheckIsNotDisposed();
 
-                if (!TryGetDependency(key, key.HashCode, out var dependencyEntry))
+                if (!TryGetDependency(key, key.GetHashCode(), out var dependencyEntry))
                 {
                     return _parent.TryGetDependency(key, out dependency, out lifetime);
                 }
@@ -425,7 +420,7 @@
         [MethodImpl((MethodImplOptions)256)]
         private bool TryUnregister<TKey>(TKey key, [NotNull] ref Table<TKey, DependencyEntry> entries)
         {
-            entries = entries.Remove(key.GetHashCode(), key, out var unregistered);
+            entries = entries.Remove(key, out var unregistered);
             if (!unregistered)
             {
                 return false;
@@ -445,7 +440,7 @@
 
         private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)
         {
-            if (_dependencies.TryGetByKey(hashCode, key, out dependencyEntry))
+            if (_dependencies.TryGetByKey(key, out dependencyEntry))
             {
                 return true;
             }
@@ -459,20 +454,20 @@
                 var genericType = typeDescriptor.GetGenericTypeDefinition();
                 var genericKey = new FullKey(genericType, key.Tag);
                 // For generic type
-                if (_dependencies.TryGetByKey(genericKey.HashCode, genericKey, out dependencyEntry))
+                if (_dependencies.TryGetByKey(genericKey, out dependencyEntry))
                 {
                     return true;
                 }
 
                 // For generic type and Any tag
-                if (_dependenciesForTagAny.TryGetByType(genericType.GetHashCode(), genericType, out dependencyEntry))
+                if (_dependenciesForTagAny.TryGetByType(genericType, out dependencyEntry))
                 {
                     return true;
                 }
             }
 
             // For Any tag
-            if (_dependenciesForTagAny.TryGetByType(type.GetHashCode(), type, out dependencyEntry))
+            if (_dependenciesForTagAny.TryGetByType(type, out dependencyEntry))
             {
                 return true;
             }
@@ -482,13 +477,13 @@
             {
                 var arrayKey = new FullKey(typeof(IArray), key.Tag);
                 // For generic type
-                if (_dependencies.TryGetByKey(arrayKey.HashCode, arrayKey, out dependencyEntry))
+                if (_dependencies.TryGetByKey(arrayKey, out dependencyEntry))
                 {
                     return true;
                 }
 
                 // For generic type and Any tag
-                if (_dependenciesForTagAny.TryGetByType(typeof(IArray).GetHashCode(), typeof(IArray), out dependencyEntry))
+                if (_dependenciesForTagAny.TryGetByType(typeof(IArray), out dependencyEntry))
                 {
                     return true;
                 }

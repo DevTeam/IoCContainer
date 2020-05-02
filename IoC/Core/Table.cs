@@ -22,7 +22,7 @@
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        private Table(Table<TKey, TValue> origin, int hashCode, TKey key, TValue value)
+        private Table(Table<TKey, TValue> origin, TKey key, TValue value)
         {
             int newBucketIndex;
             Count = origin.Count + 1;
@@ -37,7 +37,7 @@
                     for (var index = 0; index < originKeyValues.Length; index++)
                     {
                         var keyValue = originKeyValues[index];
-                        newBucketIndex = keyValue.HashCode & Divisor;
+                        newBucketIndex = keyValue.Key.GetHashCode() & Divisor;
                         Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(keyValue);
                     }
                 }
@@ -48,15 +48,15 @@
                 Buckets = origin.Buckets.Copy();
             }
 
-            newBucketIndex = hashCode & Divisor;
-            Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(new KeyValue(hashCode, key, value));
+            newBucketIndex = key.GetHashCode() & Divisor;
+            Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(new KeyValue(key, value));
         }
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public TValue Get(int hashCode, TKey key)
+        public TValue Get(TKey key)
         {
-            var items = this.Buckets[hashCode & this.Divisor];
+            var items = Buckets[key.GetHashCode() & Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
@@ -90,15 +90,16 @@
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public Table<TKey, TValue> Set(int hashCode, TKey key, TValue value) =>
-            new Table<TKey, TValue>(this, hashCode, key, value);
+        public Table<TKey, TValue> Set(TKey key, TValue value) =>
+            new Table<TKey, TValue>(this, key, value);
 
         [Pure]
-        public Table<TKey, TValue> Remove(int hashCode, TKey key, out bool removed)
+        public Table<TKey, TValue> Remove(TKey key, out bool removed)
         {
             removed = false;
             var newBuckets = CoreExtensions.CreateArray(Divisor + 1, EmptyBucket);
             var newBucketsArray = newBuckets;
+            var hashCode = key.GetHashCode();
             var bucketIndex = hashCode & Divisor;
             for (var curBucketIndex = 0; curBucketIndex < Buckets.Length; curBucketIndex++)
             {
@@ -114,7 +115,7 @@
                 {
                     var keyValue = bucket[index];
                     // Remove the element
-                    if (keyValue.HashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
+                    if (keyValue.Key.GetHashCode() == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
                     {
                         newBucketsArray[bucketIndex] = Remove(bucket, index);
                         removed = true;
@@ -147,13 +148,11 @@
 
         internal struct KeyValue
         {
-            public readonly int HashCode;
             public readonly TKey Key;
             public readonly TValue Value;
 
-            public KeyValue(int hashCode, TKey key, TValue value)
+            public KeyValue(TKey key, TValue value)
             {
-                HashCode = hashCode;
                 Key = key;
                 Value = value;
             }

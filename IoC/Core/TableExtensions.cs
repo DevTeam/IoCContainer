@@ -7,9 +7,9 @@
     {
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public static bool TryGetByType<TValue>(this Table<Type, TValue> table, int hashCode, Type key, out TValue value)
+        public static bool TryGetByType<TValue>(this Table<Type, TValue> table, Type key, out TValue value)
         {
-            var items = table.Buckets[hashCode & table.Divisor];
+            var items = table.Buckets[key.GetHashCode() & table.Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
@@ -27,9 +27,9 @@
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public static bool TryGetByKey<TValue>(this Table<Key, TValue> table, int hashCode, Key key, out TValue value)
+        public static bool TryGetByKey<TValue>(this Table<Key, TValue> table, Key key, out TValue value)
         {
-            var items = table.Buckets[hashCode & table.Divisor];
+            var items = table.Buckets[key.GetHashCode() & table.Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {

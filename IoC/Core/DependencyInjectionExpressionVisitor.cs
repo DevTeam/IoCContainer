@@ -15,8 +15,8 @@ namespace IoC.Core
     {
         private static readonly Exception InvalidExpressionError = new BuildExpressionException("Invalid expression", null);
 
-        private static readonly Key ContextKey = TypeDescriptor<Context>.Key;
-        private static readonly TypeDescriptor ContextTypeDescriptor = TypeDescriptor<Context>.Descriptor;
+        private static readonly Key ContextKey = new Key(typeof(Context));
+        private static readonly TypeDescriptor ContextTypeDescriptor = new TypeDescriptor(typeof(Context));
         private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static readonly ConstructorInfo ContextConstructor;
         [NotNull] private readonly IContainer _container;

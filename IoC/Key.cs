@@ -26,8 +26,6 @@
         /// </summary>
         [CanBeNull] public readonly object Tag;
 
-        internal readonly int HashCode;
-
         /// <summary>
         /// Creates the instance of Key.
         /// </summary>
@@ -37,15 +35,11 @@
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
             Tag = tag;
-            unchecked
-            {
-                HashCode = (tag?.GetHashCode() * 397 ?? 0) ^ type.GetHashCode();
-            }
         }
 
         /// <inheritdoc />
         [Pure]
-        public override string ToString() => $"[Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {HashCode}]";
+        public override string ToString() => $"[Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {GetHashCode()}]";
 
         /// <inheritdoc />
         [Pure]
@@ -58,7 +52,13 @@
 
         /// <inheritdoc />
         [Pure]
-        public override int GetHashCode() => HashCode;
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Tag?.GetHashCode() * 397 ?? 0) ^ Type.GetHashCode();
+            }
+        }
 
         private class AnyTagObject
         {

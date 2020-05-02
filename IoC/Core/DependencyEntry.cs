@@ -110,22 +110,21 @@
             }
 
             var lifetimeKey = new LifetimeKey(type.Descriptor().GetGenericTypeArguments());
-            var lifetimeHashCode = lifetimeKey.HashCode;
 
             if (!hasLifetimes)
             {
-                _lifetimes = _lifetimes.Set(lifetimeHashCode, lifetimeKey, Lifetime);
+                _lifetimes = _lifetimes.Set(lifetimeKey, Lifetime);
                 return Lifetime;
             }
 
-            var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
+            var lifetime = _lifetimes.Get(lifetimeKey);
             if (lifetime != default(ILifetime))
             {
                 return lifetime;
             }
 
             lifetime = Lifetime.Create();
-            _lifetimes = _lifetimes.Set(lifetimeHashCode, lifetimeKey, lifetime);
+            _lifetimes = _lifetimes.Set(lifetimeKey, lifetime);
 
             return lifetime;
         }
@@ -154,13 +153,8 @@
         private struct LifetimeKey: IEquatable<LifetimeKey>
         {
             private readonly Type[] _genericTypes;
-            internal readonly int HashCode;
 
-            public LifetimeKey(Type[] genericTypes)
-            {
-                _genericTypes = genericTypes;
-                HashCode = genericTypes.GetHash();
-            }
+            public LifetimeKey(Type[] genericTypes) => _genericTypes = genericTypes;
 
             public bool Equals(LifetimeKey other) =>
                 CoreExtensions.SequenceEqual(_genericTypes, other._genericTypes);
@@ -169,7 +163,7 @@
             public override bool Equals(object obj) =>
                 CoreExtensions.SequenceEqual(_genericTypes, ((LifetimeKey)obj)._genericTypes);
 
-            public override int GetHashCode() => HashCode;
+            public override int GetHashCode() => _genericTypes.GetHash();
         }
     }
 }

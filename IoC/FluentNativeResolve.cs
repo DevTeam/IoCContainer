@@ -24,7 +24,7 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            var items = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor];
+            var items = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor];
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];

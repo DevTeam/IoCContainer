@@ -22,7 +22,7 @@ namespace IoC
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container)
         {
-            var items = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor];
+            var items = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor];
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
@@ -47,7 +47,7 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, Tag tag)
         {
             var key = new Key(typeof(T), tag);
-            var items = container.Resolvers.Buckets[key.HashCode & container.Resolvers.Divisor];
+            var items = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor];
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
@@ -97,7 +97,7 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
             var key = new Key(type, tag);
-            var items = container.Resolvers.Buckets[key.HashCode & container.Resolvers.Divisor];
+            var items = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor];
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
