@@ -9,11 +9,17 @@
         [Pure]
         public static bool TryGetByType<TValue>(this Table<Type, TValue> table, Type key, out TValue value)
         {
-            var items = table.Buckets[key.GetHashCode() & table.Divisor];
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < items.Length; index++)
+            var bucket = table.Buckets[key.GetHashCode() & table.Divisor];
+            if (key == bucket.FirstKey)
             {
-                var item = items[index];
+                value = bucket.FirstValue;
+                return true;
+            }
+
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 1; index < bucket.Length; index++)
+            {
+                var item = bucket.KeyValues[index];
                 if (key == item.Key)
                 {
                     value = item.Value;
@@ -29,11 +35,17 @@
         [Pure]
         public static bool TryGetByKey<TValue>(this Table<Key, TValue> table, Key key, out TValue value)
         {
-            var items = table.Buckets[key.GetHashCode() & table.Divisor];
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < items.Length; index++)
+            var bucket = table.Buckets[key.GetHashCode() & table.Divisor];
+            if (CoreExtensions.Equals(key, bucket.FirstKey))
             {
-                var item = items[index];
+                value = bucket.FirstValue;
+                return true;
+            }
+
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 1; index < bucket.Length; index++)
+            {
+                var item = bucket.KeyValues[index];
                 if (CoreExtensions.Equals(key, item.Key))
                 {
                     value = item.Value;

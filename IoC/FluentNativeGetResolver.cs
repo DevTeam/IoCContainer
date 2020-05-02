@@ -22,10 +22,15 @@ namespace IoC
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container)
         {
-            var items = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor];
-            for (var index = 0; index < items.Length; index++)
+            var bucket = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor];
+            if (typeof(T) == bucket.FirstKey)
             {
-                var item = items[index];
+                return (Resolver<T>)bucket.FirstValue;
+            }
+
+            for (var index = 1; index < bucket.Length; index++)
+            {
+                var item = bucket.KeyValues[index];
                 if (typeof(T) == item.Key)
                 {
                     return (Resolver<T>)item.Value;
@@ -47,10 +52,15 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, Tag tag)
         {
             var key = new Key(typeof(T), tag);
-            var items = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor];
-            for (var index = 0; index < items.Length; index++)
+            var bucket = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor];
+            if (CoreExtensions.Equals(key, bucket.FirstKey))
             {
-                var item = items[index];
+                return (Resolver<T>)bucket.FirstValue;
+            }
+
+            for (var index = 1; index < bucket.Length; index++)
+            {
+                var item = bucket.KeyValues[index];
                 if (CoreExtensions.Equals(key, item.Key))
                 {
                     return (Resolver<T>)item.Value;
@@ -71,10 +81,15 @@ namespace IoC
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type)
         {
-            var items = container.ResolversByType.Buckets[type.GetHashCode() & container.ResolversByType.Divisor];
-            for (var index = 0; index < items.Length; index++)
+            var bucket = container.ResolversByType.Buckets[type.GetHashCode() & container.ResolversByType.Divisor];
+            if (type == bucket.FirstKey)
             {
-                var item = items[index];
+                return (Resolver<T>)bucket.FirstValue;
+            }
+
+            for (var index = 1; index < bucket.Length; index++)
+            {
+                var item = bucket.KeyValues[index];
                 if (type == item.Key)
                 {
                     return (Resolver<T>) item.Value;
@@ -97,10 +112,15 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
             var key = new Key(type, tag);
-            var items = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor];
-            for (var index = 0; index < items.Length; index++)
+            var bucket = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor];
+            if (CoreExtensions.Equals(key, bucket.FirstKey))
             {
-                var item = items[index];
+                return (Resolver<T>)bucket.FirstValue;
+            }
+
+            for (var index = 1; index < bucket.Length; index++)
+            {
+                var item = bucket.KeyValues[index];
                 if (CoreExtensions.Equals(key, item.Key))
                 {
                     return (Resolver<T>)item.Value;

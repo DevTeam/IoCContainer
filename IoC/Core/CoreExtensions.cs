@@ -39,6 +39,11 @@ namespace IoC.Core
             }
 
             var array = new T[size];
+            if (Equals(value, default(T)))
+            {
+                return array;
+            }
+
             for (var i = 0; i < size; i++)
             {
                 array[i] = value;

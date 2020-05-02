@@ -8,13 +8,13 @@
     [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
     internal sealed class Table<TKey, TValue>: IEnumerable<Table<TKey, TValue>.KeyValue>
     {
-        private static readonly KeyValue[] EmptyBucket = CoreExtensions.EmptyArray<KeyValue>();
-        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(4, EmptyBucket), 3, 0);
+        private static readonly Bucket EmptyBucket = new Bucket(CoreExtensions.EmptyArray<KeyValue>());
+        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(8, EmptyBucket), 7, 0);
         public readonly int Count;
         public readonly int Divisor;
-        public readonly KeyValue[][] Buckets;
+        public readonly Bucket[] Buckets;
 
-        private Table(KeyValue[][] buckets, int divisor, int count)
+        private Table(Bucket[] buckets, int divisor, int count)
         {
             Buckets = buckets;
             Divisor = divisor;
@@ -28,7 +28,7 @@
             Count = origin.Count + 1;
             if (origin.Count > origin.Divisor)
             {
-                Divisor = (origin.Divisor + 1) << 2 - 1;
+                Divisor = (origin.Divisor + 1) << 3 - 1;
                 Buckets = CoreExtensions.CreateArray(Divisor + 1, EmptyBucket);
                 var originBuckets = origin.Buckets;
                 for (var originBucketIndex = 0; originBucketIndex < originBuckets.Length; originBucketIndex++)
@@ -36,7 +36,7 @@
                     var originKeyValues = originBuckets[originBucketIndex];
                     for (var index = 0; index < originKeyValues.Length; index++)
                     {
-                        var keyValue = originKeyValues[index];
+                        var keyValue = originKeyValues.KeyValues[index];
                         newBucketIndex = keyValue.Key.GetHashCode() & Divisor;
                         Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(keyValue);
                     }
@@ -56,11 +56,16 @@
         [Pure]
         public TValue Get(TKey key)
         {
-            var items = Buckets[key.GetHashCode() & Divisor];
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < items.Length; index++)
+            var bucket = Buckets[key.GetHashCode() & Divisor];
+            if (Equals(key, bucket.FirstKey))
             {
-                var item = items[index];
+                return bucket.FirstValue;
+            }
+
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var index = 1; index < bucket.Length; index++)
+            {
+                var item = bucket.KeyValues[index];
                 if (Equals(key, item.Key))
                 {
                     return item.Value;
@@ -75,11 +80,10 @@
         {
             for (var bucketIndex = 0; bucketIndex < Buckets.Length; bucketIndex++)
             {
-                var keyValues = Buckets[bucketIndex];
-                for (var index = 0; index < keyValues.Length; index++)
+                var bucket = Buckets[bucketIndex];
+                for (var index = 0; index < bucket.Length; index++)
                 {
-                    var keyValue = keyValues[index];
-                    yield return keyValue;
+                    yield return bucket.KeyValues[index];
                 }
             }
         }
@@ -106,18 +110,18 @@
                 var bucket = Buckets[curBucketIndex];
                 if (curBucketIndex != bucketIndex)
                 {
-                    newBucketsArray[curBucketIndex] = bucket.Length == 0 ? EmptyBucket : bucket.Copy();
+                    newBucketsArray[curBucketIndex] = bucket.Copy();
                     continue;
                 }
 
                 // Bucket to remove an element
                 for (var index = 0; index < bucket.Length; index++)
                 {
-                    var keyValue = bucket[index];
+                    var keyValue = bucket.KeyValues[index];
                     // Remove the element
                     if (keyValue.Key.GetHashCode() == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
                     {
-                        newBucketsArray[bucketIndex] = Remove(bucket, index);
+                        newBucketsArray[bucketIndex] = bucket.Remove(index);
                         removed = true;
                     }
                 }
@@ -126,24 +130,54 @@
             return new Table<TKey, TValue>(newBuckets, Divisor, removed ? Count - 1: Count);
         }
 
-        [Pure]
-        [MethodImpl((MethodImplOptions)256)]
-        private static KeyValue[] Remove(KeyValue[] bucket, int index)
+        internal struct Bucket
         {
-            var count = bucket.Length;
-            var newBucket = new KeyValue[count - 1];
-            var keyValues = bucket;
-            for (var newIndex = 0; newIndex < index; newIndex++)
+            public readonly KeyValue[] KeyValues;
+            public readonly int Length;
+            public readonly TKey FirstKey;
+            public readonly TValue FirstValue;
+
+            public Bucket(KeyValue[] keyValues)
             {
-                newBucket[newIndex] = keyValues[newIndex];
+                KeyValues = keyValues;
+                Length = keyValues.Length;
+                if (Length > 0)
+                {
+                    var item = keyValues[0];
+                    FirstKey = item.Key;
+                    FirstValue = item.Value;
+                }
+                else
+                {
+                    FirstKey = default(TKey);
+                    FirstValue = default(TValue);
+                }
             }
 
-            for (var newIndex = index + 1; newIndex < count; newIndex++)
-            {
-                newBucket[newIndex - 1] = keyValues[newIndex];
-            }
+            [MethodImpl((MethodImplOptions)256)]
+            public Bucket Add(KeyValue keyValue) =>
+                new Bucket(KeyValues.Add(keyValue));
 
-            return newBucket;
+            [MethodImpl((MethodImplOptions)256)]
+            public Bucket Copy() =>
+                Length == 0 ? EmptyBucket : new Bucket(KeyValues.Copy());
+
+            [MethodImpl((MethodImplOptions)256)]
+            public Bucket Remove(int index)
+            {
+                var newLeyValues = new KeyValue[Length - 1];
+                for (var newIndex = 0; newIndex < index; newIndex++)
+                {
+                    newLeyValues[newIndex] = KeyValues[newIndex];
+                }
+
+                for (var newIndex = index + 1; newIndex < Length; newIndex++)
+                {
+                    newLeyValues[newIndex - 1] = KeyValues[newIndex];
+                }
+
+                return new Bucket(newLeyValues);
+            }
         }
 
         internal struct KeyValue
