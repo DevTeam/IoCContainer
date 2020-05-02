@@ -1224,8 +1224,8 @@ namespace IoC
     {
         private static long _containerId;
 
-        [NotNull] internal volatile Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
-        [NotNull] internal volatile Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
+        [NotNull] internal Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
+        [NotNull] internal Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
         [NotNull] private Table<FullKey, DependencyEntry> _dependencies = Table<FullKey, DependencyEntry>.Empty;
         [NotNull] private Table<ShortKey, DependencyEntry> _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
 
@@ -1333,20 +1333,18 @@ namespace IoC
                         var key = type != curKey.Type ? new FullKey(type, curKey.Tag) : curKey;
                         if (key.Tag == AnyTag)
                         {
-                            var hashCode = key.Type.GetHashCode();
-                            isRegistered &= !dependenciesForTagAny.TryGetByType(hashCode, key.Type, out _);
+                            isRegistered &= !dependenciesForTagAny.TryGetByType(key.Type, out _);
                             if (isRegistered)
                             {
-                                dependenciesForTagAny = dependenciesForTagAny.Set(hashCode, key.Type, dependencyEntry);
+                                dependenciesForTagAny = dependenciesForTagAny.Set(key.Type, dependencyEntry);
                             }
                         }
                         else
                         {
-                            var hashCode = key.HashCode;
-                            isRegistered &= !dependencies.TryGetByKey(hashCode, key, out _);
+                            isRegistered &= !dependencies.TryGetByKey(key, out _);
                             if (isRegistered)
                             {
-                                dependencies = dependencies.Set(hashCode, key, dependencyEntry);
+                                dependencies = dependencies.Set(key, dependencyEntry);
                             }
                         }
 
@@ -1393,11 +1391,9 @@ namespace IoC
         public bool TryGetResolver<T>(ShortKey type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
         {
             FullKey key;
-            int hashCode;
             if (tag == null)
             {
-                hashCode = type.GetHashCode();
-                if (ResolversByType.TryGetByType(hashCode, type, out var curResolver)) // found in resolvers by type
+                if (ResolversByType.TryGetByType(type, out var curResolver)) // found in resolvers by type
                 {
                     resolver = (Resolver<T>) curResolver;
                     error = default(Exception);
@@ -1409,8 +1405,7 @@ namespace IoC
             else
             {
                 key = new FullKey(type, tag);
-                hashCode = key.HashCode;
-                if (Resolvers.TryGetByKey(hashCode, key, out var curResolver)) // found in resolvers
+                if (Resolvers.TryGetByKey(key, out var curResolver)) // found in resolvers
                 {
                     resolver = (Resolver<T>) curResolver;
                     error = default(Exception);
@@ -1428,7 +1423,7 @@ namespace IoC
             lock (_lockObject)
             {
                 CheckIsNotDisposed();
-                var hasDependency = TryGetDependency(key, key.HashCode, out var dependencyEntry);
+                var hasDependency = TryGetDependency(key, key.GetHashCode(), out var dependencyEntry);
                 if (hasDependency)
                 {
                     // tries creating resolver
@@ -1462,10 +1457,10 @@ namespace IoC
                 if (resolvingContainer == null || Equals(resolvingContainer, this))
                 {
                     // Add resolver to tables
-                    Resolvers = Resolvers.Set(key.HashCode, key, resolver);
+                    Resolvers = Resolvers.Set(key, resolver);
                     if (key.Tag == null)
                     {
-                        ResolversByType = ResolversByType.Set(key.HashCode, key.Type, resolver);
+                        ResolversByType = ResolversByType.Set(key.Type, resolver);
                     }
                 }
             }
@@ -1481,7 +1476,7 @@ namespace IoC
             {
                 CheckIsNotDisposed();
 
-                if (!TryGetDependency(key, key.HashCode, out var dependencyEntry))
+                if (!TryGetDependency(key, key.GetHashCode(), out var dependencyEntry))
                 {
                     return _parent.TryGetDependency(key, out dependency, out lifetime);
                 }
@@ -1624,7 +1619,7 @@ namespace IoC
         [MethodImpl((MethodImplOptions)256)]
         private bool TryUnregister<TKey>(TKey key, [NotNull] ref Table<TKey, DependencyEntry> entries)
         {
-            entries = entries.Remove(key.GetHashCode(), key, out var unregistered);
+            entries = entries.Remove(key, out var unregistered);
             if (!unregistered)
             {
                 return false;
@@ -1644,7 +1639,7 @@ namespace IoC
 
         private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)
         {
-            if (_dependencies.TryGetByKey(hashCode, key, out dependencyEntry))
+            if (_dependencies.TryGetByKey(key, out dependencyEntry))
             {
                 return true;
             }
@@ -1658,20 +1653,20 @@ namespace IoC
                 var genericType = typeDescriptor.GetGenericTypeDefinition();
                 var genericKey = new FullKey(genericType, key.Tag);
                 // For generic type
-                if (_dependencies.TryGetByKey(genericKey.HashCode, genericKey, out dependencyEntry))
+                if (_dependencies.TryGetByKey(genericKey, out dependencyEntry))
                 {
                     return true;
                 }
 
                 // For generic type and Any tag
-                if (_dependenciesForTagAny.TryGetByType(genericType.GetHashCode(), genericType, out dependencyEntry))
+                if (_dependenciesForTagAny.TryGetByType(genericType, out dependencyEntry))
                 {
                     return true;
                 }
             }
 
             // For Any tag
-            if (_dependenciesForTagAny.TryGetByType(type.GetHashCode(), type, out dependencyEntry))
+            if (_dependenciesForTagAny.TryGetByType(type, out dependencyEntry))
             {
                 return true;
             }
@@ -1681,13 +1676,13 @@ namespace IoC
             {
                 var arrayKey = new FullKey(typeof(IArray), key.Tag);
                 // For generic type
-                if (_dependencies.TryGetByKey(arrayKey.HashCode, arrayKey, out dependencyEntry))
+                if (_dependencies.TryGetByKey(arrayKey, out dependencyEntry))
                 {
                     return true;
                 }
 
                 // For generic type and Any tag
-                if (_dependenciesForTagAny.TryGetByType(typeof(IArray).GetHashCode(), typeof(IArray), out dependencyEntry))
+                if (_dependenciesForTagAny.TryGetByType(typeof(IArray), out dependencyEntry))
                 {
                     return true;
                 }
@@ -5846,7 +5841,7 @@ namespace IoC
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container)
         {
-            var items = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor];
+            var items = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor];
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
@@ -5871,7 +5866,7 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, Tag tag)
         {
             var key = new Key(typeof(T), tag);
-            var items = container.Resolvers.Buckets[key.HashCode & container.Resolvers.Divisor];
+            var items = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor];
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
@@ -5921,7 +5916,7 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
             var key = new Key(type, tag);
-            var items = container.Resolvers.Buckets[key.HashCode & container.Resolvers.Divisor];
+            var items = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor];
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
@@ -5965,7 +5960,7 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            var items = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor];
+            var items = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor];
             for (var index = 0; index < items.Length; index++)
             {
                 var item = items[index];
@@ -8508,8 +8503,6 @@ namespace IoC
         /// </summary>
         [CanBeNull] public readonly object Tag;
 
-        internal readonly int HashCode;
-
         /// <summary>
         /// Creates the instance of Key.
         /// </summary>
@@ -8519,15 +8512,11 @@ namespace IoC
         {
             Type = type ?? throw new ArgumentNullException(nameof(type));
             Tag = tag;
-            unchecked
-            {
-                HashCode = (tag?.GetHashCode() * 397 ?? 0) ^ type.GetHashCode();
-            }
         }
 
         /// <inheritdoc />
         [Pure]
-        public override string ToString() => $"[Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {HashCode}]";
+        public override string ToString() => $"[Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {GetHashCode()}]";
 
         /// <inheritdoc />
         [Pure]
@@ -8540,7 +8529,13 @@ namespace IoC
 
         /// <inheritdoc />
         [Pure]
-        public override int GetHashCode() => HashCode;
+        public override int GetHashCode()
+        {
+            unchecked
+            {
+                return (Tag?.GetHashCode() * 397 ?? 0) ^ Type.GetHashCode();
+            }
+        }
 
         private class AnyTagObject
         {
@@ -9530,18 +9525,16 @@ namespace IoC.Lifetimes
             var instancesField = Expression.Field(thisConst, InstancesFieldInfo);
             var lockObjectConst = Expression.Constant(_lockObject);
             var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
-            var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, SingletonBasedLifetimeShared.HashCodeVar, KeyVar).Convert(returnType));
+            var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, KeyVar).Convert(returnType));
             var isNullExpression = Expression.ReferenceEqual(instanceVar, ExpressionBuilderExtensions.NullConst);
 
             return Expression.Block(
                 // Key key;
                 // int hashCode;
                 // T instance;
-                new[] { KeyVar, SingletonBasedLifetimeShared.HashCodeVar, instanceVar },
+                new[] { KeyVar, instanceVar },
                 // var key = CreateKey(container, args);
                 Expression.Assign(KeyVar, Expression.Call(thisConst, CreateKeyMethodInfo, context.ContainerParameter, context.ArgsParameter)),
-                // var hashCode = key.GetHashCode();
-                Expression.Assign(SingletonBasedLifetimeShared.HashCodeVar, Expression.Call(KeyVar, ExpressionBuilderExtensions.GetHashCodeMethodInfo)),
                 // var instance = (T)_instances.Get(hashCode, key);
                 assignInstanceExpression,
                 // if (instance == null)
@@ -9559,7 +9552,7 @@ namespace IoC.Lifetimes
                                     // instance = new T();
                                     Expression.Assign(instanceVar, bodyExpression),
                                     // Instances = _instances.Set(hashCode, key, instance);
-                                    Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, SingletonBasedLifetimeShared.HashCodeVar, KeyVar, instanceVar))
+                                    Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar))
                                 )
                             )
                         ).Lock(lockObjectConst),
@@ -9620,11 +9613,6 @@ namespace IoC.Lifetimes
         /// <param name="releasedInstance">The released instance.</param>
         /// <param name="key">The instance key.</param>
         protected abstract void OnInstanceReleased(object releasedInstance, TKey key);
-    }
-
-    internal static class SingletonBasedLifetimeShared
-    {
-        internal static readonly ParameterExpression HashCodeVar = Expression.Variable(typeof(int), "hashCode");
     }
 }
 
@@ -11529,22 +11517,21 @@ namespace IoC.Core
             }
 
             var lifetimeKey = new LifetimeKey(type.Descriptor().GetGenericTypeArguments());
-            var lifetimeHashCode = lifetimeKey.HashCode;
 
             if (!hasLifetimes)
             {
-                _lifetimes = _lifetimes.Set(lifetimeHashCode, lifetimeKey, Lifetime);
+                _lifetimes = _lifetimes.Set(lifetimeKey, Lifetime);
                 return Lifetime;
             }
 
-            var lifetime = _lifetimes.Get(lifetimeHashCode, lifetimeKey);
+            var lifetime = _lifetimes.Get(lifetimeKey);
             if (lifetime != default(ILifetime))
             {
                 return lifetime;
             }
 
             lifetime = Lifetime.Create();
-            _lifetimes = _lifetimes.Set(lifetimeHashCode, lifetimeKey, lifetime);
+            _lifetimes = _lifetimes.Set(lifetimeKey, lifetime);
 
             return lifetime;
         }
@@ -11573,12 +11560,12 @@ namespace IoC.Core
         private struct LifetimeKey: IEquatable<LifetimeKey>
         {
             private readonly Type[] _genericTypes;
-            internal readonly int HashCode;
+            private readonly int _hashCode;
 
             public LifetimeKey(Type[] genericTypes)
             {
                 _genericTypes = genericTypes;
-                HashCode = genericTypes.GetHash();
+                _hashCode = genericTypes.GetHash();
             }
 
             public bool Equals(LifetimeKey other) =>
@@ -11588,7 +11575,7 @@ namespace IoC.Core
             public override bool Equals(object obj) =>
                 CoreExtensions.SequenceEqual(_genericTypes, ((LifetimeKey)obj)._genericTypes);
 
-            public override int GetHashCode() => HashCode;
+            public override int GetHashCode() => _hashCode;
         }
     }
 }
@@ -11641,8 +11628,8 @@ namespace IoC.Core
     {
         private static readonly Exception InvalidExpressionError = new BuildExpressionException("Invalid expression", null);
 
-        private static readonly Key ContextKey = TypeDescriptor<Context>.Key;
-        private static readonly TypeDescriptor ContextTypeDescriptor = TypeDescriptor<Context>.Descriptor;
+        private static readonly Key ContextKey = new Key(typeof(Context));
+        private static readonly TypeDescriptor ContextTypeDescriptor = new TypeDescriptor(typeof(Context));
         private static readonly TypeDescriptor GenericContextTypeDescriptor = typeof(Context<>).Descriptor();
         [NotNull] private static readonly ConstructorInfo ContextConstructor;
         [NotNull] private readonly IContainer _container;
@@ -13081,8 +13068,7 @@ namespace IoC.Core
                     return false;
                 }
 
-                var hashCode = container.GetHashCode();
-                if (_map.Get(hashCode, container) != null)
+                if (_map.Get(container) != null)
                 {
                     return true;
                 }
@@ -13090,7 +13076,7 @@ namespace IoC.Core
                 if (container.TryGetResolver<T>(key.Type, key.Tag, out var resolver, out _, container))
                 {
                     var instance = resolver(container);
-                    _map = _map.Set(hashCode, container, instance);
+                    _map = _map.Set(container, instance);
                     _updater(Items, instance);
                 }
 
@@ -13104,8 +13090,7 @@ namespace IoC.Core
                     return false;
                 }
 
-                var hashCode = container.GetHashCode();
-                var instance = _map.Get(hashCode, container);
+                var instance = _map.Get(container);
                 if (instance != null)
                 {
                     Items.Remove(instance);
@@ -13323,7 +13308,7 @@ namespace IoC.Core
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        private Table(Table<TKey, TValue> origin, int hashCode, TKey key, TValue value)
+        private Table(Table<TKey, TValue> origin, TKey key, TValue value)
         {
             int newBucketIndex;
             Count = origin.Count + 1;
@@ -13338,7 +13323,7 @@ namespace IoC.Core
                     for (var index = 0; index < originKeyValues.Length; index++)
                     {
                         var keyValue = originKeyValues[index];
-                        newBucketIndex = keyValue.HashCode & Divisor;
+                        newBucketIndex = keyValue.Key.GetHashCode() & Divisor;
                         Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(keyValue);
                     }
                 }
@@ -13349,15 +13334,15 @@ namespace IoC.Core
                 Buckets = origin.Buckets.Copy();
             }
 
-            newBucketIndex = hashCode & Divisor;
-            Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(new KeyValue(hashCode, key, value));
+            newBucketIndex = key.GetHashCode() & Divisor;
+            Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(new KeyValue(key, value));
         }
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public TValue Get(int hashCode, TKey key)
+        public TValue Get(TKey key)
         {
-            var items = this.Buckets[hashCode & this.Divisor];
+            var items = Buckets[key.GetHashCode() & Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
@@ -13391,15 +13376,16 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public Table<TKey, TValue> Set(int hashCode, TKey key, TValue value) =>
-            new Table<TKey, TValue>(this, hashCode, key, value);
+        public Table<TKey, TValue> Set(TKey key, TValue value) =>
+            new Table<TKey, TValue>(this, key, value);
 
         [Pure]
-        public Table<TKey, TValue> Remove(int hashCode, TKey key, out bool removed)
+        public Table<TKey, TValue> Remove(TKey key, out bool removed)
         {
             removed = false;
             var newBuckets = CoreExtensions.CreateArray(Divisor + 1, EmptyBucket);
             var newBucketsArray = newBuckets;
+            var hashCode = key.GetHashCode();
             var bucketIndex = hashCode & Divisor;
             for (var curBucketIndex = 0; curBucketIndex < Buckets.Length; curBucketIndex++)
             {
@@ -13415,7 +13401,7 @@ namespace IoC.Core
                 {
                     var keyValue = bucket[index];
                     // Remove the element
-                    if (keyValue.HashCode == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
+                    if (keyValue.Key.GetHashCode() == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
                     {
                         newBucketsArray[bucketIndex] = Remove(bucket, index);
                         removed = true;
@@ -13448,13 +13434,11 @@ namespace IoC.Core
 
         internal struct KeyValue
         {
-            public readonly int HashCode;
             public readonly TKey Key;
             public readonly TValue Value;
 
-            public KeyValue(int hashCode, TKey key, TValue value)
+            public KeyValue(TKey key, TValue value)
             {
-                HashCode = hashCode;
                 Key = key;
                 Value = value;
             }
@@ -13474,9 +13458,9 @@ namespace IoC.Core
     {
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public static bool TryGetByType<TValue>(this Table<Type, TValue> table, int hashCode, Type key, out TValue value)
+        public static bool TryGetByType<TValue>(this Table<Type, TValue> table, Type key, out TValue value)
         {
-            var items = table.Buckets[hashCode & table.Divisor];
+            var items = table.Buckets[key.GetHashCode() & table.Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
@@ -13494,9 +13478,9 @@ namespace IoC.Core
 
         [MethodImpl((MethodImplOptions)256)]
         [Pure]
-        public static bool TryGetByKey<TValue>(this Table<Key, TValue> table, int hashCode, Key key, out TValue value)
+        public static bool TryGetByKey<TValue>(this Table<Key, TValue> table, Key key, out TValue value)
         {
-            var items = table.Buckets[hashCode & table.Divisor];
+            var items = table.Buckets[key.GetHashCode() & table.Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < items.Length; index++)
             {
@@ -13893,17 +13877,12 @@ namespace IoC.Core
 
 namespace IoC.Core
 {
-    using System;
     using System.Diagnostics.CodeAnalysis;
 
     [SuppressMessage("ReSharper", "StaticMemberInGenericType")]
     internal static class TypeDescriptor<T>
     {
-        public static readonly int HashCode = typeof(T).GetHashCode();
-
         public static readonly TypeDescriptor Descriptor = new TypeDescriptor(typeof(T));
-
-        public static readonly Key Key = new Key(typeof(T));
     }
 }
 

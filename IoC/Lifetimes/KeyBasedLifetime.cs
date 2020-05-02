@@ -35,18 +35,16 @@
             var instancesField = Expression.Field(thisConst, InstancesFieldInfo);
             var lockObjectConst = Expression.Constant(_lockObject);
             var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
-            var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, SingletonBasedLifetimeShared.HashCodeVar, KeyVar).Convert(returnType));
+            var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, KeyVar).Convert(returnType));
             var isNullExpression = Expression.ReferenceEqual(instanceVar, ExpressionBuilderExtensions.NullConst);
 
             return Expression.Block(
                 // Key key;
                 // int hashCode;
                 // T instance;
-                new[] { KeyVar, SingletonBasedLifetimeShared.HashCodeVar, instanceVar },
+                new[] { KeyVar, instanceVar },
                 // var key = CreateKey(container, args);
                 Expression.Assign(KeyVar, Expression.Call(thisConst, CreateKeyMethodInfo, context.ContainerParameter, context.ArgsParameter)),
-                // var hashCode = key.GetHashCode();
-                Expression.Assign(SingletonBasedLifetimeShared.HashCodeVar, Expression.Call(KeyVar, ExpressionBuilderExtensions.GetHashCodeMethodInfo)),
                 // var instance = (T)_instances.Get(hashCode, key);
                 assignInstanceExpression,
                 // if (instance == null)
@@ -64,7 +62,7 @@
                                     // instance = new T();
                                     Expression.Assign(instanceVar, bodyExpression),
                                     // Instances = _instances.Set(hashCode, key, instance);
-                                    Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, SingletonBasedLifetimeShared.HashCodeVar, KeyVar, instanceVar))
+                                    Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar))
                                 )
                             )
                         ).Lock(lockObjectConst),
@@ -125,10 +123,5 @@
         /// <param name="releasedInstance">The released instance.</param>
         /// <param name="key">The instance key.</param>
         protected abstract void OnInstanceReleased(object releasedInstance, TKey key);
-    }
-
-    internal static class SingletonBasedLifetimeShared
-    {
-        internal static readonly ParameterExpression HashCodeVar = Expression.Variable(typeof(int), "hashCode");
     }
 }

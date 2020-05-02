@@ -153,8 +153,13 @@
         private struct LifetimeKey: IEquatable<LifetimeKey>
         {
             private readonly Type[] _genericTypes;
+            private readonly int _hashCode;
 
-            public LifetimeKey(Type[] genericTypes) => _genericTypes = genericTypes;
+            public LifetimeKey(Type[] genericTypes)
+            {
+                _genericTypes = genericTypes;
+                _hashCode = genericTypes.GetHash();
+            }
 
             public bool Equals(LifetimeKey other) =>
                 CoreExtensions.SequenceEqual(_genericTypes, other._genericTypes);
@@ -163,7 +168,7 @@
             public override bool Equals(object obj) =>
                 CoreExtensions.SequenceEqual(_genericTypes, ((LifetimeKey)obj)._genericTypes);
 
-            public override int GetHashCode() => _genericTypes.GetHash();
+            public override int GetHashCode() => _hashCode;
         }
     }
 }
