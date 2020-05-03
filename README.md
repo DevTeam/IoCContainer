@@ -324,6 +324,7 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Tags](#tags-)
   - [Value](#value-)
   - [Dependency Tag](#dependency-tag-)
+  - [Plugins](#plugins-)
   - [Singleton lifetime](#singleton-lifetime-)
   - [Child Container](#child-container-)
   - [Container Singleton lifetime](#container-singleton-lifetime-)
@@ -814,6 +815,56 @@ using var container = Container
 
 // Resolve an instance
 var instance = container.Resolve<IService>();
+```
+
+
+
+### Plugins [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Plugins.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    // Given
+    var pluginTypes = new[] { typeof(Plugin1), typeof(Plugin2), typeof(Plugin3) };
+
+    using var container = Container.Create();
+    foreach (var pluginType in pluginTypes)
+    {
+        // Should ensure uniqueness of plugin
+        var uniquePluginId = pluginType;
+
+        // Bind several opened types by a tag which should ensure uniqueness of binding
+        container.Bind(typeof(IPlugin)).Tag(uniquePluginId).To(pluginType);
+    }
+
+    // When
+
+    // Resolve instances
+    var plugins = container.Resolve<IEnumerable<IPlugin>>();
+
+    // This also works when you cannot use a generic type like IEnumerable<IPlugin>
+    // var plugins = container.Resolve<IEnumerable<object>>(typeof(IEnumerable<>).MakeGenericType(typeof(IPlugin)));
+
+    // Then
+    var resolvedPluginTypes = plugins.Select(i => i.GetType()).ToList();
+
+    resolvedPluginTypes.Count.ShouldBe(3);
+
+    // We cannot rely on order here
+    resolvedPluginTypes.Contains(typeof(Plugin1)).ShouldBeTrue();
+    resolvedPluginTypes.Contains(typeof(Plugin2)).ShouldBeTrue();
+    resolvedPluginTypes.Contains(typeof(Plugin3)).ShouldBeTrue();
+}
+
+interface IPlugin { }
+
+class Plugin1 : IPlugin { }
+
+class Plugin2 : IPlugin { }
+
+class Plugin3 : IPlugin { }
 ```
 
 
