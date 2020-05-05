@@ -78,20 +78,11 @@
             }
         }
 
-        [Benchmark(OperationsPerInvoke = 1000)]
-        public void Autofac()
-        {
-            for (var i = 0; i < 1000; i++)
-            {
-                _autofacContainer.Resolve<IServiceRoot>().DoSomething();
-            }
-        }
+        [Benchmark]
+        public void Autofac() => _autofacContainer.Resolve<IServiceRoot>().DoSomething();
 
         [Benchmark]
-        public void CastleWindsor()
-        {
-            _windsorContainerContainer.Resolve<IServiceRoot>().DoSomething();
-        }
+        public void CastleWindsor() => _windsorContainerContainer.Resolve<IServiceRoot>().DoSomething();
 
         [Benchmark(OperationsPerInvoke = Series * 10)]
         public void DryIoc()
@@ -130,16 +121,10 @@
         }
 
         [Benchmark]
-        public void Ninject()
-        {
-            _ninjectContainer.Get<IServiceRoot>().DoSomething();
-        }
+        public void Ninject() => _ninjectContainer.Get<IServiceRoot>().DoSomething();
 
-        [Benchmark(OperationsPerInvoke = 1000)]
-        public void Unity()
-        {
-            _unityContainer.Resolve<IServiceRoot>().DoSomething();
-        }
+        [Benchmark]
+        public void Unity() => _unityContainer.Resolve<IServiceRoot>().DoSomething();
 
         [Benchmark(OperationsPerInvoke = Series * 10)]
         public void MicrosoftDependencyInjection()
