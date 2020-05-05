@@ -27,8 +27,8 @@
 
         [NotNull] internal Table<FullKey, ResolverDelegate> Resolvers = Table<FullKey, ResolverDelegate>.Empty;
         [NotNull] internal Table<ShortKey, ResolverDelegate> ResolversByType = Table<ShortKey, ResolverDelegate>.Empty;
-        [NotNull] private Table<FullKey, DependencyEntry> _dependencies = Table<FullKey, DependencyEntry>.Empty;
-        [NotNull] private Table<ShortKey, DependencyEntry> _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
+        [NotNull] private Table<FullKey, Registration> _registrations = Table<FullKey, Registration>.Empty;
+        [NotNull] private Table<ShortKey, Registration> _registrationsTagAny = Table<ShortKey, Registration>.Empty;
 
         private bool _isDisposed;
         [NotNull] private readonly IContainer _parent;
@@ -123,11 +123,11 @@
                 CheckIsNotDisposed();
 
                 var registeredKeys = new List<FullKey>();
-                var dependencyEntry = new DependencyEntry(this, dependency, lifetime, Disposable.Create(() => UnregisterKeys(registeredKeys, dependency, lifetime)), registeredKeys);
+                var dependencyEntry = new Registration(this, dependency, lifetime, Disposable.Create(() => UnregisterKeys(registeredKeys, dependency, lifetime)), registeredKeys);
                 try
                 {
-                    var dependenciesForTagAny = _dependenciesForTagAny;
-                    var dependencies = _dependencies;
+                    var dependenciesForTagAny = _registrationsTagAny;
+                    var dependencies = _registrations;
                     foreach (var curKey in keys)
                     {
                         var type = curKey.Type.ToGenericType();
@@ -159,8 +159,8 @@
 
                     if (isRegistered)
                     {
-                        _dependenciesForTagAny = dependenciesForTagAny;
-                        _dependencies = dependencies;
+                        _registrationsTagAny = dependenciesForTagAny;
+                        _registrations = dependencies;
                         _eventSubject.OnNext(ContainerEvent.RegisterDependency(this, registeredKeys, dependency, lifetime));
                     }
                 }
@@ -302,12 +302,12 @@
                 List<IDisposable> entriesToDispose;
                 lock (_lockObject)
                 {
-                    entriesToDispose = new List<IDisposable>(_dependencies.Count + _dependenciesForTagAny.Count + _resources.Count);
-                    entriesToDispose.AddRange(_dependencies.Select(i => i.Value));
-                    entriesToDispose.AddRange(_dependenciesForTagAny.Select(i => i.Value));
+                    entriesToDispose = new List<IDisposable>(_registrations.Count + _registrationsTagAny.Count + _resources.Count);
+                    entriesToDispose.AddRange(_registrations.Select(i => i.Value));
+                    entriesToDispose.AddRange(_registrationsTagAny.Select(i => i.Value));
                     entriesToDispose.AddRange(_resources);
-                    _dependencies = Table<FullKey, DependencyEntry>.Empty;
-                    _dependenciesForTagAny = Table<ShortKey, DependencyEntry>.Empty;
+                    _registrations = Table<FullKey, Registration>.Empty;
+                    _registrationsTagAny = Table<ShortKey, Registration>.Empty;
                     Reset();
                     _resources.Clear();
                 }
@@ -392,11 +392,11 @@
                 {
                     if (curKey.Tag == AnyTag)
                     {
-                        TryUnregister(curKey.Type, ref _dependenciesForTagAny);
+                        TryUnregister(curKey.Type, ref _registrationsTagAny);
                     }
                     else
                     {
-                        TryUnregister(curKey, ref _dependencies);
+                        TryUnregister(curKey, ref _registrations);
                     }
                 }
 
@@ -410,12 +410,12 @@
             lock (_lockObject)
             {
                 CheckIsNotDisposed();
-                return _dependencies.Select(i => i.Value.Keys).Concat(_dependenciesForTagAny.Select(i => i.Value.Keys)).Distinct();
+                return _registrations.Select(i => i.Value.Keys).Concat(_registrationsTagAny.Select(i => i.Value.Keys)).Distinct();
             }
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        private bool TryUnregister<TKey>(TKey key, [NotNull] ref Table<TKey, DependencyEntry> entries)
+        private bool TryUnregister<TKey>(TKey key, [NotNull] ref Table<TKey, Registration> entries)
         {
             entries = entries.Remove(key, out var unregistered);
             if (!unregistered)
@@ -435,9 +435,9 @@
         private void ApplyConfigurations(params IConfiguration[] configurations) =>
             _resources.Add(this.Apply(configurations));
 
-        private bool TryGetDependency(FullKey key, int hashCode, out DependencyEntry dependencyEntry)
+        private bool TryGetDependency(FullKey key, int hashCode, out Registration registration)
         {
-            if (_dependencies.TryGetByKey(key, out dependencyEntry))
+            if (_registrations.TryGetByKey(key, out registration))
             {
                 return true;
             }
@@ -451,20 +451,20 @@
                 var genericType = typeDescriptor.GetGenericTypeDefinition();
                 var genericKey = new FullKey(genericType, key.Tag);
                 // For generic type
-                if (_dependencies.TryGetByKey(genericKey, out dependencyEntry))
+                if (_registrations.TryGetByKey(genericKey, out registration))
                 {
                     return true;
                 }
 
                 // For generic type and Any tag
-                if (_dependenciesForTagAny.TryGetByType(genericType, out dependencyEntry))
+                if (_registrationsTagAny.TryGetByType(genericType, out registration))
                 {
                     return true;
                 }
             }
 
             // For Any tag
-            if (_dependenciesForTagAny.TryGetByType(type, out dependencyEntry))
+            if (_registrationsTagAny.TryGetByType(type, out registration))
             {
                 return true;
             }
@@ -474,13 +474,13 @@
             {
                 var arrayKey = new FullKey(typeof(IArray), key.Tag);
                 // For generic type
-                if (_dependencies.TryGetByKey(arrayKey, out dependencyEntry))
+                if (_registrations.TryGetByKey(arrayKey, out registration))
                 {
                     return true;
                 }
 
                 // For generic type and Any tag
-                if (_dependenciesForTagAny.TryGetByType(typeof(IArray), out dependencyEntry))
+                if (_registrationsTagAny.TryGetByType(typeof(IArray), out registration))
                 {
                     return true;
                 }

@@ -6,7 +6,7 @@
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
 
-    internal sealed class DependencyEntry : IToken
+    internal sealed class Registration : IToken
     {
         /// <summary>
         /// The container parameter.
@@ -33,7 +33,7 @@
         private volatile Table<LifetimeKey, ILifetime> _lifetimes = Table<LifetimeKey, ILifetime>.Empty;
         private bool _disposed;
 
-        public DependencyEntry(
+        public Registration(
             [NotNull] IMutableContainer container,
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
@@ -59,7 +59,7 @@
         {
             if (_disposed)
             {
-                throw new ObjectDisposedException(nameof(DependencyEntry));
+                throw new ObjectDisposedException(nameof(Registration));
             }
 
             var buildContext = new BuildContext(null, key, resolvingContainer, registrationTracker.Builders, registrationTracker.AutowiringStrategy, ArgsParameter, ContainerParameter);
