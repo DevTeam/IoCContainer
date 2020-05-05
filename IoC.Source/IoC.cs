@@ -1429,7 +1429,7 @@ namespace IoC
                     // tries creating resolver
                     resolvingContainer = resolvingContainer ?? this;
                     resolvingContainer = dependencyEntry.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
-                    if (!dependencyEntry.TryCreateResolver<T>(
+                    if (!dependencyEntry.TryCreateResolver(
                         key,
                         resolvingContainer,
                         _registrationTracker,
