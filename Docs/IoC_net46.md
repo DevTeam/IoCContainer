@@ -102,6 +102,8 @@
   - [Dependency](#F-IoC-Issues-DependencyDescription-Dependency 'IoC.Issues.DependencyDescription.Dependency')
   - [Lifetime](#F-IoC-Issues-DependencyDescription-Lifetime 'IoC.Issues.DependencyDescription.Lifetime')
 - [DependencyEntry](#T-IoC-Core-DependencyEntry 'IoC.Core.DependencyEntry')
+  - [ArgsParameter](#F-IoC-Core-DependencyEntry-ArgsParameter 'IoC.Core.DependencyEntry.ArgsParameter')
+  - [ContainerParameter](#F-IoC-Core-DependencyEntry-ContainerParameter 'IoC.Core.DependencyEntry.ContainerParameter')
   - [ResolverParameters](#F-IoC-Core-DependencyEntry-ResolverParameters 'IoC.Core.DependencyEntry.ResolverParameters')
 - [EventType](#T-IoC-EventType 'IoC.EventType')
   - [CreateContainer](#F-IoC-EventType-CreateContainer 'IoC.EventType.CreateContainer')
@@ -314,8 +316,10 @@
   - [Types](#P-IoC-IBinding-Types 'IoC.IBinding.Types')
 - [IBinding\`1](#T-IoC-IBinding`1 'IoC.IBinding`1')
 - [IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext')
+  - [ArgsParameter](#P-IoC-IBuildContext-ArgsParameter 'IoC.IBuildContext.ArgsParameter')
   - [AutowiringStrategy](#P-IoC-IBuildContext-AutowiringStrategy 'IoC.IBuildContext.AutowiringStrategy')
   - [Container](#P-IoC-IBuildContext-Container 'IoC.IBuildContext.Container')
+  - [ContainerParameter](#P-IoC-IBuildContext-ContainerParameter 'IoC.IBuildContext.ContainerParameter')
   - [Depth](#P-IoC-IBuildContext-Depth 'IoC.IBuildContext.Depth')
   - [Key](#P-IoC-IBuildContext-Key 'IoC.IBuildContext.Key')
   - [Parent](#P-IoC-IBuildContext-Parent 'IoC.IBuildContext.Parent')
@@ -351,7 +355,7 @@
 - [ICannotResolveType](#T-IoC-Issues-ICannotResolveType 'IoC.Issues.ICannotResolveType')
   - [Resolve(buildContext,registeredType,resolvingType)](#M-IoC-Issues-ICannotResolveType-Resolve-IoC-IBuildContext,System-Type,System-Type- 'IoC.Issues.ICannotResolveType.Resolve(IoC.IBuildContext,System.Type,System.Type)')
 - [ICompiler](#T-IoC-ICompiler 'IoC.ICompiler')
-  - [TryCompile(context,expression,resolver)](#M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@- 'IoC.ICompiler.TryCompile(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,System.Delegate@)')
+  - [TryCompileResolver\`\`1(context,expression,resolver)](#M-IoC-ICompiler-TryCompileResolver``1-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,IoC-Resolver{``0}@- 'IoC.ICompiler.TryCompileResolver``1(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,IoC.Resolver{``0}@)')
 - [ICompositionRoot\`1](#T-IoC-ICompositionRoot`1 'IoC.ICompositionRoot`1')
   - [Instance](#P-IoC-ICompositionRoot`1-Instance 'IoC.ICompositionRoot`1.Instance')
 - [IConfiguration](#T-IoC-IConfiguration 'IoC.IConfiguration')
@@ -372,7 +376,7 @@
 - [IMethod\`1](#T-IoC-IMethod`1 'IoC.IMethod`1')
   - [Info](#P-IoC-IMethod`1-Info 'IoC.IMethod`1.Info')
   - [GetParametersExpressions()](#M-IoC-IMethod`1-GetParametersExpressions-IoC-IBuildContext- 'IoC.IMethod`1.GetParametersExpressions(IoC.IBuildContext)')
-  - [SetDependency(parameterPosition,dependencyType,dependencyTag,isOptional)](#M-IoC-IMethod`1-SetDependency-System-Int32,System-Type,System-Object,System-Boolean- 'IoC.IMethod`1.SetDependency(System.Int32,System.Type,System.Object,System.Boolean)')
+  - [SetDependency(parameterPosition,dependencyType,dependencyTag,isOptional,args)](#M-IoC-IMethod`1-SetDependency-System-Int32,System-Type,System-Object,System-Boolean,System-Object[]- 'IoC.IMethod`1.SetDependency(System.Int32,System.Type,System.Object,System.Boolean,System.Object[])')
   - [SetExpression(parameterPosition,parameterExpression)](#M-IoC-IMethod`1-SetExpression-System-Int32,System-Linq-Expressions-Expression- 'IoC.IMethod`1.SetExpression(System.Int32,System.Linq.Expressions.Expression)')
 - [IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer')
   - [TryRegisterDependency(keys,dependency,lifetime,dependencyToken)](#M-IoC-IMutableContainer-TryRegisterDependency-System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime,IoC-IToken@- 'IoC.IMutableContainer.TryRegisterDependency(System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime,IoC.IToken@)')
@@ -393,17 +397,17 @@
   - [Members](#F-IoC-ImplicitUseTargetFlags-Members 'IoC.ImplicitUseTargetFlags.Members')
   - [WithMembers](#F-IoC-ImplicitUseTargetFlags-WithMembers 'IoC.ImplicitUseTargetFlags.WithMembers')
 - [Injections](#T-IoC-Injections 'IoC.Injections')
+  - [Assign\`\`1(container,destination,source)](#M-IoC-Injections-Assign``1-IoC-IContainer,``0,``0- 'IoC.Injections.Assign``1(IoC.IContainer,``0,``0)')
   - [Inject(container,type)](#M-IoC-Injections-Inject-IoC-IContainer,System-Type- 'IoC.Injections.Inject(IoC.IContainer,System.Type)')
-  - [Inject(container,type,tag)](#M-IoC-Injections-Inject-IoC-IContainer,System-Type,System-Object- 'IoC.Injections.Inject(IoC.IContainer,System.Type,System.Object)')
+  - [Inject(container,type,tag,args)](#M-IoC-Injections-Inject-IoC-IContainer,System-Type,System-Object,System-Object[]- 'IoC.Injections.Inject(IoC.IContainer,System.Type,System.Object,System.Object[])')
   - [Inject\`\`1(container)](#M-IoC-Injections-Inject``1-IoC-IContainer- 'IoC.Injections.Inject``1(IoC.IContainer)')
-  - [Inject\`\`1(container,tag)](#M-IoC-Injections-Inject``1-IoC-IContainer,System-Object- 'IoC.Injections.Inject``1(IoC.IContainer,System.Object)')
-  - [Inject\`\`1(container,destination,source)](#M-IoC-Injections-Inject``1-IoC-IContainer,``0,``0- 'IoC.Injections.Inject``1(IoC.IContainer,``0,``0)')
+  - [Inject\`\`1(container,tag,args)](#M-IoC-Injections-Inject``1-IoC-IContainer,System-Object,System-Object[]- 'IoC.Injections.Inject``1(IoC.IContainer,System.Object,System.Object[])')
   - [TryInject(container,type)](#M-IoC-Injections-TryInject-IoC-IContainer,System-Type- 'IoC.Injections.TryInject(IoC.IContainer,System.Type)')
-  - [TryInject(container,type,tag)](#M-IoC-Injections-TryInject-IoC-IContainer,System-Type,System-Object- 'IoC.Injections.TryInject(IoC.IContainer,System.Type,System.Object)')
+  - [TryInject(container,type,tag,args)](#M-IoC-Injections-TryInject-IoC-IContainer,System-Type,System-Object,System-Object[]- 'IoC.Injections.TryInject(IoC.IContainer,System.Type,System.Object,System.Object[])')
   - [TryInjectValue\`\`1(container)](#M-IoC-Injections-TryInjectValue``1-IoC-IContainer- 'IoC.Injections.TryInjectValue``1(IoC.IContainer)')
-  - [TryInjectValue\`\`1(container,tag)](#M-IoC-Injections-TryInjectValue``1-IoC-IContainer,System-Object- 'IoC.Injections.TryInjectValue``1(IoC.IContainer,System.Object)')
+  - [TryInjectValue\`\`1(container,tag,args)](#M-IoC-Injections-TryInjectValue``1-IoC-IContainer,System-Object,System-Object[]- 'IoC.Injections.TryInjectValue``1(IoC.IContainer,System.Object,System.Object[])')
   - [TryInject\`\`1(container)](#M-IoC-Injections-TryInject``1-IoC-IContainer- 'IoC.Injections.TryInject``1(IoC.IContainer)')
-  - [TryInject\`\`1(container,tag)](#M-IoC-Injections-TryInject``1-IoC-IContainer,System-Object- 'IoC.Injections.TryInject``1(IoC.IContainer,System.Object)')
+  - [TryInject\`\`1(container,tag,args)](#M-IoC-Injections-TryInject``1-IoC-IContainer,System-Object,System-Object[]- 'IoC.Injections.TryInject``1(IoC.IContainer,System.Object,System.Object[])')
 - [InstantHandleAttribute](#T-IoC-InstantHandleAttribute 'IoC.InstantHandleAttribute')
 - [InvokerParameterNameAttribute](#T-IoC-InvokerParameterNameAttribute 'IoC.InvokerParameterNameAttribute')
 - [ItemCanBeNullAttribute](#T-IoC-ItemCanBeNullAttribute 'IoC.ItemCanBeNullAttribute')
@@ -710,9 +714,6 @@
   - [Apply()](#M-IoC-Features-TupleFeature-Apply-IoC-IMutableContainer- 'IoC.Features.TupleFeature.Apply(IoC.IMutableContainer)')
 - [UsedImplicitlyAttribute](#T-IoC-UsedImplicitlyAttribute 'IoC.UsedImplicitlyAttribute')
 - [ValueProviderAttribute](#T-IoC-ValueProviderAttribute 'IoC.ValueProviderAttribute')
-- [WellknownExpressions](#T-IoC-WellknownExpressions 'IoC.WellknownExpressions')
-  - [ArgsParameter](#F-IoC-WellknownExpressions-ArgsParameter 'IoC.WellknownExpressions.ArgsParameter')
-  - [ContainerParameter](#F-IoC-WellknownExpressions-ContainerParameter 'IoC.WellknownExpressions.ContainerParameter')
 - [XamlItemBindingOfItemsControlAttribute](#T-IoC-XamlItemBindingOfItemsControlAttribute 'IoC.XamlItemBindingOfItemsControlAttribute')
 - [XamlItemsControlAttribute](#T-IoC-XamlItemsControlAttribute 'IoC.XamlItemsControlAttribute')
 
@@ -1810,6 +1811,20 @@ The lifetime to use.
 ##### Namespace
 
 IoC.Core
+
+<a name='F-IoC-Core-DependencyEntry-ArgsParameter'></a>
+### ArgsParameter `constants`
+
+##### Summary
+
+The args parameters.
+
+<a name='F-IoC-Core-DependencyEntry-ContainerParameter'></a>
+### ContainerParameter `constants`
+
+##### Summary
+
+The container parameter.
 
 <a name='F-IoC-Core-DependencyEntry-ResolverParameters'></a>
 ### ResolverParameters `constants`
@@ -7754,6 +7769,13 @@ IoC
 
 Represents an abstract build context.
 
+<a name='P-IoC-IBuildContext-ArgsParameter'></a>
+### ArgsParameter `property`
+
+##### Summary
+
+The args parameters.
+
 <a name='P-IoC-IBuildContext-AutowiringStrategy'></a>
 ### AutowiringStrategy `property`
 
@@ -7767,6 +7789,13 @@ The current autowiring strategy.
 ##### Summary
 
 The target container.
+
+<a name='P-IoC-IBuildContext-ContainerParameter'></a>
+### ContainerParameter `property`
+
+##### Summary
+
+The container parameter.
 
 <a name='P-IoC-IBuildContext-Depth'></a>
 ### Depth `property`
@@ -8286,12 +8315,12 @@ IoC
 
 Represents an abstract expression compiler.
 
-<a name='M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@-'></a>
-### TryCompile(context,expression,resolver) `method`
+<a name='M-IoC-ICompiler-TryCompileResolver``1-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,IoC-Resolver{``0}@-'></a>
+### TryCompileResolver\`\`1(context,expression,resolver) `method`
 
 ##### Summary
 
-Compiles an expression to a delegate.
+Compiles an expression to an instance resolver.
 
 ##### Returns
 
@@ -8303,7 +8332,7 @@ True if success.
 | ---- | ---- | ----------- |
 | context | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | Current context for building. |
 | expression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The lambda expression to compile. |
-| resolver | [System.Delegate@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Delegate@ 'System.Delegate@') | The compiled resolver delegate. |
+| resolver | [IoC.Resolver{\`\`0}@](#T-IoC-Resolver{``0}@ 'IoC.Resolver{``0}@') | The compiled resolver delegate. |
 
 <a name='T-IoC-ICompositionRoot`1'></a>
 ## ICompositionRoot\`1 `type`
@@ -8589,8 +8618,8 @@ Parameters' expressions
 
 This method has no parameters.
 
-<a name='M-IoC-IMethod`1-SetDependency-System-Int32,System-Type,System-Object,System-Boolean-'></a>
-### SetDependency(parameterPosition,dependencyType,dependencyTag,isOptional) `method`
+<a name='M-IoC-IMethod`1-SetDependency-System-Int32,System-Type,System-Object,System-Boolean,System-Object[]-'></a>
+### SetDependency(parameterPosition,dependencyType,dependencyTag,isOptional,args) `method`
 
 ##### Summary
 
@@ -8604,6 +8633,7 @@ Specifies the dependency type and tag for method parameter at the position.
 | dependencyType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The dependency type. |
 | dependencyTag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The optional dependency tag value. |
 | isOptional | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | `True` if it is optional dependency. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
 
 <a name='M-IoC-IMethod`1-SetExpression-System-Int32,System-Linq-Expressions-Expression-'></a>
 ### SetExpression(parameterPosition,parameterExpression) `method`
@@ -8816,6 +8846,27 @@ IoC
 
 A set of injection markers.
 
+<a name='M-IoC-Injections-Assign``1-IoC-IContainer,``0,``0-'></a>
+### Assign\`\`1(container,destination,source) `method`
+
+##### Summary
+
+Injects a dependency. Just the injection marker.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
+| destination | [\`\`0](#T-``0 '``0') | The destination member for injection. |
+| source | [\`\`0](#T-``0 '``0') | The source of injection. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T |  |
+
 <a name='M-IoC-Injections-Inject-IoC-IContainer,System-Type-'></a>
 ### Inject(container,type) `method`
 
@@ -8834,8 +8885,8 @@ The injected instance.
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
 | type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The type of dependency. |
 
-<a name='M-IoC-Injections-Inject-IoC-IContainer,System-Type,System-Object-'></a>
-### Inject(container,type,tag) `method`
+<a name='M-IoC-Injections-Inject-IoC-IContainer,System-Type,System-Object,System-Object[]-'></a>
+### Inject(container,type,tag,args) `method`
 
 ##### Summary
 
@@ -8852,6 +8903,7 @@ The injected instance.
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
 | type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The type of dependency. |
 | tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag of dependency. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
 
 <a name='M-IoC-Injections-Inject``1-IoC-IContainer-'></a>
 ### Inject\`\`1(container) `method`
@@ -8876,8 +8928,8 @@ The injected instance.
 | ---- | ----------- |
 | T | The type of dependency. |
 
-<a name='M-IoC-Injections-Inject``1-IoC-IContainer,System-Object-'></a>
-### Inject\`\`1(container,tag) `method`
+<a name='M-IoC-Injections-Inject``1-IoC-IContainer,System-Object,System-Object[]-'></a>
+### Inject\`\`1(container,tag,args) `method`
 
 ##### Summary
 
@@ -8893,33 +8945,13 @@ The injected instance.
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
 | tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag of dependency. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
 
 ##### Generic Types
 
 | Name | Description |
 | ---- | ----------- |
 | T | The type of dependency. |
-
-<a name='M-IoC-Injections-Inject``1-IoC-IContainer,``0,``0-'></a>
-### Inject\`\`1(container,destination,source) `method`
-
-##### Summary
-
-Injects a dependency. Just the injection marker.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
-| destination | [\`\`0](#T-``0 '``0') | The destination member for injection. |
-| source | [\`\`0](#T-``0 '``0') | The source of injection. |
-
-##### Generic Types
-
-| Name | Description |
-| ---- | ----------- |
-| T |  |
 
 <a name='M-IoC-Injections-TryInject-IoC-IContainer,System-Type-'></a>
 ### TryInject(container,type) `method`
@@ -8939,8 +8971,8 @@ The injected instance or `default(T)`.
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
 | type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The type of dependency. |
 
-<a name='M-IoC-Injections-TryInject-IoC-IContainer,System-Type,System-Object-'></a>
-### TryInject(container,type,tag) `method`
+<a name='M-IoC-Injections-TryInject-IoC-IContainer,System-Type,System-Object,System-Object[]-'></a>
+### TryInject(container,type,tag,args) `method`
 
 ##### Summary
 
@@ -8957,6 +8989,7 @@ The injected instance or `default(T)`.
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
 | type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The type of dependency. |
 | tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag of dependency. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
 
 <a name='M-IoC-Injections-TryInjectValue``1-IoC-IContainer-'></a>
 ### TryInjectValue\`\`1(container) `method`
@@ -8981,8 +9014,8 @@ The injected instance or `default(T)`.
 | ---- | ----------- |
 | T | The type of dependency. |
 
-<a name='M-IoC-Injections-TryInjectValue``1-IoC-IContainer,System-Object-'></a>
-### TryInjectValue\`\`1(container,tag) `method`
+<a name='M-IoC-Injections-TryInjectValue``1-IoC-IContainer,System-Object,System-Object[]-'></a>
+### TryInjectValue\`\`1(container,tag,args) `method`
 
 ##### Summary
 
@@ -8998,6 +9031,7 @@ The injected instance or `default(T)`.
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
 | tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag of dependency. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
 
 ##### Generic Types
 
@@ -9028,8 +9062,8 @@ The injected instance or `default(T)`.
 | ---- | ----------- |
 | T | The type of dependency. |
 
-<a name='M-IoC-Injections-TryInject``1-IoC-IContainer,System-Object-'></a>
-### TryInject\`\`1(container,tag) `method`
+<a name='M-IoC-Injections-TryInject``1-IoC-IContainer,System-Object,System-Object[]-'></a>
+### TryInject\`\`1(container,tag,args) `method`
 
 ##### Summary
 
@@ -9045,6 +9079,7 @@ The injected instance or `default(T)`.
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The resolving container. |
 | tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag of dependency. |
+| args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The optional arguments. |
 
 ##### Generic Types
 
@@ -12549,31 +12584,6 @@ IoC
 
 For a parameter that is expected to be one of the limited set of values.
 Specify fields of which type should be used as values for this parameter.
-
-<a name='T-IoC-WellknownExpressions'></a>
-## WellknownExpressions `type`
-
-##### Namespace
-
-IoC
-
-##### Summary
-
-The list of well-known expressions.
-
-<a name='F-IoC-WellknownExpressions-ArgsParameter'></a>
-### ArgsParameter `constants`
-
-##### Summary
-
-The args parameters.
-
-<a name='F-IoC-WellknownExpressions-ContainerParameter'></a>
-### ContainerParameter `constants`
-
-##### Summary
-
-The container parameter.
 
 <a name='T-IoC-XamlItemBindingOfItemsControlAttribute'></a>
 ## XamlItemBindingOfItemsControlAttribute `type`

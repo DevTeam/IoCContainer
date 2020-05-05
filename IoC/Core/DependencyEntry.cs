@@ -49,12 +49,12 @@
 
         public IMutableContainer Container { get; }
 
-        public bool TryCreateResolver(
+        public bool TryCreateResolver<T>(
             Key key,
             [NotNull] IContainer resolvingContainer,
             [NotNull] IRegistrationTracker registrationTracker,
             [NotNull] IObserver<ContainerEvent> eventObserver,
-            out Delegate resolver,
+            out Resolver<T> resolver,
             out Exception error)
         {
             if (_disposed)
@@ -66,17 +66,17 @@
             var lifetime = GetLifetime(key.Type);
             if (!Dependency.TryBuildExpression(buildContext, lifetime, out var expression, out error))
             {
-                resolver = default(Delegate);
+                resolver = default(Resolver<T>);
                 return false;
             }
 
             var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, ResolverParameters);
-            resolver = default(Delegate);
+            resolver = default(Resolver<T>);
             try
             {
                 foreach (var compiler in registrationTracker.Compilers)
                 {
-                    if (compiler.TryCompile(buildContext, resolverExpression, out resolver))
+                    if (compiler.TryCompileResolver(buildContext, resolverExpression, out resolver))
                     {
                         eventObserver.OnNext(ContainerEvent.ResolverCompilation(Container, Enumerable.Repeat(key, 1), Dependency, lifetime, resolverExpression ));
                         break;
@@ -91,7 +91,7 @@
             }
 
             error = default(Exception);
-            return resolver != default(Delegate);
+            return resolver != default(Resolver<T>);
         }
 
         [MethodImpl((MethodImplOptions)256)]

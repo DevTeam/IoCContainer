@@ -9,15 +9,10 @@
 
         private DefaultCompiler() { }
 
-        public bool TryCompile(IBuildContext context, LambdaExpression expression, out Delegate resolver)
+        public bool TryCompileResolver<T>(IBuildContext context, LambdaExpression expression, out Resolver<T> resolver)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            if (expression.CanReduce)
-            {
-                expression = (LambdaExpression)expression.Reduce().ReduceExtensions();
-            }
-
-            resolver = expression.Compile();
+            resolver = (Resolver<T>)expression.Compile();
             return true;
         }
     }

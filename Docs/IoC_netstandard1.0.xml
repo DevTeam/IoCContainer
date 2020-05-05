@@ -5413,9 +5413,9 @@
             Represents an abstract expression compiler.
             </summary>
         </member>
-        <member name="M:IoC.ICompiler.TryCompile(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,System.Delegate@)">
+        <member name="M:IoC.ICompiler.TryCompileResolver``1(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,IoC.Resolver{``0}@)">
             <summary>
-            Compiles an expression to a delegate.
+            Compiles an expression to an instance resolver.
             </summary>
             <param name="context">Current context for building.</param>
             <param name="expression">The lambda expression to compile.</param>

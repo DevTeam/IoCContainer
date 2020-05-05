@@ -1,6 +1,5 @@
 ﻿namespace IoC
 {
-    using System;
     using System.Linq.Expressions;
 
     /// <summary>
@@ -10,12 +9,12 @@
     public interface ICompiler
     {
         /// <summary>
-        /// Compiles an expression to a delegate.
+        /// Compiles an expression to an instance resolver.
         /// </summary>
         /// <param name="context">Current context for building.</param>
         /// <param name="expression">The lambda expression to compile.</param>
         /// <param name="resolver">The compiled resolver delegate.</param>
         /// <returns>True if success.</returns>
-        bool TryCompile([NotNull] IBuildContext context, [NotNull] LambdaExpression expression, out Delegate resolver);
+        bool TryCompileResolver<T>([NotNull] IBuildContext context, [NotNull] LambdaExpression expression, out Resolver<T> resolver);
     }
 }

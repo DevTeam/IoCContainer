@@ -17,8 +17,8 @@
             var buildContext = new BuildContext(Mock.Of<IBuildContext>(), new Key(typeof(T)), Mock.Of<IContainer>(), new List<IBuilder>(), DefaultAutowiringStrategy.Shared, DependencyEntry.ArgsParameter, DependencyEntry.ContainerParameter);
             var lifetimeExpression = lifetime.Build(buildContext, lambdaExpression.Body);
             var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), lifetimeExpression, false, DependencyEntry.ResolverParameters);
-            DefaultCompiler.Shared.TryCompile(context ?? Mock.Of<IBuildContext>(), resolverExpression, out var resolver);
-            return (Resolver<T>)resolver;
+            DefaultCompiler.Shared.TryCompileResolver<T>(context ?? Mock.Of<IBuildContext>(), resolverExpression, out var resolver);
+            return resolver;
         }
 
         public static void Parallelize(Action action, int count = 10, int parallelism = 100)
