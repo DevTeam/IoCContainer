@@ -31,7 +31,7 @@
         {
             for (var i = 0; i < 1000; i++)
             {
-                _container.Bind<IService4>().To<Service4>().Dispose();
+                _container.Bind<IService3>().To<Service3>().Dispose();
             }
         }
     }

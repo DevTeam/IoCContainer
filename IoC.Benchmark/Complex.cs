@@ -1,141 +1,26 @@
 ﻿// ReSharper disable InconsistentNaming
 namespace IoC.Benchmark
 {
+    using System.Linq;
     using BenchmarkDotNet.Attributes;
     using BenchmarkDotNet.Order;
-    using global::Autofac;
-    using global::DryIoc;
-    using global::Ninject;
-    using global::Unity;
+    using Model;
 
     [Orderer(SummaryOrderPolicy.FastestToSlowest)]
-    [BenchmarkCategory("complex", " 364 instances of unique type")]
-    public class Complex
+    // ReSharper disable once UnusedType.Global
+    public class Complex: BenchmarkBase
     {
-        [Benchmark(Description = "IoC.Container", OperationsPerInvoke = 1000000)]
-        public void This()
+        public override TActualContainer CreateContainer<TActualContainer, TAbstractContainer>()
         {
-            for (var i = 0; i < 100000; i++)
+            var abstractContainer = new TAbstractContainer();
+            var typeBuilder = TestTypeBuilder.Default;
+            foreach (var type in typeBuilder.Types.Where(i => i != typeBuilder.RootType))
             {
-                Configs.IoCContainerComplex.Resolve<object>(Configs.RootType);
-                Configs.IoCContainerComplex.Resolve<object>(Configs.RootType);
-                Configs.IoCContainerComplex.Resolve<object>(Configs.RootType);
-                Configs.IoCContainerComplex.Resolve<object>(Configs.RootType);
-                Configs.IoCContainerComplex.Resolve<object>(Configs.RootType);
-                Configs.IoCContainerComplex.Resolve<object>(Configs.RootType);
-                Configs.IoCContainerComplex.Resolve<object>(Configs.RootType);
-                Configs.IoCContainerComplex.Resolve<object>(Configs.RootType);
-                Configs.IoCContainerComplex.Resolve<object>(Configs.RootType);
-                Configs.IoCContainerComplex.Resolve<object>(Configs.RootType);
+                abstractContainer.Register(type, type);
             }
-        }
 
-        [Benchmark(Description = "IoC.Container composition root", OperationsPerInvoke = 1000000)]
-        public void ThisByCR()
-        {
-            for (var i = 0; i < 100000; i++)
-            {
-                Configs.IoCContainerComplexResolve(Configs.IoCContainerComplex, Configs.EmptyArgs);
-                Configs.IoCContainerComplexResolve(Configs.IoCContainerComplex, Configs.EmptyArgs);
-                Configs.IoCContainerComplexResolve(Configs.IoCContainerComplex, Configs.EmptyArgs);
-                Configs.IoCContainerComplexResolve(Configs.IoCContainerComplex, Configs.EmptyArgs);
-                Configs.IoCContainerComplexResolve(Configs.IoCContainerComplex, Configs.EmptyArgs);
-                Configs.IoCContainerComplexResolve(Configs.IoCContainerComplex, Configs.EmptyArgs);
-                Configs.IoCContainerComplexResolve(Configs.IoCContainerComplex, Configs.EmptyArgs);
-                Configs.IoCContainerComplexResolve(Configs.IoCContainerComplex, Configs.EmptyArgs);
-                Configs.IoCContainerComplexResolve(Configs.IoCContainerComplex, Configs.EmptyArgs);
-                Configs.IoCContainerComplexResolve(Configs.IoCContainerComplex, Configs.EmptyArgs);
-            }
-        }
-
-        [Benchmark(OperationsPerInvoke = 1000)]
-        public void Autofac()
-        {
-            for (var i = 0; i < 1000; i++)
-            {
-                Configs.AutofacComplex.Resolve(Configs.RootType);
-            }
-        }
-
-        [Benchmark(OperationsPerInvoke = 100)]
-        public void CastleWindsor()
-        {
-            for (var i = 0; i < 100; i++)
-            {
-                Configs.CastleWindsorComplex.Resolve(Configs.RootType);
-            }
-        }
-
-        [Benchmark(OperationsPerInvoke = 1000000)]
-        public void DryIoc()
-        {
-            for (var i = 0; i < 100000; i++)
-            {
-                Configs.DryIocComplex.Resolve(Configs.RootType);
-                Configs.DryIocComplex.Resolve(Configs.RootType);
-                Configs.DryIocComplex.Resolve(Configs.RootType);
-                Configs.DryIocComplex.Resolve(Configs.RootType);
-                Configs.DryIocComplex.Resolve(Configs.RootType);
-                Configs.DryIocComplex.Resolve(Configs.RootType);
-                Configs.DryIocComplex.Resolve(Configs.RootType);
-                Configs.DryIocComplex.Resolve(Configs.RootType);
-                Configs.DryIocComplex.Resolve(Configs.RootType);
-                Configs.DryIocComplex.Resolve(Configs.RootType);
-            }
-        }
-
-        [Benchmark(OperationsPerInvoke = 1000000)]
-        public void LightInject()
-        {
-            for (var i = 0; i < 100000; i++)
-            {
-                Configs.LightInjectComplex.GetInstance(Configs.RootType);
-                Configs.LightInjectComplex.GetInstance(Configs.RootType);
-                Configs.LightInjectComplex.GetInstance(Configs.RootType);
-                Configs.LightInjectComplex.GetInstance(Configs.RootType);
-                Configs.LightInjectComplex.GetInstance(Configs.RootType);
-                Configs.LightInjectComplex.GetInstance(Configs.RootType);
-                Configs.LightInjectComplex.GetInstance(Configs.RootType);
-                Configs.LightInjectComplex.GetInstance(Configs.RootType);
-                Configs.LightInjectComplex.GetInstance(Configs.RootType);
-                Configs.LightInjectComplex.GetInstance(Configs.RootType);
-            }
-        }
-
-        [Benchmark(OperationsPerInvoke = 100)]
-        public void Ninject()
-        {
-            for (var i = 0; i < 100; i++)
-            {
-                Configs.NinjectComplex.Get(Configs.RootType);
-            }
-        }
-
-        [Benchmark(OperationsPerInvoke = 1000)]
-        public void Unity()
-        {
-            for (var i = 0; i < 1000; i++)
-            {
-                Configs.UnityComplex.Resolve(Configs.RootType);
-            }
-        }
-
-        [Benchmark(OperationsPerInvoke = 1000000)]
-        public void MicrosoftDependencyInjection()
-        {
-            for (var i = 0; i < 100000; i++)
-            {
-                Configs.MicrosoftDependencyInjectionComplex.GetService(Configs.RootType);
-                Configs.MicrosoftDependencyInjectionComplex.GetService(Configs.RootType);
-                Configs.MicrosoftDependencyInjectionComplex.GetService(Configs.RootType);
-                Configs.MicrosoftDependencyInjectionComplex.GetService(Configs.RootType);
-                Configs.MicrosoftDependencyInjectionComplex.GetService(Configs.RootType);
-                Configs.MicrosoftDependencyInjectionComplex.GetService(Configs.RootType);
-                Configs.MicrosoftDependencyInjectionComplex.GetService(Configs.RootType);
-                Configs.MicrosoftDependencyInjectionComplex.GetService(Configs.RootType);
-                Configs.MicrosoftDependencyInjectionComplex.GetService(Configs.RootType);
-                Configs.MicrosoftDependencyInjectionComplex.GetService(Configs.RootType);
-            }
+            abstractContainer.Register(typeof(IServiceRoot), typeBuilder.RootType);
+            return abstractContainer.ActualContainer;
         }
     }
 }
