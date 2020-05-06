@@ -13,6 +13,7 @@ namespace IoC.Features
     // ReSharper disable once RedundantUsingDirective
     using System.Threading.Tasks;
     using Core;
+    using Lifetimes;
 
 
     /// <summary>
@@ -30,17 +31,16 @@ namespace IoC.Features
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            var containerSingletonResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
-            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), containerSingletonResolver(container));
+            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), new ContainerSingletonLifetime());
             yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToList());
             yield return container.Register(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToArray());
             yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => new HashSet<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
-            yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Inject<IEnumerable<TT>>()), containerSingletonResolver(container));
+            yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Inject<IEnumerable<TT>>()), new ContainerSingletonLifetime(false, false));
 #if !NET40
             yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<List<TT>>()));
 #endif
 #if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), containerSingletonResolver(container));
+            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), new ContainerSingletonLifetime());
 #endif
         }
 

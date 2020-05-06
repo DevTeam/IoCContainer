@@ -1,16 +1,11 @@
 ﻿namespace IoC.Benchmark.Containers
 {
     using System;
-    using Features;
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class IoCContainer: IAbstractContainer<Container>
     {
-        public IoCContainer()
-            :this(CoreFeature.Set)
-        { }
-
-        public IoCContainer(params IConfiguration[] configurations) => ActualContainer = Container.Create();
+        public IoCContainer() => ActualContainer = Container.Create();
 
         public Container ActualContainer { get; }
 

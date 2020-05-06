@@ -101,10 +101,6 @@
   - [#ctor(dependency,lifetime)](#M-IoC-Issues-DependencyDescription-#ctor-IoC-IDependency,IoC-ILifetime- 'IoC.Issues.DependencyDescription.#ctor(IoC.IDependency,IoC.ILifetime)')
   - [Dependency](#F-IoC-Issues-DependencyDescription-Dependency 'IoC.Issues.DependencyDescription.Dependency')
   - [Lifetime](#F-IoC-Issues-DependencyDescription-Lifetime 'IoC.Issues.DependencyDescription.Lifetime')
-- [DependencyEntry](#T-IoC-Core-DependencyEntry 'IoC.Core.DependencyEntry')
-  - [ArgsParameter](#F-IoC-Core-DependencyEntry-ArgsParameter 'IoC.Core.DependencyEntry.ArgsParameter')
-  - [ContainerParameter](#F-IoC-Core-DependencyEntry-ContainerParameter 'IoC.Core.DependencyEntry.ContainerParameter')
-  - [ResolverParameters](#F-IoC-Core-DependencyEntry-ResolverParameters 'IoC.Core.DependencyEntry.ResolverParameters')
 - [EventType](#T-IoC-EventType 'IoC.EventType')
   - [CreateContainer](#F-IoC-EventType-CreateContainer 'IoC.EventType.CreateContainer')
   - [DisposeContainer](#F-IoC-EventType-DisposeContainer 'IoC.EventType.DisposeContainer')
@@ -455,6 +451,10 @@
 - [PureAttribute](#T-IoC-PureAttribute 'IoC.PureAttribute')
 - [RazorSectionAttribute](#T-IoC-RazorSectionAttribute 'IoC.RazorSectionAttribute')
 - [RegexPatternAttribute](#T-IoC-RegexPatternAttribute 'IoC.RegexPatternAttribute')
+- [Registration](#T-IoC-Core-Registration 'IoC.Core.Registration')
+  - [ArgsParameter](#F-IoC-Core-Registration-ArgsParameter 'IoC.Core.Registration.ArgsParameter')
+  - [ContainerParameter](#F-IoC-Core-Registration-ContainerParameter 'IoC.Core.Registration.ContainerParameter')
+  - [ResolverParameters](#F-IoC-Core-Registration-ResolverParameters 'IoC.Core.Registration.ResolverParameters')
 - [Resolver\`1](#T-IoC-Resolver`1 'IoC.Resolver`1')
 - [ScopeSingletonLifetime](#T-IoC-Lifetimes-ScopeSingletonLifetime 'IoC.Lifetimes.ScopeSingletonLifetime')
   - [Create()](#M-IoC-Lifetimes-ScopeSingletonLifetime-Create 'IoC.Lifetimes.ScopeSingletonLifetime.Create')
@@ -1804,34 +1804,6 @@ The resolved dependency.
 ##### Summary
 
 The lifetime to use.
-
-<a name='T-IoC-Core-DependencyEntry'></a>
-## DependencyEntry `type`
-
-##### Namespace
-
-IoC.Core
-
-<a name='F-IoC-Core-DependencyEntry-ArgsParameter'></a>
-### ArgsParameter `constants`
-
-##### Summary
-
-The args parameters.
-
-<a name='F-IoC-Core-DependencyEntry-ContainerParameter'></a>
-### ContainerParameter `constants`
-
-##### Summary
-
-The container parameter.
-
-<a name='F-IoC-Core-DependencyEntry-ResolverParameters'></a>
-### ResolverParameters `constants`
-
-##### Summary
-
-All resolvers parameters.
 
 <a name='T-IoC-EventType'></a>
 ## EventType `type`
@@ -9716,6 +9688,34 @@ IoC
 ##### Summary
 
 Indicates that parameter is regular expression pattern.
+
+<a name='T-IoC-Core-Registration'></a>
+## Registration `type`
+
+##### Namespace
+
+IoC.Core
+
+<a name='F-IoC-Core-Registration-ArgsParameter'></a>
+### ArgsParameter `constants`
+
+##### Summary
+
+The args parameters.
+
+<a name='F-IoC-Core-Registration-ContainerParameter'></a>
+### ContainerParameter `constants`
+
+##### Summary
+
+The container parameter.
+
+<a name='F-IoC-Core-Registration-ResolverParameters'></a>
+### ResolverParameters `constants`
+
+##### Summary
+
+All resolvers parameters.
 
 <a name='T-IoC-Resolver`1'></a>
 ## Resolver\`1 `type`

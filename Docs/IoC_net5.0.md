@@ -79,6 +79,7 @@
   - [Lifetime](#F-IoC-ContainerEvent-Lifetime 'IoC.ContainerEvent.Lifetime')
   - [ResolverExpression](#F-IoC-ContainerEvent-ResolverExpression 'IoC.ContainerEvent.ResolverExpression')
 - [ContainerSingletonLifetime](#T-IoC-Lifetimes-ContainerSingletonLifetime 'IoC.Lifetimes.ContainerSingletonLifetime')
+  - [#ctor()](#M-IoC-Lifetimes-ContainerSingletonLifetime-#ctor 'IoC.Lifetimes.ContainerSingletonLifetime.#ctor')
   - [Create()](#M-IoC-Lifetimes-ContainerSingletonLifetime-Create 'IoC.Lifetimes.ContainerSingletonLifetime.Create')
   - [CreateKey()](#M-IoC-Lifetimes-ContainerSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ContainerSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])')
   - [OnInstanceReleased()](#M-IoC-Lifetimes-ContainerSingletonLifetime-OnInstanceReleased-System-Object,IoC-IContainer- 'IoC.Lifetimes.ContainerSingletonLifetime.OnInstanceReleased(System.Object,IoC.IContainer)')
@@ -418,6 +419,7 @@
   - [GetHashCode()](#M-IoC-Key-GetHashCode 'IoC.Key.GetHashCode')
   - [ToString()](#M-IoC-Key-ToString 'IoC.Key.ToString')
 - [KeyBasedLifetime\`1](#T-IoC-Lifetimes-KeyBasedLifetime`1 'IoC.Lifetimes.KeyBasedLifetime`1')
+  - [#ctor(supportOnNewInstanceCreated,supportOnInstanceReleased)](#M-IoC-Lifetimes-KeyBasedLifetime`1-#ctor-System-Boolean,System-Boolean- 'IoC.Lifetimes.KeyBasedLifetime`1.#ctor(System.Boolean,System.Boolean)')
   - [Build()](#M-IoC-Lifetimes-KeyBasedLifetime`1-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.KeyBasedLifetime`1.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
   - [Create()](#M-IoC-Lifetimes-KeyBasedLifetime`1-Create 'IoC.Lifetimes.KeyBasedLifetime`1.Create')
   - [CreateKey(container,args)](#M-IoC-Lifetimes-KeyBasedLifetime`1-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.KeyBasedLifetime`1.CreateKey(IoC.IContainer,System.Object[])')
@@ -1593,6 +1595,17 @@ IoC.Lifetimes
 ##### Summary
 
 For a singleton instance per container.
+
+<a name='M-IoC-Lifetimes-ContainerSingletonLifetime-#ctor'></a>
+### #ctor() `constructor`
+
+##### Summary
+
+Creates new a new lifetime instance.
+
+##### Parameters
+
+This constructor has no parameters.
 
 <a name='M-IoC-Lifetimes-ContainerSingletonLifetime-Create'></a>
 ### Create() `method`
@@ -9226,6 +9239,20 @@ Represents the abstraction for singleton based lifetimes.
 | Name | Description |
 | ---- | ----------- |
 | TKey | The key type. |
+
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-#ctor-System-Boolean,System-Boolean-'></a>
+### #ctor(supportOnNewInstanceCreated,supportOnInstanceReleased) `constructor`
+
+##### Summary
+
+Creates an instance
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| supportOnNewInstanceCreated | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | True to invoke OnNewInstanceCreated |
+| supportOnInstanceReleased | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | True to invoke OnInstanceReleased |
 
 <a name='M-IoC-Lifetimes-KeyBasedLifetime`1-Build-IoC-IBuildContext,System-Linq-Expressions-Expression-'></a>
 ### Build() `method`

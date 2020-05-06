@@ -5,7 +5,7 @@
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class IoCContainerByCompositionRoot<TContract> : IAbstractContainer<Func<TContract>>
     {
-        private readonly IoCContainer _abstractContainer = new IoCContainer(Features.DefaultFeature.Set);
+        private readonly IoCContainer _abstractContainer = new IoCContainer();
 
         public Func<TContract> ActualContainer => _abstractContainer.ActualContainer.Resolve<Func<TContract>>();
 

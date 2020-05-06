@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using Core;
+    using Lifetimes;
 
     /// <summary>
     /// Allows to resolve Functions.
@@ -24,7 +25,7 @@
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register<Func<TT>>(ctx => () => ctx.Container.Inject<TT>(ctx.Key.Tag), null, Sets.AnyTag);
+            yield return container.Register<Func<TT>>(ctx => () => ctx.Container.Inject<TT>(ctx.Key.Tag), new ContainerSingletonLifetime(false, false), Sets.AnyTag);
             yield return container.Register<Func<TT1, TT>>(ctx => arg1 => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1), null, Sets.AnyTag);
             yield return container.Register<Func<TT1, TT2, TT>>(ctx => (arg1, arg2) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2), null, Sets.AnyTag);
             yield return container.Register<Func<TT1, TT2, TT3, TT>>(ctx => (arg1, arg2, arg3) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3), null, Sets.AnyTag);

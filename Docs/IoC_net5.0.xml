@@ -5959,6 +5959,11 @@
             For a singleton instance per container.
             </summary>
         </member>
+        <member name="M:IoC.Lifetimes.ContainerSingletonLifetime.#ctor">
+            <summary>
+            Creates new a new lifetime instance.
+            </summary>
+        </member>
         <member name="M:IoC.Lifetimes.ContainerSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])">
             <inheritdoc />
         </member>
@@ -5979,6 +5984,13 @@
             Represents the abstraction for singleton based lifetimes.
             </summary>
             <typeparam name="TKey">The key type.</typeparam>
+        </member>
+        <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.#ctor(System.Boolean,System.Boolean)">
+            <summary>
+            Creates an instance
+            </summary>
+            <param name="supportOnNewInstanceCreated">True to invoke OnNewInstanceCreated</param>
+            <param name="supportOnInstanceReleased">True to invoke OnInstanceReleased</param>
         </member>
         <member name="M:IoC.Lifetimes.KeyBasedLifetime`1.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)">
             <inheritdoc />

@@ -12,8 +12,10 @@
     /// </summary>
     /// <typeparam name="TKey">The key type.</typeparam>
     [PublicAPI]
-    public abstract class KeyBasedLifetime<TKey>: ILifetime
+    public abstract class KeyBasedLifetime<TKey> : ILifetime
     {
+        private readonly bool _supportOnNewInstanceCreated;
+        private readonly bool _supportOnInstanceReleased;
         private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
         private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
         private static readonly MethodInfo GetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Get));
@@ -23,6 +25,17 @@
 
         [NotNull] private readonly ILockObject _lockObject = new LockObject();
         private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
+
+        /// <summary>
+        /// Creates an instance
+        /// </summary>
+        /// <param name="supportOnNewInstanceCreated">True to invoke OnNewInstanceCreated</param>
+        /// <param name="supportOnInstanceReleased">True to invoke OnInstanceReleased</param>
+        protected KeyBasedLifetime(bool supportOnNewInstanceCreated = true, bool supportOnInstanceReleased = true)
+        {
+            _supportOnNewInstanceCreated = supportOnNewInstanceCreated;
+            _supportOnInstanceReleased = supportOnInstanceReleased;
+        }
 
         /// <inheritdoc />
         public Expression Build(IBuildContext context, Expression bodyExpression)
@@ -37,6 +50,10 @@
             var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
             var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, KeyVar).Convert(returnType));
             var isNullExpression = Expression.ReferenceEqual(instanceVar, ExpressionBuilderExtensions.NullConst);
+
+            var initNewInstanceExpression = _supportOnNewInstanceCreated 
+                ? (Expression) Expression.Call(thisConst, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, context.ContainerParameter, context.ArgsParameter)
+                : instanceVar;
 
             return Expression.Block(
                 // Key key;
@@ -53,26 +70,24 @@
                     Expression.Block(
                         // lock (this._lockObject)
                         Expression.Block(
-                            // var instance = (T)_instances.Get(hashCode, key);
-                            assignInstanceExpression,
-                            // if (instance == null)
-                            Expression.IfThen(
-                                Expression.Equal(instanceVar, ExpressionBuilderExtensions.NullConst),
-                                Expression.Block(
-                                    // instance = new T();
-                                    Expression.Assign(instanceVar, bodyExpression),
-                                    // Instances = _instances.Set(hashCode, key, instance);
-                                    Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar))
-                                )
-                            )
-                        ).Lock(lockObjectConst),
-                        // OnNewInstanceCreated(instance, key, container, args);
-                        Expression.Call(thisConst, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, context.ContainerParameter, context.ArgsParameter)),
+                    // var instance = (T)_instances.Get(hashCode, key);
+                    assignInstanceExpression,
+                    // if (instance == null)
+                    Expression.IfThen(
+                        Expression.Equal(instanceVar, ExpressionBuilderExtensions.NullConst),
+                        Expression.Block(
+                            // instance = new T();
+                            Expression.Assign(instanceVar, bodyExpression),
+                            // Instances = _instances.Set(hashCode, key, instance);
+                            Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar))
+                        ))).Lock(lockObjectConst),
+                        // instance or OnNewInstanceCreated(instance, key, container, args);
+                        initNewInstanceExpression),
                         // else {
                         // return instance;
                         instanceVar
                     )
-                    // }
+            // }
             );
         }
 
@@ -90,9 +105,12 @@
                 _instances = Table<TKey, object>.Empty;
             }
 
-            foreach (var instance in instances)
+            if (_supportOnInstanceReleased)
             {
-                OnInstanceReleased(instance.Value, instance.Key);
+                foreach (var instance in instances)
+                {
+                    OnInstanceReleased(instance.Value, instance.Key);
+                }
             }
         }
 

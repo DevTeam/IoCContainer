@@ -8671,6 +8671,7 @@ namespace IoC.Features
     // ReSharper disable once RedundantUsingDirective
     using System.Threading.Tasks;
     using Core;
+    using Lifetimes;
 
 
     /// <summary>
@@ -8688,17 +8689,16 @@ namespace IoC.Features
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            var containerSingletonResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
-            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), containerSingletonResolver(container));
+            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), new ContainerSingletonLifetime());
             yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToList());
             yield return container.Register(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToArray());
             yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => new HashSet<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
-            yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Inject<IEnumerable<TT>>()), containerSingletonResolver(container));
+            yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Inject<IEnumerable<TT>>()), new ContainerSingletonLifetime(false, false));
 #if !NET40
             yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<List<TT>>()));
 #endif
 #if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), containerSingletonResolver(container));
+            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), new ContainerSingletonLifetime());
 #endif
         }
 
@@ -9121,6 +9121,7 @@ namespace IoC.Features
     using System;
     using System.Collections.Generic;
     using Core;
+    using Lifetimes;
 
     /// <summary>
     /// Allows to resolve Functions.
@@ -9142,7 +9143,7 @@ namespace IoC.Features
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register<Func<TT>>(ctx => () => ctx.Container.Inject<TT>(ctx.Key.Tag), null, Sets.AnyTag);
+            yield return container.Register<Func<TT>>(ctx => () => ctx.Container.Inject<TT>(ctx.Key.Tag), new ContainerSingletonLifetime(false, false), Sets.AnyTag);
             yield return container.Register<Func<TT1, TT>>(ctx => arg1 => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1), null, Sets.AnyTag);
             yield return container.Register<Func<TT1, TT2, TT>>(ctx => (arg1, arg2) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2), null, Sets.AnyTag);
             yield return container.Register<Func<TT1, TT2, TT3, TT>>(ctx => (arg1, arg2, arg3) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3), null, Sets.AnyTag);
@@ -9431,6 +9432,24 @@ namespace IoC.Lifetimes
     [PublicAPI]
     public sealed class ContainerSingletonLifetime: KeyBasedLifetime<IContainer>
     {
+        private readonly bool _supportOnNewInstanceCreated;
+        private readonly bool _supportOnInstanceReleased;
+
+        /// <summary>
+        /// Creates new a new lifetime instance.
+        /// </summary>
+        public ContainerSingletonLifetime()
+            : this(true, true)
+        {
+        }
+
+        internal ContainerSingletonLifetime(bool supportOnNewInstanceCreated, bool supportOnInstanceReleased)
+            : base(supportOnNewInstanceCreated, supportOnInstanceReleased)
+        {
+            _supportOnNewInstanceCreated = supportOnNewInstanceCreated;
+            _supportOnInstanceReleased = supportOnInstanceReleased;
+        }
+
         /// <inheritdoc />
         protected override IContainer CreateKey(IContainer container, object[] args) => container;
 
@@ -9438,7 +9457,7 @@ namespace IoC.Lifetimes
         public override string ToString() => Lifetime.ContainerSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Create() => new ContainerSingletonLifetime();
+        public override ILifetime Create() => new ContainerSingletonLifetime(_supportOnNewInstanceCreated, _supportOnInstanceReleased);
 
         /// <inheritdoc />
         protected override T OnNewInstanceCreated<T>(T newInstance, IContainer targetContainer, IContainer container, object[] args)
@@ -9497,8 +9516,10 @@ namespace IoC.Lifetimes
     /// </summary>
     /// <typeparam name="TKey">The key type.</typeparam>
     [PublicAPI]
-    public abstract class KeyBasedLifetime<TKey>: ILifetime
+    public abstract class KeyBasedLifetime<TKey> : ILifetime
     {
+        private readonly bool _supportOnNewInstanceCreated;
+        private readonly bool _supportOnInstanceReleased;
         private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
         private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
         private static readonly MethodInfo GetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Get));
@@ -9508,6 +9529,17 @@ namespace IoC.Lifetimes
 
         [NotNull] private readonly ILockObject _lockObject = new LockObject();
         private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
+
+        /// <summary>
+        /// Creates an instance
+        /// </summary>
+        /// <param name="supportOnNewInstanceCreated">True to invoke OnNewInstanceCreated</param>
+        /// <param name="supportOnInstanceReleased">True to invoke OnInstanceReleased</param>
+        protected KeyBasedLifetime(bool supportOnNewInstanceCreated = true, bool supportOnInstanceReleased = true)
+        {
+            _supportOnNewInstanceCreated = supportOnNewInstanceCreated;
+            _supportOnInstanceReleased = supportOnInstanceReleased;
+        }
 
         /// <inheritdoc />
         public Expression Build(IBuildContext context, Expression bodyExpression)
@@ -9522,6 +9554,10 @@ namespace IoC.Lifetimes
             var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
             var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, KeyVar).Convert(returnType));
             var isNullExpression = Expression.ReferenceEqual(instanceVar, ExpressionBuilderExtensions.NullConst);
+
+            var initNewInstanceExpression = _supportOnNewInstanceCreated 
+                ? (Expression) Expression.Call(thisConst, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, context.ContainerParameter, context.ArgsParameter)
+                : instanceVar;
 
             return Expression.Block(
                 // Key key;
@@ -9538,26 +9574,24 @@ namespace IoC.Lifetimes
                     Expression.Block(
                         // lock (this._lockObject)
                         Expression.Block(
-                            // var instance = (T)_instances.Get(hashCode, key);
-                            assignInstanceExpression,
-                            // if (instance == null)
-                            Expression.IfThen(
-                                Expression.Equal(instanceVar, ExpressionBuilderExtensions.NullConst),
-                                Expression.Block(
-                                    // instance = new T();
-                                    Expression.Assign(instanceVar, bodyExpression),
-                                    // Instances = _instances.Set(hashCode, key, instance);
-                                    Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar))
-                                )
-                            )
-                        ).Lock(lockObjectConst),
-                        // OnNewInstanceCreated(instance, key, container, args);
-                        Expression.Call(thisConst, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, context.ContainerParameter, context.ArgsParameter)),
+                    // var instance = (T)_instances.Get(hashCode, key);
+                    assignInstanceExpression,
+                    // if (instance == null)
+                    Expression.IfThen(
+                        Expression.Equal(instanceVar, ExpressionBuilderExtensions.NullConst),
+                        Expression.Block(
+                            // instance = new T();
+                            Expression.Assign(instanceVar, bodyExpression),
+                            // Instances = _instances.Set(hashCode, key, instance);
+                            Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar))
+                        ))).Lock(lockObjectConst),
+                        // instance or OnNewInstanceCreated(instance, key, container, args);
+                        initNewInstanceExpression),
                         // else {
                         // return instance;
                         instanceVar
                     )
-                    // }
+            // }
             );
         }
 
@@ -9575,9 +9609,12 @@ namespace IoC.Lifetimes
                 _instances = Table<TKey, object>.Empty;
             }
 
-            foreach (var instance in instances)
+            if (_supportOnInstanceReleased)
             {
-                OnInstanceReleased(instance.Value, instance.Key);
+                foreach (var instance in instances)
+                {
+                    OnInstanceReleased(instance.Value, instance.Key);
+                }
             }
         }
 

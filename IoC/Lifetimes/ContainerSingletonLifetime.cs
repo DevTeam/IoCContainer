@@ -10,6 +10,24 @@
     [PublicAPI]
     public sealed class ContainerSingletonLifetime: KeyBasedLifetime<IContainer>
     {
+        private readonly bool _supportOnNewInstanceCreated;
+        private readonly bool _supportOnInstanceReleased;
+
+        /// <summary>
+        /// Creates new a new lifetime instance.
+        /// </summary>
+        public ContainerSingletonLifetime()
+            : this(true, true)
+        {
+        }
+
+        internal ContainerSingletonLifetime(bool supportOnNewInstanceCreated, bool supportOnInstanceReleased)
+            : base(supportOnNewInstanceCreated, supportOnInstanceReleased)
+        {
+            _supportOnNewInstanceCreated = supportOnNewInstanceCreated;
+            _supportOnInstanceReleased = supportOnInstanceReleased;
+        }
+
         /// <inheritdoc />
         protected override IContainer CreateKey(IContainer container, object[] args) => container;
 
@@ -17,7 +35,7 @@
         public override string ToString() => Lifetime.ContainerSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Create() => new ContainerSingletonLifetime();
+        public override ILifetime Create() => new ContainerSingletonLifetime(_supportOnNewInstanceCreated, _supportOnInstanceReleased);
 
         /// <inheritdoc />
         protected override T OnNewInstanceCreated<T>(T newInstance, IContainer targetContainer, IContainer container, object[] args)

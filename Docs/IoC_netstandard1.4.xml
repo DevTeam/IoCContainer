@@ -787,21 +787,6 @@
             Represents build context.
             </summary>
         </member>
-        <member name="F:IoC.Core.DependencyEntry.ContainerParameter">
-            <summary>
-            The container parameter.
-            </summary>
-        </member>
-        <member name="F:IoC.Core.DependencyEntry.ArgsParameter">
-            <summary>
-            The args parameters.
-            </summary>
-        </member>
-        <member name="F:IoC.Core.DependencyEntry.ResolverParameters">
-            <summary>
-            All resolvers parameters.
-            </summary>
-        </member>
         <member name="T:IoC.Core.FluentRegister">
             <summary>
             Represents extensions to register a dependency in the container.
@@ -939,6 +924,21 @@
             <param name="buildContext">The build context.</param>
             <param name="context">The expression build context.</param>
             <returns>The new expression.</returns>
+        </member>
+        <member name="F:IoC.Core.Registration.ContainerParameter">
+            <summary>
+            The container parameter.
+            </summary>
+        </member>
+        <member name="F:IoC.Core.Registration.ArgsParameter">
+            <summary>
+            The args parameters.
+            </summary>
+        </member>
+        <member name="F:IoC.Core.Registration.ResolverParameters">
+            <summary>
+            All resolvers parameters.
+            </summary>
         </member>
         <member name="T:IoC.EventType">
             <summary>
