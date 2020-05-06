@@ -224,13 +224,12 @@
             lock (_lockObject)
             {
                 CheckIsNotDisposed();
-                var hasDependency = TryGetDependency(key, key.GetHashCode(), out var dependencyEntry);
-                if (hasDependency)
+                if (TryGetRegistration(key, out var registration))
                 {
                     // tries creating resolver
                     resolvingContainer = resolvingContainer ?? this;
-                    resolvingContainer = dependencyEntry.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
-                    if (!dependencyEntry.TryCreateResolver(
+                    resolvingContainer = registration.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
+                    if (!registration.TryCreateResolver(
                         key,
                         resolvingContainer,
                         _registrationTracker,
@@ -274,13 +273,13 @@
             {
                 CheckIsNotDisposed();
 
-                if (!TryGetDependency(key, key.GetHashCode(), out var dependencyEntry))
+                if (!TryGetRegistration(key, out var registration))
                 {
                     return _parent.TryGetDependency(key, out dependency, out lifetime);
                 }
 
-                dependency = dependencyEntry.Dependency;
-                lifetime = dependencyEntry.GetLifetime(key.Type);
+                dependency = registration.Dependency;
+                lifetime = registration.GetLifetime(key.Type);
                 return true;
             }
         }
@@ -435,7 +434,7 @@
         private void ApplyConfigurations(params IConfiguration[] configurations) =>
             _resources.Add(this.Apply(configurations));
 
-        private bool TryGetDependency(FullKey key, int hashCode, out Registration registration)
+        private bool TryGetRegistration(FullKey key, out Registration registration)
         {
             if (_registrations.TryGetByKey(key, out registration))
             {

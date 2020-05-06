@@ -9,7 +9,7 @@
     internal sealed class Table<TKey, TValue>: IEnumerable<Table<TKey, TValue>.KeyValue>
     {
         private static readonly Bucket EmptyBucket = new Bucket(CoreExtensions.EmptyArray<KeyValue>());
-        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(8, EmptyBucket), 7, 0);
+        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(4, EmptyBucket), 3, 0);
         public readonly int Count;
         public readonly int Divisor;
         public readonly Bucket[] Buckets;
@@ -28,7 +28,7 @@
             Count = origin.Count + 1;
             if (origin.Count > origin.Divisor)
             {
-                Divisor = (origin.Divisor + 1) << 3 - 1;
+                Divisor = (origin.Divisor + 1) << 1 - 1;
                 Buckets = CoreExtensions.CreateArray(Divisor + 1, EmptyBucket);
                 var originBuckets = origin.Buckets;
                 for (var originBucketIndex = 0; originBucketIndex < originBuckets.Length; originBucketIndex++)
@@ -57,13 +57,8 @@
         public TValue Get(TKey key)
         {
             var bucket = Buckets[key.GetHashCode() & Divisor];
-            if (Equals(key, bucket.FirstKey))
-            {
-                return bucket.FirstValue;
-            }
-
             // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 1; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (Equals(key, item.Key))
@@ -134,24 +129,11 @@
         {
             public readonly KeyValue[] KeyValues;
             public readonly int Length;
-            public readonly TKey FirstKey;
-            public readonly TValue FirstValue;
 
             public Bucket(KeyValue[] keyValues)
             {
                 KeyValues = keyValues;
                 Length = keyValues.Length;
-                if (Length > 0)
-                {
-                    var item = keyValues[0];
-                    FirstKey = item.Key;
-                    FirstValue = item.Value;
-                }
-                else
-                {
-                    FirstKey = default(TKey);
-                    FirstValue = default(TValue);
-                }
             }
 
             [MethodImpl((MethodImplOptions)256)]
@@ -178,6 +160,8 @@
 
                 return new Bucket(newLeyValues);
             }
+
+            public override string ToString() => $"Bucket[{KeyValues.Length}]";
         }
 
         internal struct KeyValue

@@ -25,12 +25,7 @@ namespace IoC
         public static T Resolve<T>([NotNull] this Container container)
         {
             var bucket = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor];
-            if (typeof(T) == bucket.FirstKey)
-            {
-                return ((Resolver<T>)bucket.FirstValue)(container, EmptyArgs);
-            }
-
-            for (var index = 1; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (typeof(T) == item.Key)

@@ -1423,13 +1423,12 @@ namespace IoC
             lock (_lockObject)
             {
                 CheckIsNotDisposed();
-                var hasDependency = TryGetDependency(key, key.GetHashCode(), out var dependencyEntry);
-                if (hasDependency)
+                if (TryGetRegistration(key, out var registration))
                 {
                     // tries creating resolver
                     resolvingContainer = resolvingContainer ?? this;
-                    resolvingContainer = dependencyEntry.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
-                    if (!dependencyEntry.TryCreateResolver(
+                    resolvingContainer = registration.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
+                    if (!registration.TryCreateResolver(
                         key,
                         resolvingContainer,
                         _registrationTracker,
@@ -1473,13 +1472,13 @@ namespace IoC
             {
                 CheckIsNotDisposed();
 
-                if (!TryGetDependency(key, key.GetHashCode(), out var dependencyEntry))
+                if (!TryGetRegistration(key, out var registration))
                 {
                     return _parent.TryGetDependency(key, out dependency, out lifetime);
                 }
 
-                dependency = dependencyEntry.Dependency;
-                lifetime = dependencyEntry.GetLifetime(key.Type);
+                dependency = registration.Dependency;
+                lifetime = registration.GetLifetime(key.Type);
                 return true;
             }
         }
@@ -1634,7 +1633,7 @@ namespace IoC
         private void ApplyConfigurations(params IConfiguration[] configurations) =>
             _resources.Add(this.Apply(configurations));
 
-        private bool TryGetDependency(FullKey key, int hashCode, out Registration registration)
+        private bool TryGetRegistration(FullKey key, out Registration registration)
         {
             if (_registrations.TryGetByKey(key, out registration))
             {
@@ -5839,12 +5838,7 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container)
         {
             var bucket = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor];
-            if (typeof(T) == bucket.FirstKey)
-            {
-                return (Resolver<T>)bucket.FirstValue;
-            }
-
-            for (var index = 1; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (typeof(T) == item.Key)
@@ -5869,12 +5863,7 @@ namespace IoC
         {
             var key = new Key(typeof(T), tag);
             var bucket = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor];
-            if (CoreExtensions.Equals(key, bucket.FirstKey))
-            {
-                return (Resolver<T>)bucket.FirstValue;
-            }
-
-            for (var index = 1; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (CoreExtensions.Equals(key, item.Key))
@@ -5898,12 +5887,7 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type)
         {
             var bucket = container.ResolversByType.Buckets[type.GetHashCode() & container.ResolversByType.Divisor];
-            if (type == bucket.FirstKey)
-            {
-                return (Resolver<T>)bucket.FirstValue;
-            }
-
-            for (var index = 1; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (type == item.Key)
@@ -5929,12 +5913,7 @@ namespace IoC
         {
             var key = new Key(type, tag);
             var bucket = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor];
-            if (CoreExtensions.Equals(key, bucket.FirstKey))
-            {
-                return (Resolver<T>)bucket.FirstValue;
-            }
-
-            for (var index = 1; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (CoreExtensions.Equals(key, item.Key))
@@ -5978,12 +5957,7 @@ namespace IoC
         public static T Resolve<T>([NotNull] this Container container)
         {
             var bucket = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor];
-            if (typeof(T) == bucket.FirstKey)
-            {
-                return ((Resolver<T>)bucket.FirstValue)(container, EmptyArgs);
-            }
-
-            for (var index = 1; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (typeof(T) == item.Key)
@@ -13316,7 +13290,7 @@ namespace IoC.Core
     internal sealed class Table<TKey, TValue>: IEnumerable<Table<TKey, TValue>.KeyValue>
     {
         private static readonly Bucket EmptyBucket = new Bucket(CoreExtensions.EmptyArray<KeyValue>());
-        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(8, EmptyBucket), 7, 0);
+        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(4, EmptyBucket), 3, 0);
         public readonly int Count;
         public readonly int Divisor;
         public readonly Bucket[] Buckets;
@@ -13335,7 +13309,7 @@ namespace IoC.Core
             Count = origin.Count + 1;
             if (origin.Count > origin.Divisor)
             {
-                Divisor = (origin.Divisor + 1) << 3 - 1;
+                Divisor = (origin.Divisor + 1) << 1 - 1;
                 Buckets = CoreExtensions.CreateArray(Divisor + 1, EmptyBucket);
                 var originBuckets = origin.Buckets;
                 for (var originBucketIndex = 0; originBucketIndex < originBuckets.Length; originBucketIndex++)
@@ -13364,13 +13338,8 @@ namespace IoC.Core
         public TValue Get(TKey key)
         {
             var bucket = Buckets[key.GetHashCode() & Divisor];
-            if (Equals(key, bucket.FirstKey))
-            {
-                return bucket.FirstValue;
-            }
-
             // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 1; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (Equals(key, item.Key))
@@ -13441,24 +13410,11 @@ namespace IoC.Core
         {
             public readonly KeyValue[] KeyValues;
             public readonly int Length;
-            public readonly TKey FirstKey;
-            public readonly TValue FirstValue;
 
             public Bucket(KeyValue[] keyValues)
             {
                 KeyValues = keyValues;
                 Length = keyValues.Length;
-                if (Length > 0)
-                {
-                    var item = keyValues[0];
-                    FirstKey = item.Key;
-                    FirstValue = item.Value;
-                }
-                else
-                {
-                    FirstKey = default(TKey);
-                    FirstValue = default(TValue);
-                }
             }
 
             [MethodImpl((MethodImplOptions)256)]
@@ -13485,6 +13441,8 @@ namespace IoC.Core
 
                 return new Bucket(newLeyValues);
             }
+
+            public override string ToString() => $"Bucket[{KeyValues.Length}]";
         }
 
         internal struct KeyValue
@@ -13516,14 +13474,8 @@ namespace IoC.Core
         public static bool TryGetByType<TValue>(this Table<Type, TValue> table, Type key, out TValue value)
         {
             var bucket = table.Buckets[key.GetHashCode() & table.Divisor];
-            if (key == bucket.FirstKey)
-            {
-                value = bucket.FirstValue;
-                return true;
-            }
-
             // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 1; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (key == item.Key)
@@ -13542,14 +13494,8 @@ namespace IoC.Core
         public static bool TryGetByKey<TValue>(this Table<Key, TValue> table, Key key, out TValue value)
         {
             var bucket = table.Buckets[key.GetHashCode() & table.Divisor];
-            if (CoreExtensions.Equals(key, bucket.FirstKey))
-            {
-                value = bucket.FirstValue;
-                return true;
-            }
-
             // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 1; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (CoreExtensions.Equals(key, item.Key))

@@ -23,12 +23,7 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container)
         {
             var bucket = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor];
-            if (typeof(T) == bucket.FirstKey)
-            {
-                return (Resolver<T>)bucket.FirstValue;
-            }
-
-            for (var index = 1; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (typeof(T) == item.Key)
@@ -53,12 +48,7 @@ namespace IoC
         {
             var key = new Key(typeof(T), tag);
             var bucket = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor];
-            if (CoreExtensions.Equals(key, bucket.FirstKey))
-            {
-                return (Resolver<T>)bucket.FirstValue;
-            }
-
-            for (var index = 1; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (CoreExtensions.Equals(key, item.Key))
@@ -82,12 +72,7 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type)
         {
             var bucket = container.ResolversByType.Buckets[type.GetHashCode() & container.ResolversByType.Divisor];
-            if (type == bucket.FirstKey)
-            {
-                return (Resolver<T>)bucket.FirstValue;
-            }
-
-            for (var index = 1; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (type == item.Key)
@@ -113,12 +98,7 @@ namespace IoC
         {
             var key = new Key(type, tag);
             var bucket = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor];
-            if (CoreExtensions.Equals(key, bucket.FirstKey))
-            {
-                return (Resolver<T>)bucket.FirstValue;
-            }
-
-            for (var index = 1; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (CoreExtensions.Equals(key, item.Key))
