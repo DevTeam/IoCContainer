@@ -1,5 +1,6 @@
 ﻿namespace IoC.Core
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -28,7 +29,7 @@
             Count = origin.Count + 1;
             if (origin.Count > origin.Divisor)
             {
-                Divisor = (origin.Divisor + 1) * 2 - 1;
+                Divisor = (origin.Divisor + 1) * 4 - 1;
                 Buckets = CoreExtensions.CreateArray(Divisor + 1, EmptyBucket);
                 var originBuckets = origin.Buckets;
                 for (var originBucketIndex = 0; originBucketIndex < originBuckets.Length; originBucketIndex++)
@@ -97,7 +98,6 @@
         {
             removed = false;
             var newBuckets = CoreExtensions.CreateArray(Divisor + 1, EmptyBucket);
-            var newBucketsArray = newBuckets;
             var hashCode = key.GetHashCode();
             var bucketIndex = hashCode & Divisor;
             for (var curBucketIndex = 0; curBucketIndex < Buckets.Length; curBucketIndex++)
@@ -105,7 +105,7 @@
                 var bucket = Buckets[curBucketIndex];
                 if (curBucketIndex != bucketIndex)
                 {
-                    newBucketsArray[curBucketIndex] = bucket.Copy();
+                    newBuckets[curBucketIndex] = bucket.Copy();
                     continue;
                 }
 
@@ -116,7 +116,7 @@
                     // Remove the element
                     if (keyValue.Key.GetHashCode() == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
                     {
-                        newBucketsArray[bucketIndex] = bucket.Remove(index);
+                        newBuckets[bucketIndex] = bucket.Remove(index);
                         removed = true;
                     }
                 }

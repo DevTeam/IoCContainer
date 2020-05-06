@@ -5837,10 +5837,10 @@ namespace IoC
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container)
         {
-            var bucket = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor];
+            var bucket = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor].KeyValues;
             for (var index = 0; index < bucket.Length; index++)
             {
-                var item = bucket.KeyValues[index];
+                var item = bucket[index];
                 if (typeof(T) == item.Key)
                 {
                     return (Resolver<T>)item.Value;
@@ -5862,10 +5862,10 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, Tag tag)
         {
             var key = new Key(typeof(T), tag);
-            var bucket = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor];
+            var bucket = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor].KeyValues;
             for (var index = 0; index < bucket.Length; index++)
             {
-                var item = bucket.KeyValues[index];
+                var item = bucket[index];
                 if (CoreExtensions.Equals(key, item.Key))
                 {
                     return (Resolver<T>)item.Value;
@@ -5886,10 +5886,10 @@ namespace IoC
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type)
         {
-            var bucket = container.ResolversByType.Buckets[type.GetHashCode() & container.ResolversByType.Divisor];
+            var bucket = container.ResolversByType.Buckets[type.GetHashCode() & container.ResolversByType.Divisor].KeyValues;
             for (var index = 0; index < bucket.Length; index++)
             {
-                var item = bucket.KeyValues[index];
+                var item = bucket[index];
                 if (type == item.Key)
                 {
                     return (Resolver<T>) item.Value;
@@ -5912,10 +5912,10 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
             var key = new Key(type, tag);
-            var bucket = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor];
+            var bucket = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor].KeyValues;
             for (var index = 0; index < bucket.Length; index++)
             {
-                var item = bucket.KeyValues[index];
+                var item = bucket[index];
                 if (CoreExtensions.Equals(key, item.Key))
                 {
                     return (Resolver<T>)item.Value;
@@ -5956,10 +5956,10 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            var bucket = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor];
+            var bucket = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor].KeyValues;
             for (var index = 0; index < bucket.Length; index++)
             {
-                var item = bucket.KeyValues[index];
+                var item = bucket[index];
                 if (typeof(T) == item.Key)
                 {
                     return ((Resolver<T>)item.Value)(container, EmptyArgs);
@@ -13281,6 +13281,7 @@ namespace IoC.Core
 
 namespace IoC.Core
 {
+    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
@@ -13309,15 +13310,15 @@ namespace IoC.Core
             Count = origin.Count + 1;
             if (origin.Count > origin.Divisor)
             {
-                Divisor = (origin.Divisor + 1) << 1 - 1;
+                Divisor = (origin.Divisor + 1) * 4 - 1;
                 Buckets = CoreExtensions.CreateArray(Divisor + 1, EmptyBucket);
                 var originBuckets = origin.Buckets;
                 for (var originBucketIndex = 0; originBucketIndex < originBuckets.Length; originBucketIndex++)
                 {
-                    var originKeyValues = originBuckets[originBucketIndex];
-                    for (var index = 0; index < originKeyValues.Length; index++)
+                    var originBucket = originBuckets[originBucketIndex];
+                    for (var index = 0; index < originBucket.KeyValues.Length; index++)
                     {
-                        var keyValue = originKeyValues.KeyValues[index];
+                        var keyValue = originBucket.KeyValues[index];
                         newBucketIndex = keyValue.Key.GetHashCode() & Divisor;
                         Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(keyValue);
                     }
@@ -13339,7 +13340,7 @@ namespace IoC.Core
         {
             var bucket = Buckets[key.GetHashCode() & Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.KeyValues.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (Equals(key, item.Key))
@@ -13357,7 +13358,7 @@ namespace IoC.Core
             for (var bucketIndex = 0; bucketIndex < Buckets.Length; bucketIndex++)
             {
                 var bucket = Buckets[bucketIndex];
-                for (var index = 0; index < bucket.Length; index++)
+                for (var index = 0; index < bucket.KeyValues.Length; index++)
                 {
                     yield return bucket.KeyValues[index];
                 }
@@ -13378,7 +13379,6 @@ namespace IoC.Core
         {
             removed = false;
             var newBuckets = CoreExtensions.CreateArray(Divisor + 1, EmptyBucket);
-            var newBucketsArray = newBuckets;
             var hashCode = key.GetHashCode();
             var bucketIndex = hashCode & Divisor;
             for (var curBucketIndex = 0; curBucketIndex < Buckets.Length; curBucketIndex++)
@@ -13386,18 +13386,18 @@ namespace IoC.Core
                 var bucket = Buckets[curBucketIndex];
                 if (curBucketIndex != bucketIndex)
                 {
-                    newBucketsArray[curBucketIndex] = bucket.Copy();
+                    newBuckets[curBucketIndex] = bucket.Copy();
                     continue;
                 }
 
                 // Bucket to remove an element
-                for (var index = 0; index < bucket.Length; index++)
+                for (var index = 0; index < bucket.KeyValues.Length; index++)
                 {
                     var keyValue = bucket.KeyValues[index];
                     // Remove the element
                     if (keyValue.Key.GetHashCode() == hashCode && (ReferenceEquals(keyValue.Key, key) || Equals(keyValue.Key, key)))
                     {
-                        newBucketsArray[bucketIndex] = bucket.Remove(index);
+                        newBuckets[bucketIndex] = bucket.Remove(index);
                         removed = true;
                     }
                 }
@@ -13409,13 +13409,8 @@ namespace IoC.Core
         internal struct Bucket
         {
             public readonly KeyValue[] KeyValues;
-            public readonly int Length;
 
-            public Bucket(KeyValue[] keyValues)
-            {
-                KeyValues = keyValues;
-                Length = keyValues.Length;
-            }
+            public Bucket(KeyValue[] keyValues) => KeyValues = keyValues;
 
             [MethodImpl((MethodImplOptions)256)]
             public Bucket Add(KeyValue keyValue) =>
@@ -13423,18 +13418,18 @@ namespace IoC.Core
 
             [MethodImpl((MethodImplOptions)256)]
             public Bucket Copy() =>
-                Length == 0 ? EmptyBucket : new Bucket(KeyValues.Copy());
+                KeyValues.Length == 0 ? EmptyBucket : new Bucket(KeyValues.Copy());
 
             [MethodImpl((MethodImplOptions)256)]
             public Bucket Remove(int index)
             {
-                var newLeyValues = new KeyValue[Length - 1];
+                var newLeyValues = new KeyValue[KeyValues.Length - 1];
                 for (var newIndex = 0; newIndex < index; newIndex++)
                 {
                     newLeyValues[newIndex] = KeyValues[newIndex];
                 }
 
-                for (var newIndex = index + 1; newIndex < Length; newIndex++)
+                for (var newIndex = index + 1; newIndex < KeyValues.Length; newIndex++)
                 {
                     newLeyValues[newIndex - 1] = KeyValues[newIndex];
                 }
@@ -13475,7 +13470,7 @@ namespace IoC.Core
         {
             var bucket = table.Buckets[key.GetHashCode() & table.Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.KeyValues.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (key == item.Key)
@@ -13495,7 +13490,7 @@ namespace IoC.Core
         {
             var bucket = table.Buckets[key.GetHashCode() & table.Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.KeyValues.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (CoreExtensions.Equals(key, item.Key))
