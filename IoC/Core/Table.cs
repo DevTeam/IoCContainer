@@ -28,15 +28,15 @@
             Count = origin.Count + 1;
             if (origin.Count > origin.Divisor)
             {
-                Divisor = (origin.Divisor + 1) << 1 - 1;
+                Divisor = (origin.Divisor + 1) * 2 - 1;
                 Buckets = CoreExtensions.CreateArray(Divisor + 1, EmptyBucket);
                 var originBuckets = origin.Buckets;
                 for (var originBucketIndex = 0; originBucketIndex < originBuckets.Length; originBucketIndex++)
                 {
-                    var originKeyValues = originBuckets[originBucketIndex];
-                    for (var index = 0; index < originKeyValues.Length; index++)
+                    var originBucket = originBuckets[originBucketIndex];
+                    for (var index = 0; index < originBucket.KeyValues.Length; index++)
                     {
-                        var keyValue = originKeyValues.KeyValues[index];
+                        var keyValue = originBucket.KeyValues[index];
                         newBucketIndex = keyValue.Key.GetHashCode() & Divisor;
                         Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(keyValue);
                     }
@@ -58,7 +58,7 @@
         {
             var bucket = Buckets[key.GetHashCode() & Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.KeyValues.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (Equals(key, item.Key))
@@ -76,7 +76,7 @@
             for (var bucketIndex = 0; bucketIndex < Buckets.Length; bucketIndex++)
             {
                 var bucket = Buckets[bucketIndex];
-                for (var index = 0; index < bucket.Length; index++)
+                for (var index = 0; index < bucket.KeyValues.Length; index++)
                 {
                     yield return bucket.KeyValues[index];
                 }
@@ -110,7 +110,7 @@
                 }
 
                 // Bucket to remove an element
-                for (var index = 0; index < bucket.Length; index++)
+                for (var index = 0; index < bucket.KeyValues.Length; index++)
                 {
                     var keyValue = bucket.KeyValues[index];
                     // Remove the element
@@ -128,13 +128,8 @@
         internal struct Bucket
         {
             public readonly KeyValue[] KeyValues;
-            public readonly int Length;
 
-            public Bucket(KeyValue[] keyValues)
-            {
-                KeyValues = keyValues;
-                Length = keyValues.Length;
-            }
+            public Bucket(KeyValue[] keyValues) => KeyValues = keyValues;
 
             [MethodImpl((MethodImplOptions)256)]
             public Bucket Add(KeyValue keyValue) =>
@@ -142,18 +137,18 @@
 
             [MethodImpl((MethodImplOptions)256)]
             public Bucket Copy() =>
-                Length == 0 ? EmptyBucket : new Bucket(KeyValues.Copy());
+                KeyValues.Length == 0 ? EmptyBucket : new Bucket(KeyValues.Copy());
 
             [MethodImpl((MethodImplOptions)256)]
             public Bucket Remove(int index)
             {
-                var newLeyValues = new KeyValue[Length - 1];
+                var newLeyValues = new KeyValue[KeyValues.Length - 1];
                 for (var newIndex = 0; newIndex < index; newIndex++)
                 {
                     newLeyValues[newIndex] = KeyValues[newIndex];
                 }
 
-                for (var newIndex = index + 1; newIndex < Length; newIndex++)
+                for (var newIndex = index + 1; newIndex < KeyValues.Length; newIndex++)
                 {
                     newLeyValues[newIndex - 1] = KeyValues[newIndex];
                 }

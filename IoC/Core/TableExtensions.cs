@@ -11,7 +11,7 @@
         {
             var bucket = table.Buckets[key.GetHashCode() & table.Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.KeyValues.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (key == item.Key)
@@ -31,7 +31,7 @@
         {
             var bucket = table.Buckets[key.GetHashCode() & table.Divisor];
             // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < bucket.Length; index++)
+            for (var index = 0; index < bucket.KeyValues.Length; index++)
             {
                 var item = bucket.KeyValues[index];
                 if (CoreExtensions.Equals(key, item.Key))

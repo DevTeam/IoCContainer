@@ -24,10 +24,10 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            var bucket = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor];
+            var bucket = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor].KeyValues;
             for (var index = 0; index < bucket.Length; index++)
             {
-                var item = bucket.KeyValues[index];
+                var item = bucket[index];
                 if (typeof(T) == item.Key)
                 {
                     return ((Resolver<T>)item.Value)(container, EmptyArgs);
