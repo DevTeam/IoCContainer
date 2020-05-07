@@ -42,7 +42,7 @@ namespace IoC.Benchmark
 
         private static readonly Func<IService3> Service3Factory = () => new Service3();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private static IServiceRoot NewInstance() => 
             new ServiceRoot(new Service1(new Service2Func(Service3Factory)), new Service2Func(Service3Factory), new Service2Func(Service3Factory), new Service2Func(Service3Factory), new Service3());
     }

@@ -8,20 +8,20 @@
 
     internal static class TypeDescriptorExtensions
     {
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static TypeDescriptor Descriptor(this Type type) => new TypeDescriptor(type);
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static TypeDescriptor Descriptor<T>() => TypeDescriptor<T>.Descriptor;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Assembly LoadAssembly(string assemblyName)
         {
             if (string.IsNullOrWhiteSpace(assemblyName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(assemblyName));
             return Assembly.Load(new AssemblyName(assemblyName));
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static Type ToGenericType([NotNull] this Type type)
         {

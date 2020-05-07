@@ -224,6 +224,7 @@
   - [To(binding,type,statements)](#M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Linq-Expressions-Expression{System-Action{IoC-Context{System-Object}}}[]- 'IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,System.Linq.Expressions.Expression{System.Action{IoC.Context{System.Object}}}[])')
   - [To\`\`1(binding,statements)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
   - [To\`\`1(binding,factory,statements)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [To\`\`1(binding,dependency)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},IoC-IDependency- 'IoC.FluentBind.To``1(IoC.IBinding{``0},IoC.IDependency)')
 - [FluentConfiguration](#T-IoC-FluentConfiguration 'IoC.FluentConfiguration')
   - [Apply(container,configurationText)](#M-IoC-FluentConfiguration-Apply-IoC-IMutableContainer,System-String[]- 'IoC.FluentConfiguration.Apply(IoC.IMutableContainer,System.String[])')
   - [Apply(token,configurationText)](#M-IoC-FluentConfiguration-Apply-IoC-IToken,System-String[]- 'IoC.FluentConfiguration.Apply(IoC.IToken,System.String[])')
@@ -366,7 +367,7 @@
   - [TryGetDependency(key,dependency,lifetime)](#M-IoC-IContainer-TryGetDependency-IoC-Key,IoC-IDependency@,IoC-ILifetime@- 'IoC.IContainer.TryGetDependency(IoC.Key,IoC.IDependency@,IoC.ILifetime@)')
   - [TryGetResolver\`\`1(type,tag,resolver,error,resolvingContainer)](#M-IoC-IContainer-TryGetResolver``1-System-Type,System-Object,IoC-Resolver{``0}@,System-Exception@,IoC-IContainer- 'IoC.IContainer.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,System.Exception@,IoC.IContainer)')
 - [IDependency](#T-IoC-IDependency 'IoC.IDependency')
-  - [TryBuildExpression(buildContext,lifetime,baseExpression,error)](#M-IoC-IDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.IDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
+  - [TryBuildExpression(buildContext,lifetime,expression,error)](#M-IoC-IDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.IDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
 - [IExpressionBuilder\`1](#T-IoC-Core-IExpressionBuilder`1 'IoC.Core.IExpressionBuilder`1')
   - [Build(bodyExpression,buildContext,context)](#M-IoC-Core-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-IBuildContext,`0- 'IoC.Core.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext,`0)')
 - [IFoundCyclicDependency](#T-IoC-Issues-IFoundCyclicDependency 'IoC.Issues.IFoundCyclicDependency')
@@ -6030,6 +6031,30 @@ The dependency token.
 | ---- | ----------- |
 | T | The instance type. |
 
+<a name='M-IoC-FluentBind-To``1-IoC-IBinding{``0},IoC-IDependency-'></a>
+### To\`\`1(binding,dependency) `method`
+
+##### Summary
+
+Registers autowiring binding.
+
+##### Returns
+
+The dependency token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') | The binding token. |
+| dependency | [IoC.IDependency](#T-IoC-IDependency 'IoC.IDependency') | The dependency. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
 <a name='T-IoC-FluentConfiguration'></a>
 ## FluentConfiguration `type`
 
@@ -8484,7 +8509,7 @@ IoC
 Represents an abstract IoC dependency.
 
 <a name='M-IoC-IDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@-'></a>
-### TryBuildExpression(buildContext,lifetime,baseExpression,error) `method`
+### TryBuildExpression(buildContext,lifetime,expression,error) `method`
 
 ##### Summary
 
@@ -8500,7 +8525,7 @@ Builds an expression for dependency based on the current build context and speci
 | ---- | ---- | ----------- |
 | buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context. |
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| baseExpression | [System.Linq.Expressions.Expression@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression@ 'System.Linq.Expressions.Expression@') | The resulting expression for the current dependency. |
+| expression | [System.Linq.Expressions.Expression@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression@ 'System.Linq.Expressions.Expression@') | The resulting expression for the current dependency. |
 | error | [System.Exception@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception@ 'System.Exception@') | The error if something goes wrong. |
 
 <a name='T-IoC-Core-IExpressionBuilder`1'></a>

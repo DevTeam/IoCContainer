@@ -38,38 +38,38 @@
 
         public Expression Expression { get; }
 
-        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
+        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             try
             {
-                baseExpression = Autowiring.ReplaceTypes(buildContext, _isComplexType, _expression);
-                baseExpression = Autowiring.ApplyInitializers(
+                expression = Autowiring.ReplaceTypes(buildContext, _isComplexType, _expression);
+                expression = Autowiring.ApplyInitializers(
                     buildContext,
                     _autoWiringStrategy ?? buildContext.AutowiringStrategy,
-                    baseExpression.Type.Descriptor(),
+                    expression.Type.Descriptor(),
                     _isComplexType,
-                    baseExpression,
+                    expression,
                     _statements);
 
                 if (_statements.Length == 0)
                 {
                     if (_isComplexType)
                     {
-                        baseExpression = buildContext.ReplaceTypes(baseExpression);
+                        expression = buildContext.ReplaceTypes(expression);
                     }
 
-                    baseExpression = buildContext.InjectDependencies(baseExpression);
+                    expression = buildContext.InjectDependencies(expression);
                 }
 
-                baseExpression = buildContext.AddLifetime(baseExpression, lifetime);
+                expression = buildContext.AddLifetime(expression, lifetime);
                 error = default(Exception);
                 return true;
             }
             catch (BuildExpressionException ex)
             {
                 error = ex;
-                baseExpression = default(Expression);
+                expression = default(Expression);
                 return false;
             }
         }

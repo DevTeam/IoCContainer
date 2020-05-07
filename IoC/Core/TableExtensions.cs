@@ -5,7 +5,7 @@
 
     internal static class TableExtensions
     {
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [Pure]
         public static bool TryGetByType<TValue>(this Table<Type, TValue> table, Type key, out TValue value)
         {
@@ -25,7 +25,7 @@
             return false;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [Pure]
         public static bool TryGetByKey<TValue>(this Table<Key, TValue> table, Key key, out TValue value)
         {
@@ -34,7 +34,7 @@
             for (var index = 0; index < bucket.KeyValues.Length; index++)
             {
                 var item = bucket.KeyValues[index];
-                if (CoreExtensions.Equals(key, item.Key))
+                if (key.Equals(item.Key))
                 {
                     value = item.Value;
                     return true;

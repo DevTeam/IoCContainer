@@ -1244,6 +1244,7 @@ namespace IoC
         /// <returns>The root container.</returns>
         [PublicAPI]
         [NotNull]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Container Create([NotNull] [ItemNotNull] params IConfiguration[] configurations) =>
             Create(string.Empty, configurations ?? throw new ArgumentNullException(nameof(configurations)));
 
@@ -1255,6 +1256,7 @@ namespace IoC
         /// <returns>The root container.</returns>
         [PublicAPI]
         [NotNull]
+        [MethodImpl((MethodImplOptions)0x200)]
         public static Container Create([NotNull] string name = "", [NotNull][ItemNotNull] params IConfiguration[] configurations)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
@@ -1279,6 +1281,7 @@ namespace IoC
             return container;
         }
 
+        [MethodImpl((MethodImplOptions)0x200)]
         internal Container([NotNull] string name, [NotNull] IContainer parent, [NotNull] ILockObject lockObject)
         {
             _lockObject = lockObject ?? throw new ArgumentNullException(nameof(parent));
@@ -1311,6 +1314,7 @@ namespace IoC
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+        [MethodImpl((MethodImplOptions)0x200)]
         public bool TryRegisterDependency(IEnumerable<FullKey> keys, IDependency dependency, ILifetime lifetime, out IToken dependencyToken)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
@@ -1388,6 +1392,7 @@ namespace IoC
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
+        [MethodImpl((MethodImplOptions)0x200)]
         public bool TryGetResolver<T>(ShortKey type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
         {
             FullKey key;
@@ -1416,7 +1421,7 @@ namespace IoC
             return TryGetResolver(key, out resolver, out error, resolvingContainer);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         internal bool TryGetResolver<T>(FullKey key, out Resolver<T> resolver, out Exception error, [CanBeNull] IContainer resolvingContainer)
         {
             // tries finding in dependencies
@@ -1466,6 +1471,7 @@ namespace IoC
         }
 
         /// <inheritdoc />
+        [MethodImpl((MethodImplOptions)0x200)]
         public bool TryGetDependency(FullKey key, out IDependency dependency, out ILifetime lifetime)
         {
             lock (_lockObject)
@@ -1525,6 +1531,7 @@ namespace IoC
         }
 
         /// <inheritdoc />
+        [MethodImpl((MethodImplOptions)0x200)]
         public void RegisterResource(IDisposable resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
@@ -1536,6 +1543,7 @@ namespace IoC
         }
 
         /// <inheritdoc />
+        [MethodImpl((MethodImplOptions)0x200)]
         public void UnregisterResource(IDisposable resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
@@ -1545,14 +1553,17 @@ namespace IoC
             }
         }
 
+        [MethodImpl((MethodImplOptions)0x200)]
         IEnumerator IEnumerable.GetEnumerator() =>
             GetEnumerator();
 
         /// <inheritdoc />
+        [MethodImpl((MethodImplOptions)0x200)]
         public IEnumerator<IEnumerable<FullKey>> GetEnumerator() =>
             GetAllKeys().Concat(_parent).GetEnumerator();
 
         /// <inheritdoc />
+        [MethodImpl((MethodImplOptions)0x200)]
         public IDisposable Subscribe(IObserver<ContainerEvent> observer)
         {
             lock (_lockObject)
@@ -1562,6 +1573,7 @@ namespace IoC
             }
         }
 
+        [MethodImpl((MethodImplOptions)0x200)]
         internal void Reset()
         {
             lock (_lockObject)
@@ -1571,7 +1583,7 @@ namespace IoC
             }
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private void CheckIsNotDisposed()
         {
             if (_isDisposed)
@@ -1580,6 +1592,7 @@ namespace IoC
             }
         }
 
+        [MethodImpl((MethodImplOptions)0x200)]
         private void UnregisterKeys(List<FullKey> registeredKeys, IDependency dependency, ILifetime lifetime)
         {
             lock (_lockObject)
@@ -1602,7 +1615,7 @@ namespace IoC
             }
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private IEnumerable<IEnumerable<FullKey>> GetAllKeys()
         {
             lock (_lockObject)
@@ -1612,7 +1625,7 @@ namespace IoC
             }
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private bool TryUnregister<TKey>(TKey key, [NotNull] ref Table<TKey, Registration> entries)
         {
             entries = entries.Remove(key, out var unregistered);
@@ -1624,15 +1637,16 @@ namespace IoC
             return true;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         internal static string CreateContainerName([CanBeNull] string name = "") =>
             !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private void ApplyConfigurations(params IConfiguration[] configurations) =>
             _resources.Add(this.Apply(configurations));
 
+        [MethodImpl((MethodImplOptions)0x200)]
         private bool TryGetRegistration(FullKey key, out Registration registration)
         {
             if (_registrations.TryGetByKey(key, out registration))
@@ -1854,7 +1868,7 @@ namespace IoC
         {
             return new ContainerEvent(
                 registeringContainer,
-                EventType.UnregisterDependency,
+                EventType.ContainerStateSingletonLifetime,
                 true,
                 default(Exception),
                 keys,
@@ -1998,7 +2012,7 @@ namespace IoC
         /// <summary>
         /// On dependency unregistration.
         /// </summary>
-        UnregisterDependency,
+        ContainerStateSingletonLifetime,
 
         /// <summary>
         /// On resolver compilation.
@@ -2013,7 +2027,7 @@ namespace IoC
 namespace IoC
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Linq.Expressions;
@@ -2032,7 +2046,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="types"></param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<object> Bind([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params Type[] types)
         {
@@ -2048,7 +2062,7 @@ namespace IoC
         /// <param name="token">The container binding token.</param>
         /// <param name="types"></param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<object> Bind([NotNull] this IToken token, [NotNull] [ItemNotNull] params Type[] types)
         {
@@ -2064,7 +2078,7 @@ namespace IoC
         /// <typeparam name="T">The contract type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T>([NotNull] this IMutableContainer container)
         {
@@ -2078,7 +2092,7 @@ namespace IoC
         /// <typeparam name="T">The contract type.</typeparam>
         /// <param name="token">The container binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T>([NotNull] this IToken token)
         {
@@ -2092,7 +2106,7 @@ namespace IoC
         /// <typeparam name="T">The contract type.</typeparam>
         /// <param name="binding"></param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T>([NotNull] this IBinding binding)
         {
@@ -2107,7 +2121,7 @@ namespace IoC
         /// <param name="binding"></param>
         /// <param name="lifetime"></param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> As<T>([NotNull] this IBinding<T> binding, Lifetime lifetime)
         {
@@ -2122,7 +2136,7 @@ namespace IoC
         /// <param name="binding"></param>
         /// <param name="lifetime"></param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Lifetime<T>([NotNull] this IBinding<T> binding, [NotNull] ILifetime lifetime)
         {
@@ -2138,7 +2152,7 @@ namespace IoC
         /// <param name="binding"></param>
         /// <param name="autowiringStrategy"></param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Autowiring<T>([NotNull] this IBinding<T> binding, [NotNull] IAutowiringStrategy autowiringStrategy)
         {
@@ -2154,7 +2168,7 @@ namespace IoC
         /// <param name="binding"></param>
         /// <param name="tagValue"></param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Tag<T>([NotNull] this IBinding<T> binding, [CanBeNull] object tagValue = null)
         {
@@ -2168,7 +2182,7 @@ namespace IoC
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="binding">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> AnyTag<T>([NotNull] this IBinding<T> binding)
         {
@@ -2183,7 +2197,7 @@ namespace IoC
         /// <param name="type">The instance type.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken To(
             [NotNull] this IBinding<object> binding,
@@ -2192,7 +2206,7 @@ namespace IoC
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return CreateDependencyToken(binding, CreateDependency(binding, new FullAutowiringDependency(type, binding.AutowiringStrategy, statements)));
+            return binding.To(new FullAutowiringDependency(type, binding.AutowiringStrategy, statements));
         }
 
         /// <summary>
@@ -2202,7 +2216,7 @@ namespace IoC
         /// <param name="binding">The binding token.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken To<T>(
             [NotNull] this IBinding<T> binding,
@@ -2210,7 +2224,7 @@ namespace IoC
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return CreateDependencyToken(binding, CreateDependency(binding, new FullAutowiringDependency(typeof(T), binding.AutowiringStrategy, statements)));
+            return binding.To(new FullAutowiringDependency(typeof(T), binding.AutowiringStrategy, statements));
         }
 
         /// <summary>
@@ -2221,7 +2235,7 @@ namespace IoC
         /// <param name="factory">The expression to create an instance.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken To<T>(
             [NotNull] this IBinding<T> binding,
@@ -2230,33 +2244,36 @@ namespace IoC
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return CreateDependencyToken(binding, CreateDependency(binding, new AutowiringDependency(factory, binding.AutowiringStrategy, statements)));
+            return binding.To(new AutowiringDependency(factory, binding.AutowiringStrategy, statements));
         }
 
+        /// <summary>
+        /// Registers autowiring binding.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <param name="binding">The binding token.</param>
+        /// <param name="dependency">The dependency.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
-        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        private static IDisposable CreateDependency<T>([NotNull] this IBinding<T> binding, [NotNull] IDependency dependency)
+        public static IToken To<T>(
+            [NotNull] this IBinding<T> binding,
+            [NotNull] IDependency dependency)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
-
             var tags = binding.Tags.DefaultIfEmpty(null);
-            var keys =
+            var keys = (
                 from type in binding.Types
                 from tag in tags
-                select new Key(type, tag);
+                select new Key(type, tag))
+                .ToArray();
 
-            return binding.Container.TryRegisterDependency(keys, dependency, binding.Lifetime, out var dependencyToken)
+            var token = (binding.Container.TryRegisterDependency(keys, dependency, binding.Lifetime, out var dependencyToken)
                 ? dependencyToken
-                : binding.Container.Resolve<ICannotRegister>().Resolve(binding.Container, keys.ToArray());
-        }
+                : binding.Container.Resolve<ICannotRegister>().Resolve(binding.Container, keys.ToArray())).AsTokenOf(binding.Container);
 
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        private static IToken CreateDependencyToken<T>(IBinding<T> binding, IDisposable dependency)
-        {
-            var tokens = binding.Tokens.ToList();
-            tokens.Add(dependency.AsTokenOf(binding.Container));
+            var tokens = new List<IToken>(binding.Tokens) { token };
             return Disposable.Create(tokens).AsTokenOf(binding.Container);
         }
     }
@@ -2283,7 +2300,7 @@ namespace IoC
         /// <typeparam name="T1">The contract type #1.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1>([NotNull] this IMutableContainer container)
             where T: T1
@@ -2300,7 +2317,7 @@ namespace IoC
         /// <typeparam name="T1">The contract type #1.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1>([NotNull] this IBinding binding)
             where T: T1
@@ -2316,7 +2333,7 @@ namespace IoC
         /// <typeparam name="T1">The contract type #1.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1>([NotNull] this IToken token)
             where T: T1
@@ -2332,7 +2349,7 @@ namespace IoC
         /// <typeparam name="T2">The contract type #2.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2>([NotNull] this IMutableContainer container)
             where T: T1, T2
@@ -2350,7 +2367,7 @@ namespace IoC
         /// <typeparam name="T2">The contract type #2.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2>([NotNull] this IBinding binding)
             where T: T1, T2
@@ -2367,7 +2384,7 @@ namespace IoC
         /// <typeparam name="T2">The contract type #2.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2>([NotNull] this IToken token)
             where T: T1, T2
@@ -2384,7 +2401,7 @@ namespace IoC
         /// <typeparam name="T3">The contract type #3.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3
@@ -2403,7 +2420,7 @@ namespace IoC
         /// <typeparam name="T3">The contract type #3.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3>([NotNull] this IBinding binding)
             where T: T1, T2, T3
@@ -2421,7 +2438,7 @@ namespace IoC
         /// <typeparam name="T3">The contract type #3.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3>([NotNull] this IToken token)
             where T: T1, T2, T3
@@ -2439,7 +2456,7 @@ namespace IoC
         /// <typeparam name="T4">The contract type #4.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4
@@ -2459,7 +2476,7 @@ namespace IoC
         /// <typeparam name="T4">The contract type #4.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4
@@ -2478,7 +2495,7 @@ namespace IoC
         /// <typeparam name="T4">The contract type #4.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4>([NotNull] this IToken token)
             where T: T1, T2, T3, T4
@@ -2497,7 +2514,7 @@ namespace IoC
         /// <typeparam name="T5">The contract type #5.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5
@@ -2518,7 +2535,7 @@ namespace IoC
         /// <typeparam name="T5">The contract type #5.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5
@@ -2538,7 +2555,7 @@ namespace IoC
         /// <typeparam name="T5">The contract type #5.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5
@@ -2558,7 +2575,7 @@ namespace IoC
         /// <typeparam name="T6">The contract type #6.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6
@@ -2580,7 +2597,7 @@ namespace IoC
         /// <typeparam name="T6">The contract type #6.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6
@@ -2601,7 +2618,7 @@ namespace IoC
         /// <typeparam name="T6">The contract type #6.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6
@@ -2622,7 +2639,7 @@ namespace IoC
         /// <typeparam name="T7">The contract type #7.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7
@@ -2645,7 +2662,7 @@ namespace IoC
         /// <typeparam name="T7">The contract type #7.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7
@@ -2667,7 +2684,7 @@ namespace IoC
         /// <typeparam name="T7">The contract type #7.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7
@@ -2689,7 +2706,7 @@ namespace IoC
         /// <typeparam name="T8">The contract type #8.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8
@@ -2713,7 +2730,7 @@ namespace IoC
         /// <typeparam name="T8">The contract type #8.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8
@@ -2736,7 +2753,7 @@ namespace IoC
         /// <typeparam name="T8">The contract type #8.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8
@@ -2759,7 +2776,7 @@ namespace IoC
         /// <typeparam name="T9">The contract type #9.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9
@@ -2784,7 +2801,7 @@ namespace IoC
         /// <typeparam name="T9">The contract type #9.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9
@@ -2808,7 +2825,7 @@ namespace IoC
         /// <typeparam name="T9">The contract type #9.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9
@@ -2832,7 +2849,7 @@ namespace IoC
         /// <typeparam name="T10">The contract type #10.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10
@@ -2858,7 +2875,7 @@ namespace IoC
         /// <typeparam name="T10">The contract type #10.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10
@@ -2883,7 +2900,7 @@ namespace IoC
         /// <typeparam name="T10">The contract type #10.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10
@@ -2908,7 +2925,7 @@ namespace IoC
         /// <typeparam name="T11">The contract type #11.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11
@@ -2935,7 +2952,7 @@ namespace IoC
         /// <typeparam name="T11">The contract type #11.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11
@@ -2961,7 +2978,7 @@ namespace IoC
         /// <typeparam name="T11">The contract type #11.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11
@@ -2987,7 +3004,7 @@ namespace IoC
         /// <typeparam name="T12">The contract type #12.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12
@@ -3015,7 +3032,7 @@ namespace IoC
         /// <typeparam name="T12">The contract type #12.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12
@@ -3042,7 +3059,7 @@ namespace IoC
         /// <typeparam name="T12">The contract type #12.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12
@@ -3069,7 +3086,7 @@ namespace IoC
         /// <typeparam name="T13">The contract type #13.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
@@ -3098,7 +3115,7 @@ namespace IoC
         /// <typeparam name="T13">The contract type #13.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
@@ -3126,7 +3143,7 @@ namespace IoC
         /// <typeparam name="T13">The contract type #13.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13
@@ -3154,7 +3171,7 @@ namespace IoC
         /// <typeparam name="T14">The contract type #14.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14
@@ -3184,7 +3201,7 @@ namespace IoC
         /// <typeparam name="T14">The contract type #14.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14
@@ -3213,7 +3230,7 @@ namespace IoC
         /// <typeparam name="T14">The contract type #14.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14
@@ -3242,7 +3259,7 @@ namespace IoC
         /// <typeparam name="T15">The contract type #15.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
@@ -3273,7 +3290,7 @@ namespace IoC
         /// <typeparam name="T15">The contract type #15.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
@@ -3303,7 +3320,7 @@ namespace IoC
         /// <typeparam name="T15">The contract type #15.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15
@@ -3333,7 +3350,7 @@ namespace IoC
         /// <typeparam name="T16">The contract type #16.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16
@@ -3365,7 +3382,7 @@ namespace IoC
         /// <typeparam name="T16">The contract type #16.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16
@@ -3396,7 +3413,7 @@ namespace IoC
         /// <typeparam name="T16">The contract type #16.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16
@@ -3427,7 +3444,7 @@ namespace IoC
         /// <typeparam name="T17">The contract type #17.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17
@@ -3460,7 +3477,7 @@ namespace IoC
         /// <typeparam name="T17">The contract type #17.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17
@@ -3492,7 +3509,7 @@ namespace IoC
         /// <typeparam name="T17">The contract type #17.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17
@@ -3524,7 +3541,7 @@ namespace IoC
         /// <typeparam name="T18">The contract type #18.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18
@@ -3558,7 +3575,7 @@ namespace IoC
         /// <typeparam name="T18">The contract type #18.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18
@@ -3591,7 +3608,7 @@ namespace IoC
         /// <typeparam name="T18">The contract type #18.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18
@@ -3624,7 +3641,7 @@ namespace IoC
         /// <typeparam name="T19">The contract type #19.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19
@@ -3659,7 +3676,7 @@ namespace IoC
         /// <typeparam name="T19">The contract type #19.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19
@@ -3693,7 +3710,7 @@ namespace IoC
         /// <typeparam name="T19">The contract type #19.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19
@@ -3727,7 +3744,7 @@ namespace IoC
         /// <typeparam name="T20">The contract type #20.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20
@@ -3763,7 +3780,7 @@ namespace IoC
         /// <typeparam name="T20">The contract type #20.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20
@@ -3798,7 +3815,7 @@ namespace IoC
         /// <typeparam name="T20">The contract type #20.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20
@@ -3833,7 +3850,7 @@ namespace IoC
         /// <typeparam name="T21">The contract type #21.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21
@@ -3870,7 +3887,7 @@ namespace IoC
         /// <typeparam name="T21">The contract type #21.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21
@@ -3906,7 +3923,7 @@ namespace IoC
         /// <typeparam name="T21">The contract type #21.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21
@@ -3942,7 +3959,7 @@ namespace IoC
         /// <typeparam name="T22">The contract type #22.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22
@@ -3980,7 +3997,7 @@ namespace IoC
         /// <typeparam name="T22">The contract type #22.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22
@@ -4017,7 +4034,7 @@ namespace IoC
         /// <typeparam name="T22">The contract type #22.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22
@@ -4054,7 +4071,7 @@ namespace IoC
         /// <typeparam name="T23">The contract type #23.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23
@@ -4093,7 +4110,7 @@ namespace IoC
         /// <typeparam name="T23">The contract type #23.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23
@@ -4131,7 +4148,7 @@ namespace IoC
         /// <typeparam name="T23">The contract type #23.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23
@@ -4169,7 +4186,7 @@ namespace IoC
         /// <typeparam name="T24">The contract type #24.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24
@@ -4209,7 +4226,7 @@ namespace IoC
         /// <typeparam name="T24">The contract type #24.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24
@@ -4248,7 +4265,7 @@ namespace IoC
         /// <typeparam name="T24">The contract type #24.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24
@@ -4287,7 +4304,7 @@ namespace IoC
         /// <typeparam name="T25">The contract type #25.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25
@@ -4328,7 +4345,7 @@ namespace IoC
         /// <typeparam name="T25">The contract type #25.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25
@@ -4368,7 +4385,7 @@ namespace IoC
         /// <typeparam name="T25">The contract type #25.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25
@@ -4408,7 +4425,7 @@ namespace IoC
         /// <typeparam name="T26">The contract type #26.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26
@@ -4450,7 +4467,7 @@ namespace IoC
         /// <typeparam name="T26">The contract type #26.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26
@@ -4491,7 +4508,7 @@ namespace IoC
         /// <typeparam name="T26">The contract type #26.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26
@@ -4532,7 +4549,7 @@ namespace IoC
         /// <typeparam name="T27">The contract type #27.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27
@@ -4575,7 +4592,7 @@ namespace IoC
         /// <typeparam name="T27">The contract type #27.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27
@@ -4617,7 +4634,7 @@ namespace IoC
         /// <typeparam name="T27">The contract type #27.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27
@@ -4659,7 +4676,7 @@ namespace IoC
         /// <typeparam name="T28">The contract type #28.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28
@@ -4703,7 +4720,7 @@ namespace IoC
         /// <typeparam name="T28">The contract type #28.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28
@@ -4746,7 +4763,7 @@ namespace IoC
         /// <typeparam name="T28">The contract type #28.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28
@@ -4789,7 +4806,7 @@ namespace IoC
         /// <typeparam name="T29">The contract type #29.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29
@@ -4834,7 +4851,7 @@ namespace IoC
         /// <typeparam name="T29">The contract type #29.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29
@@ -4878,7 +4895,7 @@ namespace IoC
         /// <typeparam name="T29">The contract type #29.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29
@@ -4922,7 +4939,7 @@ namespace IoC
         /// <typeparam name="T30">The contract type #30.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30
@@ -4968,7 +4985,7 @@ namespace IoC
         /// <typeparam name="T30">The contract type #30.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30
@@ -5013,7 +5030,7 @@ namespace IoC
         /// <typeparam name="T30">The contract type #30.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30
@@ -5058,7 +5075,7 @@ namespace IoC
         /// <typeparam name="T31">The contract type #31.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31
@@ -5105,7 +5122,7 @@ namespace IoC
         /// <typeparam name="T31">The contract type #31.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31
@@ -5151,7 +5168,7 @@ namespace IoC
         /// <typeparam name="T31">The contract type #31.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31
@@ -5197,7 +5214,7 @@ namespace IoC
         /// <typeparam name="T32">The contract type #32.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32>([NotNull] this IMutableContainer container)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32
@@ -5245,7 +5262,7 @@ namespace IoC
         /// <typeparam name="T32">The contract type #32.</typeparam>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32>([NotNull] this IBinding binding)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32
@@ -5292,7 +5309,7 @@ namespace IoC
         /// <typeparam name="T32">The contract type #32.</typeparam>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32>([NotNull] this IToken token)
             where T: T1, T2, T3, T4, T5, T6, T7, T8, T9, T10, T11, T12, T13, T14, T15, T16, T17, T18, T19, T20, T21, T22, T23, T24, T25, T26, T27, T28, T29, T30, T31, T32
@@ -5326,7 +5343,7 @@ namespace IoC
         /// </summary>
         /// <param name="configurationFactory">The configuration factory.</param>
         /// <returns>The configuration instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IConfiguration Create([NotNull] Func<IContainer, IToken> configurationFactory) =>
             new ConfigurationFromDelegate(configurationFactory ?? throw new ArgumentNullException(nameof(configurationFactory)));
@@ -5337,7 +5354,7 @@ namespace IoC
         /// <param name="disposableToken">A disposable resource.</param>
         /// <param name="container">The target container.</param>
         /// <returns></returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken AsTokenOf([NotNull] this IDisposable disposableToken, [NotNull] IMutableContainer container) =>
             new Token(container ?? throw new ArgumentNullException(nameof(container)), disposableToken ?? throw new ArgumentNullException(nameof(disposableToken)));
@@ -5348,7 +5365,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="configurationText">The text configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
         {
@@ -5364,7 +5381,7 @@ namespace IoC
         /// <param name="token">The target container token.</param>
         /// <param name="configurationText">The text configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params string[] configurationText) =>
             (token ?? throw new ArgumentNullException(nameof(token))).Container.Apply(configurationText);
@@ -5375,7 +5392,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="configurationStreams">The set of streams with text configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
         {
@@ -5391,7 +5408,7 @@ namespace IoC
         /// <param name="token">The target container token.</param>
         /// <param name="configurationStreams">The set of streams with text configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params Stream[] configurationStreams) =>
             (token ?? throw new ArgumentNullException(nameof(token))).Container.Apply(configurationStreams);
@@ -5402,7 +5419,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="configurationReaders">The set of text readers with text configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
         {
@@ -5418,7 +5435,7 @@ namespace IoC
         /// <param name="token">The target container token.</param>
         /// <param name="configurationReaders">The set of text readers with text configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params TextReader[] configurationReaders) =>
             (token ?? throw new ArgumentNullException(nameof(token))).Container.Apply(configurationReaders);
@@ -5429,7 +5446,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations)
         {
@@ -5444,7 +5461,7 @@ namespace IoC
         /// <param name="token">The target container token.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations) =>
             (token ?? throw new ArgumentNullException(nameof(token))).Container.Apply(configurations);
@@ -5455,7 +5472,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
@@ -5471,7 +5488,7 @@ namespace IoC
         /// <param name="token">The target container token.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params IConfiguration[] configurations) =>
             (token ?? throw new ArgumentNullException(nameof(token))).Container.Apply(configurations);
@@ -5482,7 +5499,7 @@ namespace IoC
         /// <typeparam name="T">The type of configuration.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The target container token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply<T>([NotNull] this IMutableContainer container)
             where T : IConfiguration, new() =>
@@ -5494,7 +5511,7 @@ namespace IoC
         /// <typeparam name="T">The type of configuration.</typeparam>
         /// <param name="token">The target container token.</param>
         /// <returns>The target container token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply<T>([NotNull] this IToken token)
             where T : IConfiguration, new() =>
@@ -5506,7 +5523,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The target container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IMutableContainer Using([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
@@ -5523,7 +5540,7 @@ namespace IoC
         /// <param name="token">The target container token.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The target container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IMutableContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
@@ -5537,7 +5554,7 @@ namespace IoC
         /// <typeparam name="T">The type of configuration.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The target container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IMutableContainer Using<T>([NotNull] this IMutableContainer container)
             where T : IConfiguration, new()
@@ -5552,7 +5569,7 @@ namespace IoC
         /// <typeparam name="T">The type of configuration.</typeparam>
         /// <param name="token">The target container token.</param>
         /// <returns>The target container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IMutableContainer Using<T>([NotNull] this IToken token)
             where T : IConfiguration, new()
@@ -5561,7 +5578,7 @@ namespace IoC
             return token.Container.Using<T>();
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         private static IToken ApplyConfigurationFromData<T>([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params T[] configurationData)
         {
@@ -5594,7 +5611,7 @@ namespace IoC
         /// <param name="parentContainer">The parent container.</param>
         /// <param name="name">The name of child container.</param>
         /// <returns>The child container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IMutableContainer Create([NotNull] this IContainer parentContainer, [NotNull] string name = "")
         {
@@ -5609,7 +5626,7 @@ namespace IoC
         /// <param name="token">The parent container token.</param>
         /// <param name="name">The name of child container.</param>
         /// <returns>The child container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IMutableContainer Create([NotNull] this IToken token, [NotNull] string name = "")
         {
@@ -5625,7 +5642,7 @@ namespace IoC
         /// <param name="args">The optional arguments.</param>
         /// <typeparam name="TInstance">The instance type.</typeparam>
         /// <returns>The disposable instance holder.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IConfiguration configuration, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class
@@ -5639,7 +5656,7 @@ namespace IoC
         /// <param name="token">The target container token.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class =>
@@ -5654,6 +5671,7 @@ namespace IoC
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>
         [NotNull]
+        [MethodImpl((MethodImplOptions)0x200)]
         public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IMutableContainer container, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class
         {
@@ -5704,7 +5722,7 @@ namespace IoC
         /// <param name="tag">The tag of binding.</param>
         /// <param name="container">The target container.</param>
         /// <returns>The resolver.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag) =>
             container is Container nativeContainer 
@@ -5720,7 +5738,7 @@ namespace IoC
         /// <param name="container"></param>
         /// <param name="resolver"></param>
         /// <returns>True if success.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag, [NotNull] out Resolver<T> resolver)
             => container.TryGetResolver(type, tag.Value, out resolver, out _);
 
@@ -5731,7 +5749,7 @@ namespace IoC
         /// <param name="tag">The tag of binding.</param>
         /// <param name="container">The target container.</param>
         /// <returns>The resolver.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, Tag tag) =>
             container is Container nativeContainer
@@ -5746,7 +5764,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="resolver"></param>
         /// <returns>True if success.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, Tag tag, [NotNull] out Resolver<T> resolver)
             => container.TryGetResolver(typeof(T), tag, out resolver);
 
@@ -5757,7 +5775,7 @@ namespace IoC
         /// <param name="type">The target type.</param>
         /// <param name="container">The target container.</param>
         /// <returns>The resolver.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container, [NotNull] Type type) =>
             container is Container nativeContainer
@@ -5772,7 +5790,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="resolver"></param>
         /// <returns>True if success.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, [NotNull] Type type, [NotNull] out Resolver<T> resolver)
             => container.TryGetResolver(type, null, out resolver, out _);
 
@@ -5782,7 +5800,7 @@ namespace IoC
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The resolver.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this IContainer container) =>
             container is Container nativeContainer
@@ -5796,7 +5814,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="resolver"></param>
         /// <returns>True if success.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static bool TryGetResolver<T>([NotNull] this IContainer container, [NotNull] out Resolver<T> resolver)
             => container.TryGetResolver(typeof(T), out resolver);
 
@@ -5805,7 +5823,7 @@ namespace IoC
         /// </summary>
         /// <param name="tagValue">The tag value.</param>
         /// <returns>The tag.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Tag AsTag([CanBeNull] this object tagValue) => new Tag(tagValue);
     }
 }
@@ -5833,7 +5851,7 @@ namespace IoC
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The resolver.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container)
         {
@@ -5841,7 +5859,7 @@ namespace IoC
             for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket[index];
-                if (typeof(T) == item.Key)
+                if (ReferenceEquals(typeof(T), item.Key))
                 {
                     return (Resolver<T>)item.Value;
                 }
@@ -5857,7 +5875,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="tag">The tag.</param>
         /// <returns>The resolver.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, Tag tag)
         {
@@ -5866,7 +5884,7 @@ namespace IoC
             for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket[index];
-                if (CoreExtensions.Equals(key, item.Key))
+                if (key.Equals(item.Key))
                 {
                     return (Resolver<T>)item.Value;
                 }
@@ -5882,7 +5900,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="type">The resolving instance type.</param>
         /// <returns>The resolver.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type)
         {
@@ -5890,7 +5908,7 @@ namespace IoC
             for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket[index];
-                if (type == item.Key)
+                if (ReferenceEquals(type, item.Key))
                 {
                     return (Resolver<T>) item.Value;
                 }
@@ -5907,7 +5925,7 @@ namespace IoC
         /// <param name="type">The resolving instance type.</param>
         /// <param name="tag">The tag.</param>
         /// <returns>The resolver.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
@@ -5916,7 +5934,7 @@ namespace IoC
             for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket[index];
-                if (CoreExtensions.Equals(key, item.Key))
+                if (key.Equals(item.Key))
                 {
                     return (Resolver<T>)item.Value;
                 }
@@ -5952,7 +5970,7 @@ namespace IoC
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
@@ -5960,7 +5978,7 @@ namespace IoC
             for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket[index];
-                if (typeof(T) == item.Key)
+                if (ReferenceEquals(typeof(T), item.Key))
                 {
                     return ((Resolver<T>)item.Value)(container, EmptyArgs);
                 }
@@ -5980,7 +5998,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="tag">The tag.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, Tag tag) =>
             container.GetResolver<T>(tag)(container, EmptyArgs);
@@ -5992,7 +6010,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args) =>
             container.GetResolver<T>()(container, args);
@@ -6005,7 +6023,7 @@ namespace IoC
         /// <param name="tag">The tag.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args) =>
             container.GetResolver<T>(tag)(container, args);
@@ -6017,7 +6035,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="type">The resolving instance type.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type) =>
             container.GetResolver<T>(type)(container, EmptyArgs);
@@ -6030,7 +6048,7 @@ namespace IoC
         /// <param name="type">The resolving instance type.</param>
         /// <param name="tag">The tag.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag) =>
             container.GetResolver<T>(type, tag)(container, EmptyArgs);
@@ -6043,7 +6061,7 @@ namespace IoC
         /// <param name="type">The resolving instance type.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args) =>
             container.GetResolver<T>(type)(container, args);
@@ -6057,7 +6075,7 @@ namespace IoC
         /// <param name="tag">The tag.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag, [NotNull] [ItemCanBeNull] params object[] args) =>
             container.GetResolver<T>(type, tag)(container, args);
@@ -6087,7 +6105,7 @@ namespace IoC
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container)
         {
@@ -6101,7 +6119,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, [NotNull][ItemCanBeNull] params object[] args) 
             => container.GetResolver<T>()(container, args);
@@ -6113,7 +6131,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="tag">The tag.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, Tag tag)
             => container.GetResolver<T>(tag)(container, EmptyArgs);
@@ -6126,7 +6144,7 @@ namespace IoC
         /// <param name="tag">The tag.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, Tag tag, [NotNull][ItemCanBeNull] params object[] args)
             => container.GetResolver<T>(tag)(container, args);
@@ -6138,7 +6156,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="type">The resolving instance type.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, [NotNull] Type type)
             => container.GetResolver<T>(type)(container, EmptyArgs);
@@ -6151,7 +6169,7 @@ namespace IoC
         /// <param name="type">The resolving instance type.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, [NotNull] Type type, [NotNull][ItemCanBeNull] params object[] args) 
             => container.GetResolver<T>(type)(container, args);
@@ -6164,7 +6182,7 @@ namespace IoC
         /// <param name="type">The resolving instance type.</param>
         /// <param name="tag">The tag.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag)
             => container.GetResolver<T>(type, tag)(container, EmptyArgs);
@@ -6178,7 +6196,7 @@ namespace IoC
         /// <param name="tag">The tag.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag, [NotNull][ItemCanBeNull] params object[] args)
             => container.GetResolver<T>(type, tag)(container, args);
@@ -6203,7 +6221,7 @@ namespace IoC
         /// </summary>
         /// <param name="container">A container to resolve a scope.</param>
         /// <returns>Tne new scope instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IScope CreateScope([NotNull] this IContainer container) =>
             (container ?? throw new ArgumentNullException(nameof(container))).Resolve<IScope>();
@@ -8139,10 +8157,10 @@ namespace IoC
         /// </summary>
         /// <param name="buildContext">The build context.</param>
         /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="baseExpression">The resulting expression for the current dependency.</param>
+        /// <param name="expression">The resulting expression for the current dependency.</param>
         /// <param name="error">The error if something goes wrong.</param>
         /// <returns><c>True</c> if successful and an expression was provided.</returns>
-        bool TryBuildExpression([NotNull] IBuildContext buildContext, [CanBeNull] ILifetime lifetime, out Expression baseExpression, out Exception error);
+        bool TryBuildExpression([NotNull] IBuildContext buildContext, [CanBeNull] ILifetime lifetime, out Expression expression, out Exception error);
     }
 }
 
@@ -8474,6 +8492,7 @@ namespace IoC
 {
     using System;
     using System.Diagnostics;
+    using System.Runtime.CompilerServices;
     using Core;
 
     /// <summary>
@@ -8481,7 +8500,7 @@ namespace IoC
     /// </summary>
     [PublicAPI]
     [DebuggerDisplay("Type = {" + nameof(Type) + "}, Tag = {" + nameof(Tag) + "}")]
-    public struct Key: IEquatable<Key>
+    public struct Key
     {
         /// <summary>
         /// The marker object for any tag.
@@ -8516,14 +8535,17 @@ namespace IoC
         /// <inheritdoc />
         [Pure]
         // ReSharper disable once PossibleNullReferenceException
-        public override bool Equals(object obj) => CoreExtensions.Equals(this, (Key)obj);
+        [MethodImpl((MethodImplOptions)0x200)]
+        public override bool Equals(object obj) => this.Equals((Key)obj);
 
         /// <inheritdoc />
         [Pure]
-        public bool Equals(Key other) => CoreExtensions.Equals(this, other);
+        [MethodImpl((MethodImplOptions)0x100)]
+        public bool Equals(Key other) => ReferenceEquals(Type, other.Type) && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
 
         /// <inheritdoc />
         [Pure]
+        [MethodImpl((MethodImplOptions)0x200)]
         public override int GetHashCode()
         {
             unchecked
@@ -8657,6 +8679,7 @@ namespace IoC
 #region CollectionFeature
 
 // ReSharper disable MemberCanBeProtected.Local
+// ReSharper disable ForCanBeConvertedToForeach
 namespace IoC.Features
 {
     using System;
@@ -8666,13 +8689,13 @@ namespace IoC.Features
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Linq.Expressions;
+    using System.Runtime.CompilerServices;
     // ReSharper disable once RedundantUsingDirective
     using System.Threading;
     // ReSharper disable once RedundantUsingDirective
     using System.Threading.Tasks;
     using Core;
-    using Lifetimes;
-
 
     /// <summary>
     /// Allows to resolve enumeration of all instances related to corresponding bindings.
@@ -8689,30 +8712,92 @@ namespace IoC.Features
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), new ContainerSingletonLifetime());
-            yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToList());
-            yield return container.Register(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToArray());
-            yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => new HashSet<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
-            yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Inject<IEnumerable<TT>>()), new ContainerSingletonLifetime(false, false));
+            yield return container.Register(new[] { typeof(IEnumerable<TT>) }, new EnumerableDependency());
+            yield return container.Register(new[] { typeof(TT[]) }, new ArrayDependency());
+            yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => new List<TT>(ctx.Container.Inject<TT[]>()));
+            yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => new HashSet<TT>(ctx.Container.Inject<TT[]>()));
+            yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
 #if !NET40
-            yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<List<TT>>()));
+            yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<TT[]>()));
 #endif
-#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), new ContainerSingletonLifetime());
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
 #endif
         }
 
-        internal sealed class Observable<T>: IObservable<T>
+        [MethodImpl((MethodImplOptions)0x200)]
+        private static IEnumerable<Key> GetKeys(IContainer container, Type type)
         {
-            private readonly IEnumerable<T> _source;
+            var targetType = type.Descriptor();
+            var isConstructedGenericType = targetType.IsConstructedGenericType();
+            var genericTargetType = default(TypeDescriptor);
+            Type[] genericTypeArguments = null;
+            if (isConstructedGenericType)
+            {
+                genericTargetType = targetType.GetGenericTypeDefinition().Descriptor();
+                genericTypeArguments = targetType.GetGenericTypeArguments();
+            }
 
-            public Observable([NotNull] IEnumerable<T> source) => _source = source ?? throw new ArgumentNullException(nameof(source));
+            foreach (var keyGroup in container)
+            {
+                foreach (var key in keyGroup)
+                {
+                    Type typeToResolve = null;
+                    var registeredType = key.Type.Descriptor();
+                    if (registeredType.IsGenericTypeDefinition())
+                    {
+                        if (isConstructedGenericType && genericTargetType.IsAssignableFrom(registeredType))
+                        {
+                            typeToResolve = registeredType.MakeGenericType(genericTypeArguments);
+                        }
+                    }
+                    else
+                    {
+                        if (targetType.IsAssignableFrom(registeredType))
+                        {
+                            typeToResolve = key.Type;
+                        }
+                    }
 
+                    if (typeToResolve == null)
+                    {
+                        continue;
+                    }
+
+                    var tag = key.Tag;
+                    if (tag == null || ReferenceEquals(tag, Key.AnyTag))
+                    {
+                        yield return new Key(typeToResolve);
+                    }
+                    else
+                    {
+                        yield return new Key(typeToResolve, tag);
+                    }
+
+                    break;
+                }
+            }
+        }
+
+        private sealed class Observable<T>: IObservable<T>
+        {
+            private readonly IEnumerable<T> _instances;
+
+            public Observable(IEnumerable<T> instances) => _instances = instances;
+
+            [MethodImpl((MethodImplOptions)0x200)]
             public IDisposable Subscribe(IObserver<T> observer)
             {
-                foreach (var value in _source)
+                try
                 {
-                    observer.OnNext(value);
+                    foreach(var instance in _instances)
+                    {
+                        observer.OnNext(instance);
+                    }
+                }
+                catch (Exception error)
+                {
+                    observer.OnError(error);
                 }
 
                 observer.OnCompleted();
@@ -8720,182 +8805,168 @@ namespace IoC.Features
             }
         }
 
-        private sealed class Enumeration<T> : EnumerationBase<T>, IEnumerable<T>
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+        private sealed class AsyncEnumeration<T> : IAsyncEnumerable<T>
         {
-            public Enumeration([NotNull] Context context, [NotNull] ILockObject lockObject)
-            : base(context, lockObject)
-            { }
+            private readonly IEnumerable<T> _instances;
 
-            [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
-            public IEnumerator<T> GetEnumerator()
-            {
-                var resolvers = GetResolvers();
-
-                // ReSharper disable once ForCanBeConvertedToForeach
-                for (var i = 0; i < resolvers.Length; i++)
-                {
-                    yield return resolvers[i](Context.Container, Context.Args);
-                }
-            }
-
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        }
-
-#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-        private sealed class AsyncEnumeration<T> : EnumerationBase<T>, IAsyncEnumerable<T>
-        {
-            public AsyncEnumeration([NotNull] Context context, [NotNull] ILockObject lockObject)
-                : base(context, lockObject)
-            { }
+            public AsyncEnumeration(IEnumerable<T> instances) => _instances = instances;
 
             public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken()) => 
-                new AsyncEnumerator<T>(this, cancellationToken);
+                new AsyncEnumerator<T>(_instances.GetEnumerator());
         }
 
         private sealed class AsyncEnumerator<T> : IAsyncEnumerator<T>
         {
-            private readonly AsyncEnumeration<T> _enumeration;
-            private readonly CancellationToken _cancellationToken;
-            private readonly TaskScheduler _taskScheduler;
-            private int _index = -1;
+            private readonly IEnumerator<T> _enumerator;
 
-            public AsyncEnumerator(AsyncEnumeration<T> enumeration, CancellationToken cancellationToken)
-            {
-                _enumeration = enumeration;
-                _cancellationToken = cancellationToken;
-                var container = enumeration.Context.Container;
-                _taskScheduler = container.TryGetResolver(out Resolver<TaskScheduler> taskSchedulerResolver) ? taskSchedulerResolver(container) : TaskScheduler.Current;
-            }
+            public AsyncEnumerator(IEnumerator<T> enumerator) => 
+                _enumerator = enumerator;
 
             public async ValueTask<bool> MoveNextAsync() =>
-                await new ValueTask<bool>(
-                    StartTask(
-                        new Task<bool>(
-                            () =>
-                            {
-                                var resolvers = _enumeration.GetResolvers();
-                                var index = Interlocked.Increment(ref _index);
-                                if (index >= resolvers.Length)
-                                {
-                                    return false;
-                                }
+                await new ValueTask<bool>(_enumerator.MoveNext());
 
-                                Current = resolvers[index](_enumeration.Context.Container, _enumeration.Context.Args);
-                                return true;
-                            },
-                            _cancellationToken)));
-
-            public T Current { get; private set; }
+            public T Current => _enumerator.Current;
 
             public ValueTask DisposeAsync() => new ValueTask();
-
-            private Task<bool> StartTask(Task<bool> task)
-            {
-                task.Start(_taskScheduler);
-                return task;
-            }
         }
 #endif
 
-        private class EnumerationBase<T>: IObserver<ContainerEvent>, IDisposable
+        private class EnumerableDependency : IDependency
         {
-            [NotNull] protected internal readonly Context Context;
-            private readonly ILockObject _lockObject;
-            private readonly IDisposable _subscription;
-            private volatile Resolver<T>[] _resolvers;
-
-            public EnumerationBase([NotNull] Context context, [NotNull] ILockObject lockObject)
+            public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
             {
-                Context = context;
-                _lockObject = lockObject;
-                _subscription = context.Container.Subscribe(this);
-                Reset();
+                var type = buildContext.Key.Type.Descriptor();
+                if (!type.IsConstructedGenericType())
+                {
+                    throw new BuildExpressionException($"Unsupported enumerable type {type}.", null);
+                }
+
+                var genericTypeArguments = type.GetGenericTypeArguments();
+                if (genericTypeArguments.Length != 1)
+                {
+                    throw new BuildExpressionException($"Unsupported enumerable type {type}.", null);
+                }
+
+                var elementType = genericTypeArguments[0];
+                var keys = GetKeys(buildContext.Container, elementType).ToArray();
+                var cases = new SwitchCase[keys.Length];
+                for (var i = 0; i < keys.Length; i++)
+                {
+                    var context = buildContext.CreateChild(keys[i], buildContext.Container);
+                    cases[i] = Expression.SwitchCase(Expression.Convert(context.GetDependencyExpression(), elementType), Expression.Constant(i));
+                }
+
+                var positionVar = Expression.Variable(typeof(int));
+                var switchExpression = Expression.Switch(
+                    positionVar,
+                    Expression.Block(
+                        Expression.Throw(Expression.Constant(new BuildExpressionException("Invalid enumeration state.", null))),
+                        Expression.Default(elementType)),
+                    cases);
+
+                var factory = Expression.Lambda(switchExpression, positionVar, buildContext.ContainerParameter, buildContext.ArgsParameter).Compile();
+                var ctor = typeof(Enumerable<>).Descriptor().MakeGenericType(elementType).Descriptor().GetDeclaredConstructors().Single();
+                var enumerableExpression = Expression.New(ctor, Expression.Constant(factory), Expression.Constant(cases.Length), buildContext.ContainerParameter, buildContext.ArgsParameter);
+                expression = buildContext.ReplaceTypes(buildContext.AddLifetime(enumerableExpression, lifetime));
+                error = default(Exception);
+                return true;
+            }
+        }
+
+        private sealed class Enumerable<T> : IEnumerable<T>
+        {
+            private readonly Func<int, IContainer, object[], T> _factory;
+            private readonly int _count;
+            private readonly IContainer _container;
+            private readonly object[] _args;
+
+            public Enumerable([NotNull] Func<int, IContainer, object[], T> factory, int count, IContainer container, object[] args)
+            {
+                _factory = factory;
+                _count = count;
+                _container = container;
+                _args = args;
             }
 
-            public void OnNext(ContainerEvent value) => Reset();
+            [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
+            public IEnumerator<T> GetEnumerator() => new Enumerator<T>(_factory, _count, _container, _args);
 
-            public void OnError(Exception error) { }
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
 
-            public void OnCompleted() { }
+        private sealed class Enumerator<T> : IEnumerator<T>
+        {
+            private readonly Func<int, IContainer, object[], T> _factory;
+            private readonly int _count;
+            private readonly IContainer _container;
+            private readonly object[] _args;
+            private int _index = -1;
+            private bool _hasCurrent;
+            private T _current;
 
-            public void Dispose() => _subscription.Dispose();
-
-            public Resolver<T>[] GetResolvers()
+            public Enumerator([NotNull] Func<int, IContainer, object[], T> factory, int count, IContainer container, object[] args)
             {
-                lock (_lockObject)
+                _factory = factory;
+                _count = count;
+                _container = container;
+                _args = args;
+            }
+
+            [MethodImpl((MethodImplOptions)0x200)]
+            public bool MoveNext()
+            {
+                _hasCurrent = false;
+                _current = default(T);
+                return ++_index < _count;
+            }
+
+            public T Current
+            {
+                [MethodImpl((MethodImplOptions)0x200)]
+                get
                 {
-                    var resolvers = _resolvers;
-                    if (resolvers != null)
+                    if (!_hasCurrent)
                     {
-                        return resolvers;
+                        _hasCurrent = true;
+                        _current = _factory(_index, _container, _args);
                     }
-                    
-                    resolvers = GetResolvers(Context.Container).ToArray();
-                    _resolvers = resolvers;
 
-                    return resolvers;
+                    return _current;
                 }
             }
 
-            private void Reset()
+            object IEnumerator.Current => Current;
+
+            public void Dispose() { }
+
+            public void Reset() => _index = -1;
+        }
+
+
+        private class ArrayDependency: IDependency
+        {
+            public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
             {
-                lock (_lockObject)
+                var type = buildContext.Key.Type.Descriptor();
+                var elementType = type.GetElementType();
+                if (elementType == null)
                 {
-                    _resolvers = null;
-                }
-            }
-
-            private static IEnumerable<Resolver<T>> GetResolvers(IContainer container)
-            {
-                var targetType = TypeDescriptorExtensions.Descriptor<T>();
-                var isConstructedGenericType = targetType.IsConstructedGenericType();
-                var genericTargetType = default(TypeDescriptor);
-                Type[] genericTypeArguments = null;
-                if (isConstructedGenericType)
-                {
-                    genericTargetType = targetType.GetGenericTypeDefinition().Descriptor();
-                    genericTypeArguments = targetType.GetGenericTypeArguments();
+                    throw new BuildExpressionException($"Unsupported array type {type}.", null);
                 }
 
-                foreach (var keyGroup in container)
+                var keys = GetKeys(buildContext.Container, elementType).ToArray();
+                var expressions = new Expression[keys.Length];
+                for (var i = 0; i < keys.Length; i++)
                 {
-                    foreach (var key in keyGroup)
-                    {
-                        Type typeToResolve = null;
-                        var registeredType = key.Type.Descriptor();
-                        if (registeredType.IsGenericTypeDefinition())
-                        {
-                            if (isConstructedGenericType && genericTargetType.IsAssignableFrom(registeredType))
-                            {
-                                typeToResolve = registeredType.MakeGenericType(genericTypeArguments);
-                            }
-                        }
-                        else
-                        {
-                            if (targetType.IsAssignableFrom(registeredType))
-                            {
-                                typeToResolve = key.Type;
-                            }
-                        }
-
-                        if (typeToResolve == null)
-                        {
-                            continue;
-                        }
-
-                        var tag = key.Tag;
-                        if (tag == null || ReferenceEquals(tag, Key.AnyTag))
-                        {
-                            yield return container.GetResolver<T>(typeToResolve);
-                        }
-                        else
-                        {
-                            yield return container.GetResolver<T>(typeToResolve, tag.AsTag());
-                        }
-
-                        break;
-                    }
+                    var context = buildContext.CreateChild(keys[i], buildContext.Container);
+                    expressions[i] = context.GetDependencyExpression();
                 }
+
+                var arrayExpression = Expression.NewArrayInit(elementType, expressions);
+                expression = buildContext.ReplaceTypes(buildContext.AddLifetime(arrayExpression, lifetime));
+                error = default(Exception);
+                return true;
             }
         }
     }
@@ -9143,7 +9214,7 @@ namespace IoC.Features
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register<Func<TT>>(ctx => () => ctx.Container.Inject<TT>(ctx.Key.Tag), new ContainerSingletonLifetime(false, false), Sets.AnyTag);
+            yield return container.Register<Func<TT>>(ctx => () => ctx.Container.Inject<TT>(ctx.Key.Tag), new ContainerStateSingletonLifetime<object>(false), Sets.AnyTag);
             yield return container.Register<Func<TT1, TT>>(ctx => arg1 => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1), null, Sets.AnyTag);
             yield return container.Register<Func<TT1, TT2, TT>>(ctx => (arg1, arg2) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2), null, Sets.AnyTag);
             yield return container.Register<Func<TT1, TT2, TT3, TT>>(ctx => (arg1, arg2, arg3) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3), null, Sets.AnyTag);
@@ -9430,26 +9501,8 @@ namespace IoC.Lifetimes
     /// For a singleton instance per container.
     /// </summary>
     [PublicAPI]
-    public sealed class ContainerSingletonLifetime: KeyBasedLifetime<IContainer>
+    public sealed class ContainerSingletonLifetime: KeyBasedLifetime<IContainer, object>
     {
-        private readonly bool _supportOnNewInstanceCreated;
-        private readonly bool _supportOnInstanceReleased;
-
-        /// <summary>
-        /// Creates new a new lifetime instance.
-        /// </summary>
-        public ContainerSingletonLifetime()
-            : this(true, true)
-        {
-        }
-
-        internal ContainerSingletonLifetime(bool supportOnNewInstanceCreated, bool supportOnInstanceReleased)
-            : base(supportOnNewInstanceCreated, supportOnInstanceReleased)
-        {
-            _supportOnNewInstanceCreated = supportOnNewInstanceCreated;
-            _supportOnInstanceReleased = supportOnInstanceReleased;
-        }
-
         /// <inheritdoc />
         protected override IContainer CreateKey(IContainer container, object[] args) => container;
 
@@ -9457,17 +9510,17 @@ namespace IoC.Lifetimes
         public override string ToString() => Lifetime.ContainerSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Create() => new ContainerSingletonLifetime(_supportOnNewInstanceCreated, _supportOnInstanceReleased);
+        public override ILifetime Create() => new ContainerSingletonLifetime();
 
         /// <inheritdoc />
-        protected override T OnNewInstanceCreated<T>(T newInstance, IContainer targetContainer, IContainer container, object[] args)
+        protected override object OnNewInstanceCreated(object newInstance, IContainer targetContainer, IContainer container, object[] args)
         {
             if (newInstance is IDisposable disposable)
             {
                 targetContainer.RegisterResource(disposable);
             }
 
-#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (newInstance is IAsyncDisposable asyncDisposable)
             {
                 targetContainer.RegisterResource(asyncDisposable.ToDisposable());
@@ -9486,7 +9539,7 @@ namespace IoC.Lifetimes
                 disposable.Dispose();
             }
 
-#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();
@@ -9494,6 +9547,84 @@ namespace IoC.Lifetimes
                 disposable.Dispose();
             }
 #endif
+        }
+    }
+}
+
+
+#endregion
+#region ContainerStateSingletonLifetime
+
+namespace IoC.Lifetimes
+{
+    using System;
+    using Core; // ReSharper disable once RedundantUsingDirective
+
+    /// <summary>
+    /// For a singleton instance per state.
+    /// </summary>
+    internal sealed class ContainerStateSingletonLifetime<TValue> : KeyBasedLifetime<IContainer, TValue>
+        where TValue : class
+    {
+        private readonly bool _isDisposable;
+        private IDisposable _containerSubscription = Disposable.Empty;
+
+        public ContainerStateSingletonLifetime(bool isDisposable)
+        {
+            _isDisposable = isDisposable;
+        }
+
+        /// <inheritdoc />
+        protected override IContainer CreateKey(IContainer container, object[] args) => container;
+
+        /// <inheritdoc />
+        public override string ToString() => Lifetime.ContainerSingleton.ToString();
+
+        /// <inheritdoc />
+        public override ILifetime Create() => new ContainerStateSingletonLifetime<TValue>(_isDisposable);
+
+        /// <inheritdoc />
+        protected override TValue OnNewInstanceCreated(TValue newInstance, IContainer targetContainer, IContainer container, object[] args)
+        {
+            _containerSubscription = container.Subscribe(
+                value =>
+                {
+                    if (value.IsSuccess && (value.EventType == EventType.RegisterDependency || value.EventType == EventType.ContainerStateSingletonLifetime))
+                    {
+                        var curContainer = targetContainer;
+                        while (curContainer != null && !Remove(container))
+                        {
+                            curContainer = curContainer.Parent;
+                        }
+                    }
+                },
+                e => { },
+                () => { });
+
+            if (_isDisposable && newInstance is IDisposable disposable)
+            {
+                targetContainer.RegisterResource(disposable);
+            }
+
+            return newInstance;
+        }
+
+        /// <inheritdoc />
+        protected override void OnInstanceReleased(TValue releasedInstance, IContainer targetContainer)
+        {
+            _containerSubscription.Dispose();
+            if (_isDisposable && releasedInstance is IDisposable disposable)
+            {
+                targetContainer.UnregisterResource(disposable);
+                disposable.Dispose();
+            }
+        }
+
+        /// <inheritdoc />
+        public override void Dispose()
+        {
+            _containerSubscription.Dispose();
+            base.Dispose();
         }
     }
 }
@@ -9515,20 +9646,22 @@ namespace IoC.Lifetimes
     /// Represents the abstraction for singleton based lifetimes.
     /// </summary>
     /// <typeparam name="TKey">The key type.</typeparam>
+    /// <typeparam name="TValue">The value type.</typeparam>
     [PublicAPI]
-    public abstract class KeyBasedLifetime<TKey> : ILifetime
+    public abstract class KeyBasedLifetime<TKey, TValue> : ILifetime
+        where TValue: class
     {
         private readonly bool _supportOnNewInstanceCreated;
         private readonly bool _supportOnInstanceReleased;
-        private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
-        private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
-        private static readonly MethodInfo GetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Get));
-        private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
-        private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
+        private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey, TValue>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
+        private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey, TValue>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
+        private static readonly MethodInfo GetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, TValue>.Get));
+        private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, TValue>.Set));
+        private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey, TValue>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
         private static readonly ParameterExpression KeyVar = Expression.Variable(typeof(TKey), "key");
 
         [NotNull] private readonly ILockObject _lockObject = new LockObject();
-        private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
+        private volatile Table<TKey, TValue> _instances = Table<TKey, TValue>.Empty;
 
         /// <summary>
         /// Creates an instance
@@ -9548,15 +9681,22 @@ namespace IoC.Lifetimes
             if (context == null) throw new ArgumentNullException(nameof(context));
             var returnType = context.Key.Type;
             var thisConst = Expression.Constant(this);
-            var instanceVar = Expression.Variable(returnType, "val");
+            var instanceVar = Expression.Variable(typeof(TValue));
             var instancesField = Expression.Field(thisConst, InstancesFieldInfo);
             var lockObjectConst = Expression.Constant(_lockObject);
-            var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
-            var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, KeyVar).Convert(returnType));
-            var isNullExpression = Expression.ReferenceEqual(instanceVar, ExpressionBuilderExtensions.NullConst);
+            var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, KeyVar));
+            Expression isEmptyExpression;
+            if (returnType.Descriptor().IsValueType())
+            {
+                isEmptyExpression = Expression.Call(null, ExpressionBuilderExtensions.EqualsMethodInfo, instanceVar.Convert(typeof(TValue)), Expression.Default(typeof(TValue)));
+            }
+            else
+            {
+                isEmptyExpression = Expression.ReferenceEqual(instanceVar, Expression.Default(returnType));
+            }
 
             var initNewInstanceExpression = _supportOnNewInstanceCreated 
-                ? (Expression) Expression.Call(thisConst, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, context.ContainerParameter, context.ArgsParameter)
+                ? Expression.Call(thisConst, OnNewInstanceCreatedMethodInfo, instanceVar.Convert(typeof(TValue)), KeyVar, context.ContainerParameter, context.ArgsParameter).Convert(returnType)
                 : instanceVar;
 
             return Expression.Block(
@@ -9564,32 +9704,32 @@ namespace IoC.Lifetimes
                 // int hashCode;
                 // T instance;
                 new[] { KeyVar, instanceVar },
-                // var key = CreateKey(container, args);
+                // TKey key = CreateKey(container, args);
                 Expression.Assign(KeyVar, Expression.Call(thisConst, CreateKeyMethodInfo, context.ContainerParameter, context.ArgsParameter)),
-                // var instance = (T)_instances.Get(hashCode, key);
+                // TValue instance = _instances.Get(key);
                 assignInstanceExpression,
-                // if (instance == null)
+                // if (instance == default(TValue))
                 Expression.Condition(
-                    isNullExpression,
+                    isEmptyExpression,
                     Expression.Block(
                         // lock (this._lockObject)
                         Expression.Block(
-                    // var instance = (T)_instances.Get(hashCode, key);
+                    // instance = _instances.Get(hashCode, key);
                     assignInstanceExpression,
-                    // if (instance == null)
+                    // if (instance == default(TValue))
                     Expression.IfThen(
-                        Expression.Equal(instanceVar, ExpressionBuilderExtensions.NullConst),
+                        isEmptyExpression,
                         Expression.Block(
                             // instance = new T();
-                            Expression.Assign(instanceVar, bodyExpression),
+                            Expression.Assign(instanceVar, bodyExpression.Convert(typeof(TValue))),
                             // Instances = _instances.Set(hashCode, key, instance);
-                            Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar))
+                            Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar.Convert(typeof(object))))
                         ))).Lock(lockObjectConst),
                         // instance or OnNewInstanceCreated(instance, key, container, args);
-                        initNewInstanceExpression),
+                        initNewInstanceExpression.Convert(returnType)),
                         // else {
                         // return instance;
-                        instanceVar
+                        instanceVar.Convert(returnType)
                     )
             // }
             );
@@ -9602,11 +9742,11 @@ namespace IoC.Lifetimes
         /// <inheritdoc />
         public virtual void Dispose()
         {
-            Table<TKey, object> instances;
+            Table<TKey, TValue> instances;
             lock (_lockObject)
             {
                 instances = _instances;
-                _instances = Table<TKey, object>.Empty;
+                _instances = Table<TKey, TValue>.Empty;
             }
 
             if (_supportOnInstanceReleased)
@@ -9637,14 +9777,29 @@ namespace IoC.Lifetimes
         /// <param name="container">The target container.</param>
         /// <param name="args">Optional arguments.</param>
         /// <returns>The created instance.</returns>
-        protected abstract T OnNewInstanceCreated<T>(T newInstance, TKey key, IContainer container, object[] args);
+        protected abstract TValue OnNewInstanceCreated(TValue newInstance, TKey key, IContainer container, object[] args);
 
         /// <summary>
         /// Is invoked on the instance was released.
         /// </summary>
         /// <param name="releasedInstance">The released instance.</param>
         /// <param name="key">The instance key.</param>
-        protected abstract void OnInstanceReleased(object releasedInstance, TKey key);
+        protected abstract void OnInstanceReleased(TValue releasedInstance, TKey key);
+
+        /// <summary>
+        /// Forcibly remove an instance.
+        /// </summary>
+        /// <param name="key">The instance key.</param>
+        protected bool Remove(TKey key)
+        {
+            bool removed;
+            lock (_lockObject)
+            {
+                _instances = _instances.Remove(key, out removed);
+            }
+
+            return removed;
+        }
     }
 }
 
@@ -9662,7 +9817,7 @@ namespace IoC.Lifetimes
     /// For a singleton instance per scope.
     /// </summary>
     [PublicAPI]
-    public sealed class ScopeSingletonLifetime: KeyBasedLifetime<IScope>
+    public sealed class ScopeSingletonLifetime: KeyBasedLifetime<IScope, object>
     {
         /// <inheritdoc />
         protected override IScope CreateKey(IContainer container, object[] args) => Scope.Current;
@@ -9674,7 +9829,7 @@ namespace IoC.Lifetimes
         public override ILifetime Create() => new ScopeSingletonLifetime();
 
         /// <inheritdoc />
-        protected override T OnNewInstanceCreated<T>(T newInstance, IScope scope, IContainer container, object[] args)
+        protected override object OnNewInstanceCreated(object newInstance, IScope scope, IContainer container, object[] args)
         {
             if (!(scope is IResourceRegistry resourceRegistry))
             {
@@ -9686,8 +9841,8 @@ namespace IoC.Lifetimes
                 resourceRegistry.RegisterResource(disposable);
             }
 
-#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-                if (newInstance is IAsyncDisposable asyncDisposable)
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+            if (newInstance is IAsyncDisposable asyncDisposable)
                 {
                     resourceRegistry.RegisterResource(asyncDisposable.ToDisposable());
                 }
@@ -9710,7 +9865,7 @@ namespace IoC.Lifetimes
                 disposable.Dispose();
             }
 
-#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();
@@ -9788,7 +9943,7 @@ namespace IoC.Lifetimes
 
             disposable?.Dispose();
 
-#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             IAsyncDisposable asyncDisposable;
             lock (_lockObject)
             {
@@ -10449,17 +10604,17 @@ namespace IoC.Core
             return buildContext.InjectDependencies(baseExpression, contextItVar);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static bool IsComplexType(TypeDescriptor typeDescriptor) => 
             typeDescriptor.IsConstructedGenericType() || typeDescriptor.IsGenericTypeDefinition() || typeDescriptor.IsArray();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static T ReplaceTypes<T>(IBuildContext buildContext, bool isComplexType, T expression)
             where T : Expression =>
             isComplexType ? (T)buildContext.ReplaceTypes(expression) : expression;
 
         [IoC.NotNull]
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IEnumerable<IMethod<TMethodInfo>> GetMethods<TMethodInfo>([IoC.NotNull] IEnumerable<TMethodInfo> methodInfos)
             where TMethodInfo : MethodBase
             => methodInfos
@@ -10512,38 +10667,38 @@ namespace IoC.Core
 
         public Expression Expression { get; }
 
-        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
+        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             try
             {
-                baseExpression = Autowiring.ReplaceTypes(buildContext, _isComplexType, _expression);
-                baseExpression = Autowiring.ApplyInitializers(
+                expression = Autowiring.ReplaceTypes(buildContext, _isComplexType, _expression);
+                expression = Autowiring.ApplyInitializers(
                     buildContext,
                     _autoWiringStrategy ?? buildContext.AutowiringStrategy,
-                    baseExpression.Type.Descriptor(),
+                    expression.Type.Descriptor(),
                     _isComplexType,
-                    baseExpression,
+                    expression,
                     _statements);
 
                 if (_statements.Length == 0)
                 {
                     if (_isComplexType)
                     {
-                        baseExpression = buildContext.ReplaceTypes(baseExpression);
+                        expression = buildContext.ReplaceTypes(expression);
                     }
 
-                    baseExpression = buildContext.InjectDependencies(baseExpression);
+                    expression = buildContext.InjectDependencies(expression);
                 }
 
-                baseExpression = buildContext.AddLifetime(baseExpression, lifetime);
+                expression = buildContext.AddLifetime(expression, lifetime);
                 error = default(Exception);
                 return true;
             }
             catch (BuildExpressionException ex)
             {
                 error = ex;
-                baseExpression = default(Expression);
+                expression = default(Expression);
                 return false;
             }
         }
@@ -10627,7 +10782,7 @@ namespace IoC.Core
             Tokens = binding.Tokens;
             Types = binding.Types;
             Lifetime = binding.Lifetime;
-            Tags = binding.Tags.Concat(Enumerable.Repeat(tagValue, 1));
+            Tags = new List<object>(binding.Tags) { tagValue};
             AutowiringStrategy = binding.AutowiringStrategy;
         }
 
@@ -11190,7 +11345,7 @@ namespace IoC.Core
                     text = $"adds {FormatDependency(src)}.";
                     break;
 
-                case EventType.UnregisterDependency:
+                case EventType.ContainerStateSingletonLifetime:
                     text = $"removes {FormatDependency(src)}.";
                     break;
 
@@ -11265,11 +11420,11 @@ namespace IoC.Core
 
     internal static class CoreExtensions
     {
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static bool SequenceEqual<T>([NotNull] this T[] array1, [NotNull] T[] array2) =>
             ((System.Collections.IStructuralEquatable)array1).Equals(array2, System.Collections.StructuralComparisons.StructuralEqualityComparer);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         public static int GetHash<T>([NotNull][ItemNotNull] this T[] items)
         {
             unchecked
@@ -11286,10 +11441,10 @@ namespace IoC.Core
             }
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static T[] EmptyArray<T>() => Empty<T>.Array;
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         public static T[] CreateArray<T>(int size = 0, T value = default(T))
         {
             if (size == 0)
@@ -11311,7 +11466,7 @@ namespace IoC.Core
             return array;
         }
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [Pure]
         [NotNull]
         public static T[] Add<T>([NotNull] this T[] source, [CanBeNull] T value)
@@ -11329,7 +11484,7 @@ namespace IoC.Core
         }
 
         [Pure]
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         public static T[] Copy<T>([NotNull] this T[] previous)
         {
             var length = previous.Length;
@@ -11337,17 +11492,6 @@ namespace IoC.Core
             Array.Copy(previous, result, length);
             return result;
         }
-
-        [Pure]
-        [MethodImpl((MethodImplOptions)256)]
-        public static bool Equals(this Key that, Key other) =>
-#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
-            ReferenceEquals(that.Type, other.Type)
-#else
-            that.Type == other.Type
-#endif
-            && (ReferenceEquals(that.Tag, other.Tag) || Equals(that.Tag, other.Tag));
-
 
         private static class Empty<T>
         {
@@ -11390,7 +11534,7 @@ namespace IoC.Core
             return true;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private static int GetOrder(MethodBase method)
         {
             var order = method.GetParameters().Length + 1;
@@ -11878,7 +12022,7 @@ namespace IoC.Core
         [NotNull]
         public static readonly IDisposable Empty = EmptyDisposable.Shared;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IDisposable Create([NotNull] Action action)
         {
@@ -11888,7 +12032,7 @@ namespace IoC.Core
             return new DisposableAction(action);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IDisposable Create([NotNull][ItemCanBeNull] IEnumerable<IDisposable> disposables)
         {
@@ -11898,8 +12042,8 @@ namespace IoC.Core
             return new CompositeDisposable(disposables);
         }
 
-#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-        [MethodImpl((MethodImplOptions)256)]
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IDisposable ToDisposable([NotNull] this IAsyncDisposable asyncDisposable)
         {
 #if DEBUG
@@ -11978,35 +12122,37 @@ namespace IoC.Core
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Threading;
-    using static TypeDescriptorExtensions;
 
     internal static class ExpressionBuilderExtensions
     {
         private static readonly TypeDescriptor ResolverGenericTypeDescriptor = typeof(Resolver<>).Descriptor();
-        internal static readonly MethodInfo GetHashCodeMethodInfo = Descriptor<object>().GetDeclaredMethods().Single(i => i.Name == nameof(GetHashCode));
         internal static readonly Expression NullConst = Expression.Constant(null);
         internal static readonly Expression ContainerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
+        internal static readonly MethodInfo EqualsMethodInfo = typeof(Object).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Equals) && i.ReturnType == typeof(bool) && i.GetParameters().Length == 2 && i.GetParameters()[0].ParameterType == typeof(object) && i.GetParameters()[1].ParameterType == typeof(object));
         private static readonly MethodInfo EnterMethodInfo = typeof(Monitor).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Monitor.Enter) && i.GetParameters().Length == 1);
         private static readonly MethodInfo ExitMethodInfo = typeof(Monitor).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Monitor.Exit));
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Expression Convert(this Expression expression, Type type)
         {
-            var baseTypeDescriptor = expression.Type.Descriptor();
-            var typeDescriptor = type.Descriptor();
-            if (typeDescriptor.IsAssignableFrom(baseTypeDescriptor))
+            if (type != typeof(object))
             {
-                return expression;
+                var baseTypeDescriptor = expression.Type.Descriptor();
+                var typeDescriptor = type.Descriptor();
+                if (typeDescriptor.IsAssignableFrom(baseTypeDescriptor))
+                {
+                    return expression;
+                }
             }
 
             return Expression.Convert(expression, type);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Type ToResolverType(this Type type) =>
             ResolverGenericTypeDescriptor.MakeGenericType(type);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Expression Lock(this Expression body, Expression lockObject) =>
             Expression.TryFinally(
                 Expression.Block(
@@ -12047,7 +12193,7 @@ namespace IoC.Core
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <returns>The registration token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [IoC.NotNull]
         public static IToken Register<T>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
             => container.Register(new[] { typeof(T)}, new FullAutowiringDependency(typeof(T)), lifetime, tags);
@@ -12062,7 +12208,7 @@ namespace IoC.Core
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
         /// <returns>The registration token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [IoC.NotNull]
         public static IToken Register<T>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             => container.Register(new[] { typeof(T) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
@@ -12078,7 +12224,7 @@ namespace IoC.Core
         /// <returns>The registration token.</returns>
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         [IoC.NotNull]
-        public static IToken Register([NotNull] this IMutableContainer container, [NotNull][ItemNotNull] IEnumerable<Type> types, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime = null, [CanBeNull][ItemCanBeNull] params object[] tags)
+        public static IToken Register([NotNull] this IMutableContainer container, [NotNull][ItemNotNull] IEnumerable<Type> types, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime = null, [CanBeNull][ItemCanBeNull] object[] tags = null)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (types == null) throw new ArgumentNullException(nameof(types));
@@ -12118,7 +12264,7 @@ namespace IoC.Core
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <returns>The registration token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Register<T, T1>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1
@@ -12135,7 +12281,7 @@ namespace IoC.Core
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Register<T, T1>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1
@@ -12152,7 +12298,7 @@ namespace IoC.Core
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <returns>The registration token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Register<T, T1, T2>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1, T2
@@ -12170,7 +12316,7 @@ namespace IoC.Core
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Register<T, T1, T2>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1, T2
@@ -12188,7 +12334,7 @@ namespace IoC.Core
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <returns>The registration token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Register<T, T1, T2, T3>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1, T2, T3
@@ -12207,7 +12353,7 @@ namespace IoC.Core
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Register<T, T1, T2, T3>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1, T2, T3
@@ -12346,7 +12492,7 @@ namespace IoC.Core
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
+        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             try
@@ -12400,7 +12546,7 @@ namespace IoC.Core
                     }
                 }
 
-                baseExpression = Autowiring.ApplyInitializers(
+                expression = Autowiring.ApplyInitializers(
                     buildContext,
                     autoWiringStrategy,
                     typeDescriptor,
@@ -12408,14 +12554,14 @@ namespace IoC.Core
                     Expression.New(ctor.Info, ctor.GetParametersExpressions(buildContext)),
                     _statements);
 
-                baseExpression = buildContext.AddLifetime(baseExpression, lifetime);
+                expression = buildContext.AddLifetime(expression, lifetime);
                 error = default(Exception);
                 return true;
             }
             catch (BuildExpressionException ex)
             {
                 error = ex;
-                baseExpression = default(Expression);
+                expression = default(Expression);
                 return false;
             }
         }
@@ -12716,7 +12862,7 @@ namespace IoC.Core
 
         private NullContainer() { }
 
-        public IContainer Parent => throw new NotSupportedException();
+        public IContainer Parent => null;
 
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
         {
@@ -12867,6 +13013,7 @@ namespace IoC.Core
 
         public IMutableContainer Container { get; }
 
+        [MethodImpl((MethodImplOptions)0x200)]
         public bool TryCreateResolver<T>(
             Key key,
             [NotNull] IContainer resolvingContainer,
@@ -12912,7 +13059,7 @@ namespace IoC.Core
             return resolver != default(Resolver<T>);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [CanBeNull]
         public ILifetime GetLifetime([NotNull] Type type)
         {
@@ -13030,7 +13177,7 @@ namespace IoC.Core
 
         public void OnNext(ContainerEvent value)
         {
-            if (value.Keys == null)
+            if (value.Keys == null || !value.IsSuccess || value.EventType != EventType.RegisterDependency && value.EventType != EventType.ContainerStateSingletonLifetime)
             {
                 return;
             }
@@ -13054,7 +13201,7 @@ namespace IoC.Core
 
                     break;
 
-                case EventType.UnregisterDependency:
+                case EventType.ContainerStateSingletonLifetime:
                     _container.Reset();
                     container = value.Container;
                     foreach (var key in value.Keys)
@@ -13340,7 +13487,7 @@ namespace IoC.Core
             Count = count;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         private Table(Table<TKey, TValue> origin, TKey key, TValue value)
         {
             int newBucketIndex;
@@ -13371,7 +13518,7 @@ namespace IoC.Core
             Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(new KeyValue(key, value));
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [Pure]
         public TValue Get(TKey key)
         {
@@ -13380,7 +13527,7 @@ namespace IoC.Core
             for (var index = 0; index < bucket.KeyValues.Length; index++)
             {
                 var item = bucket.KeyValues[index];
-                if (Equals(key, item.Key))
+                if (ReferenceEquals(key, item.Key) || Equals(key, item.Key))
                 {
                     return item.Value;
                 }
@@ -13389,6 +13536,7 @@ namespace IoC.Core
             return default(TValue);
         }
 
+        [MethodImpl((MethodImplOptions)0x200)]
         [Pure]
         public IEnumerator<KeyValue> GetEnumerator()
         {
@@ -13403,14 +13551,16 @@ namespace IoC.Core
         }
 
         [Pure]
+        [MethodImpl((MethodImplOptions)0x100)]
         IEnumerator IEnumerable.GetEnumerator() =>
             GetEnumerator();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public Table<TKey, TValue> Set(TKey key, TValue value) =>
             new Table<TKey, TValue>(this, key, value);
 
+        [MethodImpl((MethodImplOptions)0x200)]
         [Pure]
         public Table<TKey, TValue> Remove(TKey key, out bool removed)
         {
@@ -13449,15 +13599,15 @@ namespace IoC.Core
 
             public Bucket(KeyValue[] keyValues) => KeyValues = keyValues;
 
-            [MethodImpl((MethodImplOptions)256)]
+            [MethodImpl((MethodImplOptions)0x100)]
             public Bucket Add(KeyValue keyValue) =>
                 new Bucket(KeyValues.Add(keyValue));
 
-            [MethodImpl((MethodImplOptions)256)]
+            [MethodImpl((MethodImplOptions)0x100)]
             public Bucket Copy() =>
                 KeyValues.Length == 0 ? EmptyBucket : new Bucket(KeyValues.Copy());
 
-            [MethodImpl((MethodImplOptions)256)]
+            [MethodImpl((MethodImplOptions)0x200)]
             public Bucket Remove(int index)
             {
                 var newLeyValues = new KeyValue[KeyValues.Length - 1];
@@ -13501,7 +13651,7 @@ namespace IoC.Core
 
     internal static class TableExtensions
     {
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [Pure]
         public static bool TryGetByType<TValue>(this Table<Type, TValue> table, Type key, out TValue value)
         {
@@ -13521,7 +13671,7 @@ namespace IoC.Core
             return false;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [Pure]
         public static bool TryGetByKey<TValue>(this Table<Key, TValue> table, Key key, out TValue value)
         {
@@ -13530,7 +13680,7 @@ namespace IoC.Core
             for (var index = 0; index < bucket.KeyValues.Length; index++)
             {
                 var item = bucket.KeyValues[index];
-                if (CoreExtensions.Equals(key, item.Key))
+                if (key.Equals(item.Key))
                 {
                     value = item.Value;
                     return true;
@@ -13590,123 +13740,123 @@ namespace IoC.Core
         public TypeDescriptor([NotNull] Type type) =>
             Type = type ?? throw new ArgumentNullException(nameof(type));
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type AsType() => Type;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public Guid GetId() => Type.GUID;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Assembly GetAssembly() => Type.Assembly;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsValueType() => Type.IsValueType;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsArray() => Type.IsArray;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsPublic() => Type.IsPublic;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [CanBeNull]
         [Pure]
         public Type GetElementType() => Type.GetElementType();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsInterface() => Type.IsInterface;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsAbstract() => Type.IsAbstract;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsGenericParameter() => Type.IsGenericParameter;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsConstructedGenericType() => Type.IsGenericType && !Type.IsGenericTypeDefinition;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsGenericTypeDefinition() => Type.IsGenericTypeDefinition;
 
         public bool IsGenericTypeArgument() => Type.GetCustomAttributes(typeof(GenericTypeArgumentAttribute), true).Length > 0;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type[] GetGenericTypeArguments() => Type.GetGenericArguments();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type[] GetGenericParameterConstraints() => Type.GetGenericParameterConstraints();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public GenericParameterAttributes GetGenericParameterAttributes() => Type.GenericParameterAttributes;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type[] GetGenericTypeParameters() => Type.GetGenericArguments();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<ConstructorInfo> GetDeclaredConstructors() => Type.GetConstructors(DefaultBindingFlags);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<MethodInfo> GetDeclaredMethods() => Type.GetMethods(DefaultBindingFlags);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<MemberInfo> GetDeclaredMembers() => Type.GetMembers(DefaultBindingFlags);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<FieldInfo> GetDeclaredFields() => Type.GetFields(DefaultBindingFlags);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<PropertyInfo> GetDeclaredProperties() => Type.GetProperties(DefaultBindingFlags);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [CanBeNull]
         [Pure]
         public Type GetBaseType() => Type.BaseType;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<Type> GetImplementedInterfaces() => Type.GetInterfaces();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsAssignableFrom(TypeDescriptor typeDescriptor) =>Type.IsAssignableFrom(typeDescriptor.Type);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type MakeGenericType([NotNull] params Type[] typeArguments) => Type.MakeGenericType(typeArguments ?? throw new ArgumentNullException(nameof(typeArguments)));
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
@@ -13726,125 +13876,125 @@ namespace IoC.Core
             _typeInfo = type.GetTypeInfo();
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type AsType() => Type;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public Guid GetId() => _typeInfo.GUID;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Assembly GetAssembly() => _typeInfo.Assembly;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsValueType() => _typeInfo.IsValueType;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsInterface() => _typeInfo.IsInterface;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsAbstract() => _typeInfo.IsAbstract;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsGenericParameter() => _typeInfo.IsGenericParameter;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsArray() => _typeInfo.IsArray;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsPublic() => _typeInfo.IsPublic;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [CanBeNull]
         [Pure]
         public Type GetElementType() => _typeInfo.GetElementType();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsConstructedGenericType() => Type.IsConstructedGenericType;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsGenericTypeDefinition() => _typeInfo.IsGenericTypeDefinition;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type[] GetGenericTypeArguments() => _typeInfo.GenericTypeArguments;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type[] GetGenericParameterConstraints() => _typeInfo.GetGenericParameterConstraints();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public GenericParameterAttributes GetGenericParameterAttributes() => _typeInfo.GenericParameterAttributes;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type[] GetGenericTypeParameters() => _typeInfo.GenericTypeParameters;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsGenericTypeArgument() => _typeInfo.GetCustomAttribute<GenericTypeArgumentAttribute>(true) != null;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<ConstructorInfo> GetDeclaredConstructors() => _typeInfo.DeclaredConstructors;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<MethodInfo> GetDeclaredMethods() => _typeInfo.DeclaredMethods;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<MemberInfo> GetDeclaredMembers() => _typeInfo.DeclaredMembers;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<FieldInfo> GetDeclaredFields() => _typeInfo.DeclaredFields;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<PropertyInfo> GetDeclaredProperties() => _typeInfo.DeclaredProperties;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [CanBeNull]
         [Pure]
         public Type GetBaseType() => _typeInfo.BaseType;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<Type> GetImplementedInterfaces() => _typeInfo.ImplementedInterfaces;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsAssignableFrom(TypeDescriptor typeDescriptor) => _typeInfo.IsAssignableFrom(typeDescriptor._typeInfo);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type MakeGenericType([NotNull] params Type[] typeArguments) => Type.MakeGenericType(typeArguments ?? throw new ArgumentNullException(nameof(typeArguments)));
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
@@ -13873,20 +14023,20 @@ namespace IoC.Core
 
     internal static class TypeDescriptorExtensions
     {
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static TypeDescriptor Descriptor(this Type type) => new TypeDescriptor(type);
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static TypeDescriptor Descriptor<T>() => TypeDescriptor<T>.Descriptor;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Assembly LoadAssembly(string assemblyName)
         {
             if (string.IsNullOrWhiteSpace(assemblyName)) throw new ArgumentException("Value cannot be null or whitespace.", nameof(assemblyName));
             return Assembly.Load(new AssemblyName(assemblyName));
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static Type ToGenericType([NotNull] this Type type)
         {
@@ -14176,8 +14326,12 @@ namespace IoC.Core
             return Expression.Lambda(ReplaceType(node.Type), body, parameters);
         }
 
-        protected override Expression VisitNewArray(NewArrayExpression node) => 
-            Expression.NewArrayInit(ReplaceType(node.Type.GetElementType()), ReplaceAll(node.Expressions));
+        protected override Expression VisitNewArray(NewArrayExpression node)
+        {
+            var elementType = ReplaceType(node.Type.GetElementType());
+            var elements = ReplaceAll(node.Expressions).Select(i => i.Convert(elementType));
+            return Expression.NewArrayInit(elementType, elements);
+        }
 
         protected override Expression VisitListInit(ListInitExpression node)
         {
@@ -14247,7 +14401,7 @@ namespace IoC.Core
             return true;
         }
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private Type[] ReplaceTypes(Type[] types)
         {
             for (var i = 0; i < types.Length; i++)
@@ -14287,7 +14441,7 @@ namespace IoC.Core
             return type;
         }
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private IEnumerable<Expression> ReplaceAll(IEnumerable<Expression> expressions) => 
             expressions.Select(Visit);
     }

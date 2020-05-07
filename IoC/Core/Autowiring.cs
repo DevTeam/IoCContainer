@@ -66,17 +66,17 @@ namespace IoC.Core
             return buildContext.InjectDependencies(baseExpression, contextItVar);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static bool IsComplexType(TypeDescriptor typeDescriptor) => 
             typeDescriptor.IsConstructedGenericType() || typeDescriptor.IsGenericTypeDefinition() || typeDescriptor.IsArray();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static T ReplaceTypes<T>(IBuildContext buildContext, bool isComplexType, T expression)
             where T : Expression =>
             isComplexType ? (T)buildContext.ReplaceTypes(expression) : expression;
 
         [IoC.NotNull]
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IEnumerable<IMethod<TMethodInfo>> GetMethods<TMethodInfo>([IoC.NotNull] IEnumerable<TMethodInfo> methodInfos)
             where TMethodInfo : MethodBase
             => methodInfos

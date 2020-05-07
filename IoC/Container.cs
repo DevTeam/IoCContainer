@@ -45,6 +45,7 @@
         /// <returns>The root container.</returns>
         [PublicAPI]
         [NotNull]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Container Create([NotNull] [ItemNotNull] params IConfiguration[] configurations) =>
             Create(string.Empty, configurations ?? throw new ArgumentNullException(nameof(configurations)));
 
@@ -56,6 +57,7 @@
         /// <returns>The root container.</returns>
         [PublicAPI]
         [NotNull]
+        [MethodImpl((MethodImplOptions)0x200)]
         public static Container Create([NotNull] string name = "", [NotNull][ItemNotNull] params IConfiguration[] configurations)
         {
             if (name == null) throw new ArgumentNullException(nameof(name));
@@ -80,6 +82,7 @@
             return container;
         }
 
+        [MethodImpl((MethodImplOptions)0x200)]
         internal Container([NotNull] string name, [NotNull] IContainer parent, [NotNull] ILockObject lockObject)
         {
             _lockObject = lockObject ?? throw new ArgumentNullException(nameof(parent));
@@ -112,6 +115,7 @@
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+        [MethodImpl((MethodImplOptions)0x200)]
         public bool TryRegisterDependency(IEnumerable<FullKey> keys, IDependency dependency, ILifetime lifetime, out IToken dependencyToken)
         {
             if (keys == null) throw new ArgumentNullException(nameof(keys));
@@ -189,6 +193,7 @@
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "ForCanBeConvertedToForeach")]
+        [MethodImpl((MethodImplOptions)0x200)]
         public bool TryGetResolver<T>(ShortKey type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
         {
             FullKey key;
@@ -217,7 +222,7 @@
             return TryGetResolver(key, out resolver, out error, resolvingContainer);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         internal bool TryGetResolver<T>(FullKey key, out Resolver<T> resolver, out Exception error, [CanBeNull] IContainer resolvingContainer)
         {
             // tries finding in dependencies
@@ -267,6 +272,7 @@
         }
 
         /// <inheritdoc />
+        [MethodImpl((MethodImplOptions)0x200)]
         public bool TryGetDependency(FullKey key, out IDependency dependency, out ILifetime lifetime)
         {
             lock (_lockObject)
@@ -326,6 +332,7 @@
         }
 
         /// <inheritdoc />
+        [MethodImpl((MethodImplOptions)0x200)]
         public void RegisterResource(IDisposable resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
@@ -337,6 +344,7 @@
         }
 
         /// <inheritdoc />
+        [MethodImpl((MethodImplOptions)0x200)]
         public void UnregisterResource(IDisposable resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
@@ -346,14 +354,17 @@
             }
         }
 
+        [MethodImpl((MethodImplOptions)0x200)]
         IEnumerator IEnumerable.GetEnumerator() =>
             GetEnumerator();
 
         /// <inheritdoc />
+        [MethodImpl((MethodImplOptions)0x200)]
         public IEnumerator<IEnumerable<FullKey>> GetEnumerator() =>
             GetAllKeys().Concat(_parent).GetEnumerator();
 
         /// <inheritdoc />
+        [MethodImpl((MethodImplOptions)0x200)]
         public IDisposable Subscribe(IObserver<ContainerEvent> observer)
         {
             lock (_lockObject)
@@ -363,6 +374,7 @@
             }
         }
 
+        [MethodImpl((MethodImplOptions)0x200)]
         internal void Reset()
         {
             lock (_lockObject)
@@ -372,7 +384,7 @@
             }
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private void CheckIsNotDisposed()
         {
             if (_isDisposed)
@@ -381,6 +393,7 @@
             }
         }
 
+        [MethodImpl((MethodImplOptions)0x200)]
         private void UnregisterKeys(List<FullKey> registeredKeys, IDependency dependency, ILifetime lifetime)
         {
             lock (_lockObject)
@@ -403,7 +416,7 @@
             }
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private IEnumerable<IEnumerable<FullKey>> GetAllKeys()
         {
             lock (_lockObject)
@@ -413,7 +426,7 @@
             }
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private bool TryUnregister<TKey>(TKey key, [NotNull] ref Table<TKey, Registration> entries)
         {
             entries = entries.Remove(key, out var unregistered);
@@ -425,15 +438,16 @@
             return true;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         internal static string CreateContainerName([CanBeNull] string name = "") =>
             !string.IsNullOrWhiteSpace(name) ? name : Interlocked.Increment(ref _containerId).ToString(CultureInfo.InvariantCulture);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private void ApplyConfigurations(params IConfiguration[] configurations) =>
             _resources.Add(this.Apply(configurations));
 
+        [MethodImpl((MethodImplOptions)0x200)]
         private bool TryGetRegistration(FullKey key, out Registration registration)
         {
             if (_registrations.TryGetByKey(key, out registration))

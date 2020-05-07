@@ -16,7 +16,7 @@
         private static readonly MethodInfo EnterMethodInfo = typeof(Monitor).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Monitor.Enter) && i.GetParameters().Length == 1);
         private static readonly MethodInfo ExitMethodInfo = typeof(Monitor).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Monitor.Exit));
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Expression Convert(this Expression expression, Type type)
         {
             if (type != typeof(object))
@@ -32,11 +32,11 @@
             return Expression.Convert(expression, type);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Type ToResolverType(this Type type) =>
             ResolverGenericTypeDescriptor.MakeGenericType(type);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static Expression Lock(this Expression body, Expression lockObject) =>
             Expression.TryFinally(
                 Expression.Block(

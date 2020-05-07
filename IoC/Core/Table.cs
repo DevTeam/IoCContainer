@@ -22,7 +22,7 @@
             Count = count;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         private Table(Table<TKey, TValue> origin, TKey key, TValue value)
         {
             int newBucketIndex;
@@ -53,7 +53,7 @@
             Buckets[newBucketIndex] = Buckets[newBucketIndex].Add(new KeyValue(key, value));
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [Pure]
         public TValue Get(TKey key)
         {
@@ -62,7 +62,7 @@
             for (var index = 0; index < bucket.KeyValues.Length; index++)
             {
                 var item = bucket.KeyValues[index];
-                if (Equals(key, item.Key))
+                if (ReferenceEquals(key, item.Key) || Equals(key, item.Key))
                 {
                     return item.Value;
                 }
@@ -71,6 +71,7 @@
             return default(TValue);
         }
 
+        [MethodImpl((MethodImplOptions)0x200)]
         [Pure]
         public IEnumerator<KeyValue> GetEnumerator()
         {
@@ -85,14 +86,16 @@
         }
 
         [Pure]
+        [MethodImpl((MethodImplOptions)0x100)]
         IEnumerator IEnumerable.GetEnumerator() =>
             GetEnumerator();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public Table<TKey, TValue> Set(TKey key, TValue value) =>
             new Table<TKey, TValue>(this, key, value);
 
+        [MethodImpl((MethodImplOptions)0x200)]
         [Pure]
         public Table<TKey, TValue> Remove(TKey key, out bool removed)
         {
@@ -131,15 +134,15 @@
 
             public Bucket(KeyValue[] keyValues) => KeyValues = keyValues;
 
-            [MethodImpl((MethodImplOptions)256)]
+            [MethodImpl((MethodImplOptions)0x100)]
             public Bucket Add(KeyValue keyValue) =>
                 new Bucket(KeyValues.Add(keyValue));
 
-            [MethodImpl((MethodImplOptions)256)]
+            [MethodImpl((MethodImplOptions)0x100)]
             public Bucket Copy() =>
                 KeyValues.Length == 0 ? EmptyBucket : new Bucket(KeyValues.Copy());
 
-            [MethodImpl((MethodImplOptions)256)]
+            [MethodImpl((MethodImplOptions)0x200)]
             public Bucket Remove(int index)
             {
                 var newLeyValues = new KeyValue[KeyValues.Length - 1];

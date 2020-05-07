@@ -18,7 +18,7 @@
         /// </summary>
         /// <param name="configurationFactory">The configuration factory.</param>
         /// <returns>The configuration instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IConfiguration Create([NotNull] Func<IContainer, IToken> configurationFactory) =>
             new ConfigurationFromDelegate(configurationFactory ?? throw new ArgumentNullException(nameof(configurationFactory)));
@@ -29,7 +29,7 @@
         /// <param name="disposableToken">A disposable resource.</param>
         /// <param name="container">The target container.</param>
         /// <returns></returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken AsTokenOf([NotNull] this IDisposable disposableToken, [NotNull] IMutableContainer container) =>
             new Token(container ?? throw new ArgumentNullException(nameof(container)), disposableToken ?? throw new ArgumentNullException(nameof(disposableToken)));
@@ -40,7 +40,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="configurationText">The text configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params string[] configurationText)
         {
@@ -56,7 +56,7 @@
         /// <param name="token">The target container token.</param>
         /// <param name="configurationText">The text configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params string[] configurationText) =>
             (token ?? throw new ArgumentNullException(nameof(token))).Container.Apply(configurationText);
@@ -67,7 +67,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="configurationStreams">The set of streams with text configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params Stream[] configurationStreams)
         {
@@ -83,7 +83,7 @@
         /// <param name="token">The target container token.</param>
         /// <param name="configurationStreams">The set of streams with text configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params Stream[] configurationStreams) =>
             (token ?? throw new ArgumentNullException(nameof(token))).Container.Apply(configurationStreams);
@@ -94,7 +94,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="configurationReaders">The set of text readers with text configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params TextReader[] configurationReaders)
         {
@@ -110,7 +110,7 @@
         /// <param name="token">The target container token.</param>
         /// <param name="configurationReaders">The set of text readers with text configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params TextReader[] configurationReaders) =>
             (token ?? throw new ArgumentNullException(nameof(token))).Container.Apply(configurationReaders);
@@ -121,7 +121,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations)
         {
@@ -136,7 +136,7 @@
         /// <param name="token">The target container token.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] IEnumerable<IConfiguration> configurations) =>
             (token ?? throw new ArgumentNullException(nameof(token))).Container.Apply(configurations);
@@ -147,7 +147,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
@@ -163,7 +163,7 @@
         /// <param name="token">The target container token.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply([NotNull] this IToken token, [NotNull] [ItemNotNull] params IConfiguration[] configurations) =>
             (token ?? throw new ArgumentNullException(nameof(token))).Container.Apply(configurations);
@@ -174,7 +174,7 @@
         /// <typeparam name="T">The type of configuration.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The target container token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply<T>([NotNull] this IMutableContainer container)
             where T : IConfiguration, new() =>
@@ -186,7 +186,7 @@
         /// <typeparam name="T">The type of configuration.</typeparam>
         /// <param name="token">The target container token.</param>
         /// <returns>The target container token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Apply<T>([NotNull] this IToken token)
             where T : IConfiguration, new() =>
@@ -198,7 +198,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The target container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IMutableContainer Using([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
@@ -215,7 +215,7 @@
         /// <param name="token">The target container token.</param>
         /// <param name="configurations">The configurations.</param>
         /// <returns>The target container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IMutableContainer Using([NotNull] this IToken token, [NotNull] [ItemNotNull] params IConfiguration[] configurations)
         {
@@ -229,7 +229,7 @@
         /// <typeparam name="T">The type of configuration.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The target container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IMutableContainer Using<T>([NotNull] this IMutableContainer container)
             where T : IConfiguration, new()
@@ -244,7 +244,7 @@
         /// <typeparam name="T">The type of configuration.</typeparam>
         /// <param name="token">The target container token.</param>
         /// <returns>The target container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IMutableContainer Using<T>([NotNull] this IToken token)
             where T : IConfiguration, new()
@@ -253,7 +253,7 @@
             return token.Container.Using<T>();
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         private static IToken ApplyConfigurationFromData<T>([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params T[] configurationData)
         {

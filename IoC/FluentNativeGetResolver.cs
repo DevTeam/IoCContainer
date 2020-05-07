@@ -18,7 +18,7 @@ namespace IoC
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The resolver.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container)
         {
@@ -26,7 +26,7 @@ namespace IoC
             for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket[index];
-                if (typeof(T) == item.Key)
+                if (ReferenceEquals(typeof(T), item.Key))
                 {
                     return (Resolver<T>)item.Value;
                 }
@@ -42,7 +42,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="tag">The tag.</param>
         /// <returns>The resolver.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, Tag tag)
         {
@@ -51,7 +51,7 @@ namespace IoC
             for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket[index];
-                if (CoreExtensions.Equals(key, item.Key))
+                if (key.Equals(item.Key))
                 {
                     return (Resolver<T>)item.Value;
                 }
@@ -67,7 +67,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="type">The resolving instance type.</param>
         /// <returns>The resolver.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type)
         {
@@ -75,7 +75,7 @@ namespace IoC
             for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket[index];
-                if (type == item.Key)
+                if (ReferenceEquals(type, item.Key))
                 {
                     return (Resolver<T>) item.Value;
                 }
@@ -92,7 +92,7 @@ namespace IoC
         /// <param name="type">The resolving instance type.</param>
         /// <param name="tag">The tag.</param>
         /// <returns>The resolver.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type, Tag tag)
         {
@@ -101,7 +101,7 @@ namespace IoC
             for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket[index];
-                if (CoreExtensions.Equals(key, item.Key))
+                if (key.Equals(item.Key))
                 {
                     return (Resolver<T>)item.Value;
                 }

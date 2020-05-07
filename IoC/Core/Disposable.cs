@@ -12,7 +12,7 @@ namespace IoC.Core
         [NotNull]
         public static readonly IDisposable Empty = EmptyDisposable.Shared;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IDisposable Create([NotNull] Action action)
         {
@@ -22,7 +22,7 @@ namespace IoC.Core
             return new DisposableAction(action);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IDisposable Create([NotNull][ItemCanBeNull] IEnumerable<IDisposable> disposables)
         {
@@ -33,7 +33,7 @@ namespace IoC.Core
         }
 
 #if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static IDisposable ToDisposable([NotNull] this IAsyncDisposable asyncDisposable)
         {
 #if DEBUG

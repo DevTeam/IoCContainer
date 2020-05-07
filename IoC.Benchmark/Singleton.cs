@@ -42,7 +42,7 @@ namespace IoC.Benchmark
         private readonly object LockObject = new object();
         private  volatile Service1 _service1;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private IServiceRoot NewInstance()
         {
             if (_service1 == null)

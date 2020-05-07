@@ -29,7 +29,7 @@ var args = String.Join(", ", range.Select(i => $"typeof(T{i})"));
 <#}#>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, <#=types#>>([NotNull] this IMutableContainer container)
             where T: <#=types#>
@@ -48,7 +48,7 @@ var args = String.Join(", ", range.Select(i => $"typeof(T{i})"));
 <#}#>
         /// <param name="binding">The target binding.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, <#=types#>>([NotNull] this IBinding binding)
             where T: <#=types#>
@@ -66,7 +66,7 @@ var args = String.Join(", ", range.Select(i => $"typeof(T{i})"));
 <#}#>
         /// <param name="token">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T, <#=types#>>([NotNull] this IToken token)
             where T: <#=types#>

@@ -43,9 +43,14 @@ namespace IoC.Benchmark
             }
         }
 
+        public override void LightInject()
+        {
+            throw new NotSupportedException();
+        }
+
         private static readonly Func<IService3> Service3Factory = () => new Service3();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private static IServiceRoot NewInstance() =>
             new ServiceRoot(new Service1(new Service2Array(new IService3[] { new Service3(), new Service3v2(), new Service3v3(), new Service3v4() })), new Service2Func(Service3Factory), new Service2Array(new IService3[] { new Service3(), new Service3v2(), new Service3v3(), new Service3v4() }), new Service2Array(new IService3[] { new Service3(), new Service3v2(), new Service3v3(), new Service3v4() }), new Service3());
     }

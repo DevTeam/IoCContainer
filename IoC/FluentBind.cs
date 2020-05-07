@@ -1,7 +1,7 @@
 ﻿namespace IoC
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Linq.Expressions;
@@ -20,7 +20,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="types"></param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<object> Bind([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params Type[] types)
         {
@@ -36,7 +36,7 @@
         /// <param name="token">The container binding token.</param>
         /// <param name="types"></param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<object> Bind([NotNull] this IToken token, [NotNull] [ItemNotNull] params Type[] types)
         {
@@ -52,7 +52,7 @@
         /// <typeparam name="T">The contract type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T>([NotNull] this IMutableContainer container)
         {
@@ -66,7 +66,7 @@
         /// <typeparam name="T">The contract type.</typeparam>
         /// <param name="token">The container binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T>([NotNull] this IToken token)
         {
@@ -80,7 +80,7 @@
         /// <typeparam name="T">The contract type.</typeparam>
         /// <param name="binding"></param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Bind<T>([NotNull] this IBinding binding)
         {
@@ -95,7 +95,7 @@
         /// <param name="binding"></param>
         /// <param name="lifetime"></param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> As<T>([NotNull] this IBinding<T> binding, Lifetime lifetime)
         {
@@ -110,7 +110,7 @@
         /// <param name="binding"></param>
         /// <param name="lifetime"></param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Lifetime<T>([NotNull] this IBinding<T> binding, [NotNull] ILifetime lifetime)
         {
@@ -126,7 +126,7 @@
         /// <param name="binding"></param>
         /// <param name="autowiringStrategy"></param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Autowiring<T>([NotNull] this IBinding<T> binding, [NotNull] IAutowiringStrategy autowiringStrategy)
         {
@@ -142,7 +142,7 @@
         /// <param name="binding"></param>
         /// <param name="tagValue"></param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> Tag<T>([NotNull] this IBinding<T> binding, [CanBeNull] object tagValue = null)
         {
@@ -156,7 +156,7 @@
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="binding">The binding token.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IBinding<T> AnyTag<T>([NotNull] this IBinding<T> binding)
         {
@@ -171,7 +171,7 @@
         /// <param name="type">The instance type.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken To(
             [NotNull] this IBinding<object> binding,
@@ -180,7 +180,7 @@
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return CreateDependencyToken(binding, CreateDependency(binding, new FullAutowiringDependency(type, binding.AutowiringStrategy, statements)));
+            return binding.To(new FullAutowiringDependency(type, binding.AutowiringStrategy, statements));
         }
 
         /// <summary>
@@ -190,7 +190,7 @@
         /// <param name="binding">The binding token.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken To<T>(
             [NotNull] this IBinding<T> binding,
@@ -198,7 +198,7 @@
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return CreateDependencyToken(binding, CreateDependency(binding, new FullAutowiringDependency(typeof(T), binding.AutowiringStrategy, statements)));
+            return binding.To(new FullAutowiringDependency(typeof(T), binding.AutowiringStrategy, statements));
         }
 
         /// <summary>
@@ -209,7 +209,7 @@
         /// <param name="factory">The expression to create an instance.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
         /// <returns>The dependency token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken To<T>(
             [NotNull] this IBinding<T> binding,
@@ -218,33 +218,36 @@
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return CreateDependencyToken(binding, CreateDependency(binding, new AutowiringDependency(factory, binding.AutowiringStrategy, statements)));
+            return binding.To(new AutowiringDependency(factory, binding.AutowiringStrategy, statements));
         }
 
+        /// <summary>
+        /// Registers autowiring binding.
+        /// </summary>
+        /// <typeparam name="T">The instance type.</typeparam>
+        /// <param name="binding">The binding token.</param>
+        /// <param name="dependency">The dependency.</param>
+        /// <returns>The dependency token.</returns>
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
-        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        private static IDisposable CreateDependency<T>([NotNull] this IBinding<T> binding, [NotNull] IDependency dependency)
+        public static IToken To<T>(
+            [NotNull] this IBinding<T> binding,
+            [NotNull] IDependency dependency)
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             if (dependency == null) throw new ArgumentNullException(nameof(dependency));
-
             var tags = binding.Tags.DefaultIfEmpty(null);
-            var keys =
+            var keys = (
                 from type in binding.Types
                 from tag in tags
-                select new Key(type, tag);
+                select new Key(type, tag))
+                .ToArray();
 
-            return binding.Container.TryRegisterDependency(keys, dependency, binding.Lifetime, out var dependencyToken)
+            var token = (binding.Container.TryRegisterDependency(keys, dependency, binding.Lifetime, out var dependencyToken)
                 ? dependencyToken
-                : binding.Container.Resolve<ICannotRegister>().Resolve(binding.Container, keys.ToArray());
-        }
+                : binding.Container.Resolve<ICannotRegister>().Resolve(binding.Container, keys.ToArray())).AsTokenOf(binding.Container);
 
-        [MethodImpl((MethodImplOptions)256)]
-        [NotNull]
-        private static IToken CreateDependencyToken<T>(IBinding<T> binding, IDisposable dependency)
-        {
-            var tokens = binding.Tokens.ToList();
-            tokens.Add(dependency.AsTokenOf(binding.Container));
+            var tokens = new List<IToken>(binding.Tokens) { token };
             return Disposable.Create(tokens).AsTokenOf(binding.Container);
         }
     }

@@ -404,6 +404,25 @@
             }
         }
 
+        [Fact]
+        public void ContainerShouldResolveWhenArray()
+        {
+            // Given
+            using var container = Container.Create();
+            
+            // When
+            using (container.Bind<IMyService>().As(Lifetime.Singleton).To(ctx => Mock.Of<IMyService>()))
+            using (container.Bind<IMyService>().Tag(2).To(ctx => Mock.Of<IMyService>()))
+            {
+                // Then
+                var instance = container.Resolve<IMyService[]>();
+                var instance2 = container.Resolve<IMyService[]>();
+                instance.Length.ShouldBe(2);
+                instance2.Length.ShouldBe(2);
+                instance.Intersect(instance2).Count().ShouldBe(1);
+            }
+        }
+
 #if !NET40
         [Fact]
         public async Task ContainerShouldResolveTask()

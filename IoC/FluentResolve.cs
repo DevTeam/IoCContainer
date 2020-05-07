@@ -18,7 +18,7 @@
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container)
         {
@@ -32,7 +32,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, [NotNull][ItemCanBeNull] params object[] args) 
             => container.GetResolver<T>()(container, args);
@@ -44,7 +44,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="tag">The tag.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, Tag tag)
             => container.GetResolver<T>(tag)(container, EmptyArgs);
@@ -57,7 +57,7 @@
         /// <param name="tag">The tag.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, Tag tag, [NotNull][ItemCanBeNull] params object[] args)
             => container.GetResolver<T>(tag)(container, args);
@@ -69,7 +69,7 @@
         /// <param name="container">The target container.</param>
         /// <param name="type">The resolving instance type.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, [NotNull] Type type)
             => container.GetResolver<T>(type)(container, EmptyArgs);
@@ -82,7 +82,7 @@
         /// <param name="type">The resolving instance type.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, [NotNull] Type type, [NotNull][ItemCanBeNull] params object[] args) 
             => container.GetResolver<T>(type)(container, args);
@@ -95,7 +95,7 @@
         /// <param name="type">The resolving instance type.</param>
         /// <param name="tag">The tag.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag)
             => container.GetResolver<T>(type, tag)(container, EmptyArgs);
@@ -109,7 +109,7 @@
         /// <param name="tag">The tag.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this IContainer container, [NotNull] Type type, Tag tag, [NotNull][ItemCanBeNull] params object[] args)
             => container.GetResolver<T>(type, tag)(container, args);

@@ -9,13 +9,13 @@ namespace IoC.Features
     using System.Collections.ObjectModel;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Linq.Expressions;
+    using System.Runtime.CompilerServices;
     // ReSharper disable once RedundantUsingDirective
     using System.Threading;
     // ReSharper disable once RedundantUsingDirective
     using System.Threading.Tasks;
     using Core;
-    using Lifetimes;
-
 
     /// <summary>
     /// Allows to resolve enumeration of all instances related to corresponding bindings.
@@ -32,72 +32,87 @@ namespace IoC.Features
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register(ctx => new Resolvers<TT>(ctx.Container), new ContainerStateSingletonLifetime<object>(false));
-
-            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx, ctx.Container.Resolve<Resolvers<TT>>().Items), new ContainerStateSingletonLifetime<object>(false));
-            yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => CreateList(ctx.Container.Resolve<Resolvers<TT>>().Items, ctx), new ContainerStateSingletonLifetime<object>(false));
-            yield return container.Register(ctx => CreateArray(ctx.Container.Resolve<Resolvers<TT>>().Items, ctx), new ContainerStateSingletonLifetime<object>(false));
-            yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => CreateHashSet(ctx.Container.Resolve<Resolvers<TT>>().Items, ctx), new ContainerStateSingletonLifetime<object>(false));
-            yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Resolve<Resolvers<TT>>().Items, ctx), new ContainerStateSingletonLifetime<object>(false));
+            yield return container.Register(new[] { typeof(IEnumerable<TT>) }, new EnumerableDependency());
+            yield return container.Register(new[] { typeof(TT[]) }, new ArrayDependency());
+            yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => new List<TT>(ctx.Container.Inject<TT[]>()));
+            yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => new HashSet<TT>(ctx.Container.Inject<TT[]>()));
+            yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
 #if !NET40
-            yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<List<TT>>()), new ContainerStateSingletonLifetime<object>(false));
+            yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<TT[]>()));
 #endif
 #if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx.Container.Inject<IEnumerable<TT>>()), new ContainerStateSingletonLifetime<object>(false));
+            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
 #endif
         }
 
-        private static List<T> CreateList<T>(Resolver<T>[] resolvers, Context ctx)
+        [MethodImpl((MethodImplOptions)0x200)]
+        private static IEnumerable<Key> GetKeys(IContainer container, Type type)
         {
-            var result = new List<T>(resolvers.Length);
-            for (var i = 0; i < resolvers.Length; i++)
+            var targetType = type.Descriptor();
+            var isConstructedGenericType = targetType.IsConstructedGenericType();
+            var genericTargetType = default(TypeDescriptor);
+            Type[] genericTypeArguments = null;
+            if (isConstructedGenericType)
             {
-                result.Add(resolvers[i](ctx.Container, ctx.Args));
+                genericTargetType = targetType.GetGenericTypeDefinition().Descriptor();
+                genericTypeArguments = targetType.GetGenericTypeArguments();
             }
 
-            return result;
+            foreach (var keyGroup in container)
+            {
+                foreach (var key in keyGroup)
+                {
+                    Type typeToResolve = null;
+                    var registeredType = key.Type.Descriptor();
+                    if (registeredType.IsGenericTypeDefinition())
+                    {
+                        if (isConstructedGenericType && genericTargetType.IsAssignableFrom(registeredType))
+                        {
+                            typeToResolve = registeredType.MakeGenericType(genericTypeArguments);
+                        }
+                    }
+                    else
+                    {
+                        if (targetType.IsAssignableFrom(registeredType))
+                        {
+                            typeToResolve = key.Type;
+                        }
+                    }
+
+                    if (typeToResolve == null)
+                    {
+                        continue;
+                    }
+
+                    var tag = key.Tag;
+                    if (tag == null || ReferenceEquals(tag, Key.AnyTag))
+                    {
+                        yield return new Key(typeToResolve);
+                    }
+                    else
+                    {
+                        yield return new Key(typeToResolve, tag);
+                    }
+
+                    break;
+                }
+            }
         }
 
-        private static T[] CreateArray<T>(Resolver<T>[] resolvers, Context ctx)
+        private sealed class Observable<T>: IObservable<T>
         {
-            var result = new T[resolvers.Length];
-            for (var i = 0; i < resolvers.Length; i++)
-            {
-                result[i] = resolvers[i](ctx.Container, ctx.Args);
-            }
+            private readonly IEnumerable<T> _instances;
 
-            return result;
-        }
+            public Observable(IEnumerable<T> instances) => _instances = instances;
 
-        private static HashSet<T> CreateHashSet<T>(Resolver<T>[] resolvers, Context ctx)
-        {
-            var result = new HashSet<T>();
-            for (var i = 0; i < resolvers.Length; i++)
-            {
-                result.Add(resolvers[i](ctx.Container, ctx.Args));
-            }
-
-            return result;
-        }
-
-        internal sealed class Observable<T>: IObservable<T>
-        {
-            private readonly Resolver<T>[] _resolvers;
-            private readonly Context _ctx;
-
-            public Observable(Resolver<T>[] resolvers, Context ctx)
-            {
-                _resolvers = resolvers;
-                _ctx = ctx;
-            }
-
+            [MethodImpl((MethodImplOptions)0x200)]
             public IDisposable Subscribe(IObserver<T> observer)
             {
                 try
                 {
-                    for (var i = 0; i < _resolvers.Length; i++)
+                    foreach(var instance in _instances)
                     {
-                        observer.OnNext(_resolvers[i](_ctx.Container, _ctx.Args));
+                        observer.OnNext(instance);
                     }
                 }
                 catch (Exception error)
@@ -110,76 +125,15 @@ namespace IoC.Features
             }
         }
 
-        private sealed class Enumeration<T> : IEnumerable<T>
-        {
-            private readonly Context _context;
-            private readonly Resolver<T>[] _resolvers;
-
-            public Enumeration([NotNull] Context context, [NotNull] Resolver<T>[] resolvers)
-            {
-                _context = context;
-                _resolvers = resolvers;
-            }
-
-            [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
-            public IEnumerator<T> GetEnumerator() => new Enumerator<T>(_context, _resolvers);
-
-            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-        }
-
-        private sealed class Enumerator<T>: IEnumerator<T>
-        {
-            private readonly Context _context;
-            private readonly Resolver<T>[] _resolvers;
-            private readonly int _length;
-            private int _index = -1;
-            private bool _hasCurrent;
-            private T _current;
-
-            public Enumerator([NotNull] Context context, [NotNull] Resolver<T>[] resolvers)
-            {
-                _context = context;
-                _resolvers = resolvers;
-                _length = resolvers.Length;
-            }
-
-            public bool MoveNext()
-            {
-                _hasCurrent = false;
-                _current = default(T);
-                return ++_index < _length;
-            }
-
-            public T Current
-            {
-                get
-                {
-                    if (!_hasCurrent)
-                    {
-                        _hasCurrent = true;
-                        _current = _resolvers[_index](_context.Container, _context.Args);
-                    }
-
-                    return _current;
-                }
-            }
-
-            object IEnumerator.Current => Current;
-
-            public void Dispose() { }
-
-            public void Reset() => _index = -1;
-        }
-
 #if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
         private sealed class AsyncEnumeration<T> : IAsyncEnumerable<T>
         {
-            private readonly IEnumerable<T> _enumerable;
+            private readonly IEnumerable<T> _instances;
 
-            public AsyncEnumeration(IEnumerable<T> enumerable) => _enumerable = enumerable;
+            public AsyncEnumeration(IEnumerable<T> instances) => _instances = instances;
 
             public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken()) => 
-                new AsyncEnumerator<T>(_enumerable.GetEnumerator());
+                new AsyncEnumerator<T>(_instances.GetEnumerator());
         }
 
         private sealed class AsyncEnumerator<T> : IAsyncEnumerator<T>
@@ -197,66 +151,142 @@ namespace IoC.Features
             public ValueTask DisposeAsync() => new ValueTask();
         }
 #endif
-        private class Resolvers<T>
-        {
-            public readonly Resolver<T>[] Items;
 
-            public Resolvers(IContainer container)
+        private class EnumerableDependency : IDependency
+        {
+            public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
             {
-                Items = GetResolvers(container).ToArray();
+                var type = buildContext.Key.Type.Descriptor();
+                if (!type.IsConstructedGenericType())
+                {
+                    throw new BuildExpressionException($"Unsupported enumerable type {type}.", null);
+                }
+
+                var genericTypeArguments = type.GetGenericTypeArguments();
+                if (genericTypeArguments.Length != 1)
+                {
+                    throw new BuildExpressionException($"Unsupported enumerable type {type}.", null);
+                }
+
+                var elementType = genericTypeArguments[0];
+                var keys = GetKeys(buildContext.Container, elementType).ToArray();
+                var cases = new SwitchCase[keys.Length];
+                for (var i = 0; i < keys.Length; i++)
+                {
+                    var context = buildContext.CreateChild(keys[i], buildContext.Container);
+                    cases[i] = Expression.SwitchCase(Expression.Convert(context.GetDependencyExpression(), elementType), Expression.Constant(i));
+                }
+
+                var positionVar = Expression.Variable(typeof(int));
+                var switchExpression = Expression.Switch(
+                    positionVar,
+                    Expression.Block(
+                        Expression.Throw(Expression.Constant(new BuildExpressionException("Invalid enumeration state.", null))),
+                        Expression.Default(elementType)),
+                    cases);
+
+                var factory = Expression.Lambda(switchExpression, positionVar, buildContext.ContainerParameter, buildContext.ArgsParameter).Compile();
+                var ctor = typeof(Enumerable<>).Descriptor().MakeGenericType(elementType).Descriptor().GetDeclaredConstructors().Single();
+                var enumerableExpression = Expression.New(ctor, Expression.Constant(factory), Expression.Constant(cases.Length), buildContext.ContainerParameter, buildContext.ArgsParameter);
+                expression = buildContext.ReplaceTypes(buildContext.AddLifetime(enumerableExpression, lifetime));
+                error = default(Exception);
+                return true;
+            }
+        }
+
+        private sealed class Enumerable<T> : IEnumerable<T>
+        {
+            private readonly Func<int, IContainer, object[], T> _factory;
+            private readonly int _count;
+            private readonly IContainer _container;
+            private readonly object[] _args;
+
+            public Enumerable([NotNull] Func<int, IContainer, object[], T> factory, int count, IContainer container, object[] args)
+            {
+                _factory = factory;
+                _count = count;
+                _container = container;
+                _args = args;
             }
 
-            private static IEnumerable<Resolver<T>> GetResolvers(IContainer container)
+            [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
+            public IEnumerator<T> GetEnumerator() => new Enumerator<T>(_factory, _count, _container, _args);
+
+            IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+        }
+
+        private sealed class Enumerator<T> : IEnumerator<T>
+        {
+            private readonly Func<int, IContainer, object[], T> _factory;
+            private readonly int _count;
+            private readonly IContainer _container;
+            private readonly object[] _args;
+            private int _index = -1;
+            private bool _hasCurrent;
+            private T _current;
+
+            public Enumerator([NotNull] Func<int, IContainer, object[], T> factory, int count, IContainer container, object[] args)
             {
-                var targetType = TypeDescriptorExtensions.Descriptor<T>();
-                var isConstructedGenericType = targetType.IsConstructedGenericType();
-                var genericTargetType = default(TypeDescriptor);
-                Type[] genericTypeArguments = null;
-                if (isConstructedGenericType)
-                {
-                    genericTargetType = targetType.GetGenericTypeDefinition().Descriptor();
-                    genericTypeArguments = targetType.GetGenericTypeArguments();
-                }
+                _factory = factory;
+                _count = count;
+                _container = container;
+                _args = args;
+            }
 
-                foreach (var keyGroup in container)
+            [MethodImpl((MethodImplOptions)0x200)]
+            public bool MoveNext()
+            {
+                _hasCurrent = false;
+                _current = default(T);
+                return ++_index < _count;
+            }
+
+            public T Current
+            {
+                [MethodImpl((MethodImplOptions)0x200)]
+                get
                 {
-                    foreach (var key in keyGroup)
+                    if (!_hasCurrent)
                     {
-                        Type typeToResolve = null;
-                        var registeredType = key.Type.Descriptor();
-                        if (registeredType.IsGenericTypeDefinition())
-                        {
-                            if (isConstructedGenericType && genericTargetType.IsAssignableFrom(registeredType))
-                            {
-                                typeToResolve = registeredType.MakeGenericType(genericTypeArguments);
-                            }
-                        }
-                        else
-                        {
-                            if (targetType.IsAssignableFrom(registeredType))
-                            {
-                                typeToResolve = key.Type;
-                            }
-                        }
-
-                        if (typeToResolve == null)
-                        {
-                            continue;
-                        }
-
-                        var tag = key.Tag;
-                        if (tag == null || ReferenceEquals(tag, Key.AnyTag))
-                        {
-                            yield return container.GetResolver<T>(typeToResolve);
-                        }
-                        else
-                        {
-                            yield return container.GetResolver<T>(typeToResolve, tag.AsTag());
-                        }
-
-                        break;
+                        _hasCurrent = true;
+                        _current = _factory(_index, _container, _args);
                     }
+
+                    return _current;
                 }
+            }
+
+            object IEnumerator.Current => Current;
+
+            public void Dispose() { }
+
+            public void Reset() => _index = -1;
+        }
+
+
+        private class ArrayDependency: IDependency
+        {
+            public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
+            {
+                var type = buildContext.Key.Type.Descriptor();
+                var elementType = type.GetElementType();
+                if (elementType == null)
+                {
+                    throw new BuildExpressionException($"Unsupported array type {type}.", null);
+                }
+
+                var keys = GetKeys(buildContext.Container, elementType).ToArray();
+                var expressions = new Expression[keys.Length];
+                for (var i = 0; i < keys.Length; i++)
+                {
+                    var context = buildContext.CreateChild(keys[i], buildContext.Container);
+                    expressions[i] = context.GetDependencyExpression();
+                }
+
+                var arrayExpression = Expression.NewArrayInit(elementType, expressions);
+                expression = buildContext.ReplaceTypes(buildContext.AddLifetime(arrayExpression, lifetime));
+                error = default(Exception);
+                return true;
             }
         }
     }

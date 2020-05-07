@@ -69,7 +69,7 @@
             Tokens = binding.Tokens;
             Types = binding.Types;
             Lifetime = binding.Lifetime;
-            Tags = binding.Tags.Concat(Enumerable.Repeat(tagValue, 1));
+            Tags = new List<object>(binding.Tags) { tagValue};
             AutowiringStrategy = binding.AutowiringStrategy;
         }
 

@@ -13,7 +13,7 @@
         /// </summary>
         /// <param name="container">A container to resolve a scope.</param>
         /// <returns>Tne new scope instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IScope CreateScope([NotNull] this IContainer container) =>
             (container ?? throw new ArgumentNullException(nameof(container))).Resolve<IScope>();

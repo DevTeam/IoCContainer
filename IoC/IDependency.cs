@@ -14,9 +14,9 @@
         /// </summary>
         /// <param name="buildContext">The build context.</param>
         /// <param name="lifetime">The target lifetime.</param>
-        /// <param name="baseExpression">The resulting expression for the current dependency.</param>
+        /// <param name="expression">The resulting expression for the current dependency.</param>
         /// <param name="error">The error if something goes wrong.</param>
         /// <returns><c>True</c> if successful and an expression was provided.</returns>
-        bool TryBuildExpression([NotNull] IBuildContext buildContext, [CanBeNull] ILifetime lifetime, out Expression baseExpression, out Exception error);
+        bool TryBuildExpression([NotNull] IBuildContext buildContext, [CanBeNull] ILifetime lifetime, out Expression expression, out Exception error);
     }
 }

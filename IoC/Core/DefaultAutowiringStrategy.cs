@@ -28,7 +28,7 @@
             return true;
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private static int GetOrder(MethodBase method)
         {
             var order = method.GetParameters().Length + 1;

@@ -26,7 +26,7 @@ namespace IoC.Core
         /// <param name="lifetime">The target lifetime.</param>
         /// <param name="tags">The tags.</param>
         /// <returns>The registration token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [IoC.NotNull]
         public static IToken Register<T>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
             => container.Register(new[] { typeof(T)}, new FullAutowiringDependency(typeof(T)), lifetime, tags);
@@ -41,7 +41,7 @@ namespace IoC.Core
         /// <param name="tags">The tags.</param>
         /// <param name="statements">The set of expressions to initialize an instance.</param>
         /// <returns>The registration token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [IoC.NotNull]
         public static IToken Register<T>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             => container.Register(new[] { typeof(T) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
@@ -57,7 +57,7 @@ namespace IoC.Core
         /// <returns>The registration token.</returns>
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         [IoC.NotNull]
-        public static IToken Register([NotNull] this IMutableContainer container, [NotNull][ItemNotNull] IEnumerable<Type> types, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime = null, [CanBeNull][ItemCanBeNull] params object[] tags)
+        public static IToken Register([NotNull] this IMutableContainer container, [NotNull][ItemNotNull] IEnumerable<Type> types, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime = null, [CanBeNull][ItemCanBeNull] object[] tags = null)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (types == null) throw new ArgumentNullException(nameof(types));

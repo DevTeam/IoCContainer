@@ -98,7 +98,7 @@
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression baseExpression, out Exception error)
+        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
             try
@@ -152,7 +152,7 @@
                     }
                 }
 
-                baseExpression = Autowiring.ApplyInitializers(
+                expression = Autowiring.ApplyInitializers(
                     buildContext,
                     autoWiringStrategy,
                     typeDescriptor,
@@ -160,14 +160,14 @@
                     Expression.New(ctor.Info, ctor.GetParametersExpressions(buildContext)),
                     _statements);
 
-                baseExpression = buildContext.AddLifetime(baseExpression, lifetime);
+                expression = buildContext.AddLifetime(expression, lifetime);
                 error = default(Exception);
                 return true;
             }
             catch (BuildExpressionException ex)
             {
                 error = ex;
-                baseExpression = default(Expression);
+                expression = default(Expression);
                 return false;
             }
         }

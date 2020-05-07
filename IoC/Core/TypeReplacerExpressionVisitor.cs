@@ -198,7 +198,7 @@
             return true;
         }
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private Type[] ReplaceTypes(Type[] types)
         {
             for (var i = 0; i < types.Length; i++)
@@ -238,7 +238,7 @@
             return type;
         }
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         private IEnumerable<Expression> ReplaceAll(IEnumerable<Expression> expressions) => 
             expressions.Select(Visit);
     }

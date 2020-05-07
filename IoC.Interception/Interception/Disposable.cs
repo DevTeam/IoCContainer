@@ -6,7 +6,7 @@
 
     internal static class Disposable
     {
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IDisposable Create([NotNull] Action action)
         {

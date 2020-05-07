@@ -16,7 +16,7 @@
         /// <param name="parentContainer">The parent container.</param>
         /// <param name="name">The name of child container.</param>
         /// <returns>The child container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IMutableContainer Create([NotNull] this IContainer parentContainer, [NotNull] string name = "")
         {
@@ -31,7 +31,7 @@
         /// <param name="token">The parent container token.</param>
         /// <param name="name">The name of child container.</param>
         /// <returns>The child container.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IMutableContainer Create([NotNull] this IToken token, [NotNull] string name = "")
         {
@@ -47,7 +47,7 @@
         /// <param name="args">The optional arguments.</param>
         /// <typeparam name="TInstance">The instance type.</typeparam>
         /// <returns>The disposable instance holder.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IConfiguration configuration, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class
@@ -61,7 +61,7 @@
         /// <param name="token">The target container token.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class =>
@@ -76,6 +76,7 @@
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>
         [NotNull]
+        [MethodImpl((MethodImplOptions)0x200)]
         public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IMutableContainer container, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class
         {

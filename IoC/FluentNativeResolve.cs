@@ -20,7 +20,7 @@ namespace IoC
         /// <typeparam name="T">The instance type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
@@ -28,7 +28,7 @@ namespace IoC
             for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket[index];
-                if (typeof(T) == item.Key)
+                if (ReferenceEquals(typeof(T), item.Key))
                 {
                     return ((Resolver<T>)item.Value)(container, EmptyArgs);
                 }
@@ -48,7 +48,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="tag">The tag.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, Tag tag) =>
             container.GetResolver<T>(tag)(container, EmptyArgs);
@@ -60,7 +60,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] [ItemCanBeNull] params object[] args) =>
             container.GetResolver<T>()(container, args);
@@ -73,7 +73,7 @@ namespace IoC
         /// <param name="tag">The tag.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, Tag tag, [NotNull] [ItemCanBeNull] params object[] args) =>
             container.GetResolver<T>(tag)(container, args);
@@ -85,7 +85,7 @@ namespace IoC
         /// <param name="container">The target container.</param>
         /// <param name="type">The resolving instance type.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type) =>
             container.GetResolver<T>(type)(container, EmptyArgs);
@@ -98,7 +98,7 @@ namespace IoC
         /// <param name="type">The resolving instance type.</param>
         /// <param name="tag">The tag.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag) =>
             container.GetResolver<T>(type, tag)(container, EmptyArgs);
@@ -111,7 +111,7 @@ namespace IoC
         /// <param name="type">The resolving instance type.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, [NotNull] [ItemCanBeNull] params object[] args) =>
             container.GetResolver<T>(type)(container, args);
@@ -125,7 +125,7 @@ namespace IoC
         /// <param name="tag">The tag.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The instance.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container, [NotNull] Type type, Tag tag, [NotNull] [ItemCanBeNull] params object[] args) =>
             container.GetResolver<T>(type, tag)(container, args);

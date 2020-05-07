@@ -2,6 +2,7 @@
 {
     using System;
     using System.Diagnostics;
+    using System.Runtime.CompilerServices;
     using Core;
 
     /// <summary>
@@ -9,7 +10,7 @@
     /// </summary>
     [PublicAPI]
     [DebuggerDisplay("Type = {" + nameof(Type) + "}, Tag = {" + nameof(Tag) + "}")]
-    public struct Key: IEquatable<Key>
+    public struct Key
     {
         /// <summary>
         /// The marker object for any tag.
@@ -44,14 +45,17 @@
         /// <inheritdoc />
         [Pure]
         // ReSharper disable once PossibleNullReferenceException
-        public override bool Equals(object obj) => CoreExtensions.Equals(this, (Key)obj);
+        [MethodImpl((MethodImplOptions)0x200)]
+        public override bool Equals(object obj) => this.Equals((Key)obj);
 
         /// <inheritdoc />
         [Pure]
-        public bool Equals(Key other) => CoreExtensions.Equals(this, other);
+        [MethodImpl((MethodImplOptions)0x100)]
+        public bool Equals(Key other) => ReferenceEquals(Type, other.Type) && (ReferenceEquals(Tag, other.Tag) || Equals(Tag, other.Tag));
 
         /// <inheritdoc />
         [Pure]
+        [MethodImpl((MethodImplOptions)0x200)]
         public override int GetHashCode()
         {
             unchecked

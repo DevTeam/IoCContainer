@@ -6,11 +6,11 @@ namespace IoC.Core
 
     internal static class CoreExtensions
     {
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static bool SequenceEqual<T>([NotNull] this T[] array1, [NotNull] T[] array2) =>
             ((System.Collections.IStructuralEquatable)array1).Equals(array2, System.Collections.StructuralComparisons.StructuralEqualityComparer);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         public static int GetHash<T>([NotNull][ItemNotNull] this T[] items)
         {
             unchecked
@@ -27,10 +27,10 @@ namespace IoC.Core
             }
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         public static T[] EmptyArray<T>() => Empty<T>.Array;
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         public static T[] CreateArray<T>(int size = 0, T value = default(T))
         {
             if (size == 0)
@@ -52,7 +52,7 @@ namespace IoC.Core
             return array;
         }
 
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [Pure]
         [NotNull]
         public static T[] Add<T>([NotNull] this T[] source, [CanBeNull] T value)
@@ -70,7 +70,7 @@ namespace IoC.Core
         }
 
         [Pure]
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         public static T[] Copy<T>([NotNull] this T[] previous)
         {
             var length = previous.Length;
@@ -78,17 +78,6 @@ namespace IoC.Core
             Array.Copy(previous, result, length);
             return result;
         }
-
-        [Pure]
-        [MethodImpl((MethodImplOptions)256)]
-        public static bool Equals(this Key that, Key other) =>
-#if NETSTANDARD1_0 || NETSTANDARD1_2 || NETSTANDARD1_3 || NETSTANDARD1_4 || NETSTANDARD1_5
-            ReferenceEquals(that.Type, other.Type)
-#else
-            that.Type == other.Type
-#endif
-            && (ReferenceEquals(that.Tag, other.Tag) || Equals(that.Tag, other.Tag));
-
 
         private static class Empty<T>
         {

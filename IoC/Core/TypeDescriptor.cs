@@ -18,123 +18,123 @@ namespace IoC.Core
         public TypeDescriptor([NotNull] Type type) =>
             Type = type ?? throw new ArgumentNullException(nameof(type));
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type AsType() => Type;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public Guid GetId() => Type.GUID;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Assembly GetAssembly() => Type.Assembly;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsValueType() => Type.IsValueType;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsArray() => Type.IsArray;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsPublic() => Type.IsPublic;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [CanBeNull]
         [Pure]
         public Type GetElementType() => Type.GetElementType();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsInterface() => Type.IsInterface;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsAbstract() => Type.IsAbstract;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsGenericParameter() => Type.IsGenericParameter;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsConstructedGenericType() => Type.IsGenericType && !Type.IsGenericTypeDefinition;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsGenericTypeDefinition() => Type.IsGenericTypeDefinition;
 
         public bool IsGenericTypeArgument() => Type.GetCustomAttributes(typeof(GenericTypeArgumentAttribute), true).Length > 0;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type[] GetGenericTypeArguments() => Type.GetGenericArguments();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type[] GetGenericParameterConstraints() => Type.GetGenericParameterConstraints();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public GenericParameterAttributes GetGenericParameterAttributes() => Type.GenericParameterAttributes;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type[] GetGenericTypeParameters() => Type.GetGenericArguments();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<ConstructorInfo> GetDeclaredConstructors() => Type.GetConstructors(DefaultBindingFlags);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<MethodInfo> GetDeclaredMethods() => Type.GetMethods(DefaultBindingFlags);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<MemberInfo> GetDeclaredMembers() => Type.GetMembers(DefaultBindingFlags);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<FieldInfo> GetDeclaredFields() => Type.GetFields(DefaultBindingFlags);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<PropertyInfo> GetDeclaredProperties() => Type.GetProperties(DefaultBindingFlags);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [CanBeNull]
         [Pure]
         public Type GetBaseType() => Type.BaseType;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<Type> GetImplementedInterfaces() => Type.GetInterfaces();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsAssignableFrom(TypeDescriptor typeDescriptor) =>Type.IsAssignableFrom(typeDescriptor.Type);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type MakeGenericType([NotNull] params Type[] typeArguments) => Type.MakeGenericType(typeArguments ?? throw new ArgumentNullException(nameof(typeArguments)));
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
@@ -154,125 +154,125 @@ namespace IoC.Core
             _typeInfo = type.GetTypeInfo();
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type AsType() => Type;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public Guid GetId() => _typeInfo.GUID;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Assembly GetAssembly() => _typeInfo.Assembly;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsValueType() => _typeInfo.IsValueType;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsInterface() => _typeInfo.IsInterface;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsAbstract() => _typeInfo.IsAbstract;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsGenericParameter() => _typeInfo.IsGenericParameter;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsArray() => _typeInfo.IsArray;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsPublic() => _typeInfo.IsPublic;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [CanBeNull]
         [Pure]
         public Type GetElementType() => _typeInfo.GetElementType();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsConstructedGenericType() => Type.IsConstructedGenericType;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsGenericTypeDefinition() => _typeInfo.IsGenericTypeDefinition;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type[] GetGenericTypeArguments() => _typeInfo.GenericTypeArguments;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type[] GetGenericParameterConstraints() => _typeInfo.GetGenericParameterConstraints();
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public GenericParameterAttributes GetGenericParameterAttributes() => _typeInfo.GenericParameterAttributes;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type[] GetGenericTypeParameters() => _typeInfo.GenericTypeParameters;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsGenericTypeArgument() => _typeInfo.GetCustomAttribute<GenericTypeArgumentAttribute>(true) != null;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<ConstructorInfo> GetDeclaredConstructors() => _typeInfo.DeclaredConstructors;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<MethodInfo> GetDeclaredMethods() => _typeInfo.DeclaredMethods;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<MemberInfo> GetDeclaredMembers() => _typeInfo.DeclaredMembers;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<FieldInfo> GetDeclaredFields() => _typeInfo.DeclaredFields;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<PropertyInfo> GetDeclaredProperties() => _typeInfo.DeclaredProperties;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [CanBeNull]
         [Pure]
         public Type GetBaseType() => _typeInfo.BaseType;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public IEnumerable<Type> GetImplementedInterfaces() => _typeInfo.ImplementedInterfaces;
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [Pure]
         public bool IsAssignableFrom(TypeDescriptor typeDescriptor) => _typeInfo.IsAssignableFrom(typeDescriptor._typeInfo);
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type MakeGenericType([NotNull] params Type[] typeArguments) => Type.MakeGenericType(typeArguments ?? throw new ArgumentNullException(nameof(typeArguments)));
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         [Pure]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();

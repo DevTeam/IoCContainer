@@ -49,6 +49,7 @@
 
         public IMutableContainer Container { get; }
 
+        [MethodImpl((MethodImplOptions)0x200)]
         public bool TryCreateResolver<T>(
             Key key,
             [NotNull] IContainer resolvingContainer,
@@ -94,7 +95,7 @@
             return resolver != default(Resolver<T>);
         }
 
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x200)]
         [CanBeNull]
         public ILifetime GetLifetime([NotNull] Type type)
         {

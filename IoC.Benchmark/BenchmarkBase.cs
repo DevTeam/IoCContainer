@@ -103,7 +103,7 @@
         }
 
         [Benchmark(OperationsPerInvoke = Series * 10)]
-        public void LightInject()
+        public virtual void LightInject()
         {
             for (var i = 0; i < Series; i++)
             {

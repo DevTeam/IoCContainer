@@ -22,7 +22,7 @@ namespace IoC.Features
         /// <param name="filter">The filter to intercept appropriate instances.</param>
         /// <param name="interceptors">The set of interceptors.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Intercept([NotNull] this IMutableContainer container, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
@@ -39,7 +39,7 @@ namespace IoC.Features
         /// <param name="filter">The filter to intercept appropriate instances.</param>
         /// <param name="interceptors">The set of interceptors.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Intercept([NotNull] this IToken token, [NotNull] Predicate<Key> filter, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
@@ -55,7 +55,7 @@ namespace IoC.Features
         /// <param name="container">The target container.</param>
         /// <param name="interceptors">The set of interceptors.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Intercept<T>([NotNull] this IMutableContainer container, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
@@ -70,7 +70,7 @@ namespace IoC.Features
         /// <param name="token">The binding token.</param>
         /// <param name="interceptors">The set of interceptors.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Intercept<T>([NotNull] this IToken token, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
@@ -86,7 +86,7 @@ namespace IoC.Features
         /// <param name="key">The key to intercept appropriate instance.</param>
         /// <param name="interceptors">The set of interceptors.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Intercept([NotNull] this IToken token, Key key, [NotNull] [ItemNotNull] params IInterceptor[] interceptors) =>
             Intercept(token.Container, key, interceptors);
@@ -98,7 +98,7 @@ namespace IoC.Features
         /// <param name="key">The key to intercept appropriate instance.</param>
         /// <param name="interceptors">The set of interceptors.</param>
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions)256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         public static IToken Intercept([NotNull] this IMutableContainer container, Key key, [NotNull] [ItemNotNull] params IInterceptor[] interceptors)
         {
@@ -109,7 +109,7 @@ namespace IoC.Features
         }
 
         /// <returns>The binding token.</returns>
-        [MethodImpl((MethodImplOptions) 256)]
+        [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
         private static IInterceptorRegistry GetRegistry([NotNull] this IContainer container)
         {
