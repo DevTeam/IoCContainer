@@ -6,6 +6,6 @@
     {
         TActualContainer ActualContainer { get; }
 
-        void Register(Type contractType, Type implementationType, AbstractLifetime lifetime = AbstractLifetime.Transient);
+        void Register(Type contractType, Type implementationType, AbstractLifetime lifetime = AbstractLifetime.Transient, string name = null);
     }
 }

@@ -32,7 +32,7 @@ namespace IoC.Core
             return new CompositeDisposable(disposables);
         }
 
-#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
         [MethodImpl((MethodImplOptions)256)]
         public static IDisposable ToDisposable([NotNull] this IAsyncDisposable asyncDisposable)
         {

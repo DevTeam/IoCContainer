@@ -9,7 +9,7 @@
 
         public Container ActualContainer { get; }
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime = AbstractLifetime.Transient)
+        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         { 
             var bind = ActualContainer.Bind(contractType);
             switch (lifetime)
@@ -18,11 +18,16 @@
                     break;
 
                 case AbstractLifetime.Singleton:
-                    bind.As(Lifetime.Singleton);
+                    bind = bind.As(Lifetime.Singleton);
                     break;
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(lifetime), lifetime, null);
+            }
+
+            if (name != null)
+            {
+                bind = bind.Tag(name);
             }
 
             bind.To(implementationType);

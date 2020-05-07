@@ -110,6 +110,74 @@
         }
 
         [Fact]
+        public void ContainerShouldResolveNewFuncWhenContainerChanged()
+        {
+            // Given
+            using var container = Container.Create();
+            var firstInstance = Mock.Of<IMyService>();
+            var expectedInstance = Mock.Of<IMyService>();
+
+            var token1 = container.Bind<IMyService>().To(ctx => firstInstance);
+            var instance1 = container.Resolve<Func<IMyService>>();
+            instance1().ShouldBe(firstInstance);
+
+            // When
+            token1.Dispose();
+            container.Bind<IMyService>().To(ctx => expectedInstance);
+            var actualInstance = container.Resolve<Func<IMyService>>();
+            // Then
+
+            actualInstance().ShouldBe(expectedInstance);
+        }
+
+        [Fact]
+        public void ContainerShouldResolveFuncWitgArgs()
+        {
+            // Given
+            using var container = Container.Create();
+
+            // When
+            container.Bind<string>().To(ctx => $"{Inc()}abc{ctx.Args[0]}");
+            var func = container.Resolve<Func<int, string>>();
+            var val = func(99);
+            
+            // Then
+            val.ShouldBe("1abc99");
+        }
+
+        private int Inc()
+        {
+            return 1;
+        }
+
+        [Fact]
+        public void ContainerShouldResolveNewFuncWhenParentContainerChanged()
+        {
+            // Given
+            using(var parentContainer = Container.Create())
+            using (var container = parentContainer.Create())
+            {
+
+                var firstInstance = Mock.Of<IMyService>();
+                var expectedInstance = Mock.Of<IMyService>();
+
+                var token1 = parentContainer.Bind<IMyService>().To(ctx => firstInstance);
+                var instance1 = container.Resolve<Func<IMyService>>();
+                instance1().ShouldBe(firstInstance);
+
+                // When
+                token1.Dispose();
+                using (parentContainer.Bind<IMyService>().To(ctx => expectedInstance))
+                {
+                    var actualInstance = container.Resolve<Func<IMyService>>();
+
+                    // Then
+                    actualInstance().ShouldBe(expectedInstance);
+                }
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveLazy()
         {
             // Given
@@ -568,7 +636,7 @@
         }
 #endif
 
-#if NET5 || NETCOREAPP2_1 || NETCOREAPP3_1
+#if NETCOREAPP5_0 || NETCOREAPP2_1 || NETCOREAPP3_1
         [Fact]
         public void ContainerShouldResolveGenericWhenValueTuple()
         {

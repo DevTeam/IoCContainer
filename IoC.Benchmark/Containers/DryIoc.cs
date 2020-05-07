@@ -7,7 +7,7 @@
     {
         public Container ActualContainer { get; } = new Container();
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime = AbstractLifetime.Transient)
+        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
             IReuse reuse;
             switch (lifetime)
@@ -24,7 +24,7 @@
                     throw new ArgumentOutOfRangeException(nameof(lifetime), lifetime, null);
             }
 
-            ActualContainer.Register(new ReflectionFactory(implementationType, reuse), contractType, null, null, true);
+            ActualContainer.Register(new ReflectionFactory(implementationType, reuse), contractType, name, null, true);
         }
 
         public void Dispose() => ActualContainer.Dispose();

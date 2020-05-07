@@ -9,8 +9,6 @@
         {
         }
 
-        public void DoSomething()
-        {
-        }
+        public void DoSomething() { }
     }
 }

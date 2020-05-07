@@ -26,21 +26,21 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < 100000; i++)
             {
-                NewTransient().DoSomething();
-                NewTransient().DoSomething();
-                NewTransient().DoSomething();
-                NewTransient().DoSomething();
-                NewTransient().DoSomething();
-                NewTransient().DoSomething();
-                NewTransient().DoSomething();
-                NewTransient().DoSomething();
-                NewTransient().DoSomething();
-                NewTransient().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
             }
         }
 
         [MethodImpl((MethodImplOptions)256)]
-        private static IServiceRoot NewTransient() => 
+        private static IServiceRoot NewInstance() => 
             new ServiceRoot(new Service1(new Service2(new Service3(), new Service3(), new Service3(), new Service3(), new Service3())), new Service2(new Service3(), new Service3(), new Service3(), new Service3(), new Service3()), new Service2(new Service3(), new Service3(), new Service3(), new Service3(), new Service3()), new Service2(new Service3(), new Service3(), new Service3(), new Service3(), new Service3()), new Service3());
     }
 }

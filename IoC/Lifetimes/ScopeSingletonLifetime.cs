@@ -8,7 +8,7 @@
     /// For a singleton instance per scope.
     /// </summary>
     [PublicAPI]
-    public sealed class ScopeSingletonLifetime: KeyBasedLifetime<IScope>
+    public sealed class ScopeSingletonLifetime: KeyBasedLifetime<IScope, object>
     {
         /// <inheritdoc />
         protected override IScope CreateKey(IContainer container, object[] args) => Scope.Current;
@@ -20,7 +20,7 @@
         public override ILifetime Create() => new ScopeSingletonLifetime();
 
         /// <inheritdoc />
-        protected override T OnNewInstanceCreated<T>(T newInstance, IScope scope, IContainer container, object[] args)
+        protected override object OnNewInstanceCreated(object newInstance, IScope scope, IContainer container, object[] args)
         {
             if (!(scope is IResourceRegistry resourceRegistry))
             {
@@ -32,8 +32,8 @@
                 resourceRegistry.RegisterResource(disposable);
             }
 
-#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-                if (newInstance is IAsyncDisposable asyncDisposable)
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+            if (newInstance is IAsyncDisposable asyncDisposable)
                 {
                     resourceRegistry.RegisterResource(asyncDisposable.ToDisposable());
                 }
@@ -56,7 +56,7 @@
                 disposable.Dispose();
             }
 
-#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();

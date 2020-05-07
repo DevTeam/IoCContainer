@@ -23,7 +23,7 @@
         /// <summary>
         /// On dependency unregistration.
         /// </summary>
-        UnregisterDependency,
+        ContainerStateSingletonLifetime,
 
         /// <summary>
         /// On resolver compilation.

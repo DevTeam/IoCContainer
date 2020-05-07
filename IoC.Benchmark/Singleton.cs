@@ -26,16 +26,16 @@ namespace IoC.Benchmark
         {
             for (var i = 0; i < 100000; i++)
             {
-                NewSingleton().DoSomething();
-                NewSingleton().DoSomething();
-                NewSingleton().DoSomething();
-                NewSingleton().DoSomething();
-                NewSingleton().DoSomething();
-                NewSingleton().DoSomething();
-                NewSingleton().DoSomething();
-                NewSingleton().DoSomething();
-                NewSingleton().DoSomething();
-                NewSingleton().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
+                NewInstance().DoSomething();
             }
         }
 
@@ -43,7 +43,7 @@ namespace IoC.Benchmark
         private  volatile Service1 _service1;
 
         [MethodImpl((MethodImplOptions)256)]
-        private IServiceRoot NewSingleton()
+        private IServiceRoot NewInstance()
         {
             if (_service1 == null)
             {

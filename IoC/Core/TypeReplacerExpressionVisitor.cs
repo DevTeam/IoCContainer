@@ -123,8 +123,12 @@
             return Expression.Lambda(ReplaceType(node.Type), body, parameters);
         }
 
-        protected override Expression VisitNewArray(NewArrayExpression node) => 
-            Expression.NewArrayInit(ReplaceType(node.Type.GetElementType()), ReplaceAll(node.Expressions));
+        protected override Expression VisitNewArray(NewArrayExpression node)
+        {
+            var elementType = ReplaceType(node.Type.GetElementType());
+            var elements = ReplaceAll(node.Expressions).Select(i => i.Convert(elementType));
+            return Expression.NewArrayInit(elementType, elements);
+        }
 
         protected override Expression VisitListInit(ListInitExpression node)
         {

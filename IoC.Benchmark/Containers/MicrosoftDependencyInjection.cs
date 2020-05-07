@@ -14,7 +14,7 @@
 
         public ServiceProvider ActualContainer => _container.Value;
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime = AbstractLifetime.Transient)
+        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
             switch (lifetime)
             {

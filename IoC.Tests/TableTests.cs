@@ -70,13 +70,23 @@
             table = table.Set("d", "d");
 
             // When
-            table = table.Remove("c", out var removed);
 
             // Then
+            table = table.Remove("c", out var removed);
             removed.ShouldBe(true);
             table.Get("c").ShouldBe(null);
-            table.Count().ShouldBe(4);
-            table.Count.ShouldBe(4);
+
+            table = table.Remove("d", out removed);
+            removed.ShouldBe(true);
+
+            table = table.Remove("Z", out removed);
+            removed.ShouldBe(true);
+
+            table = table.Remove("a", out removed);
+            removed.ShouldBe(true);
+
+            table.Count().ShouldBe(1);
+            table.Count.ShouldBe(1);
         }
     }
 }

@@ -12,7 +12,7 @@
 
         private NullContainer() { }
 
-        public IContainer Parent => throw new NotSupportedException();
+        public IContainer Parent => null;
 
         public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
         {

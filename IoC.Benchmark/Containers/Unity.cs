@@ -9,7 +9,7 @@
     {
         public UnityContainer ActualContainer { get; } = new UnityContainer();
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime = AbstractLifetime.Transient)
+        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
             ITypeLifetimeManager lifetimeManager = null;
             switch (lifetime)
@@ -25,7 +25,7 @@
                     throw new ArgumentOutOfRangeException(nameof(lifetime), lifetime, null);
             }
 
-            ActualContainer.RegisterType(contractType, implementationType, lifetimeManager);
+           ((IUnityContainer)ActualContainer).RegisterType(contractType, implementationType, name, lifetimeManager);
         }
 
         public void Dispose() => ActualContainer.Dispose();

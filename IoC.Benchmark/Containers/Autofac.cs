@@ -13,7 +13,7 @@
 
         public IContainer ActualContainer => _container.Value;
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime)
+        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
             var registration = _builder.RegisterType(implementationType).As(contractType);
             switch (lifetime)
@@ -27,6 +27,11 @@
                 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(lifetime), lifetime, null);
+            }
+
+            if (name != null)
+            {
+                registration.Keyed<object>(name);
             }
         }
 

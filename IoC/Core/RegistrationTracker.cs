@@ -33,7 +33,7 @@ namespace IoC.Core
 
         public void OnNext(ContainerEvent value)
         {
-            if (value.Keys == null)
+            if (value.Keys == null || !value.IsSuccess || value.EventType != EventType.RegisterDependency && value.EventType != EventType.ContainerStateSingletonLifetime)
             {
                 return;
             }
@@ -57,7 +57,7 @@ namespace IoC.Core
 
                     break;
 
-                case EventType.UnregisterDependency:
+                case EventType.ContainerStateSingletonLifetime:
                     _container.Reset();
                     container = value.Container;
                     foreach (var key in value.Keys)

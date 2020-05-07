@@ -1,4 +1,5 @@
 ﻿// ReSharper disable MemberCanBeProtected.Local
+// ReSharper disable ForCanBeConvertedToForeach
 namespace IoC.Features
 {
     using System;
@@ -31,30 +32,77 @@ namespace IoC.Features
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), new ContainerSingletonLifetime());
-            yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToList());
-            yield return container.Register(ctx => ctx.Container.Inject<IEnumerable<TT>>().ToArray());
-            yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => new HashSet<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
-            yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Inject<IEnumerable<TT>>()), new ContainerSingletonLifetime(false, false));
+            yield return container.Register(ctx => new Resolvers<TT>(ctx.Container), new ContainerStateSingletonLifetime<object>(false));
+
+            yield return container.Register<IEnumerable<TT>>(ctx => new Enumeration<TT>(ctx, ctx.Container.Resolve<Resolvers<TT>>().Items), new ContainerStateSingletonLifetime<object>(false));
+            yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => CreateList(ctx.Container.Resolve<Resolvers<TT>>().Items, ctx), new ContainerStateSingletonLifetime<object>(false));
+            yield return container.Register(ctx => CreateArray(ctx.Container.Resolve<Resolvers<TT>>().Items, ctx), new ContainerStateSingletonLifetime<object>(false));
+            yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => CreateHashSet(ctx.Container.Resolve<Resolvers<TT>>().Items, ctx), new ContainerStateSingletonLifetime<object>(false));
+            yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Resolve<Resolvers<TT>>().Items, ctx), new ContainerStateSingletonLifetime<object>(false));
 #if !NET40
-            yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<List<TT>>()));
+            yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<List<TT>>()), new ContainerStateSingletonLifetime<object>(false));
 #endif
-#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx, ctx.Container.Inject<ILockObject>()), new ContainerSingletonLifetime());
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx.Container.Inject<IEnumerable<TT>>()), new ContainerStateSingletonLifetime<object>(false));
 #endif
+        }
+
+        private static List<T> CreateList<T>(Resolver<T>[] resolvers, Context ctx)
+        {
+            var result = new List<T>(resolvers.Length);
+            for (var i = 0; i < resolvers.Length; i++)
+            {
+                result.Add(resolvers[i](ctx.Container, ctx.Args));
+            }
+
+            return result;
+        }
+
+        private static T[] CreateArray<T>(Resolver<T>[] resolvers, Context ctx)
+        {
+            var result = new T[resolvers.Length];
+            for (var i = 0; i < resolvers.Length; i++)
+            {
+                result[i] = resolvers[i](ctx.Container, ctx.Args);
+            }
+
+            return result;
+        }
+
+        private static HashSet<T> CreateHashSet<T>(Resolver<T>[] resolvers, Context ctx)
+        {
+            var result = new HashSet<T>();
+            for (var i = 0; i < resolvers.Length; i++)
+            {
+                result.Add(resolvers[i](ctx.Container, ctx.Args));
+            }
+
+            return result;
         }
 
         internal sealed class Observable<T>: IObservable<T>
         {
-            private readonly IEnumerable<T> _source;
+            private readonly Resolver<T>[] _resolvers;
+            private readonly Context _ctx;
 
-            public Observable([NotNull] IEnumerable<T> source) => _source = source ?? throw new ArgumentNullException(nameof(source));
+            public Observable(Resolver<T>[] resolvers, Context ctx)
+            {
+                _resolvers = resolvers;
+                _ctx = ctx;
+            }
 
             public IDisposable Subscribe(IObserver<T> observer)
             {
-                foreach (var value in _source)
+                try
                 {
-                    observer.OnNext(value);
+                    for (var i = 0; i < _resolvers.Length; i++)
+                    {
+                        observer.OnNext(_resolvers[i](_ctx.Container, _ctx.Args));
+                    }
+                }
+                catch (Exception error)
+                {
+                    observer.OnError(error);
                 }
 
                 observer.OnCompleted();
@@ -62,129 +110,100 @@ namespace IoC.Features
             }
         }
 
-        private sealed class Enumeration<T> : EnumerationBase<T>, IEnumerable<T>
+        private sealed class Enumeration<T> : IEnumerable<T>
         {
-            public Enumeration([NotNull] Context context, [NotNull] ILockObject lockObject)
-            : base(context, lockObject)
-            { }
+            private readonly Context _context;
+            private readonly Resolver<T>[] _resolvers;
+
+            public Enumeration([NotNull] Context context, [NotNull] Resolver<T>[] resolvers)
+            {
+                _context = context;
+                _resolvers = resolvers;
+            }
 
             [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
-            public IEnumerator<T> GetEnumerator()
-            {
-                var resolvers = GetResolvers();
-
-                // ReSharper disable once ForCanBeConvertedToForeach
-                for (var i = 0; i < resolvers.Length; i++)
-                {
-                    yield return resolvers[i](Context.Container, Context.Args);
-                }
-            }
+            public IEnumerator<T> GetEnumerator() => new Enumerator<T>(_context, _resolvers);
 
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         }
 
-#if NET5 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-        private sealed class AsyncEnumeration<T> : EnumerationBase<T>, IAsyncEnumerable<T>
+        private sealed class Enumerator<T>: IEnumerator<T>
         {
-            public AsyncEnumeration([NotNull] Context context, [NotNull] ILockObject lockObject)
-                : base(context, lockObject)
-            { }
+            private readonly Context _context;
+            private readonly Resolver<T>[] _resolvers;
+            private readonly int _length;
+            private int _index = -1;
+            private bool _hasCurrent;
+            private T _current;
+
+            public Enumerator([NotNull] Context context, [NotNull] Resolver<T>[] resolvers)
+            {
+                _context = context;
+                _resolvers = resolvers;
+                _length = resolvers.Length;
+            }
+
+            public bool MoveNext()
+            {
+                _hasCurrent = false;
+                _current = default(T);
+                return ++_index < _length;
+            }
+
+            public T Current
+            {
+                get
+                {
+                    if (!_hasCurrent)
+                    {
+                        _hasCurrent = true;
+                        _current = _resolvers[_index](_context.Container, _context.Args);
+                    }
+
+                    return _current;
+                }
+            }
+
+            object IEnumerator.Current => Current;
+
+            public void Dispose() { }
+
+            public void Reset() => _index = -1;
+        }
+
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+        private sealed class AsyncEnumeration<T> : IAsyncEnumerable<T>
+        {
+            private readonly IEnumerable<T> _enumerable;
+
+            public AsyncEnumeration(IEnumerable<T> enumerable) => _enumerable = enumerable;
 
             public IAsyncEnumerator<T> GetAsyncEnumerator(CancellationToken cancellationToken = new CancellationToken()) => 
-                new AsyncEnumerator<T>(this, cancellationToken);
+                new AsyncEnumerator<T>(_enumerable.GetEnumerator());
         }
 
         private sealed class AsyncEnumerator<T> : IAsyncEnumerator<T>
         {
-            private readonly AsyncEnumeration<T> _enumeration;
-            private readonly CancellationToken _cancellationToken;
-            private readonly TaskScheduler _taskScheduler;
-            private int _index = -1;
+            private readonly IEnumerator<T> _enumerator;
 
-            public AsyncEnumerator(AsyncEnumeration<T> enumeration, CancellationToken cancellationToken)
-            {
-                _enumeration = enumeration;
-                _cancellationToken = cancellationToken;
-                var container = enumeration.Context.Container;
-                _taskScheduler = container.TryGetResolver(out Resolver<TaskScheduler> taskSchedulerResolver) ? taskSchedulerResolver(container) : TaskScheduler.Current;
-            }
+            public AsyncEnumerator(IEnumerator<T> enumerator) => 
+                _enumerator = enumerator;
 
             public async ValueTask<bool> MoveNextAsync() =>
-                await new ValueTask<bool>(
-                    StartTask(
-                        new Task<bool>(
-                            () =>
-                            {
-                                var resolvers = _enumeration.GetResolvers();
-                                var index = Interlocked.Increment(ref _index);
-                                if (index >= resolvers.Length)
-                                {
-                                    return false;
-                                }
+                await new ValueTask<bool>(_enumerator.MoveNext());
 
-                                Current = resolvers[index](_enumeration.Context.Container, _enumeration.Context.Args);
-                                return true;
-                            },
-                            _cancellationToken)));
-
-            public T Current { get; private set; }
+            public T Current => _enumerator.Current;
 
             public ValueTask DisposeAsync() => new ValueTask();
-
-            private Task<bool> StartTask(Task<bool> task)
-            {
-                task.Start(_taskScheduler);
-                return task;
-            }
         }
 #endif
-
-        private class EnumerationBase<T>: IObserver<ContainerEvent>, IDisposable
+        private class Resolvers<T>
         {
-            [NotNull] protected internal readonly Context Context;
-            private readonly ILockObject _lockObject;
-            private readonly IDisposable _subscription;
-            private volatile Resolver<T>[] _resolvers;
+            public readonly Resolver<T>[] Items;
 
-            public EnumerationBase([NotNull] Context context, [NotNull] ILockObject lockObject)
+            public Resolvers(IContainer container)
             {
-                Context = context;
-                _lockObject = lockObject;
-                _subscription = context.Container.Subscribe(this);
-                Reset();
-            }
-
-            public void OnNext(ContainerEvent value) => Reset();
-
-            public void OnError(Exception error) { }
-
-            public void OnCompleted() { }
-
-            public void Dispose() => _subscription.Dispose();
-
-            public Resolver<T>[] GetResolvers()
-            {
-                lock (_lockObject)
-                {
-                    var resolvers = _resolvers;
-                    if (resolvers != null)
-                    {
-                        return resolvers;
-                    }
-                    
-                    resolvers = GetResolvers(Context.Container).ToArray();
-                    _resolvers = resolvers;
-
-                    return resolvers;
-                }
-            }
-
-            private void Reset()
-            {
-                lock (_lockObject)
-                {
-                    _resolvers = null;
-                }
+                Items = GetResolvers(container).ToArray();
             }
 
             private static IEnumerable<Resolver<T>> GetResolvers(IContainer container)

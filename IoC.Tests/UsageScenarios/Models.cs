@@ -18,7 +18,7 @@ namespace IoC.Tests.UsageScenarios
     public interface IAnotherService { }
 
     public interface IDisposableService : IService, IDisposable
-#if NET5 || NETCOREAPP3_1
+#if NETCOREAPP5_0 || NETCOREAPP3_1
     , IAsyncDisposable
 #endif
     {

@@ -9,8 +9,8 @@
 
         public Func<TContract> ActualContainer => _abstractContainer.ActualContainer.Resolve<Func<TContract>>();
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime = AbstractLifetime.Transient) =>
-            _abstractContainer.Register(contractType, implementationType, lifetime);
+        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name) =>
+            _abstractContainer.Register(contractType, implementationType, lifetime, name);
 
         public void Dispose() => _abstractContainer.Dispose();
     }

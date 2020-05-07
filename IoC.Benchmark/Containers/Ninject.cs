@@ -8,7 +8,7 @@
     {
         public StandardKernel ActualContainer { get; } = new StandardKernel();
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime = AbstractLifetime.Transient)
+        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
             var bind = ActualContainer.Bind(contractType).To(implementationType);
             switch (lifetime)
@@ -22,6 +22,11 @@
 
                 default:
                     throw new ArgumentOutOfRangeException(nameof(lifetime), lifetime, null);
+            }
+
+            if (name != null)
+            {
+                bind.Named(name);
             }
         }
 

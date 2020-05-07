@@ -29,7 +29,7 @@
                     text = $"adds {FormatDependency(src)}.";
                     break;
 
-                case EventType.UnregisterDependency:
+                case EventType.ContainerStateSingletonLifetime:
                     text = $"removes {FormatDependency(src)}.";
                     break;
 

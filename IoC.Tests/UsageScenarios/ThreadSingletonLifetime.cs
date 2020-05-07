@@ -54,7 +54,7 @@ namespace IoC.Tests.UsageScenarios
         }
 
         // Represents the custom thead singleton lifetime based on the KeyBasedLifetime
-        public class ThreadLifetime : KeyBasedLifetime<int>
+        public class ThreadLifetime : KeyBasedLifetime<int, object>
         {
             // Creates a clone of the current lifetime (for the case with generic types)
             public override ILifetime Create() =>
@@ -66,7 +66,7 @@ namespace IoC.Tests.UsageScenarios
                 Thread.CurrentThread.ManagedThreadId;
 
             // Just returns created instance
-            protected override T OnNewInstanceCreated<T>(T newInstance, int key, IContainer container, object[] args) =>
+            protected override object OnNewInstanceCreated(object newInstance, int key, IContainer container, object[] args) =>
                 newInstance;
 
             // Do nothing

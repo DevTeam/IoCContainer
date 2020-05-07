@@ -11,20 +11,22 @@
     /// Represents the abstraction for singleton based lifetimes.
     /// </summary>
     /// <typeparam name="TKey">The key type.</typeparam>
+    /// <typeparam name="TValue">The value type.</typeparam>
     [PublicAPI]
-    public abstract class KeyBasedLifetime<TKey> : ILifetime
+    public abstract class KeyBasedLifetime<TKey, TValue> : ILifetime
+        where TValue: class
     {
         private readonly bool _supportOnNewInstanceCreated;
         private readonly bool _supportOnInstanceReleased;
-        private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
-        private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
-        private static readonly MethodInfo GetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Get));
-        private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
-        private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
+        private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey, TValue>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
+        private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey, TValue>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
+        private static readonly MethodInfo GetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, TValue>.Get));
+        private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, TValue>.Set));
+        private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey, TValue>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
         private static readonly ParameterExpression KeyVar = Expression.Variable(typeof(TKey), "key");
 
         [NotNull] private readonly ILockObject _lockObject = new LockObject();
-        private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
+        private volatile Table<TKey, TValue> _instances = Table<TKey, TValue>.Empty;
 
         /// <summary>
         /// Creates an instance
@@ -44,15 +46,22 @@
             if (context == null) throw new ArgumentNullException(nameof(context));
             var returnType = context.Key.Type;
             var thisConst = Expression.Constant(this);
-            var instanceVar = Expression.Variable(returnType, "val");
+            var instanceVar = Expression.Variable(typeof(TValue));
             var instancesField = Expression.Field(thisConst, InstancesFieldInfo);
             var lockObjectConst = Expression.Constant(_lockObject);
-            var onNewInstanceCreatedMethodInfo = OnNewInstanceCreatedMethodInfo.MakeGenericMethod(returnType);
-            var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, KeyVar).Convert(returnType));
-            var isNullExpression = Expression.ReferenceEqual(instanceVar, ExpressionBuilderExtensions.NullConst);
+            var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, KeyVar));
+            Expression isEmptyExpression;
+            if (returnType.Descriptor().IsValueType())
+            {
+                isEmptyExpression = Expression.Call(null, ExpressionBuilderExtensions.EqualsMethodInfo, instanceVar.Convert(typeof(TValue)), Expression.Default(typeof(TValue)));
+            }
+            else
+            {
+                isEmptyExpression = Expression.ReferenceEqual(instanceVar, Expression.Default(returnType));
+            }
 
             var initNewInstanceExpression = _supportOnNewInstanceCreated 
-                ? (Expression) Expression.Call(thisConst, onNewInstanceCreatedMethodInfo, instanceVar, KeyVar, context.ContainerParameter, context.ArgsParameter)
+                ? Expression.Call(thisConst, OnNewInstanceCreatedMethodInfo, instanceVar.Convert(typeof(TValue)), KeyVar, context.ContainerParameter, context.ArgsParameter).Convert(returnType)
                 : instanceVar;
 
             return Expression.Block(
@@ -60,32 +69,32 @@
                 // int hashCode;
                 // T instance;
                 new[] { KeyVar, instanceVar },
-                // var key = CreateKey(container, args);
+                // TKey key = CreateKey(container, args);
                 Expression.Assign(KeyVar, Expression.Call(thisConst, CreateKeyMethodInfo, context.ContainerParameter, context.ArgsParameter)),
-                // var instance = (T)_instances.Get(hashCode, key);
+                // TValue instance = _instances.Get(key);
                 assignInstanceExpression,
-                // if (instance == null)
+                // if (instance == default(TValue))
                 Expression.Condition(
-                    isNullExpression,
+                    isEmptyExpression,
                     Expression.Block(
                         // lock (this._lockObject)
                         Expression.Block(
-                    // var instance = (T)_instances.Get(hashCode, key);
+                    // instance = _instances.Get(hashCode, key);
                     assignInstanceExpression,
-                    // if (instance == null)
+                    // if (instance == default(TValue))
                     Expression.IfThen(
-                        Expression.Equal(instanceVar, ExpressionBuilderExtensions.NullConst),
+                        isEmptyExpression,
                         Expression.Block(
                             // instance = new T();
-                            Expression.Assign(instanceVar, bodyExpression),
+                            Expression.Assign(instanceVar, bodyExpression.Convert(typeof(TValue))),
                             // Instances = _instances.Set(hashCode, key, instance);
-                            Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar))
+                            Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar.Convert(typeof(object))))
                         ))).Lock(lockObjectConst),
                         // instance or OnNewInstanceCreated(instance, key, container, args);
-                        initNewInstanceExpression),
+                        initNewInstanceExpression.Convert(returnType)),
                         // else {
                         // return instance;
-                        instanceVar
+                        instanceVar.Convert(returnType)
                     )
             // }
             );
@@ -98,11 +107,11 @@
         /// <inheritdoc />
         public virtual void Dispose()
         {
-            Table<TKey, object> instances;
+            Table<TKey, TValue> instances;
             lock (_lockObject)
             {
                 instances = _instances;
-                _instances = Table<TKey, object>.Empty;
+                _instances = Table<TKey, TValue>.Empty;
             }
 
             if (_supportOnInstanceReleased)
@@ -133,13 +142,28 @@
         /// <param name="container">The target container.</param>
         /// <param name="args">Optional arguments.</param>
         /// <returns>The created instance.</returns>
-        protected abstract T OnNewInstanceCreated<T>(T newInstance, TKey key, IContainer container, object[] args);
+        protected abstract TValue OnNewInstanceCreated(TValue newInstance, TKey key, IContainer container, object[] args);
 
         /// <summary>
         /// Is invoked on the instance was released.
         /// </summary>
         /// <param name="releasedInstance">The released instance.</param>
         /// <param name="key">The instance key.</param>
-        protected abstract void OnInstanceReleased(object releasedInstance, TKey key);
+        protected abstract void OnInstanceReleased(TValue releasedInstance, TKey key);
+
+        /// <summary>
+        /// Forcibly remove an instance.
+        /// </summary>
+        /// <param name="key">The instance key.</param>
+        protected bool Remove(TKey key)
+        {
+            bool removed;
+            lock (_lockObject)
+            {
+                _instances = _instances.Remove(key, out removed);
+            }
+
+            return removed;
+        }
     }
 }

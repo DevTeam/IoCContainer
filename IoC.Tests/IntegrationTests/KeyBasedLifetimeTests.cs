@@ -48,7 +48,7 @@
             }
         }
 
-        public class StringKeyLifetime: KeyBasedLifetime<string>
+        public class StringKeyLifetime: KeyBasedLifetime<string, object>
         {
             [NotNull] private readonly string _key;
 
@@ -58,12 +58,12 @@
 
             protected override string CreateKey(IContainer container, object[] args) => _key;
 
-            protected override T OnNewInstanceCreated<T>(T newInstance, string key, IContainer container, object[] args) => newInstance;
+            protected override object OnNewInstanceCreated(object newInstance, string key, IContainer container, object[] args) => newInstance;
 
             protected override void OnInstanceReleased(object releasedInstance, string key) { }
         }
 
-        public class IntKeyLifetime : KeyBasedLifetime<int>
+        public class IntKeyLifetime : KeyBasedLifetime<int, object>
         {
             private readonly int _key;
 
@@ -73,7 +73,7 @@
 
             protected override int CreateKey(IContainer container, object[] args) => _key;
 
-            protected override T OnNewInstanceCreated<T>(T newInstance, int key, IContainer container, object[] args) => newInstance;
+            protected override object OnNewInstanceCreated(object newInstance, int key, IContainer container, object[] args) => newInstance;
 
             protected override void OnInstanceReleased(object releasedInstance, int key) { }
         }

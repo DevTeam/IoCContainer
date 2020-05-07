@@ -8,7 +8,7 @@
     {
         public ServiceContainer ActualContainer { get; } = new ServiceContainer();
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime = AbstractLifetime.Transient)
+        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
             switch (lifetime)
             {
@@ -17,7 +17,7 @@
                     break;
 
                 case AbstractLifetime.Singleton:
-                    ActualContainer.Register(contractType, implementationType, new PerContainerLifetime());
+                    ActualContainer.Register(contractType, implementationType, name, new PerContainerLifetime());
                     break;
 
                 default:

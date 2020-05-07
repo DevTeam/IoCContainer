@@ -141,7 +141,7 @@
         {
             return new ContainerEvent(
                 registeringContainer,
-                EventType.UnregisterDependency,
+                EventType.ContainerStateSingletonLifetime,
                 true,
                 default(Exception),
                 keys,

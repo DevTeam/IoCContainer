@@ -6,25 +6,27 @@
     using System.Reflection;
     using System.Runtime.CompilerServices;
     using System.Threading;
-    using static TypeDescriptorExtensions;
 
     internal static class ExpressionBuilderExtensions
     {
         private static readonly TypeDescriptor ResolverGenericTypeDescriptor = typeof(Resolver<>).Descriptor();
-        internal static readonly MethodInfo GetHashCodeMethodInfo = Descriptor<object>().GetDeclaredMethods().Single(i => i.Name == nameof(GetHashCode));
         internal static readonly Expression NullConst = Expression.Constant(null);
         internal static readonly Expression ContainerExpression = Expression.Field(Expression.Constant(null, typeof(Context)), nameof(Context.Container));
+        internal static readonly MethodInfo EqualsMethodInfo = typeof(Object).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Equals) && i.ReturnType == typeof(bool) && i.GetParameters().Length == 2 && i.GetParameters()[0].ParameterType == typeof(object) && i.GetParameters()[1].ParameterType == typeof(object));
         private static readonly MethodInfo EnterMethodInfo = typeof(Monitor).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Monitor.Enter) && i.GetParameters().Length == 1);
         private static readonly MethodInfo ExitMethodInfo = typeof(Monitor).Descriptor().GetDeclaredMethods().Single(i => i.Name == nameof(Monitor.Exit));
 
         [MethodImpl((MethodImplOptions)256)]
         public static Expression Convert(this Expression expression, Type type)
         {
-            var baseTypeDescriptor = expression.Type.Descriptor();
-            var typeDescriptor = type.Descriptor();
-            if (typeDescriptor.IsAssignableFrom(baseTypeDescriptor))
+            if (type != typeof(object))
             {
-                return expression;
+                var baseTypeDescriptor = expression.Type.Descriptor();
+                var typeDescriptor = type.Descriptor();
+                if (typeDescriptor.IsAssignableFrom(baseTypeDescriptor))
+                {
+                    return expression;
+                }
             }
 
             return Expression.Convert(expression, type);

@@ -79,12 +79,18 @@
   - [Lifetime](#F-IoC-ContainerEvent-Lifetime 'IoC.ContainerEvent.Lifetime')
   - [ResolverExpression](#F-IoC-ContainerEvent-ResolverExpression 'IoC.ContainerEvent.ResolverExpression')
 - [ContainerSingletonLifetime](#T-IoC-Lifetimes-ContainerSingletonLifetime 'IoC.Lifetimes.ContainerSingletonLifetime')
-  - [#ctor()](#M-IoC-Lifetimes-ContainerSingletonLifetime-#ctor 'IoC.Lifetimes.ContainerSingletonLifetime.#ctor')
   - [Create()](#M-IoC-Lifetimes-ContainerSingletonLifetime-Create 'IoC.Lifetimes.ContainerSingletonLifetime.Create')
   - [CreateKey()](#M-IoC-Lifetimes-ContainerSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ContainerSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])')
   - [OnInstanceReleased()](#M-IoC-Lifetimes-ContainerSingletonLifetime-OnInstanceReleased-System-Object,IoC-IContainer- 'IoC.Lifetimes.ContainerSingletonLifetime.OnInstanceReleased(System.Object,IoC.IContainer)')
-  - [OnNewInstanceCreated\`\`1()](#M-IoC-Lifetimes-ContainerSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-IContainer,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ContainerSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.IContainer,IoC.IContainer,System.Object[])')
+  - [OnNewInstanceCreated()](#M-IoC-Lifetimes-ContainerSingletonLifetime-OnNewInstanceCreated-System-Object,IoC-IContainer,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ContainerSingletonLifetime.OnNewInstanceCreated(System.Object,IoC.IContainer,IoC.IContainer,System.Object[])')
   - [ToString()](#M-IoC-Lifetimes-ContainerSingletonLifetime-ToString 'IoC.Lifetimes.ContainerSingletonLifetime.ToString')
+- [ContainerStateSingletonLifetime\`1](#T-IoC-Lifetimes-ContainerStateSingletonLifetime`1 'IoC.Lifetimes.ContainerStateSingletonLifetime`1')
+  - [Create()](#M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-Create 'IoC.Lifetimes.ContainerStateSingletonLifetime`1.Create')
+  - [CreateKey()](#M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ContainerStateSingletonLifetime`1.CreateKey(IoC.IContainer,System.Object[])')
+  - [Dispose()](#M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-Dispose 'IoC.Lifetimes.ContainerStateSingletonLifetime`1.Dispose')
+  - [OnInstanceReleased()](#M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-OnInstanceReleased-`0,IoC-IContainer- 'IoC.Lifetimes.ContainerStateSingletonLifetime`1.OnInstanceReleased(`0,IoC.IContainer)')
+  - [OnNewInstanceCreated()](#M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-OnNewInstanceCreated-`0,IoC-IContainer,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ContainerStateSingletonLifetime`1.OnNewInstanceCreated(`0,IoC.IContainer,IoC.IContainer,System.Object[])')
+  - [ToString()](#M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-ToString 'IoC.Lifetimes.ContainerStateSingletonLifetime`1.ToString')
 - [Context](#T-IoC-Context 'IoC.Context')
   - [Args](#F-IoC-Context-Args 'IoC.Context.Args')
   - [Container](#F-IoC-Context-Container 'IoC.Context.Container')
@@ -103,11 +109,11 @@
   - [Dependency](#F-IoC-Issues-DependencyDescription-Dependency 'IoC.Issues.DependencyDescription.Dependency')
   - [Lifetime](#F-IoC-Issues-DependencyDescription-Lifetime 'IoC.Issues.DependencyDescription.Lifetime')
 - [EventType](#T-IoC-EventType 'IoC.EventType')
+  - [ContainerStateSingletonLifetime](#F-IoC-EventType-ContainerStateSingletonLifetime 'IoC.EventType.ContainerStateSingletonLifetime')
   - [CreateContainer](#F-IoC-EventType-CreateContainer 'IoC.EventType.CreateContainer')
   - [DisposeContainer](#F-IoC-EventType-DisposeContainer 'IoC.EventType.DisposeContainer')
   - [RegisterDependency](#F-IoC-EventType-RegisterDependency 'IoC.EventType.RegisterDependency')
   - [ResolverCompilation](#F-IoC-EventType-ResolverCompilation 'IoC.EventType.ResolverCompilation')
-  - [UnregisterDependency](#F-IoC-EventType-UnregisterDependency 'IoC.EventType.UnregisterDependency')
 - [FluentBind](#T-IoC-FluentBind 'IoC.FluentBind')
   - [AnyTag\`\`1(binding)](#M-IoC-FluentBind-AnyTag``1-IoC-IBinding{``0}- 'IoC.FluentBind.AnyTag``1(IoC.IBinding{``0})')
   - [As\`\`1(binding,lifetime)](#M-IoC-FluentBind-As``1-IoC-IBinding{``0},IoC-Lifetime- 'IoC.FluentBind.As``1(IoC.IBinding{``0},IoC.Lifetime)')
@@ -418,15 +424,16 @@
   - [Equals()](#M-IoC-Key-Equals-IoC-Key- 'IoC.Key.Equals(IoC.Key)')
   - [GetHashCode()](#M-IoC-Key-GetHashCode 'IoC.Key.GetHashCode')
   - [ToString()](#M-IoC-Key-ToString 'IoC.Key.ToString')
-- [KeyBasedLifetime\`1](#T-IoC-Lifetimes-KeyBasedLifetime`1 'IoC.Lifetimes.KeyBasedLifetime`1')
-  - [#ctor(supportOnNewInstanceCreated,supportOnInstanceReleased)](#M-IoC-Lifetimes-KeyBasedLifetime`1-#ctor-System-Boolean,System-Boolean- 'IoC.Lifetimes.KeyBasedLifetime`1.#ctor(System.Boolean,System.Boolean)')
-  - [Build()](#M-IoC-Lifetimes-KeyBasedLifetime`1-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.KeyBasedLifetime`1.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
-  - [Create()](#M-IoC-Lifetimes-KeyBasedLifetime`1-Create 'IoC.Lifetimes.KeyBasedLifetime`1.Create')
-  - [CreateKey(container,args)](#M-IoC-Lifetimes-KeyBasedLifetime`1-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.KeyBasedLifetime`1.CreateKey(IoC.IContainer,System.Object[])')
-  - [Dispose()](#M-IoC-Lifetimes-KeyBasedLifetime`1-Dispose 'IoC.Lifetimes.KeyBasedLifetime`1.Dispose')
-  - [OnInstanceReleased(releasedInstance,key)](#M-IoC-Lifetimes-KeyBasedLifetime`1-OnInstanceReleased-System-Object,`0- 'IoC.Lifetimes.KeyBasedLifetime`1.OnInstanceReleased(System.Object,`0)')
-  - [OnNewInstanceCreated\`\`1(newInstance,key,container,args)](#M-IoC-Lifetimes-KeyBasedLifetime`1-OnNewInstanceCreated``1-``0,`0,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.KeyBasedLifetime`1.OnNewInstanceCreated``1(``0,`0,IoC.IContainer,System.Object[])')
-  - [SelectResolvingContainer()](#M-IoC-Lifetimes-KeyBasedLifetime`1-SelectResolvingContainer-IoC-IContainer,IoC-IContainer- 'IoC.Lifetimes.KeyBasedLifetime`1.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)')
+- [KeyBasedLifetime\`2](#T-IoC-Lifetimes-KeyBasedLifetime`2 'IoC.Lifetimes.KeyBasedLifetime`2')
+  - [#ctor(supportOnNewInstanceCreated,supportOnInstanceReleased)](#M-IoC-Lifetimes-KeyBasedLifetime`2-#ctor-System-Boolean,System-Boolean- 'IoC.Lifetimes.KeyBasedLifetime`2.#ctor(System.Boolean,System.Boolean)')
+  - [Build()](#M-IoC-Lifetimes-KeyBasedLifetime`2-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.KeyBasedLifetime`2.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
+  - [Create()](#M-IoC-Lifetimes-KeyBasedLifetime`2-Create 'IoC.Lifetimes.KeyBasedLifetime`2.Create')
+  - [CreateKey(container,args)](#M-IoC-Lifetimes-KeyBasedLifetime`2-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.KeyBasedLifetime`2.CreateKey(IoC.IContainer,System.Object[])')
+  - [Dispose()](#M-IoC-Lifetimes-KeyBasedLifetime`2-Dispose 'IoC.Lifetimes.KeyBasedLifetime`2.Dispose')
+  - [OnInstanceReleased(releasedInstance,key)](#M-IoC-Lifetimes-KeyBasedLifetime`2-OnInstanceReleased-`1,`0- 'IoC.Lifetimes.KeyBasedLifetime`2.OnInstanceReleased(`1,`0)')
+  - [OnNewInstanceCreated(newInstance,key,container,args)](#M-IoC-Lifetimes-KeyBasedLifetime`2-OnNewInstanceCreated-`1,`0,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.KeyBasedLifetime`2.OnNewInstanceCreated(`1,`0,IoC.IContainer,System.Object[])')
+  - [Remove(key)](#M-IoC-Lifetimes-KeyBasedLifetime`2-Remove-`0- 'IoC.Lifetimes.KeyBasedLifetime`2.Remove(`0)')
+  - [SelectResolvingContainer()](#M-IoC-Lifetimes-KeyBasedLifetime`2-SelectResolvingContainer-IoC-IContainer,IoC-IContainer- 'IoC.Lifetimes.KeyBasedLifetime`2.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)')
 - [Lifetime](#T-IoC-Lifetime 'IoC.Lifetime')
   - [ContainerSingleton](#F-IoC-Lifetime-ContainerSingleton 'IoC.Lifetime.ContainerSingleton')
   - [ScopeSingleton](#F-IoC-Lifetime-ScopeSingleton 'IoC.Lifetime.ScopeSingleton')
@@ -462,7 +469,7 @@
   - [Create()](#M-IoC-Lifetimes-ScopeSingletonLifetime-Create 'IoC.Lifetimes.ScopeSingletonLifetime.Create')
   - [CreateKey()](#M-IoC-Lifetimes-ScopeSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])')
   - [OnInstanceReleased()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnInstanceReleased-System-Object,IoC-IScope- 'IoC.Lifetimes.ScopeSingletonLifetime.OnInstanceReleased(System.Object,IoC.IScope)')
-  - [OnNewInstanceCreated\`\`1()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-IScope,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.IScope,IoC.IContainer,System.Object[])')
+  - [OnNewInstanceCreated()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated-System-Object,IoC-IScope,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated(System.Object,IoC.IScope,IoC.IContainer,System.Object[])')
   - [ToString()](#M-IoC-Lifetimes-ScopeSingletonLifetime-ToString 'IoC.Lifetimes.ScopeSingletonLifetime.ToString')
 - [Sets](#T-IoC-Features-Sets 'IoC.Features.Sets')
 - [SingletonLifetime](#T-IoC-Lifetimes-SingletonLifetime 'IoC.Lifetimes.SingletonLifetime')
@@ -1596,17 +1603,6 @@ IoC.Lifetimes
 
 For a singleton instance per container.
 
-<a name='M-IoC-Lifetimes-ContainerSingletonLifetime-#ctor'></a>
-### #ctor() `constructor`
-
-##### Summary
-
-Creates new a new lifetime instance.
-
-##### Parameters
-
-This constructor has no parameters.
-
 <a name='M-IoC-Lifetimes-ContainerSingletonLifetime-Create'></a>
 ### Create() `method`
 
@@ -1640,8 +1636,8 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-IoC-Lifetimes-ContainerSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-IContainer,IoC-IContainer,System-Object[]-'></a>
-### OnNewInstanceCreated\`\`1() `method`
+<a name='M-IoC-Lifetimes-ContainerSingletonLifetime-OnNewInstanceCreated-System-Object,IoC-IContainer,IoC-IContainer,System-Object[]-'></a>
+### OnNewInstanceCreated() `method`
 
 ##### Summary
 
@@ -1652,6 +1648,83 @@ This method has no parameters.
 This method has no parameters.
 
 <a name='M-IoC-Lifetimes-ContainerSingletonLifetime-ToString'></a>
+### ToString() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='T-IoC-Lifetimes-ContainerStateSingletonLifetime`1'></a>
+## ContainerStateSingletonLifetime\`1 `type`
+
+##### Namespace
+
+IoC.Lifetimes
+
+##### Summary
+
+For a singleton instance per state.
+
+<a name='M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-Create'></a>
+### Create() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-CreateKey-IoC-IContainer,System-Object[]-'></a>
+### CreateKey() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-Dispose'></a>
+### Dispose() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-OnInstanceReleased-`0,IoC-IContainer-'></a>
+### OnInstanceReleased() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-OnNewInstanceCreated-`0,IoC-IContainer,IoC-IContainer,System-Object[]-'></a>
+### OnNewInstanceCreated() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-ToString'></a>
 ### ToString() `method`
 
 ##### Summary
@@ -1829,6 +1902,13 @@ IoC
 
 Container event types.
 
+<a name='F-IoC-EventType-ContainerStateSingletonLifetime'></a>
+### ContainerStateSingletonLifetime `constants`
+
+##### Summary
+
+On dependency unregistration.
+
 <a name='F-IoC-EventType-CreateContainer'></a>
 ### CreateContainer `constants`
 
@@ -1856,13 +1936,6 @@ On dependency registration.
 ##### Summary
 
 On resolver compilation.
-
-<a name='F-IoC-EventType-UnregisterDependency'></a>
-### UnregisterDependency `constants`
-
-##### Summary
-
-On dependency unregistration.
 
 <a name='T-IoC-FluentBind'></a>
 ## FluentBind `type`
@@ -9223,8 +9296,8 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='T-IoC-Lifetimes-KeyBasedLifetime`1'></a>
-## KeyBasedLifetime\`1 `type`
+<a name='T-IoC-Lifetimes-KeyBasedLifetime`2'></a>
+## KeyBasedLifetime\`2 `type`
 
 ##### Namespace
 
@@ -9239,8 +9312,9 @@ Represents the abstraction for singleton based lifetimes.
 | Name | Description |
 | ---- | ----------- |
 | TKey | The key type. |
+| TValue | The value type. |
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-#ctor-System-Boolean,System-Boolean-'></a>
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-#ctor-System-Boolean,System-Boolean-'></a>
 ### #ctor(supportOnNewInstanceCreated,supportOnInstanceReleased) `constructor`
 
 ##### Summary
@@ -9254,7 +9328,7 @@ Creates an instance
 | supportOnNewInstanceCreated | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | True to invoke OnNewInstanceCreated |
 | supportOnInstanceReleased | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | True to invoke OnInstanceReleased |
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-Build-IoC-IBuildContext,System-Linq-Expressions-Expression-'></a>
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-Build-IoC-IBuildContext,System-Linq-Expressions-Expression-'></a>
 ### Build() `method`
 
 ##### Summary
@@ -9265,7 +9339,7 @@ Creates an instance
 
 This method has no parameters.
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-Create'></a>
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-Create'></a>
 ### Create() `method`
 
 ##### Summary
@@ -9276,7 +9350,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-CreateKey-IoC-IContainer,System-Object[]-'></a>
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-CreateKey-IoC-IContainer,System-Object[]-'></a>
 ### CreateKey(container,args) `method`
 
 ##### Summary
@@ -9294,7 +9368,7 @@ The created key.
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
 | args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The arguments. |
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-Dispose'></a>
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-Dispose'></a>
 ### Dispose() `method`
 
 ##### Summary
@@ -9305,7 +9379,7 @@ The created key.
 
 This method has no parameters.
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-OnInstanceReleased-System-Object,`0-'></a>
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-OnInstanceReleased-`1,`0-'></a>
 ### OnInstanceReleased(releasedInstance,key) `method`
 
 ##### Summary
@@ -9316,11 +9390,11 @@ Is invoked on the instance was released.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| releasedInstance | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The released instance. |
+| releasedInstance | [\`1](#T-`1 '`1') | The released instance. |
 | key | [\`0](#T-`0 '`0') | The instance key. |
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-OnNewInstanceCreated``1-``0,`0,IoC-IContainer,System-Object[]-'></a>
-### OnNewInstanceCreated\`\`1(newInstance,key,container,args) `method`
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-OnNewInstanceCreated-`1,`0,IoC-IContainer,System-Object[]-'></a>
+### OnNewInstanceCreated(newInstance,key,container,args) `method`
 
 ##### Summary
 
@@ -9334,12 +9408,25 @@ The created instance.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| newInstance | [\`\`0](#T-``0 '``0') | The new instance. |
+| newInstance | [\`1](#T-`1 '`1') | The new instance. |
 | key | [\`0](#T-`0 '`0') | The instance key. |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
 | args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | Optional arguments. |
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-SelectResolvingContainer-IoC-IContainer,IoC-IContainer-'></a>
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-Remove-`0-'></a>
+### Remove(key) `method`
+
+##### Summary
+
+Forcibly remove an instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| key | [\`0](#T-`0 '`0') | The instance key. |
+
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-SelectResolvingContainer-IoC-IContainer,IoC-IContainer-'></a>
 ### SelectResolvingContainer() `method`
 
 ##### Summary
@@ -9815,8 +9902,8 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-IScope,IoC-IContainer,System-Object[]-'></a>
-### OnNewInstanceCreated\`\`1() `method`
+<a name='M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated-System-Object,IoC-IScope,IoC-IContainer,System-Object[]-'></a>
+### OnNewInstanceCreated() `method`
 
 ##### Summary
 
