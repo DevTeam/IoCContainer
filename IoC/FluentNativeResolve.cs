@@ -28,7 +28,7 @@ namespace IoC
             for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket[index];
-                if (ReferenceEquals(typeof(T), item.Key))
+                if (typeof(T) == item.Key)
                 {
                     return ((Resolver<T>)item.Value)(container, EmptyArgs);
                 }
