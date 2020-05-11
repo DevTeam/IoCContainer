@@ -82,7 +82,7 @@
         public void Autofac() => _autofacContainer.Resolve<IServiceRoot>().DoSomething();
 
         [Benchmark]
-        public void CastleWindsor() => _windsorContainerContainer.Resolve<IServiceRoot>().DoSomething();
+        public virtual void CastleWindsor() => _windsorContainerContainer.Resolve<IServiceRoot>().DoSomething();
 
         [Benchmark(OperationsPerInvoke = Series * 10)]
         public void DryIoc()
@@ -103,7 +103,7 @@
         }
 
         [Benchmark(OperationsPerInvoke = Series * 10)]
-        public virtual void LightInject()
+        public void LightInject()
         {
             for (var i = 0; i < Series; i++)
             {
@@ -121,13 +121,13 @@
         }
 
         [Benchmark]
-        public void Ninject() => _ninjectContainer.Get<IServiceRoot>().DoSomething();
+        public virtual void Ninject() => _ninjectContainer.Get<IServiceRoot>().DoSomething();
 
         [Benchmark]
         public void Unity() => _unityContainer.Resolve<IServiceRoot>().DoSomething();
 
         [Benchmark(OperationsPerInvoke = Series * 10)]
-        public void MicrosoftDependencyInjection()
+        public virtual void MicrosoftDependencyInjection()
         {
             for (var i = 0; i < Series; i++)
             {

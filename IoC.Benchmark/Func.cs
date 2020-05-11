@@ -40,6 +40,10 @@ namespace IoC.Benchmark
             }
         }
 
+        public override void CastleWindsor() => throw new NotSupportedException();
+
+        public override void Ninject() => throw new NotSupportedException();
+
         private static readonly Func<IService3> Service3Factory = () => new Service3();
 
         [MethodImpl((MethodImplOptions)0x100)]

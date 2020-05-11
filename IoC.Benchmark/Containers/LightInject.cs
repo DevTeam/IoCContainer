@@ -1,6 +1,7 @@
 ﻿namespace IoC.Benchmark.Containers
 {
     using System;
+    using Castle.Core.Internal;
     using global::LightInject;
 
     // ReSharper disable once ClassNeverInstantiated.Global
@@ -13,11 +14,27 @@
             switch (lifetime)
             {
                 case AbstractLifetime.Transient:
-                    ActualContainer.Register(contractType, implementationType);
+                    if (name.IsNullOrEmpty())
+                    {
+                        ActualContainer.Register(contractType, implementationType);
+                    }
+                    else
+                    {
+                        ActualContainer.Register(contractType, implementationType, name);
+                    }
+
                     break;
 
                 case AbstractLifetime.Singleton:
-                    ActualContainer.Register(contractType, implementationType, name, new PerContainerLifetime());
+                    if (name.IsNullOrEmpty())
+                    {
+                        ActualContainer.Register(contractType, implementationType, new PerContainerLifetime());
+                    }
+                    else
+                    {
+                        ActualContainer.Register(contractType, implementationType, name, new PerContainerLifetime());
+                    }
+
                     break;
 
                 default:
