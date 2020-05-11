@@ -22,7 +22,7 @@ namespace IoC
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container)
         {
-            var bucket = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor].KeyValues;
+            var bucket = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor].KeyValues;
             for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket[index];

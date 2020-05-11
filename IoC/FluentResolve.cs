@@ -20,10 +20,8 @@
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
-        public static T Resolve<T>([NotNull] this IContainer container)
-        {
-            return container.GetResolver<T>()(container, EmptyArgs);
-        }
+        public static T Resolve<T>([NotNull] this IContainer container) =>
+            container.GetResolver<T>()(container, EmptyArgs);
 
         /// <summary>
         /// Resolves an instance.

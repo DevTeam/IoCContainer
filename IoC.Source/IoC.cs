@@ -5855,7 +5855,7 @@ namespace IoC
         [NotNull]
         public static Resolver<T> GetResolver<T>([NotNull] this Container container)
         {
-            var bucket = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor].KeyValues;
+            var bucket = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor].KeyValues;
             for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket[index];
@@ -5974,7 +5974,7 @@ namespace IoC
         [NotNull]
         public static T Resolve<T>([NotNull] this Container container)
         {
-            var bucket = container.ResolversByType.Buckets[typeof(T).GetHashCode() & container.ResolversByType.Divisor].KeyValues;
+            var bucket = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor].KeyValues;
             for (var index = 0; index < bucket.Length; index++)
             {
                 var item = bucket[index];
@@ -6107,10 +6107,8 @@ namespace IoC
         /// <returns>The instance.</returns>
         [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
-        public static T Resolve<T>([NotNull] this IContainer container)
-        {
-            return container.GetResolver<T>()(container, EmptyArgs);
-        }
+        public static T Resolve<T>([NotNull] this IContainer container) =>
+            container.GetResolver<T>()(container, EmptyArgs);
 
         /// <summary>
         /// Resolves an instance.
@@ -14078,6 +14076,7 @@ namespace IoC.Core
     internal static class TypeDescriptor<T>
     {
         public static readonly TypeDescriptor Descriptor = new TypeDescriptor(typeof(T));
+        public static readonly int HashCode = typeof(T).GetHashCode();
     }
 }
 
