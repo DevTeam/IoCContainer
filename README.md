@@ -299,6 +299,7 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Resolve Lazy](#resolve-lazy-)
   - [Resolve ThreadLocal](#resolve-threadlocal-)
   - [Resolve Tuple](#resolve-tuple-)
+  - [Resolve Unregistered](#resolve-unregistered-)
   - [Resolve ValueTuple](#resolve-valuetuple-)
   - [Method Injection](#method-injection-)
   - [Nullable Value Type Resolving](#nullable-value-type-resolving-)
@@ -1088,7 +1089,7 @@ public void Run()
 }
 
 // Represents the custom thead singleton lifetime based on the KeyBasedLifetime
-public class ThreadLifetime : KeyBasedLifetime<int>
+public class ThreadLifetime : KeyBasedLifetime<int, object>
 {
     // Creates a clone of the current lifetime (for the case with generic types)
     public override ILifetime Create() =>
@@ -1100,7 +1101,7 @@ public class ThreadLifetime : KeyBasedLifetime<int>
         Thread.CurrentThread.ManagedThreadId;
 
     // Just returns created instance
-    protected override T OnNewInstanceCreated<T>(T newInstance, int key, IContainer container, object[] args) =>
+    protected override object OnNewInstanceCreated(object newInstance, int key, IContainer container, object[] args) =>
         newInstance;
 
     // Do nothing
@@ -2008,7 +2009,6 @@ _Func_ dependency helps when a logic needs to inject some number of type instanc
 
 ``` CSharp
 // Create and configure the container
-// Create and configure the container
 using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
@@ -2123,6 +2123,34 @@ using var container = Container
 
 // Resolve an instance of type Tuple<IService, INamedService>
 var tuple = container.Resolve<Tuple<IService, INamedService>>();
+```
+
+
+
+### Resolve Unregistered [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveUnregistered.cs)
+
+The feature _ResolveUnregisteredFeature_ allows you to resolve any concrete type from the container regardless of whether or not you specifically registered it.
+
+``` CSharp
+public void Run()
+{
+    // Create and configure the container
+    using var container = Container
+        .Create()
+        .Using<ResolveUnregisteredFeature>()
+        .Bind<IDependency>().To<Dependency>()
+        .Container;
+
+    // Resolve an instance of unregistered type
+    container.Resolve<Service>();
+}
+
+class Service
+{
+    public Service(OtherService otherService, IDependency dependency) { }
+}
+
+class OtherService { }
 ```
 
 

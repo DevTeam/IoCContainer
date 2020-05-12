@@ -18,7 +18,6 @@
             // $header=_Func_ dependency helps when a logic needs to inject some number of type instances on demand.
             // {
             // Create and configure the container
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
