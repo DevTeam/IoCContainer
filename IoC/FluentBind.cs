@@ -245,7 +245,7 @@
 
             var token = (binding.Container.TryRegisterDependency(keys, dependency, binding.Lifetime, out var dependencyToken)
                 ? dependencyToken
-                : binding.Container.Resolve<ICannotRegister>().Resolve(binding.Container, keys.ToArray())).AsTokenOf(binding.Container);
+                : binding.Container.Resolve<ICannotRegister>().Resolve(binding.Container, keys, dependency, binding.Lifetime)).AsTokenOf(binding.Container);
 
             var tokens = new List<IToken>(binding.Tokens) { token };
             return Disposable.Create(tokens).AsTokenOf(binding.Container);

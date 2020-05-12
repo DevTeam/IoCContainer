@@ -23,7 +23,7 @@
                 _tokens.Add(token);
                 return container.GetResolver<T>(key.Type, key.Tag.AsTag());
             }
-            
+
             return (container.Parent ?? throw new InvalidOperationException($"Parent container should not be null.")).Resolve<ICannotGetResolver>().Resolve<T>(container, key, error);
         }
 

@@ -69,7 +69,7 @@ namespace IoC.Core
 
             return container.TryRegisterDependency(keys, dependency, lifetime, out var dependencyToken) 
                 ? dependencyToken
-                : container.Resolve<ICannotRegister>().Resolve(container, keys.ToArray());
+                : container.Resolve<ICannotRegister>().Resolve(container, keys, dependency, lifetime);
         }
     }
 }

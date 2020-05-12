@@ -5802,12 +5802,14 @@
             Resolves the scenario when a new binding cannot be registered.
             </summary>
         </member>
-        <member name="M:IoC.Issues.ICannotRegister.Resolve(IoC.IContainer,IoC.Key[])">
+        <member name="M:IoC.Issues.ICannotRegister.Resolve(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime)">
             <summary>
             Resolves the scenario when a new binding cannot be registered.
             </summary>
             <param name="container">The target container.</param>
             <param name="keys">The set of binding keys.</param>
+            <param name="dependency">The dependency.</param>
+            <param name="lifetime">The target lifetime.</param>
             <returns>The dependency token.</returns>
         </member>
         <member name="T:IoC.Issues.ICannotResolveConstructor">

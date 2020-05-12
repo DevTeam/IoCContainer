@@ -349,7 +349,7 @@
 - [ICannotParseType](#T-IoC-Issues-ICannotParseType 'IoC.Issues.ICannotParseType')
   - [Resolve(statementText,statementLineNumber,statementPosition,typeName)](#M-IoC-Issues-ICannotParseType-Resolve-System-String,System-Int32,System-Int32,System-String- 'IoC.Issues.ICannotParseType.Resolve(System.String,System.Int32,System.Int32,System.String)')
 - [ICannotRegister](#T-IoC-Issues-ICannotRegister 'IoC.Issues.ICannotRegister')
-  - [Resolve(container,keys)](#M-IoC-Issues-ICannotRegister-Resolve-IoC-IContainer,IoC-Key[]- 'IoC.Issues.ICannotRegister.Resolve(IoC.IContainer,IoC.Key[])')
+  - [Resolve(container,keys,dependency,lifetime)](#M-IoC-Issues-ICannotRegister-Resolve-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime- 'IoC.Issues.ICannotRegister.Resolve(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime)')
 - [ICannotResolveConstructor](#T-IoC-Issues-ICannotResolveConstructor 'IoC.Issues.ICannotResolveConstructor')
   - [Resolve(buildContext,constructors)](#M-IoC-Issues-ICannotResolveConstructor-Resolve-IoC-IBuildContext,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}}- 'IoC.Issues.ICannotResolveConstructor.Resolve(IoC.IBuildContext,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})')
 - [ICannotResolveDependency](#T-IoC-Issues-ICannotResolveDependency 'IoC.Issues.ICannotResolveDependency')
@@ -8251,8 +8251,8 @@ IoC.Issues
 
 Resolves the scenario when a new binding cannot be registered.
 
-<a name='M-IoC-Issues-ICannotRegister-Resolve-IoC-IContainer,IoC-Key[]-'></a>
-### Resolve(container,keys) `method`
+<a name='M-IoC-Issues-ICannotRegister-Resolve-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime-'></a>
+### Resolve(container,keys,dependency,lifetime) `method`
 
 ##### Summary
 
@@ -8267,7 +8267,9 @@ The dependency token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| keys | [IoC.Key[]](#T-IoC-Key[] 'IoC.Key[]') | The set of binding keys. |
+| keys | [System.Collections.Generic.IEnumerable{IoC.Key}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.Key}') | The set of binding keys. |
+| dependency | [IoC.IDependency](#T-IoC-IDependency 'IoC.IDependency') | The dependency. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 
 <a name='T-IoC-Issues-ICannotResolveConstructor'></a>
 ## ICannotResolveConstructor `type`
