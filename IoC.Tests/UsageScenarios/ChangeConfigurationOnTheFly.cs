@@ -22,6 +22,8 @@
             // Configure `IService` as Transient
             using (container.Bind<IService>().To<Service>())
             {
+                container.IsBound<IService>().ShouldBeTrue();
+
                 // Resolve instances
                 var instance1 = container.Resolve<IService>();
                 var instance2 = container.Resolve<IService>();
@@ -29,6 +31,8 @@
                 // Check that instances are not equal
                 instance1.ShouldNotBe(instance2);
             }
+
+            container.IsBound<IService>().ShouldBeFalse();
 
             // Reconfigure `IService` as Singleton
             using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())

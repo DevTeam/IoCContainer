@@ -219,6 +219,8 @@
   - [Bind\`\`9(container)](#M-IoC-FluentBind-Bind``9-IoC-IMutableContainer- 'IoC.FluentBind.Bind``9(IoC.IMutableContainer)')
   - [Bind\`\`9(binding)](#M-IoC-FluentBind-Bind``9-IoC-IBinding- 'IoC.FluentBind.Bind``9(IoC.IBinding)')
   - [Bind\`\`9(token)](#M-IoC-FluentBind-Bind``9-IoC-IToken- 'IoC.FluentBind.Bind``9(IoC.IToken)')
+  - [IsBound(container,type,tag)](#M-IoC-FluentBind-IsBound-IoC-IContainer,System-Type,System-Object- 'IoC.FluentBind.IsBound(IoC.IContainer,System.Type,System.Object)')
+  - [IsBound\`\`1(container,tag)](#M-IoC-FluentBind-IsBound``1-IoC-IContainer,System-Object- 'IoC.FluentBind.IsBound``1(IoC.IContainer,System.Object)')
   - [Lifetime\`\`1(binding,lifetime)](#M-IoC-FluentBind-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime- 'IoC.FluentBind.Lifetime``1(IoC.IBinding{``0},IoC.ILifetime)')
   - [Tag\`\`1(binding,tagValue)](#M-IoC-FluentBind-Tag``1-IoC-IBinding{``0},System-Object- 'IoC.FluentBind.Tag``1(IoC.IBinding{``0},System.Object)')
   - [To(binding,type,statements)](#M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Linq-Expressions-Expression{System-Action{IoC-Context{System-Object}}}[]- 'IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,System.Linq.Expressions.Expression{System.Action{IoC.Context{System.Object}}}[])')
@@ -2034,7 +2036,7 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
-| types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') |  |
+| types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') | A set of contract types. |
 
 <a name='M-IoC-FluentBind-Bind-IoC-IToken,System-Type[]-'></a>
 ### Bind(token,types) `method`
@@ -2052,7 +2054,7 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The container binding token. |
-| types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') |  |
+| types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') | A set of contract types. |
 
 <a name='M-IoC-FluentBind-Bind``1-IoC-IMutableContainer-'></a>
 ### Bind\`\`1(container) `method`
@@ -5915,6 +5917,49 @@ The binding token.
 | T7 | The contract type #7. |
 | T8 | The contract type #8. |
 
+<a name='M-IoC-FluentBind-IsBound-IoC-IContainer,System-Type,System-Object-'></a>
+### IsBound(container,type,tag) `method`
+
+##### Summary
+
+Determines if the container or any his parents have a binding.
+
+##### Returns
+
+`True` if the binding exists.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The contract type. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
+
+<a name='M-IoC-FluentBind-IsBound``1-IoC-IContainer,System-Object-'></a>
+### IsBound\`\`1(container,tag) `method`
+
+##### Summary
+
+Determines if the container or any his parents have a binding.
+
+##### Returns
+
+`True` if the binding exists.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The contract type. |
+
 <a name='M-IoC-FluentBind-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime-'></a>
 ### Lifetime\`\`1(binding,lifetime) `method`
 
@@ -5954,8 +5999,8 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') |  |
-| tagValue | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') |  |
+| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') | The binding token. |
+| tagValue | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
 
 ##### Generic Types
 

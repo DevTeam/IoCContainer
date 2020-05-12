@@ -1095,12 +1095,30 @@
             Represents extensions to add bindings to the container.
             </summary>
         </member>
+        <member name="M:IoC.FluentBind.IsBound(IoC.IContainer,System.Type,System.Object)">
+            <summary>
+            Determines if the container or any his parents have a binding.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="type">The contract type.</param>
+            <param name="tag">The tag value.</param>
+            <returns><c>True</c> if the binding exists.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.IsBound``1(IoC.IContainer,System.Object)">
+            <summary>
+            Determines if the container or any his parents have a binding.
+            </summary>
+            <typeparam name="T">The contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="tag">The tag value.</param>
+            <returns><c>True</c> if the binding exists.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind(IoC.IMutableContainer,System.Type[])">
             <summary>
             Binds types.
             </summary>
             <param name="container">The target container.</param>
-            <param name="types"></param>
+            <param name="types">A set of contract types.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind(IoC.IToken,System.Type[])">
@@ -1108,7 +1126,7 @@
             Binds types.
             </summary>
             <param name="token">The container binding token.</param>
-            <param name="types"></param>
+            <param name="types">A set of contract types.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.Bind``1(IoC.IMutableContainer)">
@@ -1167,8 +1185,8 @@
             Marks the binding by the tag. Is it possible to use multiple times.
             </summary>
             <typeparam name="T">The instance type.</typeparam>
-            <param name="binding"></param>
-            <param name="tagValue"></param>
+            <param name="binding">The binding token.</param>
+            <param name="tagValue">The tag value.</param>
             <returns>The binding token.</returns>
         </member>
         <member name="M:IoC.FluentBind.AnyTag``1(IoC.IBinding{``0})">

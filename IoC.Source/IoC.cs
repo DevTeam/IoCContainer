@@ -2041,10 +2041,30 @@ namespace IoC
     public static partial class FluentBind
     {
         /// <summary>
+        /// Determines if the container or any his parents have a binding.
+        /// </summary>
+        /// <param name="container">The target container.</param>
+        /// <param name="type">The contract type.</param>
+        /// <param name="tag">The tag value.</param>
+        /// <returns><c>True</c> if the binding exists.</returns>
+        public static bool IsBound(this IContainer container, Type type, object tag = null) =>
+            container.TryGetDependency(new Key(type, tag), out _, out _);
+
+        /// <summary>
+        /// Determines if the container or any his parents have a binding.
+        /// </summary>
+        /// <typeparam name="T">The contract type.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <param name="tag">The tag value.</param>
+        /// <returns><c>True</c> if the binding exists.</returns>
+        public static bool IsBound<T>(this IContainer container, object tag = null) =>
+            container.IsBound(typeof(T), tag);
+
+        /// <summary>
         /// Binds types.
         /// </summary>
         /// <param name="container">The target container.</param>
-        /// <param name="types"></param>
+        /// <param name="types">A set of contract types.</param>
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
@@ -2060,7 +2080,7 @@ namespace IoC
         /// Binds types.
         /// </summary>
         /// <param name="token">The container binding token.</param>
-        /// <param name="types"></param>
+        /// <param name="types">A set of contract types.</param>
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
@@ -2165,8 +2185,8 @@ namespace IoC
         /// Marks the binding by the tag. Is it possible to use multiple times.
         /// </summary>
         /// <typeparam name="T">The instance type.</typeparam>
-        /// <param name="binding"></param>
-        /// <param name="tagValue"></param>
+        /// <param name="binding">The binding token.</param>
+        /// <param name="tagValue">The tag value.</param>
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
@@ -9296,7 +9316,7 @@ namespace IoC.Features
                 _tokens.Add(token);
                 return container.GetResolver<T>(key.Type, key.Tag.AsTag());
             }
-            
+
             return (container.Parent ?? throw new InvalidOperationException($"Parent container should not be null.")).Resolve<ICannotGetResolver>().Resolve<T>(container, key, error);
         }
 
@@ -10178,6 +10198,8 @@ namespace IoC.Issues
 
 namespace IoC.Issues
 {
+    using System.Collections.Generic;
+
     /// <summary>
     /// Resolves the scenario when a new binding cannot be registered.
     /// </summary>
@@ -10189,8 +10211,10 @@ namespace IoC.Issues
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="keys">The set of binding keys.</param>
+        /// <param name="dependency">The dependency.</param>
+        /// <param name="lifetime">The target lifetime.</param>
         /// <returns>The dependency token.</returns>
-        [NotNull] IToken Resolve([NotNull] IContainer container, [NotNull] Key[] keys);
+        [NotNull] IToken Resolve([NotNull] IContainer container, [NotNull] IEnumerable<Key> keys, [NotNull] IDependency dependency, [CanBeNull] ILifetime lifetime);
     }
 }
 
@@ -11188,6 +11212,7 @@ namespace IoC.Core
 namespace IoC.Core
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using Issues;
 
@@ -11197,7 +11222,7 @@ namespace IoC.Core
 
         private CannotRegister() { }
 
-        public IToken Resolve(IContainer container, Key[] keys)
+        public IToken Resolve(IContainer container, IEnumerable<Key> keys, IDependency dependency, ILifetime lifetime)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (keys == null) throw new ArgumentNullException(nameof(keys));
@@ -12280,7 +12305,7 @@ namespace IoC.Core
 
             return container.TryRegisterDependency(keys, dependency, lifetime, out var dependencyToken) 
                 ? dependencyToken
-                : container.Resolve<ICannotRegister>().Resolve(container, keys.ToArray());
+                : container.Resolve<ICannotRegister>().Resolve(container, keys, dependency, lifetime);
         }
     }
 }

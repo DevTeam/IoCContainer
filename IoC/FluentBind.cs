@@ -15,10 +15,30 @@
     public static partial class FluentBind
     {
         /// <summary>
+        /// Determines if the container or any his parents have a binding.
+        /// </summary>
+        /// <param name="container">The target container.</param>
+        /// <param name="type">The contract type.</param>
+        /// <param name="tag">The tag value.</param>
+        /// <returns><c>True</c> if the binding exists.</returns>
+        public static bool IsBound(this IContainer container, Type type, object tag = null) =>
+            container.TryGetDependency(new Key(type, tag), out _, out _);
+
+        /// <summary>
+        /// Determines if the container or any his parents have a binding.
+        /// </summary>
+        /// <typeparam name="T">The contract type.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <param name="tag">The tag value.</param>
+        /// <returns><c>True</c> if the binding exists.</returns>
+        public static bool IsBound<T>(this IContainer container, object tag = null) =>
+            container.IsBound(typeof(T), tag);
+
+        /// <summary>
         /// Binds types.
         /// </summary>
         /// <param name="container">The target container.</param>
-        /// <param name="types"></param>
+        /// <param name="types">A set of contract types.</param>
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
@@ -34,7 +54,7 @@
         /// Binds types.
         /// </summary>
         /// <param name="token">The container binding token.</param>
-        /// <param name="types"></param>
+        /// <param name="types">A set of contract types.</param>
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
@@ -139,8 +159,8 @@
         /// Marks the binding by the tag. Is it possible to use multiple times.
         /// </summary>
         /// <typeparam name="T">The instance type.</typeparam>
-        /// <param name="binding"></param>
-        /// <param name="tagValue"></param>
+        /// <param name="binding">The binding token.</param>
+        /// <param name="tagValue">The tag value.</param>
         /// <returns>The binding token.</returns>
         [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
