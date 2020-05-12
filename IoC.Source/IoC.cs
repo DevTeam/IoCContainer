@@ -2061,6 +2061,26 @@ namespace IoC
             container.IsBound(typeof(T), tag);
 
         /// <summary>
+        /// Determines if the related instance can be resolved.
+        /// </summary>
+        /// <param name="container">The target container.</param>
+        /// <param name="type">The contract type.</param>
+        /// <param name="tag">The tag value.</param>
+        /// <returns><c>True</c> if the binding exists.</returns>
+        public static bool CanResolve(this IContainer container, Type type, object tag = null) =>
+            container.TryGetResolver<object>(type, tag, out _, out _, container);
+
+        /// <summary>
+        /// Determines if the related instance can be resolved.
+        /// </summary>
+        /// <typeparam name="T">The contract type.</typeparam>
+        /// <param name="container">The target container.</param>
+        /// <param name="tag">The tag value.</param>
+        /// <returns><c>True</c> if the binding exists.</returns>
+        public static bool CanResolve<T>(this IContainer container, object tag = null) =>
+            container.TryGetResolver<T>(typeof(T), tag, out _, out _, container);
+
+        /// <summary>
         /// Binds types.
         /// </summary>
         /// <param name="container">The target container.</param>

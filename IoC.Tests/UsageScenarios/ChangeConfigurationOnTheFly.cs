@@ -13,16 +13,15 @@
             // $priority=01
             // $description=Change configuration on-the-fly
             // {
-            // Create and configure the container
-            using var container = Container
-                .Create()
-                .Bind<IDependency>().To<Dependency>()
-                .Container;
-            
+            using var container = Container.Create();
+            var dependencyBindingToken = container.Bind<IDependency>().To<Dependency>();
+
             // Configure `IService` as Transient
             using (container.Bind<IService>().To<Service>())
             {
+                // Check binding state for IService
                 container.IsBound<IService>().ShouldBeTrue();
+                container.CanResolve<IService>().ShouldBeTrue();
 
                 // Resolve instances
                 var instance1 = container.Resolve<IService>();
@@ -32,7 +31,9 @@
                 instance1.ShouldNotBe(instance2);
             }
 
+            // Check binding state for IService
             container.IsBound<IService>().ShouldBeFalse();
+            container.CanResolve<IService>().ShouldBeFalse();
 
             // Reconfigure `IService` as Singleton
             using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
@@ -43,8 +44,17 @@
 
                 // Check that instances are equal
                 instance1.ShouldBe(instance2);
+
+                // Unbind IDependency
+                dependencyBindingToken.Dispose();
+
+                // Check binding state for IService
+                container.IsBound<IService>().ShouldBeTrue();
+                container.CanResolve<IService>().ShouldBeFalse();
             }
 
+            container.IsBound<IService>().ShouldBeFalse();
+            container.CanResolve<IService>().ShouldBeFalse();
             // }
         }
     }

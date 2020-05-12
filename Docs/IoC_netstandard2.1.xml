@@ -1113,6 +1113,24 @@
             <param name="tag">The tag value.</param>
             <returns><c>True</c> if the binding exists.</returns>
         </member>
+        <member name="M:IoC.FluentBind.CanResolve(IoC.IContainer,System.Type,System.Object)">
+            <summary>
+            Determines if the related instance can be resolved.
+            </summary>
+            <param name="container">The target container.</param>
+            <param name="type">The contract type.</param>
+            <param name="tag">The tag value.</param>
+            <returns><c>True</c> if the binding exists.</returns>
+        </member>
+        <member name="M:IoC.FluentBind.CanResolve``1(IoC.IContainer,System.Object)">
+            <summary>
+            Determines if the related instance can be resolved.
+            </summary>
+            <typeparam name="T">The contract type.</typeparam>
+            <param name="container">The target container.</param>
+            <param name="tag">The tag value.</param>
+            <returns><c>True</c> if the binding exists.</returns>
+        </member>
         <member name="M:IoC.FluentBind.Bind(IoC.IMutableContainer,System.Type[])">
             <summary>
             Binds types.
