@@ -2061,7 +2061,7 @@ namespace IoC
             container.IsBound(typeof(T), tag);
 
         /// <summary>
-        /// Determines if the related instance can be resolved.
+        /// Determines if a related instance can be resolved.
         /// </summary>
         /// <param name="container">The target container.</param>
         /// <param name="type">The contract type.</param>
@@ -2071,7 +2071,7 @@ namespace IoC
             container.TryGetResolver<object>(type, tag, out _, out _, container);
 
         /// <summary>
-        /// Determines if the related instance can be resolved.
+        /// Determines if a related instance can be resolved.
         /// </summary>
         /// <typeparam name="T">The contract type.</typeparam>
         /// <param name="container">The target container.</param>
