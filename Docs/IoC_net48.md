@@ -5926,7 +5926,7 @@ The binding token.
 
 ##### Summary
 
-Determines if the related instance can be resolved.
+Determines if a related instance can be resolved.
 
 ##### Returns
 
@@ -5945,7 +5945,7 @@ Determines if the related instance can be resolved.
 
 ##### Summary
 
-Determines if the related instance can be resolved.
+Determines if a related instance can be resolved.
 
 ##### Returns
 

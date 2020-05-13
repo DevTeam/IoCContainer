@@ -1115,7 +1115,7 @@
         </member>
         <member name="M:IoC.FluentBind.CanResolve(IoC.IContainer,System.Type,System.Object)">
             <summary>
-            Determines if the related instance can be resolved.
+            Determines if a related instance can be resolved.
             </summary>
             <param name="container">The target container.</param>
             <param name="type">The contract type.</param>
@@ -1124,7 +1124,7 @@
         </member>
         <member name="M:IoC.FluentBind.CanResolve``1(IoC.IContainer,System.Object)">
             <summary>
-            Determines if the related instance can be resolved.
+            Determines if a related instance can be resolved.
             </summary>
             <typeparam name="T">The contract type.</typeparam>
             <param name="container">The target container.</param>

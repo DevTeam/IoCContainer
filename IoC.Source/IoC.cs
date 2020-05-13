@@ -8888,6 +8888,41 @@ namespace IoC.Features
 
                 var elementType = genericTypeArguments[0];
                 var keys = GetKeys(buildContext.Container, elementType).ToArray();
+                var positionVar = Expression.Variable(typeof(int));
+
+                var conditionExpression =
+                    keys.Length < 5
+                        ? CreateConditions(buildContext, keys, elementType, positionVar)
+                        : CreateSwitchCases(buildContext, keys, elementType, positionVar);
+
+                var factory = Expression.Lambda(conditionExpression, positionVar, buildContext.ContainerParameter, buildContext.ArgsParameter).Compile();
+                var ctor = typeof(Enumerable<>).Descriptor().MakeGenericType(elementType).Descriptor().GetDeclaredConstructors().Single();
+                var enumerableExpression = Expression.New(ctor, Expression.Constant(factory), Expression.Constant(keys.Length), buildContext.ContainerParameter, buildContext.ArgsParameter);
+                expression = buildContext.ReplaceTypes(buildContext.AddLifetime(enumerableExpression, lifetime));
+                error = default(Exception);
+                return true;
+            }
+
+            private static Expression CreateConditions(IBuildContext buildContext, Key[] keys, Type elementType, ParameterExpression positionVar)
+            {
+                Expression result = Expression.Block(
+                    Expression.Throw(Expression.Constant(new BuildExpressionException("Invalid enumeration state.", null))),
+                    Expression.Default(elementType));
+
+                for (var i = keys.Length - 1; i >= 0; i--)
+                {
+                    var context = buildContext.CreateChild(keys[i], buildContext.Container);
+                    result = Expression.Condition(
+                        Expression.Equal(positionVar, Expression.Constant(i)),
+                        Expression.Convert(context.GetDependencyExpression(), elementType),
+                        result);
+                }
+
+                return result;
+            }
+
+            private static Expression CreateSwitchCases(IBuildContext buildContext, Key[] keys, Type elementType, ParameterExpression positionVar)
+            {
                 var cases = new SwitchCase[keys.Length];
                 for (var i = 0; i < keys.Length; i++)
                 {
@@ -8895,20 +8930,13 @@ namespace IoC.Features
                     cases[i] = Expression.SwitchCase(Expression.Convert(context.GetDependencyExpression(), elementType), Expression.Constant(i));
                 }
 
-                var positionVar = Expression.Variable(typeof(int));
                 var switchExpression = Expression.Switch(
                     positionVar,
                     Expression.Block(
                         Expression.Throw(Expression.Constant(new BuildExpressionException("Invalid enumeration state.", null))),
                         Expression.Default(elementType)),
                     cases);
-
-                var factory = Expression.Lambda(switchExpression, positionVar, buildContext.ContainerParameter, buildContext.ArgsParameter).Compile();
-                var ctor = typeof(Enumerable<>).Descriptor().MakeGenericType(elementType).Descriptor().GetDeclaredConstructors().Single();
-                var enumerableExpression = Expression.New(ctor, Expression.Constant(factory), Expression.Constant(cases.Length), buildContext.ContainerParameter, buildContext.ArgsParameter);
-                expression = buildContext.ReplaceTypes(buildContext.AddLifetime(enumerableExpression, lifetime));
-                error = default(Exception);
-                return true;
+                return switchExpression;
             }
         }
 
