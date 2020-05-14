@@ -256,6 +256,18 @@ For details please see [this sample](IoC.Tests/UsageScenarios/Interception.cs).
 
 ![Complex](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/IoC.Benchmark.Complex-report.jpg)
 
+### Graph of 22 transient instances, including 3 Func to create 4 instances each time
+
+![Array](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/IoC.Benchmark.Func-report.jpg)
+
+### Graph of 22 transient instances, including 3 arrays of 4 instances in each
+
+![Array](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/IoC.Benchmark.Array-report.jpg)
+
+### Graph of 22 transient instances, including 3 enumerable of 4 instances in each
+
+![Array](http://tcavs2015.cloudapp.net/guestAuth/app/rest/builds/buildType:DevTeam_IoCContainer_CreateReports,pinned:true,status:SUCCESS/artifacts/content/IoC.Benchmark.Enum-report.jpg)
+
 - __new__ - _Method_ when the graph of objects was constructed by operators _new_ only
 - __Mean__ - arithmetic mean of the root instances resolved per nanosecond
 - __Error__ - half of 99.9% confidence interval
