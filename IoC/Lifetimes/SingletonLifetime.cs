@@ -15,10 +15,22 @@
     {
         private static readonly FieldInfo InstanceFieldInfo = Descriptor<SingletonLifetime>().GetDeclaredFields().Single(i => i.Name == nameof(_instance));
 
-        [NotNull] private readonly ILockObject _lockObject = new LockObject();
+        [CanBeNull] private readonly object _lockObject;
 #pragma warning disable CS0649, IDE0044
         private volatile object _instance;
 #pragma warning restore CS0649, IDE0044
+
+        /// <summary>
+        /// Creates an instance of lifetime.
+        /// </summary>
+        /// <param name="threadSafe"><c>True</c> to synchronize operations.</param>
+        public SingletonLifetime(bool threadSafe = true)
+        {
+            if (threadSafe)
+            {
+                _lockObject = new LockObject();
+            }
+        }
 
         /// <inheritdoc />
         public Expression Build(IBuildContext context, Expression expression)
@@ -27,20 +39,24 @@
             if (context == null) throw new ArgumentNullException(nameof(context));
 
             var thisConst = Expression.Constant(this);
-            var lockObjectConst = Expression.Constant(_lockObject);
             var instanceField = Expression.Field(thisConst, InstanceFieldInfo);
             var typedInstance = instanceField.Convert(expression.Type);
             var isNullExpression = Expression.ReferenceEqual(instanceField, ExpressionBuilderExtensions.NullConst);
 
-            return Expression.Block(Expression.IfThen(
-                isNullExpression,
+            Expression createExpression = Expression.IfThen(
                 // if (this._instance == null)
-                // lock (this._lockObject)
-                Expression.IfThen(
-                    // if (this._instance == null)
-                    isNullExpression,
-                    // this._instance = new T();
-                    Expression.Assign(instanceField, expression)).Lock(lockObjectConst)),
+                isNullExpression,
+                // this._instance = new T();
+                Expression.Assign(instanceField, expression));
+
+            if (_lockObject != null)
+            {
+                // double check
+                createExpression = Expression.IfThen(isNullExpression, createExpression.Lock(Expression.Constant(_lockObject)));
+            }
+
+            return Expression.Block(
+                createExpression,
                 // return this._instance
                 typedInstance);
         }
@@ -53,7 +69,14 @@
         public void Dispose()
         {
             IDisposable disposable;
-            lock (_lockObject)
+            if (_lockObject != null)
+            {
+                lock (_lockObject)
+                {
+                    disposable = _instance as IDisposable;
+                }
+            }
+            else
             {
                 disposable = _instance as IDisposable;
             }
@@ -62,7 +85,14 @@
 
 #if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             IAsyncDisposable asyncDisposable;
-            lock (_lockObject)
+            if (_lockObject != null)
+            {
+                lock (_lockObject)
+                {
+                    asyncDisposable = _instance as IAsyncDisposable;
+                }
+            }
+            else
             {
                 asyncDisposable = _instance as IAsyncDisposable;
             }
@@ -72,7 +102,7 @@
         }
 
         /// <inheritdoc />
-        public ILifetime Create() => new SingletonLifetime();
+        public ILifetime Create() => new SingletonLifetime(_lockObject != null);
 
         /// <inheritdoc />
         public override string ToString() => Lifetime.Singleton.ToString();

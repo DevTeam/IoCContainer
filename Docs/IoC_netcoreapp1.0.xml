@@ -6037,12 +6037,13 @@
             <typeparam name="TKey">The key type.</typeparam>
             <typeparam name="TValue">The value type.</typeparam>
         </member>
-        <member name="M:IoC.Lifetimes.KeyBasedLifetime`2.#ctor(System.Boolean,System.Boolean)">
+        <member name="M:IoC.Lifetimes.KeyBasedLifetime`2.#ctor(System.Boolean,System.Boolean,System.Boolean)">
             <summary>
             Creates an instance
             </summary>
             <param name="supportOnNewInstanceCreated">True to invoke OnNewInstanceCreated</param>
             <param name="supportOnInstanceReleased">True to invoke OnInstanceReleased</param>
+            <param name="threadSafe"><c>True</c> to synchronize operations.</param>
         </member>
         <member name="M:IoC.Lifetimes.KeyBasedLifetime`2.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)">
             <inheritdoc />
@@ -6111,6 +6112,12 @@
             <summary>
             For a singleton instance.
             </summary>
+        </member>
+        <member name="M:IoC.Lifetimes.SingletonLifetime.#ctor(System.Boolean)">
+            <summary>
+            Creates an instance of lifetime.
+            </summary>
+            <param name="threadSafe"><c>True</c> to synchronize operations.</param>
         </member>
         <member name="M:IoC.Lifetimes.SingletonLifetime.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)">
             <inheritdoc />

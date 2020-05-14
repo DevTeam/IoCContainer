@@ -9181,7 +9181,7 @@ namespace IoC.Features
             yield return container.Register(ctx => DefaultAutowiringStrategy.Shared);
 
             // Lifetimes
-            yield return container.Register<ILifetime>(ctx => new SingletonLifetime(), null, new object[] { Lifetime.Singleton });
+            yield return container.Register<ILifetime>(ctx => new SingletonLifetime(true), null, new object[] { Lifetime.Singleton });
             yield return container.Register<ILifetime>(ctx => new ContainerSingletonLifetime(), null, new object[] { Lifetime.ContainerSingleton });
             yield return container.Register<ILifetime>(ctx => new ScopeSingletonLifetime(), null, new object[] { Lifetime.ScopeSingleton });
 
@@ -9772,7 +9772,7 @@ namespace IoC.Lifetimes
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey, TValue>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
         private static readonly ParameterExpression KeyVar = Expression.Variable(typeof(TKey), "key");
 
-        [NotNull] private readonly ILockObject _lockObject = new LockObject();
+        [CanBeNull] private readonly object _lockObject;
         private volatile Table<TKey, TValue> _instances = Table<TKey, TValue>.Empty;
 
         /// <summary>
@@ -9780,10 +9780,18 @@ namespace IoC.Lifetimes
         /// </summary>
         /// <param name="supportOnNewInstanceCreated">True to invoke OnNewInstanceCreated</param>
         /// <param name="supportOnInstanceReleased">True to invoke OnInstanceReleased</param>
-        protected KeyBasedLifetime(bool supportOnNewInstanceCreated = true, bool supportOnInstanceReleased = true)
+        /// <param name="threadSafe"><c>True</c> to synchronize operations.</param>
+        protected KeyBasedLifetime(
+            bool supportOnNewInstanceCreated = true,
+            bool supportOnInstanceReleased = true,
+            bool threadSafe = true)
         {
             _supportOnNewInstanceCreated = supportOnNewInstanceCreated;
             _supportOnInstanceReleased = supportOnInstanceReleased;
+            if (threadSafe)
+            {
+                _lockObject = new LockObject();
+            }
         }
 
         /// <inheritdoc />
@@ -9795,8 +9803,7 @@ namespace IoC.Lifetimes
             var thisConst = Expression.Constant(this);
             var instanceVar = Expression.Variable(typeof(TValue));
             var instancesField = Expression.Field(thisConst, InstancesFieldInfo);
-            var lockObjectConst = Expression.Constant(_lockObject);
-            var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, KeyVar));
+            var getExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, KeyVar));
             Expression isEmptyExpression;
             if (returnType.Descriptor().IsValueType())
             {
@@ -9811,6 +9818,32 @@ namespace IoC.Lifetimes
                 ? Expression.Call(thisConst, OnNewInstanceCreatedMethodInfo, instanceVar.Convert(typeof(TValue)), KeyVar, context.ContainerParameter, context.ArgsParameter).Convert(returnType)
                 : instanceVar;
 
+            Expression createExpression = Expression.Block(
+                // instance = _instances.Get(hashCode, key);
+                getExpression,
+                // if (instance == default(TValue))
+                Expression.Condition(
+                    isEmptyExpression,
+                    Expression.Block(
+                        // instance = new T();
+                        Expression.Assign(instanceVar, bodyExpression.Convert(typeof(TValue))),
+                        // Instances = _instances.Set(hashCode, key, instance);
+                        Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar.Convert(typeof(object)))),
+                        // instance or OnNewInstanceCreated(instance, key, container, args);
+                        initNewInstanceExpression,
+                        instanceVar), 
+                    instanceVar));
+
+            if (_lockObject != null)
+            {
+                // double check
+                createExpression = Expression.Block(
+                    // instance = _instances.Get(hashCode, key);
+                    getExpression,
+                    Expression.Condition(isEmptyExpression, createExpression.Lock(Expression.Constant(_lockObject)), instanceVar)
+                );
+            }
+
             return Expression.Block(
                 // Key key;
                 // int hashCode;
@@ -9818,31 +9851,7 @@ namespace IoC.Lifetimes
                 new[] { KeyVar, instanceVar },
                 // TKey key = CreateKey(container, args);
                 Expression.Assign(KeyVar, Expression.Call(thisConst, CreateKeyMethodInfo, context.ContainerParameter, context.ArgsParameter)),
-                // TValue instance = _instances.Get(key);
-                assignInstanceExpression,
-                // if (instance == default(TValue))
-                Expression.Condition(
-                    isEmptyExpression,
-                    Expression.Block(
-                        // lock (this._lockObject)
-                        Expression.Block(
-                    // instance = _instances.Get(hashCode, key);
-                    assignInstanceExpression,
-                    // if (instance == default(TValue))
-                    Expression.IfThen(
-                        isEmptyExpression,
-                        Expression.Block(
-                            // instance = new T();
-                            Expression.Assign(instanceVar, bodyExpression.Convert(typeof(TValue))),
-                            // Instances = _instances.Set(hashCode, key, instance);
-                            Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar.Convert(typeof(object))))
-                        ))).Lock(lockObjectConst),
-                        // instance or OnNewInstanceCreated(instance, key, container, args);
-                        initNewInstanceExpression.Convert(returnType)),
-                        // else {
-                        // return instance;
-                        instanceVar.Convert(returnType)
-                    )
+                createExpression.Convert(returnType)
             // }
             );
         }
@@ -9855,7 +9864,15 @@ namespace IoC.Lifetimes
         public virtual void Dispose()
         {
             Table<TKey, TValue> instances;
-            lock (_lockObject)
+            if (_lockObject != null)
+            {
+                lock (_lockObject)
+                {
+                    instances = _instances;
+                    _instances = Table<TKey, TValue>.Empty;
+                }
+            }
+            else
             {
                 instances = _instances;
                 _instances = Table<TKey, TValue>.Empty;
@@ -9905,7 +9922,14 @@ namespace IoC.Lifetimes
         protected bool Remove(TKey key)
         {
             bool removed;
-            lock (_lockObject)
+            if (_lockObject != null)
+            {
+                lock (_lockObject)
+                {
+                    _instances = _instances.Remove(key, out removed);
+                }
+            }
+            else
             {
                 _instances = _instances.Remove(key, out removed);
             }
@@ -10010,10 +10034,22 @@ namespace IoC.Lifetimes
     {
         private static readonly FieldInfo InstanceFieldInfo = Descriptor<SingletonLifetime>().GetDeclaredFields().Single(i => i.Name == nameof(_instance));
 
-        [NotNull] private readonly ILockObject _lockObject = new LockObject();
+        [CanBeNull] private readonly object _lockObject;
 #pragma warning disable CS0649, IDE0044
         private volatile object _instance;
 #pragma warning restore CS0649, IDE0044
+
+        /// <summary>
+        /// Creates an instance of lifetime.
+        /// </summary>
+        /// <param name="threadSafe"><c>True</c> to synchronize operations.</param>
+        public SingletonLifetime(bool threadSafe = true)
+        {
+            if (threadSafe)
+            {
+                _lockObject = new LockObject();
+            }
+        }
 
         /// <inheritdoc />
         public Expression Build(IBuildContext context, Expression expression)
@@ -10022,20 +10058,24 @@ namespace IoC.Lifetimes
             if (context == null) throw new ArgumentNullException(nameof(context));
 
             var thisConst = Expression.Constant(this);
-            var lockObjectConst = Expression.Constant(_lockObject);
             var instanceField = Expression.Field(thisConst, InstanceFieldInfo);
             var typedInstance = instanceField.Convert(expression.Type);
             var isNullExpression = Expression.ReferenceEqual(instanceField, ExpressionBuilderExtensions.NullConst);
 
-            return Expression.Block(Expression.IfThen(
-                isNullExpression,
+            Expression createExpression = Expression.IfThen(
                 // if (this._instance == null)
-                // lock (this._lockObject)
-                Expression.IfThen(
-                    // if (this._instance == null)
-                    isNullExpression,
-                    // this._instance = new T();
-                    Expression.Assign(instanceField, expression)).Lock(lockObjectConst)),
+                isNullExpression,
+                // this._instance = new T();
+                Expression.Assign(instanceField, expression));
+
+            if (_lockObject != null)
+            {
+                // double check
+                createExpression = Expression.IfThen(isNullExpression, createExpression.Lock(Expression.Constant(_lockObject)));
+            }
+
+            return Expression.Block(
+                createExpression,
                 // return this._instance
                 typedInstance);
         }
@@ -10048,7 +10088,14 @@ namespace IoC.Lifetimes
         public void Dispose()
         {
             IDisposable disposable;
-            lock (_lockObject)
+            if (_lockObject != null)
+            {
+                lock (_lockObject)
+                {
+                    disposable = _instance as IDisposable;
+                }
+            }
+            else
             {
                 disposable = _instance as IDisposable;
             }
@@ -10057,7 +10104,14 @@ namespace IoC.Lifetimes
 
 #if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             IAsyncDisposable asyncDisposable;
-            lock (_lockObject)
+            if (_lockObject != null)
+            {
+                lock (_lockObject)
+                {
+                    asyncDisposable = _instance as IAsyncDisposable;
+                }
+            }
+            else
             {
                 asyncDisposable = _instance as IAsyncDisposable;
             }
@@ -10067,7 +10121,7 @@ namespace IoC.Lifetimes
         }
 
         /// <inheritdoc />
-        public ILifetime Create() => new SingletonLifetime();
+        public ILifetime Create() => new SingletonLifetime(_lockObject != null);
 
         /// <inheritdoc />
         public override string ToString() => Lifetime.Singleton.ToString();
@@ -13582,7 +13636,6 @@ namespace IoC.Core
 
 namespace IoC.Core
 {
-    using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;

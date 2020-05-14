@@ -219,6 +219,10 @@
   - [Bind\`\`9(container)](#M-IoC-FluentBind-Bind``9-IoC-IMutableContainer- 'IoC.FluentBind.Bind``9(IoC.IMutableContainer)')
   - [Bind\`\`9(binding)](#M-IoC-FluentBind-Bind``9-IoC-IBinding- 'IoC.FluentBind.Bind``9(IoC.IBinding)')
   - [Bind\`\`9(token)](#M-IoC-FluentBind-Bind``9-IoC-IToken- 'IoC.FluentBind.Bind``9(IoC.IToken)')
+  - [CanResolve(container,type,tag)](#M-IoC-FluentBind-CanResolve-IoC-IContainer,System-Type,System-Object- 'IoC.FluentBind.CanResolve(IoC.IContainer,System.Type,System.Object)')
+  - [CanResolve\`\`1(container,tag)](#M-IoC-FluentBind-CanResolve``1-IoC-IContainer,System-Object- 'IoC.FluentBind.CanResolve``1(IoC.IContainer,System.Object)')
+  - [IsBound(container,type,tag)](#M-IoC-FluentBind-IsBound-IoC-IContainer,System-Type,System-Object- 'IoC.FluentBind.IsBound(IoC.IContainer,System.Type,System.Object)')
+  - [IsBound\`\`1(container,tag)](#M-IoC-FluentBind-IsBound``1-IoC-IContainer,System-Object- 'IoC.FluentBind.IsBound``1(IoC.IContainer,System.Object)')
   - [Lifetime\`\`1(binding,lifetime)](#M-IoC-FluentBind-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime- 'IoC.FluentBind.Lifetime``1(IoC.IBinding{``0},IoC.ILifetime)')
   - [Tag\`\`1(binding,tagValue)](#M-IoC-FluentBind-Tag``1-IoC-IBinding{``0},System-Object- 'IoC.FluentBind.Tag``1(IoC.IBinding{``0},System.Object)')
   - [To(binding,type,statements)](#M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Linq-Expressions-Expression{System-Action{IoC-Context{System-Object}}}[]- 'IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,System.Linq.Expressions.Expression{System.Action{IoC.Context{System.Object}}}[])')
@@ -349,7 +353,7 @@
 - [ICannotParseType](#T-IoC-Issues-ICannotParseType 'IoC.Issues.ICannotParseType')
   - [Resolve(statementText,statementLineNumber,statementPosition,typeName)](#M-IoC-Issues-ICannotParseType-Resolve-System-String,System-Int32,System-Int32,System-String- 'IoC.Issues.ICannotParseType.Resolve(System.String,System.Int32,System.Int32,System.String)')
 - [ICannotRegister](#T-IoC-Issues-ICannotRegister 'IoC.Issues.ICannotRegister')
-  - [Resolve(container,keys)](#M-IoC-Issues-ICannotRegister-Resolve-IoC-IContainer,IoC-Key[]- 'IoC.Issues.ICannotRegister.Resolve(IoC.IContainer,IoC.Key[])')
+  - [Resolve(container,keys,dependency,lifetime)](#M-IoC-Issues-ICannotRegister-Resolve-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime- 'IoC.Issues.ICannotRegister.Resolve(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime)')
 - [ICannotResolveConstructor](#T-IoC-Issues-ICannotResolveConstructor 'IoC.Issues.ICannotResolveConstructor')
   - [Resolve(buildContext,constructors)](#M-IoC-Issues-ICannotResolveConstructor-Resolve-IoC-IBuildContext,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}}- 'IoC.Issues.ICannotResolveConstructor.Resolve(IoC.IBuildContext,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})')
 - [ICannotResolveDependency](#T-IoC-Issues-ICannotResolveDependency 'IoC.Issues.ICannotResolveDependency')
@@ -474,6 +478,8 @@
   - [ToString()](#M-IoC-Lifetimes-ScopeSingletonLifetime-ToString 'IoC.Lifetimes.ScopeSingletonLifetime.ToString')
 - [Sets](#T-IoC-Features-Sets 'IoC.Features.Sets')
 - [SingletonLifetime](#T-IoC-Lifetimes-SingletonLifetime 'IoC.Lifetimes.SingletonLifetime')
+  - [#ctor()](#M-IoC-Lifetimes-SingletonLifetime-#ctor 'IoC.Lifetimes.SingletonLifetime.#ctor')
+  - [#ctor(threadSafe,lockObject)](#M-IoC-Lifetimes-SingletonLifetime-#ctor-System-Boolean,System-Object- 'IoC.Lifetimes.SingletonLifetime.#ctor(System.Boolean,System.Object)')
   - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.SingletonLifetime.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
   - [Create()](#M-IoC-Lifetimes-SingletonLifetime-Create 'IoC.Lifetimes.SingletonLifetime.Create')
   - [Dispose()](#M-IoC-Lifetimes-SingletonLifetime-Dispose 'IoC.Lifetimes.SingletonLifetime.Dispose')
@@ -2036,7 +2042,7 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
-| types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') |  |
+| types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') | A set of contract types. |
 
 <a name='M-IoC-FluentBind-Bind-IoC-IToken,System-Type[]-'></a>
 ### Bind(token,types) `method`
@@ -2054,7 +2060,7 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The container binding token. |
-| types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') |  |
+| types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') | A set of contract types. |
 
 <a name='M-IoC-FluentBind-Bind``1-IoC-IMutableContainer-'></a>
 ### Bind\`\`1(container) `method`
@@ -5917,6 +5923,92 @@ The binding token.
 | T7 | The contract type #7. |
 | T8 | The contract type #8. |
 
+<a name='M-IoC-FluentBind-CanResolve-IoC-IContainer,System-Type,System-Object-'></a>
+### CanResolve(container,type,tag) `method`
+
+##### Summary
+
+Determines if a related instance can be resolved.
+
+##### Returns
+
+`True` if the binding exists.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The contract type. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
+
+<a name='M-IoC-FluentBind-CanResolve``1-IoC-IContainer,System-Object-'></a>
+### CanResolve\`\`1(container,tag) `method`
+
+##### Summary
+
+Determines if a related instance can be resolved.
+
+##### Returns
+
+`True` if the binding exists.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The contract type. |
+
+<a name='M-IoC-FluentBind-IsBound-IoC-IContainer,System-Type,System-Object-'></a>
+### IsBound(container,type,tag) `method`
+
+##### Summary
+
+Determines if the container or any his parents have a binding.
+
+##### Returns
+
+`True` if the binding exists.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The contract type. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
+
+<a name='M-IoC-FluentBind-IsBound``1-IoC-IContainer,System-Object-'></a>
+### IsBound\`\`1(container,tag) `method`
+
+##### Summary
+
+Determines if the container or any his parents have a binding.
+
+##### Returns
+
+`True` if the binding exists.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The contract type. |
+
 <a name='M-IoC-FluentBind-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime-'></a>
 ### Lifetime\`\`1(binding,lifetime) `method`
 
@@ -5956,8 +6048,8 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') |  |
-| tagValue | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') |  |
+| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') | The binding token. |
+| tagValue | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
 
 ##### Generic Types
 
@@ -8251,8 +8343,8 @@ IoC.Issues
 
 Resolves the scenario when a new binding cannot be registered.
 
-<a name='M-IoC-Issues-ICannotRegister-Resolve-IoC-IContainer,IoC-Key[]-'></a>
-### Resolve(container,keys) `method`
+<a name='M-IoC-Issues-ICannotRegister-Resolve-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime-'></a>
+### Resolve(container,keys,dependency,lifetime) `method`
 
 ##### Summary
 
@@ -8267,7 +8359,9 @@ The dependency token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| keys | [IoC.Key[]](#T-IoC-Key[] 'IoC.Key[]') | The set of binding keys. |
+| keys | [System.Collections.Generic.IEnumerable{IoC.Key}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.Key}') | The set of binding keys. |
+| dependency | [IoC.IDependency](#T-IoC-IDependency 'IoC.IDependency') | The dependency. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 
 <a name='T-IoC-Issues-ICannotResolveConstructor'></a>
 ## ICannotResolveConstructor `type`
@@ -9970,6 +10064,31 @@ IoC.Lifetimes
 ##### Summary
 
 For a singleton instance.
+
+<a name='M-IoC-Lifetimes-SingletonLifetime-#ctor'></a>
+### #ctor() `constructor`
+
+##### Summary
+
+Creates an instance of lifetime.
+
+##### Parameters
+
+This constructor has no parameters.
+
+<a name='M-IoC-Lifetimes-SingletonLifetime-#ctor-System-Boolean,System-Object-'></a>
+### #ctor(threadSafe,lockObject) `constructor`
+
+##### Summary
+
+
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| threadSafe | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') |  |
+| lockObject | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') |  |
 
 <a name='M-IoC-Lifetimes-SingletonLifetime-Build-IoC-IBuildContext,System-Linq-Expressions-Expression-'></a>
 ### Build() `method`

@@ -25,7 +25,7 @@
         private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey, TValue>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
         private static readonly ParameterExpression KeyVar = Expression.Variable(typeof(TKey), "key");
 
-        [NotNull] private readonly ILockObject _lockObject = new LockObject();
+        [CanBeNull] private readonly object _lockObject;
         private volatile Table<TKey, TValue> _instances = Table<TKey, TValue>.Empty;
 
         /// <summary>
@@ -33,10 +33,18 @@
         /// </summary>
         /// <param name="supportOnNewInstanceCreated">True to invoke OnNewInstanceCreated</param>
         /// <param name="supportOnInstanceReleased">True to invoke OnInstanceReleased</param>
-        protected KeyBasedLifetime(bool supportOnNewInstanceCreated = true, bool supportOnInstanceReleased = true)
+        /// <param name="threadSafe"><c>True</c> to synchronize operations.</param>
+        protected KeyBasedLifetime(
+            bool supportOnNewInstanceCreated = true,
+            bool supportOnInstanceReleased = true,
+            bool threadSafe = true)
         {
             _supportOnNewInstanceCreated = supportOnNewInstanceCreated;
             _supportOnInstanceReleased = supportOnInstanceReleased;
+            if (threadSafe)
+            {
+                _lockObject = new LockObject();
+            }
         }
 
         /// <inheritdoc />
@@ -48,8 +56,7 @@
             var thisConst = Expression.Constant(this);
             var instanceVar = Expression.Variable(typeof(TValue));
             var instancesField = Expression.Field(thisConst, InstancesFieldInfo);
-            var lockObjectConst = Expression.Constant(_lockObject);
-            var assignInstanceExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, KeyVar));
+            var getExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, KeyVar));
             Expression isEmptyExpression;
             if (returnType.Descriptor().IsValueType())
             {
@@ -64,6 +71,32 @@
                 ? Expression.Call(thisConst, OnNewInstanceCreatedMethodInfo, instanceVar.Convert(typeof(TValue)), KeyVar, context.ContainerParameter, context.ArgsParameter).Convert(returnType)
                 : instanceVar;
 
+            Expression createExpression = Expression.Block(
+                // instance = _instances.Get(hashCode, key);
+                getExpression,
+                // if (instance == default(TValue))
+                Expression.Condition(
+                    isEmptyExpression,
+                    Expression.Block(
+                        // instance = new T();
+                        Expression.Assign(instanceVar, bodyExpression.Convert(typeof(TValue))),
+                        // Instances = _instances.Set(hashCode, key, instance);
+                        Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar.Convert(typeof(object)))),
+                        // instance or OnNewInstanceCreated(instance, key, container, args);
+                        initNewInstanceExpression,
+                        instanceVar), 
+                    instanceVar));
+
+            if (_lockObject != null)
+            {
+                // double check
+                createExpression = Expression.Block(
+                    // instance = _instances.Get(hashCode, key);
+                    getExpression,
+                    Expression.Condition(isEmptyExpression, createExpression.Lock(Expression.Constant(_lockObject)), instanceVar)
+                );
+            }
+
             return Expression.Block(
                 // Key key;
                 // int hashCode;
@@ -71,31 +104,7 @@
                 new[] { KeyVar, instanceVar },
                 // TKey key = CreateKey(container, args);
                 Expression.Assign(KeyVar, Expression.Call(thisConst, CreateKeyMethodInfo, context.ContainerParameter, context.ArgsParameter)),
-                // TValue instance = _instances.Get(key);
-                assignInstanceExpression,
-                // if (instance == default(TValue))
-                Expression.Condition(
-                    isEmptyExpression,
-                    Expression.Block(
-                        // lock (this._lockObject)
-                        Expression.Block(
-                    // instance = _instances.Get(hashCode, key);
-                    assignInstanceExpression,
-                    // if (instance == default(TValue))
-                    Expression.IfThen(
-                        isEmptyExpression,
-                        Expression.Block(
-                            // instance = new T();
-                            Expression.Assign(instanceVar, bodyExpression.Convert(typeof(TValue))),
-                            // Instances = _instances.Set(hashCode, key, instance);
-                            Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar.Convert(typeof(object))))
-                        ))).Lock(lockObjectConst),
-                        // instance or OnNewInstanceCreated(instance, key, container, args);
-                        initNewInstanceExpression.Convert(returnType)),
-                        // else {
-                        // return instance;
-                        instanceVar.Convert(returnType)
-                    )
+                createExpression.Convert(returnType)
             // }
             );
         }
@@ -108,7 +117,15 @@
         public virtual void Dispose()
         {
             Table<TKey, TValue> instances;
-            lock (_lockObject)
+            if (_lockObject != null)
+            {
+                lock (_lockObject)
+                {
+                    instances = _instances;
+                    _instances = Table<TKey, TValue>.Empty;
+                }
+            }
+            else
             {
                 instances = _instances;
                 _instances = Table<TKey, TValue>.Empty;
@@ -158,7 +175,14 @@
         protected bool Remove(TKey key)
         {
             bool removed;
-            lock (_lockObject)
+            if (_lockObject != null)
+            {
+                lock (_lockObject)
+                {
+                    _instances = _instances.Remove(key, out removed);
+                }
+            }
+            else
             {
                 _instances = _instances.Remove(key, out removed);
             }

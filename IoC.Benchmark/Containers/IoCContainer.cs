@@ -1,6 +1,7 @@
 ﻿namespace IoC.Benchmark.Containers
 {
     using System;
+    using Lifetimes;
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class IoCContainer: IAbstractContainer<Container>
@@ -18,7 +19,7 @@
                     break;
 
                 case AbstractLifetime.Singleton:
-                    bind = bind.As(Lifetime.Singleton);
+                    bind = bind.Lifetime(new SingletonLifetime(false));
                     break;
 
                 default:
