@@ -595,15 +595,15 @@ public void Run()
     var instance = container.Resolve<IService>();
 }
 
-ic class Glue : IConfiguration
+public class Glue : IConfiguration
 {
-public IEnumerable<IToken> Apply(IMutableContainer container)
-{
-    // Bind using full autowiring
-    yield return container
-        .Bind<IDependency>().To<Dependency>()
-        .Bind<IService>().To<Service>();
-}
+    public IEnumerable<IToken> Apply(IMutableContainer container)
+    {
+        // Bind using full autowiring
+        yield return container
+            .Bind<IDependency>().To<Dependency>()
+            .Bind<IService>().To<Service>();
+    }
 }
 ```
 
