@@ -52,5 +52,6 @@ namespace IoC.Tests.UsageScenarios
         // Custom generic type marker using predefined attribute `GenericTypeArgument`
         [GenericTypeArgument]
         class TTMy { }
+        // }
     }
 }
