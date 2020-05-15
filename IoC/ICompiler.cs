@@ -10,13 +10,13 @@
     public interface ICompiler
     {
         /// <summary>
-        /// Compiles an expression to an instance resolver.
+        /// Compiles a lambda expression to delegate.
         /// </summary>
         /// <param name="context">Current context for building.</param>
-        /// <param name="expression">The lambda expression to compile.</param>
-        /// <param name="resolver">The compiled resolver delegate.</param>
+        /// <param name="lambdaExpression">The lambda expression to compile.</param>
+        /// <param name="lambdaCompiled">The compiled lambda.</param>
         /// <param name="error">Compilation error.</param>
         /// <returns>True if success.</returns>
-        bool TryCompile([NotNull] IBuildContext context, [NotNull] LambdaExpression expression, out Delegate resolver, out Exception error);
+        bool TryCompile([NotNull] IBuildContext context, [NotNull] LambdaExpression lambdaExpression, out Delegate lambdaCompiled, out Exception error);
     }
 }

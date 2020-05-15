@@ -86,34 +86,34 @@
             return false;
         }
 
-        private bool TryCompile([NotNull] IBuildContext context, [NotNull] LambdaExpression expression, [CanBeNull] ILifetime lifetime, out Delegate resolver, out Exception error)
+        private bool TryCompile([NotNull] IBuildContext context, [NotNull] LambdaExpression lambdaExpression, [CanBeNull] ILifetime lifetime, out Delegate resolver, out Exception error)
         {
             error = default(Exception);
             try
             {
                 foreach (var compiler in _registrationTracker.Compilers)
                 {
-                    if (compiler.TryCompile(context, expression, out resolver, out error))
+                    if (compiler.TryCompile(context, lambdaExpression, out resolver, out error))
                     {
-                        _eventObserver.OnNext(ContainerEvent.Compilation(Container, new[] { context.Key }, Dependency, lifetime, expression));
+                        _eventObserver.OnNext(ContainerEvent.Compilation(Container, new[] { context.Key }, Dependency, lifetime, lambdaExpression));
                         return true;
                     }
 
-                    _eventObserver.OnNext(ContainerEvent.CompilationFailed(Container, new[] { context.Key }, Dependency, lifetime, expression, error));
+                    _eventObserver.OnNext(ContainerEvent.CompilationFailed(Container, new[] { context.Key }, Dependency, lifetime, lambdaExpression, error));
                 }
             }
             catch (Exception ex)
             {
                 error = ex;
-                _eventObserver.OnNext(ContainerEvent.CompilationFailed(Container, new[] { context.Key }, Dependency, lifetime, expression, ex));
+                _eventObserver.OnNext(ContainerEvent.CompilationFailed(Container, new[] { context.Key }, Dependency, lifetime, lambdaExpression, ex));
             }
 
             resolver = default(Delegate);
             return false;
         }
 
-        public bool TryCompile(IBuildContext context, LambdaExpression expression, out Delegate resolver, out Exception error) =>
-            TryCompile(context, expression, null, out resolver, out error);
+        public bool TryCompile(IBuildContext context, LambdaExpression lambdaExpression, out Delegate lambdaCompiled, out Exception error) =>
+            TryCompile(context, lambdaExpression, null, out lambdaCompiled, out error);
 
         [MethodImpl((MethodImplOptions)0x200)]
         [CanBeNull]

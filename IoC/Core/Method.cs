@@ -48,8 +48,24 @@
                 else
                 {
                     var key = new Key(param.ParameterType);
-                    var defaultExpression = param.IsOptional ? Expression.Constant(param.DefaultValue) : null;
-                    yield return buildContext.CreateChild(key, buildContext.Container).GetDependencyExpression(defaultExpression);
+                    Expression defaultExpression;
+                    if (param.IsOptional)
+                    {
+                        if (param.DefaultValue == null)
+                        {
+                            defaultExpression = Expression.Default(param.ParameterType);
+                        }
+                        else
+                        {
+                            defaultExpression = Expression.Constant(param.DefaultValue);
+                        }
+                    }
+                    else
+                    {
+                        defaultExpression = null;
+                    }
+
+                    yield return buildContext.Create(key, buildContext.Container).GetDependencyExpression(defaultExpression);
                 }
             }
         }

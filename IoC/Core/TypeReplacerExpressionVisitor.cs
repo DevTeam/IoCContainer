@@ -10,7 +10,7 @@
     internal sealed class TypeReplacerExpressionVisitor : ExpressionVisitor
     {
         [NotNull] private readonly IDictionary<Type, Type> _typesMap;
-        [NotNull] private readonly Dictionary<string, ParameterExpression> _parameters = new Dictionary<string, ParameterExpression>();
+        [NotNull] private readonly Dictionary<ParameterExpression, ParameterExpression> _parameters = new Dictionary<ParameterExpression, ParameterExpression>();
 
         public TypeReplacerExpressionVisitor([NotNull] IDictionary<Type, Type> typesMap)
         {
@@ -82,7 +82,7 @@
 
         protected override Expression VisitParameter(ParameterExpression node)
         {
-            if (_parameters.TryGetValue(node.Name, out var newNode))
+            if (_parameters.TryGetValue(node, out var newNode))
             {
                 return newNode;
             }
@@ -97,7 +97,7 @@
                 newNode = Expression.Parameter(ReplaceType(node.Type), node.Name);
             }
 
-            _parameters[node.Name] = newNode;
+            _parameters[node] = newNode;
             return newNode;
         }
 
@@ -108,7 +108,14 @@
                 return Expression.Constant(ReplaceType(type), node.Type);
             }
 
-            return Expression.Constant(node.Value, ReplaceType(node.Type));
+            var newType = ReplaceType(node.Type);
+            var value = node.Value;
+            if (node.Value == null)
+            {
+                return Expression.Default(newType);
+            }
+
+            return Expression.Constant(value, newType);
         }
 
         protected override Expression VisitLambda<T>(Expression<T> node)

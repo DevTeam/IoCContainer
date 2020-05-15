@@ -1,6 +1,7 @@
 ﻿namespace IoC.Core
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
@@ -10,7 +11,6 @@
         private readonly Expression _expression;
         [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;
         [NotNull] [ItemNotNull] private readonly Expression[] _statements;
-        private readonly bool _isComplexType;
 
         [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
         [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
@@ -32,37 +32,30 @@
         {
             _expression = constructorExpression ?? throw new ArgumentNullException(nameof(constructorExpression));
             _autoWiringStrategy = autoWiringStrategy;
-            _isComplexType = Autowiring.IsComplexType(_expression.Type.Descriptor());
             _statements = (statementExpressions ?? throw new ArgumentNullException(nameof(statementExpressions))).ToArray();
         }
-
-        public Expression Expression { get; }
 
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            var typesMap = new Dictionary<Type, Type>();
+
             try
             {
-                expression = Autowiring.ReplaceTypes(buildContext, _isComplexType, _expression);
-                expression = Autowiring.ApplyInitializers(
-                    buildContext,
-                    _autoWiringStrategy ?? buildContext.AutowiringStrategy,
-                    expression.Type.Descriptor(),
-                    _isComplexType,
-                    expression,
-                    _statements);
-
-                if (_statements.Length == 0)
+                TypeMapper.Shared.Map(_expression.Type, buildContext.Key.Type, typesMap);
+                foreach (var mapping in typesMap)
                 {
-                    if (_isComplexType)
-                    {
-                        expression = buildContext.ReplaceTypes(expression);
-                    }
-
-                    expression = buildContext.InjectDependencies(expression);
+                    buildContext.MapType(mapping.Key, mapping.Value);
                 }
 
-                expression = buildContext.AddLifetime(expression, lifetime);
+                expression = buildContext.ApplyInitializers(
+                    _autoWiringStrategy ?? buildContext.AutowiringStrategy,
+                    _expression.Type.Descriptor(),
+                    _expression,
+                    _statements,
+                    lifetime,
+                    typesMap);
+
                 error = default(Exception);
                 return true;
             }

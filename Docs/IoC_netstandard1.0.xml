@@ -5339,11 +5339,6 @@
             Represents an abstract build context.
             </summary>
         </member>
-        <member name="P:IoC.IBuildContext.Parent">
-            <summary>
-            The parent of the current build context.
-            </summary>
-        </member>
         <member name="P:IoC.IBuildContext.Key">
             <summary>
             The target key to build resolver.
@@ -5381,43 +5376,13 @@
             <param name="defaultExpression">The default expression.</param>
             <returns>The dependency expression.</returns>
         </member>
-        <member name="M:IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)">
+        <member name="M:IoC.IBuildContext.Create(IoC.Key,IoC.IContainer)">
             <summary>
-            Creates a child build context.
+            Creates a child context.
             </summary>
             <param name="key">The key</param>
             <param name="container">The container.</param>
             <returns>The new build context.</returns>
-        </member>
-        <member name="M:IoC.IBuildContext.BindTypes(System.Type,System.Type)">
-            <summary>
-            Binds a raw type to a target type.
-            </summary>
-            <param name="originalType">The registered type.</param>
-            <param name="targetType">The target type.</param>
-        </member>
-        <member name="M:IoC.IBuildContext.TryReplaceType(System.Type,System.Type@)">
-            <summary>
-            Tries to replace generic types' markers by related types.
-            </summary>
-            <param name="originalType">The target raw type.</param>
-            <param name="targetType">The replacing type.</param>
-            <returns></returns>
-        </member>
-        <member name="M:IoC.IBuildContext.ReplaceTypes(System.Linq.Expressions.Expression)">
-            <summary>
-            Prepares base expression replacing generic types' markers by related types.
-            </summary>
-            <param name="baseExpression">The base expression.</param>
-            <returns>The resulting expression.</returns>
-        </member>
-        <member name="M:IoC.IBuildContext.InjectDependencies(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)">
-            <summary>
-            Prepares base expression injecting appropriate dependencies.
-            </summary>
-            <param name="baseExpression">The base expression.</param>
-            <param name="instanceExpression">The instance expression.</param>
-            <returns>The resulting expression.</returns>
         </member>
         <member name="M:IoC.IBuildContext.AddLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)">
             <summary>
@@ -5433,19 +5398,19 @@
             </summary>
             <param name="parameterExpression">The parameters expression to add.</param>
         </member>
-        <member name="M:IoC.IBuildContext.DeclareParameters(System.Linq.Expressions.Expression)">
+        <member name="M:IoC.IBuildContext.MapType(System.Type,System.Type)">
             <summary>
-            Declares all added parameters.
+            Adds types mapping.
             </summary>
-            <param name="baseExpression">The base expression.</param>
-            <returns>The base expression with parameters.</returns>
+            <param name="fromType">Type to map.</param>
+            <param name="toType">The target type.</param>
         </member>
         <member name="M:IoC.IBuildContext.TryCompile(System.Linq.Expressions.LambdaExpression,System.Delegate@,System.Exception@)">
             <summary>
-            Compiles an expression to an instance resolver.
+            Compiles a lambda expression to delegate.
             </summary>
-            <param name="expression">The lambda expression to compile.</param>
-            <param name="resolver">The compiled resolver delegate.</param>
+            <param name="lambdaExpression">The lambda expression to compile.</param>
+            <param name="lambdaCompiled">The compiled lambda.</param>
             <param name="error">Compilation error.</param>
             <returns>True if success.</returns>
         </member>
@@ -5469,11 +5434,11 @@
         </member>
         <member name="M:IoC.ICompiler.TryCompile(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,System.Delegate@,System.Exception@)">
             <summary>
-            Compiles an expression to an instance resolver.
+            Compiles a lambda expression to delegate.
             </summary>
             <param name="context">Current context for building.</param>
-            <param name="expression">The lambda expression to compile.</param>
-            <param name="resolver">The compiled resolver delegate.</param>
+            <param name="lambdaExpression">The lambda expression to compile.</param>
+            <param name="lambdaCompiled">The compiled lambda.</param>
             <param name="error">Compilation error.</param>
             <returns>True if success.</returns>
         </member>

@@ -108,6 +108,8 @@ namespace IoC.Tests.IntegrationTests
 
         public void Init(MySimpleClass mySimpleClass) => MySimpleClass = mySimpleClass;
 
+        public void Init(T1 t1 = default(T1), T2 t2 = default(T2)) { }
+
         public MySimpleClass MySimpleClass { get; private set; }
 
         public int Counter => _counter;

@@ -17,7 +17,7 @@
         private readonly Type[] _registeredGenericTypeParameters;
         private readonly TypeDescriptor _registeredTypeDescriptor;
         [NotNull] [ItemNotNull] private readonly Expression[] _statements;
-        private readonly bool _isComplexType;
+        private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
 
         public FullAutowiringDependency(
             [NotNull] Type type,
@@ -29,7 +29,6 @@
             _autoWiringStrategy = autoWiringStrategy;
             _statements = statements.Select(i => i.Body).ToArray();
             _registeredTypeDescriptor = type.Descriptor();
-            _isComplexType = Autowiring.IsComplexType(_registeredTypeDescriptor);
 
             if (_registeredTypeDescriptor.IsInterface())
             {
@@ -54,7 +53,6 @@
 
             _genericParamsWithConstraints = new List<GenericParamsWithConstraints>(_registeredGenericTypeParameters.Length);
             var genericTypePos = 0;
-            var typesMap = new Dictionary<Type, Type>();
             for (var position = 0; position < _registeredGenericTypeParameters.Length; position++)
             {
                 var genericType = _registeredGenericTypeParameters[position];
@@ -66,12 +64,12 @@
                 var descriptor = genericType.Descriptor();
                 if (descriptor.GetGenericParameterAttributes() == GenericParameterAttributes.None && !descriptor.GetGenericParameterConstraints().Any())
                 {
-                    if (!typesMap.TryGetValue(genericType, out var curType))
+                    if (!_typesMap.TryGetValue(genericType, out var curType))
                     {
                         try
                         {
                             curType = GenericTypeArguments.Arguments[genericTypePos++];
-                            typesMap[genericType] = curType;
+                            _typesMap[genericType] = curType;
                         }
                         catch (IndexOutOfRangeException ex)
                         {
@@ -101,6 +99,7 @@
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            var typesMap = new Dictionary<Type, Type>(_typesMap);
             try
             {
                 var autoWiringStrategy = _autoWiringStrategy ?? buildContext.AutowiringStrategy;
@@ -115,7 +114,12 @@
                 var typeDescriptor = instanceType.Descriptor();
                 if (typeDescriptor.IsConstructedGenericType())
                 {
-                    buildContext.BindTypes(instanceType, buildContext.Key.Type);
+                    TypeMapper.Shared.Map(instanceType, buildContext.Key.Type, typesMap);
+                    foreach (var mapping in typesMap)
+                    {
+                        buildContext.MapType(mapping.Key, mapping.Value);
+                    }
+
                     var genericTypeArgs = typeDescriptor.GetGenericTypeArguments();
                     var isReplaced = false;
                     for (var position = 0; position < genericTypeArgs.Length; position++)
@@ -124,7 +128,7 @@
                         var genericTypeArgDescriptor = genericTypeArg.Descriptor();
                         if (genericTypeArgDescriptor.IsGenericTypeDefinition() || genericTypeArgDescriptor.IsGenericTypeArgument())
                         {
-                            if (buildContext.TryReplaceType(genericTypeArg, out var type))
+                            if (typesMap.TryGetValue(genericTypeArg, out var type))
                             {
                                 genericTypeArgs[position] = type;
                                 isReplaced = true;
@@ -143,7 +147,7 @@
                     }
                 }
 
-                var defaultConstructors = Autowiring.GetMethods(typeDescriptor.GetDeclaredConstructors());
+                var defaultConstructors = typeDescriptor.GetDeclaredConstructors().FilterMethods();
                 if (!autoWiringStrategy.TryResolveConstructor(defaultConstructors, out var ctor))
                 {
                     if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
@@ -152,15 +156,14 @@
                     }
                 }
 
-                expression = Autowiring.ApplyInitializers(
-                    buildContext,
+                expression = buildContext.ApplyInitializers(
                     autoWiringStrategy,
                     typeDescriptor,
-                    _isComplexType,
                     Expression.New(ctor.Info, ctor.GetParametersExpressions(buildContext)),
-                    _statements);
+                    _statements,
+                    lifetime,
+                    typesMap);
 
-                expression = buildContext.AddLifetime(expression, lifetime);
                 error = default(Exception);
                 return true;
             }

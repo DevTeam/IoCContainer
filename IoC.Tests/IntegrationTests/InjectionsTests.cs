@@ -394,6 +394,19 @@
             }
         }
 
+        [Fact]
+        public void ContainerResolveWhenGenericInitializer()
+        {
+            // Given
+            using var container = Container.Create();
+            // When
+            using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>(ctx => new MyGenericService<TT1, TT2>(), ctx => ctx.It.Init(default(TT1), default(TT2))))
+            {
+                // Then
+                var instance1 = container.Resolve<IMyGenericService<int, double>>();
+            }
+        }
+
         public class MyHolder
         {
             public MyHolder(IMyService myService)

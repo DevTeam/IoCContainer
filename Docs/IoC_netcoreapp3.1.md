@@ -330,17 +330,12 @@
   - [ContainerParameter](#P-IoC-IBuildContext-ContainerParameter 'IoC.IBuildContext.ContainerParameter')
   - [Depth](#P-IoC-IBuildContext-Depth 'IoC.IBuildContext.Depth')
   - [Key](#P-IoC-IBuildContext-Key 'IoC.IBuildContext.Key')
-  - [Parent](#P-IoC-IBuildContext-Parent 'IoC.IBuildContext.Parent')
   - [AddLifetime(baseExpression,lifetime)](#M-IoC-IBuildContext-AddLifetime-System-Linq-Expressions-Expression,IoC-ILifetime- 'IoC.IBuildContext.AddLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)')
   - [AddParameter(parameterExpression)](#M-IoC-IBuildContext-AddParameter-System-Linq-Expressions-ParameterExpression- 'IoC.IBuildContext.AddParameter(System.Linq.Expressions.ParameterExpression)')
-  - [BindTypes(originalType,targetType)](#M-IoC-IBuildContext-BindTypes-System-Type,System-Type- 'IoC.IBuildContext.BindTypes(System.Type,System.Type)')
-  - [CreateChild(key,container)](#M-IoC-IBuildContext-CreateChild-IoC-Key,IoC-IContainer- 'IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)')
-  - [DeclareParameters(baseExpression)](#M-IoC-IBuildContext-DeclareParameters-System-Linq-Expressions-Expression- 'IoC.IBuildContext.DeclareParameters(System.Linq.Expressions.Expression)')
+  - [Create(key,container)](#M-IoC-IBuildContext-Create-IoC-Key,IoC-IContainer- 'IoC.IBuildContext.Create(IoC.Key,IoC.IContainer)')
   - [GetDependencyExpression(defaultExpression)](#M-IoC-IBuildContext-GetDependencyExpression-System-Linq-Expressions-Expression- 'IoC.IBuildContext.GetDependencyExpression(System.Linq.Expressions.Expression)')
-  - [InjectDependencies(baseExpression,instanceExpression)](#M-IoC-IBuildContext-InjectDependencies-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression- 'IoC.IBuildContext.InjectDependencies(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)')
-  - [ReplaceTypes(baseExpression)](#M-IoC-IBuildContext-ReplaceTypes-System-Linq-Expressions-Expression- 'IoC.IBuildContext.ReplaceTypes(System.Linq.Expressions.Expression)')
-  - [TryCompile(expression,resolver,error)](#M-IoC-IBuildContext-TryCompile-System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@- 'IoC.IBuildContext.TryCompile(System.Linq.Expressions.LambdaExpression,System.Delegate@,System.Exception@)')
-  - [TryReplaceType(originalType,targetType)](#M-IoC-IBuildContext-TryReplaceType-System-Type,System-Type@- 'IoC.IBuildContext.TryReplaceType(System.Type,System.Type@)')
+  - [MapType(fromType,toType)](#M-IoC-IBuildContext-MapType-System-Type,System-Type- 'IoC.IBuildContext.MapType(System.Type,System.Type)')
+  - [TryCompile(lambdaExpression,lambdaCompiled,error)](#M-IoC-IBuildContext-TryCompile-System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@- 'IoC.IBuildContext.TryCompile(System.Linq.Expressions.LambdaExpression,System.Delegate@,System.Exception@)')
 - [IBuilder](#T-IoC-IBuilder 'IoC.IBuilder')
   - [Build(context,bodyExpression)](#M-IoC-IBuilder-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.IBuilder.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
 - [ICannotBuildExpression](#T-IoC-Issues-ICannotBuildExpression 'IoC.Issues.ICannotBuildExpression')
@@ -364,7 +359,7 @@
 - [ICannotResolveType](#T-IoC-Issues-ICannotResolveType 'IoC.Issues.ICannotResolveType')
   - [Resolve(buildContext,registeredType,resolvingType)](#M-IoC-Issues-ICannotResolveType-Resolve-IoC-IBuildContext,System-Type,System-Type- 'IoC.Issues.ICannotResolveType.Resolve(IoC.IBuildContext,System.Type,System.Type)')
 - [ICompiler](#T-IoC-ICompiler 'IoC.ICompiler')
-  - [TryCompile(context,expression,resolver,error)](#M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@- 'IoC.ICompiler.TryCompile(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,System.Delegate@,System.Exception@)')
+  - [TryCompile(context,lambdaExpression,lambdaCompiled,error)](#M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@- 'IoC.ICompiler.TryCompile(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,System.Delegate@,System.Exception@)')
 - [ICompositionRoot\`1](#T-IoC-ICompositionRoot`1 'IoC.ICompositionRoot`1')
   - [Instance](#P-IoC-ICompositionRoot`1-Instance 'IoC.ICompositionRoot`1.Instance')
 - [IConfiguration](#T-IoC-IConfiguration 'IoC.IConfiguration')
@@ -7986,13 +7981,6 @@ The depth of current context in the build tree.
 
 The target key to build resolver.
 
-<a name='P-IoC-IBuildContext-Parent'></a>
-### Parent `property`
-
-##### Summary
-
-The parent of the current build context.
-
 <a name='M-IoC-IBuildContext-AddLifetime-System-Linq-Expressions-Expression,IoC-ILifetime-'></a>
 ### AddLifetime(baseExpression,lifetime) `method`
 
@@ -8024,26 +8012,12 @@ Adds a parameter.
 | ---- | ---- | ----------- |
 | parameterExpression | [System.Linq.Expressions.ParameterExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.ParameterExpression 'System.Linq.Expressions.ParameterExpression') | The parameters expression to add. |
 
-<a name='M-IoC-IBuildContext-BindTypes-System-Type,System-Type-'></a>
-### BindTypes(originalType,targetType) `method`
+<a name='M-IoC-IBuildContext-Create-IoC-Key,IoC-IContainer-'></a>
+### Create(key,container) `method`
 
 ##### Summary
 
-Binds a raw type to a target type.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| originalType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The registered type. |
-| targetType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The target type. |
-
-<a name='M-IoC-IBuildContext-CreateChild-IoC-Key,IoC-IContainer-'></a>
-### CreateChild(key,container) `method`
-
-##### Summary
-
-Creates a child build context.
+Creates a child context.
 
 ##### Returns
 
@@ -8055,23 +8029,6 @@ The new build context.
 | ---- | ---- | ----------- |
 | key | [IoC.Key](#T-IoC-Key 'IoC.Key') | The key |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The container. |
-
-<a name='M-IoC-IBuildContext-DeclareParameters-System-Linq-Expressions-Expression-'></a>
-### DeclareParameters(baseExpression) `method`
-
-##### Summary
-
-Declares all added parameters.
-
-##### Returns
-
-The base expression with parameters.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
 
 <a name='M-IoC-IBuildContext-GetDependencyExpression-System-Linq-Expressions-Expression-'></a>
 ### GetDependencyExpression(defaultExpression) `method`
@@ -8090,47 +8047,26 @@ The dependency expression.
 | ---- | ---- | ----------- |
 | defaultExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The default expression. |
 
-<a name='M-IoC-IBuildContext-InjectDependencies-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression-'></a>
-### InjectDependencies(baseExpression,instanceExpression) `method`
+<a name='M-IoC-IBuildContext-MapType-System-Type,System-Type-'></a>
+### MapType(fromType,toType) `method`
 
 ##### Summary
 
-Prepares base expression injecting appropriate dependencies.
-
-##### Returns
-
-The resulting expression.
+Adds types mapping.
 
 ##### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
-| instanceExpression | [System.Linq.Expressions.ParameterExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.ParameterExpression 'System.Linq.Expressions.ParameterExpression') | The instance expression. |
-
-<a name='M-IoC-IBuildContext-ReplaceTypes-System-Linq-Expressions-Expression-'></a>
-### ReplaceTypes(baseExpression) `method`
-
-##### Summary
-
-Prepares base expression replacing generic types' markers by related types.
-
-##### Returns
-
-The resulting expression.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
+| fromType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | Type to map. |
+| toType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The target type. |
 
 <a name='M-IoC-IBuildContext-TryCompile-System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@-'></a>
-### TryCompile(expression,resolver,error) `method`
+### TryCompile(lambdaExpression,lambdaCompiled,error) `method`
 
 ##### Summary
 
-Compiles an expression to an instance resolver.
+Compiles a lambda expression to delegate.
 
 ##### Returns
 
@@ -8140,27 +8076,9 @@ True if success.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| expression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The lambda expression to compile. |
-| resolver | [System.Delegate@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Delegate@ 'System.Delegate@') | The compiled resolver delegate. |
+| lambdaExpression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The lambda expression to compile. |
+| lambdaCompiled | [System.Delegate@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Delegate@ 'System.Delegate@') | The compiled lambda. |
 | error | [System.Exception@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception@ 'System.Exception@') | Compilation error. |
-
-<a name='M-IoC-IBuildContext-TryReplaceType-System-Type,System-Type@-'></a>
-### TryReplaceType(originalType,targetType) `method`
-
-##### Summary
-
-Tries to replace generic types' markers by related types.
-
-##### Returns
-
-
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| originalType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The target raw type. |
-| targetType | [System.Type@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type@ 'System.Type@') | The replacing type. |
 
 <a name='T-IoC-IBuilder'></a>
 ## IBuilder `type`
@@ -8512,11 +8430,11 @@ IoC
 Represents an abstract expression compiler.
 
 <a name='M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@-'></a>
-### TryCompile(context,expression,resolver,error) `method`
+### TryCompile(context,lambdaExpression,lambdaCompiled,error) `method`
 
 ##### Summary
 
-Compiles an expression to an instance resolver.
+Compiles a lambda expression to delegate.
 
 ##### Returns
 
@@ -8527,8 +8445,8 @@ True if success.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | context | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | Current context for building. |
-| expression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The lambda expression to compile. |
-| resolver | [System.Delegate@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Delegate@ 'System.Delegate@') | The compiled resolver delegate. |
+| lambdaExpression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The lambda expression to compile. |
+| lambdaCompiled | [System.Delegate@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Delegate@ 'System.Delegate@') | The compiled lambda. |
 | error | [System.Exception@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception@ 'System.Exception@') | Compilation error. |
 
 <a name='T-IoC-ICompositionRoot`1'></a>

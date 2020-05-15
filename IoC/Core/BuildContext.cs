@@ -17,12 +17,13 @@
     {
         private static readonly ICollection<IBuilder> EmptyBuilders = new List<IBuilder>();
         [NotNull] private readonly IEnumerable<IBuilder> _builders;
-        private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
         private readonly IList<ParameterExpression> _parameters = new List<ParameterExpression>();
         [NotNull] private readonly ICompiler _compiler;
+        [CanBeNull] internal readonly BuildContext Parent;
+        [NotNull] private readonly IDictionary<Type, Type> _typesMap;
 
         internal BuildContext(
-            [CanBeNull] IBuildContext parent,
+            [CanBeNull] BuildContext parent,
             Key key,
             [NotNull] IContainer resolvingContainer,
             [NotNull] IEnumerable<IBuilder> builders,
@@ -41,9 +42,8 @@
             ArgsParameter = argsParameter ?? throw new ArgumentNullException(nameof(argsParameter));
             ContainerParameter = containerParameter ?? throw new ArgumentNullException(nameof(containerParameter));
             Depth = depth;
+            _typesMap = parent == null ? new Dictionary<Type, Type>() : new Dictionary<Type, Type>(parent._typesMap);
         }
-
-        public IBuildContext Parent { get; }
 
         public Key Key { get; }
 
@@ -56,54 +56,25 @@
         public ParameterExpression ArgsParameter { get; private set; }
 
         public ParameterExpression ContainerParameter { get; private set; }
-        
-        public IDisposable OverrideArgsParameter(ParameterExpression argsParameter)
-        {
-            var origin = ArgsParameter;
-            ArgsParameter = argsParameter;
-            return Disposable.Create(() => { ArgsParameter = origin; });
-        }
 
-        public IDisposable OverrideContainerParameter(ParameterExpression containerParameter)
-        {
-            var origin = ContainerParameter;
-            ContainerParameter = containerParameter;
-            return Disposable.Create(() => { ContainerParameter = origin; });
-        }
-
-        public IBuildContext CreateChild(Key key, IContainer container) => 
-            CreateChildInternal(key, container ?? throw new ArgumentNullException(nameof(container)));
-
-        public Expression ReplaceTypes(Expression baseExpression) =>
-            TypeReplacerExpressionBuilder.Shared.Build(baseExpression, this, _typesMap);
-
-        public void BindTypes(Type originalType, Type targetType) =>
-            TypeMapper.Shared.Map(originalType, targetType, _typesMap);
-
-        public bool TryReplaceType(Type originalType, out Type targetType) =>
-            _typesMap.TryGetValue(originalType, out targetType);
+        public IBuildContext Create(Key key, IContainer container) => 
+            CreateInternal(key, container ?? throw new ArgumentNullException(nameof(container)));
 
         public void AddParameter(ParameterExpression parameterExpression)
             => _parameters.Add(parameterExpression ?? throw new ArgumentNullException(nameof(parameterExpression)));
 
-        public Expression DeclareParameters(Expression baseExpression)
-        {
-            if (_parameters.Count > 0)
-            {
-                return Expression.Block(baseExpression.Type, _parameters, baseExpression);
-            }
-
-            return baseExpression;
-        }
-
-        public Expression InjectDependencies(Expression baseExpression, ParameterExpression instanceExpression = null) =>
-            DependencyInjectionExpressionBuilder.Shared.Build(baseExpression, this, instanceExpression);
+        public void MapType(Type fromType, Type toType) => _typesMap[fromType] = toType;
 
         public Expression AddLifetime(Expression baseExpression, ILifetime lifetime)
         {
+            if (_parameters.Count > 0)
+            {
+                baseExpression = Expression.Block(baseExpression.Type, _parameters, baseExpression);
+            }
+
             if (_builders.Any())
             {
-                var buildContext = CreateChildInternal(Key, Container, forBuilders: true);
+                var buildContext = CreateInternal(Key, Container, forBuilders: true);
                 foreach (var builder in _builders)
                 {
                     baseExpression = baseExpression.Convert(Key.Type);
@@ -115,14 +86,24 @@
             return LifetimeExpressionBuilder.Shared.Build(baseExpression, this, lifetime);
         }
 
-        private IBuildContext CreateChildInternal(Key key, IContainer container, bool forBuilders = false)
+        private IBuildContext CreateInternal(Key key, IContainer container, bool forBuilders = false)
         {
             if (_typesMap.TryGetValue(key.Type, out var type))
             {
                 key = new Key(type, key.Tag);
             }
 
-            return new BuildContext(this, key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, _compiler, ArgsParameter, ContainerParameter, Depth + 1);
+            return new BuildContext(
+                this,
+                key,
+                container,
+                forBuilders ? EmptyBuilders :
+                    _builders,
+                AutowiringStrategy,
+                _compiler,
+                ArgsParameter,
+                ContainerParameter,
+                Depth + 1);
         }
 
         public Expression GetDependencyExpression(Expression defaultExpression = null)
@@ -180,10 +161,13 @@
             return Container.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
         }
 
+        public bool TryCompile(LambdaExpression lambdaExpression, out Delegate lambdaCompiled, out Exception error) =>
+            _compiler.TryCompile(this, lambdaExpression, out lambdaCompiled, out error);
+
         public override string ToString()
         {
             var path = new List<IBuildContext>();
-            IBuildContext context = this;
+            var context = this;
             while (context != null)
             {
                 path.Add(context);
@@ -198,8 +182,5 @@
 
             return text.ToString();
         }
-
-        public bool TryCompile(LambdaExpression expression, out Delegate resolver, out Exception error) =>
-            _compiler.TryCompile(this, expression, out resolver, out error);
     }
 }

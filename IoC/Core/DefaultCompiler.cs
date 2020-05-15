@@ -9,19 +9,19 @@
 
         private DefaultCompiler() { }
 
-        public bool TryCompile(IBuildContext context, LambdaExpression expression, out Delegate resolver, out Exception error)
+        public bool TryCompile(IBuildContext context, LambdaExpression lambdaExpression, out Delegate lambdaCompiled, out Exception error)
         {
-            if (expression == null) throw new ArgumentNullException(nameof(expression));
+            if (lambdaExpression == null) throw new ArgumentNullException(nameof(lambdaExpression));
             try
             {
-                resolver = expression.Compile();
+                lambdaCompiled = lambdaExpression.Compile();
                 error = default(Exception);
                 return true;
             }
             catch (Exception ex)
             {
                 error = ex;
-                resolver = default(Delegate);
+                lambdaCompiled = default(Delegate);
                 return false;
             }
         }

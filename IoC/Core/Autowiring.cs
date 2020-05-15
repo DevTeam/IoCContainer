@@ -1,6 +1,7 @@
 ﻿// ReSharper disable RedundantNameQualifier
 namespace IoC.Core
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
@@ -12,15 +13,16 @@ namespace IoC.Core
     {
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public static Expression ApplyInitializers(
-            IBuildContext buildContext,
+            this IBuildContext buildContext,
             IAutowiringStrategy autoWiringStrategy,
             TypeDescriptor typeDescriptor,
-            bool isComplexType,
             Expression baseExpression,
-            Expression[] statements)
+            IEnumerable<Expression> statements,
+            ILifetime lifetime,
+            IDictionary<Type, Type> typesMap)
         {
             var isDefaultAutoWiringStrategy = DefaultAutowiringStrategy.Shared == autoWiringStrategy;
-            var defaultMethods = GetMethods(typeDescriptor.GetDeclaredMethods());
+            var defaultMethods = typeDescriptor.GetDeclaredMethods().FilterMethods();
             if (!autoWiringStrategy.TryResolveInitializers(defaultMethods, out var initializers))
             {
                 if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
@@ -29,55 +31,31 @@ namespace IoC.Core
                 }
             }
 
-            var curInitializers = initializers.ToArray();
-            if (curInitializers.Length > 0)
+            baseExpression = TypeReplacerExpressionBuilder.Shared.Build(baseExpression, buildContext, typesMap);
+            var thisVar = Expression.Variable(baseExpression.Type);
+
+            var initializerExpressions =
+                initializers.Select(initializer => (Expression)Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext)))
+                    .Concat(statements.Select(expression => TypeReplacerExpressionBuilder.Shared.Build(expression, buildContext, typesMap)))
+                    .ToArray();
+
+            if (initializerExpressions.Length > 0)
             {
-                var thisVar = Expression.Variable(baseExpression.Type, "this");
                 baseExpression = Expression.Block(
                     new[] { thisVar },
                     Expression.Assign(thisVar, baseExpression),
-                    Expression.Block(
-                        from initializer in curInitializers
-                        select Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext))
-                    ),
+                    Expression.Block(initializerExpressions),
                     thisVar
                 );
             }
 
-            if (!isDefaultAutoWiringStrategy)
-            {
-                baseExpression = buildContext.InjectDependencies(baseExpression);
-            }
-
-            if (statements.Length == 0)
-            {
-                return buildContext.DeclareParameters(baseExpression);
-            }
-
-            var contextItVar = ReplaceTypes(buildContext, isComplexType, Expression.Variable(baseExpression.Type, "ctx.It"));
-            baseExpression = Expression.Block(
-                new[] { contextItVar },
-                Expression.Assign(contextItVar, baseExpression),
-                ReplaceTypes(buildContext, isComplexType, Expression.Block(statements)),
-                contextItVar
-            );
-
-            baseExpression = buildContext.DeclareParameters(baseExpression);
-            return buildContext.InjectDependencies(baseExpression, contextItVar);
+            baseExpression = DependencyInjectionExpressionBuilder.Shared.Build(baseExpression, buildContext, thisVar);
+            return buildContext.AddLifetime(baseExpression, lifetime);
         }
-
-        [MethodImpl((MethodImplOptions)0x100)]
-        public static bool IsComplexType(TypeDescriptor typeDescriptor) => 
-            typeDescriptor.IsConstructedGenericType() || typeDescriptor.IsGenericTypeDefinition() || typeDescriptor.IsArray();
-
-        [MethodImpl((MethodImplOptions)0x100)]
-        public static T ReplaceTypes<T>(IBuildContext buildContext, bool isComplexType, T expression)
-            where T : Expression =>
-            isComplexType ? (T)buildContext.ReplaceTypes(expression) : expression;
 
         [IoC.NotNull]
         [MethodImpl((MethodImplOptions)0x100)]
-        public static IEnumerable<IMethod<TMethodInfo>> GetMethods<TMethodInfo>([IoC.NotNull] IEnumerable<TMethodInfo> methodInfos)
+        public static IEnumerable<IMethod<TMethodInfo>> FilterMethods<TMethodInfo>([IoC.NotNull] this IEnumerable<TMethodInfo> methodInfos)
             where TMethodInfo : MethodBase
             => methodInfos
                 .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))

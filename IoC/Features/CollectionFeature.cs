@@ -181,7 +181,7 @@ namespace IoC.Features
                 {
                     var ctor = typeof(Enumerable<>).Descriptor().MakeGenericType(elementType).Descriptor().GetDeclaredConstructors().Single();
                     var enumerableExpression = Expression.New(ctor, Expression.Constant(factory), Expression.Constant(keys.Length), buildContext.ContainerParameter, buildContext.ArgsParameter);
-                    expression = buildContext.ReplaceTypes(buildContext.AddLifetime(enumerableExpression, lifetime));
+                    expression = enumerableExpression;
                     return true;
                 }
 
@@ -197,7 +197,7 @@ namespace IoC.Features
 
                 for (var i = keys.Length - 1; i >= 0; i--)
                 {
-                    var context = buildContext.CreateChild(keys[i], buildContext.Container);
+                    var context = buildContext.Create(keys[i], buildContext.Container);
                     result = Expression.Condition(
                         Expression.Equal(positionVar, Expression.Constant(i)),
                         Expression.Convert(context.GetDependencyExpression(), elementType),
@@ -212,7 +212,7 @@ namespace IoC.Features
                 var cases = new SwitchCase[keys.Length];
                 for (var i = 0; i < keys.Length; i++)
                 {
-                    var context = buildContext.CreateChild(keys[i], buildContext.Container);
+                    var context = buildContext.Create(keys[i], buildContext.Container);
                     cases[i] = Expression.SwitchCase(Expression.Convert(context.GetDependencyExpression(), elementType), Expression.Constant(i));
                 }
 
@@ -311,12 +311,11 @@ namespace IoC.Features
                 var expressions = new Expression[keys.Length];
                 for (var i = 0; i < keys.Length; i++)
                 {
-                    var context = buildContext.CreateChild(keys[i], buildContext.Container);
+                    var context = buildContext.Create(keys[i], buildContext.Container);
                     expressions[i] = context.GetDependencyExpression();
                 }
 
-                var arrayExpression = Expression.NewArrayInit(elementType, expressions);
-                expression = buildContext.ReplaceTypes(buildContext.AddLifetime(arrayExpression, lifetime));
+                expression = Expression.NewArrayInit(elementType, expressions);
                 error = default(Exception);
                 return true;
             }
