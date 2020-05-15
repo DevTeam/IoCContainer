@@ -37,12 +37,12 @@ namespace IoC.Tests.UsageScenarios
         {
             public MyClass(
                 IContainer currentContainer,
-                IMutableContainer newChildContainerFactory,
+                IMutableContainer newChildContainer,
                 Func<IMutableContainer> childContainerFactory,
                 Func<string, IMutableContainer> nameChildContainerFactory)
             {
                 CurrentContainer = currentContainer;
-                ChildContainer1 = newChildContainerFactory;
+                ChildContainer1 = newChildContainer;
                 ChildContainer2 = childContainerFactory();
                 NamedChildContainer = nameChildContainerFactory("Some name");
             }
