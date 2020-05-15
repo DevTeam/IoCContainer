@@ -430,7 +430,7 @@
   - [GetHashCode()](#M-IoC-Key-GetHashCode 'IoC.Key.GetHashCode')
   - [ToString()](#M-IoC-Key-ToString 'IoC.Key.ToString')
 - [KeyBasedLifetime\`2](#T-IoC-Lifetimes-KeyBasedLifetime`2 'IoC.Lifetimes.KeyBasedLifetime`2')
-  - [#ctor(supportOnNewInstanceCreated,supportOnInstanceReleased)](#M-IoC-Lifetimes-KeyBasedLifetime`2-#ctor-System-Boolean,System-Boolean- 'IoC.Lifetimes.KeyBasedLifetime`2.#ctor(System.Boolean,System.Boolean)')
+  - [#ctor(supportOnNewInstanceCreated,supportOnInstanceReleased,threadSafe)](#M-IoC-Lifetimes-KeyBasedLifetime`2-#ctor-System-Boolean,System-Boolean,System-Boolean- 'IoC.Lifetimes.KeyBasedLifetime`2.#ctor(System.Boolean,System.Boolean,System.Boolean)')
   - [Build()](#M-IoC-Lifetimes-KeyBasedLifetime`2-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.KeyBasedLifetime`2.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
   - [Create()](#M-IoC-Lifetimes-KeyBasedLifetime`2-Create 'IoC.Lifetimes.KeyBasedLifetime`2.Create')
   - [CreateKey(container,args)](#M-IoC-Lifetimes-KeyBasedLifetime`2-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.KeyBasedLifetime`2.CreateKey(IoC.IContainer,System.Object[])')
@@ -478,8 +478,7 @@
   - [ToString()](#M-IoC-Lifetimes-ScopeSingletonLifetime-ToString 'IoC.Lifetimes.ScopeSingletonLifetime.ToString')
 - [Sets](#T-IoC-Features-Sets 'IoC.Features.Sets')
 - [SingletonLifetime](#T-IoC-Lifetimes-SingletonLifetime 'IoC.Lifetimes.SingletonLifetime')
-  - [#ctor()](#M-IoC-Lifetimes-SingletonLifetime-#ctor 'IoC.Lifetimes.SingletonLifetime.#ctor')
-  - [#ctor(threadSafe,lockObject)](#M-IoC-Lifetimes-SingletonLifetime-#ctor-System-Boolean,System-Object- 'IoC.Lifetimes.SingletonLifetime.#ctor(System.Boolean,System.Object)')
+  - [#ctor(threadSafe)](#M-IoC-Lifetimes-SingletonLifetime-#ctor-System-Boolean- 'IoC.Lifetimes.SingletonLifetime.#ctor(System.Boolean)')
   - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.SingletonLifetime.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
   - [Create()](#M-IoC-Lifetimes-SingletonLifetime-Create 'IoC.Lifetimes.SingletonLifetime.Create')
   - [Dispose()](#M-IoC-Lifetimes-SingletonLifetime-Dispose 'IoC.Lifetimes.SingletonLifetime.Dispose')
@@ -9433,8 +9432,8 @@ Represents the abstraction for singleton based lifetimes.
 | TKey | The key type. |
 | TValue | The value type. |
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-#ctor-System-Boolean,System-Boolean-'></a>
-### #ctor(supportOnNewInstanceCreated,supportOnInstanceReleased) `constructor`
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-#ctor-System-Boolean,System-Boolean,System-Boolean-'></a>
+### #ctor(supportOnNewInstanceCreated,supportOnInstanceReleased,threadSafe) `constructor`
 
 ##### Summary
 
@@ -9446,6 +9445,7 @@ Creates an instance
 | ---- | ---- | ----------- |
 | supportOnNewInstanceCreated | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | True to invoke OnNewInstanceCreated |
 | supportOnInstanceReleased | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | True to invoke OnInstanceReleased |
+| threadSafe | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | `True` to synchronize operations. |
 
 <a name='M-IoC-Lifetimes-KeyBasedLifetime`2-Build-IoC-IBuildContext,System-Linq-Expressions-Expression-'></a>
 ### Build() `method`
@@ -10065,8 +10065,8 @@ IoC.Lifetimes
 
 For a singleton instance.
 
-<a name='M-IoC-Lifetimes-SingletonLifetime-#ctor'></a>
-### #ctor() `constructor`
+<a name='M-IoC-Lifetimes-SingletonLifetime-#ctor-System-Boolean-'></a>
+### #ctor(threadSafe) `constructor`
 
 ##### Summary
 
@@ -10074,21 +10074,9 @@ Creates an instance of lifetime.
 
 ##### Parameters
 
-This constructor has no parameters.
-
-<a name='M-IoC-Lifetimes-SingletonLifetime-#ctor-System-Boolean,System-Object-'></a>
-### #ctor(threadSafe,lockObject) `constructor`
-
-##### Summary
-
-
-
-##### Parameters
-
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| threadSafe | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') |  |
-| lockObject | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') |  |
+| threadSafe | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | `True` to synchronize operations. |
 
 <a name='M-IoC-Lifetimes-SingletonLifetime-Build-IoC-IBuildContext,System-Linq-Expressions-Expression-'></a>
 ### Build() `method`

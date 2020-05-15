@@ -9259,6 +9259,7 @@ namespace IoC.Features
     using System.Collections.Generic;
     using System.Linq.Expressions;
     using Core;
+    using Lifetimes;
 
     /// <summary>
     /// Allows to resolve Functions.
@@ -9280,18 +9281,18 @@ namespace IoC.Features
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register(new[] { typeof(Func<TT>) }, new FuncDependency(), null, Sets.AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT>) }, new FuncDependency(), null, Sets.AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT>) }, new FuncDependency(), null, Sets.AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT>) }, new FuncDependency(), null, Sets.AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT>) }, new FuncDependency(), null, Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
 
             if (_light) yield break;
 
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT>) }, new FuncDependency(), null, Sets.AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>) }, new FuncDependency(), null, Sets.AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>) }, new FuncDependency(), null, Sets.AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>) }, new FuncDependency(), null, Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
         }
 
         private class FuncDependency : IDependency
