@@ -12159,8 +12159,15 @@ namespace IoC.Core
                 default:
                     // ReSharper disable once ConstantNullCoalescingCondition
                     var expression = Visit(tagExpression) ?? throw new BuildExpressionException($"Invalid tag expression {tagExpression}.", new InvalidOperationException());
-                    var tagFunc = Expression.Lambda<Func<object>>(expression, true).Compile();
-                    tag = tagFunc();
+                    if (_buildContext.TryCompile(Expression.Lambda(expression, true), out var tagFunc, out var error))
+                    {
+                        tag = ((Func<object>)tagFunc)();
+                    }
+                    else
+                    {
+                        throw error;
+                    }
+
                     break;
             }
 
@@ -12178,8 +12185,12 @@ namespace IoC.Core
             }
 
             var containerSelectorExpression = Expression.Lambda<ContainerSelector>(containerExpression, true, _buildContext.ContainerParameter);
-            var selectContainer = containerSelectorExpression.Compile();
-            return selectContainer(_container);
+            if (_buildContext.TryCompile(containerSelectorExpression, out var selectContainer, out var error))
+            {
+                return ((ContainerSelector)selectContainer)(_container);
+            }
+
+            throw error;
         }
 
         private Expression CreateDependencyExpression(Key key, [CanBeNull] Expression containerExpression, DefaultExpression defaultExpression)
