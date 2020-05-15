@@ -19,11 +19,11 @@
         [MethodImpl((MethodImplOptions)0x100)]
         public static Expression Convert(this Expression expression, Type type)
         {
+            var targetType = expression.Type.Descriptor();
             if (type != typeof(object))
             {
-                var baseTypeDescriptor = expression.Type.Descriptor();
                 var typeDescriptor = type.Descriptor();
-                if (typeDescriptor.IsAssignableFrom(baseTypeDescriptor))
+                if (typeDescriptor.IsAssignableFrom(targetType))
                 {
                     return expression;
                 }

@@ -12,7 +12,7 @@ namespace IoC
     [PublicAPI]
     public static class FluentNativeResolve
     {
-        private static readonly object[] EmptyArgs = CoreExtensions.EmptyArray<object>();
+        internal static readonly object[] EmptyArgs = CoreExtensions.EmptyArray<object>();
 
         /// <summary>
         /// Resolves an instance.

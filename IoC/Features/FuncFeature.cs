@@ -2,8 +2,8 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq.Expressions;
     using Core;
-    using Lifetimes;
 
     /// <summary>
     /// Allows to resolve Functions.
@@ -25,18 +25,59 @@
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register<Func<TT>>(ctx => () => ctx.Container.Inject<TT>(ctx.Key.Tag), new ContainerStateSingletonLifetime<object>(false), Sets.AnyTag);
-            yield return container.Register<Func<TT1, TT>>(ctx => arg1 => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1), null, Sets.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT>>(ctx => (arg1, arg2) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2), null, Sets.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT>>(ctx => (arg1, arg2, arg3) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3), null, Sets.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT>>(ctx => (arg1, arg2, arg3, arg4) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3, arg4), null, Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT>) }, new FuncDependency(), null, Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT>) }, new FuncDependency(), null, Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT>) }, new FuncDependency(), null, Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT>) }, new FuncDependency(), null, Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT>) }, new FuncDependency(), null, Sets.AnyTag);
 
             if (_light) yield break;
 
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3, arg4, arg5), null, Sets.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3, arg4, arg5, arg6), null, Sets.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6, arg7) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3, arg4, arg5, arg6, arg7), null, Sets.AnyTag);
-            yield return container.Register<Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>>(ctx => (arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8) => ctx.Container.Inject<TT>(ctx.Key.Tag, arg1, arg2, arg3, arg4, arg5, arg6, arg7, arg8), null, Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT>) }, new FuncDependency(), null, Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>) }, new FuncDependency(), null, Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>) }, new FuncDependency(), null, Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>) }, new FuncDependency(), null, Sets.AnyTag);
+        }
+
+        private class FuncDependency : IDependency
+        {
+            public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
+            {
+                var genericTypeArguments = buildContext.Key.Type.Descriptor().GetGenericTypeArguments();
+                var paramsCount = genericTypeArguments.Length - 1;
+                var instanceType = genericTypeArguments[paramsCount];
+                var key = new Key(instanceType, buildContext.Key.Tag);
+                var context = buildContext.CreateChild(key, buildContext.Container);
+                var instanceExpression = context.GetDependencyExpression();
+                var parameters = new ParameterExpression[paramsCount];
+                var parametersArgs = new Expression[paramsCount];
+                for (var i = 0; i < paramsCount; i++)
+                {
+                    var parameterExpression = Expression.Parameter(genericTypeArguments[i]);
+                    parameters[i] = parameterExpression;
+                    parametersArgs[i] = parameterExpression.Convert(typeof(object));
+                }
+
+                Expression argsExpression;
+                if (parameters.Length == 0)
+                {
+                    argsExpression = Expression.Constant(FluentNativeResolve.EmptyArgs);
+                }
+                else
+                {
+                    argsExpression = Expression.NewArrayInit(typeof(object), parametersArgs);
+                }
+
+                instanceExpression = Expression.Block(
+                    new[] { buildContext.ContainerParameter, buildContext.ArgsParameter },
+                    Expression.Assign(buildContext.ContainerParameter, Expression.Constant(buildContext.Container)),
+                    Expression.Assign(buildContext.ArgsParameter, argsExpression),
+                    instanceExpression);
+                var factory = Expression.Lambda(instanceExpression, parameters).Compile();
+                expression = Expression.Constant(factory);
+                error = default(Exception);
+                return true;
+            }
         }
     }
 }
