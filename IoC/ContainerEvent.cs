@@ -150,7 +150,7 @@
                 default(LambdaExpression));
         }
 
-        internal static ContainerEvent ResolverCompilation(
+        internal static ContainerEvent Compilation(
             [NotNull] IContainer registeringContainer,
             [NotNull] IEnumerable<Key> keys,
             [NotNull] IDependency dependency,
@@ -168,7 +168,7 @@
                 resolverExpression);
         }
 
-        internal static ContainerEvent ResolverCompilationFailed(
+        internal static ContainerEvent CompilationFailed(
             [NotNull] IContainer registeringContainer,
             [NotNull] IEnumerable<Key> keys,
             [NotNull] IDependency dependency,

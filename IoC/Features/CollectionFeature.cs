@@ -177,12 +177,16 @@ namespace IoC.Features
                         ? CreateConditions(buildContext, keys, elementType, positionVar)
                         : CreateSwitchCases(buildContext, keys, elementType, positionVar);
 
-                var factory = Expression.Lambda(conditionExpression, positionVar, buildContext.ContainerParameter, buildContext.ArgsParameter).Compile();
-                var ctor = typeof(Enumerable<>).Descriptor().MakeGenericType(elementType).Descriptor().GetDeclaredConstructors().Single();
-                var enumerableExpression = Expression.New(ctor, Expression.Constant(factory), Expression.Constant(keys.Length), buildContext.ContainerParameter, buildContext.ArgsParameter);
-                expression = buildContext.ReplaceTypes(buildContext.AddLifetime(enumerableExpression, lifetime));
-                error = default(Exception);
-                return true;
+                if (buildContext.TryCompile(Expression.Lambda(conditionExpression, positionVar, buildContext.ContainerParameter, buildContext.ArgsParameter), out var factory, out error))
+                {
+                    var ctor = typeof(Enumerable<>).Descriptor().MakeGenericType(elementType).Descriptor().GetDeclaredConstructors().Single();
+                    var enumerableExpression = Expression.New(ctor, Expression.Constant(factory), Expression.Constant(keys.Length), buildContext.ContainerParameter, buildContext.ArgsParameter);
+                    expression = buildContext.ReplaceTypes(buildContext.AddLifetime(enumerableExpression, lifetime));
+                    return true;
+                }
+
+                expression = default(Expression);
+                return false;
             }
 
             private static Expression CreateConditions(IBuildContext buildContext, Key[] keys, Type elementType, ParameterExpression positionVar)

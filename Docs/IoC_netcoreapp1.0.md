@@ -337,6 +337,7 @@
   - [GetDependencyExpression(defaultExpression)](#M-IoC-IBuildContext-GetDependencyExpression-System-Linq-Expressions-Expression- 'IoC.IBuildContext.GetDependencyExpression(System.Linq.Expressions.Expression)')
   - [InjectDependencies(baseExpression,instanceExpression)](#M-IoC-IBuildContext-InjectDependencies-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression- 'IoC.IBuildContext.InjectDependencies(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)')
   - [ReplaceTypes(baseExpression)](#M-IoC-IBuildContext-ReplaceTypes-System-Linq-Expressions-Expression- 'IoC.IBuildContext.ReplaceTypes(System.Linq.Expressions.Expression)')
+  - [TryCompile(expression,resolver,error)](#M-IoC-IBuildContext-TryCompile-System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@- 'IoC.IBuildContext.TryCompile(System.Linq.Expressions.LambdaExpression,System.Delegate@,System.Exception@)')
   - [TryReplaceType(originalType,targetType)](#M-IoC-IBuildContext-TryReplaceType-System-Type,System-Type@- 'IoC.IBuildContext.TryReplaceType(System.Type,System.Type@)')
 - [IBuilder](#T-IoC-IBuilder 'IoC.IBuilder')
   - [Build(context,bodyExpression)](#M-IoC-IBuilder-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.IBuilder.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
@@ -361,7 +362,7 @@
 - [ICannotResolveType](#T-IoC-Issues-ICannotResolveType 'IoC.Issues.ICannotResolveType')
   - [Resolve(buildContext,registeredType,resolvingType)](#M-IoC-Issues-ICannotResolveType-Resolve-IoC-IBuildContext,System-Type,System-Type- 'IoC.Issues.ICannotResolveType.Resolve(IoC.IBuildContext,System.Type,System.Type)')
 - [ICompiler](#T-IoC-ICompiler 'IoC.ICompiler')
-  - [TryCompileResolver\`\`1(context,expression,resolver)](#M-IoC-ICompiler-TryCompileResolver``1-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,IoC-Resolver{``0}@- 'IoC.ICompiler.TryCompileResolver``1(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,IoC.Resolver{``0}@)')
+  - [TryCompile(context,expression,resolver,error)](#M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@- 'IoC.ICompiler.TryCompile(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,System.Delegate@,System.Exception@)')
 - [ICompositionRoot\`1](#T-IoC-ICompositionRoot`1 'IoC.ICompositionRoot`1')
   - [Instance](#P-IoC-ICompositionRoot`1-Instance 'IoC.ICompositionRoot`1.Instance')
 - [IConfiguration](#T-IoC-IConfiguration 'IoC.IConfiguration')
@@ -8088,6 +8089,25 @@ The resulting expression.
 | ---- | ---- | ----------- |
 | baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
 
+<a name='M-IoC-IBuildContext-TryCompile-System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@-'></a>
+### TryCompile(expression,resolver,error) `method`
+
+##### Summary
+
+Compiles an expression to an instance resolver.
+
+##### Returns
+
+True if success.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| expression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The lambda expression to compile. |
+| resolver | [System.Delegate@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Delegate@ 'System.Delegate@') | The compiled resolver delegate. |
+| error | [System.Exception@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception@ 'System.Exception@') | Compilation error. |
+
 <a name='M-IoC-IBuildContext-TryReplaceType-System-Type,System-Type@-'></a>
 ### TryReplaceType(originalType,targetType) `method`
 
@@ -8455,8 +8475,8 @@ IoC
 
 Represents an abstract expression compiler.
 
-<a name='M-IoC-ICompiler-TryCompileResolver``1-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,IoC-Resolver{``0}@-'></a>
-### TryCompileResolver\`\`1(context,expression,resolver) `method`
+<a name='M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@-'></a>
+### TryCompile(context,expression,resolver,error) `method`
 
 ##### Summary
 
@@ -8472,7 +8492,8 @@ True if success.
 | ---- | ---- | ----------- |
 | context | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | Current context for building. |
 | expression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The lambda expression to compile. |
-| resolver | [IoC.Resolver{\`\`0}@](#T-IoC-Resolver{``0}@ 'IoC.Resolver{``0}@') | The compiled resolver delegate. |
+| resolver | [System.Delegate@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Delegate@ 'System.Delegate@') | The compiled resolver delegate. |
+| error | [System.Exception@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception@ 'System.Exception@') | Compilation error. |
 
 <a name='T-IoC-ICompositionRoot`1'></a>
 ## ICompositionRoot\`1 `type`

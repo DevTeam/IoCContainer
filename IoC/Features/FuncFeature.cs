@@ -74,10 +74,15 @@
                     Expression.Assign(buildContext.ContainerParameter, Expression.Constant(buildContext.Container)),
                     Expression.Assign(buildContext.ArgsParameter, argsExpression),
                     instanceExpression);
-                var factory = Expression.Lambda(instanceExpression, parameters).Compile();
-                expression = Expression.Constant(factory);
-                error = default(Exception);
-                return true;
+
+                if (context.TryCompile(Expression.Lambda(instanceExpression, parameters), out var factory, out error))
+                {
+                    expression = Expression.Constant(factory);
+                    return true;
+                }
+
+                expression = default(Expression);
+                return false;
             }
         }
     }

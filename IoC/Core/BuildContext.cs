@@ -19,6 +19,7 @@
         [NotNull] private readonly IEnumerable<IBuilder> _builders;
         private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
         private readonly IList<ParameterExpression> _parameters = new List<ParameterExpression>();
+        [NotNull] private readonly ICompiler _compiler;
 
         internal BuildContext(
             [CanBeNull] IBuildContext parent,
@@ -26,6 +27,7 @@
             [NotNull] IContainer resolvingContainer,
             [NotNull] IEnumerable<IBuilder> builders,
             [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
+            [NotNull] ICompiler compiler,
             [NotNull] ParameterExpression argsParameter,
             [NotNull] ParameterExpression containerParameter,
             int depth = 0)
@@ -35,6 +37,7 @@
             Container = resolvingContainer ?? throw new ArgumentNullException(nameof(resolvingContainer));
             _builders = builders ?? throw new ArgumentNullException(nameof(builders));
             AutowiringStrategy = defaultAutowiringStrategy ?? throw new ArgumentNullException(nameof(defaultAutowiringStrategy));
+            _compiler = compiler;
             ArgsParameter = argsParameter ?? throw new ArgumentNullException(nameof(argsParameter));
             ContainerParameter = containerParameter ?? throw new ArgumentNullException(nameof(containerParameter));
             Depth = depth;
@@ -47,7 +50,7 @@
         public IContainer Container { get; }
 
         public IAutowiringStrategy AutowiringStrategy { get; }
-
+        
         public int Depth { get; }
 
         public ParameterExpression ArgsParameter { get; private set; }
@@ -119,7 +122,7 @@
                 key = new Key(type, key.Tag);
             }
 
-            return new BuildContext(this, key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, ArgsParameter, ContainerParameter, Depth + 1);
+            return new BuildContext(this, key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, _compiler, ArgsParameter, ContainerParameter, Depth + 1);
         }
 
         public Expression GetDependencyExpression(Expression defaultExpression = null)
@@ -195,5 +198,8 @@
 
             return text.ToString();
         }
+
+        public bool TryCompile(LambdaExpression expression, out Delegate resolver, out Exception error) =>
+            _compiler.TryCompile(this, expression, out resolver, out error);
     }
 }

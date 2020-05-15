@@ -127,7 +127,7 @@
                 CheckIsNotDisposed();
 
                 var registeredKeys = new List<FullKey>();
-                var dependencyEntry = new Registration(this, dependency, lifetime, Disposable.Create(() => UnregisterKeys(registeredKeys, dependency, lifetime)), registeredKeys);
+                var dependencyEntry = new Registration(this, _registrationTracker, _eventSubject, dependency, lifetime, Disposable.Create(() => UnregisterKeys(registeredKeys, dependency, lifetime)), registeredKeys);
                 try
                 {
                     var dependenciesForTagAny = _registrationsTagAny;
@@ -234,13 +234,7 @@
                     // tries creating resolver
                     resolvingContainer = resolvingContainer ?? this;
                     resolvingContainer = registration.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
-                    if (!registration.TryCreateResolver(
-                        key,
-                        resolvingContainer,
-                        _registrationTracker,
-                        _eventSubject,
-                        out resolver,
-                        out error))
+                    if (!registration.TryCreateResolver(key, resolvingContainer, out resolver, out error))
                     {
                         return false;
                     }

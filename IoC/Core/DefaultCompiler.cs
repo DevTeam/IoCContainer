@@ -9,11 +9,21 @@
 
         private DefaultCompiler() { }
 
-        public bool TryCompileResolver<T>(IBuildContext context, LambdaExpression expression, out Resolver<T> resolver)
+        public bool TryCompile(IBuildContext context, LambdaExpression expression, out Delegate resolver, out Exception error)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            resolver = (Resolver<T>)expression.Compile();
-            return true;
+            try
+            {
+                resolver = expression.Compile();
+                error = default(Exception);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                error = ex;
+                resolver = default(Delegate);
+                return false;
+            }
         }
     }
 }

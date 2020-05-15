@@ -1326,7 +1326,7 @@ namespace IoC
                 CheckIsNotDisposed();
 
                 var registeredKeys = new List<FullKey>();
-                var dependencyEntry = new Registration(this, dependency, lifetime, Disposable.Create(() => UnregisterKeys(registeredKeys, dependency, lifetime)), registeredKeys);
+                var dependencyEntry = new Registration(this, _registrationTracker, _eventSubject, dependency, lifetime, Disposable.Create(() => UnregisterKeys(registeredKeys, dependency, lifetime)), registeredKeys);
                 try
                 {
                     var dependenciesForTagAny = _registrationsTagAny;
@@ -1433,13 +1433,7 @@ namespace IoC
                     // tries creating resolver
                     resolvingContainer = resolvingContainer ?? this;
                     resolvingContainer = registration.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
-                    if (!registration.TryCreateResolver(
-                        key,
-                        resolvingContainer,
-                        _registrationTracker,
-                        _eventSubject,
-                        out resolver,
-                        out error))
+                    if (!registration.TryCreateResolver(key, resolvingContainer, out resolver, out error))
                     {
                         return false;
                     }
@@ -1877,7 +1871,7 @@ namespace IoC
                 default(LambdaExpression));
         }
 
-        internal static ContainerEvent ResolverCompilation(
+        internal static ContainerEvent Compilation(
             [NotNull] IContainer registeringContainer,
             [NotNull] IEnumerable<Key> keys,
             [NotNull] IDependency dependency,
@@ -1895,7 +1889,7 @@ namespace IoC
                 resolverExpression);
         }
 
-        internal static ContainerEvent ResolverCompilationFailed(
+        internal static ContainerEvent CompilationFailed(
             [NotNull] IContainer registeringContainer,
             [NotNull] IEnumerable<Key> keys,
             [NotNull] IDependency dependency,
@@ -8038,6 +8032,15 @@ namespace IoC
         /// <param name="baseExpression">The base expression.</param>
         /// <returns>The base expression with parameters.</returns>
         [NotNull] Expression DeclareParameters([NotNull] Expression baseExpression);
+
+        /// <summary>
+        /// Compiles an expression to an instance resolver.
+        /// </summary>
+        /// <param name="expression">The lambda expression to compile.</param>
+        /// <param name="resolver">The compiled resolver delegate.</param>
+        /// <param name="error">Compilation error.</param>
+        /// <returns>True if success.</returns>
+        bool TryCompile([NotNull] LambdaExpression expression, out Delegate resolver, out Exception error);
     }
 }
 
@@ -8069,6 +8072,7 @@ namespace IoC
 
 namespace IoC
 {
+    using System;
     using System.Linq.Expressions;
 
     /// <summary>
@@ -8083,8 +8087,9 @@ namespace IoC
         /// <param name="context">Current context for building.</param>
         /// <param name="expression">The lambda expression to compile.</param>
         /// <param name="resolver">The compiled resolver delegate.</param>
+        /// <param name="error">Compilation error.</param>
         /// <returns>True if success.</returns>
-        bool TryCompileResolver<T>([NotNull] IBuildContext context, [NotNull] LambdaExpression expression, out Resolver<T> resolver);
+        bool TryCompile([NotNull] IBuildContext context, [NotNull] LambdaExpression expression, out Delegate resolver, out Exception error);
     }
 }
 
@@ -8895,12 +8900,16 @@ namespace IoC.Features
                         ? CreateConditions(buildContext, keys, elementType, positionVar)
                         : CreateSwitchCases(buildContext, keys, elementType, positionVar);
 
-                var factory = Expression.Lambda(conditionExpression, positionVar, buildContext.ContainerParameter, buildContext.ArgsParameter).Compile();
-                var ctor = typeof(Enumerable<>).Descriptor().MakeGenericType(elementType).Descriptor().GetDeclaredConstructors().Single();
-                var enumerableExpression = Expression.New(ctor, Expression.Constant(factory), Expression.Constant(keys.Length), buildContext.ContainerParameter, buildContext.ArgsParameter);
-                expression = buildContext.ReplaceTypes(buildContext.AddLifetime(enumerableExpression, lifetime));
-                error = default(Exception);
-                return true;
+                if (buildContext.TryCompile(Expression.Lambda(conditionExpression, positionVar, buildContext.ContainerParameter, buildContext.ArgsParameter), out var factory, out error))
+                {
+                    var ctor = typeof(Enumerable<>).Descriptor().MakeGenericType(elementType).Descriptor().GetDeclaredConstructors().Single();
+                    var enumerableExpression = Expression.New(ctor, Expression.Constant(factory), Expression.Constant(keys.Length), buildContext.ContainerParameter, buildContext.ArgsParameter);
+                    expression = buildContext.ReplaceTypes(buildContext.AddLifetime(enumerableExpression, lifetime));
+                    return true;
+                }
+
+                expression = default(Expression);
+                return false;
             }
 
             private static Expression CreateConditions(IBuildContext buildContext, Key[] keys, Type elementType, ParameterExpression positionVar)
@@ -9329,10 +9338,15 @@ namespace IoC.Features
                     Expression.Assign(buildContext.ContainerParameter, Expression.Constant(buildContext.Container)),
                     Expression.Assign(buildContext.ArgsParameter, argsExpression),
                     instanceExpression);
-                var factory = Expression.Lambda(instanceExpression, parameters).Compile();
-                expression = Expression.Constant(factory);
-                error = default(Exception);
-                return true;
+
+                if (context.TryCompile(Expression.Lambda(instanceExpression, parameters), out var factory, out error))
+                {
+                    expression = Expression.Constant(factory);
+                    return true;
+                }
+
+                expression = default(Expression);
+                return false;
             }
         }
     }
@@ -11048,6 +11062,7 @@ namespace IoC.Core
         [NotNull] private readonly IEnumerable<IBuilder> _builders;
         private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
         private readonly IList<ParameterExpression> _parameters = new List<ParameterExpression>();
+        [NotNull] private readonly ICompiler _compiler;
 
         internal BuildContext(
             [CanBeNull] IBuildContext parent,
@@ -11055,6 +11070,7 @@ namespace IoC.Core
             [NotNull] IContainer resolvingContainer,
             [NotNull] IEnumerable<IBuilder> builders,
             [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
+            [NotNull] ICompiler compiler,
             [NotNull] ParameterExpression argsParameter,
             [NotNull] ParameterExpression containerParameter,
             int depth = 0)
@@ -11064,6 +11080,7 @@ namespace IoC.Core
             Container = resolvingContainer ?? throw new ArgumentNullException(nameof(resolvingContainer));
             _builders = builders ?? throw new ArgumentNullException(nameof(builders));
             AutowiringStrategy = defaultAutowiringStrategy ?? throw new ArgumentNullException(nameof(defaultAutowiringStrategy));
+            _compiler = compiler;
             ArgsParameter = argsParameter ?? throw new ArgumentNullException(nameof(argsParameter));
             ContainerParameter = containerParameter ?? throw new ArgumentNullException(nameof(containerParameter));
             Depth = depth;
@@ -11076,7 +11093,7 @@ namespace IoC.Core
         public IContainer Container { get; }
 
         public IAutowiringStrategy AutowiringStrategy { get; }
-
+        
         public int Depth { get; }
 
         public ParameterExpression ArgsParameter { get; private set; }
@@ -11148,7 +11165,7 @@ namespace IoC.Core
                 key = new Key(type, key.Tag);
             }
 
-            return new BuildContext(this, key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, ArgsParameter, ContainerParameter, Depth + 1);
+            return new BuildContext(this, key, container, forBuilders ? EmptyBuilders : _builders, AutowiringStrategy, _compiler, ArgsParameter, ContainerParameter, Depth + 1);
         }
 
         public Expression GetDependencyExpression(Expression defaultExpression = null)
@@ -11224,6 +11241,9 @@ namespace IoC.Core
 
             return text.ToString();
         }
+
+        public bool TryCompile(LambdaExpression expression, out Delegate resolver, out Exception error) =>
+            _compiler.TryCompile(this, expression, out resolver, out error);
     }
 }
 
@@ -11782,11 +11802,21 @@ namespace IoC.Core
 
         private DefaultCompiler() { }
 
-        public bool TryCompileResolver<T>(IBuildContext context, LambdaExpression expression, out Resolver<T> resolver)
+        public bool TryCompile(IBuildContext context, LambdaExpression expression, out Delegate resolver, out Exception error)
         {
             if (expression == null) throw new ArgumentNullException(nameof(expression));
-            resolver = (Resolver<T>)expression.Compile();
-            return true;
+            try
+            {
+                resolver = expression.Compile();
+                error = default(Exception);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                error = ex;
+                resolver = default(Delegate);
+                return false;
+            }
         }
     }
 }
@@ -13183,7 +13213,7 @@ namespace IoC.Core
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
 
-    internal sealed class Registration : IToken
+    internal sealed class Registration : IToken, ICompiler
     {
         /// <summary>
         /// The container parameter.
@@ -13205,6 +13235,8 @@ namespace IoC.Core
         [CanBeNull] internal readonly ILifetime Lifetime;
         [NotNull] private readonly IDisposable _resource;
         [NotNull] internal readonly ICollection<Key> Keys;
+        [NotNull] private readonly IRegistrationTracker _registrationTracker;
+        [NotNull] private readonly IObserver<ContainerEvent> _eventObserver;
         [NotNull] internal readonly IDependency Dependency;
 
         private volatile Table<LifetimeKey, ILifetime> _lifetimes = Table<LifetimeKey, ILifetime>.Empty;
@@ -13212,12 +13244,16 @@ namespace IoC.Core
 
         public Registration(
             [NotNull] IMutableContainer container,
+            [NotNull] IRegistrationTracker registrationTracker,
+            [NotNull] IObserver<ContainerEvent> eventObserver,
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
             [NotNull] IDisposable resource,
             [NotNull] ICollection<Key> keys)
         {
             Container = container;
+            _registrationTracker = registrationTracker;
+            _eventObserver = eventObserver;
             Dependency = dependency;
             Lifetime = lifetime;
             _resource = resource;
@@ -13230,8 +13266,6 @@ namespace IoC.Core
         public bool TryCreateResolver<T>(
             Key key,
             [NotNull] IContainer resolvingContainer,
-            [NotNull] IRegistrationTracker registrationTracker,
-            [NotNull] IObserver<ContainerEvent> eventObserver,
             out Resolver<T> resolver,
             out Exception error)
         {
@@ -13240,7 +13274,7 @@ namespace IoC.Core
                 throw new ObjectDisposedException(nameof(Registration));
             }
 
-            var buildContext = new BuildContext(null, key, resolvingContainer, registrationTracker.Builders, registrationTracker.AutowiringStrategy, ArgsParameter, ContainerParameter);
+            var buildContext = new BuildContext(null, key, resolvingContainer, _registrationTracker.Builders, _registrationTracker.AutowiringStrategy, this, ArgsParameter, ContainerParameter);
             var lifetime = GetLifetime(key.Type);
             if (!Dependency.TryBuildExpression(buildContext, lifetime, out var expression, out error))
             {
@@ -13249,28 +13283,44 @@ namespace IoC.Core
             }
 
             var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, ResolverParameters);
+            if (TryCompile(buildContext, resolverExpression, lifetime, out var resolverDelegate, out error))
+            {
+                resolver = (Resolver<T>) resolverDelegate;
+                return true;
+            }
+
             resolver = default(Resolver<T>);
+            return false;
+        }
+
+        private bool TryCompile([NotNull] IBuildContext context, [NotNull] LambdaExpression expression, [CanBeNull] ILifetime lifetime, out Delegate resolver, out Exception error)
+        {
+            error = default(Exception);
             try
             {
-                foreach (var compiler in registrationTracker.Compilers)
+                foreach (var compiler in _registrationTracker.Compilers)
                 {
-                    if (compiler.TryCompileResolver(buildContext, resolverExpression, out resolver))
+                    if (compiler.TryCompile(context, expression, out resolver, out error))
                     {
-                        eventObserver.OnNext(ContainerEvent.ResolverCompilation(Container, Enumerable.Repeat(key, 1), Dependency, lifetime, resolverExpression ));
-                        break;
+                        _eventObserver.OnNext(ContainerEvent.Compilation(Container, new[] { context.Key }, Dependency, lifetime, expression));
+                        return true;
                     }
+
+                    _eventObserver.OnNext(ContainerEvent.CompilationFailed(Container, new[] { context.Key }, Dependency, lifetime, expression, error));
                 }
             }
             catch (Exception ex)
             {
                 error = ex;
-                eventObserver.OnNext(ContainerEvent.ResolverCompilationFailed(Container, Enumerable.Repeat(key, 1), Dependency, lifetime, resolverExpression, error));
-                return false;
+                _eventObserver.OnNext(ContainerEvent.CompilationFailed(Container, new[] { context.Key }, Dependency, lifetime, expression, ex));
             }
 
-            error = default(Exception);
-            return resolver != default(Resolver<T>);
+            resolver = default(Delegate);
+            return false;
         }
+
+        public bool TryCompile(IBuildContext context, LambdaExpression expression, out Delegate resolver, out Exception error) =>
+            TryCompile(context, expression, null, out resolver, out error);
 
         [MethodImpl((MethodImplOptions)0x200)]
         [CanBeNull]

@@ -109,5 +109,14 @@
         /// <param name="baseExpression">The base expression.</param>
         /// <returns>The base expression with parameters.</returns>
         [NotNull] Expression DeclareParameters([NotNull] Expression baseExpression);
+
+        /// <summary>
+        /// Compiles an expression to an instance resolver.
+        /// </summary>
+        /// <param name="expression">The lambda expression to compile.</param>
+        /// <param name="resolver">The compiled resolver delegate.</param>
+        /// <param name="error">Compilation error.</param>
+        /// <returns>True if success.</returns>
+        bool TryCompile([NotNull] LambdaExpression expression, out Delegate resolver, out Exception error);
     }
 }
