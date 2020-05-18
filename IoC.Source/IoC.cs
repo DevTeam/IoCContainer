@@ -10735,7 +10735,6 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Runtime.CompilerServices;
 
     internal static class Autowiring
     {
@@ -10744,50 +10743,53 @@ namespace IoC.Core
             this IBuildContext buildContext,
             IAutowiringStrategy autoWiringStrategy,
             TypeDescriptor typeDescriptor,
-            Expression baseExpression,
+            Expression expression,
             IEnumerable<Expression> statements,
             ILifetime lifetime,
             IDictionary<Type, Type> typesMap)
         {
-            var isDefaultAutoWiringStrategy = DefaultAutowiringStrategy.Shared == autoWiringStrategy;
-            var defaultMethods = typeDescriptor.GetDeclaredMethods().FilterMethods();
-            if (!autoWiringStrategy.TryResolveInitializers(defaultMethods, out var initializers))
-            {
-                if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
-                {
-                    initializers = Enumerable.Empty<IMethod<MethodInfo>>();
-                }
-            }
+            expression = ReplaceTypes(buildContext, expression, typesMap);
+            var thisVar = Expression.Variable(expression.Type);
 
-            baseExpression = TypeReplacerExpressionBuilder.Shared.Build(baseExpression, buildContext, typesMap);
-            var thisVar = Expression.Variable(baseExpression.Type);
-
-            var initializerExpressions =
-                initializers.Select(initializer => (Expression)Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext)))
-                    .Concat(statements.Select(expression => TypeReplacerExpressionBuilder.Shared.Build(expression, buildContext, typesMap)))
+            var initializerExpressions = 
+                GetInitializers(autoWiringStrategy, typeDescriptor)
+                    .Select(initializer => (Expression)Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext)))
+                    .Concat(statements.Select(statementExpression => ReplaceTypes(buildContext, statementExpression, typesMap)))
                     .ToArray();
 
             if (initializerExpressions.Length > 0)
             {
-                baseExpression = Expression.Block(
+                expression = Expression.Block(
                     new[] { thisVar },
-                    Expression.Assign(thisVar, baseExpression),
+                    Expression.Assign(thisVar, expression),
                     Expression.Block(initializerExpressions),
                     thisVar
                 );
             }
 
-            baseExpression = DependencyInjectionExpressionBuilder.Shared.Build(baseExpression, buildContext, thisVar);
-            return buildContext.FinalizeExpression(baseExpression, lifetime);
+            expression = DependencyInjectionExpressionBuilder.Shared.Build(expression, buildContext, thisVar);
+            return buildContext.FinalizeExpression(expression, lifetime);
         }
 
-        [IoC.NotNull]
-        [MethodImpl((MethodImplOptions)0x100)]
-        public static IEnumerable<IMethod<TMethodInfo>> FilterMethods<TMethodInfo>([IoC.NotNull] this IEnumerable<TMethodInfo> methodInfos)
-            where TMethodInfo : MethodBase
-            => methodInfos
-                .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
-                .Select(info => new Method<TMethodInfo>(info));
+        private static Expression ReplaceTypes(IBuildContext buildContext, Expression expression, IDictionary<Type, Type> typesMap) =>
+            TypeReplacerExpressionBuilder.Shared.Build(expression, buildContext, typesMap);
+
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+        private static IEnumerable<IMethod<MethodInfo>> GetInitializers(IAutowiringStrategy autoWiringStrategy, TypeDescriptor typeDescriptor)
+        {
+            var methods = typeDescriptor.GetDeclaredMethods().Select(info => new Method<MethodInfo>(info));
+            if (autoWiringStrategy.TryResolveInitializers(methods, out var initializers))
+            {
+                return initializers;
+            }
+
+            if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(methods, out initializers))
+            {
+                initializers = Enumerable.Empty<IMethod<MethodInfo>>();
+            }
+
+            return initializers;
+        }
     }
 }
 
@@ -10835,10 +10837,9 @@ namespace IoC.Core
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            var typesMap = new Dictionary<Type, Type>();
-
             try
             {
+                var typesMap = new Dictionary<Type, Type>();
                 TypeMapper.Shared.Map(_expression.Type, buildContext.Key.Type, typesMap);
                 foreach (var mapping in typesMap)
                 {
@@ -12658,67 +12659,16 @@ namespace IoC.Core
             }
         }
 
-        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            var typesMap = new Dictionary<Type, Type>(_typesMap);
             try
             {
                 var autoWiringStrategy = _autoWiringStrategy ?? buildContext.AutowiringStrategy;
-                var isDefaultAutoWiringStrategy = DefaultAutowiringStrategy.Shared == autoWiringStrategy;
-                if (!autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
-                {
-                    instanceType = _hasGenericParamsWithConstraints
-                        ? GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<ICannotResolveType>().Resolve(buildContext, _type, buildContext.Key.Type)
-                        : _type;
-                }
-
-                var typeDescriptor = instanceType.Descriptor();
-                if (typeDescriptor.IsConstructedGenericType())
-                {
-                    TypeMapper.Shared.Map(instanceType, buildContext.Key.Type, typesMap);
-                    foreach (var mapping in typesMap)
-                    {
-                        buildContext.MapType(mapping.Key, mapping.Value);
-                    }
-
-                    var genericTypeArgs = typeDescriptor.GetGenericTypeArguments();
-                    var isReplaced = false;
-                    for (var position = 0; position < genericTypeArgs.Length; position++)
-                    {
-                        var genericTypeArg = genericTypeArgs[position];
-                        var genericTypeArgDescriptor = genericTypeArg.Descriptor();
-                        if (genericTypeArgDescriptor.IsGenericTypeDefinition() || genericTypeArgDescriptor.IsGenericTypeArgument())
-                        {
-                            if (typesMap.TryGetValue(genericTypeArg, out var type))
-                            {
-                                genericTypeArgs[position] = type;
-                                isReplaced = true;
-                            }
-                            else
-                            {
-                                genericTypeArgs[position] = buildContext.Container.Resolve<ICannotResolveGenericTypeArgument>().Resolve(buildContext, _registeredTypeDescriptor.Type, position, genericTypeArg);
-                                isReplaced = true;
-                            }
-                        }
-                    }
-
-                    if (isReplaced)
-                    {
-                        typeDescriptor = typeDescriptor.GetGenericTypeDefinition().MakeGenericType(genericTypeArgs).Descriptor();
-                    }
-                }
-
-                var defaultConstructors = typeDescriptor.GetDeclaredConstructors().FilterMethods();
-                if (!autoWiringStrategy.TryResolveConstructor(defaultConstructors, out var ctor))
-                {
-                    if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveConstructor(defaultConstructors, out ctor))
-                    {
-                        ctor = buildContext.Container.Resolve<ICannotResolveConstructor>().Resolve(buildContext, defaultConstructors);
-                    }
-                }
-
+                var instanceType = ResolveInstanceType(buildContext, autoWiringStrategy);
+                var typesMap = new Dictionary<Type, Type>(_typesMap);
+                var typeDescriptor = CreateTypeDescriptor(buildContext, instanceType, typesMap);
+                var ctor = SelectConstructor(buildContext, typeDescriptor, autoWiringStrategy);
                 expression = buildContext.ApplyInitializers(
                     autoWiringStrategy,
                     typeDescriptor,
@@ -12738,33 +12688,111 @@ namespace IoC.Core
             }
         }
 
+        private Type ResolveInstanceType(IBuildContext buildContext, IAutowiringStrategy autoWiringStrategy)
+        {
+            if (autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
+            {
+                return instanceType;
+            }
+
+            if (_hasGenericParamsWithConstraints)
+            {
+                return GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<ICannotResolveType>().Resolve(buildContext, _type, buildContext.Key.Type);
+            }
+
+            return _type;
+        }
+
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+        private static IMethod<ConstructorInfo> SelectConstructor(IBuildContext buildContext, TypeDescriptor typeDescriptor, IAutowiringStrategy autoWiringStrategy)
+        {
+            var constructors = (IEnumerable<IMethod<ConstructorInfo>>)typeDescriptor
+                .GetDeclaredConstructors()
+                .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
+                .Select(info => new Method<ConstructorInfo>(info));
+
+            if (autoWiringStrategy.TryResolveConstructor(constructors, out var ctor))
+            {
+                return ctor;
+            }
+
+            if (DefaultAutowiringStrategy.Shared != autoWiringStrategy && DefaultAutowiringStrategy.Shared.TryResolveConstructor(constructors, out ctor))
+            {
+                return ctor;
+            }
+
+            return buildContext.Container.Resolve<ICannotResolveConstructor>().Resolve(buildContext, constructors);
+        }
+
+        private TypeDescriptor CreateTypeDescriptor(IBuildContext buildContext, Type type, Dictionary<Type, Type> typesMap)
+        {
+            var typeDescriptor = type.Descriptor();
+            if (!typeDescriptor.IsConstructedGenericType())
+            {
+                return typeDescriptor;
+            }
+
+            TypeMapper.Shared.Map(type, buildContext.Key.Type, typesMap);
+            foreach (var mapping in typesMap)
+            {
+                buildContext.MapType(mapping.Key, mapping.Value);
+            }
+
+            var genericTypeArgs = typeDescriptor.GetGenericTypeArguments();
+            var isReplaced = false;
+            for (var position = 0; position < genericTypeArgs.Length; position++)
+            {
+                var genericTypeArg = genericTypeArgs[position];
+                var genericTypeArgDescriptor = genericTypeArg.Descriptor();
+                if (genericTypeArgDescriptor.IsGenericTypeDefinition() || genericTypeArgDescriptor.IsGenericTypeArgument())
+                {
+                    if (typesMap.TryGetValue(genericTypeArg, out var genericArgType))
+                    {
+                        genericTypeArgs[position] = genericArgType;
+                        isReplaced = true;
+                    }
+                    else
+                    {
+                        genericTypeArgs[position] = buildContext.Container.Resolve<ICannotResolveGenericTypeArgument>().Resolve(buildContext, _registeredTypeDescriptor.Type, position, genericTypeArg);
+                        isReplaced = true;
+                    }
+                }
+            }
+
+            if (isReplaced)
+            {
+                typeDescriptor = typeDescriptor.GetGenericTypeDefinition().MakeGenericType(genericTypeArgs).Descriptor();
+            }
+
+            return typeDescriptor;
+        }
+
         [CanBeNull]
-        internal Type GetInstanceTypeBasedOnTargetGenericConstrains(Type targetType)
+        internal Type GetInstanceTypeBasedOnTargetGenericConstrains(Type type)
         {
             var registeredGenericTypeParameters = new Type[_registeredGenericTypeParameters.Length];
             Array.Copy(_registeredGenericTypeParameters, registeredGenericTypeParameters, _registeredGenericTypeParameters.Length);
-            var resolvingTypeDescriptor = targetType.Descriptor();
-            var resolvingTypeDefinitionDescriptor = resolvingTypeDescriptor.GetGenericTypeDefinition().Descriptor();
-            var resolvingTypeDefinitionGenericTypeParameters = resolvingTypeDefinitionDescriptor.GetGenericTypeParameters();
-            var constraintsMap = resolvingTypeDescriptor
+            var typeDescriptor = type.Descriptor();
+            var typeDefinitionDescriptor = typeDescriptor.GetGenericTypeDefinition().Descriptor();
+            var typeDefinitionGenericTypeParameters = typeDefinitionDescriptor.GetGenericTypeParameters();
+            var constraintsMap = typeDescriptor
                 .GetGenericTypeArguments()
-                .Zip(resolvingTypeDefinitionGenericTypeParameters, (type, typeDefinition) => Tuple.Create(type, typeDefinition.Descriptor().GetGenericParameterConstraints()))
+                .Zip(typeDefinitionGenericTypeParameters, (genericType, typeDefinition) => Tuple.Create(genericType, typeDefinition.Descriptor().GetGenericParameterConstraints()))
                 .ToArray();
 
             var canBeResolved = true;
             foreach (var item in _genericParamsWithConstraints)
             {
                 var constraints = item.TypeDescriptor.GetGenericParameterConstraints();
-
                 var isDefined = false;
-                foreach (var constraintsEntry in constraintsMap)
+                foreach (var constraint in constraintsMap)
                 {
-                    if (!CoreExtensions.SequenceEqual(constraints, constraintsEntry.Item2))
+                    if (!CoreExtensions.SequenceEqual(constraints, constraint.Item2))
                     {
                         continue;
                     }
 
-                    registeredGenericTypeParameters[item.Position] = constraintsEntry.Item1;
+                    registeredGenericTypeParameters[item.Position] = constraint.Item1;
                     isDefined = true;
                     break;
                 }

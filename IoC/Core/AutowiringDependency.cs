@@ -38,10 +38,9 @@
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            var typesMap = new Dictionary<Type, Type>();
-
             try
             {
+                var typesMap = new Dictionary<Type, Type>();
                 TypeMapper.Shared.Map(_expression.Type, buildContext.Key.Type, typesMap);
                 foreach (var mapping in typesMap)
                 {

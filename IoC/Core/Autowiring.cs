@@ -7,7 +7,6 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
-    using System.Runtime.CompilerServices;
 
     internal static class Autowiring
     {
@@ -16,49 +15,52 @@ namespace IoC.Core
             this IBuildContext buildContext,
             IAutowiringStrategy autoWiringStrategy,
             TypeDescriptor typeDescriptor,
-            Expression baseExpression,
+            Expression expression,
             IEnumerable<Expression> statements,
             ILifetime lifetime,
             IDictionary<Type, Type> typesMap)
         {
-            var isDefaultAutoWiringStrategy = DefaultAutowiringStrategy.Shared == autoWiringStrategy;
-            var defaultMethods = typeDescriptor.GetDeclaredMethods().FilterMethods();
-            if (!autoWiringStrategy.TryResolveInitializers(defaultMethods, out var initializers))
-            {
-                if (isDefaultAutoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(defaultMethods, out initializers))
-                {
-                    initializers = Enumerable.Empty<IMethod<MethodInfo>>();
-                }
-            }
+            expression = ReplaceTypes(buildContext, expression, typesMap);
+            var thisVar = Expression.Variable(expression.Type);
 
-            baseExpression = TypeReplacerExpressionBuilder.Shared.Build(baseExpression, buildContext, typesMap);
-            var thisVar = Expression.Variable(baseExpression.Type);
-
-            var initializerExpressions =
-                initializers.Select(initializer => (Expression)Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext)))
-                    .Concat(statements.Select(expression => TypeReplacerExpressionBuilder.Shared.Build(expression, buildContext, typesMap)))
+            var initializerExpressions = 
+                GetInitializers(autoWiringStrategy, typeDescriptor)
+                    .Select(initializer => (Expression)Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext)))
+                    .Concat(statements.Select(statementExpression => ReplaceTypes(buildContext, statementExpression, typesMap)))
                     .ToArray();
 
             if (initializerExpressions.Length > 0)
             {
-                baseExpression = Expression.Block(
+                expression = Expression.Block(
                     new[] { thisVar },
-                    Expression.Assign(thisVar, baseExpression),
+                    Expression.Assign(thisVar, expression),
                     Expression.Block(initializerExpressions),
                     thisVar
                 );
             }
 
-            baseExpression = DependencyInjectionExpressionBuilder.Shared.Build(baseExpression, buildContext, thisVar);
-            return buildContext.FinalizeExpression(baseExpression, lifetime);
+            expression = DependencyInjectionExpressionBuilder.Shared.Build(expression, buildContext, thisVar);
+            return buildContext.FinalizeExpression(expression, lifetime);
         }
 
-        [IoC.NotNull]
-        [MethodImpl((MethodImplOptions)0x100)]
-        public static IEnumerable<IMethod<TMethodInfo>> FilterMethods<TMethodInfo>([IoC.NotNull] this IEnumerable<TMethodInfo> methodInfos)
-            where TMethodInfo : MethodBase
-            => methodInfos
-                .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
-                .Select(info => new Method<TMethodInfo>(info));
+        private static Expression ReplaceTypes(IBuildContext buildContext, Expression expression, IDictionary<Type, Type> typesMap) =>
+            TypeReplacerExpressionBuilder.Shared.Build(expression, buildContext, typesMap);
+
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+        private static IEnumerable<IMethod<MethodInfo>> GetInitializers(IAutowiringStrategy autoWiringStrategy, TypeDescriptor typeDescriptor)
+        {
+            var methods = typeDescriptor.GetDeclaredMethods().Select(info => new Method<MethodInfo>(info));
+            if (autoWiringStrategy.TryResolveInitializers(methods, out var initializers))
+            {
+                return initializers;
+            }
+
+            if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(methods, out initializers))
+            {
+                initializers = Enumerable.Empty<IMethod<MethodInfo>>();
+            }
+
+            return initializers;
+        }
     }
 }
