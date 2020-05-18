@@ -15,32 +15,32 @@ namespace IoC.Core
             this IBuildContext buildContext,
             IAutowiringStrategy autoWiringStrategy,
             TypeDescriptor typeDescriptor,
-            Expression expression,
-            IEnumerable<Expression> statements,
+            Expression createInstanceExpression,
+            IEnumerable<Expression> initializeInstanceStatements,
             ILifetime lifetime,
             IDictionary<Type, Type> typesMap)
         {
-            expression = ReplaceTypes(buildContext, expression, typesMap);
-            var thisVar = Expression.Variable(expression.Type);
+            createInstanceExpression = ReplaceTypes(buildContext, createInstanceExpression, typesMap);
+            var thisVar = Expression.Variable(createInstanceExpression.Type);
 
-            var initializerExpressions = 
+            var initializeExpressions = 
                 GetInitializers(autoWiringStrategy, typeDescriptor)
                     .Select(initializer => (Expression)Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext)))
-                    .Concat(statements.Select(statementExpression => ReplaceTypes(buildContext, statementExpression, typesMap)))
+                    .Concat(initializeInstanceStatements.Select(statementExpression => ReplaceTypes(buildContext, statementExpression, typesMap)))
                     .ToArray();
 
-            if (initializerExpressions.Length > 0)
+            if (initializeExpressions.Length > 0)
             {
-                expression = Expression.Block(
+                createInstanceExpression = Expression.Block(
                     new[] { thisVar },
-                    Expression.Assign(thisVar, expression),
-                    Expression.Block(initializerExpressions),
+                    Expression.Assign(thisVar, createInstanceExpression),
+                    Expression.Block(initializeExpressions),
                     thisVar
                 );
             }
 
-            expression = DependencyInjectionExpressionBuilder.Shared.Build(expression, buildContext, thisVar);
-            return buildContext.FinalizeExpression(expression, lifetime);
+            createInstanceExpression = DependencyInjectionExpressionBuilder.Shared.Build(createInstanceExpression, buildContext, thisVar);
+            return buildContext.FinalizeExpression(createInstanceExpression, lifetime);
         }
 
         private static Expression ReplaceTypes(IBuildContext buildContext, Expression expression, IDictionary<Type, Type> typesMap) =>
