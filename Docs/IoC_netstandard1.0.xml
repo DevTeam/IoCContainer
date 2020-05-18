@@ -5344,14 +5344,14 @@
             The target key to build resolver.
             </summary>
         </member>
-        <member name="P:IoC.IBuildContext.Depth">
-            <summary>
-            The depth of current context in the build tree.
-            </summary>
-        </member>
         <member name="P:IoC.IBuildContext.Container">
             <summary>
             The target container.
+            </summary>
+        </member>
+        <member name="P:IoC.IBuildContext.Depth">
+            <summary>
+            The depth of current context in the build tree.
             </summary>
         </member>
         <member name="P:IoC.IBuildContext.AutowiringStrategy">
@@ -5369,14 +5369,7 @@
             The container parameter.
             </summary>
         </member>
-        <member name="M:IoC.IBuildContext.GetDependencyExpression(System.Linq.Expressions.Expression)">
-            <summary>
-            Gets the dependency expression.
-            </summary>
-            <param name="defaultExpression">The default expression.</param>
-            <returns>The dependency expression.</returns>
-        </member>
-        <member name="M:IoC.IBuildContext.Create(IoC.Key,IoC.IContainer)">
+        <member name="M:IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)">
             <summary>
             Creates a child context.
             </summary>
@@ -5384,19 +5377,12 @@
             <param name="container">The container.</param>
             <returns>The new build context.</returns>
         </member>
-        <member name="M:IoC.IBuildContext.AddLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)">
+        <member name="M:IoC.IBuildContext.CreateExpression(System.Linq.Expressions.Expression)">
             <summary>
-            Prepares base expression adding the appropriate lifetime.
+            Create the expression.
             </summary>
-            <param name="baseExpression">The base expression.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <returns></returns>
-        </member>
-        <member name="M:IoC.IBuildContext.AddParameter(System.Linq.Expressions.ParameterExpression)">
-            <summary>
-            Adds a parameter.
-            </summary>
-            <param name="parameterExpression">The parameters expression to add.</param>
+            <param name="defaultExpression">The default expression.</param>
+            <returns>The expression.</returns>
         </member>
         <member name="M:IoC.IBuildContext.MapType(System.Type,System.Type)">
             <summary>
@@ -5404,6 +5390,20 @@
             </summary>
             <param name="fromType">Type to map.</param>
             <param name="toType">The target type.</param>
+        </member>
+        <member name="M:IoC.IBuildContext.AddParameter(System.Linq.Expressions.ParameterExpression)">
+            <summary>
+            Adds a parameter.
+            </summary>
+            <param name="parameterExpression">The parameters expression to add.</param>
+        </member>
+        <member name="M:IoC.IBuildContext.FinalizeExpression(System.Linq.Expressions.Expression,IoC.ILifetime)">
+            <summary>
+            Finalizes an expression and adds a lifetime.
+            </summary>
+            <param name="baseExpression">The base expression.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <returns></returns>
         </member>
         <member name="M:IoC.IBuildContext.TryCompile(System.Linq.Expressions.LambdaExpression,System.Delegate@,System.Exception@)">
             <summary>

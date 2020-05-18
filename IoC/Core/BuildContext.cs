@@ -57,56 +57,10 @@
 
         public ParameterExpression ContainerParameter { get; private set; }
 
-        public IBuildContext Create(Key key, IContainer container) => 
+        public IBuildContext CreateChild(Key key, IContainer container) => 
             CreateInternal(key, container ?? throw new ArgumentNullException(nameof(container)));
 
-        public void AddParameter(ParameterExpression parameterExpression)
-            => _parameters.Add(parameterExpression ?? throw new ArgumentNullException(nameof(parameterExpression)));
-
-        public void MapType(Type fromType, Type toType) => _typesMap[fromType] = toType;
-
-        public Expression AddLifetime(Expression baseExpression, ILifetime lifetime)
-        {
-            if (_parameters.Count > 0)
-            {
-                baseExpression = Expression.Block(baseExpression.Type, _parameters, baseExpression);
-            }
-
-            if (_builders.Any())
-            {
-                var buildContext = CreateInternal(Key, Container, forBuilders: true);
-                foreach (var builder in _builders)
-                {
-                    baseExpression = baseExpression.Convert(Key.Type);
-                    baseExpression = builder.Build(buildContext, baseExpression);
-                }
-            }
-
-            baseExpression = baseExpression.Convert(Key.Type);
-            return LifetimeExpressionBuilder.Shared.Build(baseExpression, this, lifetime);
-        }
-
-        private IBuildContext CreateInternal(Key key, IContainer container, bool forBuilders = false)
-        {
-            if (_typesMap.TryGetValue(key.Type, out var type))
-            {
-                key = new Key(type, key.Tag);
-            }
-
-            return new BuildContext(
-                this,
-                key,
-                container,
-                forBuilders ? EmptyBuilders :
-                    _builders,
-                AutowiringStrategy,
-                _compiler,
-                ArgsParameter,
-                ContainerParameter,
-                Depth + 1);
-        }
-
-        public Expression GetDependencyExpression(Expression defaultExpression = null)
+        public Expression CreateExpression(Expression defaultExpression = null)
         {
             var selectedContainer = Container;
             if (selectedContainer.Parent != null)
@@ -161,8 +115,53 @@
             return Container.Resolve<ICannotBuildExpression>().Resolve(this, dependency, lifetime, error);
         }
 
+        public void AddParameter(ParameterExpression parameterExpression)
+            => _parameters.Add(parameterExpression ?? throw new ArgumentNullException(nameof(parameterExpression)));
+
+        public void MapType(Type fromType, Type toType) => _typesMap[fromType] = toType;
+
+        public Expression FinalizeExpression(Expression baseExpression, ILifetime lifetime)
+        {
+            if (_parameters.Count > 0)
+            {
+                baseExpression = Expression.Block(baseExpression.Type, _parameters, baseExpression);
+            }
+
+            if (_builders.Any())
+            {
+                var buildContext = CreateInternal(Key, Container, forBuilders: true);
+                foreach (var builder in _builders)
+                {
+                    baseExpression = baseExpression.Convert(Key.Type);
+                    baseExpression = builder.Build(buildContext, baseExpression);
+                }
+            }
+
+            baseExpression = baseExpression.Convert(Key.Type);
+            return LifetimeExpressionBuilder.Shared.Build(baseExpression, this, lifetime);
+        }
+
         public bool TryCompile(LambdaExpression lambdaExpression, out Delegate lambdaCompiled, out Exception error) =>
             _compiler.TryCompile(this, lambdaExpression, out lambdaCompiled, out error);
+
+        private IBuildContext CreateInternal(Key key, IContainer container, bool forBuilders = false)
+        {
+            if (_typesMap.TryGetValue(key.Type, out var type))
+            {
+                key = new Key(type, key.Tag);
+            }
+
+            return new BuildContext(
+                this,
+                key,
+                container,
+                forBuilders ? EmptyBuilders : _builders,
+                AutowiringStrategy,
+                _compiler,
+                ArgsParameter,
+                ContainerParameter,
+                Depth + 1);
+        }
 
         public override string ToString()
         {

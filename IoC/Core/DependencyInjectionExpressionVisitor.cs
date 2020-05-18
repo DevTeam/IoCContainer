@@ -348,7 +348,7 @@ namespace IoC.Core
             }
 
             var selectedContainer = containerExpression != null ? SelectedContainer(Visit(containerExpression) ?? throw InvalidExpressionError) : _container;
-            return _buildContext.Create(key, selectedContainer).GetDependencyExpression(defaultExpression);
+            return _buildContext.CreateChild(key, selectedContainer).CreateExpression(defaultExpression);
         }
 
         private bool TryReplaceContextFields([CanBeNull] Type type, string name, out Expression expression)

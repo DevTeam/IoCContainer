@@ -65,7 +65,7 @@
                         defaultExpression = null;
                     }
 
-                    yield return buildContext.Create(key, buildContext.Container).GetDependencyExpression(defaultExpression);
+                    yield return buildContext.CreateChild(key, buildContext.Container).CreateExpression(defaultExpression);
                 }
             }
         }

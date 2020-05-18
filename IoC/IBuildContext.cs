@@ -15,14 +15,14 @@
         Key Key { get; }
 
         /// <summary>
-        /// The depth of current context in the build tree.
-        /// </summary>
-        int Depth { get; }
-
-        /// <summary>
         /// The target container.
         /// </summary>
         [NotNull] IContainer Container { get; }
+
+        /// <summary>
+        /// The depth of current context in the build tree.
+        /// </summary>
+        int Depth { get; }
 
         /// <summary>
         /// The current autowiring strategy.
@@ -40,27 +40,26 @@
         [NotNull] ParameterExpression ContainerParameter { get; }
 
         /// <summary>
-        /// Gets the dependency expression.
-        /// </summary>
-        /// <param name="defaultExpression">The default expression.</param>
-        /// <returns>The dependency expression.</returns>
-        [NotNull] Expression GetDependencyExpression([CanBeNull] Expression defaultExpression = null);
-
-        /// <summary>
         /// Creates a child context.
         /// </summary>
         /// <param name="key">The key</param>
         /// <param name="container">The container.</param>
         /// <returns>The new build context.</returns>
-        [NotNull] IBuildContext Create(Key key, [NotNull] IContainer container);
+        [NotNull] IBuildContext CreateChild(Key key, [NotNull] IContainer container);
 
         /// <summary>
-        /// Prepares base expression adding the appropriate lifetime.
+        /// Create the expression.
         /// </summary>
-        /// <param name="baseExpression">The base expression.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <returns></returns>
-        [NotNull] Expression AddLifetime([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
+        /// <param name="defaultExpression">The default expression.</param>
+        /// <returns>The expression.</returns>
+        [NotNull] Expression CreateExpression([CanBeNull] Expression defaultExpression = null);
+
+        /// <summary>
+        /// Adds types mapping.
+        /// </summary>
+        /// <param name="fromType">Type to map.</param>
+        /// <param name="toType">The target type.</param>
+        void MapType([NotNull] Type fromType, [NotNull] Type toType);
 
         /// <summary>
         /// Adds a parameter.
@@ -69,11 +68,12 @@
         void AddParameter([NotNull] ParameterExpression parameterExpression);
 
         /// <summary>
-        /// Adds types mapping.
+        /// Finalizes an expression and adds a lifetime.
         /// </summary>
-        /// <param name="fromType">Type to map.</param>
-        /// <param name="toType">The target type.</param>
-        void MapType([NotNull] Type fromType, [NotNull] Type toType);
+        /// <param name="baseExpression">The base expression.</param>
+        /// <param name="lifetime">The target lifetime.</param>
+        /// <returns></returns>
+        [NotNull] Expression FinalizeExpression([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
 
         /// <summary>
         /// Compiles a lambda expression to delegate.

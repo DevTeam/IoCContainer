@@ -48,8 +48,8 @@
                 var paramsCount = genericTypeArguments.Length - 1;
                 var instanceType = genericTypeArguments[paramsCount];
                 var key = new Key(instanceType, buildContext.Key.Tag);
-                var context = buildContext.Create(key, buildContext.Container);
-                var instanceExpression = context.GetDependencyExpression();
+                var context = buildContext.CreateChild(key, buildContext.Container);
+                var instanceExpression = context.CreateExpression();
                 var parameters = new ParameterExpression[paramsCount];
                 var parametersArgs = new Expression[paramsCount];
                 for (var i = 0; i < paramsCount; i++)

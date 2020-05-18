@@ -197,10 +197,10 @@ namespace IoC.Features
 
                 for (var i = keys.Length - 1; i >= 0; i--)
                 {
-                    var context = buildContext.Create(keys[i], buildContext.Container);
+                    var context = buildContext.CreateChild(keys[i], buildContext.Container);
                     result = Expression.Condition(
                         Expression.Equal(positionVar, Expression.Constant(i)),
-                        Expression.Convert(context.GetDependencyExpression(), elementType),
+                        Expression.Convert(context.CreateExpression(), elementType),
                         result);
                 }
 
@@ -212,8 +212,8 @@ namespace IoC.Features
                 var cases = new SwitchCase[keys.Length];
                 for (var i = 0; i < keys.Length; i++)
                 {
-                    var context = buildContext.Create(keys[i], buildContext.Container);
-                    cases[i] = Expression.SwitchCase(Expression.Convert(context.GetDependencyExpression(), elementType), Expression.Constant(i));
+                    var context = buildContext.CreateChild(keys[i], buildContext.Container);
+                    cases[i] = Expression.SwitchCase(Expression.Convert(context.CreateExpression(), elementType), Expression.Constant(i));
                 }
 
                 var switchExpression = Expression.Switch(
@@ -311,8 +311,8 @@ namespace IoC.Features
                 var expressions = new Expression[keys.Length];
                 for (var i = 0; i < keys.Length; i++)
                 {
-                    var context = buildContext.Create(keys[i], buildContext.Container);
-                    expressions[i] = context.GetDependencyExpression();
+                    var context = buildContext.CreateChild(keys[i], buildContext.Container);
+                    expressions[i] = context.CreateExpression();
                 }
 
                 expression = Expression.NewArrayInit(elementType, expressions);

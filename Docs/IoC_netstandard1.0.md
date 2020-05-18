@@ -328,10 +328,10 @@
   - [ContainerParameter](#P-IoC-IBuildContext-ContainerParameter 'IoC.IBuildContext.ContainerParameter')
   - [Depth](#P-IoC-IBuildContext-Depth 'IoC.IBuildContext.Depth')
   - [Key](#P-IoC-IBuildContext-Key 'IoC.IBuildContext.Key')
-  - [AddLifetime(baseExpression,lifetime)](#M-IoC-IBuildContext-AddLifetime-System-Linq-Expressions-Expression,IoC-ILifetime- 'IoC.IBuildContext.AddLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)')
   - [AddParameter(parameterExpression)](#M-IoC-IBuildContext-AddParameter-System-Linq-Expressions-ParameterExpression- 'IoC.IBuildContext.AddParameter(System.Linq.Expressions.ParameterExpression)')
-  - [Create(key,container)](#M-IoC-IBuildContext-Create-IoC-Key,IoC-IContainer- 'IoC.IBuildContext.Create(IoC.Key,IoC.IContainer)')
-  - [GetDependencyExpression(defaultExpression)](#M-IoC-IBuildContext-GetDependencyExpression-System-Linq-Expressions-Expression- 'IoC.IBuildContext.GetDependencyExpression(System.Linq.Expressions.Expression)')
+  - [CreateChild(key,container)](#M-IoC-IBuildContext-CreateChild-IoC-Key,IoC-IContainer- 'IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)')
+  - [CreateExpression(defaultExpression)](#M-IoC-IBuildContext-CreateExpression-System-Linq-Expressions-Expression- 'IoC.IBuildContext.CreateExpression(System.Linq.Expressions.Expression)')
+  - [FinalizeExpression(baseExpression,lifetime)](#M-IoC-IBuildContext-FinalizeExpression-System-Linq-Expressions-Expression,IoC-ILifetime- 'IoC.IBuildContext.FinalizeExpression(System.Linq.Expressions.Expression,IoC.ILifetime)')
   - [MapType(fromType,toType)](#M-IoC-IBuildContext-MapType-System-Type,System-Type- 'IoC.IBuildContext.MapType(System.Type,System.Type)')
   - [TryCompile(lambdaExpression,lambdaCompiled,error)](#M-IoC-IBuildContext-TryCompile-System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@- 'IoC.IBuildContext.TryCompile(System.Linq.Expressions.LambdaExpression,System.Delegate@,System.Exception@)')
 - [IBuilder](#T-IoC-IBuilder 'IoC.IBuilder')
@@ -7945,24 +7945,6 @@ The depth of current context in the build tree.
 
 The target key to build resolver.
 
-<a name='M-IoC-IBuildContext-AddLifetime-System-Linq-Expressions-Expression,IoC-ILifetime-'></a>
-### AddLifetime(baseExpression,lifetime) `method`
-
-##### Summary
-
-Prepares base expression adding the appropriate lifetime.
-
-##### Returns
-
-
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-
 <a name='M-IoC-IBuildContext-AddParameter-System-Linq-Expressions-ParameterExpression-'></a>
 ### AddParameter(parameterExpression) `method`
 
@@ -7976,8 +7958,8 @@ Adds a parameter.
 | ---- | ---- | ----------- |
 | parameterExpression | [System.Linq.Expressions.ParameterExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.ParameterExpression 'System.Linq.Expressions.ParameterExpression') | The parameters expression to add. |
 
-<a name='M-IoC-IBuildContext-Create-IoC-Key,IoC-IContainer-'></a>
-### Create(key,container) `method`
+<a name='M-IoC-IBuildContext-CreateChild-IoC-Key,IoC-IContainer-'></a>
+### CreateChild(key,container) `method`
 
 ##### Summary
 
@@ -7994,22 +7976,40 @@ The new build context.
 | key | [IoC.Key](#T-IoC-Key 'IoC.Key') | The key |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The container. |
 
-<a name='M-IoC-IBuildContext-GetDependencyExpression-System-Linq-Expressions-Expression-'></a>
-### GetDependencyExpression(defaultExpression) `method`
+<a name='M-IoC-IBuildContext-CreateExpression-System-Linq-Expressions-Expression-'></a>
+### CreateExpression(defaultExpression) `method`
 
 ##### Summary
 
-Gets the dependency expression.
+Create the expression.
 
 ##### Returns
 
-The dependency expression.
+The expression.
 
 ##### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | defaultExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The default expression. |
+
+<a name='M-IoC-IBuildContext-FinalizeExpression-System-Linq-Expressions-Expression,IoC-ILifetime-'></a>
+### FinalizeExpression(baseExpression,lifetime) `method`
+
+##### Summary
+
+Finalizes an expression and adds a lifetime.
+
+##### Returns
+
+
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 
 <a name='M-IoC-IBuildContext-MapType-System-Type,System-Type-'></a>
 ### MapType(fromType,toType) `method`

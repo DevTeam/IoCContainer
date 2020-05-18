@@ -50,7 +50,7 @@ namespace IoC.Core
             }
 
             baseExpression = DependencyInjectionExpressionBuilder.Shared.Build(baseExpression, buildContext, thisVar);
-            return buildContext.AddLifetime(baseExpression, lifetime);
+            return buildContext.FinalizeExpression(baseExpression, lifetime);
         }
 
         [IoC.NotNull]

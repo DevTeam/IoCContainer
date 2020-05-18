@@ -82,8 +82,15 @@
   - [Create()](#M-IoC-Lifetimes-ContainerSingletonLifetime-Create 'IoC.Lifetimes.ContainerSingletonLifetime.Create')
   - [CreateKey()](#M-IoC-Lifetimes-ContainerSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ContainerSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])')
   - [OnInstanceReleased()](#M-IoC-Lifetimes-ContainerSingletonLifetime-OnInstanceReleased-System-Object,IoC-IContainer- 'IoC.Lifetimes.ContainerSingletonLifetime.OnInstanceReleased(System.Object,IoC.IContainer)')
-  - [OnNewInstanceCreated\`\`1()](#M-IoC-Lifetimes-ContainerSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-IContainer,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ContainerSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.IContainer,IoC.IContainer,System.Object[])')
+  - [OnNewInstanceCreated()](#M-IoC-Lifetimes-ContainerSingletonLifetime-OnNewInstanceCreated-System-Object,IoC-IContainer,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ContainerSingletonLifetime.OnNewInstanceCreated(System.Object,IoC.IContainer,IoC.IContainer,System.Object[])')
   - [ToString()](#M-IoC-Lifetimes-ContainerSingletonLifetime-ToString 'IoC.Lifetimes.ContainerSingletonLifetime.ToString')
+- [ContainerStateSingletonLifetime\`1](#T-IoC-Lifetimes-ContainerStateSingletonLifetime`1 'IoC.Lifetimes.ContainerStateSingletonLifetime`1')
+  - [Create()](#M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-Create 'IoC.Lifetimes.ContainerStateSingletonLifetime`1.Create')
+  - [CreateKey()](#M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ContainerStateSingletonLifetime`1.CreateKey(IoC.IContainer,System.Object[])')
+  - [Dispose()](#M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-Dispose 'IoC.Lifetimes.ContainerStateSingletonLifetime`1.Dispose')
+  - [OnInstanceReleased()](#M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-OnInstanceReleased-`0,IoC-IContainer- 'IoC.Lifetimes.ContainerStateSingletonLifetime`1.OnInstanceReleased(`0,IoC.IContainer)')
+  - [OnNewInstanceCreated()](#M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-OnNewInstanceCreated-`0,IoC-IContainer,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ContainerStateSingletonLifetime`1.OnNewInstanceCreated(`0,IoC.IContainer,IoC.IContainer,System.Object[])')
+  - [ToString()](#M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-ToString 'IoC.Lifetimes.ContainerStateSingletonLifetime`1.ToString')
 - [Context](#T-IoC-Context 'IoC.Context')
   - [Args](#F-IoC-Context-Args 'IoC.Context.Args')
   - [Container](#F-IoC-Context-Container 'IoC.Context.Container')
@@ -102,11 +109,11 @@
   - [Dependency](#F-IoC-Issues-DependencyDescription-Dependency 'IoC.Issues.DependencyDescription.Dependency')
   - [Lifetime](#F-IoC-Issues-DependencyDescription-Lifetime 'IoC.Issues.DependencyDescription.Lifetime')
 - [EventType](#T-IoC-EventType 'IoC.EventType')
+  - [ContainerStateSingletonLifetime](#F-IoC-EventType-ContainerStateSingletonLifetime 'IoC.EventType.ContainerStateSingletonLifetime')
   - [CreateContainer](#F-IoC-EventType-CreateContainer 'IoC.EventType.CreateContainer')
   - [DisposeContainer](#F-IoC-EventType-DisposeContainer 'IoC.EventType.DisposeContainer')
   - [RegisterDependency](#F-IoC-EventType-RegisterDependency 'IoC.EventType.RegisterDependency')
   - [ResolverCompilation](#F-IoC-EventType-ResolverCompilation 'IoC.EventType.ResolverCompilation')
-  - [UnregisterDependency](#F-IoC-EventType-UnregisterDependency 'IoC.EventType.UnregisterDependency')
 - [FluentBind](#T-IoC-FluentBind 'IoC.FluentBind')
   - [AnyTag\`\`1(binding)](#M-IoC-FluentBind-AnyTag``1-IoC-IBinding{``0}- 'IoC.FluentBind.AnyTag``1(IoC.IBinding{``0})')
   - [As\`\`1(binding,lifetime)](#M-IoC-FluentBind-As``1-IoC-IBinding{``0},IoC-Lifetime- 'IoC.FluentBind.As``1(IoC.IBinding{``0},IoC.Lifetime)')
@@ -212,11 +219,16 @@
   - [Bind\`\`9(container)](#M-IoC-FluentBind-Bind``9-IoC-IMutableContainer- 'IoC.FluentBind.Bind``9(IoC.IMutableContainer)')
   - [Bind\`\`9(binding)](#M-IoC-FluentBind-Bind``9-IoC-IBinding- 'IoC.FluentBind.Bind``9(IoC.IBinding)')
   - [Bind\`\`9(token)](#M-IoC-FluentBind-Bind``9-IoC-IToken- 'IoC.FluentBind.Bind``9(IoC.IToken)')
+  - [CanResolve(container,type,tag)](#M-IoC-FluentBind-CanResolve-IoC-IContainer,System-Type,System-Object- 'IoC.FluentBind.CanResolve(IoC.IContainer,System.Type,System.Object)')
+  - [CanResolve\`\`1(container,tag)](#M-IoC-FluentBind-CanResolve``1-IoC-IContainer,System-Object- 'IoC.FluentBind.CanResolve``1(IoC.IContainer,System.Object)')
+  - [IsBound(container,type,tag)](#M-IoC-FluentBind-IsBound-IoC-IContainer,System-Type,System-Object- 'IoC.FluentBind.IsBound(IoC.IContainer,System.Type,System.Object)')
+  - [IsBound\`\`1(container,tag)](#M-IoC-FluentBind-IsBound``1-IoC-IContainer,System-Object- 'IoC.FluentBind.IsBound``1(IoC.IContainer,System.Object)')
   - [Lifetime\`\`1(binding,lifetime)](#M-IoC-FluentBind-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime- 'IoC.FluentBind.Lifetime``1(IoC.IBinding{``0},IoC.ILifetime)')
   - [Tag\`\`1(binding,tagValue)](#M-IoC-FluentBind-Tag``1-IoC-IBinding{``0},System-Object- 'IoC.FluentBind.Tag``1(IoC.IBinding{``0},System.Object)')
   - [To(binding,type,statements)](#M-IoC-FluentBind-To-IoC-IBinding{System-Object},System-Type,System-Linq-Expressions-Expression{System-Action{IoC-Context{System-Object}}}[]- 'IoC.FluentBind.To(IoC.IBinding{System.Object},System.Type,System.Linq.Expressions.Expression{System.Action{IoC.Context{System.Object}}}[])')
   - [To\`\`1(binding,statements)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
   - [To\`\`1(binding,factory,statements)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},System-Linq-Expressions-Expression{System-Func{IoC-Context,``0}},System-Linq-Expressions-Expression{System-Action{IoC-Context{``0}}}[]- 'IoC.FluentBind.To``1(IoC.IBinding{``0},System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}},System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[])')
+  - [To\`\`1(binding,dependency)](#M-IoC-FluentBind-To``1-IoC-IBinding{``0},IoC-IDependency- 'IoC.FluentBind.To``1(IoC.IBinding{``0},IoC.IDependency)')
 - [FluentConfiguration](#T-IoC-FluentConfiguration 'IoC.FluentConfiguration')
   - [Apply(container,configurationText)](#M-IoC-FluentConfiguration-Apply-IoC-IMutableContainer,System-String[]- 'IoC.FluentConfiguration.Apply(IoC.IMutableContainer,System.String[])')
   - [Apply(token,configurationText)](#M-IoC-FluentConfiguration-Apply-IoC-IToken,System-String[]- 'IoC.FluentConfiguration.Apply(IoC.IToken,System.String[])')
@@ -318,16 +330,12 @@
   - [ContainerParameter](#P-IoC-IBuildContext-ContainerParameter 'IoC.IBuildContext.ContainerParameter')
   - [Depth](#P-IoC-IBuildContext-Depth 'IoC.IBuildContext.Depth')
   - [Key](#P-IoC-IBuildContext-Key 'IoC.IBuildContext.Key')
-  - [Parent](#P-IoC-IBuildContext-Parent 'IoC.IBuildContext.Parent')
-  - [AddLifetime(baseExpression,lifetime)](#M-IoC-IBuildContext-AddLifetime-System-Linq-Expressions-Expression,IoC-ILifetime- 'IoC.IBuildContext.AddLifetime(System.Linq.Expressions.Expression,IoC.ILifetime)')
   - [AddParameter(parameterExpression)](#M-IoC-IBuildContext-AddParameter-System-Linq-Expressions-ParameterExpression- 'IoC.IBuildContext.AddParameter(System.Linq.Expressions.ParameterExpression)')
-  - [BindTypes(originalType,targetType)](#M-IoC-IBuildContext-BindTypes-System-Type,System-Type- 'IoC.IBuildContext.BindTypes(System.Type,System.Type)')
   - [CreateChild(key,container)](#M-IoC-IBuildContext-CreateChild-IoC-Key,IoC-IContainer- 'IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)')
-  - [DeclareParameters(baseExpression)](#M-IoC-IBuildContext-DeclareParameters-System-Linq-Expressions-Expression- 'IoC.IBuildContext.DeclareParameters(System.Linq.Expressions.Expression)')
-  - [GetDependencyExpression(defaultExpression)](#M-IoC-IBuildContext-GetDependencyExpression-System-Linq-Expressions-Expression- 'IoC.IBuildContext.GetDependencyExpression(System.Linq.Expressions.Expression)')
-  - [InjectDependencies(baseExpression,instanceExpression)](#M-IoC-IBuildContext-InjectDependencies-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression- 'IoC.IBuildContext.InjectDependencies(System.Linq.Expressions.Expression,System.Linq.Expressions.ParameterExpression)')
-  - [ReplaceTypes(baseExpression)](#M-IoC-IBuildContext-ReplaceTypes-System-Linq-Expressions-Expression- 'IoC.IBuildContext.ReplaceTypes(System.Linq.Expressions.Expression)')
-  - [TryReplaceType(originalType,targetType)](#M-IoC-IBuildContext-TryReplaceType-System-Type,System-Type@- 'IoC.IBuildContext.TryReplaceType(System.Type,System.Type@)')
+  - [CreateExpression(defaultExpression)](#M-IoC-IBuildContext-CreateExpression-System-Linq-Expressions-Expression- 'IoC.IBuildContext.CreateExpression(System.Linq.Expressions.Expression)')
+  - [FinalizeExpression(baseExpression,lifetime)](#M-IoC-IBuildContext-FinalizeExpression-System-Linq-Expressions-Expression,IoC-ILifetime- 'IoC.IBuildContext.FinalizeExpression(System.Linq.Expressions.Expression,IoC.ILifetime)')
+  - [MapType(fromType,toType)](#M-IoC-IBuildContext-MapType-System-Type,System-Type- 'IoC.IBuildContext.MapType(System.Type,System.Type)')
+  - [TryCompile(lambdaExpression,lambdaCompiled,error)](#M-IoC-IBuildContext-TryCompile-System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@- 'IoC.IBuildContext.TryCompile(System.Linq.Expressions.LambdaExpression,System.Delegate@,System.Exception@)')
 - [IBuilder](#T-IoC-IBuilder 'IoC.IBuilder')
   - [Build(context,bodyExpression)](#M-IoC-IBuilder-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.IBuilder.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
 - [ICannotBuildExpression](#T-IoC-Issues-ICannotBuildExpression 'IoC.Issues.ICannotBuildExpression')
@@ -341,7 +349,7 @@
 - [ICannotParseType](#T-IoC-Issues-ICannotParseType 'IoC.Issues.ICannotParseType')
   - [Resolve(statementText,statementLineNumber,statementPosition,typeName)](#M-IoC-Issues-ICannotParseType-Resolve-System-String,System-Int32,System-Int32,System-String- 'IoC.Issues.ICannotParseType.Resolve(System.String,System.Int32,System.Int32,System.String)')
 - [ICannotRegister](#T-IoC-Issues-ICannotRegister 'IoC.Issues.ICannotRegister')
-  - [Resolve(container,keys)](#M-IoC-Issues-ICannotRegister-Resolve-IoC-IContainer,IoC-Key[]- 'IoC.Issues.ICannotRegister.Resolve(IoC.IContainer,IoC.Key[])')
+  - [Resolve(container,keys,dependency,lifetime)](#M-IoC-Issues-ICannotRegister-Resolve-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime- 'IoC.Issues.ICannotRegister.Resolve(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.Key},IoC.IDependency,IoC.ILifetime)')
 - [ICannotResolveConstructor](#T-IoC-Issues-ICannotResolveConstructor 'IoC.Issues.ICannotResolveConstructor')
   - [Resolve(buildContext,constructors)](#M-IoC-Issues-ICannotResolveConstructor-Resolve-IoC-IBuildContext,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}}- 'IoC.Issues.ICannotResolveConstructor.Resolve(IoC.IBuildContext,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}})')
 - [ICannotResolveDependency](#T-IoC-Issues-ICannotResolveDependency 'IoC.Issues.ICannotResolveDependency')
@@ -351,7 +359,7 @@
 - [ICannotResolveType](#T-IoC-Issues-ICannotResolveType 'IoC.Issues.ICannotResolveType')
   - [Resolve(buildContext,registeredType,resolvingType)](#M-IoC-Issues-ICannotResolveType-Resolve-IoC-IBuildContext,System-Type,System-Type- 'IoC.Issues.ICannotResolveType.Resolve(IoC.IBuildContext,System.Type,System.Type)')
 - [ICompiler](#T-IoC-ICompiler 'IoC.ICompiler')
-  - [TryCompileResolver\`\`1(context,expression,resolver)](#M-IoC-ICompiler-TryCompileResolver``1-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,IoC-Resolver{``0}@- 'IoC.ICompiler.TryCompileResolver``1(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,IoC.Resolver{``0}@)')
+  - [TryCompile(context,lambdaExpression,lambdaCompiled,error)](#M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@- 'IoC.ICompiler.TryCompile(IoC.IBuildContext,System.Linq.Expressions.LambdaExpression,System.Delegate@,System.Exception@)')
 - [ICompositionRoot\`1](#T-IoC-ICompositionRoot`1 'IoC.ICompositionRoot`1')
   - [Instance](#P-IoC-ICompositionRoot`1-Instance 'IoC.ICompositionRoot`1.Instance')
 - [IConfiguration](#T-IoC-IConfiguration 'IoC.IConfiguration')
@@ -361,7 +369,7 @@
   - [TryGetDependency(key,dependency,lifetime)](#M-IoC-IContainer-TryGetDependency-IoC-Key,IoC-IDependency@,IoC-ILifetime@- 'IoC.IContainer.TryGetDependency(IoC.Key,IoC.IDependency@,IoC.ILifetime@)')
   - [TryGetResolver\`\`1(type,tag,resolver,error,resolvingContainer)](#M-IoC-IContainer-TryGetResolver``1-System-Type,System-Object,IoC-Resolver{``0}@,System-Exception@,IoC-IContainer- 'IoC.IContainer.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,System.Exception@,IoC.IContainer)')
 - [IDependency](#T-IoC-IDependency 'IoC.IDependency')
-  - [TryBuildExpression(buildContext,lifetime,baseExpression,error)](#M-IoC-IDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.IDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
+  - [TryBuildExpression(buildContext,lifetime,expression,error)](#M-IoC-IDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.IDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
 - [IExpressionBuilder\`1](#T-IoC-Core-IExpressionBuilder`1 'IoC.Core.IExpressionBuilder`1')
   - [Build(bodyExpression,buildContext,context)](#M-IoC-Core-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-IBuildContext,`0- 'IoC.Core.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext,`0)')
 - [IFoundCyclicDependency](#T-IoC-Issues-IFoundCyclicDependency 'IoC.Issues.IFoundCyclicDependency')
@@ -417,14 +425,16 @@
   - [Equals()](#M-IoC-Key-Equals-IoC-Key- 'IoC.Key.Equals(IoC.Key)')
   - [GetHashCode()](#M-IoC-Key-GetHashCode 'IoC.Key.GetHashCode')
   - [ToString()](#M-IoC-Key-ToString 'IoC.Key.ToString')
-- [KeyBasedLifetime\`1](#T-IoC-Lifetimes-KeyBasedLifetime`1 'IoC.Lifetimes.KeyBasedLifetime`1')
-  - [Build()](#M-IoC-Lifetimes-KeyBasedLifetime`1-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.KeyBasedLifetime`1.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
-  - [Create()](#M-IoC-Lifetimes-KeyBasedLifetime`1-Create 'IoC.Lifetimes.KeyBasedLifetime`1.Create')
-  - [CreateKey(container,args)](#M-IoC-Lifetimes-KeyBasedLifetime`1-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.KeyBasedLifetime`1.CreateKey(IoC.IContainer,System.Object[])')
-  - [Dispose()](#M-IoC-Lifetimes-KeyBasedLifetime`1-Dispose 'IoC.Lifetimes.KeyBasedLifetime`1.Dispose')
-  - [OnInstanceReleased(releasedInstance,key)](#M-IoC-Lifetimes-KeyBasedLifetime`1-OnInstanceReleased-System-Object,`0- 'IoC.Lifetimes.KeyBasedLifetime`1.OnInstanceReleased(System.Object,`0)')
-  - [OnNewInstanceCreated\`\`1(newInstance,key,container,args)](#M-IoC-Lifetimes-KeyBasedLifetime`1-OnNewInstanceCreated``1-``0,`0,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.KeyBasedLifetime`1.OnNewInstanceCreated``1(``0,`0,IoC.IContainer,System.Object[])')
-  - [SelectResolvingContainer()](#M-IoC-Lifetimes-KeyBasedLifetime`1-SelectResolvingContainer-IoC-IContainer,IoC-IContainer- 'IoC.Lifetimes.KeyBasedLifetime`1.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)')
+- [KeyBasedLifetime\`2](#T-IoC-Lifetimes-KeyBasedLifetime`2 'IoC.Lifetimes.KeyBasedLifetime`2')
+  - [#ctor(supportOnNewInstanceCreated,supportOnInstanceReleased,threadSafe)](#M-IoC-Lifetimes-KeyBasedLifetime`2-#ctor-System-Boolean,System-Boolean,System-Boolean- 'IoC.Lifetimes.KeyBasedLifetime`2.#ctor(System.Boolean,System.Boolean,System.Boolean)')
+  - [Build()](#M-IoC-Lifetimes-KeyBasedLifetime`2-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.KeyBasedLifetime`2.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
+  - [Create()](#M-IoC-Lifetimes-KeyBasedLifetime`2-Create 'IoC.Lifetimes.KeyBasedLifetime`2.Create')
+  - [CreateKey(container,args)](#M-IoC-Lifetimes-KeyBasedLifetime`2-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.KeyBasedLifetime`2.CreateKey(IoC.IContainer,System.Object[])')
+  - [Dispose()](#M-IoC-Lifetimes-KeyBasedLifetime`2-Dispose 'IoC.Lifetimes.KeyBasedLifetime`2.Dispose')
+  - [OnInstanceReleased(releasedInstance,key)](#M-IoC-Lifetimes-KeyBasedLifetime`2-OnInstanceReleased-`1,`0- 'IoC.Lifetimes.KeyBasedLifetime`2.OnInstanceReleased(`1,`0)')
+  - [OnNewInstanceCreated(newInstance,key,container,args)](#M-IoC-Lifetimes-KeyBasedLifetime`2-OnNewInstanceCreated-`1,`0,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.KeyBasedLifetime`2.OnNewInstanceCreated(`1,`0,IoC.IContainer,System.Object[])')
+  - [Remove(key)](#M-IoC-Lifetimes-KeyBasedLifetime`2-Remove-`0- 'IoC.Lifetimes.KeyBasedLifetime`2.Remove(`0)')
+  - [SelectResolvingContainer()](#M-IoC-Lifetimes-KeyBasedLifetime`2-SelectResolvingContainer-IoC-IContainer,IoC-IContainer- 'IoC.Lifetimes.KeyBasedLifetime`2.SelectResolvingContainer(IoC.IContainer,IoC.IContainer)')
 - [Lifetime](#T-IoC-Lifetime 'IoC.Lifetime')
   - [ContainerSingleton](#F-IoC-Lifetime-ContainerSingleton 'IoC.Lifetime.ContainerSingleton')
   - [ScopeSingleton](#F-IoC-Lifetime-ScopeSingleton 'IoC.Lifetime.ScopeSingleton')
@@ -460,10 +470,11 @@
   - [Create()](#M-IoC-Lifetimes-ScopeSingletonLifetime-Create 'IoC.Lifetimes.ScopeSingletonLifetime.Create')
   - [CreateKey()](#M-IoC-Lifetimes-ScopeSingletonLifetime-CreateKey-IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.CreateKey(IoC.IContainer,System.Object[])')
   - [OnInstanceReleased()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnInstanceReleased-System-Object,IoC-IScope- 'IoC.Lifetimes.ScopeSingletonLifetime.OnInstanceReleased(System.Object,IoC.IScope)')
-  - [OnNewInstanceCreated\`\`1()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-IScope,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated``1(``0,IoC.IScope,IoC.IContainer,System.Object[])')
+  - [OnNewInstanceCreated()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated-System-Object,IoC-IScope,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated(System.Object,IoC.IScope,IoC.IContainer,System.Object[])')
   - [ToString()](#M-IoC-Lifetimes-ScopeSingletonLifetime-ToString 'IoC.Lifetimes.ScopeSingletonLifetime.ToString')
 - [Sets](#T-IoC-Features-Sets 'IoC.Features.Sets')
 - [SingletonLifetime](#T-IoC-Lifetimes-SingletonLifetime 'IoC.Lifetimes.SingletonLifetime')
+  - [#ctor(threadSafe)](#M-IoC-Lifetimes-SingletonLifetime-#ctor-System-Boolean- 'IoC.Lifetimes.SingletonLifetime.#ctor(System.Boolean)')
   - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.SingletonLifetime.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
   - [Create()](#M-IoC-Lifetimes-SingletonLifetime-Create 'IoC.Lifetimes.SingletonLifetime.Create')
   - [Dispose()](#M-IoC-Lifetimes-SingletonLifetime-Dispose 'IoC.Lifetimes.SingletonLifetime.Dispose')
@@ -1627,8 +1638,8 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-IoC-Lifetimes-ContainerSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-IContainer,IoC-IContainer,System-Object[]-'></a>
-### OnNewInstanceCreated\`\`1() `method`
+<a name='M-IoC-Lifetimes-ContainerSingletonLifetime-OnNewInstanceCreated-System-Object,IoC-IContainer,IoC-IContainer,System-Object[]-'></a>
+### OnNewInstanceCreated() `method`
 
 ##### Summary
 
@@ -1639,6 +1650,83 @@ This method has no parameters.
 This method has no parameters.
 
 <a name='M-IoC-Lifetimes-ContainerSingletonLifetime-ToString'></a>
+### ToString() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='T-IoC-Lifetimes-ContainerStateSingletonLifetime`1'></a>
+## ContainerStateSingletonLifetime\`1 `type`
+
+##### Namespace
+
+IoC.Lifetimes
+
+##### Summary
+
+For a singleton instance per state.
+
+<a name='M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-Create'></a>
+### Create() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-CreateKey-IoC-IContainer,System-Object[]-'></a>
+### CreateKey() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-Dispose'></a>
+### Dispose() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-OnInstanceReleased-`0,IoC-IContainer-'></a>
+### OnInstanceReleased() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-OnNewInstanceCreated-`0,IoC-IContainer,IoC-IContainer,System-Object[]-'></a>
+### OnNewInstanceCreated() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Lifetimes-ContainerStateSingletonLifetime`1-ToString'></a>
 ### ToString() `method`
 
 ##### Summary
@@ -1816,6 +1904,13 @@ IoC
 
 Container event types.
 
+<a name='F-IoC-EventType-ContainerStateSingletonLifetime'></a>
+### ContainerStateSingletonLifetime `constants`
+
+##### Summary
+
+On dependency unregistration.
+
 <a name='F-IoC-EventType-CreateContainer'></a>
 ### CreateContainer `constants`
 
@@ -1843,13 +1938,6 @@ On dependency registration.
 ##### Summary
 
 On resolver compilation.
-
-<a name='F-IoC-EventType-UnregisterDependency'></a>
-### UnregisterDependency `constants`
-
-##### Summary
-
-On dependency unregistration.
 
 <a name='T-IoC-FluentBind'></a>
 ## FluentBind `type`
@@ -1949,7 +2037,7 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container. |
-| types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') |  |
+| types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') | A set of contract types. |
 
 <a name='M-IoC-FluentBind-Bind-IoC-IToken,System-Type[]-'></a>
 ### Bind(token,types) `method`
@@ -1967,7 +2055,7 @@ The binding token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The container binding token. |
-| types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') |  |
+| types | [System.Type[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type[] 'System.Type[]') | A set of contract types. |
 
 <a name='M-IoC-FluentBind-Bind``1-IoC-IMutableContainer-'></a>
 ### Bind\`\`1(container) `method`
@@ -5830,6 +5918,92 @@ The binding token.
 | T7 | The contract type #7. |
 | T8 | The contract type #8. |
 
+<a name='M-IoC-FluentBind-CanResolve-IoC-IContainer,System-Type,System-Object-'></a>
+### CanResolve(container,type,tag) `method`
+
+##### Summary
+
+Determines if a related instance can be resolved.
+
+##### Returns
+
+`True` if the binding exists.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The contract type. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
+
+<a name='M-IoC-FluentBind-CanResolve``1-IoC-IContainer,System-Object-'></a>
+### CanResolve\`\`1(container,tag) `method`
+
+##### Summary
+
+Determines if a related instance can be resolved.
+
+##### Returns
+
+`True` if the binding exists.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The contract type. |
+
+<a name='M-IoC-FluentBind-IsBound-IoC-IContainer,System-Type,System-Object-'></a>
+### IsBound(container,type,tag) `method`
+
+##### Summary
+
+Determines if the container or any his parents have a binding.
+
+##### Returns
+
+`True` if the binding exists.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| type | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The contract type. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
+
+<a name='M-IoC-FluentBind-IsBound``1-IoC-IContainer,System-Object-'></a>
+### IsBound\`\`1(container,tag) `method`
+
+##### Summary
+
+Determines if the container or any his parents have a binding.
+
+##### Returns
+
+`True` if the binding exists.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
+| tag | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The contract type. |
+
 <a name='M-IoC-FluentBind-Lifetime``1-IoC-IBinding{``0},IoC-ILifetime-'></a>
 ### Lifetime\`\`1(binding,lifetime) `method`
 
@@ -5869,8 +6043,8 @@ The binding token.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') |  |
-| tagValue | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') |  |
+| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') | The binding token. |
+| tagValue | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The tag value. |
 
 ##### Generic Types
 
@@ -5939,6 +6113,30 @@ The dependency token.
 | binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') | The binding token. |
 | factory | [System.Linq.Expressions.Expression{System.Func{IoC.Context,\`\`0}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Func{IoC.Context,``0}}') | The expression to create an instance. |
 | statements | [System.Linq.Expressions.Expression{System.Action{IoC.Context{\`\`0}}}[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression{System.Action{IoC.Context{``0}}}[]') | The set of expressions to initialize an instance. |
+
+##### Generic Types
+
+| Name | Description |
+| ---- | ----------- |
+| T | The instance type. |
+
+<a name='M-IoC-FluentBind-To``1-IoC-IBinding{``0},IoC-IDependency-'></a>
+### To\`\`1(binding,dependency) `method`
+
+##### Summary
+
+Registers autowiring binding.
+
+##### Returns
+
+The dependency token.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| binding | [IoC.IBinding{\`\`0}](#T-IoC-IBinding{``0} 'IoC.IBinding{``0}') | The binding token. |
+| dependency | [IoC.IDependency](#T-IoC-IDependency 'IoC.IDependency') | The dependency. |
 
 ##### Generic Types
 
@@ -7783,31 +7981,6 @@ The depth of current context in the build tree.
 
 The target key to build resolver.
 
-<a name='P-IoC-IBuildContext-Parent'></a>
-### Parent `property`
-
-##### Summary
-
-The parent of the current build context.
-
-<a name='M-IoC-IBuildContext-AddLifetime-System-Linq-Expressions-Expression,IoC-ILifetime-'></a>
-### AddLifetime(baseExpression,lifetime) `method`
-
-##### Summary
-
-Prepares base expression adding the appropriate lifetime.
-
-##### Returns
-
-
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
-| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-
 <a name='M-IoC-IBuildContext-AddParameter-System-Linq-Expressions-ParameterExpression-'></a>
 ### AddParameter(parameterExpression) `method`
 
@@ -7821,26 +7994,12 @@ Adds a parameter.
 | ---- | ---- | ----------- |
 | parameterExpression | [System.Linq.Expressions.ParameterExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.ParameterExpression 'System.Linq.Expressions.ParameterExpression') | The parameters expression to add. |
 
-<a name='M-IoC-IBuildContext-BindTypes-System-Type,System-Type-'></a>
-### BindTypes(originalType,targetType) `method`
-
-##### Summary
-
-Binds a raw type to a target type.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| originalType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The registered type. |
-| targetType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The target type. |
-
 <a name='M-IoC-IBuildContext-CreateChild-IoC-Key,IoC-IContainer-'></a>
 ### CreateChild(key,container) `method`
 
 ##### Summary
 
-Creates a child build context.
+Creates a child context.
 
 ##### Returns
 
@@ -7853,33 +8012,16 @@ The new build context.
 | key | [IoC.Key](#T-IoC-Key 'IoC.Key') | The key |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The container. |
 
-<a name='M-IoC-IBuildContext-DeclareParameters-System-Linq-Expressions-Expression-'></a>
-### DeclareParameters(baseExpression) `method`
+<a name='M-IoC-IBuildContext-CreateExpression-System-Linq-Expressions-Expression-'></a>
+### CreateExpression(defaultExpression) `method`
 
 ##### Summary
 
-Declares all added parameters.
+Create the expression.
 
 ##### Returns
 
-The base expression with parameters.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
-
-<a name='M-IoC-IBuildContext-GetDependencyExpression-System-Linq-Expressions-Expression-'></a>
-### GetDependencyExpression(defaultExpression) `method`
-
-##### Summary
-
-Gets the dependency expression.
-
-##### Returns
-
-The dependency expression.
+The expression.
 
 ##### Parameters
 
@@ -7887,58 +8029,56 @@ The dependency expression.
 | ---- | ---- | ----------- |
 | defaultExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The default expression. |
 
-<a name='M-IoC-IBuildContext-InjectDependencies-System-Linq-Expressions-Expression,System-Linq-Expressions-ParameterExpression-'></a>
-### InjectDependencies(baseExpression,instanceExpression) `method`
+<a name='M-IoC-IBuildContext-FinalizeExpression-System-Linq-Expressions-Expression,IoC-ILifetime-'></a>
+### FinalizeExpression(baseExpression,lifetime) `method`
 
 ##### Summary
 
-Prepares base expression injecting appropriate dependencies.
+Finalizes an expression and adds a lifetime.
 
 ##### Returns
 
-The resulting expression.
+
 
 ##### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
-| instanceExpression | [System.Linq.Expressions.ParameterExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.ParameterExpression 'System.Linq.Expressions.ParameterExpression') | The instance expression. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 
-<a name='M-IoC-IBuildContext-ReplaceTypes-System-Linq-Expressions-Expression-'></a>
-### ReplaceTypes(baseExpression) `method`
+<a name='M-IoC-IBuildContext-MapType-System-Type,System-Type-'></a>
+### MapType(fromType,toType) `method`
 
 ##### Summary
 
-Prepares base expression replacing generic types' markers by related types.
-
-##### Returns
-
-The resulting expression.
+Adds types mapping.
 
 ##### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| baseExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The base expression. |
+| fromType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | Type to map. |
+| toType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The target type. |
 
-<a name='M-IoC-IBuildContext-TryReplaceType-System-Type,System-Type@-'></a>
-### TryReplaceType(originalType,targetType) `method`
+<a name='M-IoC-IBuildContext-TryCompile-System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@-'></a>
+### TryCompile(lambdaExpression,lambdaCompiled,error) `method`
 
 ##### Summary
 
-Tries to replace generic types' markers by related types.
+Compiles a lambda expression to delegate.
 
 ##### Returns
 
-
+True if success.
 
 ##### Parameters
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| originalType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The target raw type. |
-| targetType | [System.Type@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type@ 'System.Type@') | The replacing type. |
+| lambdaExpression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The lambda expression to compile. |
+| lambdaCompiled | [System.Delegate@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Delegate@ 'System.Delegate@') | The compiled lambda. |
+| error | [System.Exception@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception@ 'System.Exception@') | Compilation error. |
 
 <a name='T-IoC-IBuilder'></a>
 ## IBuilder `type`
@@ -8140,8 +8280,8 @@ IoC.Issues
 
 Resolves the scenario when a new binding cannot be registered.
 
-<a name='M-IoC-Issues-ICannotRegister-Resolve-IoC-IContainer,IoC-Key[]-'></a>
-### Resolve(container,keys) `method`
+<a name='M-IoC-Issues-ICannotRegister-Resolve-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-Key},IoC-IDependency,IoC-ILifetime-'></a>
+### Resolve(container,keys,dependency,lifetime) `method`
 
 ##### Summary
 
@@ -8156,7 +8296,9 @@ The dependency token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
-| keys | [IoC.Key[]](#T-IoC-Key[] 'IoC.Key[]') | The set of binding keys. |
+| keys | [System.Collections.Generic.IEnumerable{IoC.Key}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.Key}') | The set of binding keys. |
+| dependency | [IoC.IDependency](#T-IoC-IDependency 'IoC.IDependency') | The dependency. |
+| lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 
 <a name='T-IoC-Issues-ICannotResolveConstructor'></a>
 ## ICannotResolveConstructor `type`
@@ -8287,12 +8429,12 @@ IoC
 
 Represents an abstract expression compiler.
 
-<a name='M-IoC-ICompiler-TryCompileResolver``1-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,IoC-Resolver{``0}@-'></a>
-### TryCompileResolver\`\`1(context,expression,resolver) `method`
+<a name='M-IoC-ICompiler-TryCompile-IoC-IBuildContext,System-Linq-Expressions-LambdaExpression,System-Delegate@,System-Exception@-'></a>
+### TryCompile(context,lambdaExpression,lambdaCompiled,error) `method`
 
 ##### Summary
 
-Compiles an expression to an instance resolver.
+Compiles a lambda expression to delegate.
 
 ##### Returns
 
@@ -8303,8 +8445,9 @@ True if success.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | context | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | Current context for building. |
-| expression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The lambda expression to compile. |
-| resolver | [IoC.Resolver{\`\`0}@](#T-IoC-Resolver{``0}@ 'IoC.Resolver{``0}@') | The compiled resolver delegate. |
+| lambdaExpression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The lambda expression to compile. |
+| lambdaCompiled | [System.Delegate@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Delegate@ 'System.Delegate@') | The compiled lambda. |
+| error | [System.Exception@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception@ 'System.Exception@') | Compilation error. |
 
 <a name='T-IoC-ICompositionRoot`1'></a>
 ## ICompositionRoot\`1 `type`
@@ -8434,7 +8577,7 @@ IoC
 Represents an abstract IoC dependency.
 
 <a name='M-IoC-IDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@-'></a>
-### TryBuildExpression(buildContext,lifetime,baseExpression,error) `method`
+### TryBuildExpression(buildContext,lifetime,expression,error) `method`
 
 ##### Summary
 
@@ -8450,7 +8593,7 @@ Builds an expression for dependency based on the current build context and speci
 | ---- | ---- | ----------- |
 | buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context. |
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
-| baseExpression | [System.Linq.Expressions.Expression@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression@ 'System.Linq.Expressions.Expression@') | The resulting expression for the current dependency. |
+| expression | [System.Linq.Expressions.Expression@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression@ 'System.Linq.Expressions.Expression@') | The resulting expression for the current dependency. |
 | error | [System.Exception@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception@ 'System.Exception@') | The error if something goes wrong. |
 
 <a name='T-IoC-Core-IExpressionBuilder`1'></a>
@@ -9210,8 +9353,8 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='T-IoC-Lifetimes-KeyBasedLifetime`1'></a>
-## KeyBasedLifetime\`1 `type`
+<a name='T-IoC-Lifetimes-KeyBasedLifetime`2'></a>
+## KeyBasedLifetime\`2 `type`
 
 ##### Namespace
 
@@ -9226,8 +9369,24 @@ Represents the abstraction for singleton based lifetimes.
 | Name | Description |
 | ---- | ----------- |
 | TKey | The key type. |
+| TValue | The value type. |
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-Build-IoC-IBuildContext,System-Linq-Expressions-Expression-'></a>
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-#ctor-System-Boolean,System-Boolean,System-Boolean-'></a>
+### #ctor(supportOnNewInstanceCreated,supportOnInstanceReleased,threadSafe) `constructor`
+
+##### Summary
+
+Creates an instance
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| supportOnNewInstanceCreated | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | True to invoke OnNewInstanceCreated |
+| supportOnInstanceReleased | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | True to invoke OnInstanceReleased |
+| threadSafe | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | `True` to synchronize operations. |
+
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-Build-IoC-IBuildContext,System-Linq-Expressions-Expression-'></a>
 ### Build() `method`
 
 ##### Summary
@@ -9238,7 +9397,7 @@ Represents the abstraction for singleton based lifetimes.
 
 This method has no parameters.
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-Create'></a>
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-Create'></a>
 ### Create() `method`
 
 ##### Summary
@@ -9249,7 +9408,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-CreateKey-IoC-IContainer,System-Object[]-'></a>
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-CreateKey-IoC-IContainer,System-Object[]-'></a>
 ### CreateKey(container,args) `method`
 
 ##### Summary
@@ -9267,7 +9426,7 @@ The created key.
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
 | args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | The arguments. |
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-Dispose'></a>
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-Dispose'></a>
 ### Dispose() `method`
 
 ##### Summary
@@ -9278,7 +9437,7 @@ The created key.
 
 This method has no parameters.
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-OnInstanceReleased-System-Object,`0-'></a>
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-OnInstanceReleased-`1,`0-'></a>
 ### OnInstanceReleased(releasedInstance,key) `method`
 
 ##### Summary
@@ -9289,11 +9448,11 @@ Is invoked on the instance was released.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| releasedInstance | [System.Object](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object 'System.Object') | The released instance. |
+| releasedInstance | [\`1](#T-`1 '`1') | The released instance. |
 | key | [\`0](#T-`0 '`0') | The instance key. |
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-OnNewInstanceCreated``1-``0,`0,IoC-IContainer,System-Object[]-'></a>
-### OnNewInstanceCreated\`\`1(newInstance,key,container,args) `method`
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-OnNewInstanceCreated-`1,`0,IoC-IContainer,System-Object[]-'></a>
+### OnNewInstanceCreated(newInstance,key,container,args) `method`
 
 ##### Summary
 
@@ -9307,12 +9466,25 @@ The created instance.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| newInstance | [\`\`0](#T-``0 '``0') | The new instance. |
+| newInstance | [\`1](#T-`1 '`1') | The new instance. |
 | key | [\`0](#T-`0 '`0') | The instance key. |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container. |
 | args | [System.Object[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Object[] 'System.Object[]') | Optional arguments. |
 
-<a name='M-IoC-Lifetimes-KeyBasedLifetime`1-SelectResolvingContainer-IoC-IContainer,IoC-IContainer-'></a>
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-Remove-`0-'></a>
+### Remove(key) `method`
+
+##### Summary
+
+Forcibly remove an instance.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| key | [\`0](#T-`0 '`0') | The instance key. |
+
+<a name='M-IoC-Lifetimes-KeyBasedLifetime`2-SelectResolvingContainer-IoC-IContainer,IoC-IContainer-'></a>
 ### SelectResolvingContainer() `method`
 
 ##### Summary
@@ -9788,8 +9960,8 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated``1-``0,IoC-IScope,IoC-IContainer,System-Object[]-'></a>
-### OnNewInstanceCreated\`\`1() `method`
+<a name='M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated-System-Object,IoC-IScope,IoC-IContainer,System-Object[]-'></a>
+### OnNewInstanceCreated() `method`
 
 ##### Summary
 
@@ -9831,6 +10003,19 @@ IoC.Lifetimes
 ##### Summary
 
 For a singleton instance.
+
+<a name='M-IoC-Lifetimes-SingletonLifetime-#ctor-System-Boolean-'></a>
+### #ctor(threadSafe) `constructor`
+
+##### Summary
+
+Creates an instance of lifetime.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| threadSafe | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | `True` to synchronize operations. |
 
 <a name='M-IoC-Lifetimes-SingletonLifetime-Build-IoC-IBuildContext,System-Linq-Expressions-Expression-'></a>
 ### Build() `method`
