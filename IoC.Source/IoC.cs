@@ -8879,20 +8879,17 @@ namespace IoC.Features
 
             private static Expression CreateConditions(IBuildContext buildContext, Key[] keys, Type elementType, ParameterExpression positionVar)
             {
-                Expression result = Expression.Block(
-                    Expression.Throw(Expression.Constant(new BuildExpressionException("Invalid enumeration state.", null))),
-                    Expression.Default(elementType));
-
+                var conditionExpression = CreateDefault(elementType);
                 for (var i = keys.Length - 1; i >= 0; i--)
                 {
                     var context = buildContext.CreateChild(keys[i], buildContext.Container);
-                    result = Expression.Condition(
+                    conditionExpression = Expression.Condition(
                         Expression.Equal(positionVar, Expression.Constant(i)),
                         Expression.Convert(context.CreateExpression(), elementType),
-                        result);
+                        conditionExpression);
                 }
 
-                return result;
+                return conditionExpression;
             }
 
             private static Expression CreateSwitchCases(IBuildContext buildContext, Key[] keys, Type elementType, ParameterExpression positionVar)
@@ -8904,14 +8901,13 @@ namespace IoC.Features
                     cases[i] = Expression.SwitchCase(Expression.Convert(context.CreateExpression(), elementType), Expression.Constant(i));
                 }
 
-                var switchExpression = Expression.Switch(
-                    positionVar,
-                    Expression.Block(
-                        Expression.Throw(Expression.Constant(new BuildExpressionException("Invalid enumeration state.", null))),
-                        Expression.Default(elementType)),
-                    cases);
-                return switchExpression;
+                return Expression.Switch(positionVar, CreateDefault(elementType), cases);
             }
+
+            private static Expression CreateDefault(Type elementType) =>
+                Expression.Block(
+                    Expression.Throw(Expression.Constant(new BuildExpressionException("Invalid enumeration state.", null))),
+                    Expression.Default(elementType));
         }
 
         private sealed class Enumerable<T> : IEnumerable<T>
