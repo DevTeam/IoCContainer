@@ -311,7 +311,7 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Resolve Lazy](#resolve-lazy-)
   - [Resolve ThreadLocal](#resolve-threadlocal-)
   - [Resolve Tuple](#resolve-tuple-)
-  - [Resolve Unregistered](#resolve-unregistered-)
+  - [Resolve Unregistered Implementations](#resolve-unregistered-implementations-)
   - [Resolve ValueTuple](#resolve-valuetuple-)
   - [Method Injection](#method-injection-)
   - [Nullable Value Type Resolving](#nullable-value-type-resolving-)
@@ -2151,9 +2151,9 @@ var tuple = container.Resolve<Tuple<IService, INamedService>>();
 
 
 
-### Resolve Unregistered [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveUnregistered.cs)
+### Resolve Unregistered Implementations [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveUnregisteredImplementations.cs)
 
-The feature _ResolveUnregisteredFeature_ allows you to resolve any concrete type from the container regardless of whether or not you specifically registered it.
+The feature _ResolveUnregisteredImplementationsFeature_ allows you to resolve any implementation type from the container regardless of whether or not you specifically registered it.
 
 ``` CSharp
 public void Run()
@@ -2161,20 +2161,23 @@ public void Run()
     // Create and configure the container
     using var container = Container
         .Create()
-        .Using<ResolveUnregisteredFeature>()
+        .Using<ResolveUnregisteredImplementationsFeature>()
         .Bind<IDependency>().To<Dependency>()
         .Container;
 
     // Resolve an instance of unregistered type
-    container.Resolve<Service>();
+    container.Resolve<Service<int>>();
 }
 
-class Service
+class Service<T>
 {
-    public Service(OtherService otherService, IDependency dependency) { }
+    public Service(OtherService<T> otherService, IDependency dependency) { }
 }
 
-class OtherService { }
+class OtherService<T>
+{
+    public OtherService(T value) { }
+}
 ```
 
 

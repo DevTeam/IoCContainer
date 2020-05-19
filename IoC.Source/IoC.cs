@@ -2026,6 +2026,7 @@ namespace IoC
     using System.Runtime.CompilerServices;
     using System.Linq.Expressions;
     using Core;
+    using Dependencies;
     using Issues;
 
     /// <summary>
@@ -2240,7 +2241,7 @@ namespace IoC
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return binding.To(new FullAutowiringDependency(type, binding.AutowiringStrategy, statements));
+            return binding.To(new AutowiringDependency(type, binding.AutowiringStrategy, statements));
         }
 
         /// <summary>
@@ -2258,7 +2259,7 @@ namespace IoC
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return binding.To(new FullAutowiringDependency(typeof(T), binding.AutowiringStrategy, statements));
+            return binding.To(new AutowiringDependency(typeof(T), binding.AutowiringStrategy, statements));
         }
 
         /// <summary>
@@ -2278,7 +2279,7 @@ namespace IoC
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return binding.To(new AutowiringDependency(factory, binding.AutowiringStrategy, statements));
+            return binding.To(new ExpressionDependency(factory, binding.AutowiringStrategy, statements));
         }
 
         /// <summary>
@@ -9353,46 +9354,117 @@ namespace IoC.Features
 
 
 #endregion
-#region ResolveUnregisteredFeature
+#region ResolveUnregisteredImplementationsFeature
 
 namespace IoC.Features
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
+    using System.Linq.Expressions;
     using Core;
+    using Dependencies;
     using Issues;
 
-    internal class ResolveUnregisteredFeature: IConfiguration, ICannotGetResolver, ICannotResolveDependency, IDisposable
+    /// <summary>
+    /// Allows to resolve unregistered dependencies.
+    /// </summary>
+    public class ResolveUnregisteredImplementationsFeature:
+        IConfiguration,
+        IDisposable,
+        IEnumerable<Key>,
+        ICannotGetResolver,
+        ICannotResolveDependency,
+        IDependency
     {
+        private readonly bool _supportDefaults;
+        [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
         private readonly IList<IDisposable> _tokens = new List<IDisposable>();
+        private readonly IList<Key> _registeredKeys = new List<Key>();
 
-        public ResolveUnregisteredFeature() { }
+        /// <summary>
+        /// Creates an instance of feature.
+        /// </summary>
+        public ResolveUnregisteredImplementationsFeature()
+            : this(true)
+        {
+        }
 
+        /// <summary>
+        /// Creates an instance of feature.
+        /// </summary>
+        /// <param name="supportDefaults"><c>True</c> to resolve default(T) for unresolved value types.</param>
+        /// <param name="autowiringStrategy">The autowiring strategy.</param>
+        public ResolveUnregisteredImplementationsFeature(bool supportDefaults, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
+        {
+            _supportDefaults = supportDefaults;
+            _autowiringStrategy = autowiringStrategy;
+        }
+
+        /// <inheritdoc />
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             yield return container.Bind<ICannotResolveDependency>().Bind<ICannotGetResolver>().To(ctx => this);
         }
 
-        public Resolver<T> Resolve<T>(IContainer container, Key key, Exception error)
+        Resolver<T> ICannotGetResolver.Resolve<T>(IContainer container, Key key, Exception error)
         {
-            if (container is IMutableContainer mutableContainer && mutableContainer.TryRegisterDependency(new[] { key }, new FullAutowiringDependency(key.Type), null, out var token))
+            if (IsValidType(key.Type) && container is IMutableContainer mutableContainer && mutableContainer.TryRegisterDependency(new[] {key}, this, null, out var token))
             {
+                _registeredKeys.Add(key);
                 _tokens.Add(token);
                 return container.GetResolver<T>(key.Type, key.Tag.AsTag());
             }
 
-            return (container.Parent ?? throw new InvalidOperationException($"Parent container should not be null.")).Resolve<ICannotGetResolver>().Resolve<T>(container, key, error);
+            return (container.Parent ?? throw new InvalidOperationException("Parent container should not be null.")).Resolve<ICannotGetResolver>().Resolve<T>(container, key, error);
         }
 
-        public DependencyDescription Resolve(IBuildContext buildContext) => 
-            new DependencyDescription(new FullAutowiringDependency(buildContext.Key.Type), null);
+        DependencyDescription ICannotResolveDependency.Resolve(IBuildContext buildContext)
+        {
+            if (IsValidType(buildContext.Key.Type))
+            {
+                return new DependencyDescription(this, null);
+            }
 
+            return (buildContext.Container.Parent ?? throw new InvalidOperationException("Parent container should not be null.")).Resolve<ICannotResolveDependency>().Resolve(buildContext);
+        }
+
+        /// <inheritdoc />
         public void Dispose()
         {
             foreach (var token in _tokens)
             {
                 token.Dispose();
             }
+        }
+
+        /// <inheritdoc />
+        public IEnumerator<Key> GetEnumerator() => _registeredKeys.GetEnumerator();
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        bool IDependency.TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
+        {
+            var type = buildContext.Key.Type;
+            if (_supportDefaults)
+            {
+                if (type.Descriptor().IsValueType())
+                {
+                    expression = Expression.Default(type);
+                    error = default(Exception);
+                    return true;
+                }
+            }
+
+            return
+                new AutowiringDependency(type, _autowiringStrategy)
+                .TryBuildExpression(buildContext, lifetime, out expression, out error);
+        }
+
+        private static bool IsValidType(Type type)
+        {
+            var typeDescriptor = type.Descriptor();
+            return !typeDescriptor.IsAbstract() && !typeDescriptor.IsInterface();
         }
     }
 }
@@ -10149,6 +10221,502 @@ namespace IoC.Lifetimes
 
 #endregion
 
+#region Dependencies
+
+#region AutowiringDependency
+
+namespace IoC.Dependencies
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using Core;
+    using Issues;
+
+    /// <summary>
+    /// Represents the autowiring dependency.
+    /// </summary>
+    public sealed class AutowiringDependency : IDependency
+    {
+        [NotNull] private readonly Type _implementationType;
+        [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
+        private readonly bool _hasGenericParamsWithConstraints;
+        private readonly List<GenericParamsWithConstraints> _genericParamsWithConstraints;
+        private readonly Type[] _genericTypeParameters;
+        private readonly TypeDescriptor _typeDescriptor;
+        [NotNull] [ItemNotNull] private readonly LambdaExpression[] _initializeInstanceExpressions;
+        private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
+
+        /// <summary>
+        /// Creates an instance of dependency.
+        /// </summary>
+        /// <param name="implementationType">The autowiring implementation type.</param>
+        /// <param name="initializeInstanceLambdaStatements">The statements to initialize an instance.</param>
+        public AutowiringDependency(
+            [NotNull] Type implementationType,
+            [NotNull] [ItemNotNull] params LambdaExpression[] initializeInstanceLambdaStatements)
+            :this(implementationType, null, initializeInstanceLambdaStatements)
+        {
+        }
+
+        /// <summary>
+        /// Creates an instance of dependency.
+        /// </summary>
+        /// <param name="implementationType">The autowiring implementation type.</param>
+        /// <param name="autowiringStrategy">The autowiring strategy.</param>
+        /// <param name="initializeInstanceLambdaStatements">The statements to initialize an instance.</param>
+        public AutowiringDependency(
+            [NotNull] Type implementationType,
+            [CanBeNull] IAutowiringStrategy autowiringStrategy = null,
+            [NotNull][ItemNotNull] params LambdaExpression[] initializeInstanceLambdaStatements)
+        {
+            _implementationType = implementationType ?? throw new ArgumentNullException(nameof(implementationType));
+            _autowiringStrategy = autowiringStrategy;
+            _initializeInstanceExpressions = initializeInstanceLambdaStatements ?? throw new ArgumentNullException(nameof(initializeInstanceLambdaStatements));
+            _typeDescriptor = implementationType.Descriptor();
+
+            if (_typeDescriptor.IsInterface())
+            {
+                throw new ArgumentException($"Type \"{implementationType}\" should not be an interface.", nameof(implementationType));
+            }
+
+            if (_typeDescriptor.IsAbstract())
+            {
+                throw new ArgumentException($"Type \"{implementationType}\" should not be an abstract class.", nameof(implementationType));
+            }
+
+            if (!_typeDescriptor.IsGenericTypeDefinition())
+            {
+                return;
+            }
+
+            _genericTypeParameters = _typeDescriptor.GetGenericTypeParameters();
+            if (_genericTypeParameters.Length > GenericTypeArguments.Arguments.Length)
+            {
+                throw new ArgumentException($"Too many generic type parameters in the type \"{implementationType}\".", nameof(implementationType));
+            }
+
+            _genericParamsWithConstraints = new List<GenericParamsWithConstraints>(_genericTypeParameters.Length);
+            var genericTypePos = 0;
+            for (var position = 0; position < _genericTypeParameters.Length; position++)
+            {
+                var genericType = _genericTypeParameters[position];
+                if (!genericType.IsGenericParameter)
+                {
+                    continue;
+                }
+
+                var descriptor = genericType.Descriptor();
+                if (descriptor.GetGenericParameterAttributes() == GenericParameterAttributes.None && !descriptor.GetGenericParameterConstraints().Any())
+                {
+                    if (!_typesMap.TryGetValue(genericType, out var curType))
+                    {
+                        try
+                        {
+                            curType = GenericTypeArguments.Arguments[genericTypePos++];
+                            _typesMap[genericType] = curType;
+                        }
+                        catch (IndexOutOfRangeException ex)
+                        {
+                            throw new BuildExpressionException("Too many generic arguments.", ex);
+                        }
+                    }
+
+                    _genericTypeParameters[position] = curType;
+                }
+                else
+                {
+                    _genericParamsWithConstraints.Add(new GenericParamsWithConstraints(descriptor, position));
+                }
+            }
+
+            if (_genericParamsWithConstraints.Count == 0)
+            {
+                _implementationType = _typeDescriptor.MakeGenericType(_genericTypeParameters);
+            }
+            else
+            {
+                _hasGenericParamsWithConstraints = true;
+            }
+        }
+
+        /// <inheritdoc />
+        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
+        {
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+
+            var typesMap = new Dictionary<Type, Type>(_typesMap);
+            NewExpression newExpression;
+            try
+            {
+                var autoWiringStrategy = _autowiringStrategy ?? buildContext.AutowiringStrategy;
+                var instanceType = ResolveInstanceType(buildContext, autoWiringStrategy);
+                var typeDescriptor = CreateTypeDescriptor(buildContext, instanceType, typesMap);
+                var ctor = SelectConstructor(buildContext, typeDescriptor, autoWiringStrategy);
+                newExpression = Expression.New(ctor.Info, ctor.GetParametersExpressions(buildContext));
+            }
+            catch (BuildExpressionException ex)
+            {
+                error = ex;
+                expression = default(Expression);
+                return false;
+            }
+
+            return
+                new TypesMapDependency(
+                        newExpression,
+                        _initializeInstanceExpressions.Select(i => i.Body),
+                        typesMap,
+                        _autowiringStrategy)
+                .TryBuildExpression(buildContext, lifetime, out expression, out error);
+        }
+
+        private Type ResolveInstanceType(IBuildContext buildContext, IAutowiringStrategy autoWiringStrategy)
+        {
+            if (autoWiringStrategy.TryResolveType(_implementationType, buildContext.Key.Type, out var instanceType))
+            {
+                return instanceType;
+            }
+
+            if (_hasGenericParamsWithConstraints)
+            {
+                return GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<ICannotResolveType>().Resolve(buildContext, _implementationType, buildContext.Key.Type);
+            }
+
+            return _implementationType;
+        }
+
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+        private static IMethod<ConstructorInfo> SelectConstructor(IBuildContext buildContext, TypeDescriptor typeDescriptor, IAutowiringStrategy autoWiringStrategy)
+        {
+            var constructors = (IEnumerable<IMethod<ConstructorInfo>>)typeDescriptor
+                .GetDeclaredConstructors()
+                .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
+                .Select(info => new Method<ConstructorInfo>(info));
+
+            if (autoWiringStrategy.TryResolveConstructor(constructors, out var ctor))
+            {
+                return ctor;
+            }
+
+            if (DefaultAutowiringStrategy.Shared != autoWiringStrategy && DefaultAutowiringStrategy.Shared.TryResolveConstructor(constructors, out ctor))
+            {
+                return ctor;
+            }
+
+            return buildContext.Container.Resolve<ICannotResolveConstructor>().Resolve(buildContext, constructors);
+        }
+
+        private TypeDescriptor CreateTypeDescriptor(IBuildContext buildContext, Type type, Dictionary<Type, Type> typesMap)
+        {
+            var typeDescriptor = type.Descriptor();
+            if (!typeDescriptor.IsConstructedGenericType())
+            {
+                return typeDescriptor;
+            }
+
+            TypeMapper.Shared.Map(type, buildContext.Key.Type, typesMap);
+            foreach (var mapping in typesMap)
+            {
+                buildContext.MapType(mapping.Key, mapping.Value);
+            }
+
+            var genericTypeArgs = typeDescriptor.GetGenericTypeArguments();
+            var isReplaced = false;
+            for (var position = 0; position < genericTypeArgs.Length; position++)
+            {
+                var genericTypeArg = genericTypeArgs[position];
+                var genericTypeArgDescriptor = genericTypeArg.Descriptor();
+                if (genericTypeArgDescriptor.IsGenericTypeDefinition() || genericTypeArgDescriptor.IsGenericTypeArgument())
+                {
+                    if (typesMap.TryGetValue(genericTypeArg, out var genericArgType))
+                    {
+                        genericTypeArgs[position] = genericArgType;
+                        isReplaced = true;
+                    }
+                    else
+                    {
+                        genericTypeArgs[position] = buildContext.Container.Resolve<ICannotResolveGenericTypeArgument>().Resolve(buildContext, _typeDescriptor.Type, position, genericTypeArg);
+                        isReplaced = true;
+                    }
+                }
+            }
+
+            if (isReplaced)
+            {
+                typeDescriptor = typeDescriptor.GetGenericTypeDefinition().MakeGenericType(genericTypeArgs).Descriptor();
+            }
+
+            return typeDescriptor;
+        }
+
+        [CanBeNull]
+        internal Type GetInstanceTypeBasedOnTargetGenericConstrains(Type type)
+        {
+            var registeredGenericTypeParameters = new Type[_genericTypeParameters.Length];
+            Array.Copy(_genericTypeParameters, registeredGenericTypeParameters, _genericTypeParameters.Length);
+            var typeDescriptor = type.Descriptor();
+            var typeDefinitionDescriptor = typeDescriptor.GetGenericTypeDefinition().Descriptor();
+            var typeDefinitionGenericTypeParameters = typeDefinitionDescriptor.GetGenericTypeParameters();
+            var constraintsMap = typeDescriptor
+                .GetGenericTypeArguments()
+                .Zip(typeDefinitionGenericTypeParameters, (genericType, typeDefinition) => Tuple.Create(genericType, typeDefinition.Descriptor().GetGenericParameterConstraints()))
+                .ToArray();
+
+            var canBeResolved = true;
+            foreach (var item in _genericParamsWithConstraints)
+            {
+                var constraints = item.TypeDescriptor.GetGenericParameterConstraints();
+                var isDefined = false;
+                foreach (var constraint in constraintsMap)
+                {
+                    if (!CoreExtensions.SequenceEqual(constraints, constraint.Item2))
+                    {
+                        continue;
+                    }
+
+                    registeredGenericTypeParameters[item.Position] = constraint.Item1;
+                    isDefined = true;
+                    break;
+                }
+
+                if (!isDefined)
+                {
+                    canBeResolved = false;
+                    break;
+                }
+            }
+
+            return canBeResolved ? _typeDescriptor.MakeGenericType(registeredGenericTypeParameters) : null;
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => $"new {_implementationType.Descriptor()}(...)";
+
+        private struct GenericParamsWithConstraints
+        {
+            public readonly TypeDescriptor TypeDescriptor;
+            public readonly int Position;
+
+            public GenericParamsWithConstraints(TypeDescriptor typeDescriptor, int position)
+            {
+                TypeDescriptor = typeDescriptor;
+                Position = position;
+            }
+        }
+    }
+}
+
+
+#endregion
+#region ExpressionDependency
+
+namespace IoC.Dependencies
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using Core;
+
+    /// <summary>
+    /// Represents the dependency based on expressions.
+    /// </summary>
+    public sealed class ExpressionDependency : IDependency
+    {
+        private readonly LambdaExpression _instanceExpression;
+        [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
+        [NotNull] [ItemNotNull] private readonly LambdaExpression[] _initializeInstanceExpressions;
+
+        /// <summary>
+        /// Creates an instance of dependency.
+        /// </summary>
+        /// <param name="instanceExpression">The expression to create an instance.</param>
+        /// <param name="initializeInstanceExpressions">The statements to initialize an instance.</param>
+        [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
+        [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
+        public ExpressionDependency(
+            [NotNull] LambdaExpression instanceExpression,
+            [NotNull][ItemNotNull] params LambdaExpression[] initializeInstanceExpressions)
+            :this(instanceExpression, null, initializeInstanceExpressions)
+        {
+        }
+
+        /// <summary>
+        /// Creates an instance of dependency.
+        /// </summary>
+        /// <param name="instanceExpression">The expression to create an instance.</param>
+        /// <param name="autowiringStrategy">The autowiring strategy.</param>
+        /// <param name="initializeInstanceExpressions">The statements to initialize an instance.</param>
+        [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
+        [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
+        public ExpressionDependency(
+            [NotNull] LambdaExpression instanceExpression,
+            [CanBeNull] IAutowiringStrategy autowiringStrategy = default(IAutowiringStrategy),
+            [NotNull][ItemNotNull] params LambdaExpression[] initializeInstanceExpressions)
+        {
+            _instanceExpression = instanceExpression ?? throw new ArgumentNullException(nameof(instanceExpression));
+            _autowiringStrategy = autowiringStrategy;
+            _initializeInstanceExpressions = initializeInstanceExpressions ?? throw new ArgumentNullException(nameof(initializeInstanceExpressions));
+        }
+
+        /// <inheritdoc />
+        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
+        {
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            var typesMap = new Dictionary<Type, Type>();
+            try
+            {
+                if (_instanceExpression.Type.Descriptor().IsGenericTypeDefinition())
+                {
+                    TypeMapper.Shared.Map(_instanceExpression.Type, buildContext.Key.Type, typesMap);
+                    foreach (var mapping in typesMap)
+                    {
+                        buildContext.MapType(mapping.Key, mapping.Value);
+                    }
+                }
+            }
+            catch (BuildExpressionException ex)
+            {
+                error = ex;
+                expression = default(Expression);
+                return false;
+            }
+
+            return 
+                new TypesMapDependency(
+                    _instanceExpression.Body,
+                    _initializeInstanceExpressions.Select(i => i.Body),
+                    typesMap,
+                    _autowiringStrategy)
+                .TryBuildExpression(buildContext, lifetime, out expression, out error);
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => $"{_instanceExpression}";
+    }
+}
+
+
+#endregion
+#region TypesMapDependency
+
+namespace IoC.Dependencies
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using Core;
+
+    /// <summary>
+    /// Represents the dependency based on expressions and a map of types.
+    /// </summary>
+    internal sealed class TypesMapDependency : IDependency
+    {
+        [NotNull] private readonly IDictionary<Type, Type> _typesMap;
+        private readonly Expression _createInstanceExpression;
+        [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
+        [NotNull] [ItemNotNull] private readonly IEnumerable<Expression> _initializeInstanceExpressions;
+
+        /// <summary>
+        /// Creates an instance of dependency.
+        /// </summary>
+        /// <param name="instanceExpression">The expression to create an instance.</param>
+        /// <param name="initializeInstanceExpressions">The statements to initialize an instance.</param>
+        /// <param name="typesMap">The type mapping dictionary.</param>
+        /// <param name="autowiringStrategy">The autowiring strategy.</param>
+        [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
+        [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
+        public TypesMapDependency(
+            [NotNull] Expression instanceExpression,
+            [NotNull] [ItemNotNull] IEnumerable<Expression> initializeInstanceExpressions,
+            [NotNull] IDictionary<Type, Type> typesMap,
+            [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
+        {
+            _createInstanceExpression = instanceExpression ?? throw new ArgumentNullException(nameof(instanceExpression));
+            _initializeInstanceExpressions = initializeInstanceExpressions ?? throw new ArgumentNullException(nameof(initializeInstanceExpressions));
+            _typesMap = typesMap ?? throw new ArgumentNullException(nameof(typesMap));
+            _autowiringStrategy = autowiringStrategy;
+        }
+
+        /// <inheritdoc />
+        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
+        {
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            try
+            {
+                var autoWiringStrategy = _autowiringStrategy ?? buildContext.AutowiringStrategy;
+                var typeDescriptor = _createInstanceExpression.Type.Descriptor();
+                expression = ReplaceTypes(buildContext, _createInstanceExpression, _typesMap);
+                var thisVar = Expression.Variable(expression.Type);
+
+                var initializeExpressions =
+                    GetInitializers(autoWiringStrategy, typeDescriptor)
+                        .Select(initializer => (Expression)Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext)))
+                        .Concat(_initializeInstanceExpressions.Select(statementExpression => ReplaceTypes(buildContext, statementExpression, _typesMap)))
+                        .ToArray();
+
+                if (initializeExpressions.Length > 0)
+                {
+                    expression = Expression.Block(
+                        new[] {thisVar},
+                        Expression.Assign(thisVar, expression),
+                        Expression.Block(initializeExpressions),
+                        thisVar
+                    );
+                }
+
+                expression = DependencyInjectionExpressionBuilder.Shared.Build(expression, buildContext, thisVar);
+                expression = buildContext.FinalizeExpression(expression, lifetime);
+
+                error = default(Exception);
+                return true;
+            }
+            catch (BuildExpressionException ex)
+            {
+                error = ex;
+                expression = default(Expression);
+                return false;
+            }
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => $"{_createInstanceExpression}";
+
+        private static Expression ReplaceTypes(IBuildContext buildContext, Expression expression, IDictionary<Type, Type> typesMap) =>
+            TypeReplacerExpressionBuilder.Shared.Build(expression, buildContext, typesMap);
+
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+        private static IEnumerable<IMethod<MethodInfo>> GetInitializers(IAutowiringStrategy autoWiringStrategy, TypeDescriptor typeDescriptor)
+        {
+            var methods = typeDescriptor.GetDeclaredMethods().Select(info => new Method<MethodInfo>(info));
+            if (autoWiringStrategy.TryResolveInitializers(methods, out var initializers))
+            {
+                return initializers;
+            }
+
+            if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(methods, out initializers))
+            {
+                initializers = Enumerable.Empty<IMethod<MethodInfo>>();
+            }
+
+            return initializers;
+        }
+    }
+}
+
+
+#endregion
+
+#endregion
+
 #region Issues
 
 #region DependencyDescription
@@ -10720,153 +11288,6 @@ namespace IoC.Core
 }
 
 #endregion
-#region Autowiring
-
-// ReSharper disable RedundantNameQualifier
-namespace IoC.Core
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-
-    internal static class Autowiring
-    {
-        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public static Expression ApplyInitializers(
-            this IBuildContext buildContext,
-            IAutowiringStrategy autoWiringStrategy,
-            TypeDescriptor typeDescriptor,
-            Expression createInstanceExpression,
-            IEnumerable<Expression> initializeInstanceStatements,
-            ILifetime lifetime,
-            IDictionary<Type, Type> typesMap)
-        {
-            createInstanceExpression = ReplaceTypes(buildContext, createInstanceExpression, typesMap);
-            var thisVar = Expression.Variable(createInstanceExpression.Type);
-
-            var initializeExpressions = 
-                GetInitializers(autoWiringStrategy, typeDescriptor)
-                    .Select(initializer => (Expression)Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext)))
-                    .Concat(initializeInstanceStatements.Select(statementExpression => ReplaceTypes(buildContext, statementExpression, typesMap)))
-                    .ToArray();
-
-            if (initializeExpressions.Length > 0)
-            {
-                createInstanceExpression = Expression.Block(
-                    new[] { thisVar },
-                    Expression.Assign(thisVar, createInstanceExpression),
-                    Expression.Block(initializeExpressions),
-                    thisVar
-                );
-            }
-
-            createInstanceExpression = DependencyInjectionExpressionBuilder.Shared.Build(createInstanceExpression, buildContext, thisVar);
-            return buildContext.FinalizeExpression(createInstanceExpression, lifetime);
-        }
-
-        private static Expression ReplaceTypes(IBuildContext buildContext, Expression expression, IDictionary<Type, Type> typesMap) =>
-            TypeReplacerExpressionBuilder.Shared.Build(expression, buildContext, typesMap);
-
-        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        private static IEnumerable<IMethod<MethodInfo>> GetInitializers(IAutowiringStrategy autoWiringStrategy, TypeDescriptor typeDescriptor)
-        {
-            var methods = typeDescriptor.GetDeclaredMethods().Select(info => new Method<MethodInfo>(info));
-            if (autoWiringStrategy.TryResolveInitializers(methods, out var initializers))
-            {
-                return initializers;
-            }
-
-            if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(methods, out initializers))
-            {
-                initializers = Enumerable.Empty<IMethod<MethodInfo>>();
-            }
-
-            return initializers;
-        }
-    }
-}
-
-
-#endregion
-#region AutowiringDependency
-
-namespace IoC.Core
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Linq.Expressions;
-
-    internal sealed class AutowiringDependency : IDependency
-    {
-        private readonly Expression _expression;
-        [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;
-        [NotNull] [ItemNotNull] private readonly Expression[] _statements;
-
-        [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
-        [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
-        public AutowiringDependency(
-            [NotNull] LambdaExpression constructor,
-            [CanBeNull] IAutowiringStrategy autoWiringStrategy = default(IAutowiringStrategy),
-            [NotNull][ItemNotNull] params LambdaExpression[] statements)
-            :this(
-                constructor?.Body ?? throw new ArgumentNullException(nameof(constructor)),
-                autoWiringStrategy,
-                statements?.Select(i => i.Body)?.ToArray() ?? throw new ArgumentNullException(nameof(statements)))
-        {
-        }
-
-        public AutowiringDependency(
-            [NotNull] Expression constructorExpression,
-            [CanBeNull] IAutowiringStrategy autoWiringStrategy = default(IAutowiringStrategy),
-            [NotNull][ItemNotNull] params Expression[] statementExpressions)
-        {
-            _expression = constructorExpression ?? throw new ArgumentNullException(nameof(constructorExpression));
-            _autoWiringStrategy = autoWiringStrategy;
-            _statements = (statementExpressions ?? throw new ArgumentNullException(nameof(statementExpressions))).ToArray();
-        }
-
-        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
-        {
-            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            try
-            {
-                var typesMap = new Dictionary<Type, Type>();
-                TypeMapper.Shared.Map(_expression.Type, buildContext.Key.Type, typesMap);
-                foreach (var mapping in typesMap)
-                {
-                    buildContext.MapType(mapping.Key, mapping.Value);
-                }
-
-                expression = buildContext.ApplyInitializers(
-                    _autoWiringStrategy ?? buildContext.AutowiringStrategy,
-                    _expression.Type.Descriptor(),
-                    _expression,
-                    _statements,
-                    lifetime,
-                    typesMap);
-
-                error = default(Exception);
-                return true;
-            }
-            catch (BuildExpressionException ex)
-            {
-                error = ex;
-                expression = default(Expression);
-                return false;
-            }
-        }
-
-        public override string ToString() => $"{_expression}";
-    }
-}
-
-
-#endregion
 #region Binding
 
 namespace IoC.Core
@@ -11327,8 +11748,7 @@ namespace IoC.Core
         public IMethod<ConstructorInfo> Resolve(IBuildContext buildContext, IEnumerable<IMethod<ConstructorInfo>> constructors)
         {
             if (constructors == null) throw new ArgumentNullException(nameof(constructors));
-            var type = constructors.Single().Info.DeclaringType;
-            throw new InvalidOperationException($"Cannot find a constructor for the type {type}.\n{buildContext}");
+            throw new InvalidOperationException($"Cannot find a constructor for the type {buildContext.Key.Type}.\n{buildContext}");
         }
     }
 }
@@ -12340,6 +12760,7 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
+    using Dependencies;
     using Issues;
 
     /// <summary>
@@ -12362,7 +12783,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)0x100)]
         [IoC.NotNull]
         public static IToken Register<T>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
-            => container.Register(new[] { typeof(T)}, new FullAutowiringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T)}, new AutowiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -12377,7 +12798,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)0x100)]
         [IoC.NotNull]
         public static IToken Register<T>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            => container.Register(new[] { typeof(T) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+            => container.Register(new[] { typeof(T) }, new ExpressionDependency(factory, null, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -12415,6 +12836,7 @@ namespace IoC.Core
     using System;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
+    using Dependencies;
 
     /// <summary>
     /// Represents extensions to add bindings to the container.
@@ -12434,7 +12856,7 @@ namespace IoC.Core
         [NotNull]
         public static IToken Register<T, T1>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1
-            => container.Register(new[] { typeof(T1) }, new FullAutowiringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1) }, new AutowiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -12452,7 +12874,7 @@ namespace IoC.Core
         public static IToken Register<T, T1>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1
             // ReSharper disable once CoVariantArrayConversion
-            => container.Register(new[] { typeof(T), typeof(T1) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+            => container.Register(new[] { typeof(T), typeof(T1) }, new ExpressionDependency(factory, null, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -12468,7 +12890,7 @@ namespace IoC.Core
         [NotNull]
         public static IToken Register<T, T1, T2>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1, T2
-            => container.Register(new[] { typeof(T1), typeof(T2) }, new FullAutowiringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2) }, new AutowiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -12487,7 +12909,7 @@ namespace IoC.Core
         public static IToken Register<T, T1, T2>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1, T2
             // ReSharper disable once CoVariantArrayConversion
-            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2) }, new ExpressionDependency(factory, null, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -12504,7 +12926,7 @@ namespace IoC.Core
         [NotNull]
         public static IToken Register<T, T1, T2, T3>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null)
             where T: T1, T2, T3
-            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3) }, new FullAutowiringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T1), typeof(T2), typeof(T3) }, new AutowiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -12524,7 +12946,7 @@ namespace IoC.Core
         public static IToken Register<T, T1, T2, T3>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
             where T: T1, T2, T3
             // ReSharper disable once CoVariantArrayConversion
-            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2), typeof(T3) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+            => container.Register(new[] { typeof(T), typeof(T1), typeof(T2), typeof(T3) }, new ExpressionDependency(factory, null, statements), lifetime, tags);
 
     }
 }
@@ -12554,271 +12976,6 @@ namespace IoC.Core
         }
     }
 }
-
-#endregion
-#region FullAutowiringDependency
-
-namespace IoC.Core
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using Issues;
-
-    internal sealed class FullAutowiringDependency : IDependency
-    {
-        [NotNull] private readonly Type _type;
-        [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;
-        private readonly bool _hasGenericParamsWithConstraints;
-        private readonly List<GenericParamsWithConstraints> _genericParamsWithConstraints;
-        private readonly Type[] _registeredGenericTypeParameters;
-        private readonly TypeDescriptor _registeredTypeDescriptor;
-        [NotNull] [ItemNotNull] private readonly Expression[] _statements;
-        private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
-
-        public FullAutowiringDependency(
-            [NotNull] Type type,
-            [CanBeNull] IAutowiringStrategy autoWiringStrategy = null,
-            [NotNull][ItemNotNull] params LambdaExpression[] statements)
-        {
-            if (statements == null) throw new ArgumentNullException(nameof(statements));
-            _type = type ?? throw new ArgumentNullException(nameof(type));
-            _autoWiringStrategy = autoWiringStrategy;
-            _statements = statements.Select(i => i.Body).ToArray();
-            _registeredTypeDescriptor = type.Descriptor();
-
-            if (_registeredTypeDescriptor.IsInterface())
-            {
-                throw new ArgumentException($"Type \"{type}\" should not be an interface.", nameof(type));
-            }
-
-            if (_registeredTypeDescriptor.IsAbstract())
-            {
-                throw new ArgumentException($"Type \"{type}\" should not be an abstract class.", nameof(type));
-            }
-
-            if (!_registeredTypeDescriptor.IsGenericTypeDefinition())
-            {
-                return;
-            }
-
-            _registeredGenericTypeParameters = _registeredTypeDescriptor.GetGenericTypeParameters();
-            if (_registeredGenericTypeParameters.Length > GenericTypeArguments.Arguments.Length)
-            {
-                throw new ArgumentException($"Too many generic type parameters in the type \"{type}\".", nameof(type));
-            }
-
-            _genericParamsWithConstraints = new List<GenericParamsWithConstraints>(_registeredGenericTypeParameters.Length);
-            var genericTypePos = 0;
-            for (var position = 0; position < _registeredGenericTypeParameters.Length; position++)
-            {
-                var genericType = _registeredGenericTypeParameters[position];
-                if (!genericType.IsGenericParameter)
-                {
-                    continue;
-                }
-
-                var descriptor = genericType.Descriptor();
-                if (descriptor.GetGenericParameterAttributes() == GenericParameterAttributes.None && !descriptor.GetGenericParameterConstraints().Any())
-                {
-                    if (!_typesMap.TryGetValue(genericType, out var curType))
-                    {
-                        try
-                        {
-                            curType = GenericTypeArguments.Arguments[genericTypePos++];
-                            _typesMap[genericType] = curType;
-                        }
-                        catch (IndexOutOfRangeException ex)
-                        {
-                            throw new BuildExpressionException("Too many generic arguments.", ex);
-                        }
-                    }
-
-                    _registeredGenericTypeParameters[position] = curType;
-                }
-                else
-                {
-                    _genericParamsWithConstraints.Add(new GenericParamsWithConstraints(descriptor, position));
-                }
-            }
-
-            if (_genericParamsWithConstraints.Count == 0)
-            {
-                _type = _registeredTypeDescriptor.MakeGenericType(_registeredGenericTypeParameters);
-            }
-            else
-            {
-                _hasGenericParamsWithConstraints = true;
-            }
-        }
-
-        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
-        {
-            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            try
-            {
-                var autoWiringStrategy = _autoWiringStrategy ?? buildContext.AutowiringStrategy;
-                var instanceType = ResolveInstanceType(buildContext, autoWiringStrategy);
-                var typesMap = new Dictionary<Type, Type>(_typesMap);
-                var typeDescriptor = CreateTypeDescriptor(buildContext, instanceType, typesMap);
-                var ctor = SelectConstructor(buildContext, typeDescriptor, autoWiringStrategy);
-                expression = buildContext.ApplyInitializers(
-                    autoWiringStrategy,
-                    typeDescriptor,
-                    Expression.New(ctor.Info, ctor.GetParametersExpressions(buildContext)),
-                    _statements,
-                    lifetime,
-                    typesMap);
-
-                error = default(Exception);
-                return true;
-            }
-            catch (BuildExpressionException ex)
-            {
-                error = ex;
-                expression = default(Expression);
-                return false;
-            }
-        }
-
-        private Type ResolveInstanceType(IBuildContext buildContext, IAutowiringStrategy autoWiringStrategy)
-        {
-            if (autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
-            {
-                return instanceType;
-            }
-
-            if (_hasGenericParamsWithConstraints)
-            {
-                return GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<ICannotResolveType>().Resolve(buildContext, _type, buildContext.Key.Type);
-            }
-
-            return _type;
-        }
-
-        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        private static IMethod<ConstructorInfo> SelectConstructor(IBuildContext buildContext, TypeDescriptor typeDescriptor, IAutowiringStrategy autoWiringStrategy)
-        {
-            var constructors = (IEnumerable<IMethod<ConstructorInfo>>)typeDescriptor
-                .GetDeclaredConstructors()
-                .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
-                .Select(info => new Method<ConstructorInfo>(info));
-
-            if (autoWiringStrategy.TryResolveConstructor(constructors, out var ctor))
-            {
-                return ctor;
-            }
-
-            if (DefaultAutowiringStrategy.Shared != autoWiringStrategy && DefaultAutowiringStrategy.Shared.TryResolveConstructor(constructors, out ctor))
-            {
-                return ctor;
-            }
-
-            return buildContext.Container.Resolve<ICannotResolveConstructor>().Resolve(buildContext, constructors);
-        }
-
-        private TypeDescriptor CreateTypeDescriptor(IBuildContext buildContext, Type type, Dictionary<Type, Type> typesMap)
-        {
-            var typeDescriptor = type.Descriptor();
-            if (!typeDescriptor.IsConstructedGenericType())
-            {
-                return typeDescriptor;
-            }
-
-            TypeMapper.Shared.Map(type, buildContext.Key.Type, typesMap);
-            foreach (var mapping in typesMap)
-            {
-                buildContext.MapType(mapping.Key, mapping.Value);
-            }
-
-            var genericTypeArgs = typeDescriptor.GetGenericTypeArguments();
-            var isReplaced = false;
-            for (var position = 0; position < genericTypeArgs.Length; position++)
-            {
-                var genericTypeArg = genericTypeArgs[position];
-                var genericTypeArgDescriptor = genericTypeArg.Descriptor();
-                if (genericTypeArgDescriptor.IsGenericTypeDefinition() || genericTypeArgDescriptor.IsGenericTypeArgument())
-                {
-                    if (typesMap.TryGetValue(genericTypeArg, out var genericArgType))
-                    {
-                        genericTypeArgs[position] = genericArgType;
-                        isReplaced = true;
-                    }
-                    else
-                    {
-                        genericTypeArgs[position] = buildContext.Container.Resolve<ICannotResolveGenericTypeArgument>().Resolve(buildContext, _registeredTypeDescriptor.Type, position, genericTypeArg);
-                        isReplaced = true;
-                    }
-                }
-            }
-
-            if (isReplaced)
-            {
-                typeDescriptor = typeDescriptor.GetGenericTypeDefinition().MakeGenericType(genericTypeArgs).Descriptor();
-            }
-
-            return typeDescriptor;
-        }
-
-        [CanBeNull]
-        internal Type GetInstanceTypeBasedOnTargetGenericConstrains(Type type)
-        {
-            var registeredGenericTypeParameters = new Type[_registeredGenericTypeParameters.Length];
-            Array.Copy(_registeredGenericTypeParameters, registeredGenericTypeParameters, _registeredGenericTypeParameters.Length);
-            var typeDescriptor = type.Descriptor();
-            var typeDefinitionDescriptor = typeDescriptor.GetGenericTypeDefinition().Descriptor();
-            var typeDefinitionGenericTypeParameters = typeDefinitionDescriptor.GetGenericTypeParameters();
-            var constraintsMap = typeDescriptor
-                .GetGenericTypeArguments()
-                .Zip(typeDefinitionGenericTypeParameters, (genericType, typeDefinition) => Tuple.Create(genericType, typeDefinition.Descriptor().GetGenericParameterConstraints()))
-                .ToArray();
-
-            var canBeResolved = true;
-            foreach (var item in _genericParamsWithConstraints)
-            {
-                var constraints = item.TypeDescriptor.GetGenericParameterConstraints();
-                var isDefined = false;
-                foreach (var constraint in constraintsMap)
-                {
-                    if (!CoreExtensions.SequenceEqual(constraints, constraint.Item2))
-                    {
-                        continue;
-                    }
-
-                    registeredGenericTypeParameters[item.Position] = constraint.Item1;
-                    isDefined = true;
-                    break;
-                }
-
-                if (!isDefined)
-                {
-                    canBeResolved = false;
-                    break;
-                }
-            }
-
-            return canBeResolved ? _registeredTypeDescriptor.MakeGenericType(registeredGenericTypeParameters) : null;
-        }
-
-        public override string ToString() => $"new {_type.Descriptor()}(...)";
-
-        private struct GenericParamsWithConstraints
-        {
-            public readonly TypeDescriptor TypeDescriptor;
-            public readonly int Position;
-
-            public GenericParamsWithConstraints(TypeDescriptor typeDescriptor, int position)
-            {
-                TypeDescriptor = typeDescriptor;
-                Position = position;
-            }
-        }
-    }
-}
-
 
 #endregion
 #region IArray

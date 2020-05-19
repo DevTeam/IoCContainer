@@ -8,34 +8,37 @@ namespace IoC.Tests.UsageScenarios
     using Xunit;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public class ResolveUnregistered
+    public class ResolveUnregisteredImplementations
     {
         [Fact]
         // $visible=true
         // $tag=injection
         // $priority=02
-        // $description=Resolve Unregistered
-        // $header=The feature _ResolveUnregisteredFeature_ allows you to resolve any concrete type from the container regardless of whether or not you specifically registered it.
+        // $description=Resolve Unregistered Implementations
+        // $header=The feature _ResolveUnregisteredImplementationsFeature_ allows you to resolve any implementation type from the container regardless of whether or not you specifically registered it.
         // {
         public void Run()
         {
             // Create and configure the container
             using var container = Container
                 .Create()
-                .Using<ResolveUnregisteredFeature>()
+                .Using<ResolveUnregisteredImplementationsFeature>()
                 .Bind<IDependency>().To<Dependency>()
                 .Container;
 
             // Resolve an instance of unregistered type
-            container.Resolve<Service>();
+            container.Resolve<Service<int>>();
         }
 
-        class Service
+        class Service<T>
         {
-            public Service(OtherService otherService, IDependency dependency) { }
+            public Service(OtherService<T> otherService, IDependency dependency) { }
         }
 
-        class OtherService { }
+        class OtherService<T>
+        {
+            public OtherService(T value) { }
+        }
         // }
     }
 }

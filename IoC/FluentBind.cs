@@ -6,6 +6,7 @@
     using System.Runtime.CompilerServices;
     using System.Linq.Expressions;
     using Core;
+    using Dependencies;
     using Issues;
 
     /// <summary>
@@ -220,7 +221,7 @@
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return binding.To(new FullAutowiringDependency(type, binding.AutowiringStrategy, statements));
+            return binding.To(new AutowiringDependency(type, binding.AutowiringStrategy, statements));
         }
 
         /// <summary>
@@ -238,7 +239,7 @@
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return binding.To(new FullAutowiringDependency(typeof(T), binding.AutowiringStrategy, statements));
+            return binding.To(new AutowiringDependency(typeof(T), binding.AutowiringStrategy, statements));
         }
 
         /// <summary>
@@ -258,7 +259,7 @@
         {
             if (binding == null) throw new ArgumentNullException(nameof(binding));
             // ReSharper disable once CoVariantArrayConversion
-            return binding.To(new AutowiringDependency(factory, binding.AutowiringStrategy, statements));
+            return binding.To(new ExpressionDependency(factory, binding.AutowiringStrategy, statements));
         }
 
         /// <summary>

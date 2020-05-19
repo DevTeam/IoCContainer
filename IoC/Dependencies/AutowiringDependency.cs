@@ -1,4 +1,4 @@
-﻿namespace IoC.Core
+﻿namespace IoC.Dependencies
 {
     using System;
     using System.Collections.Generic;
@@ -6,56 +6,77 @@
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
+    using Core;
     using Issues;
 
-    internal sealed class FullAutowiringDependency : IDependency
+    /// <summary>
+    /// Represents the autowiring dependency.
+    /// </summary>
+    public sealed class AutowiringDependency : IDependency
     {
-        [NotNull] private readonly Type _type;
-        [CanBeNull] private readonly IAutowiringStrategy _autoWiringStrategy;
+        [NotNull] private readonly Type _implementationType;
+        [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
         private readonly bool _hasGenericParamsWithConstraints;
         private readonly List<GenericParamsWithConstraints> _genericParamsWithConstraints;
-        private readonly Type[] _registeredGenericTypeParameters;
-        private readonly TypeDescriptor _registeredTypeDescriptor;
-        [NotNull] [ItemNotNull] private readonly Expression[] _statements;
+        private readonly Type[] _genericTypeParameters;
+        private readonly TypeDescriptor _typeDescriptor;
+        [NotNull] [ItemNotNull] private readonly LambdaExpression[] _initializeInstanceExpressions;
         private readonly IDictionary<Type, Type> _typesMap = new Dictionary<Type, Type>();
 
-        public FullAutowiringDependency(
-            [NotNull] Type type,
-            [CanBeNull] IAutowiringStrategy autoWiringStrategy = null,
-            [NotNull][ItemNotNull] params LambdaExpression[] statements)
+        /// <summary>
+        /// Creates an instance of dependency.
+        /// </summary>
+        /// <param name="implementationType">The autowiring implementation type.</param>
+        /// <param name="initializeInstanceLambdaStatements">The statements to initialize an instance.</param>
+        public AutowiringDependency(
+            [NotNull] Type implementationType,
+            [NotNull] [ItemNotNull] params LambdaExpression[] initializeInstanceLambdaStatements)
+            :this(implementationType, null, initializeInstanceLambdaStatements)
         {
-            if (statements == null) throw new ArgumentNullException(nameof(statements));
-            _type = type ?? throw new ArgumentNullException(nameof(type));
-            _autoWiringStrategy = autoWiringStrategy;
-            _statements = statements.Select(i => i.Body).ToArray();
-            _registeredTypeDescriptor = type.Descriptor();
+        }
 
-            if (_registeredTypeDescriptor.IsInterface())
+        /// <summary>
+        /// Creates an instance of dependency.
+        /// </summary>
+        /// <param name="implementationType">The autowiring implementation type.</param>
+        /// <param name="autowiringStrategy">The autowiring strategy.</param>
+        /// <param name="initializeInstanceLambdaStatements">The statements to initialize an instance.</param>
+        public AutowiringDependency(
+            [NotNull] Type implementationType,
+            [CanBeNull] IAutowiringStrategy autowiringStrategy = null,
+            [NotNull][ItemNotNull] params LambdaExpression[] initializeInstanceLambdaStatements)
+        {
+            _implementationType = implementationType ?? throw new ArgumentNullException(nameof(implementationType));
+            _autowiringStrategy = autowiringStrategy;
+            _initializeInstanceExpressions = initializeInstanceLambdaStatements ?? throw new ArgumentNullException(nameof(initializeInstanceLambdaStatements));
+            _typeDescriptor = implementationType.Descriptor();
+
+            if (_typeDescriptor.IsInterface())
             {
-                throw new ArgumentException($"Type \"{type}\" should not be an interface.", nameof(type));
+                throw new ArgumentException($"Type \"{implementationType}\" should not be an interface.", nameof(implementationType));
             }
 
-            if (_registeredTypeDescriptor.IsAbstract())
+            if (_typeDescriptor.IsAbstract())
             {
-                throw new ArgumentException($"Type \"{type}\" should not be an abstract class.", nameof(type));
+                throw new ArgumentException($"Type \"{implementationType}\" should not be an abstract class.", nameof(implementationType));
             }
 
-            if (!_registeredTypeDescriptor.IsGenericTypeDefinition())
+            if (!_typeDescriptor.IsGenericTypeDefinition())
             {
                 return;
             }
 
-            _registeredGenericTypeParameters = _registeredTypeDescriptor.GetGenericTypeParameters();
-            if (_registeredGenericTypeParameters.Length > GenericTypeArguments.Arguments.Length)
+            _genericTypeParameters = _typeDescriptor.GetGenericTypeParameters();
+            if (_genericTypeParameters.Length > GenericTypeArguments.Arguments.Length)
             {
-                throw new ArgumentException($"Too many generic type parameters in the type \"{type}\".", nameof(type));
+                throw new ArgumentException($"Too many generic type parameters in the type \"{implementationType}\".", nameof(implementationType));
             }
 
-            _genericParamsWithConstraints = new List<GenericParamsWithConstraints>(_registeredGenericTypeParameters.Length);
+            _genericParamsWithConstraints = new List<GenericParamsWithConstraints>(_genericTypeParameters.Length);
             var genericTypePos = 0;
-            for (var position = 0; position < _registeredGenericTypeParameters.Length; position++)
+            for (var position = 0; position < _genericTypeParameters.Length; position++)
             {
-                var genericType = _registeredGenericTypeParameters[position];
+                var genericType = _genericTypeParameters[position];
                 if (!genericType.IsGenericParameter)
                 {
                     continue;
@@ -77,7 +98,7 @@
                         }
                     }
 
-                    _registeredGenericTypeParameters[position] = curType;
+                    _genericTypeParameters[position] = curType;
                 }
                 else
                 {
@@ -87,7 +108,7 @@
 
             if (_genericParamsWithConstraints.Count == 0)
             {
-                _type = _registeredTypeDescriptor.MakeGenericType(_registeredGenericTypeParameters);
+                _implementationType = _typeDescriptor.MakeGenericType(_genericTypeParameters);
             }
             else
             {
@@ -95,26 +116,20 @@
             }
         }
 
+        /// <inheritdoc />
         public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+
+            var typesMap = new Dictionary<Type, Type>(_typesMap);
+            NewExpression newExpression;
             try
             {
-                var autoWiringStrategy = _autoWiringStrategy ?? buildContext.AutowiringStrategy;
+                var autoWiringStrategy = _autowiringStrategy ?? buildContext.AutowiringStrategy;
                 var instanceType = ResolveInstanceType(buildContext, autoWiringStrategy);
-                var typesMap = new Dictionary<Type, Type>(_typesMap);
                 var typeDescriptor = CreateTypeDescriptor(buildContext, instanceType, typesMap);
                 var ctor = SelectConstructor(buildContext, typeDescriptor, autoWiringStrategy);
-                expression = buildContext.ApplyInitializers(
-                    autoWiringStrategy,
-                    typeDescriptor,
-                    Expression.New(ctor.Info, ctor.GetParametersExpressions(buildContext)),
-                    _statements,
-                    lifetime,
-                    typesMap);
-
-                error = default(Exception);
-                return true;
+                newExpression = Expression.New(ctor.Info, ctor.GetParametersExpressions(buildContext));
             }
             catch (BuildExpressionException ex)
             {
@@ -122,21 +137,29 @@
                 expression = default(Expression);
                 return false;
             }
+
+            return
+                new TypesMapDependency(
+                        newExpression,
+                        _initializeInstanceExpressions.Select(i => i.Body),
+                        typesMap,
+                        _autowiringStrategy)
+                .TryBuildExpression(buildContext, lifetime, out expression, out error);
         }
 
         private Type ResolveInstanceType(IBuildContext buildContext, IAutowiringStrategy autoWiringStrategy)
         {
-            if (autoWiringStrategy.TryResolveType(_type, buildContext.Key.Type, out var instanceType))
+            if (autoWiringStrategy.TryResolveType(_implementationType, buildContext.Key.Type, out var instanceType))
             {
                 return instanceType;
             }
 
             if (_hasGenericParamsWithConstraints)
             {
-                return GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<ICannotResolveType>().Resolve(buildContext, _type, buildContext.Key.Type);
+                return GetInstanceTypeBasedOnTargetGenericConstrains(buildContext.Key.Type) ?? buildContext.Container.Resolve<ICannotResolveType>().Resolve(buildContext, _implementationType, buildContext.Key.Type);
             }
 
-            return _type;
+            return _implementationType;
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
@@ -189,7 +212,7 @@
                     }
                     else
                     {
-                        genericTypeArgs[position] = buildContext.Container.Resolve<ICannotResolveGenericTypeArgument>().Resolve(buildContext, _registeredTypeDescriptor.Type, position, genericTypeArg);
+                        genericTypeArgs[position] = buildContext.Container.Resolve<ICannotResolveGenericTypeArgument>().Resolve(buildContext, _typeDescriptor.Type, position, genericTypeArg);
                         isReplaced = true;
                     }
                 }
@@ -206,8 +229,8 @@
         [CanBeNull]
         internal Type GetInstanceTypeBasedOnTargetGenericConstrains(Type type)
         {
-            var registeredGenericTypeParameters = new Type[_registeredGenericTypeParameters.Length];
-            Array.Copy(_registeredGenericTypeParameters, registeredGenericTypeParameters, _registeredGenericTypeParameters.Length);
+            var registeredGenericTypeParameters = new Type[_genericTypeParameters.Length];
+            Array.Copy(_genericTypeParameters, registeredGenericTypeParameters, _genericTypeParameters.Length);
             var typeDescriptor = type.Descriptor();
             var typeDefinitionDescriptor = typeDescriptor.GetGenericTypeDefinition().Descriptor();
             var typeDefinitionGenericTypeParameters = typeDefinitionDescriptor.GetGenericTypeParameters();
@@ -240,10 +263,11 @@
                 }
             }
 
-            return canBeResolved ? _registeredTypeDescriptor.MakeGenericType(registeredGenericTypeParameters) : null;
+            return canBeResolved ? _typeDescriptor.MakeGenericType(registeredGenericTypeParameters) : null;
         }
 
-        public override string ToString() => $"new {_type.Descriptor()}(...)";
+        /// <inheritdoc />
+        public override string ToString() => $"new {_implementationType.Descriptor()}(...)";
 
         private struct GenericParamsWithConstraints
         {

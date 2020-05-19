@@ -49,6 +49,7 @@ SOFTWARE.
         ".",
         "Features",
         "Lifetimes",
+        "Dependencies",
         "Issues",
         "Core",
         "Core" + Path.DirectorySeparatorChar + "Configuration"};

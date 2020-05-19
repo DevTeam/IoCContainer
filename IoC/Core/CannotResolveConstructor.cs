@@ -15,8 +15,7 @@
         public IMethod<ConstructorInfo> Resolve(IBuildContext buildContext, IEnumerable<IMethod<ConstructorInfo>> constructors)
         {
             if (constructors == null) throw new ArgumentNullException(nameof(constructors));
-            var type = constructors.Single().Info.DeclaringType;
-            throw new InvalidOperationException($"Cannot find a constructor for the type {type}.\n{buildContext}");
+            throw new InvalidOperationException($"Cannot find a constructor for the type {buildContext.Key.Type}.\n{buildContext}");
         }
     }
 }

@@ -32,6 +32,11 @@
   - [IS_NULL](#F-IoC-AssertionConditionType-IS_NULL 'IoC.AssertionConditionType.IS_NULL')
   - [IS_TRUE](#F-IoC-AssertionConditionType-IS_TRUE 'IoC.AssertionConditionType.IS_TRUE')
 - [AssertionMethodAttribute](#T-IoC-AssertionMethodAttribute 'IoC.AssertionMethodAttribute')
+- [AutowiringDependency](#T-IoC-Dependencies-AutowiringDependency 'IoC.Dependencies.AutowiringDependency')
+  - [#ctor(implementationType,initializeInstanceLambdaStatements)](#M-IoC-Dependencies-AutowiringDependency-#ctor-System-Type,System-Linq-Expressions-LambdaExpression[]- 'IoC.Dependencies.AutowiringDependency.#ctor(System.Type,System.Linq.Expressions.LambdaExpression[])')
+  - [#ctor(implementationType,autowiringStrategy,initializeInstanceLambdaStatements)](#M-IoC-Dependencies-AutowiringDependency-#ctor-System-Type,IoC-IAutowiringStrategy,System-Linq-Expressions-LambdaExpression[]- 'IoC.Dependencies.AutowiringDependency.#ctor(System.Type,IoC.IAutowiringStrategy,System.Linq.Expressions.LambdaExpression[])')
+  - [ToString()](#M-IoC-Dependencies-AutowiringDependency-ToString 'IoC.Dependencies.AutowiringDependency.ToString')
+  - [TryBuildExpression()](#M-IoC-Dependencies-AutowiringDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.Dependencies.AutowiringDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
 - [AutowiringStrategies](#T-IoC-AutowiringStrategies 'IoC.AutowiringStrategies')
   - [AspectOriented()](#M-IoC-AutowiringStrategies-AspectOriented 'IoC.AutowiringStrategies.AspectOriented')
   - [Order\`\`1(strategy,orderSelector)](#M-IoC-AutowiringStrategies-Order``1-IoC-IAutowiringStrategy,System-Func{``0,System-IComparable}- 'IoC.AutowiringStrategies.Order``1(IoC.IAutowiringStrategy,System.Func{``0,System.IComparable})')
@@ -114,6 +119,11 @@
   - [DisposeContainer](#F-IoC-EventType-DisposeContainer 'IoC.EventType.DisposeContainer')
   - [RegisterDependency](#F-IoC-EventType-RegisterDependency 'IoC.EventType.RegisterDependency')
   - [ResolverCompilation](#F-IoC-EventType-ResolverCompilation 'IoC.EventType.ResolverCompilation')
+- [ExpressionDependency](#T-IoC-Dependencies-ExpressionDependency 'IoC.Dependencies.ExpressionDependency')
+  - [#ctor(instanceExpression,initializeInstanceExpressions)](#M-IoC-Dependencies-ExpressionDependency-#ctor-System-Linq-Expressions-LambdaExpression,System-Linq-Expressions-LambdaExpression[]- 'IoC.Dependencies.ExpressionDependency.#ctor(System.Linq.Expressions.LambdaExpression,System.Linq.Expressions.LambdaExpression[])')
+  - [#ctor(instanceExpression,autowiringStrategy,initializeInstanceExpressions)](#M-IoC-Dependencies-ExpressionDependency-#ctor-System-Linq-Expressions-LambdaExpression,IoC-IAutowiringStrategy,System-Linq-Expressions-LambdaExpression[]- 'IoC.Dependencies.ExpressionDependency.#ctor(System.Linq.Expressions.LambdaExpression,IoC.IAutowiringStrategy,System.Linq.Expressions.LambdaExpression[])')
+  - [ToString()](#M-IoC-Dependencies-ExpressionDependency-ToString 'IoC.Dependencies.ExpressionDependency.ToString')
+  - [TryBuildExpression()](#M-IoC-Dependencies-ExpressionDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.Dependencies.ExpressionDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
 - [FluentBind](#T-IoC-FluentBind 'IoC.FluentBind')
   - [AnyTag\`\`1(binding)](#M-IoC-FluentBind-AnyTag``1-IoC-IBinding{``0}- 'IoC.FluentBind.AnyTag``1(IoC.IBinding{``0})')
   - [As\`\`1(binding,lifetime)](#M-IoC-FluentBind-As``1-IoC-IBinding{``0},IoC-Lifetime- 'IoC.FluentBind.As``1(IoC.IBinding{``0},IoC.Lifetime)')
@@ -465,6 +475,12 @@
   - [ArgsParameter](#F-IoC-Core-Registration-ArgsParameter 'IoC.Core.Registration.ArgsParameter')
   - [ContainerParameter](#F-IoC-Core-Registration-ContainerParameter 'IoC.Core.Registration.ContainerParameter')
   - [ResolverParameters](#F-IoC-Core-Registration-ResolverParameters 'IoC.Core.Registration.ResolverParameters')
+- [ResolveUnregisteredImplementationsFeature](#T-IoC-Features-ResolveUnregisteredImplementationsFeature 'IoC.Features.ResolveUnregisteredImplementationsFeature')
+  - [#ctor()](#M-IoC-Features-ResolveUnregisteredImplementationsFeature-#ctor 'IoC.Features.ResolveUnregisteredImplementationsFeature.#ctor')
+  - [#ctor(supportDefaults,autowiringStrategy)](#M-IoC-Features-ResolveUnregisteredImplementationsFeature-#ctor-System-Boolean,IoC-IAutowiringStrategy- 'IoC.Features.ResolveUnregisteredImplementationsFeature.#ctor(System.Boolean,IoC.IAutowiringStrategy)')
+  - [Apply()](#M-IoC-Features-ResolveUnregisteredImplementationsFeature-Apply-IoC-IMutableContainer- 'IoC.Features.ResolveUnregisteredImplementationsFeature.Apply(IoC.IMutableContainer)')
+  - [Dispose()](#M-IoC-Features-ResolveUnregisteredImplementationsFeature-Dispose 'IoC.Features.ResolveUnregisteredImplementationsFeature.Dispose')
+  - [GetEnumerator()](#M-IoC-Features-ResolveUnregisteredImplementationsFeature-GetEnumerator 'IoC.Features.ResolveUnregisteredImplementationsFeature.GetEnumerator')
 - [Resolver\`1](#T-IoC-Resolver`1 'IoC.Resolver`1')
 - [ScopeSingletonLifetime](#T-IoC-Lifetimes-ScopeSingletonLifetime 'IoC.Lifetimes.ScopeSingletonLifetime')
   - [Create()](#M-IoC-Lifetimes-ScopeSingletonLifetime-Create 'IoC.Lifetimes.ScopeSingletonLifetime.Create')
@@ -723,6 +739,10 @@
   - [LightSet](#F-IoC-Features-TupleFeature-LightSet 'IoC.Features.TupleFeature.LightSet')
   - [Set](#F-IoC-Features-TupleFeature-Set 'IoC.Features.TupleFeature.Set')
   - [Apply()](#M-IoC-Features-TupleFeature-Apply-IoC-IMutableContainer- 'IoC.Features.TupleFeature.Apply(IoC.IMutableContainer)')
+- [TypesMapDependency](#T-IoC-Dependencies-TypesMapDependency 'IoC.Dependencies.TypesMapDependency')
+  - [#ctor(instanceExpression,initializeInstanceExpressions,typesMap,autowiringStrategy)](#M-IoC-Dependencies-TypesMapDependency-#ctor-System-Linq-Expressions-Expression,System-Collections-Generic-IEnumerable{System-Linq-Expressions-Expression},System-Collections-Generic-IDictionary{System-Type,System-Type},IoC-IAutowiringStrategy- 'IoC.Dependencies.TypesMapDependency.#ctor(System.Linq.Expressions.Expression,System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression},System.Collections.Generic.IDictionary{System.Type,System.Type},IoC.IAutowiringStrategy)')
+  - [ToString()](#M-IoC-Dependencies-TypesMapDependency-ToString 'IoC.Dependencies.TypesMapDependency.ToString')
+  - [TryBuildExpression()](#M-IoC-Dependencies-TypesMapDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.Dependencies.TypesMapDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
 - [UsedImplicitlyAttribute](#T-IoC-UsedImplicitlyAttribute 'IoC.UsedImplicitlyAttribute')
 - [ValueProviderAttribute](#T-IoC-ValueProviderAttribute 'IoC.ValueProviderAttribute')
 - [XamlItemBindingOfItemsControlAttribute](#T-IoC-XamlItemBindingOfItemsControlAttribute 'IoC.XamlItemBindingOfItemsControlAttribute')
@@ -1066,6 +1086,68 @@ IoC
 Indicates that the marked method is assertion method, i.e. it halts control flow if
 one of the conditions is satisfied. To set the condition, mark one of the parameters with 
 [AssertionConditionAttribute](#T-IoC-AssertionConditionAttribute 'IoC.AssertionConditionAttribute') attribute.
+
+<a name='T-IoC-Dependencies-AutowiringDependency'></a>
+## AutowiringDependency `type`
+
+##### Namespace
+
+IoC.Dependencies
+
+##### Summary
+
+Represents the autowiring dependency.
+
+<a name='M-IoC-Dependencies-AutowiringDependency-#ctor-System-Type,System-Linq-Expressions-LambdaExpression[]-'></a>
+### #ctor(implementationType,initializeInstanceLambdaStatements) `constructor`
+
+##### Summary
+
+Creates an instance of dependency.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| implementationType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The autowiring implementation type. |
+| initializeInstanceLambdaStatements | [System.Linq.Expressions.LambdaExpression[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression[] 'System.Linq.Expressions.LambdaExpression[]') | The statements to initialize an instance. |
+
+<a name='M-IoC-Dependencies-AutowiringDependency-#ctor-System-Type,IoC-IAutowiringStrategy,System-Linq-Expressions-LambdaExpression[]-'></a>
+### #ctor(implementationType,autowiringStrategy,initializeInstanceLambdaStatements) `constructor`
+
+##### Summary
+
+Creates an instance of dependency.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| implementationType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | The autowiring implementation type. |
+| autowiringStrategy | [IoC.IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy') | The autowiring strategy. |
+| initializeInstanceLambdaStatements | [System.Linq.Expressions.LambdaExpression[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression[] 'System.Linq.Expressions.LambdaExpression[]') | The statements to initialize an instance. |
+
+<a name='M-IoC-Dependencies-AutowiringDependency-ToString'></a>
+### ToString() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Dependencies-AutowiringDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@-'></a>
+### TryBuildExpression() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
 
 <a name='T-IoC-AutowiringStrategies'></a>
 ## AutowiringStrategies `type`
@@ -1938,6 +2020,68 @@ On dependency registration.
 ##### Summary
 
 On resolver compilation.
+
+<a name='T-IoC-Dependencies-ExpressionDependency'></a>
+## ExpressionDependency `type`
+
+##### Namespace
+
+IoC.Dependencies
+
+##### Summary
+
+Represents the dependency based on expressions.
+
+<a name='M-IoC-Dependencies-ExpressionDependency-#ctor-System-Linq-Expressions-LambdaExpression,System-Linq-Expressions-LambdaExpression[]-'></a>
+### #ctor(instanceExpression,initializeInstanceExpressions) `constructor`
+
+##### Summary
+
+Creates an instance of dependency.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| instanceExpression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The expression to create an instance. |
+| initializeInstanceExpressions | [System.Linq.Expressions.LambdaExpression[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression[] 'System.Linq.Expressions.LambdaExpression[]') | The statements to initialize an instance. |
+
+<a name='M-IoC-Dependencies-ExpressionDependency-#ctor-System-Linq-Expressions-LambdaExpression,IoC-IAutowiringStrategy,System-Linq-Expressions-LambdaExpression[]-'></a>
+### #ctor(instanceExpression,autowiringStrategy,initializeInstanceExpressions) `constructor`
+
+##### Summary
+
+Creates an instance of dependency.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| instanceExpression | [System.Linq.Expressions.LambdaExpression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression 'System.Linq.Expressions.LambdaExpression') | The expression to create an instance. |
+| autowiringStrategy | [IoC.IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy') | The autowiring strategy. |
+| initializeInstanceExpressions | [System.Linq.Expressions.LambdaExpression[]](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.LambdaExpression[] 'System.Linq.Expressions.LambdaExpression[]') | The statements to initialize an instance. |
+
+<a name='M-IoC-Dependencies-ExpressionDependency-ToString'></a>
+### ToString() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Dependencies-ExpressionDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@-'></a>
+### TryBuildExpression() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
 
 <a name='T-IoC-FluentBind'></a>
 ## FluentBind `type`
@@ -9889,6 +10033,75 @@ The container parameter.
 
 All resolvers parameters.
 
+<a name='T-IoC-Features-ResolveUnregisteredImplementationsFeature'></a>
+## ResolveUnregisteredImplementationsFeature `type`
+
+##### Namespace
+
+IoC.Features
+
+##### Summary
+
+Allows to resolve unregistered dependencies.
+
+<a name='M-IoC-Features-ResolveUnregisteredImplementationsFeature-#ctor'></a>
+### #ctor() `constructor`
+
+##### Summary
+
+Creates an instance of feature.
+
+##### Parameters
+
+This constructor has no parameters.
+
+<a name='M-IoC-Features-ResolveUnregisteredImplementationsFeature-#ctor-System-Boolean,IoC-IAutowiringStrategy-'></a>
+### #ctor(supportDefaults,autowiringStrategy) `constructor`
+
+##### Summary
+
+Creates an instance of feature.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| supportDefaults | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | `True` to resolve default(T) for unresolved value types. |
+| autowiringStrategy | [IoC.IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy') | The autowiring strategy. |
+
+<a name='M-IoC-Features-ResolveUnregisteredImplementationsFeature-Apply-IoC-IMutableContainer-'></a>
+### Apply() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Features-ResolveUnregisteredImplementationsFeature-Dispose'></a>
+### Dispose() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Features-ResolveUnregisteredImplementationsFeature-GetEnumerator'></a>
+### GetEnumerator() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
 <a name='T-IoC-Resolver`1'></a>
 ## Resolver\`1 `type`
 
@@ -12737,6 +12950,55 @@ Allows to resolve Tuples.
 
 <a name='M-IoC-Features-TupleFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='T-IoC-Dependencies-TypesMapDependency'></a>
+## TypesMapDependency `type`
+
+##### Namespace
+
+IoC.Dependencies
+
+##### Summary
+
+Represents the dependency based on expressions and a map of types.
+
+<a name='M-IoC-Dependencies-TypesMapDependency-#ctor-System-Linq-Expressions-Expression,System-Collections-Generic-IEnumerable{System-Linq-Expressions-Expression},System-Collections-Generic-IDictionary{System-Type,System-Type},IoC-IAutowiringStrategy-'></a>
+### #ctor(instanceExpression,initializeInstanceExpressions,typesMap,autowiringStrategy) `constructor`
+
+##### Summary
+
+Creates an instance of dependency.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| instanceExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The expression to create an instance. |
+| initializeInstanceExpressions | [System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression}') | The statements to initialize an instance. |
+| typesMap | [System.Collections.Generic.IDictionary{System.Type,System.Type}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IDictionary 'System.Collections.Generic.IDictionary{System.Type,System.Type}') | The type mapping dictionary. |
+| autowiringStrategy | [IoC.IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy') | The autowiring strategy. |
+
+<a name='M-IoC-Dependencies-TypesMapDependency-ToString'></a>
+### ToString() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Dependencies-TypesMapDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@-'></a>
+### TryBuildExpression() `method`
 
 ##### Summary
 

@@ -7,6 +7,7 @@ namespace IoC.Core
     using System.Linq;
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
+    using Dependencies;
     using Issues;
 
     /// <summary>
@@ -29,7 +30,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)0x100)]
         [IoC.NotNull]
         public static IToken Register<T>([NotNull] this IMutableContainer container, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null) 
-            => container.Register(new[] { typeof(T)}, new FullAutowiringDependency(typeof(T)), lifetime, tags);
+            => container.Register(new[] { typeof(T)}, new AutowiringDependency(typeof(T)), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.
@@ -44,7 +45,7 @@ namespace IoC.Core
         [MethodImpl((MethodImplOptions)0x100)]
         [IoC.NotNull]
         public static IToken Register<T>([NotNull] this IMutableContainer container, Expression<Func<Context, T>> factory, [CanBeNull] ILifetime lifetime = null, [CanBeNull] object[] tags = null, [IoC.NotNull] [ItemNotNull] params Expression<Action<Context<T>>>[] statements)
-            => container.Register(new[] { typeof(T) }, new AutowiringDependency(factory, null, statements), lifetime, tags);
+            => container.Register(new[] { typeof(T) }, new ExpressionDependency(factory, null, statements), lifetime, tags);
 
         /// <summary>
         /// Registers a binding.

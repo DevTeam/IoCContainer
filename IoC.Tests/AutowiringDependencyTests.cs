@@ -3,12 +3,12 @@ namespace IoC.Tests
 {
     using System;
     using System.Collections.Generic;
-    using Core;
+    using Dependencies;
     using IntegrationTests;
     using Shouldly;
     using Xunit;
 
-    public class FullAutowiringDependencyTests
+    public class AutowiringDependencyTests
     {
         [Theory]
         [InlineData(typeof(List<>), typeof(IEnumerable<string>), typeof(List<TT>))]
@@ -16,7 +16,7 @@ namespace IoC.Tests
         public void ShouldGetInstanceTypeWithConstrains(Type type, Type targetType, Type expectedType)
         {
             // Given
-            var dependency = new FullAutowiringDependency(type);
+            var dependency = new AutowiringDependency(type);
 
             // When
             var actualType = dependency.GetInstanceTypeBasedOnTargetGenericConstrains(targetType);
