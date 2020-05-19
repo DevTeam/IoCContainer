@@ -488,7 +488,6 @@
   - [OnInstanceReleased()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnInstanceReleased-System-Object,IoC-IScope- 'IoC.Lifetimes.ScopeSingletonLifetime.OnInstanceReleased(System.Object,IoC.IScope)')
   - [OnNewInstanceCreated()](#M-IoC-Lifetimes-ScopeSingletonLifetime-OnNewInstanceCreated-System-Object,IoC-IScope,IoC-IContainer,System-Object[]- 'IoC.Lifetimes.ScopeSingletonLifetime.OnNewInstanceCreated(System.Object,IoC.IScope,IoC.IContainer,System.Object[])')
   - [ToString()](#M-IoC-Lifetimes-ScopeSingletonLifetime-ToString 'IoC.Lifetimes.ScopeSingletonLifetime.ToString')
-- [Sets](#T-IoC-Features-Sets 'IoC.Features.Sets')
 - [SingletonLifetime](#T-IoC-Lifetimes-SingletonLifetime 'IoC.Lifetimes.SingletonLifetime')
   - [#ctor(threadSafe)](#M-IoC-Lifetimes-SingletonLifetime-#ctor-System-Boolean- 'IoC.Lifetimes.SingletonLifetime.#ctor(System.Boolean)')
   - [Build()](#M-IoC-Lifetimes-SingletonLifetime-Build-IoC-IBuildContext,System-Linq-Expressions-Expression- 'IoC.Lifetimes.SingletonLifetime.Build(IoC.IBuildContext,System.Linq.Expressions.Expression)')
@@ -10194,17 +10193,6 @@ This method has no parameters.
 ##### Parameters
 
 This method has no parameters.
-
-<a name='T-IoC-Features-Sets'></a>
-## Sets `type`
-
-##### Namespace
-
-IoC.Features
-
-##### Summary
-
-Represents a feature sets.
 
 <a name='T-IoC-Lifetimes-SingletonLifetime'></a>
 ## SingletonLifetime `type`

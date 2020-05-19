@@ -5,6 +5,7 @@
     using System.Threading;
     using Core;
     using Lifetimes;
+    using static Core.FluentRegister;
 
     /// <summary>
     /// Adds the set of core features like lifetimes and containers.
@@ -44,7 +45,7 @@
             yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Inject<ILockObject>()));
 
             // ThreadLocal
-            yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Sets.AnyTag);
+            yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, AnyTag);
 
             // Current container
             yield return container.Register<IContainer, IResourceRegistry, IObservable<ContainerEvent>>(ctx => ctx.Container);

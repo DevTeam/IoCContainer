@@ -17,6 +17,7 @@ namespace IoC.Core
     [PublicAPI]
     internal static partial class FluentRegister
     {
+        internal static readonly object[] AnyTag = { Key.AnyTag };
         private static readonly IEnumerable<object> DefaultTags = new object[] { null };
 
         /// <summary>

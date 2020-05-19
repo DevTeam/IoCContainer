@@ -5652,7 +5652,7 @@ namespace IoC
         {
             if (parentContainer == null) throw new ArgumentNullException(nameof(parentContainer));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return parentContainer.GetResolver<IMutableContainer>()(parentContainer, name);
+            return parentContainer.Resolve<IMutableContainer>(parentContainer, name);
         }
 
         /// <summary>
@@ -5667,7 +5667,7 @@ namespace IoC
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return token.Container.GetResolver<IMutableContainer>()(token.Container, name);
+            return token.Container.Resolve<IMutableContainer>(token.Container, name);
         }
 
         /// <summary>
@@ -5713,7 +5713,7 @@ namespace IoC
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
 
-            if (container.TryGetResolver<TInstance>(typeof(TInstance), null, out var resolver, out _, container))
+            if (container.TryGetResolver<TInstance>(out var resolver))
             {
                 return new CompositionRoot<TInstance>(new Token(container, Disposable.Empty), resolver(container, args));
             }
@@ -9017,6 +9017,7 @@ namespace IoC.Features
     using System;
     using System.Collections.Generic;
     using Core;
+    using static Core.FluentRegister;
 
     /// <summary>
     /// Allows to resolve common types like a <c>Lazy</c>.
@@ -9032,8 +9033,8 @@ namespace IoC.Features
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register(ctx => new Lazy<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag), true), null, Sets.AnyTag);
-            yield return container.Register(ctx => ctx.Container.TryInjectValue<TTS>(ctx.Key.Tag), null, Sets.AnyTag);
+            yield return container.Register(ctx => new Lazy<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag), true), null, AnyTag);
+            yield return container.Register(ctx => ctx.Container.TryInjectValue<TTS>(ctx.Key.Tag), null, AnyTag);
         }
     }
 }
@@ -9120,6 +9121,7 @@ namespace IoC.Features
     using System.Threading;
     using Core;
     using Lifetimes;
+    using static Core.FluentRegister;
 
     /// <summary>
     /// Adds the set of core features like lifetimes and containers.
@@ -9159,7 +9161,7 @@ namespace IoC.Features
             yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Inject<ILockObject>()));
 
             // ThreadLocal
-            yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Sets.AnyTag);
+            yield return container.Register(ctx => new ThreadLocal<TT>(() => ctx.Container.Inject<TT>(ctx.Key.Tag)), null, AnyTag);
 
             // Current container
             yield return container.Register<IContainer, IResourceRegistry, IObservable<ContainerEvent>>(ctx => ctx.Container);
@@ -9230,6 +9232,7 @@ namespace IoC.Features
     using System.Linq.Expressions;
     using Core;
     using Lifetimes;
+    using static Core.FluentRegister;
 
     /// <summary>
     /// Allows to resolve Functions.
@@ -9251,18 +9254,18 @@ namespace IoC.Features
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register(new[] { typeof(Func<TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
 
             if (_light) yield break;
 
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), Sets.AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
         }
 
         private class FuncDependency : IDependency
@@ -9471,22 +9474,6 @@ namespace IoC.Features
 
 
 #endregion
-#region Sets
-
-namespace IoC.Features
-{
-    /// <summary>
-    /// Represents a feature sets.
-    /// </summary>
-    [PublicAPI]
-    public static class Sets
-    {
-        internal static readonly object[] AnyTag = { Key.AnyTag };
-    }
-}
-
-
-#endregion
 #region TaskFeature
 
 namespace IoC.Features
@@ -9495,6 +9482,7 @@ namespace IoC.Features
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Core;
+    using static Core.FluentRegister;
 
     /// <summary>
     /// Allows to resolve Tasks.
@@ -9517,9 +9505,9 @@ namespace IoC.Features
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => TaskScheduler.Current);
-            yield return container.Register(ctx => CreateTask(ctx.Container.Inject<Func<TT>>(ctx.Key.Tag), ctx.Container.Inject<TaskScheduler>()), null, Sets.AnyTag);
+            yield return container.Register(ctx => CreateTask(ctx.Container.Inject<Func<TT>>(ctx.Key.Tag), ctx.Container.Inject<TaskScheduler>()), null, AnyTag);
 #if !NET40 && !NET403 && !NET45 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NET47 && !NET48 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2&& !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETSTANDARD2_0 && !WINDOWS_UWP
-            yield return container.Register(ctx => new ValueTask<TT>(ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Sets.AnyTag);
+            yield return container.Register(ctx => new ValueTask<TT>(ctx.Container.Inject<TT>(ctx.Key.Tag)), null, AnyTag);
 #endif
         }
 
@@ -9541,6 +9529,7 @@ namespace IoC.Features
     using System;
     using System.Collections.Generic;
     using Core;
+    using static Core.FluentRegister;
 
     /// <summary>
     /// Allows to resolve Tuples.
@@ -9561,22 +9550,22 @@ namespace IoC.Features
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register(ctx => new Tuple<TT>(ctx.Container.Inject<TT>(ctx.Key.Tag)), null, Sets.AnyTag);
+            yield return container.Register(ctx => new Tuple<TT>(ctx.Container.Inject<TT>(ctx.Key.Tag)), null, AnyTag);
 
             yield return container.Register(ctx => new Tuple<TT1, TT2>(
                 ctx.Container.Inject<TT1>(ctx.Key.Tag),
-                ctx.Container.Inject<TT2>(ctx.Key.Tag)), null, Sets.AnyTag);
+                ctx.Container.Inject<TT2>(ctx.Key.Tag)), null, AnyTag);
 
             yield return container.Register(ctx => new Tuple<TT1, TT2, TT3>(
                 ctx.Container.Inject<TT1>(ctx.Key.Tag),
                 ctx.Container.Inject<TT2>(ctx.Key.Tag),
-                ctx.Container.Inject<TT3>(ctx.Key.Tag)), null, Sets.AnyTag);
+                ctx.Container.Inject<TT3>(ctx.Key.Tag)), null, AnyTag);
 
             yield return container.Register(ctx => new Tuple<TT1, TT2, TT3, TT4>(
                 ctx.Container.Inject<TT1>(ctx.Key.Tag),
                 ctx.Container.Inject<TT2>(ctx.Key.Tag),
                 ctx.Container.Inject<TT3>(ctx.Key.Tag),
-                ctx.Container.Inject<TT4>(ctx.Key.Tag)), null, Sets.AnyTag);
+                ctx.Container.Inject<TT4>(ctx.Key.Tag)), null, AnyTag);
 
             if (!_light)
             {
@@ -9585,7 +9574,7 @@ namespace IoC.Features
                     ctx.Container.Inject<TT2>(ctx.Key.Tag),
                     ctx.Container.Inject<TT3>(ctx.Key.Tag),
                     ctx.Container.Inject<TT4>(ctx.Key.Tag),
-                    ctx.Container.Inject<TT5>(ctx.Key.Tag)), null, Sets.AnyTag);
+                    ctx.Container.Inject<TT5>(ctx.Key.Tag)), null, AnyTag);
 
                 yield return container.Register(ctx => new Tuple<TT1, TT2, TT3, TT4, TT5, TT6>(
                     ctx.Container.Inject<TT1>(ctx.Key.Tag),
@@ -9593,7 +9582,7 @@ namespace IoC.Features
                     ctx.Container.Inject<TT3>(ctx.Key.Tag),
                     ctx.Container.Inject<TT4>(ctx.Key.Tag),
                     ctx.Container.Inject<TT5>(ctx.Key.Tag),
-                    ctx.Container.Inject<TT6>(ctx.Key.Tag)), null, Sets.AnyTag);
+                    ctx.Container.Inject<TT6>(ctx.Key.Tag)), null, AnyTag);
 
                 yield return container.Register(ctx => new Tuple<TT1, TT2, TT3, TT4, TT5, TT6, TT7>(
                     ctx.Container.Inject<TT1>(ctx.Key.Tag),
@@ -9602,7 +9591,7 @@ namespace IoC.Features
                     ctx.Container.Inject<TT4>(ctx.Key.Tag),
                     ctx.Container.Inject<TT5>(ctx.Key.Tag),
                     ctx.Container.Inject<TT6>(ctx.Key.Tag),
-                    ctx.Container.Inject<TT7>(ctx.Key.Tag)), null, Sets.AnyTag);
+                    ctx.Container.Inject<TT7>(ctx.Key.Tag)), null, AnyTag);
 
                 yield return container.Register(ctx => new Tuple<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8>(
                     ctx.Container.Inject<TT1>(ctx.Key.Tag),
@@ -9612,24 +9601,24 @@ namespace IoC.Features
                     ctx.Container.Inject<TT5>(ctx.Key.Tag),
                     ctx.Container.Inject<TT6>(ctx.Key.Tag),
                     ctx.Container.Inject<TT7>(ctx.Key.Tag),
-                    ctx.Container.Inject<TT8>(ctx.Key.Tag)), null, Sets.AnyTag);
+                    ctx.Container.Inject<TT8>(ctx.Key.Tag)), null, AnyTag);
             }
 
 #if !NET40 && !NET403 && !NET45 && !NET45 && !NET451 && !NET452 && !NET46 && !NET461 && !NET462 && !NETCOREAPP1_0 && !NETCOREAPP1_1 && !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2&& !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !WINDOWS_UWP
             yield return container.Register(ctx => CreateTuple(
                 ctx.Container.Inject<TT1>(ctx.Key.Tag),
-                ctx.Container.Inject<TT2>(ctx.Key.Tag)), null, Sets.AnyTag);
+                ctx.Container.Inject<TT2>(ctx.Key.Tag)), null, AnyTag);
 
             yield return container.Register(ctx => CreateTuple(
                 ctx.Container.Inject<TT1>(ctx.Key.Tag),
                 ctx.Container.Inject<TT2>(ctx.Key.Tag),
-                ctx.Container.Inject<TT3>(ctx.Key.Tag)), null, Sets.AnyTag);
+                ctx.Container.Inject<TT3>(ctx.Key.Tag)), null, AnyTag);
 
             yield return container.Register(ctx => CreateTuple(
                 ctx.Container.Inject<TT1>(ctx.Key.Tag),
                 ctx.Container.Inject<TT2>(ctx.Key.Tag),
                 ctx.Container.Inject<TT3>(ctx.Key.Tag),
-                ctx.Container.Inject<TT4>(ctx.Key.Tag)), null, Sets.AnyTag);
+                ctx.Container.Inject<TT4>(ctx.Key.Tag)), null, AnyTag);
 
             if (!_light)
             {
@@ -9646,7 +9635,7 @@ namespace IoC.Features
                     ctx.Container.Inject<TT3>(ctx.Key.Tag),
                     ctx.Container.Inject<TT4>(ctx.Key.Tag),
                     ctx.Container.Inject<TT5>(ctx.Key.Tag),
-                    ctx.Container.Inject<TT6>(ctx.Key.Tag)), null, Sets.AnyTag);
+                    ctx.Container.Inject<TT6>(ctx.Key.Tag)), null, AnyTag);
 
                 yield return container.Register(ctx => CreateTuple(
                     ctx.Container.Inject<TT1>(ctx.Key.Tag),
@@ -9655,7 +9644,7 @@ namespace IoC.Features
                     ctx.Container.Inject<TT4>(ctx.Key.Tag),
                     ctx.Container.Inject<TT5>(ctx.Key.Tag),
                     ctx.Container.Inject<TT6>(ctx.Key.Tag),
-                    ctx.Container.Inject<TT7>(ctx.Key.Tag)), null, Sets.AnyTag);
+                    ctx.Container.Inject<TT7>(ctx.Key.Tag)), null, AnyTag);
 
                 yield return container.Register(ctx => CreateTuple(
                     ctx.Container.Inject<TT1>(ctx.Key.Tag),
@@ -9665,7 +9654,7 @@ namespace IoC.Features
                     ctx.Container.Inject<TT5>(ctx.Key.Tag),
                     ctx.Container.Inject<TT6>(ctx.Key.Tag),
                     ctx.Container.Inject<TT7>(ctx.Key.Tag),
-                    ctx.Container.Inject<TT8>(ctx.Key.Tag)), null, Sets.AnyTag);
+                    ctx.Container.Inject<TT8>(ctx.Key.Tag)), null, AnyTag);
             }
 #endif
         }
@@ -12770,6 +12759,7 @@ namespace IoC.Core
     [PublicAPI]
     internal static partial class FluentRegister
     {
+        internal static readonly object[] AnyTag = { Key.AnyTag };
         private static readonly IEnumerable<object> DefaultTags = new object[] { null };
 
         /// <summary>

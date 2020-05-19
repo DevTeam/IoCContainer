@@ -1150,11 +1150,6 @@
         <member name="M:IoC.Features.ResolveUnregisteredImplementationsFeature.GetEnumerator">
             <inheritdoc />
         </member>
-        <member name="T:IoC.Features.Sets">
-            <summary>
-            Represents a feature sets.
-            </summary>
-        </member>
         <member name="T:IoC.Features.TaskFeature">
             <summary>
             Allows to resolve Tasks.

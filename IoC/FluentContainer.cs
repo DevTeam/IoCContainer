@@ -22,7 +22,7 @@
         {
             if (parentContainer == null) throw new ArgumentNullException(nameof(parentContainer));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return parentContainer.GetResolver<IMutableContainer>()(parentContainer, name);
+            return parentContainer.Resolve<IMutableContainer>(parentContainer, name);
         }
 
         /// <summary>
@@ -37,7 +37,7 @@
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return token.Container.GetResolver<IMutableContainer>()(token.Container, name);
+            return token.Container.Resolve<IMutableContainer>(token.Container, name);
         }
 
         /// <summary>
@@ -83,7 +83,7 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
 
-            if (container.TryGetResolver<TInstance>(typeof(TInstance), null, out var resolver, out _, container))
+            if (container.TryGetResolver<TInstance>(out var resolver))
             {
                 return new CompositionRoot<TInstance>(new Token(container, Disposable.Empty), resolver(container, args));
             }
