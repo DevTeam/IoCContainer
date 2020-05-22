@@ -1064,19 +1064,6 @@
         <member name="M:IoC.Features.CommonTypesFeature.Apply(IoC.IMutableContainer)">
             <inheritdoc />
         </member>
-        <member name="T:IoC.Features.ConfigurationFeature">
-            <summary>
-            Allows to configure via a text metadata.
-            </summary>
-        </member>
-        <member name="F:IoC.Features.ConfigurationFeature.Set">
-            <summary>
-            The default instance.
-            </summary>
-        </member>
-        <member name="M:IoC.Features.ConfigurationFeature.Apply(IoC.IMutableContainer)">
-            <inheritdoc />
-        </member>
         <member name="T:IoC.Features.CoreFeature">
             <summary>
             Adds the set of core features like lifetimes and containers.

@@ -58,9 +58,6 @@
 - [CommonTypesFeature](#T-IoC-Features-CommonTypesFeature 'IoC.Features.CommonTypesFeature')
   - [Set](#F-IoC-Features-CommonTypesFeature-Set 'IoC.Features.CommonTypesFeature.Set')
   - [Apply()](#M-IoC-Features-CommonTypesFeature-Apply-IoC-IMutableContainer- 'IoC.Features.CommonTypesFeature.Apply(IoC.IMutableContainer)')
-- [ConfigurationFeature](#T-IoC-Features-ConfigurationFeature 'IoC.Features.ConfigurationFeature')
-  - [Set](#F-IoC-Features-ConfigurationFeature-Set 'IoC.Features.ConfigurationFeature.Set')
-  - [Apply()](#M-IoC-Features-ConfigurationFeature-Apply-IoC-IMutableContainer- 'IoC.Features.ConfigurationFeature.Apply(IoC.IMutableContainer)')
 - [Container](#T-IoC-Container 'IoC.Container')
   - [Parent](#P-IoC-Container-Parent 'IoC.Container.Parent')
   - [Create(configurations)](#M-IoC-Container-Create-IoC-IConfiguration[]- 'IoC.Container.Create(IoC.IConfiguration[])')
@@ -1417,35 +1414,6 @@ Allows to resolve common types like a `Lazy`.
 ### Set `constants`
 
 <a name='M-IoC-Features-CommonTypesFeature-Apply-IoC-IMutableContainer-'></a>
-### Apply() `method`
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='T-IoC-Features-ConfigurationFeature'></a>
-## ConfigurationFeature `type`
-
-##### Namespace
-
-IoC.Features
-
-##### Summary
-
-Allows to configure via a text metadata.
-
-<a name='F-IoC-Features-ConfigurationFeature-Set'></a>
-### Set `constants`
-
-##### Summary
-
-The default instance.
-
-<a name='M-IoC-Features-ConfigurationFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
 
 ##### Summary

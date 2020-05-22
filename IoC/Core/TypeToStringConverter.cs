@@ -3,12 +3,27 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using Configuration;
 
     internal sealed class TypeToStringConverter : IConverter<Type, Type, string>
     {
         public static readonly IConverter<Type, Type, string> Shared = new TypeToStringConverter();
-        private static readonly IDictionary<Type, string> PrimitiveTypes = StringToTypeConverter.PrimitiveTypes.ToDictionary(i => i.Value, i => i.Key);
+        private static readonly IDictionary<Type, string> PrimitiveTypes = new Dictionary<Type, string>
+        {
+            {typeof(byte), "byte"},
+            {typeof(sbyte), "sbyte"},
+            {typeof(int), "int"},
+            {typeof(uint), "uint"},
+            {typeof(short), "short"},
+            {typeof(ushort), "ushort"},
+            {typeof(long), "long"},
+            {typeof(ulong), "ulong"},
+            {typeof(float), "float"},
+            {typeof(double), "double"},
+            {typeof(char), "char"},
+            {typeof(object), "object"},
+            {typeof(string), "string"},
+            {typeof(decimal), "decimal"}
+        };
 
         private TypeToStringConverter() { }
 

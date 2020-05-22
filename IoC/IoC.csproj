@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <AssemblyName>$(AssemblyNamePrefix)IoC</AssemblyName>
+    <AssemblyName>IoC</AssemblyName>
     <TieredCompilation>false</TieredCompilation>
     <TargetFrameworks>net5.0;net40;net48;netstandard1.0;netstandard2.1;netcoreapp1.0;netcoreapp2.0;netcoreapp3.1</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
@@ -24,7 +24,6 @@
     <TransformOnBuild>True</TransformOnBuild>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
     <LangVersion>7</LangVersion>
-    <!--NullableContextOptions>enable</NullableContextOptions-->
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
     <TargetFrameworks>net5.0;netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;netstandard2.1;net40;net45;net46;net47;net48;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;netcoreapp2.1;netcoreapp2.2;netcoreapp3.0;netcoreapp3.1;uap10.0</TargetFrameworks>
@@ -103,5 +102,4 @@
       <DependentUpon>GenericTypeArguments.tt</DependentUpon>
     </Compile>
   </ItemGroup>
-
 </Project>

@@ -51,8 +51,7 @@ SOFTWARE.
         "Lifetimes",
         "Dependencies",
         "Issues",
-        "Core",
-        "Core" + Path.DirectorySeparatorChar + "Configuration"};
+        "Core"};
 
     var infos = new List<Dictionary<string, string>>();
     foreach(var path in paths)

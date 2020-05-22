@@ -19,8 +19,7 @@
             FuncFeature.LightSet,
             TaskFeature.Set,
             TupleFeature.LightSet,
-            CommonTypesFeature.Set,
-            ConfigurationFeature.Set
+            CommonTypesFeature.Set
         };
 
         private LightFeature() { }

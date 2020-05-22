@@ -940,6 +940,78 @@
             All resolvers parameters.
             </summary>
         </member>
+        <member name="T:IoC.Dependencies.AutowiringDependency">
+            <summary>
+            Represents the autowiring dependency.
+            </summary>
+        </member>
+        <member name="M:IoC.Dependencies.AutowiringDependency.#ctor(System.Type,System.Linq.Expressions.LambdaExpression[])">
+            <summary>
+            Creates an instance of dependency.
+            </summary>
+            <param name="implementationType">The autowiring implementation type.</param>
+            <param name="initializeInstanceLambdaStatements">The statements to initialize an instance.</param>
+        </member>
+        <member name="M:IoC.Dependencies.AutowiringDependency.#ctor(System.Type,IoC.IAutowiringStrategy,System.Linq.Expressions.LambdaExpression[])">
+            <summary>
+            Creates an instance of dependency.
+            </summary>
+            <param name="implementationType">The autowiring implementation type.</param>
+            <param name="autowiringStrategy">The autowiring strategy.</param>
+            <param name="initializeInstanceLambdaStatements">The statements to initialize an instance.</param>
+        </member>
+        <member name="M:IoC.Dependencies.AutowiringDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Dependencies.AutowiringDependency.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Dependencies.ExpressionDependency">
+            <summary>
+            Represents the dependency based on expressions.
+            </summary>
+        </member>
+        <member name="M:IoC.Dependencies.ExpressionDependency.#ctor(System.Linq.Expressions.LambdaExpression,System.Linq.Expressions.LambdaExpression[])">
+            <summary>
+            Creates an instance of dependency.
+            </summary>
+            <param name="instanceExpression">The expression to create an instance.</param>
+            <param name="initializeInstanceExpressions">The statements to initialize an instance.</param>
+        </member>
+        <member name="M:IoC.Dependencies.ExpressionDependency.#ctor(System.Linq.Expressions.LambdaExpression,IoC.IAutowiringStrategy,System.Linq.Expressions.LambdaExpression[])">
+            <summary>
+            Creates an instance of dependency.
+            </summary>
+            <param name="instanceExpression">The expression to create an instance.</param>
+            <param name="autowiringStrategy">The autowiring strategy.</param>
+            <param name="initializeInstanceExpressions">The statements to initialize an instance.</param>
+        </member>
+        <member name="M:IoC.Dependencies.ExpressionDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Dependencies.ExpressionDependency.ToString">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Dependencies.TypesMapDependency">
+            <summary>
+            Represents the dependency based on expressions and a map of types.
+            </summary>
+        </member>
+        <member name="M:IoC.Dependencies.TypesMapDependency.#ctor(System.Linq.Expressions.Expression,System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression},System.Collections.Generic.IDictionary{System.Type,System.Type},IoC.IAutowiringStrategy)">
+            <summary>
+            Creates an instance of dependency.
+            </summary>
+            <param name="instanceExpression">The expression to create an instance.</param>
+            <param name="initializeInstanceExpressions">The statements to initialize an instance.</param>
+            <param name="typesMap">The type mapping dictionary.</param>
+            <param name="autowiringStrategy">The autowiring strategy.</param>
+        </member>
+        <member name="M:IoC.Dependencies.TypesMapDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Dependencies.TypesMapDependency.ToString">
+            <inheritdoc />
+        </member>
         <member name="T:IoC.EventType">
             <summary>
             Container event types.
@@ -992,19 +1064,6 @@
         <member name="M:IoC.Features.CommonTypesFeature.Apply(IoC.IMutableContainer)">
             <inheritdoc />
         </member>
-        <member name="T:IoC.Features.ConfigurationFeature">
-            <summary>
-            Allows to configure via a text metadata.
-            </summary>
-        </member>
-        <member name="F:IoC.Features.ConfigurationFeature.Set">
-            <summary>
-            The default instance.
-            </summary>
-        </member>
-        <member name="M:IoC.Features.ConfigurationFeature.Apply(IoC.IMutableContainer)">
-            <inheritdoc />
-        </member>
         <member name="T:IoC.Features.CoreFeature">
             <summary>
             Adds the set of core features like lifetimes and containers.
@@ -1052,10 +1111,31 @@
         <member name="M:IoC.Features.LightFeature.Apply(IoC.IMutableContainer)">
             <inheritdoc />
         </member>
-        <member name="T:IoC.Features.Sets">
+        <member name="T:IoC.Features.ResolveUnregisteredImplementationsFeature">
             <summary>
-            Represents a feature sets.
+            Allows to resolve unregistered dependencies.
             </summary>
+        </member>
+        <member name="M:IoC.Features.ResolveUnregisteredImplementationsFeature.#ctor">
+            <summary>
+            Creates an instance of feature.
+            </summary>
+        </member>
+        <member name="M:IoC.Features.ResolveUnregisteredImplementationsFeature.#ctor(System.Boolean,IoC.IAutowiringStrategy)">
+            <summary>
+            Creates an instance of feature.
+            </summary>
+            <param name="supportDefaults"><c>True</c> to resolve default(T) for unresolved value types.</param>
+            <param name="autowiringStrategy">The autowiring strategy.</param>
+        </member>
+        <member name="M:IoC.Features.ResolveUnregisteredImplementationsFeature.Apply(IoC.IMutableContainer)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Features.ResolveUnregisteredImplementationsFeature.Dispose">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Features.ResolveUnregisteredImplementationsFeature.GetEnumerator">
+            <inheritdoc />
         </member>
         <member name="T:IoC.Features.TaskFeature">
             <summary>

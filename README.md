@@ -350,7 +350,6 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Auto dispose a singleton during owning container's dispose](#auto-dispose-a-singleton-during-owning-containers-dispose-)
   - [Default Parameters Injection](#default-parameters-injection-)
   - [Optional Injection](#optional-injection-)
-  - [Configuration via a text metadata](#configuration-via-a-text-metadata-)
   - [Tracing](#tracing-)
   - [Validation](#validation-)
   - [Aspect Oriented](#aspect-oriented-)
@@ -1372,24 +1371,6 @@ public class SomeService: IService
 
     public string State { get; }
 }
-```
-
-
-
-### Configuration via a text metadata [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConfigurationText.cs)
-
-The container's configuration could be parsed and applied from simple text metadata.
-
-``` CSharp
-// Create and configure the container from a metadata string
-using var container = Container.Create().Apply(
-    "ref IoC.Tests;" +
-    "using IoC.Tests.UsageScenarios;" +
-    "Bind<IDependency>().As(Singleton).To<Dependency>();" +
-    "Bind<IService>().To<Service>();")
-    .Container;
-// Resolve an instance
-var instance = container.Resolve<IService>();
 ```
 
 
