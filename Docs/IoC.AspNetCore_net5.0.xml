@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>IoC.AspNetCore</name>
+    </assembly>
+    <members>
+        <member name="T:IoC.Features.AspNetCoreFeature">
+            <summary>
+            Allows to use ASP .NET and other related frameworks.
+            </summary>
+        </member>
+        <member name="M:IoC.Features.AspNetCoreFeature.#ctor">
+            <summary>
+            Default constructor.
+            </summary>
+        </member>
+        <member name="M:IoC.Features.AspNetCoreFeature.#ctor(System.Collections.Generic.IList{Microsoft.Extensions.DependencyInjection.ServiceDescriptor})">
+            <summary>
+            Creates an instance of feature based on a list of <c>ServiceDescriptor</c>.
+            </summary>
+            <param name="list"></param>
+        </member>
+        <member name="M:IoC.Features.AspNetCoreFeature.Apply(IoC.IMutableContainer)">
+            <inheritdoc />
+        </member>
+        <member name="T:IoC.Features.AspNetCore.ServiceProviderFactory">
+            <summary>
+            Creates a builder and an <see cref="T:System.IServiceProvider" />.
+            </summary>
+        </member>
+        <member name="M:IoC.Features.AspNetCore.ServiceProviderFactory.#ctor(IoC.IContainer)">
+            <summary>
+            Creates a new instance of <c>IServiceProviderFactory</c>.
+            </summary>
+            <param name="container"></param>
+        </member>
+        <member name="M:IoC.Features.AspNetCore.ServiceProviderFactory.CreateBuilder(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Features.AspNetCore.ServiceProviderFactory.CreateServiceProvider(IoC.IContainer)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Features.AspNetCore.ServiceProviderFactory.Dispose">
+            <inheritdoc />
+        </member>
+    </members>
+</doc>

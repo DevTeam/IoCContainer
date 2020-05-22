@@ -12,7 +12,7 @@ namespace UwpApp
     /// </summary>
     internal class AppConfiguration: IConfiguration
     {
-        public IEnumerable<IToken> Apply(IContainer container)
+        public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             yield return container
                 .Bind<IUIDispatcher>().As(Singleton).To<UIDispatcher>()

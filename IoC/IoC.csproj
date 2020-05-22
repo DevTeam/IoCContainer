@@ -20,7 +20,7 @@
     <DocumentationFile>..\Docs\IoC_$(TargetFramework).xml</DocumentationFile>
     <WarningsAsErrors />
     <MSBuildNative>C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild</MSBuildNative>
-    <XamlTargets>$(MSBuildNative)\Microsoft\WindowsXaml\v16.0\8.2\Microsoft.Windows.UI.Xaml.CSharp.Targets</XamlTargets>
+    <XamlTargets>$(MSBuildNative)\Microsoft\WindowsXaml\v16.0\Microsoft.Windows.UI.Xaml.CSharp.Targets</XamlTargets>
     <TransformOnBuild>True</TransformOnBuild>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
     <LangVersion>7</LangVersion>
@@ -45,7 +45,7 @@
     <LanguageTargets Condition="Exists('$(XamlTargets)')">$(XamlTargets)</LanguageTargets>
   </PropertyGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='uap10.0'">
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.9" />
+    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.10" />
   </ItemGroup>
   <ItemGroup>
     <None Include="FluentBindGenerated.cs">
