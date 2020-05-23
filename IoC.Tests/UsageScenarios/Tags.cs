@@ -11,12 +11,11 @@
         public void Run()
         {
             // $visible=true
-            // $tag=binding
+            // $tag=basic
             // $priority=01
             // $description=Tags
             // $header=Tags are useful while binding to several implementations.
             // {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
@@ -31,7 +30,7 @@
             // Resolve the instance using the empty tag
             var instance3 = container.Resolve<IService>();
             // }
-            // Check the instances' types
+            // Check instances
             instance1.ShouldBeOfType<Service>();
             instance2.ShouldBeOfType<Service>();
             instance3.ShouldBeOfType<Service>();

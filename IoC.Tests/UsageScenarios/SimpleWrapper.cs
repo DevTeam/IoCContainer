@@ -10,9 +10,9 @@
     {
         [Fact]
         // $visible=true
-        // $tag=injection
+        // $tag=basic
         // $priority=01
-        // $description=Simple Wrapper
+        // $description=Wrapper
         // {
         public void Run()
         {

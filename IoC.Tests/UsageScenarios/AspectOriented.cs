@@ -12,13 +12,13 @@ namespace IoC.Tests.UsageScenarios
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
     [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-    public class AspectOrientedAutowiring
+    public class AspectOriented
     {
         [Fact]
         // $visible=true
-        // $tag=binding
+        // $tag=basic
         // $priority=10
-        // $description=Aspect Oriented 
+        // $description=Aspect Oriented
         // $header=This framework has no special attributes to support aspect oriented autowiring because of a production code should not have references to these special attributes. But this code may contain these attributes by itself. And it is quite easy to use these attributes for aspect oriented autowiring, see the sample below.
         // $footer=Also you can specify your own aspect oriented autowiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
         // {
@@ -26,7 +26,7 @@ namespace IoC.Tests.UsageScenarios
         {
             var console = new Mock<IConsole>();
 
-            // Creates an aspect oriented autowiring strategy based on some custom `DependencyAttribute`
+            // Creates an aspect oriented autowiring strategy based the custom attribute `DependencyAttribute`
             var autowiringStrategy = AutowiringStrategies.AspectOriented()
                 .Type<TypeAttribute>(attribute => attribute.Type)
                 .Order<OrderAttribute>(attribute => attribute.Order)
@@ -40,7 +40,6 @@ namespace IoC.Tests.UsageScenarios
                     .Create("child")
                     // Configure the child container by the custom aspect oriented autowiring strategy
                     .Bind<IAutowiringStrategy>().To(ctx => autowiringStrategy)
-                    // Configure the child container
                     .Bind<IConsole>().Tag("MyConsole").To(ctx => console.Object)
                     .Bind<Clock>().To<Clock>()
                     .Bind<string>().Tag("Prefix").To(ctx => "info")

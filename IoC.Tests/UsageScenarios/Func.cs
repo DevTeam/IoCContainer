@@ -1,34 +1,38 @@
 ﻿namespace IoC.Tests.UsageScenarios
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Shouldly;
     using Xunit;
 
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class Func
     {
         [Fact]
         public void Run()
         {
             // $visible=true
-            // $tag=binding
-            // $priority=05
+            // $tag=basic
+            // $priority=04
             // $description=Func
-            // $header=No comments. Everything is very simple!
+            // $header=_Func_ dependency helps when a logic needs to inject some number of type instances on demand.
             // {
-            Func<IService> func = () => new Service(new Dependency());
-
-            // Create and configure the container
             using var container = Container
                 .Create()
-                .Bind<IService>().To(ctx => func())
+                .Bind<IDependency>().To<Dependency>()
+                .Bind<IService>().To<Service>()
                 .Container;
 
-            // Resolve an instance
-            var instance = container.Resolve<IService>();
-            // }
-            // Check the instance's type
-            instance.ShouldBeOfType<Service>();
+            // Resolve function to create instances
+            var factory = container.Resolve<Func<IService>>();
 
+            // Resolve instances
+            var instance1 = factory();
+            var instance2 = factory();
+            // }
+            // Check the instances
+            instance1.ShouldBeOfType<Service>();
+            instance2.ShouldBeOfType<Service>();
         }
     }
 }

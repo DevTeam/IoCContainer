@@ -3,29 +3,28 @@
     using Shouldly;
     using Xunit;
 
-    public class ConstructorAutowiring
+    public class ConstructorChoice
     {
         [Fact]
         public void Run()
         {
             // $visible=true
-            // $tag=injection
+            // $tag=advanced
             // $priority=04
-            // $description=Constructor Autowiring
+            // $description=Constructor choice
+            // $header
             // {
-            // Create and configure the container, using full autowiring
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
-                // Configure via manual injection
                 .Bind<IService>().To<Service>(
-                    // Select the constructor and inject arguments
+                    // Select the constructor and inject required dependencies
                     ctx => new Service(ctx.Container.Inject<IDependency>(), "some state"))
                 .Container;
-            // Resolve an instance
+
             var instance = container.Resolve<IService>();
             // }
-            // Check the instance's type
+            // Check the type
             instance.ShouldBeOfType<Service>();
             // {
 

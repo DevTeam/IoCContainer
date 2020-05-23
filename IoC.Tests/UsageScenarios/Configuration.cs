@@ -4,23 +4,24 @@
     using Shouldly;
     using Xunit;
 
-    public class ConfigurationClass
+    public class Configuration
     {
         [Fact]
         // $visible=true
-        // $tag=binding
-        // $priority=00
-        // $description=Configuration class
+        // $tag=basic
+        // $priority=06
+        // $description=Configuration
         // $header=Configuration classes are used to dedicate a logic responsible for configuring containers.
         // {
         public void Run()
         {
-            // Create and configure the container
-            using var container = Container.Create().Using<Glue>();
-            // Resolve an instance
+            using var container = Container
+                .Create()
+                .Using<Glue>();
+
             var instance = container.Resolve<IService>();
         // }
-            // Check the instance's type
+            // Check the instance
             instance.ShouldBeOfType<Service>();
         // {
         }

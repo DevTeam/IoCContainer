@@ -11,9 +11,9 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=customization
-        // $priority=00
-        // $description=Custom Child Container
+        // $tag=advanced
+        // $priority=10
+        // $description=Custom child container
         // $header=You may replace the default implementation of container by your own. I can’t imagine why, but it’s possible!
         // {
         public void Run()
@@ -38,7 +38,7 @@ namespace IoC.Tests.UsageScenarios
             // Check the child container's type
             childContainer.ShouldBeOfType<MyContainer>();
             // }
-            // Check the instance's type
+            // Check the instance
             instance.ShouldBeOfType<Service>();
         // {
         }

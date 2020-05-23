@@ -14,8 +14,8 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=async
-        // $priority=04
+        // $tag=advanced
+        // $priority=10
         // $description=Cancellation of asynchronous construction
         // $header=It is possible to inject dependencies in asynchronous style and to cancel their creations using default _CancellationTokenSource_.
         // {
@@ -24,7 +24,6 @@ namespace IoC.Tests.UsageScenarios
             // Create a cancellation token source
             var cancellationTokenSource = new CancellationTokenSource();
 
-            // Create the container and configure it
             using var container = Container.Create()
                 // Bind cancellation token source
                 .Bind<CancellationTokenSource>().To(ctx => cancellationTokenSource)

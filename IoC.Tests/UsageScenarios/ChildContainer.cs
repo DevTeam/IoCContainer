@@ -9,12 +9,11 @@
         public void Run()
         {
             // $visible=true
-            // $tag=binding
+            // $tag=basic
             // $priority=03
-            // $description=Child Container
+            // $description=Child container
             // $header=Child containers allow to override or just to add bindings of a parent containers without any influence on a parent containers. This is most useful when there are some base parent container(s). And these containers are shared between several components which have its own child containers based on common parent container(s) and have some additional bindings.
             // {
-            // Create the parent container
             using var parentContainer = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()

@@ -12,14 +12,13 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=injection
+        // $tag=advanced
         // $priority=04
-        // $description=Containers Injection
+        // $description=Containers injection
         // $header=:warning: Please avoid injecting containers in non-infrastructure code. Keep your general code in ignorance of a container.
         // {
         public void Run()
         {
-            // Create the parent container
             using var currentContainer = Container
                 .Create("root")
                 .Bind<MyClass>().To<MyClass>()

@@ -11,12 +11,11 @@
         public void Run()
         {
             // $visible=true
-            // $tag=binding
+            // $tag=basic
             // $priority=01
             // $description=Bindings
             // $header=It is possible to bind any number of types.
             // {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
@@ -29,7 +28,7 @@
             var instance2 = container.Resolve<IAnotherService>("abc".AsTag());
 
             // }
-            // Check the instances' types
+            // Check the instances
             instance1.ShouldBeOfType<Service>();
             instance2.ShouldBeOfType<Service>();
         }

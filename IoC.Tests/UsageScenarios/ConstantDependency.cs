@@ -3,18 +3,17 @@
     using Shouldly;
     using Xunit;
 
-    public class Constant
+    public class ConstantDependency
     {
         [Fact]
         public void Run()
         {
             // $visible=true
-            // $tag=binding
+            // $tag=basic
             // $priority=01
-            // $description=Constant
+            // $description=Constant dependency
             // $header=It's obvious here.
             // {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<int>().To(ctx => 10)

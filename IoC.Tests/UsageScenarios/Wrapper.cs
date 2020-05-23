@@ -12,8 +12,8 @@
         [Fact]
         // $visible=true
         // $tag=samples
-        // $priority=00
-        // $description=Wrapper
+        // $priority=05
+        // $description=Wrapper sample
         // {
         public void Run()
         {

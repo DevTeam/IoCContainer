@@ -10,23 +10,22 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=binding
+        // $tag=advanced
         // $priority=03
-        // $description=Thread Singleton Lifetime
+        // $description=Thread Singleton lifetime
         // $header=Sometimes it is useful to have a [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance per a thread (or more generally a singleton per something else). There is no special "lifetime" type in this framework to achieve this requirement, but it is quite easy create your own "lifetime" type for that using base type [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs).
         // {
         public void Run()
         {
             var finish = new ManualResetEvent(false);
 
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
                 // Bind an interface to an implementation using the singleton per a thread lifetime
                 .Bind<IService>().Lifetime(new ThreadLifetime()).To<Service>()
                 .Container;
-            
+
             // Resolve the singleton twice
             var instance1 = container.Resolve<IService>();
             var instance2 = container.Resolve<IService>();

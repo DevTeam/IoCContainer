@@ -6,18 +6,17 @@
     using Xunit;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public class ResolveTuple
+    public class Tuple
     {
         [Fact]
         public void Run()
         {
             // $visible=true
-            // $tag=injection
-            // $priority=02
-            // $description=Resolve Tuple
-            // $header=[Tuple](https://docs.microsoft.com/en-us/dotnet/api/system.tuple) has a specific number and sequence of elements which may be resolved from the box.
+            // $tag=basic
+            // $priority=05
+            // $description=Tuple
+            // $header=[Tuple](https://docs.microsoft.com/en-us/dotnet/api/system.tuple) has a specific number and sequence of elements which may be resolved at the same time.
             // {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
@@ -28,7 +27,7 @@
             // Resolve an instance of type Tuple<IService, INamedService>
             var tuple = container.Resolve<Tuple<IService, INamedService>>();
             // }
-            // Check the items types
+            // Check items
             tuple.Item1.ShouldBeOfType<Service>();
             tuple.Item2.ShouldBeOfType<NamedService>();
         }

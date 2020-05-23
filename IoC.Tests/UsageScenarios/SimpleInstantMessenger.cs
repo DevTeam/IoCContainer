@@ -17,8 +17,8 @@ namespace IoC.Tests.UsageScenarios
         [Fact]
         // $visible=true
         // $tag=samples
-        // $priority=00
-        // $description=Instant Messenger
+        // $priority=10
+        // $description=Instant Messenger sample
         // {
         public void Run()
         {

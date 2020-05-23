@@ -13,24 +13,23 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=async
-        // $priority=03
+        // $tag=advanced
+        // $priority=05
         // $description=Asynchronous construction
         // $header=It is easy to inject dependencies in asynchronous style.
         // {
         public async void Run()
         {
-            // Create the container and configure it
             using var container = Container.Create()
                 // Bind some dependency
                 .Bind<IDependency>().To<SomeDependency>()
                 .Bind<Consumer>().To<Consumer>()
                 .Container;
 
-            // Resolve an instance asynchronously using TaskScheduler.Current
+            // Resolve an instance asynchronously using the default task scheduler _TaskScheduler.Current_
             var instance = await container.Resolve<Task<Consumer>>();
 
-            // Check the instance's type
+            // Check the instance
             instance.ShouldBeOfType<Consumer>();
         }
 

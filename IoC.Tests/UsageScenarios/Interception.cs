@@ -11,8 +11,8 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=customization
-        // $priority=00
+        // $tag=advanced
+        // $priority=10
         // $description=Interception
         // $header=The _Interception_ feature allows specify the set of bindings which will be used to produce instances wrapped by proxy objects. These proxy objects intercept any invocations to the created (or injected) instances and allows to add any logic around it: checking arguments, logging, thread safety, authorization aspects and etc.
         // {
@@ -21,9 +21,8 @@ namespace IoC.Tests.UsageScenarios
         public void Run()
         {
             var methods = new List<string>();
-            // Create and configure the container
             using var container = Container
-                // Creates an Inversion of Control container
+                // Creates the Inversion of Control container
                 .Create()
                 // Using the feature InterceptionFeature
                 .Using<InterceptionFeature>()

@@ -8,14 +8,13 @@
     {
         [Fact]
         // $visible=true
-        // $tag=customization
-        // $priority=00
-        // $description=Custom Lifetime
+        // $tag=advanced
+        // $priority=10
+        // $description=Custom lifetime
         // $header=Custom lifetimes allow to implement your own logic controlling every aspects of resolved instances. Also you could use the class [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs) as a base for others.
         // {
         public void Run()
         {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()

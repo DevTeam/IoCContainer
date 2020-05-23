@@ -14,8 +14,8 @@ namespace IoC.Tests.UsageScenarios
         [Fact]
         // $visible=true
         // $tag=samples
-        // $priority=00
-        // $description=Generator
+        // $priority=05
+        // $description=Generator sample
         // {
         public void Run()
         {
@@ -23,7 +23,7 @@ namespace IoC.Tests.UsageScenarios
             using var container = Container.Create().Using<Generators>();
             using (container.Bind<(int, int)>().To(
                 // Use a function because of the expression trees have a limitation in syntax
-                ctx => ValueTuple.Create(
+                ctx => System.ValueTuple.Create(
                     // The first one is of sequential number generator
                     ctx.Container.Inject<int>(GeneratorType.Sequential),
                     // The second one is of random number generator

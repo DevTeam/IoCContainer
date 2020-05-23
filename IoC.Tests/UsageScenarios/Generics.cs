@@ -9,12 +9,11 @@
         public void Run()
         {
             // $visible=true
-            // $tag=binding
+            // $tag=basic
             // $priority=01
             // $description=Generics
-            // $header=Auto-writing of generic types via binding of open generic types or generic type markers are working the same way.
+            // $header=Autowriting of generic types via binding of open generic types or generic type markers are working the same way.
             // {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()

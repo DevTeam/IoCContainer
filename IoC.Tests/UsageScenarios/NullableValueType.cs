@@ -10,17 +10,16 @@ namespace IoC.Tests.UsageScenarios
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    public class NullableValueTypeResolving
+    public class NullableValueType
     {
         [Fact]
         // $visible=true
-        // $tag=injection
+        // $tag=basic
         // $priority=03
-        // $description=Nullable Value Type Resolving
+        // $description=Nullable value type
         public void Run()
         {
             // {
-            // Create the container and configure it
             using var container = Container.Create()
                 .Bind<int>().Tag(1).To(ctx => 1)
                 .Container;

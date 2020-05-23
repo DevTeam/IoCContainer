@@ -10,11 +10,11 @@
         public void Run()
         {
             // $visible=true
-            // $tag=injection
+            // $tag=basic
             // $priority=05
-            // $description=Resolve instances as IObservable source
+            // $description=Observable
+            // $header=To resolve all possible instances of any tags of the specific type as an _observable_ just use the injection _IObservable<T>_
             // {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()

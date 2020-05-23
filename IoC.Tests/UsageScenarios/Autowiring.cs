@@ -9,8 +9,8 @@
         public void Run()
         {
             // $visible=true
-            // $tag=binding
-            // $priority=00
+            // $tag=basic
+            // $priority=01
             // $description=Autowiring
             // $header=Auto-writing is most natural way to use containers. At first step we should create a container. At the second step we bind interfaces to their implementations. After that the container is ready to resolve dependencies.
             // {
@@ -24,7 +24,7 @@
             // Resolve an instance of interface `IService`
             var instance = container.Resolve<IService>();
             // }
-            // Check the instance's type
+            // Check the instance
             instance.ShouldBeOfType<Service>();
         }
     }

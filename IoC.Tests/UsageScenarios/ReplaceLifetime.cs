@@ -12,16 +12,15 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=customization
-        // $priority=00
-        // $description=Replace Lifetime
+        // $tag=advanced
+        // $priority=10
+        // $description=Replace a lifetime
         // $header=Is it possible to replace default lifetimes by your own. The sample below shows how to count the number of attempts to resolve [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instances.
         // {
         public void Run()
         {
             var counter = new Mock<ICounter>();
 
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<ICounter>().To(ctx => counter.Object)

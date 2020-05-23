@@ -11,12 +11,11 @@
         public void Run()
         {
             // $visible=true
-            // $tag=binding
-            // $priority=02
-            // $description=Dependency Tag
+            // $tag=basic
+            // $priority=04
+            // $description=Dependency tag
             // $header=Use a _tag_ to inject specific dependency from several bindings of the same types.
             // {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().Tag("MyDep").To<Dependency>()
@@ -27,7 +26,7 @@
             // Resolve an instance
             var instance = container.Resolve<IService>();
             // }
-            // Check the instance's type
+            // Check the instance
             instance.ShouldBeOfType<Service>();
         }
     }

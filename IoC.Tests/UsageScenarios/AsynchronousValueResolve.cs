@@ -14,12 +14,11 @@ namespace IoC.Tests.UsageScenarios
         public async void Run()
         {
             // $visible=true
-            // $tag=async
-            // $priority=02
-            // $description=Pseudo asynchronous resolve
-            // $header=Pseudo asynchronous resolve. Why load a GC when we can resolve an instance right now? In this scenario ValueTask just wrap a resolved instance.
+            // $tag=basic
+            // $priority=05
+            // $description=ValueTask
+            // $header=In this scenario ValueTask is just wrapping a resolved instance.
             // {
-            // Create a container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
@@ -30,7 +29,7 @@ namespace IoC.Tests.UsageScenarios
             // Resolve an instance asynchronously via ValueTask
             var instance = await container.Resolve<ValueTask<IService>>();
             // }
-            // Check the instance's type
+            // Check the instance
             instance.ShouldBeOfType<Service>();
         }
     }

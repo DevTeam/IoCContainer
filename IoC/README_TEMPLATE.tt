@@ -93,11 +93,9 @@
     foreach(var group in infos.Where(info => info["visible"] == "true").GroupBy(i => i["tag"]))
     {
         var groupName = group.Key;
-        groupName = groupName.Replace("binding", "Flexible Binding");
-        groupName = groupName.Replace("async", "Asynchronous");
-        groupName = groupName.Replace("injection", "Powerful Injection");
-        groupName = groupName.Replace("customization", "Fully Customizable");
-        groupName = groupName.Replace("samples", "Other Samples");
+        groupName = groupName.Replace("basic", "Basic");
+        groupName = groupName.Replace("advanced", "Advanced");
+        groupName = groupName.Replace("samples", "Samples");
     #>- <#=groupName#>
 <#
         foreach(var info in group.OrderBy(i => i["priority"]))

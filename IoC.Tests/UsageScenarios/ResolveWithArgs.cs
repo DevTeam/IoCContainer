@@ -10,11 +10,10 @@
         public void Run()
         {
             // $visible=true
-            // $tag=injection
-            // $priority=05
-            // $description=Resolve Using Arguments
+            // $tag=basic
+            // $priority=06
+            // $description=Resolve using arguments
             // {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
@@ -41,7 +40,6 @@
 
             // Check the injected dependency
             otherInstance.Name.ShouldBe("beta");
-
             // }
         }
     }

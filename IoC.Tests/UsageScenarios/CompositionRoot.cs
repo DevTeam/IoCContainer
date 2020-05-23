@@ -18,8 +18,8 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=injection
-        // $priority=01
+        // $tag=basic
+        // $priority=00
         // $description=Composition Root
         // {
         public void Run()

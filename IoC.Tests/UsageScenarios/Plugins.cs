@@ -9,8 +9,8 @@
     {
         [Fact]
         // $visible=true
-        // $tag=binding
-        // $priority=02
+        // $tag=samples
+        // $priority=00
         // $description=Plugins
         // {
         public void Run()

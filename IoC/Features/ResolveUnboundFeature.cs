@@ -9,9 +9,9 @@
     using Issues;
 
     /// <summary>
-    /// Allows to resolve unregistered dependencies.
+    /// Allows to resolve unbound dependencies.
     /// </summary>
-    public class ResolveUnregisteredImplementationsFeature:
+    public class ResolveUnboundFeature:
         IConfiguration,
         IDisposable,
         IEnumerable<Key>,
@@ -27,7 +27,7 @@
         /// <summary>
         /// Creates an instance of feature.
         /// </summary>
-        public ResolveUnregisteredImplementationsFeature()
+        public ResolveUnboundFeature()
             : this(true)
         {
         }
@@ -37,7 +37,7 @@
         /// </summary>
         /// <param name="supportDefaults"><c>True</c> to resolve default(T) for unresolved value types.</param>
         /// <param name="autowiringStrategy">The autowiring strategy.</param>
-        public ResolveUnregisteredImplementationsFeature(bool supportDefaults, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
+        public ResolveUnboundFeature(bool supportDefaults, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             _supportDefaults = supportDefaults;
             _autowiringStrategy = autowiringStrategy;

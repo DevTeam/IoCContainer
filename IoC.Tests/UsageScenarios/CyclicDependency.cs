@@ -15,7 +15,8 @@ namespace IoC.Tests.UsageScenarios
         // $visible=true
         // $tag=samples
         // $priority=00
-        // $description=Cyclic Dependency
+        // $description=Cyclic dependency
+        // $header=By default, a circular dependency is detected after the 256th recursive resolution. This behaviour may be changed by overriding the interface _IFoundCyclicDependency_.
         // {
         public void Run()
         {
@@ -24,7 +25,6 @@ namespace IoC.Tests.UsageScenarios
             // Throws the exception for reentrancy 128
             foundCyclicDependency.Setup(i => i.Resolve(It.Is<IBuildContext>(ctx => ctx.Depth == 128))).Throws(expectedException);
 
-            // Create the container
             using var container = Container
                 .Create()
                 .Bind<IFoundCyclicDependency>().To(ctx => foundCyclicDependency.Object)
@@ -48,9 +48,7 @@ namespace IoC.Tests.UsageScenarios
             }
         }
 
-        public interface ILink
-        {
-        }
+        public interface ILink { }
 
         public class Link : ILink
         {

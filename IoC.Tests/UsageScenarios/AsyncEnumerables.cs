@@ -13,12 +13,11 @@ namespace IoC.Tests.UsageScenarios
         public async ValueTask Run()
         {
             // $visible=true
-            // $tag=async
+            // $tag=basic
             // $priority=05
-            // $description=Resolve instances via IAsyncEnumerable
+            // $description=AsyncEnumerable
             // $header=It is easy to resolve an enumerator [IAsyncEnumerable<>](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1) that provides asynchronous iteration over values of a type for every tags.
             // {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Using(CollectionFeature.Set)
@@ -42,7 +41,7 @@ namespace IoC.Tests.UsageScenarios
             items.Count.ShouldBe(4);
 
             // }
-            // Check the instances' type
+            // Check instances
             items.ForEach(instance => instance.ShouldBeOfType<Service>());
         }
     }

@@ -10,10 +10,10 @@
         public void Run()
         {
             // $visible=true
-            // $tag=binding
+            // $tag=basic
             // $priority=05
-            // $description=Func With Arguments
-            // $header=It is easy to use Func<> with arguments and to pass these arguments to the created instances.
+            // $description=Func with arguments
+            // $header=It is easy to use Func<T> with arguments and to pass these arguments to the created instances.
             // {
             Func<IDependency, string, INamedService> func = 
                 (dependency, name) => new NamedService(dependency, name);

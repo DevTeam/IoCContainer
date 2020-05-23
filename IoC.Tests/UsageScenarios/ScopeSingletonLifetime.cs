@@ -10,12 +10,11 @@
         public void Run()
         {
             // $visible=true
-            // $tag=binding
+            // $tag=basic
             // $priority=03
             // $description=Scope Singleton lifetime
             // $header=Each scope has its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding. Scopes can be created, activated and deactivated. Scope can be injected like any other instance from container.
             // {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().As(ScopeSingleton).To<Dependency>()
@@ -76,7 +75,6 @@
                     transientInstance3.Dependency.ShouldNotBe(transientInstance1.Dependency);
                 }
             }
-
             // }
         }
     }

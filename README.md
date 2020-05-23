@@ -304,389 +304,86 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
 
 ## Usage Scenarios
 
-- Powerful Injection
+- Basic
   - [Composition Root](#composition-root-)
-  - [Resolve Func](#resolve-func-)
-  - [Simple Wrapper](#simple-wrapper-)
-  - [Resolve Lazy](#resolve-lazy-)
-  - [Resolve ThreadLocal](#resolve-threadlocal-)
-  - [Resolve Tuple](#resolve-tuple-)
-  - [Resolve Unregistered Implementations](#resolve-unregistered-implementations-)
-  - [Resolve ValueTuple](#resolve-valuetuple-)
-  - [Method Injection](#method-injection-)
-  - [Nullable Value Type Resolving](#nullable-value-type-resolving-)
-  - [Property Injection](#property-injection-)
-  - [Constructor Autowiring](#constructor-autowiring-)
-  - [Containers Injection](#containers-injection-)
-  - [Resolve instances as Array](#resolve-instances-as-array-)
-  - [Resolve instances as ICollection](#resolve-instances-as-icollection-)
-  - [Resolve instances as IEnumerable](#resolve-instances-as-ienumerable-)
-  - [Resolve instances as IObservable source](#resolve-instances-as-iobservable-source-)
-  - [Resolve Using Arguments](#resolve-using-arguments-)
-  - [Resolve all appropriate instances as ISet](#resolve-all-appropriate-instances-as-iset-)
-- Flexible Binding
   - [Autowiring](#autowiring-)
-  - [Autowiring with initialization](#autowiring-with-initialization-)
-  - [Configuration class](#configuration-class-)
-  - [Generic Autowiring](#generic-autowiring-)
   - [Bindings](#bindings-)
-  - [Change configuration on-the-fly](#change-configuration-on-the-fly-)
-  - [Constant](#constant-)
+  - [Constant dependency](#constant-dependency-)
   - [Generics](#generics-)
-  - [Several Contracts](#several-contracts-)
-  - [Tags](#tags-)
-  - [Value](#value-)
-  - [Dependency Tag](#dependency-tag-)
-  - [Plugins](#plugins-)
-  - [Singleton lifetime](#singleton-lifetime-)
-  - [Child Container](#child-container-)
-  - [Container Singleton lifetime](#container-singleton-lifetime-)
-  - [Scope Singleton lifetime](#scope-singleton-lifetime-)
-  - [Thread Singleton Lifetime](#thread-singleton-lifetime-)
-  - [Manual Wiring](#manual-wiring-)
-  - [Struct](#struct-)
-  - [Func](#func-)
-  - [Func With Arguments](#func-with-arguments-)
-  - [Auto dispose a singleton during owning container's dispose](#auto-dispose-a-singleton-during-owning-containers-dispose-)
-  - [Default Parameters Injection](#default-parameters-injection-)
-  - [Optional Injection](#optional-injection-)
-  - [Tracing](#tracing-)
-  - [Validation](#validation-)
-  - [Aspect Oriented](#aspect-oriented-)
-- Asynchronous
-  - [Asynchronous resolve](#asynchronous-resolve-)
-  - [Pseudo asynchronous resolve](#pseudo-asynchronous-resolve-)
-  - [Asynchronous construction](#asynchronous-construction-)
-  - [Cancellation of asynchronous construction](#cancellation-of-asynchronous-construction-)
-  - [Resolve instances via IAsyncEnumerable](#resolve-instances-via-iasyncenumerable-)
-- Fully Customizable
-  - [Custom Builder](#custom-builder-)
-  - [Custom Child Container](#custom-child-container-)
-  - [Custom Lifetime](#custom-lifetime-)
-  - [Custom Tasks](#custom-tasks-)
-  - [Interception](#interception-)
-  - [Override Autowiring Strategy](#override-autowiring-strategy-)
-  - [Replace Lifetime](#replace-lifetime-)
-- Other Samples
-  - [Cyclic Dependency](#cyclic-dependency-)
-  - [Generator](#generator-)
-  - [Instant Messenger](#instant-messenger-)
   - [Wrapper](#wrapper-)
-
-### Asynchronous resolve [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousResolve.cs)
-
-Do you want to resolve instances asynchronously? It's simple ...
-
-``` CSharp
-// Create the container and configure it
-using var container = Container.Create()
-    // Bind some dependency
-    .Bind<IDependency>().To<Dependency>()
-    .Bind<IService>().To<Service>()
-    // Override _TaskScheduler if it is required, TaskScheduler.Current will be used by default
-    .Bind<TaskScheduler>().To(ctx => TaskScheduler.Default)
-    .Container;
-
-// Resolve an instance asynchronously
-var instance = await container.Resolve<Task<IService>>();
-```
-
-
-
-### Pseudo asynchronous resolve [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousValueResolve.cs)
-
-Pseudo asynchronous resolve. Why load a GC when we can resolve an instance right now? In this scenario ValueTask just wrap a resolved instance.
-
-``` CSharp
-// Create a container
-using var container = Container
-    .Create()
-    .Bind<IDependency>().To<Dependency>()
-    // Bind Service
-    .Bind<IService>().To<Service>()
-    .Container;
-
-// Resolve an instance asynchronously via ValueTask
-var instance = await container.Resolve<ValueTask<IService>>();
-```
-
-
-
-### Asynchronous construction [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousConstruction.cs)
-
-It is easy to inject dependencies in asynchronous style.
-
-``` CSharp
-public async void Run()
-{
-    // Create the container and configure it
-    using var container = Container.Create()
-        // Bind some dependency
-        .Bind<IDependency>().To<SomeDependency>()
-        .Bind<Consumer>().To<Consumer>()
-        .Container;
-
-    // Resolve an instance asynchronously using TaskScheduler.Current
-    var instance = await container.Resolve<Task<Consumer>>();
-
-    // Check the instance's type
-    instance.ShouldBeOfType<Consumer>();
-}
-
-public class SomeDependency: IDependency
-{
-    // Time-consuming logic constructor
-    public SomeDependency() { }
-}
-
-public class Consumer
-{
-    public Consumer(Task<IDependency> dependency1, Task<IDependency> dependency2)
-    {
-        // Time-consuming logic
-        var dep1 = dependency1.Result;
-        var dep2 = dependency2.Result;
-    }
-}
-```
-
-
-
-### Cancellation of asynchronous construction [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousConstructionCancellation.cs)
-
-It is possible to inject dependencies in asynchronous style and to cancel their creations using default _CancellationTokenSource_.
-
-``` CSharp
-public void Run()
-{
-    // Create a cancellation token source
-    var cancellationTokenSource = new CancellationTokenSource();
-
-    // Create the container and configure it
-    using var container = Container.Create()
-        // Bind cancellation token source
-        .Bind<CancellationTokenSource>().To(ctx => cancellationTokenSource)
-        // Bind cancellation token
-        .Bind<CancellationToken>().To(ctx => ctx.Container.Inject<CancellationTokenSource>().Token)
-        // Bind some dependency
-        .Bind<IDependency>().To<SomeDependency>()
-        .Bind<Consumer>().To<Consumer>()
-        .Container;
-
-    // Resolve an instance asynchronously
-    var instanceTask = container.Resolve<Task<Consumer>>();
-
-    // Cancel tasks
-    cancellationTokenSource.Cancel();
-
-    // Get an instance
-    instanceTask.Result.ShouldBeOfType<Consumer>();
-}
-
-public class SomeDependency: IDependency
-{
-    // Time-consuming logic constructor with cancellation token
-    public SomeDependency(CancellationToken cancellationToken)
-    {
-        while (!cancellationToken.IsCancellationRequested) { }
-    }
-}
-
-public class Consumer
-{
-    public Consumer(Task<IDependency> dependency1, Task<IDependency> dependency2)
-    {
-        // Time-consuming logic
-        var dep1 = dependency1.Result;
-        var dep2 = dependency2.Result;
-    }
-}
-```
-
-
-
-### Resolve instances via IAsyncEnumerable [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsyncEnumerables.cs)
-
-It is easy to resolve an enumerator [IAsyncEnumerable<>](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1) that provides asynchronous iteration over values of a type for every tags.
-
-``` CSharp
-// Create and configure the container
-using var container = Container
-    .Create()
-    .Using(CollectionFeature.Set)
-    .Bind<IDependency>().To<Dependency>()
-    // Bind to the default implementation
-    .Bind<IService>().To<Service>()
-    // Bind to the implementation #1
-    .Bind<IService>().Tag(1).To<Service>()
-    // Bind to the implementation #2
-    .Bind<IService>().Tag(2).Tag("abc").To<Service>()
-    // Bind to the implementation #3
-    .Bind<IService>().Tag(3).To<Service>()
-    .Container;
-
-// Resolve all appropriate instances
-var instances = container.Resolve<IAsyncEnumerable<IService>>();
-var items = new List<IService>();
-await foreach (var instance in instances) { items.Add(instance); }
-
-// Check the number of resolved instances
-items.Count.ShouldBe(4);
-
-```
-
-
-
-### Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Autowiring.cs)
-
-Auto-writing is most natural way to use containers. At first step we should create a container. At the second step we bind interfaces to their implementations. After that the container is ready to resolve dependencies.
-
-``` CSharp
-// Create the container and configure it, using full autowiring
-using var container = Container
-    .Create()
-    .Bind<IDependency>().To<Dependency>()
-    .Bind<IService>().To<Service>()
-    .Container;
-
-// Resolve an instance of interface `IService`
-var instance = container.Resolve<IService>();
-```
-
-
-
-### Autowiring with initialization [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoWiringWithInitialization.cs)
-
-Sometimes instances required some actions before you give them to use - some methods of initialization or fields which should be defined. You can solve these things easy.
-
-``` CSharp
-// Create the container and configure it using full autowiring
-using var container = Container
-    .Create()
-    .Bind<IDependency>().To<Dependency>()
-    .Bind<INamedService>().To<InitializingNamedService>(
-        // Configure the container to invoke method "Initialize" for every created instance of this type
-        ctx => ctx.It.Initialize("initialized !!!", ctx.Container.Resolve<IDependency>()))
-    .Container;
-
-// Resolve an instance of interface `IService`
-var instance = container.Resolve<INamedService>();
-
-// Check the instance's type
-instance.ShouldBeOfType<InitializingNamedService>();
-
-// Check the initialization is ok
-instance.Name.ShouldBe("initialized !!!");
-```
-
-:warning: It is not recommended because of it is a cause of hidden dependencies.
-
-### Configuration class [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConfigurationClass.cs)
-
-Configuration classes are used to dedicate a logic responsible for configuring containers.
-
-``` CSharp
-public void Run()
-{
-    // Create and configure the container
-    using var container = Container.Create().Using<Glue>();
-    // Resolve an instance
-    var instance = container.Resolve<IService>();
-}
-
-public class Glue : IConfiguration
-{
-    public IEnumerable<IToken> Apply(IMutableContainer container)
-    {
-        // Bind using full autowiring
-        yield return container
-            .Bind<IDependency>().To<Dependency>()
-            .Bind<IService>().To<Service>();
-    }
-}
-```
-
-
-
-### Generic Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GenericAutowiring.cs)
-
-Autowiring of generic types as simple as autowiring of other simple types. Just use a generic parameters markers like _TT_, _TT1_, _TT2_ and etc. or TTI, TTI1, TTI2 ... for interfaces or TTS, TTS1, TTS2 ... for value types or other special markers like TTDisposable, TTDisposable1 and etc. TTList<>, TTDictionary<> ... or create your own generic parameters markers or bind open generic types.
-
-``` CSharp
-public void Run()
-{
-    // Create and configure the container using autowiring
-    using var container = Container
-        .Create()
-        .Bind<IDependency>().To<Dependency>()
-        // Bind using the predefined generic parameters marker TT (or TT1, TT2, TT3 ...)
-        .Bind<IService<TT>>().To<Service<TT>>()
-        // Bind using the predefined generic parameters marker TTList (or TTList1, TTList2 ...)
-        // Of other cases there are TTComparable, TTComparable<in T>, TTEquatable<T>, TTEnumerable<out T>, TTDictionary<TKey, TValue> and etc.
-        .Bind<IListService<TTList<int>>>().To<ListService<TTList<int>>>()
-        // Bind using the custom generic parameters marker TCustom
-        .Bind<IService<TTMy>>().Tag("custom marker").To<Service<TTMy>>()
-        // Bind using the open generic type
-        .Bind(typeof(IService<>)).Tag("open type").To(typeof(Service<>))
-        .Container;
-
-    // Resolve a generic instance
-    var listService = container.Resolve<IListService<IList<int>>>();
-    var instances = container.Resolve<ICollection<IService<int>>>();
-
-    instances.Count.ShouldBe(3);
-    // Check the instance's type
-    foreach (var instance in instances)
-    {
-        instance.ShouldBeOfType<Service<int>>();
-    }
-
-    listService.ShouldBeOfType<ListService<IList<int>>>();
-}
-
-// Custom generic type marker using predefined attribute `GenericTypeArgument`
-[GenericTypeArgument]
-class TTMy { }
-```
-
-
-
-### Bindings [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Bindings.cs)
-
-It is possible to bind any number of types.
-
-``` CSharp
-// Create and configure the container
-using var container = Container
-    .Create()
-    .Bind<IDependency>().To<Dependency>()
-    // Bind using several tags
-    .Bind<IService>().Bind<IAnotherService>().Tag("abc").To<Service>()
-    .Container;
-
-// Resolve instances using tags
-var instance1 = container.Resolve<IService>("abc".AsTag());
-var instance2 = container.Resolve<IAnotherService>("abc".AsTag());
-
-```
-
-
+  - [Tags](#tags-)
+  - [Several contracts](#several-contracts-)
+  - [Autowiring with initialization](#autowiring-with-initialization-)
+  - [Child container](#child-container-)
+  - [Container Singleton lifetime](#container-singleton-lifetime-)
+  - [Expression binding](#expression-binding-)
+  - [Method injection](#method-injection-)
+  - [Nullable value type](#nullable-value-type-)
+  - [Property injection](#property-injection-)
+  - [Scope Singleton lifetime](#scope-singleton-lifetime-)
+  - [Singleton lifetime](#singleton-lifetime-)
+  - [Dependency tag](#dependency-tag-)
+  - [Func](#func-)
+  - [Manual wiring](#manual-wiring-)
+  - [Array](#array-)
+  - [AsyncEnumerable](#asyncenumerable-)
+  - [ValueTask](#valuetask-)
+  - [Collection](#collection-)
+  - [Enumerable](#enumerable-)
+  - [Func dependency](#func-dependency-)
+  - [Func with arguments](#func-with-arguments-)
+  - [Lazy](#lazy-)
+  - [Observable](#observable-)
+  - [Set](#set-)
+  - [Struct](#struct-)
+  - [ThreadLocal](#threadlocal-)
+  - [Tuple](#tuple-)
+  - [ValueTuple](#valuetuple-)
+  - [Configuration](#configuration-)
+  - [Injection of default parameters](#injection-of-default-parameters-)
+  - [Generic autowiring](#generic-autowiring-)
+  - [Optional injection](#optional-injection-)
+  - [Resolve using arguments](#resolve-using-arguments-)
+  - [Auto Disposing](#auto-disposing-)
+  - [Aspect Oriented](#aspect-oriented-)
+- Advanced
+  - [Change configuration on-the-fly](#change-configuration-on-the-fly-)
+  - [Resolve unbound implementations](#resolve-unbound-implementations-)
+  - [Thread Singleton lifetime](#thread-singleton-lifetime-)
+  - [Constructor choice](#constructor-choice-)
+  - [Containers injection](#containers-injection-)
+  - [Asynchronous construction](#asynchronous-construction-)
+  - [Override a task scheduler](#override-a-task-scheduler-)
+  - [Tracing](#tracing-)
+  - [Check a binding](#check-a-binding-)
+  - [Check for possible resolving](#check-for-possible-resolving-)
+  - [Cancellation of asynchronous construction](#cancellation-of-asynchronous-construction-)
+  - [Custom builder](#custom-builder-)
+  - [Custom child container](#custom-child-container-)
+  - [Custom lifetime](#custom-lifetime-)
+  - [Interception](#interception-)
+  - [Custom autowiring strategy](#custom-autowiring-strategy-)
+  - [Replace a lifetime](#replace-a-lifetime-)
+- Samples
+  - [Cyclic dependency](#cyclic-dependency-)
+  - [Plugins](#plugins-)
+  - [Generator sample](#generator-sample-)
+  - [Wrapper sample](#wrapper-sample-)
+  - [Instant Messenger sample](#instant-messenger-sample-)
 
 ### Change configuration on-the-fly [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ChangeConfigurationOnTheFly.cs)
 
 
 
 ``` CSharp
-using var container = Container.Create();
-var dependencyBindingToken = container.Bind<IDependency>().To<Dependency>();
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    .Container;
 
 // Configure `IService` as Transient
 using (container.Bind<IService>().To<Service>())
 {
-    // Check binding state for IService
-    container.IsBound<IService>().ShouldBeTrue();
-    container.CanResolve<IService>().ShouldBeTrue();
-
     // Resolve instances
     var instance1 = container.Resolve<IService>();
     var instance2 = container.Resolve<IService>();
@@ -694,10 +391,6 @@ using (container.Bind<IService>().To<Service>())
     // Check that instances are not equal
     instance1.ShouldNotBe(instance2);
 }
-
-// Check binding state for IService
-container.IsBound<IService>().ShouldBeFalse();
-container.CanResolve<IService>().ShouldBeFalse();
 
 // Reconfigure `IService` as Singleton
 using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
@@ -708,367 +401,42 @@ using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
 
     // Check that instances are equal
     instance1.ShouldBe(instance2);
-
-    // Unbind IDependency
-    dependencyBindingToken.Dispose();
-
-    // Check binding state for IService
-    container.IsBound<IService>().ShouldBeTrue();
-    container.CanResolve<IService>().ShouldBeFalse();
 }
-
-container.IsBound<IService>().ShouldBeFalse();
-container.CanResolve<IService>().ShouldBeFalse();
 ```
 
 
 
-### Constant [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Constant.cs)
+### Resolve unbound implementations [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveUnregisteredImplementations.cs)
 
-It's obvious here.
-
-``` CSharp
-// Create and configure the container
-using var container = Container
-    .Create()
-    .Bind<int>().To(ctx => 10)
-    .Container;
-// Resolve an integer
-var val = container.Resolve<int>();
-// Check the value
-val.ShouldBe(10);
-```
-
-
-
-### Generics [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Generics.cs)
-
-Auto-writing of generic types via binding of open generic types or generic type markers are working the same way.
-
-``` CSharp
-// Create and configure the container
-using var container = Container
-    .Create()
-    .Bind<IDependency>().To<Dependency>()
-    // Bind open generic interface to open generic implementation
-    .Bind(typeof(IService<>)).To(typeof(Service<>))
-    // Or (it is working the same) just bind generic interface to generic implementation, using marker classes TT, TT1, TT2 and so on
-    .Bind<IService<TT>>().Tag("just generic").To<Service<TT>>()
-    .Container;
-
-// Resolve a generic instance using "open generic" binding
-var instance1 = container.Resolve<IService<int>>();
-
-// Resolve a generic instance using "just generic" binding
-var instance2 = container.Resolve<IService<string>>("just generic".AsTag());
-```
-
-
-
-### Several Contracts [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SeveralContracts.cs)
-
-It is possible to bind several types to single implementation.
-
-``` CSharp
-// Create and configure the container, using full autowiring
-using var container = Container
-    .Create()
-    .Bind<IDependency>().To<Dependency>()
-    .Bind<Service, IService, IAnotherService>().To<Service>()
-    .Container;
-
-// Resolve instances
-var instance1 = container.Resolve<IService>();
-var instance2 = container.Resolve<IAnotherService>();
-```
-
-
-
-### Tags [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Tags.cs)
-
-Tags are useful while binding to several implementations.
-
-``` CSharp
-// Create and configure the container
-using var container = Container
-    .Create()
-    .Bind<IDependency>().To<Dependency>()
-    // Bind using several tags
-    .Bind<IService>().Tag(10).Tag().Tag("abc").To<Service>()
-    .Container;
-
-// Resolve instances using tags
-var instance1 = container.Resolve<IService>("abc".AsTag());
-var instance2 = container.Resolve<IService>(10.AsTag());
-
-// Resolve the instance using the empty tag
-var instance3 = container.Resolve<IService>();
-```
-
-
-
-### Value [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Value.cs)
-
-In this case the specific type is binded to the manually created instance based on an expression tree. This dependency will be introduced as is, without any additional overhead like _lambda call_ or _type cast_.
-
-``` CSharp
-// Create and configure the container
-using var container = Container
-    .Create()
-    .Bind<IService>().To(ctx => new Service(new Dependency()))
-    .Container;
-
-// Resolve an instance
-var instance = container.Resolve<IService>();
-```
-
-
-
-### Dependency Tag [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/DependencyTag.cs)
-
-Use a _tag_ to inject specific dependency from several bindings of the same types.
-
-``` CSharp
-// Create and configure the container
-using var container = Container
-    .Create()
-    .Bind<IDependency>().Tag("MyDep").To<Dependency>()
-    // Configure autowiring and inject dependency tagged by "MyDep"
-    .Bind<IService>().To<Service>(ctx => new Service(ctx.Container.Inject<IDependency>("MyDep")))
-    .Container;
-
-// Resolve an instance
-var instance = container.Resolve<IService>();
-```
-
-
-
-### Plugins [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Plugins.cs)
-
-
+The feature _ResolveUnboundFeature_ allows you to resolve any implementation type from the container regardless of whether or not you specifically bound it.
 
 ``` CSharp
 public void Run()
 {
-    // Given
-    var pluginTypes = new[] { typeof(Plugin1), typeof(Plugin2), typeof(Plugin3) };
+    using var container = Container
+        .Create()
+        .Using<ResolveUnboundFeature>()
+        .Bind<IDependency>().To<Dependency>()
+        .Container;
 
-    using var container = Container.Create();
-    foreach (var pluginType in pluginTypes)
-    {
-        // Should ensure uniqueness of plugin
-        var uniquePluginId = pluginType;
-
-        // Bind several opened types by a tag which should ensure uniqueness of binding
-        container.Bind(typeof(IPlugin)).Tag(uniquePluginId).To(pluginType);
-    }
-
-    // When
-
-    // Resolve instances
-    var plugins = container.Resolve<IEnumerable<IPlugin>>();
-
-    // This also works when you cannot use a generic type like IEnumerable<IPlugin>
-    // var plugins = container.Resolve<IEnumerable<object>>(typeof(IEnumerable<>).MakeGenericType(typeof(IPlugin)));
-
-    // Then
-    var resolvedPluginTypes = plugins.Select(i => i.GetType()).ToList();
-
-    resolvedPluginTypes.Count.ShouldBe(3);
-
-    // We cannot rely on order here
-    resolvedPluginTypes.Contains(typeof(Plugin1)).ShouldBeTrue();
-    resolvedPluginTypes.Contains(typeof(Plugin2)).ShouldBeTrue();
-    resolvedPluginTypes.Contains(typeof(Plugin3)).ShouldBeTrue();
+    // Resolve an instance of unregistered type
+    container.Resolve<Service<int>>();
 }
 
-interface IPlugin { }
-
-class Plugin1 : IPlugin { }
-
-class Plugin2 : IPlugin { }
-
-class Plugin3 : IPlugin { }
-```
-
-
-
-### Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SingletonLifetime.cs)
-
-[Singleton](https://en.wikipedia.org/wiki/Singleton_pattern) is a design pattern which stands for having only one instance of some class during the whole application lifetime. The main complaint about Singleton is that it contradicts the Dependency Injection principle and thus hinders testability. It essentially acts as a global constant, and it is hard to substitute it with a test when needed. The _Singleton lifetime_ is indispensable in this case.
-
-``` CSharp
-// Create and configure the container
-using var container = Container
-    .Create()
-    .Bind<IDependency>().To<Dependency>()
-    // Use the Singleton lifetime
-    .Bind<IService>().As(Singleton).To<Service>()
-    .Container;
-
-// Resolve the singleton twice
-var parentInstance1 = container.Resolve<IService>();
-var parentInstance2 = container.Resolve<IService>();
-
-// Check that instances from the parent container are equal
-parentInstance1.ShouldBe(parentInstance2);
-
-// Create a child container
-using var childContainer = container.Create();
-// Resolve the singleton twice
-var childInstance1 = childContainer.Resolve<IService>();
-var childInstance2 = childContainer.Resolve<IService>();
-
-// Check that instances from the child container are equal
-childInstance1.ShouldBe(childInstance2);
-
-// Check that instances from different containers are equal
-parentInstance1.ShouldBe(childInstance1);
-
-```
-
-The lifetime could be:
-- _Transient_ - a new instance is creating each time (it's default lifetime)
-- [_Singleton_](https://en.wikipedia.org/wiki/Singleton_pattern) - single instance
-- _ContainerSingleton_ - singleton per container
-- _ScopeSingleton_ - singleton per scope
-
-### Child Container [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ChildContainer.cs)
-
-Child containers allow to override or just to add bindings of a parent containers without any influence on a parent containers. This is most useful when there are some base parent container(s). And these containers are shared between several components which have its own child containers based on common parent container(s) and have some additional bindings.
-
-``` CSharp
-// Create the parent container
-using var parentContainer = Container
-    .Create()
-    .Bind<IDependency>().To<Dependency>()
-    // Bind IService to Service
-    .Bind<IService>().To<Service>()
-    .Container;
-
-using var childContainer = parentContainer
-    .Create()
-    // Override binding of IService to Service<int>
-    .Bind<IService>().To<Service<int>>()
-    .Container;
-
-var instance1 = parentContainer.Resolve<IService>();
-var instance2 = childContainer.Resolve<IService>();
-
-childContainer.Parent.ShouldBe(parentContainer);
-instance1.ShouldBeOfType<Service>();
-instance2.ShouldBeOfType<Service<int>>();
-```
-
-
-
-### Container Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ContainerLifetime.cs)
-
-Each container may have its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding.
-
-``` CSharp
-// Create and configure the container
-using var container = Container
-    .Create()
-    .Bind<IDependency>().To<Dependency>()
-    // Use the Container Singleton lifetime
-    .Bind<IService>().As(ContainerSingleton).To<Service>()
-    .Container;
-
-// Resolve the container singleton twice
-var parentInstance1 = container.Resolve<IService>();
-var parentInstance2 = container.Resolve<IService>();
-
-// Check that instances from the parent container are equal
-parentInstance1.ShouldBe(parentInstance2);
-
-// Create a child container
-using var childContainer = container.Create();
-// Resolve the container singleton twice
-var childInstance1 = childContainer.Resolve<IService>();
-var childInstance2 = childContainer.Resolve<IService>();
-
-// Check that instances from the child container are equal
-childInstance1.ShouldBe(childInstance2);
-
-// Check that instances from different containers are not equal
-parentInstance1.ShouldNotBe(childInstance1);
-```
-
-
-
-### Scope Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ScopeSingletonLifetime.cs)
-
-Each scope has its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding. Scopes can be created, activated and deactivated. Scope can be injected like any other instance from container.
-
-``` CSharp
-// Create and configure the container
-using var container = Container
-    .Create()
-    .Bind<IDependency>().As(ScopeSingleton).To<Dependency>()
-    .Container;
-
-// Use the Scope Singleton lifetime for instance
-using (container.Bind<IService>().As(ScopeSingleton).To<Service>())
+class Service<T>
 {
-    // Resolve the default scope singleton twice
-    var defaultScopeInstance1 = container.Resolve<IService>();
-    var defaultScopeInstance2 = container.Resolve<IService>();
-
-    // Check that instances from the default scope are equal
-    defaultScopeInstance1.ShouldBe(defaultScopeInstance2);
-
-    // Using the scope #1
-    using var scope1 = container.CreateScope();
-    using (scope1.Activate())
-    {
-        var scopeInstance1 = container.Resolve<IService>();
-        var scopeInstance2 = container.Resolve<IService>();
-
-        // Check that instances from the scope #1 are equal
-        scopeInstance1.ShouldBe(scopeInstance2);
-
-        // Check that instances from different scopes are not equal
-        scopeInstance1.ShouldNotBe(defaultScopeInstance1);
-    }
-
-    // Default scope again
-    var defaultScopeInstance3 = container.Resolve<IService>();
-
-    // Check that instances from the default scope are equal
-    defaultScopeInstance3.ShouldBe(defaultScopeInstance1);
+    public Service(OtherService<T> otherService, IDependency dependency) { }
 }
 
-// Reconfigure the container to check dependencies only
-using (container.Bind<IService>().As(Transient).To<Service>())
+class OtherService<T>
 {
-    // Resolve transient instances
-    var transientInstance1 = container.Resolve<IService>();
-    var transientInstance2 = container.Resolve<IService>();
-
-    // Check that transient instances are not equal
-    transientInstance1.ShouldNotBe(transientInstance2);
-
-    // Check that dependencies from the default scope are equal
-    transientInstance1.Dependency.ShouldBe(transientInstance2.Dependency);
-
-    // Using the scope #1
-    using var scope2 = container.CreateScope();
-    using (scope2.Activate())
-    {
-        // Resolve a transient instance in scope #2
-        var transientInstance3 = container.Resolve<IService>();
-
-        // Check that dependencies from different scopes are not equal
-        transientInstance3.Dependency.ShouldNotBe(transientInstance1.Dependency);
-    }
+    public OtherService(T value) { }
 }
-
 ```
 
 
 
-### Thread Singleton Lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ThreadSingletonLifetime.cs)
+### Thread Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ThreadSingletonLifetime.cs)
 
 Sometimes it is useful to have a [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance per a thread (or more generally a singleton per something else). There is no special "lifetime" type in this framework to achieve this requirement, but it is quite easy create your own "lifetime" type for that using base type [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs).
 
@@ -1077,14 +445,13 @@ public void Run()
 {
     var finish = new ManualResetEvent(false);
 
-    // Create and configure the container
     using var container = Container
         .Create()
         .Bind<IDependency>().To<Dependency>()
         // Bind an interface to an implementation using the singleton per a thread lifetime
         .Bind<IService>().Lifetime(new ThreadLifetime()).To<Service>()
         .Container;
-    
+
     // Resolve the singleton twice
     var instance1 = container.Resolve<IService>();
     var instance2 = container.Resolve<IService>();
@@ -1134,243 +501,127 @@ public class ThreadLifetime : KeyBasedLifetime<int, object>
 
 
 
-### Manual Wiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ManualWiring.cs)
+### Constructor choice [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConstructorChoice.cs)
 
-In the case when the full control of creating an instance is required it is possible to do it in simple way without any performance impact.
+
 
 ``` CSharp
-// Create and configure the container using manual wiring
 using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
-    // Bind 'INamedService' to the instance creation and initialization, actually represented as an expression tree
-    .Bind<INamedService>().To<InitializingNamedService>(
-        // Select the constructor and inject the dependency into it
-        ctx => new InitializingNamedService(ctx.Container.Inject<IDependency>()),
-        // Configure the initializing method to invoke for the every created instance
-        ctx => ctx.It.Initialize("some name", ctx.Container.Inject<IDependency>()))
+    .Bind<IService>().To<Service>(
+        // Select the constructor and inject required dependencies
+        ctx => new Service(ctx.Container.Inject<IDependency>(), "some state"))
     .Container;
 
-// Resolve an instance
-var instance = container.Resolve<INamedService>();
-
-// Check the instance's type
-instance.ShouldBeOfType<InitializingNamedService>();
-
-// Check the injected dependency
-instance.Name.ShouldBe("some name");
-
-```
-
-It's important to note that injection is possible by several ways in the sample above. **The first one** is an expressions like `ctx.Container.Inject<IDependency>()`. It uses the injection context `ctx` to access to the current (or other parents) container and method `Inject` to inject a dependency. But actually this method has no implementation, it ust a marker and it every such method wil be replaced by expression which creates dependency in place without any additional invocations. **Another one way** is to use an expressions like `ctx.Resolve<IDependency>()`. It will access a container each time to resolve a dependency. That is, each time it will look for the necessary binding in the container and call the method to create an instance of the dependency type. **In summary: wherever possible, use the first approach like `ctx.Container.Inject<IDependency>()`.**
-
-### Struct [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Struct.cs)
-
-Value types are fully supported avoiding any boxing/unboxing or cast operations, so the performance does not suffer!
-
-``` CSharp
-public void Run()
-{
-    // Create and configure the container
-    using var container = Container
-        .Create()
-        .Bind<IDependency>().To<Dependency>()
-        // Register the tracing builder
-        .Bind<TracingBuilder, IBuilder>().As(Singleton).To<TracingBuilder>()
-        // Register a struct
-        .Bind<MyStruct>().To<MyStruct>()
-        .Container;
-
-    // Resolve an instance
-    var instance = container.Resolve<MyStruct>();
-
-    // Check the expression which was used to create an instances of MyStruct
-    var expressions = container.Resolve<TracingBuilder>().Expressions;
-    var structExpression = expressions[new Key(typeof(MyStruct))].ToString();
-    // The actual code is "new MyStruct(new Dependency())"!
-    structExpression.ShouldBe("new MyStruct(new Dependency())");
-    // Obvious there are no any superfluous operations like a `boxing`, `unboxing` or `cast`,
-    // just only what is really necessary to create an instance
-}
-
-public struct MyStruct
-{
-    public MyStruct(IDependency dependency) { }
-}
-
-// This builder saves expressions that used to create resolvers into a map
-public class TracingBuilder : IBuilder
-{
-    public readonly IDictionary<Key, Expression> Expressions = new Dictionary<Key, Expression>();
-
-    public Expression Build(IBuildContext context, Expression expression)
-    {
-        Expressions[context.Key] = expression;
-        return expression;
-    }
-}
-```
-
-
-
-### Func [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Func.cs)
-
-No comments. Everything is very simple!
-
-``` CSharp
-Func<IService> func = () => new Service(new Dependency());
-
-// Create and configure the container
-using var container = Container
-    .Create()
-    .Bind<IService>().To(ctx => func())
-    .Container;
-
-// Resolve an instance
 var instance = container.Resolve<IService>();
+
+// Check the injected constant
+instance.State.ShouldBe("some state");
 ```
 
 
 
-### Func With Arguments [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FuncWithArguments.cs)
+### Containers injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ContainersInjection.cs)
 
-It is easy to use Func<> with arguments and to pass these arguments to the created instances.
+:warning: Please avoid injecting containers in non-infrastructure code. Keep your general code in ignorance of a container.
 
 ``` CSharp
-Func<IDependency, string, INamedService> func = 
-    (dependency, name) => new NamedService(dependency, name);
+public void Run()
+{
+    using var currentContainer = Container
+        .Create("root")
+        .Bind<MyClass>().To<MyClass>()
+        .Container;
 
-// Create and configure the container, using full autowiring
-using var container = Container
-    .Create()
+    var instance = currentContainer.Resolve<MyClass>();
+    instance.CurrentContainer.ShouldBe(currentContainer);
+    instance.ChildContainer1.Parent.ShouldBe(currentContainer);
+    instance.ChildContainer2.Parent.ShouldBe(currentContainer);
+    instance.NamedChildContainer.Parent.ShouldBe(currentContainer);
+    instance.NamedChildContainer.ToString().ShouldBe("//root/Some name");
+}
+
+public class MyClass
+{
+    public MyClass(
+        IContainer currentContainer,
+        IMutableContainer newChildContainer,
+        Func<IMutableContainer> childContainerFactory,
+        Func<string, IMutableContainer> nameChildContainerFactory)
+    {
+        CurrentContainer = currentContainer;
+        ChildContainer1 = newChildContainer;
+        ChildContainer2 = childContainerFactory();
+        NamedChildContainer = nameChildContainerFactory("Some name");
+    }
+
+    public IContainer CurrentContainer { get; }
+
+    public IContainer ChildContainer1 { get; }
+
+    public IContainer ChildContainer2 { get; }
+
+    public IContainer NamedChildContainer { get; }
+}
+```
+
+
+
+### Asynchronous construction [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousConstruction.cs)
+
+It is easy to inject dependencies in asynchronous style.
+
+``` CSharp
+public async void Run()
+{
+    using var container = Container.Create()
+        // Bind some dependency
+        .Bind<IDependency>().To<SomeDependency>()
+        .Bind<Consumer>().To<Consumer>()
+        .Container;
+
+    // Resolve an instance asynchronously using the default task scheduler _TaskScheduler.Current_
+    var instance = await container.Resolve<Task<Consumer>>();
+
+    // Check the instance
+    instance.ShouldBeOfType<Consumer>();
+}
+
+public class SomeDependency: IDependency
+{
+    // Time-consuming logic constructor
+    public SomeDependency() { }
+}
+
+public class Consumer
+{
+    public Consumer(Task<IDependency> dependency1, Task<IDependency> dependency2)
+    {
+        // Time-consuming logic
+        var dep1 = dependency1.Result;
+        var dep2 = dependency2.Result;
+    }
+}
+```
+
+
+
+### Override a task scheduler [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/TaskSchedulerOverride.cs)
+
+_TaskScheduler.Current_ is used by default for an asynchronous construction, but it is easy to override it, binding abstract class _TaskScheduler_ to required implementation in a IoC container.
+
+``` CSharp
+using var container = Container.Create()
+    // Bind some dependency
     .Bind<IDependency>().To<Dependency>()
-    // Bind the constructor and inject argument[0] as the second parameter of type 'string'
-    .Bind<INamedService>().To(ctx => func(ctx.Container.Inject<IDependency>(), (string)ctx.Args[0]))
+    .Bind<IService>().To<Service>()
+    // Override _TaskScheduler if it is required, TaskScheduler.Current will be used by default
+    .Bind<TaskScheduler>().To(ctx => TaskScheduler.Default)
     .Container;
 
-// Resolve the instance passing the string "alpha" into the array of arguments
-var instance = container.Resolve<INamedService>("alpha");
-
-// Check the instance's type
-instance.ShouldBeOfType<NamedService>();
-
-// Check that argument "alpha" was used during the construction of an instance
-instance.Name.ShouldBe("alpha");
-
-// Resolve a function to create instance
-var getterFunc = container.Resolve<Func<string, INamedService>>();
-
-// Run this function and pass the string "beta" as argument
-var otherInstance = getterFunc("beta");
-
-// Check that argument "beta" was used during constructing an instance
-otherInstance.Name.ShouldBe("beta");
-```
-
-
-
-### Auto dispose a singleton during owning container's dispose [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoDisposeSingletonDuringContainersDispose.cs)
-
-A [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance it's a very special instance. If it implements the _IDisposable_ (or IAsyncDisposable) interface the _Sigleton_ lifetime take care about disposing this instance after disposing of the owning container (where this type was registered) or if after the binding cancelation.
-
-``` CSharp
-var disposableService = new Mock<IDisposableService>();
-
-// Create and configure the container
-using (
-    var container = Container
-    .Create()
-    .Bind<IService>().As(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object)
-    .Container)
-{
-    var disposableInstance = container.Resolve<IService>();
-}
-
-// Check the singleton was disposed after the container was disposed
-disposableService.Verify(i => i.Dispose(), Times.Once);
-disposableService.Verify(i => i.DisposeAsync(), Times.Once);
-```
-
-
-
-### Default Parameters Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/DefaultParamsInjection.cs)
-
-
-
-``` CSharp
-public void Run()
-{
-    // Create the container and configure it
-    using var container = Container.Create()
-        .Bind<IDependency>().To<Dependency>()
-        .Bind<IService>().To<SomeService>()
-        .Container;
-
-    // Resolve an instance
-    var instance = container.Resolve<IService>();
-
-    // Check the optional dependency
-    instance.State.ShouldBe("empty");
-}
-
-public class SomeService: IService
-{
-    // "state" dependency is not resolved here but it has the default value "empty"
-    public SomeService(IDependency dependency, string state = "empty")
-    {
-        Dependency = dependency;
-        State = state;
-    }
-
-    public IDependency Dependency { get; }
-
-    public string State { get; }
-}
-```
-
-
-
-### Optional Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/OptionalInjection.cs)
-
-
-
-``` CSharp
-public void Run()
-{
-    // Create the container and configure it
-    using var container = Container.Create()
-        .Bind<IDependency>().To<Dependency>()
-        .Bind<IService>().To<SomeService>(ctx => 
-            new SomeService(
-                ctx.Container.Inject<IDependency>(),
-                // injects default(string) if the dependency cannot be resolved
-                ctx.Container.TryInject<string>(),
-                // injects default(int) if the dependency cannot be resolved
-                ctx.Container.TryInject<int>(),
-                // injects int?, it has no value if the dependency cannot be resolved
-                ctx.Container.TryInjectValue<int>()))
-        .Container;
-
-    // Resolve an instance
-    var instance = container.Resolve<IService>();
-
-    // Check the optional dependency
-    instance.State.ShouldBe("empty,True,False");
-}
-
-public class SomeService: IService
-{
-    // "state" dependency is not resolved here but will be null value because it was injected optional
-    public SomeService(IDependency dependency, string state, int? val1, int? val2)
-    {
-        Dependency = dependency;
-        State = state ?? $"empty,{val1.HasValue},{val2.HasValue}";
-    }
-
-    public IDependency Dependency { get; }
-
-    public string State { get; }
-}
+// Resolve an instance asynchronously
+var instance = await container.Resolve<Task<IService>>();
 ```
 
 
@@ -1412,9 +663,29 @@ traceMessages.Count.ShouldBe(8);
 
 
 
-### Validation [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Validation.cs)
+### Check a binding [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ValidateBinding.cs)
 
-It is easy to validate any binding without actual creation of instances.
+It is easy to validate that binding is already exists.
+
+``` CSharp
+using var container = Container.Create();
+
+var isBound = container.IsBound<IService>();
+// _IService_ is not bound yet
+isBound.ShouldBeFalse();
+
+container.Bind<IService>().To<Service>();
+// _IService_ is already bound
+isBound = container.IsBound<IService>();
+
+isBound.ShouldBeTrue();
+```
+
+
+
+### Check for possible resolving [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ValidateResolving.cs)
+
+It is easy to validate without the actual operation.
 
 ``` CSharp
 // Create and configure the container
@@ -1423,141 +694,83 @@ using var container = Container
     .Bind<IService>().To<Service>()
     .Container;
 
-// Try getting a resolver of the interface `IService`
-// Also there is other method overload allowing to get the detailed error about issue why this instance cannot be resolved
-var canBeResolved = container.TryGetResolver<IService>(out _);
+var canResolve = container.CanResolve<IService>();
 
-// 'Service' has the mandatory dependency 'IDependency' in the constructor,
-// which was not registered and that is why it cannot be resolved
-canBeResolved.ShouldBeFalse();
+// _Service_ has the mandatory dependency _IDependency_ in the constructor,
+// which was not registered and that is why _IService_ cannot be resolved
+canResolve.ShouldBeFalse();
 
-// Add the required binding to fix the the issue above
+// Add the required binding for _Service_
 container.Bind<IDependency>().To<Dependency>();
 
-canBeResolved = container.TryGetResolver<IService>(out _);
+// Now it is possible to resolve _IService_
+canResolve = container.CanResolve<IService>();
 
 // Everything is ok now
-canBeResolved.ShouldBeTrue();
-
+canResolve.ShouldBeTrue();
 ```
 
 
 
-### Aspect Oriented [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AspectOrientedAutowiring.cs)
+### Cancellation of asynchronous construction [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousConstructionCancellation.cs)
 
-This framework has no special attributes to support aspect oriented autowiring because of a production code should not have references to these special attributes. But this code may contain these attributes by itself. And it is quite easy to use these attributes for aspect oriented autowiring, see the sample below.
+It is possible to inject dependencies in asynchronous style and to cancel their creations using default _CancellationTokenSource_.
 
 ``` CSharp
 public void Run()
 {
-    var console = new Mock<IConsole>();
+    // Create a cancellation token source
+    var cancellationTokenSource = new CancellationTokenSource();
 
-    // Creates an aspect oriented autowiring strategy based on some custom `DependencyAttribute`
-    var autowiringStrategy = AutowiringStrategies.AspectOriented()
-        .Type<TypeAttribute>(attribute => attribute.Type)
-        .Order<OrderAttribute>(attribute => attribute.Order)
-        .Tag<TagAttribute>(attribute => attribute.Tag);
+    using var container = Container.Create()
+        // Bind cancellation token source
+        .Bind<CancellationTokenSource>().To(ctx => cancellationTokenSource)
+        // Bind cancellation token
+        .Bind<CancellationToken>().To(ctx => ctx.Container.Inject<CancellationTokenSource>().Token)
+        // Bind some dependency
+        .Bind<IDependency>().To<SomeDependency>()
+        .Bind<Consumer>().To<Consumer>()
+        .Container;
 
-    // Create the root container
-    using (var rootContainer = Container.Create("root"))
-    // Configure the child container
+    // Resolve an instance asynchronously
+    var instanceTask = container.Resolve<Task<Consumer>>();
+
+    // Cancel tasks
+    cancellationTokenSource.Cancel();
+
+    // Get an instance
+    instanceTask.Result.ShouldBeOfType<Consumer>();
+}
+
+public class SomeDependency: IDependency
+{
+    // Time-consuming logic constructor with cancellation token
+    public SomeDependency(CancellationToken cancellationToken)
     {
-        using var childContainer = rootContainer
-            .Create("child")
-            // Configure the child container by the custom aspect oriented autowiring strategy
-            .Bind<IAutowiringStrategy>().To(ctx => autowiringStrategy)
-            // Configure the child container
-            .Bind<IConsole>().Tag("MyConsole").To(ctx => console.Object)
-            .Bind<Clock>().To<Clock>()
-            .Bind<string>().Tag("Prefix").To(ctx => "info")
-            .Bind<ILogger>().To<Logger>()
-            .Container;
-
-        // Create a logger
-        var logger = childContainer.Resolve<ILogger>();
-
-        // Log the message
-        logger.Log("Hello");
+        while (!cancellationToken.IsCancellationRequested) { }
     }
-
-    // Check the console output
-    console.Verify(i => i.WriteLine(It.IsRegex(".+ - info: Hello")));
 }
 
-// Represents the dependency attribute to specify `type` for injection.
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
-public class TypeAttribute : Attribute
+public class Consumer
 {
-    // The tag, which will be used during an injection
-    [NotNull] public readonly Type Type;
-
-    public TypeAttribute([NotNull] Type type) => Type = type;
-}
-
-// Represents the dependency attribute to specify `tag` for injection.
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
-public class TagAttribute : Attribute
-{
-    // The tag, which will be used during an injection
-    [NotNull] public readonly object Tag;
-
-    public TagAttribute([NotNull] object tag) => Tag = tag;
-}
-
-// Represents the dependency attribute to specify `order` for injection.
-[AttributeUsage(AttributeTargets.Method)]
-public class OrderAttribute : Attribute
-{
-    // The order to be used to invoke a method
-    public readonly int Order;
-
-    public OrderAttribute(int order) => Order = order;
-}
-
-public interface IConsole { void WriteLine(string text); }
-
-public interface IClock { DateTimeOffset Now { get; } }
-
-public interface ILogger { void Log(string message); }
-
-public class Logger : ILogger
-{
-    private readonly IConsole _console;
-    private IClock _clock;
-
-    // Constructor injection
-    public Logger([Tag("MyConsole")] IConsole console) => _console = console;
-
-    // Method injection
-    [Order(1)]
-    public void Initialize([Type(typeof(Clock))] IClock clock) => _clock = clock;
-
-    // Property injection
-    public string Prefix { get; [Tag("Prefix"), Order(2)] set; }
-
-    // Adds current time and prefix before a message and writes it to console
-    public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");
-}
-
-public class Clock : IClock
-{
-    // "clockName" dependency is not resolved here but has default value
-    public Clock([Type(typeof(string)), Tag("ClockName")] string clockName = "SPb") { }
-
-    public DateTimeOffset Now => DateTimeOffset.Now;
+    public Consumer(Task<IDependency> dependency1, Task<IDependency> dependency2)
+    {
+        // Time-consuming logic
+        var dep1 = dependency1.Result;
+        var dep2 = dependency2.Result;
+    }
 }
 ```
 
-Also you can specify your own aspect oriented autowiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
 
-### Custom Builder [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomBuilder.cs)
+
+### Custom builder [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomBuilder.cs)
 
 The sample below shows how to use this extension point [_IBuilder_](IoCContainer/blob/master/IoC/IBuilder.cs) to rewrite the expression tree of creation any instances to check constructor arguments on null. It is possible to create other own builders to make any manipulation on expression tree before they will be compiled into factories for the instances creation. Any logic any automation - checking arguments, logging, thread safety, authorization aspects and etc.
 
 ``` CSharp
 public void Run()
 {
-    // Create and configure the container
     using var container = Container
         .Create()
         .Bind<IDependency>().To<Dependency>()
@@ -1595,7 +808,7 @@ private class NotNullGuardBuilder : IBuilder
 
 
 
-### Custom Child Container [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomChildContainer.cs)
+### Custom child container [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomChildContainer.cs)
 
 You may replace the default implementation of container by your own. I can’t imagine why, but it’s possible!
 
@@ -1632,14 +845,13 @@ public class MyContainer: IMutableContainer
 
 
 
-### Custom Lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomLifetime.cs)
+### Custom lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomLifetime.cs)
 
 Custom lifetimes allow to implement your own logic controlling every aspects of resolved instances. Also you could use the class [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs) as a base for others.
 
 ``` CSharp
 public void Run()
 {
-    // Create and configure the container
     using var container = Container
         .Create()
         .Bind<IDependency>().To<Dependency>()
@@ -1679,80 +891,6 @@ public class MyTransientLifetime : ILifetime
 
 
 
-### Custom Tasks [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomTasks.cs)
-
-
-
-``` CSharp
-public async void Run()
-{
-    // Create the container and configure it
-    using var container = Container.Create()
-        .Using<CustomTasksFeature>()
-        // Bind some dependency
-        .Bind<IDependency>().To<SomeDependency>()
-        .Bind<Consumer>().To<Consumer>()
-        .Container;
-
-    // Resolve an instance asynchronously
-    var instance = await container.Resolve<Task<Consumer>>();
-
-    // Check the instance's type
-    instance.ShouldBeOfType<Consumer>();
-}
-
-internal class CustomTasksFeature: IConfiguration
-{
-    public IEnumerable<IToken> Apply(IMutableContainer container)
-    {
-        yield return container
-            // Bind cancellation token source
-            .Bind<CancellationTokenSource>().To<CancellationTokenSource>()
-            // Bind the class responsible for tasks creation
-            .Bind<TaskFactory<TT>>().As(Singleton).To<TaskFactory<TT>>()
-            // Bind the task factory for any tags
-            .Bind<Task<TT>>().Tag(Key.AnyTag).To(ctx => ctx.Container.Inject<TaskFactory<TT>>(ctx.Key.Tag).Create());
-    }
-
-    internal class TaskFactory<T>
-    {
-        private readonly Func<T> _factory;
-        private readonly CancellationTokenSource _cancellationTokenSource;
-
-        public TaskFactory(Func<T> factory, CancellationTokenSource cancellationTokenSource)
-        {
-            _factory = factory;
-            _cancellationTokenSource = cancellationTokenSource;
-        }
-
-        public Task<T> Create()
-        {
-            var task = new Task<T>(_factory, _cancellationTokenSource.Token, TaskCreationOptions.LongRunning);
-            task.Start(TaskScheduler.Default);
-            return task;
-        }
-    }
-}
-
-public class SomeDependency: IDependency
-{
-    // Time-consuming logic constructor
-    public SomeDependency() { }
-}
-
-public class Consumer
-{
-    public Consumer(Task<IDependency> dependency1, Task<IDependency> dependency2)
-    {
-        // Time-consuming logic
-        var dep1 = dependency1.Result;
-        var dep2 = dependency2.Result;
-    }
-}
-```
-
-
-
 ### Interception [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Interception.cs)
 
 The _Interception_ feature allows specify the set of bindings which will be used to produce instances wrapped by proxy objects. These proxy objects intercept any invocations to the created (or injected) instances and allows to add any logic around it: checking arguments, logging, thread safety, authorization aspects and etc.
@@ -1763,9 +901,8 @@ The _Interception_ feature allows specify the set of bindings which will be used
 public void Run()
 {
     var methods = new List<string>();
-    // Create and configure the container
     using var container = Container
-        // Creates an Inversion of Control container
+        // Creates the Inversion of Control container
         .Create()
         // Using the feature InterceptionFeature
         .Using<InterceptionFeature>()
@@ -1801,7 +938,7 @@ public class MyInterceptor : IInterceptor
 
 
 
-### Override Autowiring Strategy [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/OverrideAutowiringStrategy.cs)
+### Custom autowiring strategy [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/OverrideAutowiringStrategy.cs)
 
 
 
@@ -1860,7 +997,7 @@ class CustomAutowiringStrategy : IAutowiringStrategy
 
 
 
-### Replace Lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ReplaceLifetime.cs)
+### Replace a lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ReplaceLifetime.cs)
 
 Is it possible to replace default lifetimes by your own. The sample below shows how to count the number of attempts to resolve [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instances.
 
@@ -1869,7 +1006,6 @@ public void Run()
 {
     var counter = new Mock<ICounter>();
 
-    // Create and configure the container
     using var container = Container
         .Create()
         .Bind<ICounter>().To(ctx => counter.Object)
@@ -2008,29 +1144,85 @@ class Configuration: IConfiguration
 
 
 
-### Resolve Func [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveFunc.cs)
+### Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Autowiring.cs)
 
-_Func_ dependency helps when a logic needs to inject some number of type instances on demand.
+Auto-writing is most natural way to use containers. At first step we should create a container. At the second step we bind interfaces to their implementations. After that the container is ready to resolve dependencies.
 
 ``` CSharp
-// Create and configure the container
+// Create the container and configure it, using full autowiring
 using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
     .Bind<IService>().To<Service>()
     .Container;
 
-// Resolve function to create instances
-var factory = container.Resolve<Func<IService>>();
-
-// Resolve instances
-var instance1 = factory();
-var instance2 = factory();
+// Resolve an instance of interface `IService`
+var instance = container.Resolve<IService>();
 ```
 
 
 
-### Simple Wrapper [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SimpleWrapper.cs)
+### Bindings [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Bindings.cs)
+
+It is possible to bind any number of types.
+
+``` CSharp
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    // Bind using several tags
+    .Bind<IService>().Bind<IAnotherService>().Tag("abc").To<Service>()
+    .Container;
+
+// Resolve instances using tags
+var instance1 = container.Resolve<IService>("abc".AsTag());
+var instance2 = container.Resolve<IAnotherService>("abc".AsTag());
+
+```
+
+
+
+### Constant dependency [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConstantDependency.cs)
+
+It's obvious here.
+
+``` CSharp
+using var container = Container
+    .Create()
+    .Bind<int>().To(ctx => 10)
+    .Container;
+// Resolve an integer
+var val = container.Resolve<int>();
+// Check the value
+val.ShouldBe(10);
+```
+
+
+
+### Generics [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Generics.cs)
+
+Autowriting of generic types via binding of open generic types or generic type markers are working the same way.
+
+``` CSharp
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    // Bind open generic interface to open generic implementation
+    .Bind(typeof(IService<>)).To(typeof(Service<>))
+    // Or (it is working the same) just bind generic interface to generic implementation, using marker classes TT, TT1, TT2 and so on
+    .Bind<IService<TT>>().Tag("just generic").To<Service<TT>>()
+    .Container;
+
+// Resolve a generic instance using "open generic" binding
+var instance1 = container.Resolve<IService<int>>();
+
+// Resolve a generic instance using "just generic" binding
+var instance2 = container.Resolve<IService<string>>("just generic".AsTag());
+```
+
+
+
+### Wrapper [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SimpleWrapper.cs)
 
 
 
@@ -2071,120 +1263,151 @@ public class Wrapper : INamedService
 
 
 
-### Resolve Lazy [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveLazy.cs)
+### Tags [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Tags.cs)
 
-_Lazy_ dependency helps when a logic needs to inject some _lazy proxy_ to get instance once on demand.
+Tags are useful while binding to several implementations.
 
 ``` CSharp
-// Create and configure the container
 using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
-    .Bind<IService>().To<Service>()
+    // Bind using several tags
+    .Bind<IService>().Tag(10).Tag().Tag("abc").To<Service>()
     .Container;
 
-// Resolve the instance of Lazy<IService>
-var lazy = container.Resolve<Lazy<IService>>();
+// Resolve instances using tags
+var instance1 = container.Resolve<IService>("abc".AsTag());
+var instance2 = container.Resolve<IService>(10.AsTag());
 
-// Get the instance via Lazy
-var instance = lazy.Value;
+// Resolve the instance using the empty tag
+var instance3 = container.Resolve<IService>();
 ```
 
 
 
-### Resolve ThreadLocal [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveThreadLocal.cs)
+### Several contracts [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SeveralContracts.cs)
 
-
+It is possible to bind several types to single implementation.
 
 ``` CSharp
-// Create and configure the container
 using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
-    .Bind<IService>().To<Service>()
+    .Bind<Service, IService, IAnotherService>().To<Service>()
     .Container;
 
-// Resolve the instance of Lazy<IService>
-var lazy = container.Resolve<ThreadLocal<IService>>();
-
-// Get the instance via ThreadLocal
-var instance = lazy.Value;
+// Resolve instances
+var instance1 = container.Resolve<IService>();
+var instance2 = container.Resolve<IAnotherService>();
 ```
 
 
 
-### Resolve Tuple [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveTuple.cs)
+### Autowiring with initialization [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoWiringWithInitialization.cs)
 
-[Tuple](https://docs.microsoft.com/en-us/dotnet/api/system.tuple) has a specific number and sequence of elements which may be resolved from the box.
+Sometimes instances required some actions before you give them to use - some methods of initialization or fields which should be defined. You can solve these things easy.
 
 ``` CSharp
-// Create and configure the container
+// Create the container and configure it using full autowiring
 using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
-    .Bind<IService>().To<Service>()
-    .Bind<INamedService>().To<NamedService>(ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name"))
+    .Bind<INamedService>().To<InitializingNamedService>(
+        // Configure the container to invoke method "Initialize" for every created instance of this type
+        ctx => ctx.It.Initialize("initialized !!!", ctx.Container.Resolve<IDependency>()))
     .Container;
 
-// Resolve an instance of type Tuple<IService, INamedService>
-var tuple = container.Resolve<Tuple<IService, INamedService>>();
+// Resolve an instance of interface `IService`
+var instance = container.Resolve<INamedService>();
+
+// Check the instance
+instance.ShouldBeOfType<InitializingNamedService>();
+
+// Check the initialization is ok
+instance.Name.ShouldBe("initialized !!!");
+```
+
+:warning: It is not recommended because of it is a cause of hidden dependencies.
+
+### Child container [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ChildContainer.cs)
+
+Child containers allow to override or just to add bindings of a parent containers without any influence on a parent containers. This is most useful when there are some base parent container(s). And these containers are shared between several components which have its own child containers based on common parent container(s) and have some additional bindings.
+
+``` CSharp
+using var parentContainer = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    // Bind IService to Service
+    .Bind<IService>().To<Service>()
+    .Container;
+
+using var childContainer = parentContainer
+    .Create()
+    // Override binding of IService to Service<int>
+    .Bind<IService>().To<Service<int>>()
+    .Container;
+
+var instance1 = parentContainer.Resolve<IService>();
+var instance2 = childContainer.Resolve<IService>();
+
+childContainer.Parent.ShouldBe(parentContainer);
+instance1.ShouldBeOfType<Service>();
+instance2.ShouldBeOfType<Service<int>>();
 ```
 
 
 
-### Resolve Unregistered Implementations [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveUnregisteredImplementations.cs)
+### Container Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ContainerLifetime.cs)
 
-The feature _ResolveUnregisteredImplementationsFeature_ allows you to resolve any implementation type from the container regardless of whether or not you specifically registered it.
-
-``` CSharp
-public void Run()
-{
-    // Create and configure the container
-    using var container = Container
-        .Create()
-        .Using<ResolveUnregisteredImplementationsFeature>()
-        .Bind<IDependency>().To<Dependency>()
-        .Container;
-
-    // Resolve an instance of unregistered type
-    container.Resolve<Service<int>>();
-}
-
-class Service<T>
-{
-    public Service(OtherService<T> otherService, IDependency dependency) { }
-}
-
-class OtherService<T>
-{
-    public OtherService(T value) { }
-}
-```
-
-
-
-### Resolve ValueTuple [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveValueTuple.cs)
-
-
+Each container may have its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding.
 
 ``` CSharp
-// Create and configure the container
 using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
-    .Bind<IService>().To<Service>()
-    .Bind<INamedService>().To<NamedService>(ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name"))
+    // Use the Container Singleton lifetime
+    .Bind<IService>().As(ContainerSingleton).To<Service>()
     .Container;
-{
-    // Resolve an instance of type (IService service, INamedService namedService)
-    var valueTuple = container.Resolve<(IService service, INamedService namedService)>();
-}
 
+// Resolve the container singleton twice
+var parentInstance1 = container.Resolve<IService>();
+var parentInstance2 = container.Resolve<IService>();
+
+// Check that instances from the parent container are equal
+parentInstance1.ShouldBe(parentInstance2);
+
+// Create a child container
+using var childContainer = container.Create();
+// Resolve the container singleton twice
+var childInstance1 = childContainer.Resolve<IService>();
+var childInstance2 = childContainer.Resolve<IService>();
+
+// Check that instances from the child container are equal
+childInstance1.ShouldBe(childInstance2);
+
+// Check that instances from different containers are not equal
+parentInstance1.ShouldNotBe(childInstance1);
 ```
 
 
 
-### Method Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/MethodInjection.cs)
+### Expression binding [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ExpressionBinding.cs)
+
+In this case the specific type is bound to an expression tree. This dependency will be introduced as is, without any additional overhead like _lambda call_ or _type cast_.
+
+``` CSharp
+using var container = Container
+    .Create()
+    .Bind<IService>().To(ctx => new Service(new Dependency()))
+    .Container;
+
+// Resolve an instance
+var instance = container.Resolve<IService>();
+```
+
+
+
+### Method injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/MethodInjection.cs)
 
 :warning: Please try using the constructor injection instead. The method injection is not recommended because of it is a cause of hidden dependencies.
 
@@ -2220,17 +1443,15 @@ var otherInstance = func("beta");
 
 // Check the injected dependency
 otherInstance.Name.ShouldBe("beta");
-
 ```
 
 
 
-### Nullable Value Type Resolving [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/NullableValueTypeResolving.cs)
+### Nullable value type [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/NullableValueType.cs)
 
 
 
 ``` CSharp
-// Create the container and configure it
 using var container = Container.Create()
     .Bind<int>().Tag(1).To(ctx => 1)
     .Container;
@@ -2248,12 +1469,11 @@ val3.HasValue.ShouldBeFalse();
 
 
 
-### Property Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/PropertyInjection.cs)
+### Property injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/PropertyInjection.cs)
 
 :warning: Please try using the constructor injection instead. The property injection is not recommended because of it is a cause of hidden dependencies.
 
 ``` CSharp
-// Create and configure the container
 using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
@@ -2282,87 +1502,190 @@ var otherInstance = func("beta");
 
 // Check the injected dependency
 otherInstance.Name.ShouldBe("beta");
-
 ```
 
 
 
-### Constructor Autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ConstructorAutowiring.cs)
+### Scope Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ScopeSingletonLifetime.cs)
 
-
+Each scope has its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding. Scopes can be created, activated and deactivated. Scope can be injected like any other instance from container.
 
 ``` CSharp
-// Create and configure the container, using full autowiring
+using var container = Container
+    .Create()
+    .Bind<IDependency>().As(ScopeSingleton).To<Dependency>()
+    .Container;
+
+// Use the Scope Singleton lifetime for instance
+using (container.Bind<IService>().As(ScopeSingleton).To<Service>())
+{
+    // Resolve the default scope singleton twice
+    var defaultScopeInstance1 = container.Resolve<IService>();
+    var defaultScopeInstance2 = container.Resolve<IService>();
+
+    // Check that instances from the default scope are equal
+    defaultScopeInstance1.ShouldBe(defaultScopeInstance2);
+
+    // Using the scope #1
+    using var scope1 = container.CreateScope();
+    using (scope1.Activate())
+    {
+        var scopeInstance1 = container.Resolve<IService>();
+        var scopeInstance2 = container.Resolve<IService>();
+
+        // Check that instances from the scope #1 are equal
+        scopeInstance1.ShouldBe(scopeInstance2);
+
+        // Check that instances from different scopes are not equal
+        scopeInstance1.ShouldNotBe(defaultScopeInstance1);
+    }
+
+    // Default scope again
+    var defaultScopeInstance3 = container.Resolve<IService>();
+
+    // Check that instances from the default scope are equal
+    defaultScopeInstance3.ShouldBe(defaultScopeInstance1);
+}
+
+// Reconfigure the container to check dependencies only
+using (container.Bind<IService>().As(Transient).To<Service>())
+{
+    // Resolve transient instances
+    var transientInstance1 = container.Resolve<IService>();
+    var transientInstance2 = container.Resolve<IService>();
+
+    // Check that transient instances are not equal
+    transientInstance1.ShouldNotBe(transientInstance2);
+
+    // Check that dependencies from the default scope are equal
+    transientInstance1.Dependency.ShouldBe(transientInstance2.Dependency);
+
+    // Using the scope #1
+    using var scope2 = container.CreateScope();
+    using (scope2.Activate())
+    {
+        // Resolve a transient instance in scope #2
+        var transientInstance3 = container.Resolve<IService>();
+
+        // Check that dependencies from different scopes are not equal
+        transientInstance3.Dependency.ShouldNotBe(transientInstance1.Dependency);
+    }
+}
+```
+
+
+
+### Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SingletonLifetime.cs)
+
+[Singleton](https://en.wikipedia.org/wiki/Singleton_pattern) is a design pattern which stands for having only one instance of some class during the whole application lifetime. The main complaint about Singleton is that it contradicts the Dependency Injection principle and thus hinders testability. It essentially acts as a global constant, and it is hard to substitute it with a test when needed. The _Singleton lifetime_ is indispensable in this case.
+
+``` CSharp
 using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
-    // Configure via manual injection
-    .Bind<IService>().To<Service>(
-        // Select the constructor and inject arguments
-        ctx => new Service(ctx.Container.Inject<IDependency>(), "some state"))
+    // Use the Singleton lifetime
+    .Bind<IService>().As(Singleton).To<Service>()
     .Container;
+
+// Resolve the singleton twice
+var parentInstance1 = container.Resolve<IService>();
+var parentInstance2 = container.Resolve<IService>();
+
+// Check that instances from the parent container are equal
+parentInstance1.ShouldBe(parentInstance2);
+
+// Create a child container
+using var childContainer = container.Create();
+// Resolve the singleton twice
+var childInstance1 = childContainer.Resolve<IService>();
+var childInstance2 = childContainer.Resolve<IService>();
+
+// Check that instances from the child container are equal
+childInstance1.ShouldBe(childInstance2);
+
+// Check that instances from different containers are equal
+parentInstance1.ShouldBe(childInstance1);
+```
+
+The lifetime could be:
+- _Transient_ - a new instance is creating each time (it's default lifetime)
+- [_Singleton_](https://en.wikipedia.org/wiki/Singleton_pattern) - single instance
+- _ContainerSingleton_ - singleton per container
+- _ScopeSingleton_ - singleton per scope
+
+### Dependency tag [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/DependencyTag.cs)
+
+Use a _tag_ to inject specific dependency from several bindings of the same types.
+
+``` CSharp
+using var container = Container
+    .Create()
+    .Bind<IDependency>().Tag("MyDep").To<Dependency>()
+    // Configure autowiring and inject dependency tagged by "MyDep"
+    .Bind<IService>().To<Service>(ctx => new Service(ctx.Container.Inject<IDependency>("MyDep")))
+    .Container;
+
 // Resolve an instance
 var instance = container.Resolve<IService>();
-
-// Check the injected constant
-instance.State.ShouldBe("some state");
 ```
 
 
 
-### Containers Injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ContainersInjection.cs)
+### Func [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Func.cs)
 
-:warning: Please avoid injecting containers in non-infrastructure code. Keep your general code in ignorance of a container.
+_Func_ dependency helps when a logic needs to inject some number of type instances on demand.
 
 ``` CSharp
-public void Run()
-{
-    // Create the parent container
-    using var currentContainer = Container
-        .Create("root")
-        .Bind<MyClass>().To<MyClass>()
-        .Container;
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    .Bind<IService>().To<Service>()
+    .Container;
 
-    var instance = currentContainer.Resolve<MyClass>();
-    instance.CurrentContainer.ShouldBe(currentContainer);
-    instance.ChildContainer1.Parent.ShouldBe(currentContainer);
-    instance.ChildContainer2.Parent.ShouldBe(currentContainer);
-    instance.NamedChildContainer.Parent.ShouldBe(currentContainer);
-    instance.NamedChildContainer.ToString().ShouldBe("//root/Some name");
-}
+// Resolve function to create instances
+var factory = container.Resolve<Func<IService>>();
 
-public class MyClass
-{
-    public MyClass(
-        IContainer currentContainer,
-        IMutableContainer newChildContainer,
-        Func<IMutableContainer> childContainerFactory,
-        Func<string, IMutableContainer> nameChildContainerFactory)
-    {
-        CurrentContainer = currentContainer;
-        ChildContainer1 = newChildContainer;
-        ChildContainer2 = childContainerFactory();
-        NamedChildContainer = nameChildContainerFactory("Some name");
-    }
-
-    public IContainer CurrentContainer { get; }
-
-    public IContainer ChildContainer1 { get; }
-
-    public IContainer ChildContainer2 { get; }
-
-    public IContainer NamedChildContainer { get; }
-}
+// Resolve instances
+var instance1 = factory();
+var instance2 = factory();
 ```
 
 
 
-### Resolve instances as Array [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Array.cs)
+### Manual wiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ManualWiring.cs)
 
-
+In the case when the full control of creating an instance is required it is possible to do it in simple way without any performance impact.
 
 ``` CSharp
-// Create and configure the container
+// Create and configure the container using manual wiring
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    // Bind 'INamedService' to the instance creation and initialization, actually represented as an expression tree
+    .Bind<INamedService>().To<InitializingNamedService>(
+        // Select the constructor and inject the dependency into it
+        ctx => new InitializingNamedService(ctx.Container.Inject<IDependency>()),
+        // Configure the initializing method to invoke for the every created instance
+        ctx => ctx.It.Initialize("some name", ctx.Container.Inject<IDependency>()))
+    .Container;
+
+// Resolve an instance
+var instance = container.Resolve<INamedService>();
+
+// Check the instance
+instance.ShouldBeOfType<InitializingNamedService>();
+
+// Check the injected dependency
+instance.Name.ShouldBe("some name");
+```
+
+It's important to note that injection is possible by several ways in the sample above. **The first one** is an expressions like `ctx.Container.Inject<IDependency>()`. It uses the injection context `ctx` to access to the current (or other parents) container and method `Inject` to inject a dependency. But actually this method has no implementation, it ust a marker and it every such method wil be replaced by expression which creates dependency in place without any additional invocations. **Another one way** is to use an expressions like `ctx.Resolve<IDependency>()`. It will access a container each time to resolve a dependency. That is, each time it will look for the necessary binding in the container and call the method to create an instance of the dependency type. **In summary: wherever possible, use the first approach like `ctx.Container.Inject<IDependency>()`.**
+
+### Array [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Array.cs)
+
+To resolve all possible instances of any tags of the specific type as an _array_ just use the injection _T[]_
+
+``` CSharp
 using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
@@ -2380,12 +1703,60 @@ var instances = container.Resolve<IService[]>();
 
 
 
-### Resolve instances as ICollection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Collection.cs)
+### AsyncEnumerable [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsyncEnumerables.cs)
 
-
+It is easy to resolve an enumerator [IAsyncEnumerable<>](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1) that provides asynchronous iteration over values of a type for every tags.
 
 ``` CSharp
-// Create and configure the container
+using var container = Container
+    .Create()
+    .Using(CollectionFeature.Set)
+    .Bind<IDependency>().To<Dependency>()
+    // Bind to the default implementation
+    .Bind<IService>().To<Service>()
+    // Bind to the implementation #1
+    .Bind<IService>().Tag(1).To<Service>()
+    // Bind to the implementation #2
+    .Bind<IService>().Tag(2).Tag("abc").To<Service>()
+    // Bind to the implementation #3
+    .Bind<IService>().Tag(3).To<Service>()
+    .Container;
+
+// Resolve all appropriate instances
+var instances = container.Resolve<IAsyncEnumerable<IService>>();
+var items = new List<IService>();
+await foreach (var instance in instances) { items.Add(instance); }
+
+// Check the number of resolved instances
+items.Count.ShouldBe(4);
+
+```
+
+
+
+### ValueTask [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AsynchronousValueResolve.cs)
+
+In this scenario ValueTask is just wrapping a resolved instance.
+
+``` CSharp
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    // Bind Service
+    .Bind<IService>().To<Service>()
+    .Container;
+
+// Resolve an instance asynchronously via ValueTask
+var instance = await container.Resolve<ValueTask<IService>>();
+```
+
+
+
+### Collection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Collection.cs)
+
+To resolve all possible instances of any tags of the specific type as a _collection_ just use the injection _ICollection<T>_
+
+``` CSharp
 using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
@@ -2406,12 +1777,11 @@ instances.Count.ShouldBe(3);
 
 
 
-### Resolve instances as IEnumerable [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Enumerables.cs)
+### Enumerable [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Enumerables.cs)
 
-
+To resolve all possible instances of any tags of the specific type as an _enumerable_ just use the injection _IEnumerable<T>_
 
 ``` CSharp
-// Create and configure the container
 using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
@@ -2432,12 +1802,85 @@ instances.Count.ShouldBe(3);
 
 
 
-### Resolve instances as IObservable source [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Observable.cs)
+### Func dependency [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FuncDependency.cs)
 
-
+No comments. Everything is very simple!
 
 ``` CSharp
-// Create and configure the container
+Func<IService> func = () => new Service(new Dependency());
+
+using var container = Container
+    .Create()
+    .Bind<IService>().To(ctx => func())
+    .Container;
+
+var instance = container.Resolve<IService>();
+```
+
+
+
+### Func with arguments [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/FuncWithArguments.cs)
+
+It is easy to use Func<T> with arguments and to pass these arguments to the created instances.
+
+``` CSharp
+Func<IDependency, string, INamedService> func = 
+    (dependency, name) => new NamedService(dependency, name);
+
+// Create and configure the container, using full autowiring
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    // Bind the constructor and inject argument[0] as the second parameter of type 'string'
+    .Bind<INamedService>().To(ctx => func(ctx.Container.Inject<IDependency>(), (string)ctx.Args[0]))
+    .Container;
+
+// Resolve the instance passing the string "alpha" into the array of arguments
+var instance = container.Resolve<INamedService>("alpha");
+
+// Check the instance's type
+instance.ShouldBeOfType<NamedService>();
+
+// Check that argument "alpha" was used during the construction of an instance
+instance.Name.ShouldBe("alpha");
+
+// Resolve a function to create instance
+var getterFunc = container.Resolve<Func<string, INamedService>>();
+
+// Run this function and pass the string "beta" as argument
+var otherInstance = getterFunc("beta");
+
+// Check that argument "beta" was used during constructing an instance
+otherInstance.Name.ShouldBe("beta");
+```
+
+
+
+### Lazy [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Lazy.cs)
+
+_Lazy_ dependency helps when a logic needs to inject Lazy<T> to get instance once on demand.
+
+``` CSharp
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    .Bind<IService>().To<Service>()
+    .Container;
+
+// Resolve the instance of Lazy<IService>
+var lazy = container.Resolve<Lazy<IService>>();
+
+// Get the instance via Lazy
+var instance = lazy.Value;
+```
+
+
+
+### Observable [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Observable.cs)
+
+To resolve all possible instances of any tags of the specific type as an _observable_ just use the injection _IObservable<T>_
+
+``` CSharp
 using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
@@ -2455,12 +1898,293 @@ var instancesSource = container.Resolve<IObservable<IService>>();
 
 
 
-### Resolve Using Arguments [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveWithArgs.cs)
+### Set [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Set.cs)
+
+To resolve all possible instances of any tags of the specific type as a _set_ just use the injection _ISet<T>_
+
+``` CSharp
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    // Bind to the implementation #1
+    .Bind<IService>().Tag(1).To<Service>()
+    // Bind to the implementation #2
+    .Bind<IService>().Tag(2).Tag("abc").To<Service>()
+    // Bind to the implementation #3
+    .Bind<IService>().Tag(3).To<Service>()
+    .Container;
+
+// Resolve all appropriate instances
+var instances = container.Resolve<ISet<IService>>();
+
+// Check the number of resolved instances
+instances.Count.ShouldBe(3);
+```
+
+
+
+### Struct [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Struct.cs)
+
+Value types are fully supported avoiding any boxing/unboxing or cast operations, so the performance does not suffer!
+
+``` CSharp
+public void Run()
+{
+    using var container = Container
+        .Create()
+        .Bind<IDependency>().To<Dependency>()
+        // Register the tracing builder
+        .Bind<TracingBuilder, IBuilder>().As(Singleton).To<TracingBuilder>()
+        // Register a struct
+        .Bind<MyStruct>().To<MyStruct>()
+        .Container;
+
+    // Resolve an instance
+    var instance = container.Resolve<MyStruct>();
+
+    // Check the expression which was used to create an instances of MyStruct
+    var expressions = container.Resolve<TracingBuilder>().Expressions;
+    var structExpression = expressions[new Key(typeof(MyStruct))].ToString();
+    // The actual code is "new MyStruct(new Dependency())"!
+    structExpression.ShouldBe("new MyStruct(new Dependency())");
+    // Obvious there are no any superfluous operations like a `boxing`, `unboxing` or `cast`,
+    // just only what is really necessary to create an instance
+}
+
+public struct MyStruct
+{
+    public MyStruct(IDependency dependency) { }
+}
+
+// This builder saves expressions that used to create resolvers into a map
+public class TracingBuilder : IBuilder
+{
+    public readonly IDictionary<Key, Expression> Expressions = new Dictionary<Key, Expression>();
+
+    public Expression Build(IBuildContext context, Expression expression)
+    {
+        Expressions[context.Key] = expression;
+        return expression;
+    }
+}
+```
+
+
+
+### ThreadLocal [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ThreadLocal.cs)
 
 
 
 ``` CSharp
-// Create and configure the container
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    .Bind<IService>().To<Service>()
+    .Container;
+
+// Resolve the instance of ThreadLocal<IService>
+var threadLocal = container.Resolve<ThreadLocal<IService>>();
+
+// Get the instance via ThreadLocal
+var instance = threadLocal.Value;
+```
+
+
+
+### Tuple [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Tuple.cs)
+
+[Tuple](https://docs.microsoft.com/en-us/dotnet/api/system.tuple) has a specific number and sequence of elements which may be resolved at the same time.
+
+``` CSharp
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    .Bind<IService>().To<Service>()
+    .Bind<INamedService>().To<NamedService>(ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name"))
+    .Container;
+
+// Resolve an instance of type Tuple<IService, INamedService>
+var tuple = container.Resolve<Tuple<IService, INamedService>>();
+```
+
+
+
+### ValueTuple [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ValueTuple.cs)
+
+
+
+``` CSharp
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    .Bind<IService>().To<Service>()
+    .Bind<INamedService>().To<NamedService>(ctx => new NamedService(ctx.Container.Inject<IDependency>(), "some name"))
+    .Container;
+{
+    // Resolve an instance of type (IService service, INamedService namedService)
+    var valueTuple = container.Resolve<(IService service, INamedService namedService)>();
+}
+
+```
+
+
+
+### Configuration [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Configuration.cs)
+
+Configuration classes are used to dedicate a logic responsible for configuring containers.
+
+``` CSharp
+public void Run()
+{
+    using var container = Container
+        .Create()
+        .Using<Glue>();
+
+    var instance = container.Resolve<IService>();
+}
+
+public class Glue : IConfiguration
+{
+    public IEnumerable<IToken> Apply(IMutableContainer container)
+    {
+        // Bind using full autowiring
+        yield return container
+            .Bind<IDependency>().To<Dependency>()
+            .Bind<IService>().To<Service>();
+    }
+}
+```
+
+
+
+### Injection of default parameters [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/DefaultParamsInjection.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    using var container = Container.Create()
+        .Bind<IDependency>().To<Dependency>()
+        .Bind<IService>().To<SomeService>()
+        .Container;
+
+    // Resolve an instance
+    var instance = container.Resolve<IService>();
+
+    // Check the optional dependency
+    instance.State.ShouldBe("empty");
+}
+
+public class SomeService: IService
+{
+    // "state" dependency is not resolved here but it has the default value "empty"
+    public SomeService(IDependency dependency, string state = "empty")
+    {
+        Dependency = dependency;
+        State = state;
+    }
+
+    public IDependency Dependency { get; }
+
+    public string State { get; }
+}
+```
+
+
+
+### Generic autowiring [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/GenericAutowiring.cs)
+
+Autowiring of generic types as simple as autowiring of other simple types. Just use a generic parameters markers like _TT_, _TT1_, _TT2_ and etc. or TTI, TTI1, TTI2 ... for interfaces or TTS, TTS1, TTS2 ... for value types or other special markers like TTDisposable, TTDisposable1 and etc. TTList<>, TTDictionary<> ... or create your own generic parameters markers or bind open generic types.
+
+``` CSharp
+public void Run()
+{
+    // Create and configure the container using autowiring
+    using var container = Container
+        .Create()
+        .Bind<IDependency>().To<Dependency>()
+        // Bind using the predefined generic parameters marker TT (or TT1, TT2, TT3 ...)
+        .Bind<IService<TT>>().To<Service<TT>>()
+        // Bind using the predefined generic parameters marker TTList (or TTList1, TTList2 ...)
+        // Of other cases there are TTComparable, TTComparable<in T>, TTEquatable<T>, TTEnumerable<out T>, TTDictionary<TKey, TValue> and etc.
+        .Bind<IListService<TTList<int>>>().To<ListService<TTList<int>>>()
+        // Bind using the custom generic parameters marker TCustom
+        .Bind<IService<TTMy>>().Tag("custom marker").To<Service<TTMy>>()
+        // Bind using the open generic type
+        .Bind(typeof(IService<>)).Tag("open type").To(typeof(Service<>))
+        .Container;
+
+    // Resolve a generic instance
+    var listService = container.Resolve<IListService<IList<int>>>();
+    var instances = container.Resolve<ICollection<IService<int>>>();
+
+    instances.Count.ShouldBe(3);
+    // Check the instance's type
+    foreach (var instance in instances)
+    {
+        instance.ShouldBeOfType<Service<int>>();
+    }
+
+    listService.ShouldBeOfType<ListService<IList<int>>>();
+}
+
+// Custom generic type marker using predefined attribute `GenericTypeArgument`
+[GenericTypeArgument]
+class TTMy { }
+```
+
+
+
+### Optional injection [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/OptionalInjection.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    using var container = Container.Create()
+        .Bind<IDependency>().To<Dependency>()
+        .Bind<IService>().To<SomeService>(ctx => 
+            new SomeService(
+                ctx.Container.Inject<IDependency>(),
+                // injects default(string) if the dependency cannot be resolved
+                ctx.Container.TryInject<string>(),
+                // injects default(int) if the dependency cannot be resolved
+                ctx.Container.TryInject<int>(),
+                // injects int?, it has no value if the dependency cannot be resolved
+                ctx.Container.TryInjectValue<int>()))
+        .Container;
+
+    // Resolve an instance
+    var instance = container.Resolve<IService>();
+
+    // Check the optional dependency
+    instance.State.ShouldBe("empty,True,False");
+}
+
+public class SomeService: IService
+{
+    // "state" dependency is not resolved here but will be null value because it was injected optional
+    public SomeService(IDependency dependency, string state, int? val1, int? val2)
+    {
+        Dependency = dependency;
+        State = state ?? $"empty,{val1.HasValue},{val2.HasValue}";
+    }
+
+    public IDependency Dependency { get; }
+
+    public string State { get; }
+}
+```
+
+
+
+### Resolve using arguments [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveWithArgs.cs)
+
+
+
+``` CSharp
 using var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
@@ -2487,40 +2211,142 @@ var otherInstance = func("beta");
 
 // Check the injected dependency
 otherInstance.Name.ShouldBe("beta");
-
 ```
 
 
 
-### Resolve all appropriate instances as ISet [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Set.cs)
+### Auto Disposing [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoDisposing.cs)
 
-
+A [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance it's a very special instance. If it implements the _IDisposable_ (or IAsyncDisposable) interface the _Sigleton_ lifetime take care about disposing this instance after disposing of the owning container (where this type was registered) or if after the binding cancelation.
 
 ``` CSharp
-// Create and configure the container
-using var container = Container
+var disposableService = new Mock<IDisposableService>();
+
+using (
+    var container = Container
     .Create()
-    .Bind<IDependency>().To<Dependency>()
-    // Bind to the implementation #1
-    .Bind<IService>().Tag(1).To<Service>()
-    // Bind to the implementation #2
-    .Bind<IService>().Tag(2).Tag("abc").To<Service>()
-    // Bind to the implementation #3
-    .Bind<IService>().Tag(3).To<Service>()
-    .Container;
+    .Bind<IService>().As(Lifetime.Singleton).To<IDisposableService>(ctx => disposableService.Object)
+    .Container)
+{
+    var disposableInstance = container.Resolve<IService>();
+}
 
-// Resolve all appropriate instances
-var instances = container.Resolve<ISet<IService>>();
-
-// Check the number of resolved instances
-instances.Count.ShouldBe(3);
+// Check the singleton was disposed after the container was disposed
+disposableService.Verify(i => i.Dispose(), Times.Once);
+disposableService.Verify(i => i.DisposeAsync(), Times.Once);
 ```
 
 
 
-### Cyclic Dependency [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CyclicDependency.cs)
+### Aspect Oriented [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AspectOriented.cs)
 
+This framework has no special attributes to support aspect oriented autowiring because of a production code should not have references to these special attributes. But this code may contain these attributes by itself. And it is quite easy to use these attributes for aspect oriented autowiring, see the sample below.
 
+``` CSharp
+public void Run()
+{
+    var console = new Mock<IConsole>();
+
+    // Creates an aspect oriented autowiring strategy based the custom attribute `DependencyAttribute`
+    var autowiringStrategy = AutowiringStrategies.AspectOriented()
+        .Type<TypeAttribute>(attribute => attribute.Type)
+        .Order<OrderAttribute>(attribute => attribute.Order)
+        .Tag<TagAttribute>(attribute => attribute.Tag);
+
+    // Create the root container
+    using (var rootContainer = Container.Create("root"))
+    // Configure the child container
+    {
+        using var childContainer = rootContainer
+            .Create("child")
+            // Configure the child container by the custom aspect oriented autowiring strategy
+            .Bind<IAutowiringStrategy>().To(ctx => autowiringStrategy)
+            .Bind<IConsole>().Tag("MyConsole").To(ctx => console.Object)
+            .Bind<Clock>().To<Clock>()
+            .Bind<string>().Tag("Prefix").To(ctx => "info")
+            .Bind<ILogger>().To<Logger>()
+            .Container;
+
+        // Create a logger
+        var logger = childContainer.Resolve<ILogger>();
+
+        // Log the message
+        logger.Log("Hello");
+    }
+
+    // Check the console output
+    console.Verify(i => i.WriteLine(It.IsRegex(".+ - info: Hello")));
+}
+
+// Represents the dependency attribute to specify `type` for injection.
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
+public class TypeAttribute : Attribute
+{
+    // The tag, which will be used during an injection
+    [NotNull] public readonly Type Type;
+
+    public TypeAttribute([NotNull] Type type) => Type = type;
+}
+
+// Represents the dependency attribute to specify `tag` for injection.
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
+public class TagAttribute : Attribute
+{
+    // The tag, which will be used during an injection
+    [NotNull] public readonly object Tag;
+
+    public TagAttribute([NotNull] object tag) => Tag = tag;
+}
+
+// Represents the dependency attribute to specify `order` for injection.
+[AttributeUsage(AttributeTargets.Method)]
+public class OrderAttribute : Attribute
+{
+    // The order to be used to invoke a method
+    public readonly int Order;
+
+    public OrderAttribute(int order) => Order = order;
+}
+
+public interface IConsole { void WriteLine(string text); }
+
+public interface IClock { DateTimeOffset Now { get; } }
+
+public interface ILogger { void Log(string message); }
+
+public class Logger : ILogger
+{
+    private readonly IConsole _console;
+    private IClock _clock;
+
+    // Constructor injection
+    public Logger([Tag("MyConsole")] IConsole console) => _console = console;
+
+    // Method injection
+    [Order(1)]
+    public void Initialize([Type(typeof(Clock))] IClock clock) => _clock = clock;
+
+    // Property injection
+    public string Prefix { get; [Tag("Prefix"), Order(2)] set; }
+
+    // Adds current time and prefix before a message and writes it to console
+    public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");
+}
+
+public class Clock : IClock
+{
+    // "clockName" dependency is not resolved here but has default value
+    public Clock([Type(typeof(string)), Tag("ClockName")] string clockName = "SPb") { }
+
+    public DateTimeOffset Now => DateTimeOffset.Now;
+}
+```
+
+Also you can specify your own aspect oriented autowiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
+
+### Cyclic dependency [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CyclicDependency.cs)
+
+By default, a circular dependency is detected after the 256th recursive resolution. This behaviour may be changed by overriding the interface _IFoundCyclicDependency_.
 
 ``` CSharp
 public void Run()
@@ -2530,7 +2356,6 @@ public void Run()
     // Throws the exception for reentrancy 128
     foundCyclicDependency.Setup(i => i.Resolve(It.Is<IBuildContext>(ctx => ctx.Depth == 128))).Throws(expectedException);
 
-    // Create the container
     using var container = Container
         .Create()
         .Bind<IFoundCyclicDependency>().To(ctx => foundCyclicDependency.Object)
@@ -2554,9 +2379,7 @@ public void Run()
     }
 }
 
-public interface ILink
-{
-}
+public interface ILink { }
 
 public class Link : ILink
 {
@@ -2566,7 +2389,57 @@ public class Link : ILink
 
 
 
-### Generator [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Generator.cs)
+### Plugins [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Plugins.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    // Given
+    var pluginTypes = new[] { typeof(Plugin1), typeof(Plugin2), typeof(Plugin3) };
+
+    using var container = Container.Create();
+    foreach (var pluginType in pluginTypes)
+    {
+        // Should ensure uniqueness of plugin
+        var uniquePluginId = pluginType;
+
+        // Bind several opened types by a tag which should ensure uniqueness of binding
+        container.Bind(typeof(IPlugin)).Tag(uniquePluginId).To(pluginType);
+    }
+
+    // When
+
+    // Resolve instances
+    var plugins = container.Resolve<IEnumerable<IPlugin>>();
+
+    // This also works when you cannot use a generic type like IEnumerable<IPlugin>
+    // var plugins = container.Resolve<IEnumerable<object>>(typeof(IEnumerable<>).MakeGenericType(typeof(IPlugin)));
+
+    // Then
+    var resolvedPluginTypes = plugins.Select(i => i.GetType()).ToList();
+
+    resolvedPluginTypes.Count.ShouldBe(3);
+
+    // We cannot rely on order here
+    resolvedPluginTypes.Contains(typeof(Plugin1)).ShouldBeTrue();
+    resolvedPluginTypes.Contains(typeof(Plugin2)).ShouldBeTrue();
+    resolvedPluginTypes.Contains(typeof(Plugin3)).ShouldBeTrue();
+}
+
+interface IPlugin { }
+
+class Plugin1 : IPlugin { }
+
+class Plugin2 : IPlugin { }
+
+class Plugin3 : IPlugin { }
+```
+
+
+
+### Generator sample [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Generator.cs)
 
 
 
@@ -2577,7 +2450,7 @@ public void Run()
     using var container = Container.Create().Using<Generators>();
     using (container.Bind<(int, int)>().To(
         // Use a function because of the expression trees have a limitation in syntax
-        ctx => ValueTuple.Create(
+        ctx => System.ValueTuple.Create(
             // The first one is of sequential number generator
             ctx.Container.Inject<int>(GeneratorType.Sequential),
             // The second one is of random number generator
@@ -2629,7 +2502,91 @@ public class Generators: IConfiguration
 
 
 
-### Instant Messenger [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SimpleInstantMessenger.cs)
+### Wrapper sample [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Wrapper.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    var console = new Mock<IConsole>();
+    var clock = new Mock<IClock>();
+    var now = new DateTimeOffset(2019, 9, 9, 12, 31, 34, TimeSpan.FromHours(3));
+    clock.SetupGet(i => i.Now).Returns(now);
+
+    // Create and configure the root container
+    using var rootContainer = Container
+        .Create("root")
+        .Bind<IConsole>().To(ctx => console.Object)
+        .Bind<ILogger>().To<Logger>()
+        .Container;
+
+    // Create and configure the child container
+    using var childContainer = rootContainer
+        .Create("child")
+        .Bind<IClock>().To(ctx => clock.Object)
+        // Bind 'ILogger' to the instance creation, actually represented as an expression tree
+        // injecting the base logger from the parent container "root" and the clock from the current container "child"
+        .Bind<ILogger>().To<TimeLogger>()
+        .Container;
+
+    // Create a logger
+    var logger = childContainer.Resolve<ILogger>();
+
+    // Log the message
+    logger.Log("Hello");
+
+    // Check the console output
+    console.Verify(i => i.WriteLine($"{now}: Hello"));
+}
+
+public interface IConsole
+{
+    // Writes a text
+    void WriteLine(string text);
+}
+
+public interface ILogger
+{
+    // Logs a message
+    void Log(string message);
+}
+
+public interface IClock
+{
+    DateTimeOffset Now { get; }
+}
+
+public class Logger : ILogger
+{
+    private readonly IConsole _console;
+
+    // Stores console to field
+    public Logger(IConsole console) => _console = console;
+
+    // Logs a message to console
+    public void Log(string message) => _console.WriteLine(message);
+}
+
+public class TimeLogger: ILogger
+{
+    private readonly ILogger _baseLogger;
+    private readonly IClock _clock;
+
+    public TimeLogger(ILogger baseLogger, IClock clock)
+    {
+        _baseLogger = baseLogger;
+        _clock = clock;
+    }
+
+    // Adds current time as a message prefix and writes it to the console
+    public void Log(string message) => _baseLogger.Log($"{_clock.Now}: {message}");
+}
+```
+
+
+
+### Instant Messenger sample [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SimpleInstantMessenger.cs)
 
 
 
@@ -2734,90 +2691,6 @@ public class InstantMessenger<T> : IInstantMessenger<T>
     public IDisposable Subscribe(IObserver<T> observer) => _messages.Subscribe(observer);
 
     public void SendMessage(string addressFrom, string addressTo, string text) => _messages.OnNext(_messageFactory.Create(addressFrom, addressTo, text));
-}
-```
-
-
-
-### Wrapper [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Wrapper.cs)
-
-
-
-``` CSharp
-public void Run()
-{
-    var console = new Mock<IConsole>();
-    var clock = new Mock<IClock>();
-    var now = new DateTimeOffset(2019, 9, 9, 12, 31, 34, TimeSpan.FromHours(3));
-    clock.SetupGet(i => i.Now).Returns(now);
-
-    // Create and configure the root container
-    using var rootContainer = Container
-        .Create("root")
-        .Bind<IConsole>().To(ctx => console.Object)
-        .Bind<ILogger>().To<Logger>()
-        .Container;
-
-    // Create and configure the child container
-    using var childContainer = rootContainer
-        .Create("child")
-        .Bind<IClock>().To(ctx => clock.Object)
-        // Bind 'ILogger' to the instance creation, actually represented as an expression tree
-        // injecting the base logger from the parent container "root" and the clock from the current container "child"
-        .Bind<ILogger>().To<TimeLogger>()
-        .Container;
-
-    // Create a logger
-    var logger = childContainer.Resolve<ILogger>();
-
-    // Log the message
-    logger.Log("Hello");
-
-    // Check the console output
-    console.Verify(i => i.WriteLine($"{now}: Hello"));
-}
-
-public interface IConsole
-{
-    // Writes a text
-    void WriteLine(string text);
-}
-
-public interface ILogger
-{
-    // Logs a message
-    void Log(string message);
-}
-
-public interface IClock
-{
-    DateTimeOffset Now { get; }
-}
-
-public class Logger : ILogger
-{
-    private readonly IConsole _console;
-
-    // Stores console to field
-    public Logger(IConsole console) => _console = console;
-
-    // Logs a message to console
-    public void Log(string message) => _console.WriteLine(message);
-}
-
-public class TimeLogger: ILogger
-{
-    private readonly ILogger _baseLogger;
-    private readonly IClock _clock;
-
-    public TimeLogger(ILogger baseLogger, IClock clock)
-    {
-        _baseLogger = baseLogger;
-        _clock = clock;
-    }
-
-    // Adds current time as a message prefix and writes it to the console
-    public void Log(string message) => _baseLogger.Log($"{_clock.Now}: {message}");
 }
 ```
 

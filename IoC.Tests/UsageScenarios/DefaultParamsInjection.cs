@@ -15,13 +15,12 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=binding
+        // $tag=basic
         // $priority=06
-        // $description=Default Parameters Injection
+        // $description=Injection of default parameters
         // {
         public void Run()
         {
-            // Create the container and configure it
             using var container = Container.Create()
                 .Bind<IDependency>().To<Dependency>()
                 .Bind<IService>().To<SomeService>()

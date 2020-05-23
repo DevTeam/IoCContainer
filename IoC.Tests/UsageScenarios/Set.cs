@@ -10,11 +10,11 @@
         public void Run()
         {
             // $visible=true
-            // $tag=injection
+            // $tag=basic
             // $priority=05
-            // $description=Resolve all appropriate instances as ISet
+            // $description=Set
+            // $header=To resolve all possible instances of any tags of the specific type as a _set_ just use the injection _ISet<T>_
             // {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
@@ -34,7 +34,7 @@
             // }
             foreach (var instance in instances)
             {
-                // Check the instance's type
+                // Check the instance
                 instance.ShouldBeOfType<Service>();
             }
         }

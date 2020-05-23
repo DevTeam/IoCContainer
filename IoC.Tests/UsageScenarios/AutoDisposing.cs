@@ -1,23 +1,21 @@
 ﻿namespace IoC.Tests.UsageScenarios
 {
     using Moq;
-    using Shouldly;
     using Xunit;
 
-    public class AutoDisposeSingletonDuringContainersDispose
+    public class AutoDisposing
     {
         [Fact]
         public void Run()
         {
             // $visible=true
-            // $tag=binding
-            // $priority=06
-            // $description=Auto dispose a singleton during owning container's dispose
+            // $tag=basic
+            // $priority=07
+            // $description=Auto Disposing
             // $header=A [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance it's a very special instance. If it implements the _IDisposable_ (or IAsyncDisposable) interface the _Sigleton_ lifetime take care about disposing this instance after disposing of the owning container (where this type was registered) or if after the binding cancelation.
             // {
             var disposableService = new Mock<IDisposableService>();
 
-            // Create and configure the container
             using (
                 var container = Container
                 .Create()

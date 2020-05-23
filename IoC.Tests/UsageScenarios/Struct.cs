@@ -17,14 +17,13 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=binding
-        // $priority=04
+        // $tag=basic
+        // $priority=05
         // $description=Struct
         // $header=Value types are fully supported avoiding any boxing/unboxing or cast operations, so the performance does not suffer!
         // {
         public void Run()
         {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()

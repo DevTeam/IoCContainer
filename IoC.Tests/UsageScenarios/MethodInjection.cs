@@ -10,9 +10,9 @@
         public void Run()
         {
             // $visible=true
-            // $tag=injection
+            // $tag=basic
             // $priority=03
-            // $description=Method Injection
+            // $description=Method injection
             // $header=:warning: Please try using the constructor injection instead. The method injection is not recommended because of it is a cause of hidden dependencies.
             // {
             // Create and configure the container using full autowiring
@@ -46,7 +46,6 @@
 
             // Check the injected dependency
             otherInstance.Name.ShouldBe("beta");
-
             // }
         }
     }

@@ -11,11 +11,11 @@
         public void Run()
         {
             // $visible=true
-            // $tag=injection
+            // $tag=basic
             // $priority=05
-            // $description=Resolve instances as IEnumerable
+            // $description=Enumerable
+            // $header=To resolve all possible instances of any tags of the specific type as an _enumerable_ just use the injection _IEnumerable<T>_
             // {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
@@ -33,7 +33,7 @@
             // Check the number of resolved instances
             instances.Count.ShouldBe(3);
             // }
-            // Check the instances' type
+            // Check instances
             instances.ForEach(instance => instance.ShouldBeOfType<Service>());
         }
     }

@@ -9,11 +9,11 @@
         public void Run()
         {
             // $visible=true
-            // $tag=injection
+            // $tag=basic
             // $priority=05
-            // $description=Resolve instances as Array
+            // $description=Array
+            // $header=To resolve all possible instances of any tags of the specific type as an _array_ just use the injection _T[]_
             // {
-            // Create and configure the container
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
@@ -33,7 +33,7 @@
 
             foreach (var instance in instances)
             {
-                // Check the instance's type
+                // Check the instance
                 instance.ShouldBeOfType<Service>();
             }
         }
