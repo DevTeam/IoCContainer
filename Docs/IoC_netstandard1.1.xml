@@ -1111,30 +1111,30 @@
         <member name="M:IoC.Features.LightFeature.Apply(IoC.IMutableContainer)">
             <inheritdoc />
         </member>
-        <member name="T:IoC.Features.ResolveUnregisteredImplementationsFeature">
+        <member name="T:IoC.Features.ResolveUnboundFeature">
             <summary>
-            Allows to resolve unregistered dependencies.
+            Allows to resolve unbound dependencies.
             </summary>
         </member>
-        <member name="M:IoC.Features.ResolveUnregisteredImplementationsFeature.#ctor">
+        <member name="M:IoC.Features.ResolveUnboundFeature.#ctor">
             <summary>
             Creates an instance of feature.
             </summary>
         </member>
-        <member name="M:IoC.Features.ResolveUnregisteredImplementationsFeature.#ctor(System.Boolean,IoC.IAutowiringStrategy)">
+        <member name="M:IoC.Features.ResolveUnboundFeature.#ctor(System.Boolean,IoC.IAutowiringStrategy)">
             <summary>
             Creates an instance of feature.
             </summary>
             <param name="supportDefaults"><c>True</c> to resolve default(T) for unresolved value types.</param>
             <param name="autowiringStrategy">The autowiring strategy.</param>
         </member>
-        <member name="M:IoC.Features.ResolveUnregisteredImplementationsFeature.Apply(IoC.IMutableContainer)">
+        <member name="M:IoC.Features.ResolveUnboundFeature.Apply(IoC.IMutableContainer)">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Features.ResolveUnregisteredImplementationsFeature.Dispose">
+        <member name="M:IoC.Features.ResolveUnboundFeature.Dispose">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Features.ResolveUnregisteredImplementationsFeature.GetEnumerator">
+        <member name="M:IoC.Features.ResolveUnboundFeature.GetEnumerator">
             <inheritdoc />
         </member>
         <member name="T:IoC.Features.TaskFeature">

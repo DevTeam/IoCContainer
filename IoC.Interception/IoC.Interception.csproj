@@ -12,7 +12,7 @@
     <PackageProjectUrl>https://github.com/DevTeam/IoCContainer/</PackageProjectUrl>
     <PackageIcon>common\icon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
+    <RepositoryUrl Condition="'$(TargetFramework)'!='net40'">https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
     <PackageTags>ioc container di interception proxy</PackageTags>
     <Product>IoC Container Interception feature</Product>

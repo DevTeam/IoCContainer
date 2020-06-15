@@ -12,8 +12,8 @@
     <PackageProjectUrl>https://github.com/DevTeam/IoCContainer/</PackageProjectUrl>
     <PackageIcon>common\icon.png</PackageIcon>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl>https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
     <RepositoryType>git</RepositoryType>
+    <RepositoryUrl Condition="'$(TargetFramework)'!='net40'">https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
     <PackageTags>ioc container di</PackageTags>
     <Product>IoC Container</Product>
     <Copyright>Copyright (C) 2018-2020 Nikolay Pianikov</Copyright>

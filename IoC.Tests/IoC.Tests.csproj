@@ -34,7 +34,7 @@
 
     <Otherwise>
       <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.6.1" />
         <PackageReference Include="Moq" Version="4.10.1" />
         <PackageReference Include="xunit" Version="2.4.1" />
       </ItemGroup>
@@ -49,7 +49,7 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
   </ItemGroup>  
   <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.4" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.5" />
     <ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net48'">
@@ -57,7 +57,7 @@
     <ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)'=='net5.0' AND '$(Configuration)'=='Debug'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0-preview.4.20251.6" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0-preview.5.20278.1" />
     <ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
   </ItemGroup>
   <ItemGroup>

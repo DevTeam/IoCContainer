@@ -470,12 +470,12 @@
   - [ArgsParameter](#F-IoC-Core-Registration-ArgsParameter 'IoC.Core.Registration.ArgsParameter')
   - [ContainerParameter](#F-IoC-Core-Registration-ContainerParameter 'IoC.Core.Registration.ContainerParameter')
   - [ResolverParameters](#F-IoC-Core-Registration-ResolverParameters 'IoC.Core.Registration.ResolverParameters')
-- [ResolveUnregisteredImplementationsFeature](#T-IoC-Features-ResolveUnregisteredImplementationsFeature 'IoC.Features.ResolveUnregisteredImplementationsFeature')
-  - [#ctor()](#M-IoC-Features-ResolveUnregisteredImplementationsFeature-#ctor 'IoC.Features.ResolveUnregisteredImplementationsFeature.#ctor')
-  - [#ctor(supportDefaults,autowiringStrategy)](#M-IoC-Features-ResolveUnregisteredImplementationsFeature-#ctor-System-Boolean,IoC-IAutowiringStrategy- 'IoC.Features.ResolveUnregisteredImplementationsFeature.#ctor(System.Boolean,IoC.IAutowiringStrategy)')
-  - [Apply()](#M-IoC-Features-ResolveUnregisteredImplementationsFeature-Apply-IoC-IMutableContainer- 'IoC.Features.ResolveUnregisteredImplementationsFeature.Apply(IoC.IMutableContainer)')
-  - [Dispose()](#M-IoC-Features-ResolveUnregisteredImplementationsFeature-Dispose 'IoC.Features.ResolveUnregisteredImplementationsFeature.Dispose')
-  - [GetEnumerator()](#M-IoC-Features-ResolveUnregisteredImplementationsFeature-GetEnumerator 'IoC.Features.ResolveUnregisteredImplementationsFeature.GetEnumerator')
+- [ResolveUnboundFeature](#T-IoC-Features-ResolveUnboundFeature 'IoC.Features.ResolveUnboundFeature')
+  - [#ctor()](#M-IoC-Features-ResolveUnboundFeature-#ctor 'IoC.Features.ResolveUnboundFeature.#ctor')
+  - [#ctor(supportDefaults,autowiringStrategy)](#M-IoC-Features-ResolveUnboundFeature-#ctor-System-Boolean,IoC-IAutowiringStrategy- 'IoC.Features.ResolveUnboundFeature.#ctor(System.Boolean,IoC.IAutowiringStrategy)')
+  - [Apply()](#M-IoC-Features-ResolveUnboundFeature-Apply-IoC-IMutableContainer- 'IoC.Features.ResolveUnboundFeature.Apply(IoC.IMutableContainer)')
+  - [Dispose()](#M-IoC-Features-ResolveUnboundFeature-Dispose 'IoC.Features.ResolveUnboundFeature.Dispose')
+  - [GetEnumerator()](#M-IoC-Features-ResolveUnboundFeature-GetEnumerator 'IoC.Features.ResolveUnboundFeature.GetEnumerator')
 - [Resolver\`1](#T-IoC-Resolver`1 'IoC.Resolver`1')
 - [ScopeSingletonLifetime](#T-IoC-Lifetimes-ScopeSingletonLifetime 'IoC.Lifetimes.ScopeSingletonLifetime')
   - [Create()](#M-IoC-Lifetimes-ScopeSingletonLifetime-Create 'IoC.Lifetimes.ScopeSingletonLifetime.Create')
@@ -9964,8 +9964,8 @@ The container parameter.
 
 All resolvers parameters.
 
-<a name='T-IoC-Features-ResolveUnregisteredImplementationsFeature'></a>
-## ResolveUnregisteredImplementationsFeature `type`
+<a name='T-IoC-Features-ResolveUnboundFeature'></a>
+## ResolveUnboundFeature `type`
 
 ##### Namespace
 
@@ -9973,9 +9973,9 @@ IoC.Features
 
 ##### Summary
 
-Allows to resolve unregistered dependencies.
+Allows to resolve unbound dependencies.
 
-<a name='M-IoC-Features-ResolveUnregisteredImplementationsFeature-#ctor'></a>
+<a name='M-IoC-Features-ResolveUnboundFeature-#ctor'></a>
 ### #ctor() `constructor`
 
 ##### Summary
@@ -9986,7 +9986,7 @@ Creates an instance of feature.
 
 This constructor has no parameters.
 
-<a name='M-IoC-Features-ResolveUnregisteredImplementationsFeature-#ctor-System-Boolean,IoC-IAutowiringStrategy-'></a>
+<a name='M-IoC-Features-ResolveUnboundFeature-#ctor-System-Boolean,IoC-IAutowiringStrategy-'></a>
 ### #ctor(supportDefaults,autowiringStrategy) `constructor`
 
 ##### Summary
@@ -10000,7 +10000,7 @@ Creates an instance of feature.
 | supportDefaults | [System.Boolean](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Boolean 'System.Boolean') | `True` to resolve default(T) for unresolved value types. |
 | autowiringStrategy | [IoC.IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy') | The autowiring strategy. |
 
-<a name='M-IoC-Features-ResolveUnregisteredImplementationsFeature-Apply-IoC-IMutableContainer-'></a>
+<a name='M-IoC-Features-ResolveUnboundFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
 
 ##### Summary
@@ -10011,7 +10011,7 @@ Creates an instance of feature.
 
 This method has no parameters.
 
-<a name='M-IoC-Features-ResolveUnregisteredImplementationsFeature-Dispose'></a>
+<a name='M-IoC-Features-ResolveUnboundFeature-Dispose'></a>
 ### Dispose() `method`
 
 ##### Summary
@@ -10022,7 +10022,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-IoC-Features-ResolveUnregisteredImplementationsFeature-GetEnumerator'></a>
+<a name='M-IoC-Features-ResolveUnboundFeature-GetEnumerator'></a>
 ### GetEnumerator() `method`
 
 ##### Summary
