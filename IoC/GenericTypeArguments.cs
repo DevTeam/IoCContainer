@@ -10,6 +10,12 @@ namespace IoC
     public abstract class TT { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -110,6 +116,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT1 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC1 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -214,6 +226,12 @@ namespace IoC
     public abstract class TT2 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC2 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -314,6 +332,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT3 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC3 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -418,6 +442,12 @@ namespace IoC
     public abstract class TT4 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC4 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -518,6 +548,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT5 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC5 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -622,6 +658,12 @@ namespace IoC
     public abstract class TT6 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC6 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -722,6 +764,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT7 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC7 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -826,6 +874,12 @@ namespace IoC
     public abstract class TT8 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC8 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -928,6 +982,12 @@ namespace IoC
     public abstract class TT9 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC9 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -944,6 +1004,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT10 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC10 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -964,6 +1030,12 @@ namespace IoC
     public abstract class TT11 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC11 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -980,6 +1052,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT12 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC12 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -1000,6 +1078,12 @@ namespace IoC
     public abstract class TT13 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC13 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -1016,6 +1100,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT14 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC14 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -1036,6 +1126,12 @@ namespace IoC
     public abstract class TT15 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC15 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -1052,6 +1148,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT16 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC16 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -1072,6 +1174,12 @@ namespace IoC
     public abstract class TT17 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC17 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -1088,6 +1196,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT18 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC18 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -1108,6 +1222,12 @@ namespace IoC
     public abstract class TT19 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC19 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -1124,6 +1244,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT20 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC20 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -1144,6 +1270,12 @@ namespace IoC
     public abstract class TT21 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC21 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -1160,6 +1292,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT22 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC22 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -1180,6 +1318,12 @@ namespace IoC
     public abstract class TT23 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC23 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -1196,6 +1340,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT24 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC24 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -1216,6 +1366,12 @@ namespace IoC
     public abstract class TT25 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC25 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -1232,6 +1388,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT26 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC26 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -1252,6 +1414,12 @@ namespace IoC
     public abstract class TT27 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC27 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -1268,6 +1436,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT28 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC28 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -1288,6 +1462,12 @@ namespace IoC
     public abstract class TT29 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC29 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -1304,6 +1484,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT30 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC30 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -1324,6 +1510,12 @@ namespace IoC
     public abstract class TT31 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC31 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -1340,6 +1532,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT32 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC32 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.

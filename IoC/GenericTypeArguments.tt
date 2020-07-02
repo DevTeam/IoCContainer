@@ -30,6 +30,12 @@ var baseTypes = new Dictionary<string, string> {
     public abstract class TT<#=i == 0 ? "" : i.ToString()#> { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC<#=i == 0 ? "" : i.ToString()#> { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]

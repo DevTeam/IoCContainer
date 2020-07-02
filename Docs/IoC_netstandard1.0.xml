@@ -4223,6 +4223,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -4306,6 +4311,11 @@
         <member name="T:IoC.TT1">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC1">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI1">
@@ -4393,6 +4403,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC2">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI2">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -4476,6 +4491,11 @@
         <member name="T:IoC.TT3">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC3">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI3">
@@ -4563,6 +4583,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC4">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI4">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -4646,6 +4671,11 @@
         <member name="T:IoC.TT5">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC5">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI5">
@@ -4733,6 +4763,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC6">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI6">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -4816,6 +4851,11 @@
         <member name="T:IoC.TT7">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC7">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI7">
@@ -4903,6 +4943,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC8">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI8">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -4988,6 +5033,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC9">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI9">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5001,6 +5051,11 @@
         <member name="T:IoC.TT10">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC10">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI10">
@@ -5018,6 +5073,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC11">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI11">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5031,6 +5091,11 @@
         <member name="T:IoC.TT12">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC12">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI12">
@@ -5048,6 +5113,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC13">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI13">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5061,6 +5131,11 @@
         <member name="T:IoC.TT14">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC14">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI14">
@@ -5078,6 +5153,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC15">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI15">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5091,6 +5171,11 @@
         <member name="T:IoC.TT16">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC16">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI16">
@@ -5108,6 +5193,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC17">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI17">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5121,6 +5211,11 @@
         <member name="T:IoC.TT18">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC18">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI18">
@@ -5138,6 +5233,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC19">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI19">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5151,6 +5251,11 @@
         <member name="T:IoC.TT20">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC20">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI20">
@@ -5168,6 +5273,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC21">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI21">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5181,6 +5291,11 @@
         <member name="T:IoC.TT22">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC22">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI22">
@@ -5198,6 +5313,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC23">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI23">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5211,6 +5331,11 @@
         <member name="T:IoC.TT24">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC24">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI24">
@@ -5228,6 +5353,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC25">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI25">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5241,6 +5371,11 @@
         <member name="T:IoC.TT26">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC26">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI26">
@@ -5258,6 +5393,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC27">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI27">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5271,6 +5411,11 @@
         <member name="T:IoC.TT28">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC28">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI28">
@@ -5288,6 +5433,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC29">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI29">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5301,6 +5451,11 @@
         <member name="T:IoC.TT30">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC30">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI30">
@@ -5318,6 +5473,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC31">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI31">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5331,6 +5491,11 @@
         <member name="T:IoC.TT32">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC32">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI32">

@@ -44,7 +44,7 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net5.0' AND '$(Configuration)'=='Debug'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0-preview.5.20278.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0-preview.6.20305.6" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(TargetFramework)'=='net45' or '$(TargetFramework)'=='netstandard1.0'">

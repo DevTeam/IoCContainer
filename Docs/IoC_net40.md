@@ -528,6 +528,39 @@
 - [TT7](#T-IoC-TT7 'IoC.TT7')
 - [TT8](#T-IoC-TT8 'IoC.TT8')
 - [TT9](#T-IoC-TT9 'IoC.TT9')
+- [TTC](#T-IoC-TTC 'IoC.TTC')
+- [TTC1](#T-IoC-TTC1 'IoC.TTC1')
+- [TTC10](#T-IoC-TTC10 'IoC.TTC10')
+- [TTC11](#T-IoC-TTC11 'IoC.TTC11')
+- [TTC12](#T-IoC-TTC12 'IoC.TTC12')
+- [TTC13](#T-IoC-TTC13 'IoC.TTC13')
+- [TTC14](#T-IoC-TTC14 'IoC.TTC14')
+- [TTC15](#T-IoC-TTC15 'IoC.TTC15')
+- [TTC16](#T-IoC-TTC16 'IoC.TTC16')
+- [TTC17](#T-IoC-TTC17 'IoC.TTC17')
+- [TTC18](#T-IoC-TTC18 'IoC.TTC18')
+- [TTC19](#T-IoC-TTC19 'IoC.TTC19')
+- [TTC2](#T-IoC-TTC2 'IoC.TTC2')
+- [TTC20](#T-IoC-TTC20 'IoC.TTC20')
+- [TTC21](#T-IoC-TTC21 'IoC.TTC21')
+- [TTC22](#T-IoC-TTC22 'IoC.TTC22')
+- [TTC23](#T-IoC-TTC23 'IoC.TTC23')
+- [TTC24](#T-IoC-TTC24 'IoC.TTC24')
+- [TTC25](#T-IoC-TTC25 'IoC.TTC25')
+- [TTC26](#T-IoC-TTC26 'IoC.TTC26')
+- [TTC27](#T-IoC-TTC27 'IoC.TTC27')
+- [TTC28](#T-IoC-TTC28 'IoC.TTC28')
+- [TTC29](#T-IoC-TTC29 'IoC.TTC29')
+- [TTC3](#T-IoC-TTC3 'IoC.TTC3')
+- [TTC30](#T-IoC-TTC30 'IoC.TTC30')
+- [TTC31](#T-IoC-TTC31 'IoC.TTC31')
+- [TTC32](#T-IoC-TTC32 'IoC.TTC32')
+- [TTC4](#T-IoC-TTC4 'IoC.TTC4')
+- [TTC5](#T-IoC-TTC5 'IoC.TTC5')
+- [TTC6](#T-IoC-TTC6 'IoC.TTC6')
+- [TTC7](#T-IoC-TTC7 'IoC.TTC7')
+- [TTC8](#T-IoC-TTC8 'IoC.TTC8')
+- [TTC9](#T-IoC-TTC9 'IoC.TTC9')
 - [TTCollection1\`1](#T-IoC-TTCollection1`1 'IoC.TTCollection1`1')
 - [TTCollection2\`1](#T-IoC-TTCollection2`1 'IoC.TTCollection2`1')
 - [TTCollection3\`1](#T-IoC-TTCollection3`1 'IoC.TTCollection3`1')
@@ -10669,6 +10702,369 @@ IoC
 ##### Summary
 
 Represents the generic type arguments marker for a reference type.
+
+<a name='T-IoC-TTC'></a>
+## TTC `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC1'></a>
+## TTC1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC10'></a>
+## TTC10 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC11'></a>
+## TTC11 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC12'></a>
+## TTC12 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC13'></a>
+## TTC13 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC14'></a>
+## TTC14 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC15'></a>
+## TTC15 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC16'></a>
+## TTC16 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC17'></a>
+## TTC17 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC18'></a>
+## TTC18 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC19'></a>
+## TTC19 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC2'></a>
+## TTC2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC20'></a>
+## TTC20 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC21'></a>
+## TTC21 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC22'></a>
+## TTC22 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC23'></a>
+## TTC23 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC24'></a>
+## TTC24 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC25'></a>
+## TTC25 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC26'></a>
+## TTC26 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC27'></a>
+## TTC27 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC28'></a>
+## TTC28 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC29'></a>
+## TTC29 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC3'></a>
+## TTC3 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC30'></a>
+## TTC30 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC31'></a>
+## TTC31 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC32'></a>
+## TTC32 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC4'></a>
+## TTC4 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC5'></a>
+## TTC5 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC6'></a>
+## TTC6 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC7'></a>
+## TTC7 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC8'></a>
+## TTC8 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC9'></a>
+## TTC9 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
 
 <a name='T-IoC-TTCollection1`1'></a>
 ## TTCollection1\`1 `type`
