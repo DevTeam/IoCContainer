@@ -6434,6 +6434,12 @@ namespace IoC
     public abstract class TT { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -6534,6 +6540,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT1 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC1 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -6638,6 +6650,12 @@ namespace IoC
     public abstract class TT2 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC2 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -6738,6 +6756,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT3 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC3 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -6842,6 +6866,12 @@ namespace IoC
     public abstract class TT4 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC4 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -6942,6 +6972,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT5 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC5 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -7046,6 +7082,12 @@ namespace IoC
     public abstract class TT6 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC6 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -7146,6 +7188,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT7 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC7 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -7250,6 +7298,12 @@ namespace IoC
     public abstract class TT8 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC8 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -7352,6 +7406,12 @@ namespace IoC
     public abstract class TT9 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC9 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -7368,6 +7428,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT10 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC10 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -7388,6 +7454,12 @@ namespace IoC
     public abstract class TT11 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC11 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -7404,6 +7476,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT12 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC12 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -7424,6 +7502,12 @@ namespace IoC
     public abstract class TT13 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC13 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -7440,6 +7524,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT14 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC14 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -7460,6 +7550,12 @@ namespace IoC
     public abstract class TT15 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC15 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -7476,6 +7572,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT16 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC16 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -7496,6 +7598,12 @@ namespace IoC
     public abstract class TT17 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC17 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -7512,6 +7620,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT18 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC18 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -7532,6 +7646,12 @@ namespace IoC
     public abstract class TT19 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC19 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -7548,6 +7668,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT20 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC20 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -7568,6 +7694,12 @@ namespace IoC
     public abstract class TT21 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC21 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -7584,6 +7716,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT22 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC22 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -7604,6 +7742,12 @@ namespace IoC
     public abstract class TT23 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC23 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -7620,6 +7764,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT24 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC24 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -7640,6 +7790,12 @@ namespace IoC
     public abstract class TT25 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC25 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -7656,6 +7812,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT26 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC26 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -7676,6 +7838,12 @@ namespace IoC
     public abstract class TT27 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC27 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -7692,6 +7860,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT28 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC28 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -7712,6 +7886,12 @@ namespace IoC
     public abstract class TT29 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC29 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -7728,6 +7908,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT30 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC30 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -7748,6 +7934,12 @@ namespace IoC
     public abstract class TT31 { }
 
     /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC31 { }
+
+    /// <summary>
     /// Represents the generic type arguments marker for an interface.
     /// </summary>
     [PublicAPI, GenericTypeArgument]
@@ -7764,6 +7956,12 @@ namespace IoC
     /// </summary>
     [PublicAPI, GenericTypeArgument]
     public abstract class TT32 { }
+
+    /// <summary>
+    /// Represents the generic type arguments marker for a reference type with defaul constructor.
+    /// </summary>
+    [PublicAPI, GenericTypeArgument]
+    public class TTC32 { }
 
     /// <summary>
     /// Represents the generic type arguments marker for an interface.
@@ -9281,7 +9479,7 @@ namespace IoC.Features
 
 
 #endregion
-#region ResolveUnregisteredImplementationsFeature
+#region ResolveUnboundFeature
 
 namespace IoC.Features
 {
@@ -9294,9 +9492,9 @@ namespace IoC.Features
     using Issues;
 
     /// <summary>
-    /// Allows to resolve unregistered dependencies.
+    /// Allows to resolve unbound dependencies.
     /// </summary>
-    public class ResolveUnregisteredImplementationsFeature:
+    public class ResolveUnboundFeature:
         IConfiguration,
         IDisposable,
         IEnumerable<Key>,
@@ -9312,7 +9510,7 @@ namespace IoC.Features
         /// <summary>
         /// Creates an instance of feature.
         /// </summary>
-        public ResolveUnregisteredImplementationsFeature()
+        public ResolveUnboundFeature()
             : this(true)
         {
         }
@@ -9322,7 +9520,7 @@ namespace IoC.Features
         /// </summary>
         /// <param name="supportDefaults"><c>True</c> to resolve default(T) for unresolved value types.</param>
         /// <param name="autowiringStrategy">The autowiring strategy.</param>
-        public ResolveUnregisteredImplementationsFeature(bool supportDefaults, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
+        public ResolveUnboundFeature(bool supportDefaults, [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
         {
             _supportDefaults = supportDefaults;
             _autowiringStrategy = autowiringStrategy;
@@ -14526,27 +14724,18 @@ namespace IoC.Core
         protected override Expression VisitNew(NewExpression node)
         {
             var newTypeDescriptor = ReplaceType(node.Type).Descriptor();
-            var newConstructor = newTypeDescriptor.GetDeclaredConstructors().Single(i => !i.IsPrivate && Match(node.Constructor.GetParameters(), i.GetParameters()));
-            return Expression.New(newConstructor, ReplaceAll(node.Arguments));
-        }
-
-        protected override Expression VisitUnary(UnaryExpression node)
-        {
-            var newType = ReplaceType(node.Type);
-            switch (node.NodeType)
+            var newConstructor = newTypeDescriptor.GetDeclaredConstructors().SingleOrDefault(i => !i.IsPrivate && Match(node.Constructor.GetParameters(), i.GetParameters()));
+            if (newConstructor == null)
             {
-                case ExpressionType.Convert:
-                    var newOperand = Visit(node.Operand);
-                    if (newOperand == null)
-                    {
-                        return base.VisitUnary(node);
-                    }
+                if (newTypeDescriptor.IsValueType())
+                {
+                    return Expression.Default(newTypeDescriptor.Type);
+                }
 
-                    return newOperand.Convert(newType);
-
-                default:
-                    return base.VisitUnary(node);
+                throw new BuildExpressionException($"Cannot find a constructor for {newTypeDescriptor.Type}.", null);
             }
+
+            return Expression.New(newConstructor, ReplaceAll(node.Arguments));
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
@@ -14616,24 +14805,14 @@ namespace IoC.Core
 
             var newType = ReplaceType(node.Type);
             var value = node.Value;
-            if (node.Value == null)
-            {
-                return Expression.Default(newType);
-            }
-
-            return Expression.Constant(value, newType);
+            return node.Value == null ? (Expression) Expression.Default(newType) : Expression.Constant(value, newType);
         }
 
         protected override Expression VisitLambda<T>(Expression<T> node)
         {
             var parameters = node.Parameters.Select(VisitParameter).Cast<ParameterExpression>();
             var body = Visit(node.Body);
-            if (body == null)
-            {
-                return base.VisitLambda(node);
-            }
-
-            return Expression.Lambda(ReplaceType(node.Type), body, parameters);
+            return body == null ? base.VisitLambda(node) : Expression.Lambda(ReplaceType(node.Type), body, parameters);
         }
 
         protected override Expression VisitNewArray(NewArrayExpression node)
@@ -14646,23 +14825,7 @@ namespace IoC.Core
         protected override Expression VisitListInit(ListInitExpression node)
         {
             var newExpression = (NewExpression)Visit(node.NewExpression);
-            if (newExpression == null)
-            {
-                return node;
-            }
-
-            return Expression.ListInit(newExpression, node.Initializers.Select(VisitInitializer));
-        }
-
-        protected override Expression VisitBinary(BinaryExpression node)
-        {
-            switch (node.NodeType)
-            {
-                case ExpressionType.Assign:
-                    return Expression.Assign(Visit(node.Left) ?? throw new InvalidOperationException(), Visit(node.Right) ?? throw new InvalidOperationException());
-            }
-
-            return base.VisitBinary(node);
+            return newExpression == null ? node : Expression.ListInit(newExpression, node.Initializers.Select(VisitInitializer));
         }
 
         private ElementInit VisitInitializer(ElementInit node)
@@ -14682,14 +14845,29 @@ namespace IoC.Core
             return Expression.ElementInit(newMethod, ReplaceAll(node.Arguments));
         }
 
-        private bool Match(ParameterInfo[] baseParams, ParameterInfo[] newParams)
+        protected override Expression VisitUnary(UnaryExpression node)
         {
-            if (baseParams.Length != newParams.Length)
+            switch (node.NodeType)
+            {
+                case ExpressionType.Convert:
+                    return Expression.Convert(Visit(node.Operand), ReplaceType(node.Type));
+                case ExpressionType.ConvertChecked:
+                    return Expression.ConvertChecked(Visit(node.Operand), ReplaceType(node.Type));
+                case ExpressionType.Unbox:
+                    return Expression.Unbox(Visit(node.Operand), ReplaceType(node.Type));
+            }
+
+            return base.VisitUnary(node);
+        }
+
+        private bool Match(IList<ParameterInfo> baseParams, IList<ParameterInfo> newParams)
+        {
+            if (baseParams.Count != newParams.Count)
             {
                 return false;
             }
 
-            for (var i = 0; i < baseParams.Length; i++)
+            for (var i = 0; i < baseParams.Count; i++)
             {
                 if (baseParams[i].Name != newParams[i].Name)
                 {

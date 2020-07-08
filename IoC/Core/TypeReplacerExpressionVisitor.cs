@@ -20,27 +20,18 @@
         protected override Expression VisitNew(NewExpression node)
         {
             var newTypeDescriptor = ReplaceType(node.Type).Descriptor();
-            var newConstructor = newTypeDescriptor.GetDeclaredConstructors().Single(i => !i.IsPrivate && Match(node.Constructor.GetParameters(), i.GetParameters()));
-            return Expression.New(newConstructor, ReplaceAll(node.Arguments));
-        }
-
-        protected override Expression VisitUnary(UnaryExpression node)
-        {
-            var newType = ReplaceType(node.Type);
-            switch (node.NodeType)
+            var newConstructor = newTypeDescriptor.GetDeclaredConstructors().SingleOrDefault(i => !i.IsPrivate && Match(node.Constructor.GetParameters(), i.GetParameters()));
+            if (newConstructor == null)
             {
-                case ExpressionType.Convert:
-                    var newOperand = Visit(node.Operand);
-                    if (newOperand == null)
-                    {
-                        return base.VisitUnary(node);
-                    }
+                if (newTypeDescriptor.IsValueType())
+                {
+                    return Expression.Default(newTypeDescriptor.Type);
+                }
 
-                    return newOperand.Convert(newType);
-
-                default:
-                    return base.VisitUnary(node);
+                throw new BuildExpressionException($"Cannot find a constructor for {newTypeDescriptor.Type}.", null);
             }
+
+            return Expression.New(newConstructor, ReplaceAll(node.Arguments));
         }
 
         protected override Expression VisitMethodCall(MethodCallExpression node)
@@ -110,24 +101,14 @@
 
             var newType = ReplaceType(node.Type);
             var value = node.Value;
-            if (node.Value == null)
-            {
-                return Expression.Default(newType);
-            }
-
-            return Expression.Constant(value, newType);
+            return node.Value == null ? (Expression) Expression.Default(newType) : Expression.Constant(value, newType);
         }
 
         protected override Expression VisitLambda<T>(Expression<T> node)
         {
             var parameters = node.Parameters.Select(VisitParameter).Cast<ParameterExpression>();
             var body = Visit(node.Body);
-            if (body == null)
-            {
-                return base.VisitLambda(node);
-            }
-
-            return Expression.Lambda(ReplaceType(node.Type), body, parameters);
+            return body == null ? base.VisitLambda(node) : Expression.Lambda(ReplaceType(node.Type), body, parameters);
         }
 
         protected override Expression VisitNewArray(NewArrayExpression node)
@@ -140,23 +121,7 @@
         protected override Expression VisitListInit(ListInitExpression node)
         {
             var newExpression = (NewExpression)Visit(node.NewExpression);
-            if (newExpression == null)
-            {
-                return node;
-            }
-
-            return Expression.ListInit(newExpression, node.Initializers.Select(VisitInitializer));
-        }
-
-        protected override Expression VisitBinary(BinaryExpression node)
-        {
-            switch (node.NodeType)
-            {
-                case ExpressionType.Assign:
-                    return Expression.Assign(Visit(node.Left) ?? throw new InvalidOperationException(), Visit(node.Right) ?? throw new InvalidOperationException());
-            }
-
-            return base.VisitBinary(node);
+            return newExpression == null ? node : Expression.ListInit(newExpression, node.Initializers.Select(VisitInitializer));
         }
 
         private ElementInit VisitInitializer(ElementInit node)
@@ -176,14 +141,29 @@
             return Expression.ElementInit(newMethod, ReplaceAll(node.Arguments));
         }
 
-        private bool Match(ParameterInfo[] baseParams, ParameterInfo[] newParams)
+        protected override Expression VisitUnary(UnaryExpression node)
         {
-            if (baseParams.Length != newParams.Length)
+            switch (node.NodeType)
+            {
+                case ExpressionType.Convert:
+                    return Expression.Convert(Visit(node.Operand), ReplaceType(node.Type));
+                case ExpressionType.ConvertChecked:
+                    return Expression.ConvertChecked(Visit(node.Operand), ReplaceType(node.Type));
+                case ExpressionType.Unbox:
+                    return Expression.Unbox(Visit(node.Operand), ReplaceType(node.Type));
+            }
+
+            return base.VisitUnary(node);
+        }
+
+        private bool Match(IList<ParameterInfo> baseParams, IList<ParameterInfo> newParams)
+        {
+            if (baseParams.Count != newParams.Count)
             {
                 return false;
             }
 
-            for (var i = 0; i < baseParams.Length; i++)
+            for (var i = 0; i < baseParams.Count; i++)
             {
                 if (baseParams[i].Name != newParams[i].Name)
                 {

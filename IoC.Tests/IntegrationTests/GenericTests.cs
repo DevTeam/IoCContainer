@@ -31,6 +31,18 @@
         }
 
         [Fact]
+        public void ShouldCreateWhenList()
+        {
+            // Given
+
+            // When
+            _token.Bind<Holder<TT>>().To(ctx => new Holder<TT>(new List<TT> { ctx.Container.Inject<TT>() }));
+
+            // Then
+            _token.Container.Resolve<Holder<int>>();
+        }
+
+        [Fact]
         public void ShouldCreateWhenDefault()
         {
             // Given
@@ -55,7 +67,7 @@
         }
 
         [Fact]
-        public void ShouldCreateWhenNew()
+        public void ShouldCreateWhenNewValueType()
         {
             // Given
 
@@ -64,6 +76,31 @@
 
             // Then
             _token.Container.Resolve<HolderWithCtor<int>>();
+        }
+
+        [Fact]
+        public void ShouldCreateWhenArrayOfNewOfValueType()
+        {
+            // Given
+
+            // When
+            _token.Bind<HolderWithCtor<TTC>>().To(ctx => new HolderWithCtor<TTC>(new [] { new TTC() }));
+
+            // Then
+            _token.Container.Resolve<HolderWithCtor<int>>();
+        }
+
+
+        [Fact]
+        public void ShouldCreateWhenNewRefType()
+        {
+            // Given
+
+            // When
+            _token.Bind<HolderWithCtor<TTC>>().To(ctx => new HolderWithCtor<TTC>(new TTC()));
+
+            // Then
+            _token.Container.Resolve<HolderWithCtor<MyClass>>();
         }
 
         public class Holder<T>
@@ -92,6 +129,12 @@
             where T : new()
         {
             public HolderWithCtor(T value) { }
+
+            public HolderWithCtor(T[] values) { }
+        }
+
+        public class MyClass
+        {
         }
     }
 }
