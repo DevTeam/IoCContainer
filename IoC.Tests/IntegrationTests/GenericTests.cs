@@ -1,4 +1,5 @@
-﻿namespace IoC.Tests.IntegrationTests
+﻿// ReSharper disable UnusedParameter.Local
+namespace IoC.Tests.IntegrationTests
 {
     using System;
     using System.Collections.Generic;
@@ -28,6 +29,59 @@
 
             // Then
             _token.Container.Resolve<Holder<int>>();
+        }
+
+        [Fact]
+        public void ShouldCreateWhenObjectCast()
+        {
+            // Given
+
+            // When
+            // ReSharper disable once RedundantCast
+            _token.Bind<Holder<TT>>().To(ctx => new Holder<TT>((TT)(object)ctx.Container.Inject<TT>()));
+
+            // Then
+            _token.Container.Resolve<Holder<int>>();
+        }
+
+        [Fact]
+        public void ShouldCreateWhenCast()
+        {
+            // Given
+
+            // When
+            // ReSharper disable once RedundantCast
+            _token.Bind<Holder<TT>>().To(ctx => new Holder<TT>((TT)ctx.Container.Inject<TT>()));
+
+            // Then
+            _token.Container.Resolve<Holder<int>>();
+        }
+
+        [Fact]
+        public void ShouldCreateWhenTypeAs()
+        {
+            // Given
+
+            // When
+            // ReSharper disable once RedundantCast
+            _token.Bind<Holder<TT>>().To(ctx => new Holder<TT>(ctx.Container.Inject<TT>() as TT));
+
+            // Then
+            _token.Container.Resolve<Holder<string>>();
+        }
+
+        [Fact]
+        public void ShouldCreateWhenConditionalAndTypeIs()
+        {
+            // Given
+
+            // When
+            // ReSharper disable once RedundantCast
+            _token.Bind<Holder<TT>>().To(ctx => new Holder<TT>((ctx.Container.Inject<TT>() as object) is TT ? (TT)(object)typeof(TT).Name : (TT)(object)"0"));
+
+            // Then
+            var val = _token.Container.Resolve<Holder<string>>().Value;
+            val.ShouldBe("String");
         }
 
         [Fact]
@@ -105,16 +159,19 @@
 
         public class Holder<T>
         {
-            public Holder(T[] value)
+            public readonly T Value;
+
+            public Holder(T[] arr)
             {
             }
 
-            public Holder(List<T> value)
+            public Holder(List<T> list)
             {
             }
 
             public Holder(T value)
             {
+                Value = value;
             }
 
             public Holder(Type type)

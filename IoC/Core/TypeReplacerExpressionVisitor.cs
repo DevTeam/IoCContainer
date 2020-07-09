@@ -10,12 +10,9 @@
     internal sealed class TypeReplacerExpressionVisitor : ExpressionVisitor
     {
         [NotNull] private readonly IDictionary<Type, Type> _typesMap;
-        [NotNull] private readonly Dictionary<ParameterExpression, ParameterExpression> _parameters = new Dictionary<ParameterExpression, ParameterExpression>();
 
-        public TypeReplacerExpressionVisitor([NotNull] IDictionary<Type, Type> typesMap)
-        {
+        public TypeReplacerExpressionVisitor([NotNull] IDictionary<Type, Type> typesMap) =>
             _typesMap = typesMap ?? throw new ArgumentNullException(nameof(typesMap));
-        }
 
         protected override Expression VisitNew(NewExpression node)
         {
@@ -37,11 +34,10 @@
         protected override Expression VisitMethodCall(MethodCallExpression node)
         {
             var newDeclaringType = ReplaceType(node.Method.DeclaringType).Descriptor();
-            var newMethod = newDeclaringType.GetDeclaredMethods().SingleOrDefault(i => i.Name == node.Method.Name && Match(node.Method.GetParameters(), i.GetParameters()));
-            if (newMethod == null)
-            {
-                throw new BuildExpressionException($"Cannot find method {node.Method} in the {node.Method.DeclaringType}.", new InvalidOperationException());
-            }
+            var newMethod = newDeclaringType
+                .GetDeclaredMethods()
+                .SingleOrDefault(i => i.Name == node.Method.Name && Match(node.Method.GetParameters(), i.GetParameters()))
+                ?? throw new BuildExpressionException($"Cannot find method {node.Method} in the {node.Method.DeclaringType}.", new InvalidOperationException()); ;
 
             if (newMethod.IsGenericMethod)
             {
@@ -63,34 +59,11 @@
 
             var newMember = newDeclaringTypeDescriptor.GetDeclaredMembers().Single(i => i.Name == node.Member.Name);
             var newExpression = Visit(node.Expression);
-            if (newExpression == null)
-            {
-                return base.VisitMember(node);
-            }
-
-            return Expression.MakeMemberAccess(newExpression, newMember);
+            return newExpression == null ? base.VisitMember(node) : Expression.MakeMemberAccess(newExpression, newMember);
         }
 
-        protected override Expression VisitParameter(ParameterExpression node)
-        {
-            if (_parameters.TryGetValue(node, out var newNode))
-            {
-                return newNode;
-            }
-
-            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
-            if (node.IsByRef)
-            {
-                newNode = Expression.Parameter(ReplaceType(node.Type).MakeByRefType(), node.Name);
-            }
-            else
-            {
-                newNode = Expression.Parameter(ReplaceType(node.Type), node.Name);
-            }
-
-            _parameters[node] = newNode;
-            return newNode;
-        }
+        protected override Expression VisitParameter(ParameterExpression node) =>
+            Expression.Parameter(node.IsByRef ? ReplaceType(node.Type).MakeByRefType() : ReplaceType(node.Type), node.Name);
 
         protected override Expression VisitConstant(ConstantExpression node)
         {
@@ -127,11 +100,10 @@
         private ElementInit VisitInitializer(ElementInit node)
         {
             var newDeclaringType = ReplaceType(node.AddMethod.DeclaringType).Descriptor();
-            var newMethod = newDeclaringType.GetDeclaredMethods().SingleOrDefault(i => i.Name == node.AddMethod.Name && Match(node.AddMethod.GetParameters(), i.GetParameters()));
-            if (newMethod == null)
-            {
-                throw new BuildExpressionException($"Cannot find method {node.AddMethod} in the {node.AddMethod.DeclaringType}.", new InvalidOperationException());
-            }
+            var newMethod = newDeclaringType
+                .GetDeclaredMethods()
+                .SingleOrDefault(i => i.Name == node.AddMethod.Name && Match(node.AddMethod.GetParameters(), i.GetParameters()))
+                ?? throw new BuildExpressionException($"Cannot find method \"{node.AddMethod.Name}\" in the {node.AddMethod.DeclaringType}.", new InvalidOperationException());
 
             if (newMethod.IsGenericMethod)
             {
@@ -147,15 +119,31 @@
             {
                 case ExpressionType.Convert:
                     return Expression.Convert(Visit(node.Operand), ReplaceType(node.Type));
+
                 case ExpressionType.ConvertChecked:
                     return Expression.ConvertChecked(Visit(node.Operand), ReplaceType(node.Type));
+
                 case ExpressionType.Unbox:
                     return Expression.Unbox(Visit(node.Operand), ReplaceType(node.Type));
-            }
 
-            return base.VisitUnary(node);
+                case ExpressionType.TypeAs:
+                    return Expression.TypeAs(Visit(node.Operand), ReplaceType(node.Type));
+
+                case ExpressionType.TypeIs:
+                    return Expression.TypeIs(Visit(node.Operand), ReplaceType(node.Type));
+
+                default:
+                    return base.VisitUnary(node);
+            }
         }
 
+        protected override Expression VisitTypeBinary(TypeBinaryExpression node) =>
+            Expression.TypeIs(Visit(node.Expression), ReplaceType(node.TypeOperand));
+
+        protected override Expression VisitConditional(ConditionalExpression node) =>
+            Expression.Condition(Visit(node.Test), Visit(node.IfTrue), Visit(node.IfFalse), ReplaceType(node.Type));
+
+        [MethodImpl((MethodImplOptions)0x200)]
         private bool Match(IList<ParameterInfo> baseParams, IList<ParameterInfo> newParams)
         {
             if (baseParams.Count != newParams.Count)
@@ -185,7 +173,7 @@
             return true;
         }
 
-        [MethodImpl((MethodImplOptions)0x100)]
+        [MethodImpl((MethodImplOptions)0x200)]
         private Type[] ReplaceTypes(Type[] types)
         {
             for (var i = 0; i < types.Length; i++)
@@ -196,6 +184,7 @@
             return types;
         }
 
+        [MethodImpl((MethodImplOptions)0x200)]
         private Type ReplaceType(Type type)
         {
             if (_typesMap.TryGetValue(type, out var newType))
