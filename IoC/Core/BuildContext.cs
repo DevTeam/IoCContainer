@@ -19,7 +19,6 @@
         [NotNull] private readonly IEnumerable<IBuilder> _builders;
         private readonly IList<ParameterExpression> _parameters = new List<ParameterExpression>();
         [NotNull] private readonly ICompiler _compiler;
-        [CanBeNull] internal readonly BuildContext Parent;
         [NotNull] private readonly IDictionary<Type, Type> _typesMap;
 
         internal BuildContext(
@@ -44,6 +43,8 @@
             Depth = depth;
             _typesMap = parent == null ? new Dictionary<Type, Type>() : new Dictionary<Type, Type>(parent._typesMap);
         }
+
+        public IBuildContext Parent { get; private set; }
 
         public Key Key { get; }
 
@@ -166,7 +167,7 @@
         public override string ToString()
         {
             var path = new List<IBuildContext>();
-            var context = this;
+            IBuildContext context = this;
             while (context != null)
             {
                 path.Add(context);

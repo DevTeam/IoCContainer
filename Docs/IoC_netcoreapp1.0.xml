@@ -5584,6 +5584,11 @@
             Represents an abstract build context.
             </summary>
         </member>
+        <member name="P:IoC.IBuildContext.Parent">
+            <summary>
+            Provides a parent context or <c>null</c>.
+            </summary>
+        </member>
         <member name="P:IoC.IBuildContext.Key">
             <summary>
             The target key to build resolver.

@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
+    using System.Reflection;
     using Core;
     using Lifetimes;
     using static Core.FluentRegister;
@@ -13,6 +14,8 @@
     [PublicAPI]
     public sealed  class FuncFeature : IConfiguration
     {
+        [NotNull] private static readonly MethodInfo ResolveWithTagGenericMethodInfo = ((MethodCallExpression)((Expression<Func<object>>)(() => Resolve<object>(default(IContainer), default(Tag), default(object[])))).Body).Method.GetGenericMethodDefinition();
+
         /// The default instance.
         public static readonly IConfiguration Set = new FuncFeature();
 
@@ -50,7 +53,34 @@
                 var instanceType = genericTypeArguments[paramsCount];
                 var key = new Key(instanceType, buildContext.Key.Tag);
                 var context = buildContext.CreateChild(key, buildContext.Container);
-                var instanceExpression = context.CreateExpression();
+                var curContext = buildContext.Parent;
+                var reentrancy = false;
+                while (curContext != null)
+                {
+                    if (curContext.Key.Equals(buildContext.Key))
+                    {
+                        reentrancy = true;
+                        break;
+                    }
+
+                    curContext = curContext.Parent;
+                }
+
+                Expression instanceExpression;
+                if (!reentrancy)
+                {
+                    instanceExpression = context.CreateExpression();
+                }
+                else
+                {
+                    instanceExpression = Expression.Call(
+                        null,
+                        ResolveWithTagGenericMethodInfo.MakeGenericMethod(instanceType),
+                        buildContext.ContainerParameter,
+                        Expression.Constant(buildContext.Key.Tag),
+                        buildContext.ArgsParameter);
+                }
+
                 var parameters = new ParameterExpression[paramsCount];
                 var parametersArgs = new Expression[paramsCount];
                 for (var i = 0; i < paramsCount; i++)
@@ -86,5 +116,8 @@
                 return false;
             }
         }
+
+        private static T Resolve<T>([NotNull] IContainer container, object tag, [NotNull][ItemCanBeNull] params object[] args)
+            => container.GetResolver<T>(new Tag(tag))(container, args);
     }
 }

@@ -560,6 +560,52 @@
             }
         }
 
+        [Fact]
+        public void ContainerShouldResolveWhenFactory()
+        {
+            // Given
+            using var container = Container.Create();
+
+            // When
+            using (container
+                .Bind<IMyClass>().To<MyClass>()
+                .Bind<IFactory<TT>>().To<MyFactory<TT>>())
+            {
+                var instance = container.Resolve<IMyClass>();
+
+                // Then
+                instance.New().ShouldBeOfType<MyClass>();
+            }
+        }
+
+        public interface IFactory<out T>
+        {
+            T Create();
+        }
+
+        public class MyFactory<T>: IFactory<T>
+        {
+            private readonly Func<T> _func;
+
+            public MyFactory(Func<T> func) => _func = func;
+
+            public T Create() => _func();
+        }
+
+        public interface IMyClass
+        {
+            IMyClass New();
+        }
+
+        public class MyClass: IMyClass
+        {
+            private readonly IFactory<IMyClass> _factory;
+
+            public MyClass(IFactory<IMyClass> factory) => _factory = factory;
+
+            public IMyClass New() => _factory.Create();
+        }
+
 #if !NET40
         [Fact]
         public void ContainerShouldResolveGenericWhenComplex()

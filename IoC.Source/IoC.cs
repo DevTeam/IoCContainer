@@ -8132,6 +8132,11 @@ namespace IoC
     public interface IBuildContext
     {
         /// <summary>
+        /// Provides a parent context or <c>null</c>.
+        /// </summary>
+        [CanBeNull] IBuildContext Parent { get; }
+
+        /// <summary>
         /// The target key to build resolver.
         /// </summary>
         Key Key { get; }
@@ -9353,6 +9358,7 @@ namespace IoC.Features
     using System;
     using System.Collections.Generic;
     using System.Linq.Expressions;
+    using System.Reflection;
     using Core;
     using Lifetimes;
     using static Core.FluentRegister;
@@ -9363,6 +9369,8 @@ namespace IoC.Features
     [PublicAPI]
     public sealed  class FuncFeature : IConfiguration
     {
+        [NotNull] private static readonly MethodInfo ResolveWithTagGenericMethodInfo = ((MethodCallExpression)((Expression<Func<object>>)(() => Resolve<object>(default(IContainer), default(Tag), default(object[])))).Body).Method.GetGenericMethodDefinition();
+
         /// The default instance.
         public static readonly IConfiguration Set = new FuncFeature();
 
@@ -9400,7 +9408,34 @@ namespace IoC.Features
                 var instanceType = genericTypeArguments[paramsCount];
                 var key = new Key(instanceType, buildContext.Key.Tag);
                 var context = buildContext.CreateChild(key, buildContext.Container);
-                var instanceExpression = context.CreateExpression();
+                var curContext = buildContext.Parent;
+                var reentrancy = false;
+                while (curContext != null)
+                {
+                    if (curContext.Key.Equals(buildContext.Key))
+                    {
+                        reentrancy = true;
+                        break;
+                    }
+
+                    curContext = curContext.Parent;
+                }
+
+                Expression instanceExpression;
+                if (!reentrancy)
+                {
+                    instanceExpression = context.CreateExpression();
+                }
+                else
+                {
+                    instanceExpression = Expression.Call(
+                        null,
+                        ResolveWithTagGenericMethodInfo.MakeGenericMethod(instanceType),
+                        buildContext.ContainerParameter,
+                        Expression.Constant(buildContext.Key.Tag),
+                        buildContext.ArgsParameter);
+                }
+
                 var parameters = new ParameterExpression[paramsCount];
                 var parametersArgs = new Expression[paramsCount];
                 for (var i = 0; i < paramsCount; i++)
@@ -9436,6 +9471,9 @@ namespace IoC.Features
                 return false;
             }
         }
+
+        private static T Resolve<T>([NotNull] IContainer container, object tag, [NotNull][ItemCanBeNull] params object[] args)
+            => container.GetResolver<T>(new Tag(tag))(container, args);
     }
 }
 
@@ -11526,7 +11564,6 @@ namespace IoC.Core
         [NotNull] private readonly IEnumerable<IBuilder> _builders;
         private readonly IList<ParameterExpression> _parameters = new List<ParameterExpression>();
         [NotNull] private readonly ICompiler _compiler;
-        [CanBeNull] internal readonly BuildContext Parent;
         [NotNull] private readonly IDictionary<Type, Type> _typesMap;
 
         internal BuildContext(
@@ -11551,6 +11588,8 @@ namespace IoC.Core
             Depth = depth;
             _typesMap = parent == null ? new Dictionary<Type, Type>() : new Dictionary<Type, Type>(parent._typesMap);
         }
+
+        public IBuildContext Parent { get; private set; }
 
         public Key Key { get; }
 
@@ -11673,7 +11712,7 @@ namespace IoC.Core
         public override string ToString()
         {
             var path = new List<IBuildContext>();
-            var context = this;
+            IBuildContext context = this;
             while (context != null)
             {
                 path.Add(context);

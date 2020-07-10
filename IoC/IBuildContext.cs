@@ -10,6 +10,11 @@
     public interface IBuildContext
     {
         /// <summary>
+        /// Provides a parent context or <c>null</c>.
+        /// </summary>
+        [CanBeNull] IBuildContext Parent { get; }
+
+        /// <summary>
         /// The target key to build resolver.
         /// </summary>
         Key Key { get; }

@@ -335,6 +335,7 @@
   - [ContainerParameter](#P-IoC-IBuildContext-ContainerParameter 'IoC.IBuildContext.ContainerParameter')
   - [Depth](#P-IoC-IBuildContext-Depth 'IoC.IBuildContext.Depth')
   - [Key](#P-IoC-IBuildContext-Key 'IoC.IBuildContext.Key')
+  - [Parent](#P-IoC-IBuildContext-Parent 'IoC.IBuildContext.Parent')
   - [AddParameter(parameterExpression)](#M-IoC-IBuildContext-AddParameter-System-Linq-Expressions-ParameterExpression- 'IoC.IBuildContext.AddParameter(System.Linq.Expressions.ParameterExpression)')
   - [CreateChild(key,container)](#M-IoC-IBuildContext-CreateChild-IoC-Key,IoC-IContainer- 'IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)')
   - [CreateExpression(defaultExpression)](#M-IoC-IBuildContext-CreateExpression-System-Linq-Expressions-Expression- 'IoC.IBuildContext.CreateExpression(System.Linq.Expressions.Expression)')
@@ -8088,6 +8089,13 @@ The depth of current context in the build tree.
 ##### Summary
 
 The target key to build resolver.
+
+<a name='P-IoC-IBuildContext-Parent'></a>
+### Parent `property`
+
+##### Summary
+
+Provides a parent context or `null`.
 
 <a name='M-IoC-IBuildContext-AddParameter-System-Linq-Expressions-ParameterExpression-'></a>
 ### AddParameter(parameterExpression) `method`

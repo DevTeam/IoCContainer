@@ -21,7 +21,7 @@
       <ItemGroup>
         <PackageReference Include="Moq" Version="4.2.1510.2205" />
         <PackageReference Include="xunit" Version="1.9.2" />
-      </ItemGroup>      
+      </ItemGroup>
     </When>
 
     <When Condition="'$(TargetFramework)'=='netcoreapp1.0'">
