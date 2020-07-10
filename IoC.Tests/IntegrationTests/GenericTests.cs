@@ -77,6 +77,8 @@ namespace IoC.Tests.IntegrationTests
 
             // When
             // ReSharper disable once RedundantCast
+            // ReSharper disable once SuspiciousTypeConversion.Global
+            // ReSharper disable once UseNameOfInsteadOfTypeOf
             _token.Bind<Holder<TT>>().To(ctx => new Holder<TT>((ctx.Container.Inject<TT>() as object) is TT ? (TT)(object)typeof(TT).Name : (TT)(object)"0"));
 
             // Then
