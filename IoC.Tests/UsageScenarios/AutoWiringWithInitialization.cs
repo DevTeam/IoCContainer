@@ -3,7 +3,7 @@
     using Shouldly;
     using Xunit;
 
-    public class AutoWiringWithInitialization
+    public class AutowiringWithInitialization
     {
         [Fact]
         public void Run()

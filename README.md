@@ -961,20 +961,20 @@ public void Run()
 
 class CustomAutowiringStrategy : IAutowiringStrategy
 {
-    private readonly IAutowiringStrategy _baseAutowiringStrategy;
+    private readonly IAutowiringStrategy _baseStrategy;
 
-    public CustomAutowiringStrategy(IAutowiringStrategy baseAutowiringStrategy) =>
+    public CustomAutowiringStrategy(IAutowiringStrategy baseStrategy) =>
         // Saves the previous autowiring strategy
-        _baseAutowiringStrategy = baseAutowiringStrategy;
+        _baseStrategy = baseStrategy;
 
     public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType) =>
         // Just uses a logic from the previous autowiring strategy as is
-        _baseAutowiringStrategy.TryResolveType(registeredType, resolvingType, out instanceType);
+        _baseStrategy.TryResolveType(registeredType, resolvingType, out instanceType);
 
     // Overrides a logic to inject the constant "default name" to every constructors parameters named "name" of type String
     public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
     {
-        if (!_baseAutowiringStrategy.TryResolveConstructor(constructors, out constructor))
+        if (!_baseStrategy.TryResolveConstructor(constructors, out constructor))
         {
             return false;
         }
@@ -991,7 +991,7 @@ class CustomAutowiringStrategy : IAutowiringStrategy
 
     public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
         // Just uses a logic from the previous autowiring strategy as is
-        => _baseAutowiringStrategy.TryResolveInitializers(methods, out initializers);
+        => _baseStrategy.TryResolveInitializers(methods, out initializers);
 }
 ```
 
@@ -1303,7 +1303,7 @@ var instance2 = container.Resolve<IAnotherService>();
 
 
 
-### Autowiring with initialization [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoWiringWithInitialization.cs)
+### Autowiring with initialization [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutowiringWithInitialization.cs)
 
 Sometimes instances required some actions before you give them to use - some methods of initialization or fields which should be defined. You can solve these things easy.
 

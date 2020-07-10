@@ -38,20 +38,20 @@ namespace IoC.Tests.UsageScenarios
 
         class CustomAutowiringStrategy : IAutowiringStrategy
         {
-            private readonly IAutowiringStrategy _baseAutowiringStrategy;
+            private readonly IAutowiringStrategy _baseStrategy;
 
-            public CustomAutowiringStrategy(IAutowiringStrategy baseAutowiringStrategy) =>
+            public CustomAutowiringStrategy(IAutowiringStrategy baseStrategy) =>
                 // Saves the previous autowiring strategy
-                _baseAutowiringStrategy = baseAutowiringStrategy;
+                _baseStrategy = baseStrategy;
 
             public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType) =>
                 // Just uses a logic from the previous autowiring strategy as is
-                _baseAutowiringStrategy.TryResolveType(registeredType, resolvingType, out instanceType);
+                _baseStrategy.TryResolveType(registeredType, resolvingType, out instanceType);
 
             // Overrides a logic to inject the constant "default name" to every constructors parameters named "name" of type String
             public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
             {
-                if (!_baseAutowiringStrategy.TryResolveConstructor(constructors, out constructor))
+                if (!_baseStrategy.TryResolveConstructor(constructors, out constructor))
                 {
                     return false;
                 }
@@ -68,7 +68,7 @@ namespace IoC.Tests.UsageScenarios
 
             public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
                 // Just uses a logic from the previous autowiring strategy as is
-                => _baseAutowiringStrategy.TryResolveInitializers(methods, out initializers);
+                => _baseStrategy.TryResolveInitializers(methods, out initializers);
         }
         // }
     }
