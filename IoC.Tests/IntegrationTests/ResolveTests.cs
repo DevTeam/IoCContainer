@@ -14,6 +14,20 @@
     public class ResolveTests
     {
         [Fact]
+        public void ContainerShouldThrowInvalidOperationExceptionWhenResolveFromNullContainer()
+        {
+            // Given
+            using var container = Container.Create();
+
+            // When
+            using (container.Bind<IFactory<TT>>().To<MyFactory<TT>>(ctx => new MyFactory<TT>(ctx.Container.Parent.Parent.Inject<Func<TT>>())))
+            {
+                // Then
+                Should.Throw<InvalidOperationException>(() => container.Resolve<IFactory<int>>());
+            }
+        }
+
+        [Fact]
         public void ContainerShouldResolveWhenRef()
         {
             // Given

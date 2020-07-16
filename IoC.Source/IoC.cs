@@ -13374,6 +13374,7 @@ namespace IoC.Core
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using Issues;
 
     internal sealed class NullContainer : IContainer
     {
@@ -13393,6 +13394,11 @@ namespace IoC.Core
 
         public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
         {
+            if (type == typeof(ICannotGetResolver))
+            {
+                throw NotSupportedException;
+            }
+
             resolver = default(Resolver<T>);
             error = NotSupportedException;
             return false;
