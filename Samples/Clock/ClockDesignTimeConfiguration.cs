@@ -1,8 +1,8 @@
-﻿namespace SampleModels
+﻿namespace Clock
 {
     using System.Collections.Generic;
     using IoC;
-    using VewModels;
+    using ViewModels;
 
     /// <summary>
     /// Design time IoC configuration.

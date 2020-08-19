@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:XamarinXaml"
              x:Class="XamarinXaml.Views.MainPage">
     <ContentPage.Resources>
-        <local:DataProvider x:Key="ClockViewModel" ObjectType="SampleModels.VewModels.IClockViewModel, SampleModels"/>
+        <local:DataProvider x:Key="ClockViewModel" ObjectType="Clock.ViewModels.IClockViewModel, Clock"/>
     </ContentPage.Resources>
     <StackLayout HorizontalOptions="Center" VerticalOptions="Center" BindingContext="{StaticResource ClockViewModel}">
         <!-- ReSharper disable once Xaml.BindingWithContextNotResolved -->

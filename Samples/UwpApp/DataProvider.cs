@@ -2,8 +2,8 @@
 {
     using System;
     using Windows.UI.Xaml;
+    using Clock;
     using IoC;
-    using SampleModels;
 
     internal class DataProvider
     {

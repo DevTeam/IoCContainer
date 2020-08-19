@@ -1,4 +1,4 @@
-﻿namespace SampleModels.VewModels
+﻿namespace Clock.ViewModels
 {
     using System;
     using Models;
@@ -10,10 +10,10 @@
         private readonly IDisposable _timerToken;
 
         public ClockViewModel(
-            IUIDispatcher uiDispatcher,
             IClock clock,
-            ITimer timer)
-            :base(uiDispatcher)
+            ITimer timer,
+            IDispatcher dispatcher = null)
+            :base(dispatcher)
         {
             if (timer == null) throw new ArgumentNullException(nameof(timer));
             _clock = clock ?? throw new ArgumentNullException(nameof(clock));

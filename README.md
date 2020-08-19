@@ -157,8 +157,7 @@ public static void Main(string[] args)
   using var container = Container
     // Creates an Inversion of Control container
     .Create()
-    // using Glue
-    .Using<Glue>();
+    .Using<ClockConfiguration>();
 
   // Creates a host
   using var host = Host
@@ -1303,7 +1302,7 @@ var instance2 = container.Resolve<IAnotherService>();
 
 
 
-### Autowiring with initialization [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutowiringWithInitialization.cs)
+### Autowiring with initialization [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AutoWiringWithInitialization.cs)
 
 Sometimes instances required some actions before you give them to use - some methods of initialization or fields which should be defined. You can solve these things easy.
 

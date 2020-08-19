@@ -4,8 +4,8 @@ namespace WpfApp
 {
     using System.Windows;
     using System.Windows.Data;
+    using Clock;
     using IoC;
-    using SampleModels;
 
     public class DataProvider: ObjectDataProvider
     {

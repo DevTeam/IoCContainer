@@ -1,4 +1,4 @@
-﻿namespace SampleModels.Models
+﻿namespace Clock.Models
 {
     using System;
     using System.Collections.Generic;
@@ -7,6 +7,9 @@
     {
         private readonly System.Threading.Timer _timer;
         private readonly List<IObserver<Tick>> _observers = new List<IObserver<Tick>>();
+
+        // ReSharper disable once UnusedMember.Global
+        public Timer(): this(TimeSpan.FromSeconds(1)) {}
 
         public Timer(TimeSpan period) => _timer = new System.Threading.Timer(Tick, null, TimeSpan.Zero, period);
 
@@ -23,7 +26,7 @@
             foreach (var observer in _observers)
             {
                 observer.OnNext(Models.Tick.Shared);
-            }            
+            }
         }
 
         private class Token: IDisposable

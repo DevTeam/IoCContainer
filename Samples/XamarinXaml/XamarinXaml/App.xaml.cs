@@ -1,7 +1,7 @@
 ﻿namespace XamarinXaml
 {
+    using Clock;
     using IoC;
-    using SampleModels;
     using Xamarin.Forms;
 
     public partial class App

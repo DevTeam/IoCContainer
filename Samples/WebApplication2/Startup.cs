@@ -2,12 +2,12 @@
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using Clock;
     using IoC;
     using IoC.Features;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.DependencyInjection;
-    using ShroedingersCat;
     using IConfiguration = Microsoft.Extensions.Configuration.IConfiguration;
 
     [SuppressMessage("ReSharper", "UnusedMember.Global")]
@@ -33,8 +33,7 @@
                 .Create()
                 // using .NET ASP Feature
                 .Using(new AspNetCoreFeature(services))
-                // using Glue
-                .Using<Glue>()
+                .Using<ClockConfiguration>()
                 // Resolves IServiceProvider
                 .Resolve<IServiceProvider>();
         }

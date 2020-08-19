@@ -1,11 +1,11 @@
 // ReSharper disable ClassNeverInstantiated.Global
 namespace WebApplication3
 {
+    using Clock;
     using IoC;
     using IoC.Features.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Hosting;
-    using ShroedingersCat;
 
     public class Program
     {
@@ -14,8 +14,7 @@ namespace WebApplication3
             using var container = Container
                 // Creates an Inversion of Control container
                 .Create()
-                // using Glue
-                .Using<Glue>();
+                .Using<ClockConfiguration>();
 
             // Creates a host
             using var host = Host

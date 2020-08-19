@@ -1,4 +1,4 @@
-﻿namespace SampleModels.Models
+﻿namespace Clock.Models
 {
     public class Tick
     {

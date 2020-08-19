@@ -1,8 +1,8 @@
 ﻿namespace WpfAppNetCore
 {
     using System.Windows;
+    using Clock;
     using IoC;
-    using SampleModels;
     using Views;
 
     /// <summary>

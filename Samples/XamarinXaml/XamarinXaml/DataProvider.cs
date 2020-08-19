@@ -1,8 +1,8 @@
 ﻿namespace XamarinXaml
 {
     using System;
+    using Clock;
     using IoC;
-    using SampleModels;
     using Xamarin.Forms;
 
     internal class DataProvider

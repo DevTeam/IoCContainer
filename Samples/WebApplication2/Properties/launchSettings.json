@@ -12,7 +12,7 @@
     "IIS Express": {
       "commandName": "IISExpress",
       "launchBrowser": true,
-      "launchUrl": "api/boxes",
+      "launchUrl": "api/clock",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -20,7 +20,7 @@
     "WebApplication": {
       "commandName": "Project",
       "launchBrowser": true,
-      "launchUrl": "api/boxes",
+      "launchUrl": "api/clock",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },

@@ -153,8 +153,7 @@ public static void Main(string[] args)
   using var container = Container
     // Creates an Inversion of Control container
     .Create()
-    // using Glue
-    .Using<Glue>();
+    .Using<ClockConfiguration>();
 
   // Creates a host
   using var host = Host

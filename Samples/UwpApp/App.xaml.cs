@@ -6,8 +6,8 @@
     using Windows.UI.Xaml;
     using Windows.UI.Xaml.Controls;
     using Windows.UI.Xaml.Navigation;
+    using Clock;
     using IoC;
-    using SampleModels;
     using Views;
 
     /// <summary>
@@ -17,7 +17,7 @@
     {
         internal readonly IContainer Container = IoC.Container
             .Create()
-            .Using<ClockConfiguration>()
+            .Using(new ClockConfiguration())
             .Using<AppConfiguration>();
 
         /// <summary>

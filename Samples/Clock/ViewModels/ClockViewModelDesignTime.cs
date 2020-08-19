@@ -1,4 +1,4 @@
-﻿namespace SampleModels.VewModels
+﻿namespace Clock.ViewModels
 {
     /// <summary>
     /// Design time view model.

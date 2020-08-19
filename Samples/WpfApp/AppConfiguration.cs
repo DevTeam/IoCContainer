@@ -1,8 +1,8 @@
 ﻿namespace WpfApp
 {
     using System.Collections.Generic;
+    using Clock.ViewModels;
     using IoC;
-    using SampleModels.VewModels;
     using Views;
     using static IoC.Lifetime;
 
@@ -14,7 +14,7 @@
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             yield return container
-                .Bind<IUIDispatcher>().As(Singleton).To<UIDispatcher>()
+                .Bind<IDispatcher>().As(Singleton).To<Dispatcher>()
                 .Bind<IMainWindowView>().As(Singleton).To<MainWindow>();
         }
     }

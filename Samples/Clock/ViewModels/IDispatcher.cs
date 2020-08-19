@@ -1,9 +1,9 @@
-﻿namespace SampleModels.VewModels
+﻿namespace Clock.ViewModels
 {
     using System;
 
     // ReSharper disable once InconsistentNaming
-    public interface IUIDispatcher
+    public interface IDispatcher
     {
         void Dispatch(Action action);
     }

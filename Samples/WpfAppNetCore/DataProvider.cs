@@ -3,8 +3,8 @@
     using System.Diagnostics.CodeAnalysis;
     using System.Windows;
     using System.Windows.Data;
+    using Clock;
     using IoC;
-    using SampleModels;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]

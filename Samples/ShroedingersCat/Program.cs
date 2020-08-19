@@ -26,11 +26,11 @@ namespace ShroedingersCat
         }
     }
 
-    public interface IBox<out T> { T Content { get; } }
+    interface IBox<out T> { T Content { get; } }
 
-    public interface ICat { State State { get; } }
+    interface ICat { State State { get; } }
 
-    public enum State { Alive, Dead }
+    enum State { Alive, Dead }
 
     class CardboardBox<T> : IBox<T>
     {
@@ -52,7 +52,7 @@ namespace ShroedingersCat
         public override string ToString() => $"{State} cat";
     }
 
-    public class Glue : IConfiguration
+    class Glue : IConfiguration
     {
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {

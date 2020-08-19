@@ -64,7 +64,7 @@ Where _ConfigurationDesignTime_ is the [desing time configuration](Configuration
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:uwpApp="using:UwpApp">
     <Page.Resources>
-        <uwpApp:DataProvider x:Key="ClockViewModel" ObjectType="SampleModels.VewModels.IClockViewModel, SampleModels"/>
+        <uwpApp:DataProvider x:Key="ClockViewModel" ObjectType="Clock.ViewModels.IClockViewModel, Clock"/>
     </Page.Resources>
     <Grid Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" DataContext="{StaticResource ClockViewModel}">

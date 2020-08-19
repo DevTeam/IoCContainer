@@ -53,9 +53,9 @@ Where _ClockDesignTimeConfiguration_ is the [desing time configuration](https://
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:WpfApp"
-        xmlns:vewModels="clr-namespace:SampleModels.VewModels;assembly=SampleModels">
+        xmlns:viewModels="clr-namespace:Clock.ViewModels;assembly=Clock">
     <Window.Resources>
-        <local:DataProvider x:Key="ClockViewModel" ObjectType="{x:Type vewModels:IClockViewModel}" />
+        <local:DataProvider x:Key="ClockViewModel" ObjectType="{x:Type viewModels:IClockViewModel}" />
     </Window.Resources>
     <Grid DataContext="{StaticResource ClockViewModel}">
         <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">

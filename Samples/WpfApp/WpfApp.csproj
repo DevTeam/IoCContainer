@@ -54,7 +54,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="DataProvider.cs" />
-    <Compile Include="UIDispatcher.cs" />
+    <Compile Include="Dispatcher.cs" />
     <Compile Include="Views\IMainWindowView.cs" />
     <Compile Include="Views\MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -101,9 +101,9 @@
       <Project>{c7a8334e-c162-429f-9445-809060e39748}</Project>
       <Name>IoC</Name>
     </ProjectReference>
-    <ProjectReference Include="..\SampleModels\SampleModels.csproj">
+    <ProjectReference Include="..\Clock\Clock.csproj">
       <Project>{13cf9611-a4d7-47be-b2a9-58cc1061b4b5}</Project>
-      <Name>SampleModels</Name>
+      <Name>Clock</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

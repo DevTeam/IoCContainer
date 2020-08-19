@@ -18,7 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
     <ProjectReference Include="..\..\IoC\IoC.csproj" />
-    <ProjectReference Include="..\ShroedingersCat\ShroedingersCat.csproj" />
+    <ProjectReference Include="..\Clock\Clock.csproj" />
   </ItemGroup>
 
 </Project>

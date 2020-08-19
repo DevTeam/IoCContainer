@@ -100,7 +100,7 @@
     </Compile>
     <Compile Include="AppConfiguration.cs" />
     <Compile Include="DataProvider.cs" />
-    <Compile Include="UIDispatcher.cs" />
+    <Compile Include="Dispatcher.cs" />
     <Compile Include="Views\MainPage.xaml.cs">
       <DependentUpon>MainPage.xaml</DependentUpon>
     </Compile>
@@ -142,9 +142,9 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SampleModels\SampleModels.csproj">
+    <ProjectReference Include="..\Clock\Clock.csproj">
       <Project>{13cf9611-a4d7-47be-b2a9-58cc1061b4b5}</Project>
-      <Name>SampleModels</Name>
+      <Name>Clock</Name>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Condition=" '$(VisualStudioVersion)' == '' or '$(VisualStudioVersion)' &lt; '14.0' ">
