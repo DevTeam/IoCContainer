@@ -1,5 +1,6 @@
 ﻿namespace Clock
 {
+    using System;
     using System.Collections.Generic;
     using IoC;
     using Models;
@@ -19,7 +20,7 @@
 
             // Models
             yield return container
-                .Bind<ITimer>().As(Singleton).To<Timer>()
+                .Bind<ITimer>().As(Singleton).To<Timer>(ctx => new Timer(TimeSpan.FromSeconds(1)))
                 .Bind<IClock>().As(Singleton).To<Clock>();
         }
     }

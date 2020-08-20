@@ -3,14 +3,13 @@
     using System;
     using System.Collections.Generic;
 
+    // ReSharper disable once ClassNeverInstantiated.Global
     internal class Timer : ITimer, IDisposable
     {
         private readonly System.Threading.Timer _timer;
         private readonly List<IObserver<Tick>> _observers = new List<IObserver<Tick>>();
 
-        // ReSharper disable once UnusedMember.Global
-        public Timer(): this(TimeSpan.FromSeconds(1)) {}
-
+        // ReSharper disable once MemberCanBePrivate.Global
         public Timer(TimeSpan period) => _timer = new System.Threading.Timer(Tick, null, TimeSpan.Zero, period);
 
         public IDisposable Subscribe(IObserver<Tick> observer)

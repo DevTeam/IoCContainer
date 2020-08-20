@@ -15,9 +15,8 @@
             IDispatcher dispatcher = null)
             :base(dispatcher)
         {
-            if (timer == null) throw new ArgumentNullException(nameof(timer));
             _clock = clock ?? throw new ArgumentNullException(nameof(clock));
-            _timerToken = timer.Subscribe(this);
+            _timerToken = (timer ?? throw new ArgumentNullException(nameof(timer))).Subscribe(this);
         }
 
         public string Time => _clock.Now.ToString("T");
