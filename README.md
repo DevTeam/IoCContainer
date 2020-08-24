@@ -1228,36 +1228,43 @@ var instance2 = container.Resolve<IService<string>>("just generic".AsTag());
 ``` CSharp
 public void Run()
 {
-    // Create and configure the root container
-    using var rootContainer = Container
-        .Create("root")
-        .Bind<string>().To(ctx => "abc")
-        // Binds the service to wrap
-        .Bind<INamedService>().To<NamedService>()
+    // Create and configure a parent container
+    using var parentContainer = Container
+        .Create()
+        // Binds a service to wrap
+        .Bind<IService>().To<Service>()
         .Container;
 
-    // Create and configure the child container
-    using var childContainer = rootContainer
-        .Create("child")
-        .Bind<IDependency>().To<Dependency>()
-        // Binds wrapper, injecting the base INamedService from the parent container "root" via constructor
-        .Bind<INamedService>().To<Wrapper>()
+    // Create and configure a child container
+    using var childContainer = parentContainer
+        .Create()
+        // Binds wrapper, injecting the base IService from the parent container via constructor
+        .Bind<IService>().To<WrapperForService>()
         .Container;
 
-    var service = childContainer.Resolve<INamedService>();
+    var service = childContainer.Resolve<IService>();
 
-    service.Name.ShouldBe("Wrapper abc");
+    service.Value.ShouldBe("Wrapper abc");
 }
 
-public class Wrapper : INamedService
+public interface IService
 {
-    private readonly INamedService _wrapping;
-    
-    public Wrapper(INamedService wrapping) => _wrapping = wrapping;
-
-    public string Name => $"Wrapper {_wrapping.Name}";
+    public string Value { get; }
 }
 
+public class Service: IService
+{
+    public string Value => "abc";
+}
+
+public class WrapperForService : IService
+{
+    private readonly IService _wrapping;
+
+    public WrapperForService(IService wrapping) => _wrapping = wrapping;
+
+    public string Value => $"Wrapper {_wrapping.Value}";
+}
 ```
 
 
