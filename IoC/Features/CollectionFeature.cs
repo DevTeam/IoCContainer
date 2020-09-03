@@ -154,6 +154,8 @@ namespace IoC.Features
 
         private class EnumerableDependency : IDependency
         {
+            private static readonly TypeDescriptor EnumerableTypeDescriptor = typeof(Enumerable<>).Descriptor();
+
             public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
             {
                 var type = buildContext.Key.Type.Descriptor();
@@ -179,7 +181,7 @@ namespace IoC.Features
 
                 if (buildContext.TryCompile(Expression.Lambda(conditionExpression, positionVar, buildContext.ContainerParameter, buildContext.ArgsParameter), out var factory, out error))
                 {
-                    var ctor = typeof(Enumerable<>).Descriptor().MakeGenericType(elementType).Descriptor().GetDeclaredConstructors().Single();
+                    var ctor = EnumerableTypeDescriptor.MakeGenericType(elementType).Descriptor().GetDeclaredConstructors().Single();
                     var enumerableExpression = Expression.New(ctor, Expression.Constant(factory), Expression.Constant(keys.Length), buildContext.ContainerParameter, buildContext.ArgsParameter);
                     expression = enumerableExpression;
                     return true;

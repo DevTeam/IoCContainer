@@ -9046,6 +9046,8 @@ namespace IoC.Features
 
         private class EnumerableDependency : IDependency
         {
+            private static readonly TypeDescriptor EnumerableTypeDescriptor = typeof(Enumerable<>).Descriptor();
+
             public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
             {
                 var type = buildContext.Key.Type.Descriptor();
@@ -9071,7 +9073,7 @@ namespace IoC.Features
 
                 if (buildContext.TryCompile(Expression.Lambda(conditionExpression, positionVar, buildContext.ContainerParameter, buildContext.ArgsParameter), out var factory, out error))
                 {
-                    var ctor = typeof(Enumerable<>).Descriptor().MakeGenericType(elementType).Descriptor().GetDeclaredConstructors().Single();
+                    var ctor = EnumerableTypeDescriptor.MakeGenericType(elementType).Descriptor().GetDeclaredConstructors().Single();
                     var enumerableExpression = Expression.New(ctor, Expression.Constant(factory), Expression.Constant(keys.Length), buildContext.ContainerParameter, buildContext.ArgsParameter);
                     expression = enumerableExpression;
                     return true;
@@ -12554,13 +12556,8 @@ namespace IoC.Core
             var argsVar = Expression.Variable(_buildContext.ArgsParameter.Type);
             return Expression.Block(
                 new[] { argsVar },
-                Expression.TryFinally(
-                    Expression.Block(
-                        Expression.Assign(argsVar, _buildContext.ArgsParameter),
-                        Expression.Assign(_buildContext.ArgsParameter, argsExpression),
-                        CreateDependencyExpression(key, containerExpression, defaultExpression)),
-                    Expression.Assign(_buildContext.ArgsParameter, argsVar))
-            );
+                Expression.Assign(_buildContext.ArgsParameter, argsExpression),
+                CreateDependencyExpression(key, containerExpression, defaultExpression));
         }
 
         protected override Expression VisitUnary(UnaryExpression node)
@@ -13400,7 +13397,7 @@ namespace IoC.Core
             }
 
             resolver = default(Resolver<T>);
-            error = NotSupportedException;
+            error = new InvalidOperationException($"Cannot get resolver for {type} and tag \"{tag}\".");
             return false;
         }
 
@@ -13502,13 +13499,13 @@ namespace IoC.Core
         /// The container parameter.
         /// </summary>
         [NotNull]
-        internal static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer), nameof(Context.Container));
+        internal static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer));
 
         /// <summary>
         /// The args parameters.
         /// </summary>
         [NotNull]
-        internal static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]), nameof(Context.Args));
+        internal static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]));
 
         /// <summary>
         /// All resolvers parameters.
@@ -14759,6 +14756,7 @@ namespace IoC.Core
     internal sealed class TypeReplacerExpressionVisitor : ExpressionVisitor
     {
         [NotNull] private readonly IDictionary<Type, Type> _typesMap;
+        [NotNull] private readonly Dictionary<ParameterExpression, ParameterExpression> _parameters = new Dictionary<ParameterExpression, ParameterExpression>();
 
         public TypeReplacerExpressionVisitor([NotNull] IDictionary<Type, Type> typesMap) =>
             _typesMap = typesMap ?? throw new ArgumentNullException(nameof(typesMap));
@@ -14811,9 +14809,26 @@ namespace IoC.Core
             return newExpression == null ? base.VisitMember(node) : Expression.MakeMemberAccess(newExpression, newMember);
         }
 
-        protected override Expression VisitParameter(ParameterExpression node) =>
-            Expression.Parameter(node.IsByRef ? ReplaceType(node.Type).MakeByRefType() : ReplaceType(node.Type), node.Name);
+        protected override Expression VisitParameter(ParameterExpression node)
+        {
+            if (_parameters.TryGetValue(node, out var newNode))
+            {
+                return newNode;
+            }
 
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (node.IsByRef)
+            {
+                newNode = Expression.Parameter(ReplaceType(node.Type).MakeByRefType(), node.Name);
+            }
+            else
+            {
+                newNode = Expression.Parameter(ReplaceType(node.Type), node.Name);
+            }
+
+            _parameters[node] = newNode;
+            return newNode;
+        }
         protected override Expression VisitConstant(ConstantExpression node)
         {
             if (node.Value is Type type)

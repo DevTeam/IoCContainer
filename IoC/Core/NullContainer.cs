@@ -30,7 +30,7 @@
             }
 
             resolver = default(Resolver<T>);
-            error = NotSupportedException;
+            error = new InvalidOperationException($"Cannot get resolver for {type} and tag \"{tag}\".");
             return false;
         }
 

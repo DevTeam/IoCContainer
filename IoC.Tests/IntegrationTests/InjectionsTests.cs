@@ -1,7 +1,10 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
     using System;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using Features;
     using Moq;
     using Shouldly;
     using Xunit;
@@ -11,6 +14,60 @@
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
     public class InjectionsTests
     {
+        [Fact]
+        public void InjectWhenResolveWhenNestedEnumerableWithArgs()
+        {
+            // Given
+            using var container = Container
+                .Create()
+                // When
+                .Bind<MyClassRef>().Tag(1).To(ctx => new MyClassRef((string)ctx.Args[0] + "1"))
+                .Bind<MyClassRef>().Tag(2).To(ctx => new MyClassRef((string)ctx.Args[0] + "2"))
+                .Bind<MyClassWithEnumDep>().Tag(1).To()
+                .Bind<MyClassWithEnumDep>().Tag(2).To()
+                .Container;
+
+            // Then
+            var items = container.Resolve<Func<Func<IEnumerable<MyClassWithEnumDep>>>>()()().SelectMany(i => i.Val).ToList();
+            items.Count.ShouldBe(4);
+            items.Any(i => i.Val == "abc1").ShouldBeTrue();
+            items.Any(i => i.Val == "abc2").ShouldBeTrue();
+        }
+
+        [Fact]
+        public void InjectWhenInjectInFuncWithArgs()
+        {
+            // Given
+            using var container = Container
+                .Create(CoreFeature.Set)
+                // When
+                .Bind<Func<TT1, TT>>().To(ctx => arg1 => ctx.Container.Inject<TT>(null, arg1))
+                .Bind<MyClassRef>().To(ctx => new MyClassRef((string)ctx.Args[0]))
+                .Container;
+
+            // Then
+            var func = container.Resolve<Func<string, MyClassRef>>();
+
+            func("abc").Val.ShouldBe("abc");
+        }
+
+        [Fact]
+        public void InjectWhenResolveInFuncWithArgs()
+        {
+            // Given
+            using var container = Container
+                .Create(CoreFeature.Set)
+                // When
+                .Bind<Func<TT1, TT>>().To(ctx => arg1 => ctx.Container.Resolve<TT>(arg1))
+                .Bind<MyClassRef>().To(ctx => new MyClassRef((string)ctx.Args[0]))
+                .Container;
+
+            // Then
+            var func = container.Resolve<Func<string, MyClassRef>>();
+
+            func("abc").Val.ShouldBe("abc");
+        }
+
         [Fact]
         public void InjectWhenRef()
         {
@@ -22,13 +79,10 @@
                 .Bind<string>().To(ctx => "abc")
                 .Container;
 
-            using (container)
-            {
-                // Then
-                var instance = container.Resolve<MyClassRef>();
+            // Then
+            var instance = container.Resolve<MyClassRef>();
 
-                instance.Val.ShouldBe("abc");
-            }
+            instance.Val.ShouldBe("abc");
         }
 
         [Fact]
@@ -42,13 +96,10 @@
                 .Bind<MyClassRef>().To(ctx => new MyClassRef((string)ctx.Args[0]))
                 .Container;
 
-            using (container)
-            {
-                // Then
-                var instance = container.Resolve<MyClassWithDep>();
+            // Then
+            var instance = container.Resolve<MyClassWithDep>();
 
-                instance.Val.ShouldBe("arg1");
-            }
+            instance.Val.ShouldBe("arg1");
         }
 
         [Fact]
@@ -62,13 +113,10 @@
                 .Bind<MyClassRef>().As(Lifetime.Singleton).To(ctx => new MyClassRef((string)ctx.Args[0]))
                 .Container;
 
-            using (container)
-            {
-                // Then
-                var instance = container.Resolve<MyClassWithDep>();
+            // Then
+            var instance = container.Resolve<MyClassWithDep>();
 
-                instance.Val.ShouldBe("arg1");
-            }
+            instance.Val.ShouldBe("arg1");
         }
 
         [Fact]
@@ -82,13 +130,10 @@
                 .Bind<MyClassRef>().To(ctx => new MyClassRef(ctx.Args.Length.ToString()))
                 .Container;
 
-            using (container)
-            {
-                // Then
-                var instance = container.Resolve<MyClassWithDep>();
+            // Then
+            var instance = container.Resolve<MyClassWithDep>();
 
-                instance.Val.ShouldBe("0");
-            }
+            instance.Val.ShouldBe("0");
         }
 
         [Fact]
@@ -102,13 +147,10 @@
                 .Bind<string>().To(ctx => "abc")
                 .Container;
 
-            using (container)
-            {
-                // Then
-                var instance = container.Resolve<MyClassRef>();
+            // Then
+            var instance = container.Resolve<MyClassRef>();
 
-                instance.Val.ShouldBe("abc");
-            }
+            instance.Val.ShouldBe("abc");
         }
 
 
@@ -122,13 +164,10 @@
                 .Bind<MyClassRef>().To(ctx => new MyClassRef(ctx.Container.TryInject<string>()))
                 .Container;
 
-            using (container)
-            {
-                // Then
-                var instance = container.Resolve<MyClassRef>();
+            // Then
+            var instance = container.Resolve<MyClassRef>();
 
-                instance.Val.ShouldBe(null);
-            }
+            instance.Val.ShouldBe(null);
         }
 
         [Fact]
@@ -141,13 +180,10 @@
                 .Bind<MyClassRefDef>().To(ctx => new MyClassRefDef(ctx.Container.TryInject<string>()))
                 .Container;
 
-            using (container)
-            {
-                // Then
-                var instance = container.Resolve<MyClassRefDef>();
+            // Then
+            var instance = container.Resolve<MyClassRefDef>();
 
-                instance.Val.ShouldBe(null);
-            }
+            instance.Val.ShouldBe(null);
         }
 
         [Fact]
@@ -161,13 +197,10 @@
                 .Bind<int>().To(ctx => 99)
                 .Container;
 
-            using (container)
-            {
-                // Then
-                var instance = container.Resolve<MyClassVal>();
+            // Then
+            var instance = container.Resolve<MyClassVal>();
 
-                instance.Val.ShouldBe(99);
-            }
+            instance.Val.ShouldBe(99);
         }
 
         [Fact]
@@ -181,13 +214,10 @@
                 .Bind<int>().To(ctx => 99)
                 .Container;
 
-            using (container)
-            {
-                // Then
-                var instance = container.Resolve<MyClassVal>();
+            // Then
+            var instance = container.Resolve<MyClassVal>();
 
-                instance.Val.ShouldBe(99);
-            }
+            instance.Val.ShouldBe(99);
         }
 
         [Fact]
@@ -200,13 +230,10 @@
                 .Bind<MyClassVal>().To(ctx => new MyClassVal(ctx.Container.TryInject<int>()))
                 .Container;
 
-            using (container)
-            {
-                // Then
-                var instance = container.Resolve<MyClassVal>();
+            // Then
+            var instance = container.Resolve<MyClassVal>();
 
-                instance.Val.ShouldBe(0);
-            }
+            instance.Val.ShouldBe(0);
         }
 
         [Fact]
@@ -220,13 +247,10 @@
                 .Bind<int>().To(ctx => 99)
                 .Container;
 
-            using (container)
-            {
-                // Then
-                var instance = container.Resolve<MyClassNullableVal>();
+            // Then
+            var instance = container.Resolve<MyClassNullableVal>();
 
-                instance.Val.ShouldBe(99);
-            }
+            instance.Val.ShouldBe(99);
         }
 
         [Fact]
@@ -239,13 +263,10 @@
                 .Bind<MyClassNullableVal>().To(ctx => new MyClassNullableVal(ctx.Container.TryInjectValue<int>()))
                 .Container;
 
-            using (container)
-            {
-                // Then
-                var instance = container.Resolve<MyClassNullableVal>();
+            // Then
+            var instance = container.Resolve<MyClassNullableVal>();
 
-                instance.Val.HasValue.ShouldBeFalse();
-            }
+            instance.Val.HasValue.ShouldBeFalse();
         }
 
         [Fact]
@@ -259,13 +280,10 @@
                 .Bind<int>().To(ctx => 99)
                 .Container;
 
-            using (container)
-            {
-                // Then
-                var instance = container.Resolve<MyClassNullableVal>();
+            // Then
+            var instance = container.Resolve<MyClassNullableVal>();
 
-                instance.Val.ShouldBe(99);
-            }
+            instance.Val.ShouldBe(99);
         }
 
         [Fact]
@@ -278,13 +296,10 @@
                 .Bind<MyClassNullableVal>().To(ctx => new MyClassNullableVal(ctx.Container.TryInject<int>()))
                 .Container;
 
-            using (container)
-            {
-                // Then
-                var instance = container.Resolve<MyClassNullableVal>();
+            // Then
+            var instance = container.Resolve<MyClassNullableVal>();
 
-                instance.Val.ShouldBe(0);
-            }
+            instance.Val.ShouldBe(0);
         }
 
         public class MyClassRef
@@ -299,6 +314,13 @@
             public string Val { get; }
 
             public MyClassWithDep(MyClassRef myClassRef) => Val = myClassRef.Val;
+        }
+
+        public class MyClassWithEnumDep
+        {
+            public List<MyClassRef> Val { get; }
+
+            public MyClassWithEnumDep(Func<string, IEnumerable<MyClassRef>> myClassEnum) => Val = myClassEnum("abc").ToList();
         }
 
         public class MyClassRefDef

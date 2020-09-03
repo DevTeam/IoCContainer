@@ -12,13 +12,13 @@
         /// The container parameter.
         /// </summary>
         [NotNull]
-        internal static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer), nameof(Context.Container));
+        internal static readonly ParameterExpression ContainerParameter = Expression.Parameter(typeof(IContainer));
 
         /// <summary>
         /// The args parameters.
         /// </summary>
         [NotNull]
-        internal static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]), nameof(Context.Args));
+        internal static readonly ParameterExpression ArgsParameter = Expression.Parameter(typeof(object[]));
 
         /// <summary>
         /// All resolvers parameters.

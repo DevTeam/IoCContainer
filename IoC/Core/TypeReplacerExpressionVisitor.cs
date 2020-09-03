@@ -10,6 +10,7 @@
     internal sealed class TypeReplacerExpressionVisitor : ExpressionVisitor
     {
         [NotNull] private readonly IDictionary<Type, Type> _typesMap;
+        [NotNull] private readonly Dictionary<ParameterExpression, ParameterExpression> _parameters = new Dictionary<ParameterExpression, ParameterExpression>();
 
         public TypeReplacerExpressionVisitor([NotNull] IDictionary<Type, Type> typesMap) =>
             _typesMap = typesMap ?? throw new ArgumentNullException(nameof(typesMap));
@@ -62,9 +63,26 @@
             return newExpression == null ? base.VisitMember(node) : Expression.MakeMemberAccess(newExpression, newMember);
         }
 
-        protected override Expression VisitParameter(ParameterExpression node) =>
-            Expression.Parameter(node.IsByRef ? ReplaceType(node.Type).MakeByRefType() : ReplaceType(node.Type), node.Name);
+        protected override Expression VisitParameter(ParameterExpression node)
+        {
+            if (_parameters.TryGetValue(node, out var newNode))
+            {
+                return newNode;
+            }
 
+            // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            if (node.IsByRef)
+            {
+                newNode = Expression.Parameter(ReplaceType(node.Type).MakeByRefType(), node.Name);
+            }
+            else
+            {
+                newNode = Expression.Parameter(ReplaceType(node.Type), node.Name);
+            }
+
+            _parameters[node] = newNode;
+            return newNode;
+        }
         protected override Expression VisitConstant(ConstantExpression node)
         {
             if (node.Value is Type type)

@@ -89,7 +89,9 @@
             yield return container
                 .Bind<IServiceProvider>().Lifetime(singletonLifetimeResolver(container)).To<ServiceProvider>()
                 .Bind<IServiceScopeFactory>().Lifetime(singletonLifetimeResolver(container)).To<ServiceScopeFactory>()
-                .Bind<IServiceScope>().To<ServiceScope>();
+                .Bind<IServiceScope>().To<ServiceScope>()
+                .Bind<IEnumerable<TT>>().To(ctx => ctx.Container.Inject<TT[]>())
+                .Bind<IAutowiringStrategy>().To<AutowiringStrategy>();
         }
     }
 }

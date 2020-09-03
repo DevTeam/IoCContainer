@@ -219,13 +219,8 @@ namespace IoC.Core
             var argsVar = Expression.Variable(_buildContext.ArgsParameter.Type);
             return Expression.Block(
                 new[] { argsVar },
-                Expression.TryFinally(
-                    Expression.Block(
-                        Expression.Assign(argsVar, _buildContext.ArgsParameter),
-                        Expression.Assign(_buildContext.ArgsParameter, argsExpression),
-                        CreateDependencyExpression(key, containerExpression, defaultExpression)),
-                    Expression.Assign(_buildContext.ArgsParameter, argsVar))
-            );
+                Expression.Assign(_buildContext.ArgsParameter, argsExpression),
+                CreateDependencyExpression(key, containerExpression, defaultExpression));
         }
 
         protected override Expression VisitUnary(UnaryExpression node)
