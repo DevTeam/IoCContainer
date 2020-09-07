@@ -138,7 +138,7 @@
             }
 
             baseExpression = baseExpression.Convert(Key.Type);
-            return LifetimeExpressionBuilder.Shared.Build(baseExpression, this, lifetime);
+            return lifetime?.Build(this, baseExpression) ?? baseExpression;
         }
 
         public bool TryCompile(LambdaExpression lambdaExpression, out Delegate lambdaCompiled, out Exception error)

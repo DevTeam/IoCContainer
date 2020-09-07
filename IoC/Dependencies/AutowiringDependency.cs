@@ -139,11 +139,11 @@
             }
 
             return
-                new TypesMapDependency(
-                        newExpression,
-                        _initializeInstanceExpressions.Select(i => i.Body),
-                        typesMap,
-                        _autowiringStrategy)
+                new BaseDependency(
+                    newExpression,
+                    _initializeInstanceExpressions.Select(i => i.Body),
+                    typesMap,
+                    _autowiringStrategy)
                 .TryBuildExpression(buildContext, lifetime, out expression, out error);
         }
 

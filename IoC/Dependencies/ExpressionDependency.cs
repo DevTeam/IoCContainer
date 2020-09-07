@@ -72,7 +72,7 @@
             }
 
             return 
-                new TypesMapDependency(
+                new BaseDependency(
                     _instanceExpression.Body,
                     _initializeInstanceExpressions.Select(i => i.Body),
                     typesMap,

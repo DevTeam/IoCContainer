@@ -66,6 +66,14 @@
         [NotNull] Expression CreateExpression([CanBeNull] Expression defaultExpression = null);
 
         /// <summary>
+        /// Finalizes an expression and adds a lifetime.
+        /// </summary>
+        /// <param name="baseExpression">The base expression.</param>
+        /// <param name="lifetime">The target lifetime.</param>
+        /// <returns></returns>
+        [NotNull] Expression FinalizeExpression([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
+
+        /// <summary>
         /// Adds types mapping.
         /// </summary>
         /// <param name="fromType">Type to map.</param>
@@ -77,14 +85,6 @@
         /// </summary>
         /// <param name="parameterExpression">The parameters expression to add.</param>
         void AddParameter([NotNull] ParameterExpression parameterExpression);
-
-        /// <summary>
-        /// Finalizes an expression and adds a lifetime.
-        /// </summary>
-        /// <param name="baseExpression">The base expression.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <returns></returns>
-        [NotNull] Expression FinalizeExpression([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
 
         /// <summary>
         /// Compiles a lambda expression to delegate.

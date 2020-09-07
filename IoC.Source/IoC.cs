@@ -8184,6 +8184,14 @@ namespace IoC
         [NotNull] Expression CreateExpression([CanBeNull] Expression defaultExpression = null);
 
         /// <summary>
+        /// Finalizes an expression and adds a lifetime.
+        /// </summary>
+        /// <param name="baseExpression">The base expression.</param>
+        /// <param name="lifetime">The target lifetime.</param>
+        /// <returns></returns>
+        [NotNull] Expression FinalizeExpression([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
+
+        /// <summary>
         /// Adds types mapping.
         /// </summary>
         /// <param name="fromType">Type to map.</param>
@@ -8195,14 +8203,6 @@ namespace IoC
         /// </summary>
         /// <param name="parameterExpression">The parameters expression to add.</param>
         void AddParameter([NotNull] ParameterExpression parameterExpression);
-
-        /// <summary>
-        /// Finalizes an expression and adds a lifetime.
-        /// </summary>
-        /// <param name="baseExpression">The base expression.</param>
-        /// <param name="lifetime">The target lifetime.</param>
-        /// <returns></returns>
-        [NotNull] Expression FinalizeExpression([NotNull] Expression baseExpression, [CanBeNull] ILifetime lifetime);
 
         /// <summary>
         /// Compiles a lambda expression to delegate.
@@ -10519,11 +10519,11 @@ namespace IoC.Dependencies
             }
 
             return
-                new TypesMapDependency(
-                        newExpression,
-                        _initializeInstanceExpressions.Select(i => i.Body),
-                        typesMap,
-                        _autowiringStrategy)
+                new BaseDependency(
+                    newExpression,
+                    _initializeInstanceExpressions.Select(i => i.Body),
+                    typesMap,
+                    _autowiringStrategy)
                 .TryBuildExpression(buildContext, lifetime, out expression, out error);
         }
 
@@ -10665,6 +10665,132 @@ namespace IoC.Dependencies
 
 
 #endregion
+#region BaseDependency
+
+namespace IoC.Dependencies
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using Core;
+
+    /// <summary>
+    /// Represents the dependency based on expressions and a map of types.
+    /// </summary>
+    internal sealed class BaseDependency : IDependency
+    {
+        [NotNull] private readonly IDictionary<Type, Type> _typesMap;
+        private readonly Expression _createInstanceExpression;
+        [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
+        [NotNull] [ItemNotNull] private readonly IEnumerable<Expression> _initializeInstanceExpressions;
+
+        /// <summary>
+        /// Creates an instance of dependency.
+        /// </summary>
+        /// <param name="instanceExpression">The expression to create an instance.</param>
+        /// <param name="initializeInstanceExpressions">The statements to initialize an instance.</param>
+        /// <param name="typesMap">The type mapping dictionary.</param>
+        /// <param name="autowiringStrategy">The autowiring strategy.</param>
+        [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
+        [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
+        public BaseDependency(
+            [NotNull] Expression instanceExpression,
+            [NotNull] [ItemNotNull] IEnumerable<Expression> initializeInstanceExpressions,
+            [NotNull] IDictionary<Type, Type> typesMap,
+            [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
+        {
+            _createInstanceExpression = instanceExpression ?? throw new ArgumentNullException(nameof(instanceExpression));
+            _initializeInstanceExpressions = initializeInstanceExpressions ?? throw new ArgumentNullException(nameof(initializeInstanceExpressions));
+            _typesMap = typesMap ?? throw new ArgumentNullException(nameof(typesMap));
+            _autowiringStrategy = autowiringStrategy;
+        }
+
+        /// <inheritdoc />
+        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
+        {
+            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
+            try
+            {
+                var autoWiringStrategy = _autowiringStrategy ?? buildContext.AutowiringStrategy;
+                var typeDescriptor = _createInstanceExpression.Type.Descriptor();
+                expression = ReplaceTypes(buildContext, _createInstanceExpression, _typesMap);
+                var thisVar = Expression.Variable(expression.Type);
+
+                var initializeExpressions =
+                    GetInitializers(autoWiringStrategy, typeDescriptor)
+                        .Select(initializer => (Expression)Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext)))
+                        .Concat(_initializeInstanceExpressions.Select(statementExpression => ReplaceTypes(buildContext, statementExpression, _typesMap)))
+                        .ToArray();
+
+                if (initializeExpressions.Length > 0)
+                {
+                    expression = Expression.Block(
+                        new[] { thisVar },
+                        Expression.Assign(thisVar, expression),
+                        Expression.Block(initializeExpressions),
+                        thisVar
+                    );
+                }
+
+                var visitor = new DependencyInjectionExpressionVisitor(buildContext, thisVar);
+                expression = visitor.Visit(expression) ?? expression;
+                expression = buildContext.FinalizeExpression(expression, lifetime);
+                error = default(Exception);
+                return true;
+            }
+            catch (BuildExpressionException ex)
+            {
+                error = ex;
+                expression = default(Expression);
+                return false;
+            }
+        }
+
+        /// <inheritdoc />
+        public override string ToString() => $"{_createInstanceExpression}";
+
+        private static Expression ReplaceTypes(IBuildContext buildContext, Expression expression, IDictionary<Type, Type> typesMap)
+        {
+            typesMap = typesMap ?? new Dictionary<Type, Type>();
+            if (expression.Type == buildContext.Key.Type)
+            {
+                return expression;
+            }
+
+            TypeMapper.Shared.Map(expression.Type, buildContext.Key.Type, typesMap);
+            if (typesMap.Count == 0)
+            {
+                return expression;
+            }
+
+            var visitor = new TypeReplacerExpressionVisitor(typesMap);
+            return visitor.Visit(expression) ?? expression;
+        }
+
+        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+        private static IEnumerable<IMethod<MethodInfo>> GetInitializers(IAutowiringStrategy autoWiringStrategy, TypeDescriptor typeDescriptor)
+        {
+            var methods = typeDescriptor.GetDeclaredMethods().Select(info => new Method<MethodInfo>(info));
+            if (autoWiringStrategy.TryResolveInitializers(methods, out var initializers))
+            {
+                return initializers;
+            }
+
+            if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(methods, out initializers))
+            {
+                initializers = Enumerable.Empty<IMethod<MethodInfo>>();
+            }
+
+            return initializers;
+        }
+    }
+}
+
+
+#endregion
 #region ExpressionDependency
 
 namespace IoC.Dependencies
@@ -10741,7 +10867,7 @@ namespace IoC.Dependencies
             }
 
             return 
-                new TypesMapDependency(
+                new BaseDependency(
                     _instanceExpression.Body,
                     _initializeInstanceExpressions.Select(i => i.Body),
                     typesMap,
@@ -10751,117 +10877,6 @@ namespace IoC.Dependencies
 
         /// <inheritdoc />
         public override string ToString() => $"{_instanceExpression}";
-    }
-}
-
-
-#endregion
-#region TypesMapDependency
-
-namespace IoC.Dependencies
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using Core;
-
-    /// <summary>
-    /// Represents the dependency based on expressions and a map of types.
-    /// </summary>
-    internal sealed class TypesMapDependency : IDependency
-    {
-        [NotNull] private readonly IDictionary<Type, Type> _typesMap;
-        private readonly Expression _createInstanceExpression;
-        [CanBeNull] private readonly IAutowiringStrategy _autowiringStrategy;
-        [NotNull] [ItemNotNull] private readonly IEnumerable<Expression> _initializeInstanceExpressions;
-
-        /// <summary>
-        /// Creates an instance of dependency.
-        /// </summary>
-        /// <param name="instanceExpression">The expression to create an instance.</param>
-        /// <param name="initializeInstanceExpressions">The statements to initialize an instance.</param>
-        /// <param name="typesMap">The type mapping dictionary.</param>
-        /// <param name="autowiringStrategy">The autowiring strategy.</param>
-        [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
-        [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
-        public TypesMapDependency(
-            [NotNull] Expression instanceExpression,
-            [NotNull] [ItemNotNull] IEnumerable<Expression> initializeInstanceExpressions,
-            [NotNull] IDictionary<Type, Type> typesMap,
-            [CanBeNull] IAutowiringStrategy autowiringStrategy = null)
-        {
-            _createInstanceExpression = instanceExpression ?? throw new ArgumentNullException(nameof(instanceExpression));
-            _initializeInstanceExpressions = initializeInstanceExpressions ?? throw new ArgumentNullException(nameof(initializeInstanceExpressions));
-            _typesMap = typesMap ?? throw new ArgumentNullException(nameof(typesMap));
-            _autowiringStrategy = autowiringStrategy;
-        }
-
-        /// <inheritdoc />
-        public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
-        {
-            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            try
-            {
-                var autoWiringStrategy = _autowiringStrategy ?? buildContext.AutowiringStrategy;
-                var typeDescriptor = _createInstanceExpression.Type.Descriptor();
-                expression = ReplaceTypes(buildContext, _createInstanceExpression, _typesMap);
-                var thisVar = Expression.Variable(expression.Type);
-
-                var initializeExpressions =
-                    GetInitializers(autoWiringStrategy, typeDescriptor)
-                        .Select(initializer => (Expression)Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext)))
-                        .Concat(_initializeInstanceExpressions.Select(statementExpression => ReplaceTypes(buildContext, statementExpression, _typesMap)))
-                        .ToArray();
-
-                if (initializeExpressions.Length > 0)
-                {
-                    expression = Expression.Block(
-                        new[] {thisVar},
-                        Expression.Assign(thisVar, expression),
-                        Expression.Block(initializeExpressions),
-                        thisVar
-                    );
-                }
-
-                expression = DependencyInjectionExpressionBuilder.Shared.Build(expression, buildContext, thisVar);
-                expression = buildContext.FinalizeExpression(expression, lifetime);
-
-                error = default(Exception);
-                return true;
-            }
-            catch (BuildExpressionException ex)
-            {
-                error = ex;
-                expression = default(Expression);
-                return false;
-            }
-        }
-
-        /// <inheritdoc />
-        public override string ToString() => $"{_createInstanceExpression}";
-
-        private static Expression ReplaceTypes(IBuildContext buildContext, Expression expression, IDictionary<Type, Type> typesMap) =>
-            TypeReplacerExpressionBuilder.Shared.Build(expression, buildContext, typesMap);
-
-        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        private static IEnumerable<IMethod<MethodInfo>> GetInitializers(IAutowiringStrategy autoWiringStrategy, TypeDescriptor typeDescriptor)
-        {
-            var methods = typeDescriptor.GetDeclaredMethods().Select(info => new Method<MethodInfo>(info));
-            if (autoWiringStrategy.TryResolveInitializers(methods, out var initializers))
-            {
-                return initializers;
-            }
-
-            if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(methods, out initializers))
-            {
-                initializers = Enumerable.Empty<IMethod<MethodInfo>>();
-            }
-
-            return initializers;
-        }
     }
 }
 
@@ -11687,7 +11702,7 @@ namespace IoC.Core
             }
 
             baseExpression = baseExpression.Convert(Key.Type);
-            return LifetimeExpressionBuilder.Shared.Build(baseExpression, this, lifetime);
+            return lifetime?.Build(this, baseExpression) ?? baseExpression;
         }
 
         public bool TryCompile(LambdaExpression lambdaExpression, out Delegate lambdaCompiled, out Exception error)
@@ -12329,33 +12344,6 @@ namespace IoC.Core
         }
     }
 }
-
-#endregion
-#region DependencyInjectionExpressionBuilder
-
-namespace IoC.Core
-{
-    using System;
-    using System.Linq.Expressions;
-
-    internal sealed class DependencyInjectionExpressionBuilder : IExpressionBuilder<Expression>
-    {
-        public static readonly IExpressionBuilder<Expression> Shared = new DependencyInjectionExpressionBuilder();
-
-        private DependencyInjectionExpressionBuilder()
-        { }
-
-        public Expression Build(Expression bodyExpression, IBuildContext buildContext, Expression thisExpression)
-        {
-            if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
-            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            var visitor = new DependencyInjectionExpressionVisitor(buildContext, thisExpression);
-            var newExpression = visitor.Visit(bodyExpression);
-            return newExpression ?? bodyExpression;
-        }
-    }
-}
-
 
 #endregion
 #region DependencyInjectionExpressionVisitor
@@ -13192,31 +13180,6 @@ namespace IoC.Core
 
 
 #endregion
-#region IExpressionBuilder
-
-namespace IoC.Core
-{
-    using System.Linq.Expressions;
-
-    /// <summary>
-    /// Allows to build expression for lifetimes.
-    /// </summary>
-    [PublicAPI]
-    internal interface IExpressionBuilder<in TContext>
-    {
-        /// <summary>
-        /// Builds the expression.
-        /// </summary>
-        /// <param name="bodyExpression">The expression body to get an instance.</param>
-        /// <param name="buildContext">The build context.</param>
-        /// <param name="context">The expression build context.</param>
-        /// <returns>The new expression.</returns>
-        [NotNull] Expression Build([NotNull] Expression bodyExpression, [NotNull] IBuildContext buildContext, [CanBeNull] TContext context = default(TContext));
-    }
-}
-
-
-#endregion
 #region ILockObject
 
 namespace IoC.Core
@@ -13251,29 +13214,6 @@ namespace IoC.Core
     using System;
 
     internal interface ISubject<T>: IObservable<T>, IObserver<T> { }
-}
-
-
-#endregion
-#region LifetimeExpressionBuilder
-
-namespace IoC.Core
-{
-    using System;
-    using System.Linq.Expressions;
-
-    internal sealed class LifetimeExpressionBuilder : IExpressionBuilder<ILifetime>
-    {
-        public static readonly IExpressionBuilder<ILifetime> Shared = new LifetimeExpressionBuilder();
-
-        private LifetimeExpressionBuilder() { }
-
-        public Expression Build(Expression bodyExpression, IBuildContext buildContext, ILifetime lifetime)
-        {
-            if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
-            return lifetime?.Build(buildContext, bodyExpression) ?? bodyExpression;
-        }
-    }
 }
 
 
@@ -14700,46 +14640,6 @@ namespace IoC.Core
                 Map(typeDescriptor.GetElementType(), targetTypeDescriptor.GetElementType(), typesMap);
                 typesMap[typeDescriptor.Type] = targetTypeDescriptor.Type;
             }
-        }
-    }
-}
-
-
-#endregion
-#region TypeReplacerExpressionBuilder
-
-namespace IoC.Core
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-
-    internal sealed class TypeReplacerExpressionBuilder : IExpressionBuilder<IDictionary<Type, Type>>
-    {
-        public static readonly IExpressionBuilder<IDictionary<Type, Type>> Shared = new TypeReplacerExpressionBuilder();
-
-        private TypeReplacerExpressionBuilder() { }
-
-        public Expression Build(Expression bodyExpression, IBuildContext buildContext, IDictionary<Type, Type> typesMap)
-        {
-            if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
-            if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            typesMap = typesMap ?? new Dictionary<Type, Type>();
-            if (bodyExpression.Type != buildContext.Key.Type)
-            {
-                TypeMapper.Shared.Map(bodyExpression.Type, buildContext.Key.Type, typesMap);
-                if (typesMap.Count > 0)
-                {
-                    var typeReplacingExpressionVisitor = new TypeReplacerExpressionVisitor(typesMap);
-                    var newExpression = typeReplacingExpressionVisitor.Visit(bodyExpression);
-                    if (newExpression != null)
-                    {
-                        return newExpression;
-                    }
-                }
-            }
-
-            return bodyExpression;
         }
     }
 }

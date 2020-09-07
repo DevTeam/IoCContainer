@@ -11,7 +11,7 @@
     /// <summary>
     /// Represents the dependency based on expressions and a map of types.
     /// </summary>
-    internal sealed class TypesMapDependency : IDependency
+    internal sealed class BaseDependency : IDependency
     {
         [NotNull] private readonly IDictionary<Type, Type> _typesMap;
         private readonly Expression _createInstanceExpression;
@@ -27,7 +27,7 @@
         /// <param name="autowiringStrategy">The autowiring strategy.</param>
         [SuppressMessage("ReSharper", "ConstantConditionalAccessQualifier")]
         [SuppressMessage("ReSharper", "ConstantNullCoalescingCondition")]
-        public TypesMapDependency(
+        public BaseDependency(
             [NotNull] Expression instanceExpression,
             [NotNull] [ItemNotNull] IEnumerable<Expression> initializeInstanceExpressions,
             [NotNull] IDictionary<Type, Type> typesMap,
@@ -59,16 +59,16 @@
                 if (initializeExpressions.Length > 0)
                 {
                     expression = Expression.Block(
-                        new[] {thisVar},
+                        new[] { thisVar },
                         Expression.Assign(thisVar, expression),
                         Expression.Block(initializeExpressions),
                         thisVar
                     );
                 }
 
-                expression = DependencyInjectionExpressionBuilder.Shared.Build(expression, buildContext, thisVar);
+                var visitor = new DependencyInjectionExpressionVisitor(buildContext, thisVar);
+                expression = visitor.Visit(expression) ?? expression;
                 expression = buildContext.FinalizeExpression(expression, lifetime);
-
                 error = default(Exception);
                 return true;
             }
@@ -83,8 +83,23 @@
         /// <inheritdoc />
         public override string ToString() => $"{_createInstanceExpression}";
 
-        private static Expression ReplaceTypes(IBuildContext buildContext, Expression expression, IDictionary<Type, Type> typesMap) =>
-            TypeReplacerExpressionBuilder.Shared.Build(expression, buildContext, typesMap);
+        private static Expression ReplaceTypes(IBuildContext buildContext, Expression expression, IDictionary<Type, Type> typesMap)
+        {
+            typesMap = typesMap ?? new Dictionary<Type, Type>();
+            if (expression.Type == buildContext.Key.Type)
+            {
+                return expression;
+            }
+
+            TypeMapper.Shared.Map(expression.Type, buildContext.Key.Type, typesMap);
+            if (typesMap.Count == 0)
+            {
+                return expression;
+            }
+
+            var visitor = new TypeReplacerExpressionVisitor(typesMap);
+            return visitor.Visit(expression) ?? expression;
+        }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
         private static IEnumerable<IMethod<MethodInfo>> GetInitializers(IAutowiringStrategy autoWiringStrategy, TypeDescriptor typeDescriptor)

@@ -911,20 +911,6 @@
             Marker interface for arrays.
             </summary>
         </member>
-        <member name="T:IoC.Core.IExpressionBuilder`1">
-            <summary>
-            Allows to build expression for lifetimes.
-            </summary>
-        </member>
-        <member name="M:IoC.Core.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext,`0)">
-            <summary>
-            Builds the expression.
-            </summary>
-            <param name="bodyExpression">The expression body to get an instance.</param>
-            <param name="buildContext">The build context.</param>
-            <param name="context">The expression build context.</param>
-            <returns>The new expression.</returns>
-        </member>
         <member name="F:IoC.Core.Registration.ContainerParameter">
             <summary>
             The container parameter.
@@ -966,6 +952,26 @@
         <member name="M:IoC.Dependencies.AutowiringDependency.ToString">
             <inheritdoc />
         </member>
+        <member name="T:IoC.Dependencies.BaseDependency">
+            <summary>
+            Represents the dependency based on expressions and a map of types.
+            </summary>
+        </member>
+        <member name="M:IoC.Dependencies.BaseDependency.#ctor(System.Linq.Expressions.Expression,System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression},System.Collections.Generic.IDictionary{System.Type,System.Type},IoC.IAutowiringStrategy)">
+            <summary>
+            Creates an instance of dependency.
+            </summary>
+            <param name="instanceExpression">The expression to create an instance.</param>
+            <param name="initializeInstanceExpressions">The statements to initialize an instance.</param>
+            <param name="typesMap">The type mapping dictionary.</param>
+            <param name="autowiringStrategy">The autowiring strategy.</param>
+        </member>
+        <member name="M:IoC.Dependencies.BaseDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Dependencies.BaseDependency.ToString">
+            <inheritdoc />
+        </member>
         <member name="T:IoC.Dependencies.ExpressionDependency">
             <summary>
             Represents the dependency based on expressions.
@@ -990,26 +996,6 @@
             <inheritdoc />
         </member>
         <member name="M:IoC.Dependencies.ExpressionDependency.ToString">
-            <inheritdoc />
-        </member>
-        <member name="T:IoC.Dependencies.TypesMapDependency">
-            <summary>
-            Represents the dependency based on expressions and a map of types.
-            </summary>
-        </member>
-        <member name="M:IoC.Dependencies.TypesMapDependency.#ctor(System.Linq.Expressions.Expression,System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression},System.Collections.Generic.IDictionary{System.Type,System.Type},IoC.IAutowiringStrategy)">
-            <summary>
-            Creates an instance of dependency.
-            </summary>
-            <param name="instanceExpression">The expression to create an instance.</param>
-            <param name="initializeInstanceExpressions">The statements to initialize an instance.</param>
-            <param name="typesMap">The type mapping dictionary.</param>
-            <param name="autowiringStrategy">The autowiring strategy.</param>
-        </member>
-        <member name="M:IoC.Dependencies.TypesMapDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)">
-            <inheritdoc />
-        </member>
-        <member name="M:IoC.Dependencies.TypesMapDependency.ToString">
             <inheritdoc />
         </member>
         <member name="T:IoC.EventType">
@@ -5653,6 +5639,14 @@
             <param name="defaultExpression">The default expression.</param>
             <returns>The expression.</returns>
         </member>
+        <member name="M:IoC.IBuildContext.FinalizeExpression(System.Linq.Expressions.Expression,IoC.ILifetime)">
+            <summary>
+            Finalizes an expression and adds a lifetime.
+            </summary>
+            <param name="baseExpression">The base expression.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <returns></returns>
+        </member>
         <member name="M:IoC.IBuildContext.MapType(System.Type,System.Type)">
             <summary>
             Adds types mapping.
@@ -5665,14 +5659,6 @@
             Adds a parameter.
             </summary>
             <param name="parameterExpression">The parameters expression to add.</param>
-        </member>
-        <member name="M:IoC.IBuildContext.FinalizeExpression(System.Linq.Expressions.Expression,IoC.ILifetime)">
-            <summary>
-            Finalizes an expression and adds a lifetime.
-            </summary>
-            <param name="baseExpression">The base expression.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <returns></returns>
         </member>
         <member name="M:IoC.IBuildContext.TryCompile(System.Linq.Expressions.LambdaExpression,System.Delegate@,System.Exception@)">
             <summary>

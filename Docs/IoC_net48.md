@@ -42,6 +42,10 @@
   - [Order\`\`1(strategy,orderSelector)](#M-IoC-AutowiringStrategies-Order``1-IoC-IAutowiringStrategy,System-Func{``0,System-IComparable}- 'IoC.AutowiringStrategies.Order``1(IoC.IAutowiringStrategy,System.Func{``0,System.IComparable})')
   - [Tag\`\`1(strategy,tagSelector)](#M-IoC-AutowiringStrategies-Tag``1-IoC-IAutowiringStrategy,System-Func{``0,System-Object}- 'IoC.AutowiringStrategies.Tag``1(IoC.IAutowiringStrategy,System.Func{``0,System.Object})')
   - [Type\`\`1(strategy,typeSelector)](#M-IoC-AutowiringStrategies-Type``1-IoC-IAutowiringStrategy,System-Func{``0,System-Type}- 'IoC.AutowiringStrategies.Type``1(IoC.IAutowiringStrategy,System.Func{``0,System.Type})')
+- [BaseDependency](#T-IoC-Dependencies-BaseDependency 'IoC.Dependencies.BaseDependency')
+  - [#ctor(instanceExpression,initializeInstanceExpressions,typesMap,autowiringStrategy)](#M-IoC-Dependencies-BaseDependency-#ctor-System-Linq-Expressions-Expression,System-Collections-Generic-IEnumerable{System-Linq-Expressions-Expression},System-Collections-Generic-IDictionary{System-Type,System-Type},IoC-IAutowiringStrategy- 'IoC.Dependencies.BaseDependency.#ctor(System.Linq.Expressions.Expression,System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression},System.Collections.Generic.IDictionary{System.Type,System.Type},IoC.IAutowiringStrategy)')
+  - [ToString()](#M-IoC-Dependencies-BaseDependency-ToString 'IoC.Dependencies.BaseDependency.ToString')
+  - [TryBuildExpression()](#M-IoC-Dependencies-BaseDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.Dependencies.BaseDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
 - [BaseTypeRequiredAttribute](#T-IoC-BaseTypeRequiredAttribute 'IoC.BaseTypeRequiredAttribute')
 - [BuildContext](#T-IoC-Core-BuildContext 'IoC.Core.BuildContext')
 - [CanBeNullAttribute](#T-IoC-CanBeNullAttribute 'IoC.CanBeNullAttribute')
@@ -379,8 +383,6 @@
   - [TryGetResolver\`\`1(type,tag,resolver,error,resolvingContainer)](#M-IoC-IContainer-TryGetResolver``1-System-Type,System-Object,IoC-Resolver{``0}@,System-Exception@,IoC-IContainer- 'IoC.IContainer.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,System.Exception@,IoC.IContainer)')
 - [IDependency](#T-IoC-IDependency 'IoC.IDependency')
   - [TryBuildExpression(buildContext,lifetime,expression,error)](#M-IoC-IDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.IDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
-- [IExpressionBuilder\`1](#T-IoC-Core-IExpressionBuilder`1 'IoC.Core.IExpressionBuilder`1')
-  - [Build(bodyExpression,buildContext,context)](#M-IoC-Core-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-IBuildContext,`0- 'IoC.Core.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext,`0)')
 - [IFoundCyclicDependency](#T-IoC-Issues-IFoundCyclicDependency 'IoC.Issues.IFoundCyclicDependency')
   - [Resolve(buildContext)](#M-IoC-Issues-IFoundCyclicDependency-Resolve-IoC-IBuildContext- 'IoC.Issues.IFoundCyclicDependency.Resolve(IoC.IBuildContext)')
 - [ILifetime](#T-IoC-ILifetime 'IoC.ILifetime')
@@ -770,10 +772,6 @@
   - [LightSet](#F-IoC-Features-TupleFeature-LightSet 'IoC.Features.TupleFeature.LightSet')
   - [Set](#F-IoC-Features-TupleFeature-Set 'IoC.Features.TupleFeature.Set')
   - [Apply()](#M-IoC-Features-TupleFeature-Apply-IoC-IMutableContainer- 'IoC.Features.TupleFeature.Apply(IoC.IMutableContainer)')
-- [TypesMapDependency](#T-IoC-Dependencies-TypesMapDependency 'IoC.Dependencies.TypesMapDependency')
-  - [#ctor(instanceExpression,initializeInstanceExpressions,typesMap,autowiringStrategy)](#M-IoC-Dependencies-TypesMapDependency-#ctor-System-Linq-Expressions-Expression,System-Collections-Generic-IEnumerable{System-Linq-Expressions-Expression},System-Collections-Generic-IDictionary{System-Type,System-Type},IoC-IAutowiringStrategy- 'IoC.Dependencies.TypesMapDependency.#ctor(System.Linq.Expressions.Expression,System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression},System.Collections.Generic.IDictionary{System.Type,System.Type},IoC.IAutowiringStrategy)')
-  - [ToString()](#M-IoC-Dependencies-TypesMapDependency-ToString 'IoC.Dependencies.TypesMapDependency.ToString')
-  - [TryBuildExpression()](#M-IoC-Dependencies-TypesMapDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.Dependencies.TypesMapDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
 - [UsedImplicitlyAttribute](#T-IoC-UsedImplicitlyAttribute 'IoC.UsedImplicitlyAttribute')
 - [ValueProviderAttribute](#T-IoC-ValueProviderAttribute 'IoC.ValueProviderAttribute')
 - [XamlItemBindingOfItemsControlAttribute](#T-IoC-XamlItemBindingOfItemsControlAttribute 'IoC.XamlItemBindingOfItemsControlAttribute')
@@ -1277,6 +1275,55 @@ The instance of aspect oriented autowiring strategy.
 | Name | Description |
 | ---- | ----------- |
 | TTypeAttribute | The type metadata attribute. |
+
+<a name='T-IoC-Dependencies-BaseDependency'></a>
+## BaseDependency `type`
+
+##### Namespace
+
+IoC.Dependencies
+
+##### Summary
+
+Represents the dependency based on expressions and a map of types.
+
+<a name='M-IoC-Dependencies-BaseDependency-#ctor-System-Linq-Expressions-Expression,System-Collections-Generic-IEnumerable{System-Linq-Expressions-Expression},System-Collections-Generic-IDictionary{System-Type,System-Type},IoC-IAutowiringStrategy-'></a>
+### #ctor(instanceExpression,initializeInstanceExpressions,typesMap,autowiringStrategy) `constructor`
+
+##### Summary
+
+Creates an instance of dependency.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| instanceExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The expression to create an instance. |
+| initializeInstanceExpressions | [System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression}') | The statements to initialize an instance. |
+| typesMap | [System.Collections.Generic.IDictionary{System.Type,System.Type}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IDictionary 'System.Collections.Generic.IDictionary{System.Type,System.Type}') | The type mapping dictionary. |
+| autowiringStrategy | [IoC.IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy') | The autowiring strategy. |
+
+<a name='M-IoC-Dependencies-BaseDependency-ToString'></a>
+### ToString() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Dependencies-BaseDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@-'></a>
+### TryBuildExpression() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
 
 <a name='T-IoC-BaseTypeRequiredAttribute'></a>
 ## BaseTypeRequiredAttribute `type`
@@ -8756,36 +8803,6 @@ Builds an expression for dependency based on the current build context and speci
 | expression | [System.Linq.Expressions.Expression@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression@ 'System.Linq.Expressions.Expression@') | The resulting expression for the current dependency. |
 | error | [System.Exception@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception@ 'System.Exception@') | The error if something goes wrong. |
 
-<a name='T-IoC-Core-IExpressionBuilder`1'></a>
-## IExpressionBuilder\`1 `type`
-
-##### Namespace
-
-IoC.Core
-
-##### Summary
-
-Allows to build expression for lifetimes.
-
-<a name='M-IoC-Core-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-IBuildContext,`0-'></a>
-### Build(bodyExpression,buildContext,context) `method`
-
-##### Summary
-
-Builds the expression.
-
-##### Returns
-
-The new expression.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| bodyExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The expression body to get an instance. |
-| buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context. |
-| context | [\`0](#T-`0 '`0') | The expression build context. |
-
 <a name='T-IoC-Issues-IFoundCyclicDependency'></a>
 ## IFoundCyclicDependency `type`
 
@@ -13318,55 +13335,6 @@ Allows to resolve Tuples.
 
 <a name='M-IoC-Features-TupleFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='T-IoC-Dependencies-TypesMapDependency'></a>
-## TypesMapDependency `type`
-
-##### Namespace
-
-IoC.Dependencies
-
-##### Summary
-
-Represents the dependency based on expressions and a map of types.
-
-<a name='M-IoC-Dependencies-TypesMapDependency-#ctor-System-Linq-Expressions-Expression,System-Collections-Generic-IEnumerable{System-Linq-Expressions-Expression},System-Collections-Generic-IDictionary{System-Type,System-Type},IoC-IAutowiringStrategy-'></a>
-### #ctor(instanceExpression,initializeInstanceExpressions,typesMap,autowiringStrategy) `constructor`
-
-##### Summary
-
-Creates an instance of dependency.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| instanceExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The expression to create an instance. |
-| initializeInstanceExpressions | [System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression}') | The statements to initialize an instance. |
-| typesMap | [System.Collections.Generic.IDictionary{System.Type,System.Type}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IDictionary 'System.Collections.Generic.IDictionary{System.Type,System.Type}') | The type mapping dictionary. |
-| autowiringStrategy | [IoC.IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy') | The autowiring strategy. |
-
-<a name='M-IoC-Dependencies-TypesMapDependency-ToString'></a>
-### ToString() `method`
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='M-IoC-Dependencies-TypesMapDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@-'></a>
-### TryBuildExpression() `method`
 
 ##### Summary
 
