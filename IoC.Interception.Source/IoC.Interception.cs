@@ -168,7 +168,21 @@ namespace IoC.Features.Interception
                 _interceptors = interceptors;
             }
 
-            public bool Accept(Key key) => _filter(key);
+            public bool Accept(Key key)
+            {
+#if NET40
+                if (key.Type.IsSealed)
+                {
+                    return false;
+                }
+#else
+                if (key.Type.GetTypeInfo().IsSealed)
+                {
+                    return false;
+                }
+#endif
+                return _filter(key);
+            }
 
             public Expression Build(Expression bodyExpression, IBuildContext buildContext, Expression proxyGeneratorExpression)
             {

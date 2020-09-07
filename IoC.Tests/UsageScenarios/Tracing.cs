@@ -42,7 +42,7 @@
             }
             // Every containers were disposed here
 
-            traceMessages.Count.ShouldBe(8);
+            traceMessages.Count.ShouldBe(9);
             // }
         }
     }

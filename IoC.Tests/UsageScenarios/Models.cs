@@ -4,9 +4,15 @@ namespace IoC.Tests.UsageScenarios
     using System;
     using System.Collections.Generic;
 
-    public interface IDependency { }
+    public interface IDependency
+    {
+        int Index { get; set; }
+    }
 
-    public class Dependency : IDependency { }
+    public class Dependency : IDependency
+    {
+        public int Index { get; set; }
+    }
 
     public interface IService
     {

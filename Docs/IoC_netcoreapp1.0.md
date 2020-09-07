@@ -331,6 +331,7 @@
 - [IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext')
   - [ArgsParameter](#P-IoC-IBuildContext-ArgsParameter 'IoC.IBuildContext.ArgsParameter')
   - [AutowiringStrategy](#P-IoC-IBuildContext-AutowiringStrategy 'IoC.IBuildContext.AutowiringStrategy')
+  - [Compilers](#P-IoC-IBuildContext-Compilers 'IoC.IBuildContext.Compilers')
   - [Container](#P-IoC-IBuildContext-Container 'IoC.IBuildContext.Container')
   - [ContainerParameter](#P-IoC-IBuildContext-ContainerParameter 'IoC.IBuildContext.ContainerParameter')
   - [Depth](#P-IoC-IBuildContext-Depth 'IoC.IBuildContext.Depth')
@@ -8061,6 +8062,13 @@ The args parameters.
 ##### Summary
 
 The current autowiring strategy.
+
+<a name='P-IoC-IBuildContext-Compilers'></a>
+### Compilers `property`
+
+##### Summary
+
+The list of compilers.
 
 <a name='P-IoC-IBuildContext-Container'></a>
 ### Container `property`

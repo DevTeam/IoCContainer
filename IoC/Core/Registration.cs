@@ -6,7 +6,7 @@
     using System.Linq.Expressions;
     using System.Runtime.CompilerServices;
 
-    internal sealed class Registration : IToken, ICompiler
+    internal sealed class Registration : IToken
     {
         /// <summary>
         /// The container parameter.
@@ -28,7 +28,6 @@
         [CanBeNull] internal readonly ILifetime Lifetime;
         [NotNull] private readonly IDisposable _resource;
         [NotNull] internal readonly ICollection<Key> Keys;
-        [NotNull] private readonly IRegistrationTracker _registrationTracker;
         [NotNull] private readonly IObserver<ContainerEvent> _eventObserver;
         [NotNull] internal readonly IDependency Dependency;
 
@@ -37,7 +36,6 @@
 
         public Registration(
             [NotNull] IMutableContainer container,
-            [NotNull] IRegistrationTracker registrationTracker,
             [NotNull] IObserver<ContainerEvent> eventObserver,
             [NotNull] IDependency dependency,
             [CanBeNull] ILifetime lifetime,
@@ -45,7 +43,6 @@
             [NotNull] ICollection<Key> keys)
         {
             Container = container;
-            _registrationTracker = registrationTracker;
             _eventObserver = eventObserver;
             Dependency = dependency;
             Lifetime = lifetime;
@@ -59,6 +56,7 @@
         public bool TryCreateResolver<T>(
             Key key,
             [NotNull] IContainer resolvingContainer,
+            [NotNull] IRegistrationTracker registrationTracker,
             out Resolver<T> resolver,
             out Exception error)
         {
@@ -67,7 +65,17 @@
                 throw new ObjectDisposedException(nameof(Registration));
             }
 
-            var buildContext = new BuildContext(null, key, resolvingContainer, _registrationTracker.Builders, _registrationTracker.AutowiringStrategy, this, ArgsParameter, ContainerParameter);
+            var buildContext = new BuildContext(
+                null,
+                key,
+                resolvingContainer,
+                registrationTracker.Compilers,
+                registrationTracker.Builders,
+                registrationTracker.AutowiringStrategy,
+                ArgsParameter,
+                ContainerParameter,
+                _eventObserver);
+
             var lifetime = GetLifetime(key.Type);
             if (!Dependency.TryBuildExpression(buildContext, lifetime, out var expression, out error))
             {
@@ -76,7 +84,7 @@
             }
 
             var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), expression, false, ResolverParameters);
-            if (TryCompile(buildContext, resolverExpression, lifetime, out var resolverDelegate, out error))
+            if (buildContext.TryCompile(resolverExpression, out var resolverDelegate, out error))
             {
                 resolver = (Resolver<T>) resolverDelegate;
                 return true;
@@ -85,35 +93,6 @@
             resolver = default(Resolver<T>);
             return false;
         }
-
-        private bool TryCompile([NotNull] IBuildContext context, [NotNull] LambdaExpression lambdaExpression, [CanBeNull] ILifetime lifetime, out Delegate resolver, out Exception error)
-        {
-            error = default(Exception);
-            try
-            {
-                foreach (var compiler in _registrationTracker.Compilers)
-                {
-                    if (compiler.TryCompile(context, lambdaExpression, out resolver, out error))
-                    {
-                        _eventObserver.OnNext(ContainerEvent.Compilation(Container, new[] { context.Key }, Dependency, lifetime, lambdaExpression));
-                        return true;
-                    }
-
-                    _eventObserver.OnNext(ContainerEvent.CompilationFailed(Container, new[] { context.Key }, Dependency, lifetime, lambdaExpression, error));
-                }
-            }
-            catch (Exception ex)
-            {
-                error = ex;
-                _eventObserver.OnNext(ContainerEvent.CompilationFailed(Container, new[] { context.Key }, Dependency, lifetime, lambdaExpression, ex));
-            }
-
-            resolver = default(Delegate);
-            return false;
-        }
-
-        public bool TryCompile(IBuildContext context, LambdaExpression lambdaExpression, out Delegate lambdaCompiled, out Exception error) =>
-            TryCompile(context, lambdaExpression, null, out lambdaCompiled, out error);
 
         [MethodImpl((MethodImplOptions)0x200)]
         [CanBeNull]

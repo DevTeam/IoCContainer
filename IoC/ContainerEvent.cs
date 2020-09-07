@@ -153,8 +153,6 @@
         internal static ContainerEvent Compilation(
             [NotNull] IContainer registeringContainer,
             [NotNull] IEnumerable<Key> keys,
-            [NotNull] IDependency dependency,
-            [CanBeNull] ILifetime lifetime,
             [NotNull] LambdaExpression resolverExpression)
         {
             return new ContainerEvent(
@@ -163,16 +161,14 @@
                 true,
                 default(Exception),
                 keys,
-                dependency,
-                lifetime,
+                default(IDependency),
+                default(ILifetime),
                 resolverExpression);
         }
 
         internal static ContainerEvent CompilationFailed(
             [NotNull] IContainer registeringContainer,
             [NotNull] IEnumerable<Key> keys,
-            [NotNull] IDependency dependency,
-            [CanBeNull] ILifetime lifetime,
             [NotNull] LambdaExpression resolverExpression,
             [NotNull] Exception error)
         {
@@ -182,8 +178,8 @@
                 false,
                 error,
                 keys,
-                dependency,
-                lifetime,
+                default(IDependency),
+                default(ILifetime),
                 resolverExpression);
         }
     }

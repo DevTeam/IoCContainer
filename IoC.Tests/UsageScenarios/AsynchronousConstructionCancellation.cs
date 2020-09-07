@@ -51,6 +51,8 @@ namespace IoC.Tests.UsageScenarios
             {
                 while (!cancellationToken.IsCancellationRequested) { }
             }
+
+            public int Index { get; set; }
         }
 
         public class Consumer

@@ -1,6 +1,7 @@
 ﻿namespace IoC.Tests.IntegrationTests
 {
     using System.Linq.Expressions;
+    using Lifetimes;
     using Shouldly;
     using Xunit;
 
@@ -68,7 +69,8 @@
         {
             public Expression Build(IBuildContext context, Expression expression)
             {
-                return context.FinalizeExpression(expression, new Lifetimes.SingletonLifetime());
+                var singletonLifetime = new SingletonLifetime();
+                return singletonLifetime.Build(context, expression);
             }
         }
     }

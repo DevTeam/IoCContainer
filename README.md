@@ -213,14 +213,14 @@ For more information please see [this sample](Samples/AspNetCore).
 
 ```csharp
 using var container = Container
-  // Creates an Inversion of Control container
+  // Creates a container
   .Create()
   // Using the feature InterceptionFeature
   .Using<InterceptionFeature>()
   // Configures binds
   .Bind<IService>().To<Service>()
-  // Configures interception for IService calls
-  .Intercept<IService>(new MyInterceptor());
+  // Intercepts any invocations
+  .Intercept(key => true, new MyInterceptor())
 
 container.Resolve<IService>();
 
@@ -591,6 +591,8 @@ public class SomeDependency: IDependency
 {
     // Time-consuming logic constructor
     public SomeDependency() { }
+
+    public int Index { get; set; }
 }
 
 public class Consumer
@@ -657,7 +659,7 @@ var traceMessages = new List<string>();
 }
 // Every containers were disposed here
 
-traceMessages.Count.ShouldBe(8);
+traceMessages.Count.ShouldBe(9);
 ```
 
 
@@ -748,6 +750,8 @@ public class SomeDependency: IDependency
     {
         while (!cancellationToken.IsCancellationRequested) { }
     }
+
+    public int Index { get; set; }
 }
 
 public class Consumer
@@ -908,8 +912,8 @@ public void Run()
         // Configures binds
         .Bind<IDependency>().To<Dependency>()
         .Bind<IService>().To<Service>()
-        // Configures interception for IService calls
-        .Intercept<IService>(new MyInterceptor(methods))
+        // Intercepts any invocations
+        .Intercept(key => true, new MyInterceptor(methods))
         .Container;
 
     // Resolve an instance
@@ -917,9 +921,11 @@ public void Run()
 
     // Invoke the getter "get_State"
     var state = instance.State;
+    instance.Dependency.Index = 1;
 
     // Check invocations from the interceptor
     methods.ShouldContain("get_State");
+    methods.ShouldContain("set_Index");
 }
 
 // This interceptor just stores the name of called methods
@@ -931,7 +937,11 @@ public class MyInterceptor : IInterceptor
     public MyInterceptor(ICollection<string> methods) => _methods = methods;
 
     // Intercepts the invocations and appends the called method name to the collection
-    public void Intercept(IInvocation invocation) => _methods.Add(invocation.Method.Name);
+    public void Intercept(IInvocation invocation)
+    {
+        _methods.Add(invocation.Method.Name);
+        invocation.Proceed();
+    }
 }
 ```
 

@@ -5604,6 +5604,11 @@
             The depth of current context in the build tree.
             </summary>
         </member>
+        <member name="P:IoC.IBuildContext.Compilers">
+            <summary>
+            The list of compilers.
+            </summary>
+        </member>
         <member name="P:IoC.IBuildContext.AutowiringStrategy">
             <summary>
             The current autowiring strategy.

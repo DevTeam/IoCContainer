@@ -209,14 +209,14 @@ For more information please see [this sample](Samples/AspNetCore).
 
 ```csharp
 using var container = Container
-  // Creates an Inversion of Control container
+  // Creates a container
   .Create()
   // Using the feature InterceptionFeature
   .Using<InterceptionFeature>()
   // Configures binds
   .Bind<IService>().To<Service>()
-  // Configures interception for IService calls
-  .Intercept<IService>(new MyInterceptor());
+  // Intercepts any invocations
+  .Intercept(key => true, new MyInterceptor())
 
 container.Resolve<IService>();
 

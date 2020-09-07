@@ -15,29 +15,30 @@
     [PublicAPI]
     internal sealed class BuildContext : IBuildContext
     {
-        private static readonly ICollection<IBuilder> EmptyBuilders = new List<IBuilder>();
         [NotNull] private readonly IEnumerable<IBuilder> _builders;
+        [NotNull] private readonly IObserver<ContainerEvent> _eventObserver;
         private readonly IList<ParameterExpression> _parameters = new List<ParameterExpression>();
-        [NotNull] private readonly ICompiler _compiler;
         [NotNull] private readonly IDictionary<Type, Type> _typesMap;
 
         internal BuildContext(
             [CanBeNull] BuildContext parent,
             Key key,
             [NotNull] IContainer resolvingContainer,
+            [NotNull] IEnumerable<ICompiler> compilers,
             [NotNull] IEnumerable<IBuilder> builders,
             [NotNull] IAutowiringStrategy defaultAutowiringStrategy,
-            [NotNull] ICompiler compiler,
             [NotNull] ParameterExpression argsParameter,
             [NotNull] ParameterExpression containerParameter,
+            [NotNull] IObserver<ContainerEvent> eventObserver,
             int depth = 0)
         {
             Parent = parent;
             Key = key;
             Container = resolvingContainer ?? throw new ArgumentNullException(nameof(resolvingContainer));
+            Compilers = compilers ?? throw new ArgumentNullException(nameof(compilers));
             _builders = builders ?? throw new ArgumentNullException(nameof(builders));
+            _eventObserver = eventObserver ?? throw new ArgumentNullException(nameof(eventObserver));
             AutowiringStrategy = defaultAutowiringStrategy ?? throw new ArgumentNullException(nameof(defaultAutowiringStrategy));
-            _compiler = compiler;
             ArgsParameter = argsParameter ?? throw new ArgumentNullException(nameof(argsParameter));
             ContainerParameter = containerParameter ?? throw new ArgumentNullException(nameof(containerParameter));
             Depth = depth;
@@ -49,6 +50,8 @@
         public Key Key { get; }
 
         public IContainer Container { get; }
+
+        public IEnumerable<ICompiler> Compilers { get; private set; }
 
         public IAutowiringStrategy AutowiringStrategy { get; }
         
@@ -128,24 +131,43 @@
                 baseExpression = Expression.Block(baseExpression.Type, _parameters, baseExpression);
             }
 
-            if (_builders.Any())
+            foreach (var builder in _builders)
             {
-                var buildContext = CreateInternal(Key, Container, forBuilders: true);
-                foreach (var builder in _builders)
-                {
-                    baseExpression = baseExpression.Convert(Key.Type);
-                    baseExpression = builder.Build(buildContext, baseExpression);
-                }
+                baseExpression = baseExpression.Convert(Key.Type);
+                baseExpression = builder.Build(this, baseExpression);
             }
 
             baseExpression = baseExpression.Convert(Key.Type);
             return LifetimeExpressionBuilder.Shared.Build(baseExpression, this, lifetime);
         }
 
-        public bool TryCompile(LambdaExpression lambdaExpression, out Delegate lambdaCompiled, out Exception error) =>
-            _compiler.TryCompile(this, lambdaExpression, out lambdaCompiled, out error);
+        public bool TryCompile(LambdaExpression lambdaExpression, out Delegate lambdaCompiled, out Exception error)
+        {
+            error = default(Exception);
+            try
+            {
+                foreach (var compiler in Compilers)
+                {
+                    if (compiler.TryCompile(this, lambdaExpression, out lambdaCompiled, out error))
+                    {
+                        _eventObserver.OnNext(ContainerEvent.Compilation(Container, new[] { Key }, lambdaExpression));
+                        return true;
+                    }
 
-        private IBuildContext CreateInternal(Key key, IContainer container, bool forBuilders = false)
+                    _eventObserver.OnNext(ContainerEvent.CompilationFailed(Container, new[] { Key }, lambdaExpression, error));
+                }
+            }
+            catch (Exception ex)
+            {
+                error = ex;
+                _eventObserver.OnNext(ContainerEvent.CompilationFailed(Container, new[] { Key }, lambdaExpression, ex));
+            }
+
+            lambdaCompiled = default(Delegate);
+            return false;
+        }
+
+        private IBuildContext CreateInternal(Key key, IContainer container)
         {
             if (_typesMap.TryGetValue(key.Type, out var type))
             {
@@ -156,11 +178,12 @@
                 this,
                 key,
                 container,
-                forBuilders ? EmptyBuilders : _builders,
+                Compilers,
+                _builders,
                 AutowiringStrategy,
-                _compiler,
                 ArgsParameter,
                 ContainerParameter,
+                _eventObserver,
                 Depth + 1);
         }
 

@@ -29,8 +29,8 @@ namespace IoC.Tests.UsageScenarios
                 // Configures binds
                 .Bind<IDependency>().To<Dependency>()
                 .Bind<IService>().To<Service>()
-                // Configures interception for IService calls
-                .Intercept<IService>(new MyInterceptor(methods))
+                // Intercepts any invocations
+                .Intercept(key => true, new MyInterceptor(methods))
                 .Container;
 
             // Resolve an instance
@@ -38,9 +38,11 @@ namespace IoC.Tests.UsageScenarios
 
             // Invoke the getter "get_State"
             var state = instance.State;
+            instance.Dependency.Index = 1;
 
             // Check invocations from the interceptor
             methods.ShouldContain("get_State");
+            methods.ShouldContain("set_Index");
         }
 
         // This interceptor just stores the name of called methods
@@ -52,7 +54,11 @@ namespace IoC.Tests.UsageScenarios
             public MyInterceptor(ICollection<string> methods) => _methods = methods;
 
             // Intercepts the invocations and appends the called method name to the collection
-            public void Intercept(IInvocation invocation) => _methods.Add(invocation.Method.Name);
+            public void Intercept(IInvocation invocation)
+            {
+                _methods.Add(invocation.Method.Name);
+                invocation.Proceed();
+            }
         }
         // }
     }

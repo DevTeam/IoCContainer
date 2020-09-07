@@ -14,7 +14,7 @@
         {
             if (lifetime == null) throw new ArgumentNullException(nameof(lifetime));
             if (lambdaExpression == null) throw new ArgumentNullException(nameof(lambdaExpression));
-            var buildContext = new BuildContext(null, new Key(typeof(T)), Mock.Of<IContainer>(), new List<IBuilder>(), DefaultAutowiringStrategy.Shared, DefaultCompiler.Shared, Registration.ArgsParameter, Registration.ContainerParameter);
+            var buildContext = new BuildContext(null, new Key(typeof(T)), Mock.Of<IContainer>(), new List<ICompiler>() { DefaultCompiler.Shared }, new List<IBuilder>(), DefaultAutowiringStrategy.Shared, Registration.ArgsParameter, Registration.ContainerParameter, Mock.Of<IObserver<ContainerEvent>>());
             var lifetimeExpression = lifetime.Build(buildContext, lambdaExpression.Body);
             var resolverExpression = Expression.Lambda(buildContext.Key.Type.ToResolverType(), lifetimeExpression, false, Registration.ResolverParameters);
             DefaultCompiler.Shared.TryCompile(context ?? Mock.Of<IBuildContext>(), resolverExpression, out var resolverDelegate, out _);

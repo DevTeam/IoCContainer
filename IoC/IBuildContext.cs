@@ -1,6 +1,7 @@
 ﻿namespace IoC
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq.Expressions;
 
     /// <summary>
@@ -28,6 +29,11 @@
         /// The depth of current context in the build tree.
         /// </summary>
         int Depth { get; }
+
+        /// <summary>
+        /// The list of compilers.
+        /// </summary>
+        [NotNull] IEnumerable<ICompiler> Compilers { get; }
 
         /// <summary>
         /// The current autowiring strategy.

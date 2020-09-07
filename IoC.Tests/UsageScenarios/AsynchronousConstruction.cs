@@ -37,6 +37,8 @@ namespace IoC.Tests.UsageScenarios
         {
             // Time-consuming logic constructor
             public SomeDependency() { }
+
+            public int Index { get; set; }
         }
 
         public class Consumer

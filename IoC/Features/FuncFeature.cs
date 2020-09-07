@@ -76,9 +76,9 @@
                     instanceExpression = Expression.Call(
                         null,
                         ResolveWithTagGenericMethodInfo.MakeGenericMethod(instanceType),
-                        buildContext.ContainerParameter,
-                        Expression.Constant(buildContext.Key.Tag),
-                        buildContext.ArgsParameter);
+                        context.ContainerParameter,
+                        Expression.Constant(context.Key.Tag),
+                        context.ArgsParameter);
                 }
 
                 var parameters = new ParameterExpression[paramsCount];
@@ -101,9 +101,9 @@
                 }
 
                 instanceExpression = Expression.Block(
-                    new[] { buildContext.ContainerParameter, buildContext.ArgsParameter },
-                    Expression.Assign(buildContext.ContainerParameter, Expression.Constant(buildContext.Container)),
-                    Expression.Assign(buildContext.ArgsParameter, argsExpression),
+                    new[] { context.ContainerParameter, context.ArgsParameter },
+                    Expression.Assign(context.ContainerParameter, Expression.Constant(context.Container)),
+                    Expression.Assign(context.ArgsParameter, argsExpression),
                     instanceExpression);
 
                 if (context.TryCompile(Expression.Lambda(instanceExpression, parameters), out var factory, out error))
