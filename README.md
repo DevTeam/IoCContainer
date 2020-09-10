@@ -640,7 +640,7 @@ var traceMessages = new List<string>();
     using var rootContainer = Container
         .Create("root")
         // Aggregate trace messages to the list 'traceMessages'
-        .Trace(message => traceMessages.Add(message))
+        .Trace(e => traceMessages.Add(e.Message))
         .Container;
 
     // Create and configure the parent container
@@ -659,7 +659,7 @@ var traceMessages = new List<string>();
 }
 // Every containers were disposed here
 
-traceMessages.Count.ShouldBe(9);
+traceMessages.Count.ShouldBe(8);
 ```
 
 
@@ -877,8 +877,8 @@ public class MyTransientLifetime : ILifetime
     private ILifetime _baseLifetime = new Lifetimes.SingletonLifetime();
 
     // Wraps the expression by the Singleton lifetime expression
-    public Expression Build(IBuildContext context, Expression expression)
-        => context.FinalizeExpression(expression, _baseLifetime);
+    public Expression Build(IBuildContext context, Expression expression) =>
+        _baseLifetime.Build(context, expression);
 
     // Creates the similar lifetime to use with generic instances
     public ILifetime Create() => new MyTransientLifetime();

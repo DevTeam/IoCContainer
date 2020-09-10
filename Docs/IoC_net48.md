@@ -312,8 +312,8 @@
   - [CreateScope(container)](#M-IoC-FluentScope-CreateScope-IoC-IContainer- 'IoC.FluentScope.CreateScope(IoC.IContainer)')
 - [FluentTrace](#T-IoC-FluentTrace 'IoC.FluentTrace')
   - [ToTraceSource(container)](#M-IoC-FluentTrace-ToTraceSource-IoC-IContainer- 'IoC.FluentTrace.ToTraceSource(IoC.IContainer)')
-  - [Trace(container,onTraceMessage)](#M-IoC-FluentTrace-Trace-IoC-IMutableContainer,System-Action{System-String}- 'IoC.FluentTrace.Trace(IoC.IMutableContainer,System.Action{System.String})')
-  - [Trace(token,onTraceMessage)](#M-IoC-FluentTrace-Trace-IoC-IToken,System-Action{System-String}- 'IoC.FluentTrace.Trace(IoC.IToken,System.Action{System.String})')
+  - [Trace(container,onTraceEvent)](#M-IoC-FluentTrace-Trace-IoC-IMutableContainer,System-Action{IoC-TraceEvent}- 'IoC.FluentTrace.Trace(IoC.IMutableContainer,System.Action{IoC.TraceEvent})')
+  - [Trace(token,onTraceEvent)](#M-IoC-FluentTrace-Trace-IoC-IToken,System-Action{IoC-TraceEvent}- 'IoC.FluentTrace.Trace(IoC.IToken,System.Action{IoC.TraceEvent})')
   - [Trace(container)](#M-IoC-FluentTrace-Trace-IoC-IMutableContainer- 'IoC.FluentTrace.Trace(IoC.IMutableContainer)')
   - [Trace(token)](#M-IoC-FluentTrace-Trace-IoC-IToken- 'IoC.FluentTrace.Trace(IoC.IToken)')
 - [FuncFeature](#T-IoC-Features-FuncFeature 'IoC.Features.FuncFeature')
@@ -7865,8 +7865,8 @@ The race source.
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container to trace. |
 
-<a name='M-IoC-FluentTrace-Trace-IoC-IMutableContainer,System-Action{System-String}-'></a>
-### Trace(container,onTraceMessage) `method`
+<a name='M-IoC-FluentTrace-Trace-IoC-IMutableContainer,System-Action{IoC-TraceEvent}-'></a>
+### Trace(container,onTraceEvent) `method`
 
 ##### Summary
 
@@ -7881,10 +7881,10 @@ The trace token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container to trace. |
-| onTraceMessage | [System.Action{System.String}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{System.String}') | The trace handler. |
+| onTraceEvent | [System.Action{IoC.TraceEvent}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{IoC.TraceEvent}') | The trace handler. |
 
-<a name='M-IoC-FluentTrace-Trace-IoC-IToken,System-Action{System-String}-'></a>
-### Trace(token,onTraceMessage) `method`
+<a name='M-IoC-FluentTrace-Trace-IoC-IToken,System-Action{IoC-TraceEvent}-'></a>
+### Trace(token,onTraceEvent) `method`
 
 ##### Summary
 
@@ -7899,7 +7899,7 @@ The trace token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The token of target container to trace. |
-| onTraceMessage | [System.Action{System.String}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{System.String}') | The trace handler. |
+| onTraceEvent | [System.Action{IoC.TraceEvent}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{IoC.TraceEvent}') | The trace handler. |
 
 <a name='M-IoC-FluentTrace-Trace-IoC-IMutableContainer-'></a>
 ### Trace(container) `method`

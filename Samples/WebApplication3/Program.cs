@@ -6,6 +6,7 @@ namespace WebApplication3
     using IoC.Features.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Hosting;
+    using static System.Console;
 
     public class Program
     {

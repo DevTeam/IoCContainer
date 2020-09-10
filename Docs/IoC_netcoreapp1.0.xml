@@ -4183,20 +4183,20 @@
             <param name="container">The target container to trace.</param>
             <returns>The race source.</returns>
         </member>
-        <member name="M:IoC.FluentTrace.Trace(IoC.IMutableContainer,System.Action{System.String})">
+        <member name="M:IoC.FluentTrace.Trace(IoC.IMutableContainer,System.Action{IoC.TraceEvent})">
             <summary>
             Traces container actions through a handler.
             </summary>
             <param name="container">The target container to trace.</param>
-            <param name="onTraceMessage">The trace handler.</param>
+            <param name="onTraceEvent">The trace handler.</param>
             <returns>The trace token.</returns>
         </member>
-        <member name="M:IoC.FluentTrace.Trace(IoC.IToken,System.Action{System.String})">
+        <member name="M:IoC.FluentTrace.Trace(IoC.IToken,System.Action{IoC.TraceEvent})">
             <summary>
             Traces container actions through a handler.
             </summary>
             <param name="token">The token of target container to trace.</param>
-            <param name="onTraceMessage">The trace handler.</param>
+            <param name="onTraceEvent">The trace handler.</param>
             <returns>The trace token.</returns>
         </member>
         <member name="T:IoC.GenericTypeArgumentAttribute">

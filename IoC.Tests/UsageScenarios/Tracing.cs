@@ -23,7 +23,7 @@
                 using var rootContainer = Container
                     .Create("root")
                     // Aggregate trace messages to the list 'traceMessages'
-                    .Trace(message => traceMessages.Add(message))
+                    .Trace(e => traceMessages.Add(e.Message))
                     .Container;
 
                 // Create and configure the parent container
@@ -42,7 +42,7 @@
             }
             // Every containers were disposed here
 
-            traceMessages.Count.ShouldBe(9);
+            traceMessages.Count.ShouldBe(8);
             // }
         }
     }

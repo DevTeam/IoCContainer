@@ -33,31 +33,31 @@
         /// Traces container actions through a handler.
         /// </summary>
         /// <param name="container">The target container to trace.</param>
-        /// <param name="onTraceMessage">The trace handler.</param>
+        /// <param name="onTraceEvent">The trace handler.</param>
         /// <returns>The trace token.</returns>
-        public static IToken Trace([NotNull] this IMutableContainer container, [NotNull] Action<string> onTraceMessage)
+        public static IToken Trace([NotNull] this IMutableContainer container, [NotNull] Action<TraceEvent> onTraceEvent)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            if (onTraceMessage == null) throw new ArgumentNullException(nameof(onTraceMessage));
+            if (onTraceEvent == null) throw new ArgumentNullException(nameof(onTraceEvent));
 
             return new Token(
                 container,
                 container
                     .ToTraceSource()
                     .Subscribe(
-                        value => onTraceMessage(value.Message),
-                        error => { onTraceMessage($"The error is occured during tracing \"{error}\"."); },
-                        () => { onTraceMessage("The tracing is completed."); }));
+                        onTraceEvent,
+                        error => { },
+                        () => { }));
         }
 
         /// <summary>
         /// Traces container actions through a handler.
         /// </summary>
         /// <param name="token">The token of target container to trace.</param>
-        /// <param name="onTraceMessage">The trace handler.</param>
+        /// <param name="onTraceEvent">The trace handler.</param>
         /// <returns>The trace token.</returns>
-        public static IToken Trace([NotNull] this IToken token, [NotNull] Action<string> onTraceMessage) =>
-            (token ?? throw new ArgumentNullException(nameof(token))).Container.Trace(onTraceMessage ?? throw new ArgumentNullException(nameof(onTraceMessage)));
+        public static IToken Trace([NotNull] this IToken token, [NotNull] Action<TraceEvent> onTraceEvent) =>
+            (token ?? throw new ArgumentNullException(nameof(token))).Container.Trace(onTraceEvent ?? throw new ArgumentNullException(nameof(onTraceEvent)));
 
 #if !NETSTANDARD1_0 && !NETSTANDARD1_1 && !NETSTANDARD1_2 && !NETSTANDARD1_3 && !NETSTANDARD1_4 && !NETSTANDARD1_5 && !NETSTANDARD1_6 && !NETCOREAPP1_0&& !NETCOREAPP1_1 && !WINDOWS_UWP
         /// <summary>
@@ -66,7 +66,7 @@
         /// <param name="container">The target container to trace.</param>
         /// <returns>The trace token.</returns>
         public static IToken Trace([NotNull] this IMutableContainer container) =>
-            (container ?? throw new ArgumentNullException(nameof(container))).Trace(message => System.Diagnostics.Trace.WriteLine(message));
+            (container ?? throw new ArgumentNullException(nameof(container))).Trace(e => System.Diagnostics.Trace.WriteLine(e.Message));
 
         /// <summary>
         /// Traces container actions through a <c>System.Diagnostics.Trace</c>.
@@ -124,7 +124,7 @@
                             message = value.ToString();
                         }
 
-                        observer.OnNext(new TraceEvent(value, message));
+                        observer.OnNext(new TraceEvent(value, message ?? string.Empty));
                     },
                     observer.OnError,
                     observer.OnCompleted);

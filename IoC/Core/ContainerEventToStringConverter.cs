@@ -26,16 +26,16 @@
                     break;
 
                 case EventType.RegisterDependency:
-                    text = $"adds {FormatDependency(src)}.";
+                    text = $"add {FormatDependency(src)}.";
                     break;
 
                 case EventType.ContainerStateSingletonLifetime:
-                    text = $"removes {FormatDependency(src)}.";
+                    text = $"remove {FormatDependency(src)}.";
                     break;
 
                 case EventType.ResolverCompilation:
                     var body = src.ResolverExpression?.Body;
-                    text = $"compiles {FormatDependency(src)} from:\n{GetString(GetDebugView(body))}.";
+                    text = $"compile {FormatDependency(src)} from:\n{GetString(GetDebugView(body))}.";
                     break;
 
                 default:

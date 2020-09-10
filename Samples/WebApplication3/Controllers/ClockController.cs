@@ -2,7 +2,9 @@
 {
     using System.Collections.Generic;
     using Clock.ViewModels;
+    using Microsoft.AspNetCore.DataProtection.KeyManagement;
     using Microsoft.AspNetCore.Mvc;
+    using Microsoft.Extensions.Options;
 
     [ApiController]
     [Route("api/[controller]")]
@@ -10,7 +12,10 @@
     {
         private readonly IClockViewModel _viewModel;
 
-        public ClockController(IClockViewModel viewModel) => _viewModel = viewModel;
+        public ClockController(IClockViewModel viewModel, IConfigureOptions<KeyManagementOptions> options)
+        {
+            _viewModel = viewModel;
+        }
 
         [HttpGet]
         public IEnumerable<string> Get()

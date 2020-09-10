@@ -10,8 +10,7 @@
     {
         public static readonly IAutowiringStrategy Shared = new DefaultAutowiringStrategy();
 
-        private DefaultAutowiringStrategy()
-        { }
+        private DefaultAutowiringStrategy() { }
 
         public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
         {
@@ -31,7 +30,23 @@
         [MethodImpl((MethodImplOptions)0x100)]
         private static int GetOrder(MethodBase method)
         {
-            var order = method.GetParameters().Length + 1;
+            var order = 1;
+            var parameters = method.GetParameters();
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                var parameter = parameters[i];
+                if (!parameter.ParameterType.Descriptor().IsPublic())
+                {
+                    order += 10;
+                }
+
+                if (parameter.IsOut)
+                {
+                    order += 5;
+                }
+
+                order += 1;
+            }
 
             if (method.GetCustomAttributes(typeof(ObsoleteAttribute), true).Any())
             {
