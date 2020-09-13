@@ -35,7 +35,7 @@ class ShroedingersCat : ICat
 
   public ShroedingersCat(Lazy<State> superposition) => _superposition = superposition;
 
-  // The decoherence of the superposition at the time of observation via an irreversible process
+  // Decoherence of the superposition at the time of observation via an irreversible process
   public State State => _superposition.Value;
 
   public override string ToString() => $"{State} cat";
@@ -62,9 +62,9 @@ _Using NuGet packages allows you to optimize your application to include only th
   dotnet add package IoC.Container
   ```
 
-Declare the required dependencies in a dedicated class *__Glue__*. You can do this anywhere in your code, but locating this information in one place is often the best solution to maintain order.
+Declare the required dependencies in a dedicated class *__Glue__*. It is possible do this anywhere in your code, but putting this information in one place is often the better solution and helps keep your code more organized.
 
-Also presented below is the concept of mutable containers (_IMutableContainer_). Any binding is not irreversible, thus the owner of a binding [can cancel this binding](#change-configuration-on-the-fly-) using the related binding token (_IToken_).
+Below is the concept of mutable containers (_IMutableContainer_). Any binding is not irreversible, thus the owner of a binding [can cancel this binding](#change-configuration-on-the-fly-) using the related binding token (_IToken_).
 
 ```csharp
 public class Glue : IConfiguration
@@ -127,15 +127,13 @@ It allows you to take full advantage of dependency injection everywhere and ever
 
 |     | binary packages | source code packages ¹ |
 | --- | --- | ---|
-| IoC container | [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) | [![NuGet](https://buildstats.info/nuget/IoC.Container.Source)](https://www.nuget.org/packages/IoC.Container.Source) |
-| ASP.NET Core | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source) |
+| Container | [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container) | [![NuGet](https://buildstats.info/nuget/IoC.Container.Source)](https://www.nuget.org/packages/IoC.Container.Source) |
+| ASP.NET | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) | [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source) |
 | Interception | [![NuGet](https://buildstats.info/nuget/IoC.Interception)](https://www.nuget.org/packages/IoC.Interception) | [![NuGet](https://buildstats.info/nuget/IoC.Interception.Source)](https://www.nuget.org/packages/IoC.Interception.Source) |
 
 ¹ _source code packages_ require C# 7.0 or higher
 
 ## ASP.NET Core
-
-### Add the  [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore)](https://www.nuget.org/packages/IoC.AspNetCore) reference (or [![NuGet](https://buildstats.info/nuget/IoC.AspNetCore.Source)](https://www.nuget.org/packages/IoC.AspNetCore.Source))
 
 - Package Manager
 
@@ -149,7 +147,7 @@ It allows you to take full advantage of dependency injection everywhere and ever
   dotnet add package IoC.AspNetCore
   ```
 
-### For ASP.NET Core 3+ create the _IoC container_ and use the service provider factory based on this container at [Main](Samples/WebApplication3/Program.cs)
+For __ASP.NET Core 3+__ create the _IoC container_ and use the service provider factory based on this container at [Main](Samples/WebApplication3/Program.cs)
 
 ```csharp
 public static void Main(string[] args)
@@ -169,10 +167,11 @@ public static void Main(string[] args)
 
   host.Run();
 }
-
 ```
 
-### For ASP.NET Core 2 create the _IoC container_ with feature _AspNetCoreFeature_ and configure it at [Startup](Samples/WebApplication2/Startup.cs)
+For details please see [this sample](Samples/WebApplication3).
+
+For __ASP.NET Core 2__ create the _IoC container_ with feature _AspNetCoreFeature_ and configure it at [Startup](Samples/WebApplication2/Startup.cs)
 
 ```csharp
 public IServiceProvider ConfigureServices(IServiceCollection services)
@@ -191,11 +190,9 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
 }
 ```
 
-For more information please see [this sample](Samples/AspNetCore).
+For details please see [this sample](Samples/WebApplication2).
 
 ## Interception
-
-### Add the [![NuGet](https://buildstats.info/nuget/IoC.Interception)](https://www.nuget.org/packages/IoC.Interception) reference (or [![NuGet](https://buildstats.info/nuget/IoC.Interception.Source)](https://www.nuget.org/packages/IoC.Interception.Source))
 
 - Package Manager
 
@@ -209,32 +206,31 @@ For more information please see [this sample](Samples/AspNetCore).
   dotnet add package IoC.Interception
   ```
 
-### Add _InterceptionFeature_ to intercept calls to _IService_ by your own _MyInterceptor_
+Add _InterceptionFeature_ to intercept calls to _IService_ by your own _MyInterceptor_
 
 ```csharp
 using var container = Container
-  // Creates a container
-  .Create()
   // Using the feature InterceptionFeature
   .Using<InterceptionFeature>()
-  // Configures binds
   .Bind<IService>().To<Service>()
-  // Intercepts any invocations
+  // Intercepts any invocations to any instances resolved via IoC container
   .Intercept(key => true, new MyInterceptor())
 
 container.Resolve<IService>();
 
 ```
 
-where _MyInterceptor_ could look like:
+where _MyInterceptor_ looks like:
 
 ```csharp
 class MyInterceptor : IInterceptor
 {
-  // Intercepts the invocations and appends some logic here
+  // Intercepts invocations and appends some logic around
   public void Intercept(IInvocation invocation)
   {
-    ..
+    ...
+    invocation.Proceed();
+    ...
   }
 }
 ```
