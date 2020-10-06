@@ -759,13 +759,13 @@
             The optional resolving arguments.
             </summary>
         </member>
-        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveType(System.Type,System.Type,System.Type@)">
+        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveType(IoC.IContainer,System.Type,System.Type,System.Type@)">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
+        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveConstructor(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
+        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveInitializers(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
             <inheritdoc />
         </member>
         <member name="T:IoC.Core.AspectOrientedMetadata">
@@ -773,13 +773,13 @@
             Metadata for aspect oriented autowiring strategy.
             </summary>
         </member>
-        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveType(System.Type,System.Type,System.Type@)">
+        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveType(IoC.IContainer,System.Type,System.Type,System.Type@)">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
+        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveConstructor(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
+        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveInitializers(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
             <inheritdoc />
         </member>
         <member name="T:IoC.Core.BuildContext">
@@ -911,20 +911,6 @@
             Marker interface for arrays.
             </summary>
         </member>
-        <member name="T:IoC.Core.IExpressionBuilder`1">
-            <summary>
-            Allows to build expression for lifetimes.
-            </summary>
-        </member>
-        <member name="M:IoC.Core.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext,`0)">
-            <summary>
-            Builds the expression.
-            </summary>
-            <param name="bodyExpression">The expression body to get an instance.</param>
-            <param name="buildContext">The build context.</param>
-            <param name="context">The expression build context.</param>
-            <returns>The new expression.</returns>
-        </member>
         <member name="F:IoC.Core.Registration.ContainerParameter">
             <summary>
             The container parameter.
@@ -966,6 +952,26 @@
         <member name="M:IoC.Dependencies.AutowiringDependency.ToString">
             <inheritdoc />
         </member>
+        <member name="T:IoC.Dependencies.BaseDependency">
+            <summary>
+            Represents the dependency based on expressions and a map of types.
+            </summary>
+        </member>
+        <member name="M:IoC.Dependencies.BaseDependency.#ctor(System.Linq.Expressions.Expression,System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression},System.Collections.Generic.IDictionary{System.Type,System.Type},IoC.IAutowiringStrategy)">
+            <summary>
+            Creates an instance of dependency.
+            </summary>
+            <param name="instanceExpression">The expression to create an instance.</param>
+            <param name="initializeInstanceExpressions">The statements to initialize an instance.</param>
+            <param name="typesMap">The type mapping dictionary.</param>
+            <param name="autowiringStrategy">The autowiring strategy.</param>
+        </member>
+        <member name="M:IoC.Dependencies.BaseDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)">
+            <inheritdoc />
+        </member>
+        <member name="M:IoC.Dependencies.BaseDependency.ToString">
+            <inheritdoc />
+        </member>
         <member name="T:IoC.Dependencies.ExpressionDependency">
             <summary>
             Represents the dependency based on expressions.
@@ -990,26 +996,6 @@
             <inheritdoc />
         </member>
         <member name="M:IoC.Dependencies.ExpressionDependency.ToString">
-            <inheritdoc />
-        </member>
-        <member name="T:IoC.Dependencies.TypesMapDependency">
-            <summary>
-            Represents the dependency based on expressions and a map of types.
-            </summary>
-        </member>
-        <member name="M:IoC.Dependencies.TypesMapDependency.#ctor(System.Linq.Expressions.Expression,System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression},System.Collections.Generic.IDictionary{System.Type,System.Type},IoC.IAutowiringStrategy)">
-            <summary>
-            Creates an instance of dependency.
-            </summary>
-            <param name="instanceExpression">The expression to create an instance.</param>
-            <param name="initializeInstanceExpressions">The statements to initialize an instance.</param>
-            <param name="typesMap">The type mapping dictionary.</param>
-            <param name="autowiringStrategy">The autowiring strategy.</param>
-        </member>
-        <member name="M:IoC.Dependencies.TypesMapDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)">
-            <inheritdoc />
-        </member>
-        <member name="M:IoC.Dependencies.TypesMapDependency.ToString">
             <inheritdoc />
         </member>
         <member name="T:IoC.EventType">
@@ -4197,20 +4183,20 @@
             <param name="container">The target container to trace.</param>
             <returns>The race source.</returns>
         </member>
-        <member name="M:IoC.FluentTrace.Trace(IoC.IMutableContainer,System.Action{System.String})">
+        <member name="M:IoC.FluentTrace.Trace(IoC.IMutableContainer,System.Action{IoC.TraceEvent})">
             <summary>
             Traces container actions through a handler.
             </summary>
             <param name="container">The target container to trace.</param>
-            <param name="onTraceMessage">The trace handler.</param>
+            <param name="onTraceEvent">The trace handler.</param>
             <returns>The trace token.</returns>
         </member>
-        <member name="M:IoC.FluentTrace.Trace(IoC.IToken,System.Action{System.String})">
+        <member name="M:IoC.FluentTrace.Trace(IoC.IToken,System.Action{IoC.TraceEvent})">
             <summary>
             Traces container actions through a handler.
             </summary>
             <param name="token">The token of target container to trace.</param>
-            <param name="onTraceMessage">The trace handler.</param>
+            <param name="onTraceEvent">The trace handler.</param>
             <returns>The trace token.</returns>
         </member>
         <member name="T:IoC.GenericTypeArgumentAttribute">
@@ -4221,6 +4207,11 @@
         <member name="T:IoC.TT">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI">
@@ -4308,6 +4299,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC1">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI1">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -4391,6 +4387,11 @@
         <member name="T:IoC.TT2">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC2">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI2">
@@ -4478,6 +4479,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC3">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI3">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -4561,6 +4567,11 @@
         <member name="T:IoC.TT4">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC4">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI4">
@@ -4648,6 +4659,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC5">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI5">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -4731,6 +4747,11 @@
         <member name="T:IoC.TT6">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC6">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI6">
@@ -4818,6 +4839,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC7">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI7">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -4901,6 +4927,11 @@
         <member name="T:IoC.TT8">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC8">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI8">
@@ -4988,6 +5019,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC9">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI9">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5001,6 +5037,11 @@
         <member name="T:IoC.TT10">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC10">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI10">
@@ -5018,6 +5059,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC11">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI11">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5031,6 +5077,11 @@
         <member name="T:IoC.TT12">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC12">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI12">
@@ -5048,6 +5099,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC13">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI13">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5061,6 +5117,11 @@
         <member name="T:IoC.TT14">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC14">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI14">
@@ -5078,6 +5139,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC15">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI15">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5091,6 +5157,11 @@
         <member name="T:IoC.TT16">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC16">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI16">
@@ -5108,6 +5179,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC17">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI17">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5121,6 +5197,11 @@
         <member name="T:IoC.TT18">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC18">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI18">
@@ -5138,6 +5219,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC19">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI19">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5151,6 +5237,11 @@
         <member name="T:IoC.TT20">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC20">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI20">
@@ -5168,6 +5259,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC21">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI21">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5181,6 +5277,11 @@
         <member name="T:IoC.TT22">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC22">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI22">
@@ -5198,6 +5299,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC23">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI23">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5211,6 +5317,11 @@
         <member name="T:IoC.TT24">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC24">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI24">
@@ -5228,6 +5339,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC25">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI25">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5241,6 +5357,11 @@
         <member name="T:IoC.TT26">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC26">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI26">
@@ -5258,6 +5379,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC27">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI27">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5271,6 +5397,11 @@
         <member name="T:IoC.TT28">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC28">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI28">
@@ -5288,6 +5419,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC29">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI29">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5301,6 +5437,11 @@
         <member name="T:IoC.TT30">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC30">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI30">
@@ -5318,6 +5459,11 @@
             Represents the generic type arguments marker for a reference type.
             </summary>
         </member>
+        <member name="T:IoC.TTC31">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
+            </summary>
+        </member>
         <member name="T:IoC.TTI31">
             <summary>
             Represents the generic type arguments marker for an interface.
@@ -5331,6 +5477,11 @@
         <member name="T:IoC.TT32">
             <summary>
             Represents the generic type arguments marker for a reference type.
+            </summary>
+        </member>
+        <member name="T:IoC.TTC32">
+            <summary>
+            Represents the generic type arguments marker for a reference type with defaul constructor.
             </summary>
         </member>
         <member name="T:IoC.TTI32">
@@ -5348,27 +5499,30 @@
             Represents an abstraction for autowiring strategy.
             </summary>
         </member>
-        <member name="M:IoC.IAutowiringStrategy.TryResolveType(System.Type,System.Type,System.Type@)">
+        <member name="M:IoC.IAutowiringStrategy.TryResolveType(IoC.IContainer,System.Type,System.Type,System.Type@)">
             <summary>
             Resolves type to create an instance.
             </summary>
+            <param name="container">Current container.</param>
             <param name="registeredType">Registered type.</param>
             <param name="resolvingType">Resolving type.</param>
             <param name="instanceType">The type to create an instance.</param>
             <returns>True if the type was resolved.</returns>
         </member>
-        <member name="M:IoC.IAutowiringStrategy.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
+        <member name="M:IoC.IAutowiringStrategy.TryResolveConstructor(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
             <summary>
             Resolves a constructor from a set of available constructors.
             </summary>
+            <param name="container">Current container.</param>
             <param name="constructors">The set of available constructors.</param>
             <param name="constructor">The resolved constructor.</param>
             <returns>True if the constructor was resolved.</returns>
         </member>
-        <member name="M:IoC.IAutowiringStrategy.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
+        <member name="M:IoC.IAutowiringStrategy.TryResolveInitializers(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
             <summary>
             Resolves initializing methods from a set of available methods/setters in the specific order which will be used to invoke them.
             </summary>
+            <param name="container">Current container.</param>
             <param name="methods">The set of available methods.</param>
             <param name="initializers">The set of initializing methods in the appropriate order.</param>
             <returns>True if initializing methods were resolved.</returns>
@@ -5419,6 +5573,11 @@
             Represents an abstract build context.
             </summary>
         </member>
+        <member name="P:IoC.IBuildContext.Parent">
+            <summary>
+            Provides a parent context or <c>null</c>.
+            </summary>
+        </member>
         <member name="P:IoC.IBuildContext.Key">
             <summary>
             The target key to build resolver.
@@ -5432,6 +5591,11 @@
         <member name="P:IoC.IBuildContext.Depth">
             <summary>
             The depth of current context in the build tree.
+            </summary>
+        </member>
+        <member name="P:IoC.IBuildContext.Compilers">
+            <summary>
+            The list of compilers.
             </summary>
         </member>
         <member name="P:IoC.IBuildContext.AutowiringStrategy">
@@ -5464,6 +5628,14 @@
             <param name="defaultExpression">The default expression.</param>
             <returns>The expression.</returns>
         </member>
+        <member name="M:IoC.IBuildContext.FinalizeExpression(System.Linq.Expressions.Expression,IoC.ILifetime)">
+            <summary>
+            Finalizes an expression and adds a lifetime.
+            </summary>
+            <param name="baseExpression">The base expression.</param>
+            <param name="lifetime">The target lifetime.</param>
+            <returns></returns>
+        </member>
         <member name="M:IoC.IBuildContext.MapType(System.Type,System.Type)">
             <summary>
             Adds types mapping.
@@ -5476,14 +5648,6 @@
             Adds a parameter.
             </summary>
             <param name="parameterExpression">The parameters expression to add.</param>
-        </member>
-        <member name="M:IoC.IBuildContext.FinalizeExpression(System.Linq.Expressions.Expression,IoC.ILifetime)">
-            <summary>
-            Finalizes an expression and adds a lifetime.
-            </summary>
-            <param name="baseExpression">The base expression.</param>
-            <param name="lifetime">The target lifetime.</param>
-            <returns></returns>
         </member>
         <member name="M:IoC.IBuildContext.TryCompile(System.Linq.Expressions.LambdaExpression,System.Delegate@,System.Exception@)">
             <summary>

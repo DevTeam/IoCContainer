@@ -18,13 +18,13 @@
 - [AspMvcViewComponentAttribute](#T-IoC-AspMvcViewComponentAttribute 'IoC.AspMvcViewComponentAttribute')
 - [AspMvcViewComponentViewAttribute](#T-IoC-AspMvcViewComponentViewAttribute 'IoC.AspMvcViewComponentViewAttribute')
 - [AspectOrientedAutowiringStrategy](#T-IoC-Core-AspectOrientedAutowiringStrategy 'IoC.Core.AspectOrientedAutowiringStrategy')
-  - [TryResolveConstructor()](#M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@- 'IoC.Core.AspectOrientedAutowiringStrategy.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)')
-  - [TryResolveInitializers()](#M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveInitializers-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@- 'IoC.Core.AspectOrientedAutowiringStrategy.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)')
-  - [TryResolveType()](#M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveType-System-Type,System-Type,System-Type@- 'IoC.Core.AspectOrientedAutowiringStrategy.TryResolveType(System.Type,System.Type,System.Type@)')
+  - [TryResolveConstructor()](#M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveConstructor-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@- 'IoC.Core.AspectOrientedAutowiringStrategy.TryResolveConstructor(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)')
+  - [TryResolveInitializers()](#M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveInitializers-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@- 'IoC.Core.AspectOrientedAutowiringStrategy.TryResolveInitializers(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)')
+  - [TryResolveType()](#M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveType-IoC-IContainer,System-Type,System-Type,System-Type@- 'IoC.Core.AspectOrientedAutowiringStrategy.TryResolveType(IoC.IContainer,System.Type,System.Type,System.Type@)')
 - [AspectOrientedMetadata](#T-IoC-Core-AspectOrientedMetadata 'IoC.Core.AspectOrientedMetadata')
-  - [TryResolveConstructor()](#M-IoC-Core-AspectOrientedMetadata-TryResolveConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@- 'IoC.Core.AspectOrientedMetadata.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)')
-  - [TryResolveInitializers()](#M-IoC-Core-AspectOrientedMetadata-TryResolveInitializers-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@- 'IoC.Core.AspectOrientedMetadata.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)')
-  - [TryResolveType()](#M-IoC-Core-AspectOrientedMetadata-TryResolveType-System-Type,System-Type,System-Type@- 'IoC.Core.AspectOrientedMetadata.TryResolveType(System.Type,System.Type,System.Type@)')
+  - [TryResolveConstructor()](#M-IoC-Core-AspectOrientedMetadata-TryResolveConstructor-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@- 'IoC.Core.AspectOrientedMetadata.TryResolveConstructor(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)')
+  - [TryResolveInitializers()](#M-IoC-Core-AspectOrientedMetadata-TryResolveInitializers-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@- 'IoC.Core.AspectOrientedMetadata.TryResolveInitializers(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)')
+  - [TryResolveType()](#M-IoC-Core-AspectOrientedMetadata-TryResolveType-IoC-IContainer,System-Type,System-Type,System-Type@- 'IoC.Core.AspectOrientedMetadata.TryResolveType(IoC.IContainer,System.Type,System.Type,System.Type@)')
 - [AssertionConditionAttribute](#T-IoC-AssertionConditionAttribute 'IoC.AssertionConditionAttribute')
 - [AssertionConditionType](#T-IoC-AssertionConditionType 'IoC.AssertionConditionType')
   - [IS_FALSE](#F-IoC-AssertionConditionType-IS_FALSE 'IoC.AssertionConditionType.IS_FALSE')
@@ -42,6 +42,10 @@
   - [Order\`\`1(strategy,orderSelector)](#M-IoC-AutowiringStrategies-Order``1-IoC-IAutowiringStrategy,System-Func{``0,System-IComparable}- 'IoC.AutowiringStrategies.Order``1(IoC.IAutowiringStrategy,System.Func{``0,System.IComparable})')
   - [Tag\`\`1(strategy,tagSelector)](#M-IoC-AutowiringStrategies-Tag``1-IoC-IAutowiringStrategy,System-Func{``0,System-Object}- 'IoC.AutowiringStrategies.Tag``1(IoC.IAutowiringStrategy,System.Func{``0,System.Object})')
   - [Type\`\`1(strategy,typeSelector)](#M-IoC-AutowiringStrategies-Type``1-IoC-IAutowiringStrategy,System-Func{``0,System-Type}- 'IoC.AutowiringStrategies.Type``1(IoC.IAutowiringStrategy,System.Func{``0,System.Type})')
+- [BaseDependency](#T-IoC-Dependencies-BaseDependency 'IoC.Dependencies.BaseDependency')
+  - [#ctor(instanceExpression,initializeInstanceExpressions,typesMap,autowiringStrategy)](#M-IoC-Dependencies-BaseDependency-#ctor-System-Linq-Expressions-Expression,System-Collections-Generic-IEnumerable{System-Linq-Expressions-Expression},System-Collections-Generic-IDictionary{System-Type,System-Type},IoC-IAutowiringStrategy- 'IoC.Dependencies.BaseDependency.#ctor(System.Linq.Expressions.Expression,System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression},System.Collections.Generic.IDictionary{System.Type,System.Type},IoC.IAutowiringStrategy)')
+  - [ToString()](#M-IoC-Dependencies-BaseDependency-ToString 'IoC.Dependencies.BaseDependency.ToString')
+  - [TryBuildExpression()](#M-IoC-Dependencies-BaseDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.Dependencies.BaseDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
 - [BaseTypeRequiredAttribute](#T-IoC-BaseTypeRequiredAttribute 'IoC.BaseTypeRequiredAttribute')
 - [BuildContext](#T-IoC-Core-BuildContext 'IoC.Core.BuildContext')
 - [CanBeNullAttribute](#T-IoC-CanBeNullAttribute 'IoC.CanBeNullAttribute')
@@ -308,8 +312,8 @@
   - [CreateScope(container)](#M-IoC-FluentScope-CreateScope-IoC-IContainer- 'IoC.FluentScope.CreateScope(IoC.IContainer)')
 - [FluentTrace](#T-IoC-FluentTrace 'IoC.FluentTrace')
   - [ToTraceSource(container)](#M-IoC-FluentTrace-ToTraceSource-IoC-IContainer- 'IoC.FluentTrace.ToTraceSource(IoC.IContainer)')
-  - [Trace(container,onTraceMessage)](#M-IoC-FluentTrace-Trace-IoC-IMutableContainer,System-Action{System-String}- 'IoC.FluentTrace.Trace(IoC.IMutableContainer,System.Action{System.String})')
-  - [Trace(token,onTraceMessage)](#M-IoC-FluentTrace-Trace-IoC-IToken,System-Action{System-String}- 'IoC.FluentTrace.Trace(IoC.IToken,System.Action{System.String})')
+  - [Trace(container,onTraceEvent)](#M-IoC-FluentTrace-Trace-IoC-IMutableContainer,System-Action{IoC-TraceEvent}- 'IoC.FluentTrace.Trace(IoC.IMutableContainer,System.Action{IoC.TraceEvent})')
+  - [Trace(token,onTraceEvent)](#M-IoC-FluentTrace-Trace-IoC-IToken,System-Action{IoC-TraceEvent}- 'IoC.FluentTrace.Trace(IoC.IToken,System.Action{IoC.TraceEvent})')
 - [FuncFeature](#T-IoC-Features-FuncFeature 'IoC.Features.FuncFeature')
   - [LightSet](#F-IoC-Features-FuncFeature-LightSet 'IoC.Features.FuncFeature.LightSet')
   - [Set](#F-IoC-Features-FuncFeature-Set 'IoC.Features.FuncFeature.Set')
@@ -317,9 +321,9 @@
 - [GenericTypeArgumentAttribute](#T-IoC-GenericTypeArgumentAttribute 'IoC.GenericTypeArgumentAttribute')
 - [IArray](#T-IoC-Core-IArray 'IoC.Core.IArray')
 - [IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy')
-  - [TryResolveConstructor(constructors,constructor)](#M-IoC-IAutowiringStrategy-TryResolveConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@- 'IoC.IAutowiringStrategy.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)')
-  - [TryResolveInitializers(methods,initializers)](#M-IoC-IAutowiringStrategy-TryResolveInitializers-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@- 'IoC.IAutowiringStrategy.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)')
-  - [TryResolveType(registeredType,resolvingType,instanceType)](#M-IoC-IAutowiringStrategy-TryResolveType-System-Type,System-Type,System-Type@- 'IoC.IAutowiringStrategy.TryResolveType(System.Type,System.Type,System.Type@)')
+  - [TryResolveConstructor(container,constructors,constructor)](#M-IoC-IAutowiringStrategy-TryResolveConstructor-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@- 'IoC.IAutowiringStrategy.TryResolveConstructor(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)')
+  - [TryResolveInitializers(container,methods,initializers)](#M-IoC-IAutowiringStrategy-TryResolveInitializers-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@- 'IoC.IAutowiringStrategy.TryResolveInitializers(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)')
+  - [TryResolveType(container,registeredType,resolvingType,instanceType)](#M-IoC-IAutowiringStrategy-TryResolveType-IoC-IContainer,System-Type,System-Type,System-Type@- 'IoC.IAutowiringStrategy.TryResolveType(IoC.IContainer,System.Type,System.Type,System.Type@)')
 - [IBinding](#T-IoC-IBinding 'IoC.IBinding')
   - [AutowiringStrategy](#P-IoC-IBinding-AutowiringStrategy 'IoC.IBinding.AutowiringStrategy')
   - [Container](#P-IoC-IBinding-Container 'IoC.IBinding.Container')
@@ -331,10 +335,12 @@
 - [IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext')
   - [ArgsParameter](#P-IoC-IBuildContext-ArgsParameter 'IoC.IBuildContext.ArgsParameter')
   - [AutowiringStrategy](#P-IoC-IBuildContext-AutowiringStrategy 'IoC.IBuildContext.AutowiringStrategy')
+  - [Compilers](#P-IoC-IBuildContext-Compilers 'IoC.IBuildContext.Compilers')
   - [Container](#P-IoC-IBuildContext-Container 'IoC.IBuildContext.Container')
   - [ContainerParameter](#P-IoC-IBuildContext-ContainerParameter 'IoC.IBuildContext.ContainerParameter')
   - [Depth](#P-IoC-IBuildContext-Depth 'IoC.IBuildContext.Depth')
   - [Key](#P-IoC-IBuildContext-Key 'IoC.IBuildContext.Key')
+  - [Parent](#P-IoC-IBuildContext-Parent 'IoC.IBuildContext.Parent')
   - [AddParameter(parameterExpression)](#M-IoC-IBuildContext-AddParameter-System-Linq-Expressions-ParameterExpression- 'IoC.IBuildContext.AddParameter(System.Linq.Expressions.ParameterExpression)')
   - [CreateChild(key,container)](#M-IoC-IBuildContext-CreateChild-IoC-Key,IoC-IContainer- 'IoC.IBuildContext.CreateChild(IoC.Key,IoC.IContainer)')
   - [CreateExpression(defaultExpression)](#M-IoC-IBuildContext-CreateExpression-System-Linq-Expressions-Expression- 'IoC.IBuildContext.CreateExpression(System.Linq.Expressions.Expression)')
@@ -375,8 +381,6 @@
   - [TryGetResolver\`\`1(type,tag,resolver,error,resolvingContainer)](#M-IoC-IContainer-TryGetResolver``1-System-Type,System-Object,IoC-Resolver{``0}@,System-Exception@,IoC-IContainer- 'IoC.IContainer.TryGetResolver``1(System.Type,System.Object,IoC.Resolver{``0}@,System.Exception@,IoC.IContainer)')
 - [IDependency](#T-IoC-IDependency 'IoC.IDependency')
   - [TryBuildExpression(buildContext,lifetime,expression,error)](#M-IoC-IDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.IDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
-- [IExpressionBuilder\`1](#T-IoC-Core-IExpressionBuilder`1 'IoC.Core.IExpressionBuilder`1')
-  - [Build(bodyExpression,buildContext,context)](#M-IoC-Core-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-IBuildContext,`0- 'IoC.Core.IExpressionBuilder`1.Build(System.Linq.Expressions.Expression,IoC.IBuildContext,`0)')
 - [IFoundCyclicDependency](#T-IoC-Issues-IFoundCyclicDependency 'IoC.Issues.IFoundCyclicDependency')
   - [Resolve(buildContext)](#M-IoC-Issues-IFoundCyclicDependency-Resolve-IoC-IBuildContext- 'IoC.Issues.IFoundCyclicDependency.Resolve(IoC.IBuildContext)')
 - [ILifetime](#T-IoC-ILifetime 'IoC.ILifetime')
@@ -526,6 +530,39 @@
 - [TT7](#T-IoC-TT7 'IoC.TT7')
 - [TT8](#T-IoC-TT8 'IoC.TT8')
 - [TT9](#T-IoC-TT9 'IoC.TT9')
+- [TTC](#T-IoC-TTC 'IoC.TTC')
+- [TTC1](#T-IoC-TTC1 'IoC.TTC1')
+- [TTC10](#T-IoC-TTC10 'IoC.TTC10')
+- [TTC11](#T-IoC-TTC11 'IoC.TTC11')
+- [TTC12](#T-IoC-TTC12 'IoC.TTC12')
+- [TTC13](#T-IoC-TTC13 'IoC.TTC13')
+- [TTC14](#T-IoC-TTC14 'IoC.TTC14')
+- [TTC15](#T-IoC-TTC15 'IoC.TTC15')
+- [TTC16](#T-IoC-TTC16 'IoC.TTC16')
+- [TTC17](#T-IoC-TTC17 'IoC.TTC17')
+- [TTC18](#T-IoC-TTC18 'IoC.TTC18')
+- [TTC19](#T-IoC-TTC19 'IoC.TTC19')
+- [TTC2](#T-IoC-TTC2 'IoC.TTC2')
+- [TTC20](#T-IoC-TTC20 'IoC.TTC20')
+- [TTC21](#T-IoC-TTC21 'IoC.TTC21')
+- [TTC22](#T-IoC-TTC22 'IoC.TTC22')
+- [TTC23](#T-IoC-TTC23 'IoC.TTC23')
+- [TTC24](#T-IoC-TTC24 'IoC.TTC24')
+- [TTC25](#T-IoC-TTC25 'IoC.TTC25')
+- [TTC26](#T-IoC-TTC26 'IoC.TTC26')
+- [TTC27](#T-IoC-TTC27 'IoC.TTC27')
+- [TTC28](#T-IoC-TTC28 'IoC.TTC28')
+- [TTC29](#T-IoC-TTC29 'IoC.TTC29')
+- [TTC3](#T-IoC-TTC3 'IoC.TTC3')
+- [TTC30](#T-IoC-TTC30 'IoC.TTC30')
+- [TTC31](#T-IoC-TTC31 'IoC.TTC31')
+- [TTC32](#T-IoC-TTC32 'IoC.TTC32')
+- [TTC4](#T-IoC-TTC4 'IoC.TTC4')
+- [TTC5](#T-IoC-TTC5 'IoC.TTC5')
+- [TTC6](#T-IoC-TTC6 'IoC.TTC6')
+- [TTC7](#T-IoC-TTC7 'IoC.TTC7')
+- [TTC8](#T-IoC-TTC8 'IoC.TTC8')
+- [TTC9](#T-IoC-TTC9 'IoC.TTC9')
 - [TTCollection1\`1](#T-IoC-TTCollection1`1 'IoC.TTCollection1`1')
 - [TTCollection2\`1](#T-IoC-TTCollection2`1 'IoC.TTCollection2`1')
 - [TTCollection3\`1](#T-IoC-TTCollection3`1 'IoC.TTCollection3`1')
@@ -733,10 +770,6 @@
   - [LightSet](#F-IoC-Features-TupleFeature-LightSet 'IoC.Features.TupleFeature.LightSet')
   - [Set](#F-IoC-Features-TupleFeature-Set 'IoC.Features.TupleFeature.Set')
   - [Apply()](#M-IoC-Features-TupleFeature-Apply-IoC-IMutableContainer- 'IoC.Features.TupleFeature.Apply(IoC.IMutableContainer)')
-- [TypesMapDependency](#T-IoC-Dependencies-TypesMapDependency 'IoC.Dependencies.TypesMapDependency')
-  - [#ctor(instanceExpression,initializeInstanceExpressions,typesMap,autowiringStrategy)](#M-IoC-Dependencies-TypesMapDependency-#ctor-System-Linq-Expressions-Expression,System-Collections-Generic-IEnumerable{System-Linq-Expressions-Expression},System-Collections-Generic-IDictionary{System-Type,System-Type},IoC-IAutowiringStrategy- 'IoC.Dependencies.TypesMapDependency.#ctor(System.Linq.Expressions.Expression,System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression},System.Collections.Generic.IDictionary{System.Type,System.Type},IoC.IAutowiringStrategy)')
-  - [ToString()](#M-IoC-Dependencies-TypesMapDependency-ToString 'IoC.Dependencies.TypesMapDependency.ToString')
-  - [TryBuildExpression()](#M-IoC-Dependencies-TypesMapDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@- 'IoC.Dependencies.TypesMapDependency.TryBuildExpression(IoC.IBuildContext,IoC.ILifetime,System.Linq.Expressions.Expression@,System.Exception@)')
 - [UsedImplicitlyAttribute](#T-IoC-UsedImplicitlyAttribute 'IoC.UsedImplicitlyAttribute')
 - [ValueProviderAttribute](#T-IoC-ValueProviderAttribute 'IoC.ValueProviderAttribute')
 - [XamlItemBindingOfItemsControlAttribute](#T-IoC-XamlItemBindingOfItemsControlAttribute 'IoC.XamlItemBindingOfItemsControlAttribute')
@@ -938,7 +971,7 @@ is an MVC view component view. If applied to a method, the MVC view component vi
 
 IoC.Core
 
-<a name='M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@-'></a>
+<a name='M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveConstructor-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@-'></a>
 ### TryResolveConstructor() `method`
 
 ##### Summary
@@ -949,7 +982,7 @@ IoC.Core
 
 This method has no parameters.
 
-<a name='M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveInitializers-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@-'></a>
+<a name='M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveInitializers-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@-'></a>
 ### TryResolveInitializers() `method`
 
 ##### Summary
@@ -960,7 +993,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveType-System-Type,System-Type,System-Type@-'></a>
+<a name='M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveType-IoC-IContainer,System-Type,System-Type,System-Type@-'></a>
 ### TryResolveType() `method`
 
 ##### Summary
@@ -982,7 +1015,7 @@ IoC.Core
 
 Metadata for aspect oriented autowiring strategy.
 
-<a name='M-IoC-Core-AspectOrientedMetadata-TryResolveConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@-'></a>
+<a name='M-IoC-Core-AspectOrientedMetadata-TryResolveConstructor-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@-'></a>
 ### TryResolveConstructor() `method`
 
 ##### Summary
@@ -993,7 +1026,7 @@ Metadata for aspect oriented autowiring strategy.
 
 This method has no parameters.
 
-<a name='M-IoC-Core-AspectOrientedMetadata-TryResolveInitializers-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@-'></a>
+<a name='M-IoC-Core-AspectOrientedMetadata-TryResolveInitializers-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@-'></a>
 ### TryResolveInitializers() `method`
 
 ##### Summary
@@ -1004,7 +1037,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-IoC-Core-AspectOrientedMetadata-TryResolveType-System-Type,System-Type,System-Type@-'></a>
+<a name='M-IoC-Core-AspectOrientedMetadata-TryResolveType-IoC-IContainer,System-Type,System-Type,System-Type@-'></a>
 ### TryResolveType() `method`
 
 ##### Summary
@@ -1240,6 +1273,55 @@ The instance of aspect oriented autowiring strategy.
 | Name | Description |
 | ---- | ----------- |
 | TTypeAttribute | The type metadata attribute. |
+
+<a name='T-IoC-Dependencies-BaseDependency'></a>
+## BaseDependency `type`
+
+##### Namespace
+
+IoC.Dependencies
+
+##### Summary
+
+Represents the dependency based on expressions and a map of types.
+
+<a name='M-IoC-Dependencies-BaseDependency-#ctor-System-Linq-Expressions-Expression,System-Collections-Generic-IEnumerable{System-Linq-Expressions-Expression},System-Collections-Generic-IDictionary{System-Type,System-Type},IoC-IAutowiringStrategy-'></a>
+### #ctor(instanceExpression,initializeInstanceExpressions,typesMap,autowiringStrategy) `constructor`
+
+##### Summary
+
+Creates an instance of dependency.
+
+##### Parameters
+
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| instanceExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The expression to create an instance. |
+| initializeInstanceExpressions | [System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression}') | The statements to initialize an instance. |
+| typesMap | [System.Collections.Generic.IDictionary{System.Type,System.Type}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IDictionary 'System.Collections.Generic.IDictionary{System.Type,System.Type}') | The type mapping dictionary. |
+| autowiringStrategy | [IoC.IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy') | The autowiring strategy. |
+
+<a name='M-IoC-Dependencies-BaseDependency-ToString'></a>
+### ToString() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
+
+<a name='M-IoC-Dependencies-BaseDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@-'></a>
+### TryBuildExpression() `method`
+
+##### Summary
+
+*Inherit from parent.*
+
+##### Parameters
+
+This method has no parameters.
 
 <a name='T-IoC-BaseTypeRequiredAttribute'></a>
 ## BaseTypeRequiredAttribute `type`
@@ -7781,8 +7863,8 @@ The race source.
 | ---- | ---- | ----------- |
 | container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | The target container to trace. |
 
-<a name='M-IoC-FluentTrace-Trace-IoC-IMutableContainer,System-Action{System-String}-'></a>
-### Trace(container,onTraceMessage) `method`
+<a name='M-IoC-FluentTrace-Trace-IoC-IMutableContainer,System-Action{IoC-TraceEvent}-'></a>
+### Trace(container,onTraceEvent) `method`
 
 ##### Summary
 
@@ -7797,10 +7879,10 @@ The trace token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | container | [IoC.IMutableContainer](#T-IoC-IMutableContainer 'IoC.IMutableContainer') | The target container to trace. |
-| onTraceMessage | [System.Action{System.String}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{System.String}') | The trace handler. |
+| onTraceEvent | [System.Action{IoC.TraceEvent}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{IoC.TraceEvent}') | The trace handler. |
 
-<a name='M-IoC-FluentTrace-Trace-IoC-IToken,System-Action{System-String}-'></a>
-### Trace(token,onTraceMessage) `method`
+<a name='M-IoC-FluentTrace-Trace-IoC-IToken,System-Action{IoC-TraceEvent}-'></a>
+### Trace(token,onTraceEvent) `method`
 
 ##### Summary
 
@@ -7815,7 +7897,7 @@ The trace token.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | token | [IoC.IToken](#T-IoC-IToken 'IoC.IToken') | The token of target container to trace. |
-| onTraceMessage | [System.Action{System.String}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{System.String}') | The trace handler. |
+| onTraceEvent | [System.Action{IoC.TraceEvent}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Action 'System.Action{IoC.TraceEvent}') | The trace handler. |
 
 <a name='T-IoC-Features-FuncFeature'></a>
 ## FuncFeature `type`
@@ -7878,8 +7960,8 @@ IoC
 
 Represents an abstraction for autowiring strategy.
 
-<a name='M-IoC-IAutowiringStrategy-TryResolveConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@-'></a>
-### TryResolveConstructor(constructors,constructor) `method`
+<a name='M-IoC-IAutowiringStrategy-TryResolveConstructor-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@-'></a>
+### TryResolveConstructor(container,constructors,constructor) `method`
 
 ##### Summary
 
@@ -7893,11 +7975,12 @@ True if the constructor was resolved.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | Current container. |
 | constructors | [System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}}') | The set of available constructors. |
 | constructor | [IoC.IMethod{System.Reflection.ConstructorInfo}@](#T-IoC-IMethod{System-Reflection-ConstructorInfo}@ 'IoC.IMethod{System.Reflection.ConstructorInfo}@') | The resolved constructor. |
 
-<a name='M-IoC-IAutowiringStrategy-TryResolveInitializers-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@-'></a>
-### TryResolveInitializers(methods,initializers) `method`
+<a name='M-IoC-IAutowiringStrategy-TryResolveInitializers-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@-'></a>
+### TryResolveInitializers(container,methods,initializers) `method`
 
 ##### Summary
 
@@ -7911,11 +7994,12 @@ True if initializing methods were resolved.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | Current container. |
 | methods | [System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}') | The set of available methods. |
 | initializers | [System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@') | The set of initializing methods in the appropriate order. |
 
-<a name='M-IoC-IAutowiringStrategy-TryResolveType-System-Type,System-Type,System-Type@-'></a>
-### TryResolveType(registeredType,resolvingType,instanceType) `method`
+<a name='M-IoC-IAutowiringStrategy-TryResolveType-IoC-IContainer,System-Type,System-Type,System-Type@-'></a>
+### TryResolveType(container,registeredType,resolvingType,instanceType) `method`
 
 ##### Summary
 
@@ -7929,6 +8013,7 @@ True if the type was resolved.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | Current container. |
 | registeredType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | Registered type. |
 | resolvingType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | Resolving type. |
 | instanceType | [System.Type@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type@ 'System.Type@') | The type to create an instance. |
@@ -8028,6 +8113,13 @@ The args parameters.
 
 The current autowiring strategy.
 
+<a name='P-IoC-IBuildContext-Compilers'></a>
+### Compilers `property`
+
+##### Summary
+
+The list of compilers.
+
 <a name='P-IoC-IBuildContext-Container'></a>
 ### Container `property`
 
@@ -8055,6 +8147,13 @@ The depth of current context in the build tree.
 ##### Summary
 
 The target key to build resolver.
+
+<a name='P-IoC-IBuildContext-Parent'></a>
+### Parent `property`
+
+##### Summary
+
+Provides a parent context or `null`.
 
 <a name='M-IoC-IBuildContext-AddParameter-System-Linq-Expressions-ParameterExpression-'></a>
 ### AddParameter(parameterExpression) `method`
@@ -8670,36 +8769,6 @@ Builds an expression for dependency based on the current build context and speci
 | lifetime | [IoC.ILifetime](#T-IoC-ILifetime 'IoC.ILifetime') | The target lifetime. |
 | expression | [System.Linq.Expressions.Expression@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression@ 'System.Linq.Expressions.Expression@') | The resulting expression for the current dependency. |
 | error | [System.Exception@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Exception@ 'System.Exception@') | The error if something goes wrong. |
-
-<a name='T-IoC-Core-IExpressionBuilder`1'></a>
-## IExpressionBuilder\`1 `type`
-
-##### Namespace
-
-IoC.Core
-
-##### Summary
-
-Allows to build expression for lifetimes.
-
-<a name='M-IoC-Core-IExpressionBuilder`1-Build-System-Linq-Expressions-Expression,IoC-IBuildContext,`0-'></a>
-### Build(bodyExpression,buildContext,context) `method`
-
-##### Summary
-
-Builds the expression.
-
-##### Returns
-
-The new expression.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| bodyExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The expression body to get an instance. |
-| buildContext | [IoC.IBuildContext](#T-IoC-IBuildContext 'IoC.IBuildContext') | The build context. |
-| context | [\`0](#T-`0 '`0') | The expression build context. |
 
 <a name='T-IoC-Issues-IFoundCyclicDependency'></a>
 ## IFoundCyclicDependency `type`
@@ -10633,6 +10702,369 @@ IoC
 ##### Summary
 
 Represents the generic type arguments marker for a reference type.
+
+<a name='T-IoC-TTC'></a>
+## TTC `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC1'></a>
+## TTC1 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC10'></a>
+## TTC10 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC11'></a>
+## TTC11 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC12'></a>
+## TTC12 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC13'></a>
+## TTC13 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC14'></a>
+## TTC14 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC15'></a>
+## TTC15 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC16'></a>
+## TTC16 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC17'></a>
+## TTC17 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC18'></a>
+## TTC18 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC19'></a>
+## TTC19 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC2'></a>
+## TTC2 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC20'></a>
+## TTC20 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC21'></a>
+## TTC21 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC22'></a>
+## TTC22 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC23'></a>
+## TTC23 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC24'></a>
+## TTC24 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC25'></a>
+## TTC25 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC26'></a>
+## TTC26 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC27'></a>
+## TTC27 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC28'></a>
+## TTC28 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC29'></a>
+## TTC29 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC3'></a>
+## TTC3 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC30'></a>
+## TTC30 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC31'></a>
+## TTC31 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC32'></a>
+## TTC32 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC4'></a>
+## TTC4 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC5'></a>
+## TTC5 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC6'></a>
+## TTC6 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC7'></a>
+## TTC7 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC8'></a>
+## TTC8 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
+
+<a name='T-IoC-TTC9'></a>
+## TTC9 `type`
+
+##### Namespace
+
+IoC
+
+##### Summary
+
+Represents the generic type arguments marker for a reference type with defaul constructor.
 
 <a name='T-IoC-TTCollection1`1'></a>
 ## TTCollection1\`1 `type`
@@ -12870,55 +13302,6 @@ Allows to resolve Tuples.
 
 <a name='M-IoC-Features-TupleFeature-Apply-IoC-IMutableContainer-'></a>
 ### Apply() `method`
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='T-IoC-Dependencies-TypesMapDependency'></a>
-## TypesMapDependency `type`
-
-##### Namespace
-
-IoC.Dependencies
-
-##### Summary
-
-Represents the dependency based on expressions and a map of types.
-
-<a name='M-IoC-Dependencies-TypesMapDependency-#ctor-System-Linq-Expressions-Expression,System-Collections-Generic-IEnumerable{System-Linq-Expressions-Expression},System-Collections-Generic-IDictionary{System-Type,System-Type},IoC-IAutowiringStrategy-'></a>
-### #ctor(instanceExpression,initializeInstanceExpressions,typesMap,autowiringStrategy) `constructor`
-
-##### Summary
-
-Creates an instance of dependency.
-
-##### Parameters
-
-| Name | Type | Description |
-| ---- | ---- | ----------- |
-| instanceExpression | [System.Linq.Expressions.Expression](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Linq.Expressions.Expression 'System.Linq.Expressions.Expression') | The expression to create an instance. |
-| initializeInstanceExpressions | [System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{System.Linq.Expressions.Expression}') | The statements to initialize an instance. |
-| typesMap | [System.Collections.Generic.IDictionary{System.Type,System.Type}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IDictionary 'System.Collections.Generic.IDictionary{System.Type,System.Type}') | The type mapping dictionary. |
-| autowiringStrategy | [IoC.IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy') | The autowiring strategy. |
-
-<a name='M-IoC-Dependencies-TypesMapDependency-ToString'></a>
-### ToString() `method`
-
-##### Summary
-
-*Inherit from parent.*
-
-##### Parameters
-
-This method has no parameters.
-
-<a name='M-IoC-Dependencies-TypesMapDependency-TryBuildExpression-IoC-IBuildContext,IoC-ILifetime,System-Linq-Expressions-Expression@,System-Exception@-'></a>
-### TryBuildExpression() `method`
 
 ##### Summary
 
