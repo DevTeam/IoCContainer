@@ -12,37 +12,42 @@
 
         private DefaultAutowiringStrategy() { }
 
-        public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
+        public bool TryResolveType(IContainer container, Type registeredType, Type resolvingType, out Type instanceType)
         {
             instanceType = default(Type);
             return false;
         }
 
-        public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
-            => (constructor = constructors.OrderBy(i => GetOrder(i.Info)).FirstOrDefault()) != null;
+        public bool TryResolveConstructor(IContainer container, IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
+            => (constructor = constructors.OrderBy(i => GetOrder(container, i.Info)).FirstOrDefault()) != null;
 
-        public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
+        public bool TryResolveInitializers(IContainer container, IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
         {
             initializers = Enumerable.Empty<IMethod<MethodInfo>>();
             return true;
         }
 
         [MethodImpl((MethodImplOptions)0x100)]
-        private static int GetOrder(MethodBase method)
+        private static int GetOrder(IContainer container, MethodBase method)
         {
             var order = 1;
             var parameters = method.GetParameters();
             for (var i = 0; i < parameters.Length; i++)
             {
                 var parameter = parameters[i];
-                if (!parameter.ParameterType.Descriptor().IsPublic())
+                if (!container.IsBound(parameter.ParameterType) && !container.CanResolve(parameter.ParameterType))
                 {
-                    order += 10;
+                    return int.MaxValue;
                 }
 
                 if (parameter.IsOut)
                 {
-                    order += 5;
+                    return int.MaxValue;
+                }
+
+                if (!parameter.ParameterType.Descriptor().IsPublic())
+                {
+                    order += 2;
                 }
 
                 order += 1;
@@ -51,11 +56,6 @@
             if (method.GetCustomAttributes(typeof(ObsoleteAttribute), true).Any())
             {
                 order <<= 4;
-            }
-
-            if (!method.IsPublic)
-            {
-                order <<= 8;
             }
 
             return order;

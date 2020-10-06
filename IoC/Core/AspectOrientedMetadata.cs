@@ -91,21 +91,24 @@
         }
 
         /// <inheritdoc />
-        public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType) =>
+        public bool TryResolveType(IContainer container, Type registeredType, Type resolvingType, out Type instanceType) =>
             GetAutowiringStrategy().TryResolveType(
+                container ?? throw new ArgumentNullException(nameof(container)),
                 registeredType ?? throw new ArgumentNullException(nameof(registeredType)),
                 resolvingType ?? throw new ArgumentNullException(nameof(resolvingType)),
                 out instanceType);
 
         /// <inheritdoc />
-        public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor) =>
+        public bool TryResolveConstructor(IContainer container, IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor) =>
             GetAutowiringStrategy().TryResolveConstructor(
+                container ?? throw new ArgumentNullException(nameof(container)),
                 constructors ?? throw new ArgumentNullException(nameof(constructors)),
                 out constructor);
 
         /// <inheritdoc />
-        public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers) =>
+        public bool TryResolveInitializers(IContainer container, IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers) =>
             GetAutowiringStrategy().TryResolveInitializers(
+                container ?? throw new ArgumentNullException(nameof(container)),
                 methods ?? throw new ArgumentNullException(nameof(methods)),
                 out initializers);
 

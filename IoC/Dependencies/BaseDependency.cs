@@ -51,7 +51,7 @@
                 var thisVar = Expression.Variable(expression.Type);
 
                 var initializeExpressions =
-                    GetInitializers(autoWiringStrategy, typeDescriptor)
+                    GetInitializers(buildContext.Container, autoWiringStrategy, typeDescriptor)
                         .Select(initializer => (Expression)Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext)))
                         .Concat(_initializeInstanceExpressions.Select(statementExpression => ReplaceTypes(buildContext, statementExpression, _typesMap)))
                         .ToArray();
@@ -102,15 +102,15 @@
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        private static IEnumerable<IMethod<MethodInfo>> GetInitializers(IAutowiringStrategy autoWiringStrategy, TypeDescriptor typeDescriptor)
+        private static IEnumerable<IMethod<MethodInfo>> GetInitializers(IContainer container, IAutowiringStrategy autoWiringStrategy, TypeDescriptor typeDescriptor)
         {
             var methods = typeDescriptor.GetDeclaredMethods().Select(info => new Method<MethodInfo>(info));
-            if (autoWiringStrategy.TryResolveInitializers(methods, out var initializers))
+            if (autoWiringStrategy.TryResolveInitializers(container, methods, out var initializers))
             {
                 return initializers;
             }
 
-            if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(methods, out initializers))
+            if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(container, methods, out initializers))
             {
                 initializers = Enumerable.Empty<IMethod<MethodInfo>>();
             }

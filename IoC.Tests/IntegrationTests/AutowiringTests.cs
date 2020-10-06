@@ -547,19 +547,19 @@
 
         private class AutowiringStrategy: IAutowiringStrategy
         {
-            public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
+            public bool TryResolveType(IContainer container, Type registeredType, Type resolvingType, out Type instanceType)
             {
                 instanceType = default(Type);
                 return false;
             }
 
-            public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
+            public bool TryResolveConstructor(IContainer container, IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
             {
                 constructor = constructors.Single(i => i.Info.GetParameters().Length == 0);
                 return true;
             }
 
-            public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
+            public bool TryResolveInitializers(IContainer container, IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
             {
                 initializers =
                     from method in methods

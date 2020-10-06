@@ -40,18 +40,18 @@ namespace IoC.Tests.UsageScenarios
         {
             private readonly IAutowiringStrategy _baseStrategy;
 
-            public CustomAutowiringStrategy(IAutowiringStrategy baseStrategy) =>
+            public CustomAutowiringStrategy(IContainer container, IAutowiringStrategy baseStrategy) =>
                 // Saves the previous autowiring strategy
                 _baseStrategy = baseStrategy;
 
-            public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType) =>
+            public bool TryResolveType(IContainer container, Type registeredType, Type resolvingType, out Type instanceType) =>
                 // Just uses a logic from the previous autowiring strategy as is
-                _baseStrategy.TryResolveType(registeredType, resolvingType, out instanceType);
+                _baseStrategy.TryResolveType(container, registeredType, resolvingType, out instanceType);
 
             // Overrides a logic to inject the constant "default name" to every constructors parameters named "name" of type String
-            public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
+            public bool TryResolveConstructor(IContainer container, IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
             {
-                if (!_baseStrategy.TryResolveConstructor(constructors, out constructor))
+                if (!_baseStrategy.TryResolveConstructor(container, constructors, out constructor))
                 {
                     return false;
                 }
@@ -66,9 +66,9 @@ namespace IoC.Tests.UsageScenarios
                 return true;
             }
 
-            public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
+            public bool TryResolveInitializers(IContainer container, IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
                 // Just uses a logic from the previous autowiring strategy as is
-                => _baseStrategy.TryResolveInitializers(methods, out initializers);
+                => _baseStrategy.TryResolveInitializers(container, methods, out initializers);
         }
         // }
     }

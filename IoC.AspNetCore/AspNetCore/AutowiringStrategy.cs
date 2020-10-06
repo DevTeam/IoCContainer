@@ -7,29 +7,27 @@
     
     internal class AutowiringStrategy: IAutowiringStrategy
     {
-        public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
+        public bool TryResolveType(IContainer container, Type registeredType, Type resolvingType, out Type instanceType)
         {
             instanceType = default(Type);
             return false;
         }
 
-        public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
+        public bool TryResolveConstructor(IContainer container, IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
         {
             var ctors =
                 from ctor in constructors
-                where ctor.Info.IsPublic
+                where !ctor.Info.GetCustomAttributes(typeof(ObsoleteAttribute), true).Any()
                 let parameters = ctor.Info.GetParameters()
-                where parameters.Length == 1
-                from parameter in parameters
-                let type = parameter.ParameterType.GetTypeInfo()
-                where type.IsPublic && type.IsInterface
+                orderby parameters.Length descending
+                where parameters.All(parameter => container.IsBound(parameter.ParameterType) || container.CanResolve(parameter.ParameterType))
                 select ctor;
 
             constructor = ctors.FirstOrDefault();
             return constructor != null;
         }
 
-        public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
+        public bool TryResolveInitializers(IContainer container, IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
         {
             initializers = default(IEnumerable<IMethod<MethodInfo>>);
             return false;

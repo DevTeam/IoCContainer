@@ -149,7 +149,7 @@
 
         private Type ResolveInstanceType(IBuildContext buildContext, IAutowiringStrategy autoWiringStrategy)
         {
-            if (autoWiringStrategy.TryResolveType(_implementationType, buildContext.Key.Type, out var instanceType))
+            if (autoWiringStrategy.TryResolveType(buildContext.Container, _implementationType, buildContext.Key.Type, out var instanceType))
             {
                 return instanceType;
             }
@@ -170,12 +170,12 @@
                 .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
                 .Select(info => new Method<ConstructorInfo>(info));
 
-            if (autoWiringStrategy.TryResolveConstructor(constructors, out var ctor))
+            if (autoWiringStrategy.TryResolveConstructor(buildContext.Container, constructors, out var ctor))
             {
                 return ctor;
             }
 
-            if (DefaultAutowiringStrategy.Shared != autoWiringStrategy && DefaultAutowiringStrategy.Shared.TryResolveConstructor(constructors, out ctor))
+            if (DefaultAutowiringStrategy.Shared != autoWiringStrategy && DefaultAutowiringStrategy.Shared.TryResolveConstructor(buildContext.Container, constructors, out ctor))
             {
                 return ctor;
             }

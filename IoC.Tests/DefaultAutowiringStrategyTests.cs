@@ -8,6 +8,7 @@ namespace IoC.Tests
     using System.Linq;
     using System.Reflection;
     using Core;
+    using Moq;
     using Shouldly;
     using Xunit;
 
@@ -22,9 +23,13 @@ namespace IoC.Tests
         {
             // Given
             var autowiringStrategy = DefaultAutowiringStrategy.Shared;
+            var container = new Mock<IContainer>();
+            IDependency dependency;
+            ILifetime lifetime;
+            container.Setup(i => i.TryGetDependency(It.IsAny<Key>(), out dependency, out lifetime)).Returns(true);
 
             // When
-            var actualResult = autowiringStrategy.TryResolveConstructor(type.Descriptor().GetDeclaredConstructors().Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic)).Select(constructorInfo => new Method<ConstructorInfo>(constructorInfo)), out var actualConstructor);
+            var actualResult = autowiringStrategy.TryResolveConstructor(container.Object, type.Descriptor().GetDeclaredConstructors().Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic)).Select(constructorInfo => new Method<ConstructorInfo>(constructorInfo)), out var actualConstructor);
 
             // Then
             actualResult.ShouldBe(expectedResult);
@@ -43,7 +48,7 @@ namespace IoC.Tests
             var autowiringStrategy = DefaultAutowiringStrategy.Shared;
 
             // When
-            var actualResult = autowiringStrategy.TryResolveInitializers(type.Descriptor().GetDeclaredMethods().Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic)).Select(methodInfo => new Method<MethodInfo>(methodInfo)), out var actualInitializers);
+            var actualResult = autowiringStrategy.TryResolveInitializers(Mock.Of<IContainer>(), type.Descriptor().GetDeclaredMethods().Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic)).Select(methodInfo => new Method<MethodInfo>(methodInfo)), out var actualInitializers);
             var initializers = actualInitializers.ToList();
 
             // Then

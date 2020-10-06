@@ -18,13 +18,13 @@
 - [AspMvcViewComponentAttribute](#T-IoC-AspMvcViewComponentAttribute 'IoC.AspMvcViewComponentAttribute')
 - [AspMvcViewComponentViewAttribute](#T-IoC-AspMvcViewComponentViewAttribute 'IoC.AspMvcViewComponentViewAttribute')
 - [AspectOrientedAutowiringStrategy](#T-IoC-Core-AspectOrientedAutowiringStrategy 'IoC.Core.AspectOrientedAutowiringStrategy')
-  - [TryResolveConstructor()](#M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@- 'IoC.Core.AspectOrientedAutowiringStrategy.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)')
-  - [TryResolveInitializers()](#M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveInitializers-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@- 'IoC.Core.AspectOrientedAutowiringStrategy.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)')
-  - [TryResolveType()](#M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveType-System-Type,System-Type,System-Type@- 'IoC.Core.AspectOrientedAutowiringStrategy.TryResolveType(System.Type,System.Type,System.Type@)')
+  - [TryResolveConstructor()](#M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveConstructor-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@- 'IoC.Core.AspectOrientedAutowiringStrategy.TryResolveConstructor(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)')
+  - [TryResolveInitializers()](#M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveInitializers-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@- 'IoC.Core.AspectOrientedAutowiringStrategy.TryResolveInitializers(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)')
+  - [TryResolveType()](#M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveType-IoC-IContainer,System-Type,System-Type,System-Type@- 'IoC.Core.AspectOrientedAutowiringStrategy.TryResolveType(IoC.IContainer,System.Type,System.Type,System.Type@)')
 - [AspectOrientedMetadata](#T-IoC-Core-AspectOrientedMetadata 'IoC.Core.AspectOrientedMetadata')
-  - [TryResolveConstructor()](#M-IoC-Core-AspectOrientedMetadata-TryResolveConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@- 'IoC.Core.AspectOrientedMetadata.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)')
-  - [TryResolveInitializers()](#M-IoC-Core-AspectOrientedMetadata-TryResolveInitializers-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@- 'IoC.Core.AspectOrientedMetadata.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)')
-  - [TryResolveType()](#M-IoC-Core-AspectOrientedMetadata-TryResolveType-System-Type,System-Type,System-Type@- 'IoC.Core.AspectOrientedMetadata.TryResolveType(System.Type,System.Type,System.Type@)')
+  - [TryResolveConstructor()](#M-IoC-Core-AspectOrientedMetadata-TryResolveConstructor-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@- 'IoC.Core.AspectOrientedMetadata.TryResolveConstructor(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)')
+  - [TryResolveInitializers()](#M-IoC-Core-AspectOrientedMetadata-TryResolveInitializers-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@- 'IoC.Core.AspectOrientedMetadata.TryResolveInitializers(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)')
+  - [TryResolveType()](#M-IoC-Core-AspectOrientedMetadata-TryResolveType-IoC-IContainer,System-Type,System-Type,System-Type@- 'IoC.Core.AspectOrientedMetadata.TryResolveType(IoC.IContainer,System.Type,System.Type,System.Type@)')
 - [AssertionConditionAttribute](#T-IoC-AssertionConditionAttribute 'IoC.AssertionConditionAttribute')
 - [AssertionConditionType](#T-IoC-AssertionConditionType 'IoC.AssertionConditionType')
   - [IS_FALSE](#F-IoC-AssertionConditionType-IS_FALSE 'IoC.AssertionConditionType.IS_FALSE')
@@ -321,9 +321,9 @@
 - [GenericTypeArgumentAttribute](#T-IoC-GenericTypeArgumentAttribute 'IoC.GenericTypeArgumentAttribute')
 - [IArray](#T-IoC-Core-IArray 'IoC.Core.IArray')
 - [IAutowiringStrategy](#T-IoC-IAutowiringStrategy 'IoC.IAutowiringStrategy')
-  - [TryResolveConstructor(constructors,constructor)](#M-IoC-IAutowiringStrategy-TryResolveConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@- 'IoC.IAutowiringStrategy.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)')
-  - [TryResolveInitializers(methods,initializers)](#M-IoC-IAutowiringStrategy-TryResolveInitializers-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@- 'IoC.IAutowiringStrategy.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)')
-  - [TryResolveType(registeredType,resolvingType,instanceType)](#M-IoC-IAutowiringStrategy-TryResolveType-System-Type,System-Type,System-Type@- 'IoC.IAutowiringStrategy.TryResolveType(System.Type,System.Type,System.Type@)')
+  - [TryResolveConstructor(container,constructors,constructor)](#M-IoC-IAutowiringStrategy-TryResolveConstructor-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@- 'IoC.IAutowiringStrategy.TryResolveConstructor(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)')
+  - [TryResolveInitializers(container,methods,initializers)](#M-IoC-IAutowiringStrategy-TryResolveInitializers-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@- 'IoC.IAutowiringStrategy.TryResolveInitializers(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)')
+  - [TryResolveType(container,registeredType,resolvingType,instanceType)](#M-IoC-IAutowiringStrategy-TryResolveType-IoC-IContainer,System-Type,System-Type,System-Type@- 'IoC.IAutowiringStrategy.TryResolveType(IoC.IContainer,System.Type,System.Type,System.Type@)')
 - [IBinding](#T-IoC-IBinding 'IoC.IBinding')
   - [AutowiringStrategy](#P-IoC-IBinding-AutowiringStrategy 'IoC.IBinding.AutowiringStrategy')
   - [Container](#P-IoC-IBinding-Container 'IoC.IBinding.Container')
@@ -971,7 +971,7 @@ is an MVC view component view. If applied to a method, the MVC view component vi
 
 IoC.Core
 
-<a name='M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@-'></a>
+<a name='M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveConstructor-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@-'></a>
 ### TryResolveConstructor() `method`
 
 ##### Summary
@@ -982,7 +982,7 @@ IoC.Core
 
 This method has no parameters.
 
-<a name='M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveInitializers-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@-'></a>
+<a name='M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveInitializers-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@-'></a>
 ### TryResolveInitializers() `method`
 
 ##### Summary
@@ -993,7 +993,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveType-System-Type,System-Type,System-Type@-'></a>
+<a name='M-IoC-Core-AspectOrientedAutowiringStrategy-TryResolveType-IoC-IContainer,System-Type,System-Type,System-Type@-'></a>
 ### TryResolveType() `method`
 
 ##### Summary
@@ -1015,7 +1015,7 @@ IoC.Core
 
 Metadata for aspect oriented autowiring strategy.
 
-<a name='M-IoC-Core-AspectOrientedMetadata-TryResolveConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@-'></a>
+<a name='M-IoC-Core-AspectOrientedMetadata-TryResolveConstructor-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@-'></a>
 ### TryResolveConstructor() `method`
 
 ##### Summary
@@ -1026,7 +1026,7 @@ Metadata for aspect oriented autowiring strategy.
 
 This method has no parameters.
 
-<a name='M-IoC-Core-AspectOrientedMetadata-TryResolveInitializers-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@-'></a>
+<a name='M-IoC-Core-AspectOrientedMetadata-TryResolveInitializers-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@-'></a>
 ### TryResolveInitializers() `method`
 
 ##### Summary
@@ -1037,7 +1037,7 @@ This method has no parameters.
 
 This method has no parameters.
 
-<a name='M-IoC-Core-AspectOrientedMetadata-TryResolveType-System-Type,System-Type,System-Type@-'></a>
+<a name='M-IoC-Core-AspectOrientedMetadata-TryResolveType-IoC-IContainer,System-Type,System-Type,System-Type@-'></a>
 ### TryResolveType() `method`
 
 ##### Summary
@@ -7960,8 +7960,8 @@ IoC
 
 Represents an abstraction for autowiring strategy.
 
-<a name='M-IoC-IAutowiringStrategy-TryResolveConstructor-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@-'></a>
-### TryResolveConstructor(constructors,constructor) `method`
+<a name='M-IoC-IAutowiringStrategy-TryResolveConstructor-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-ConstructorInfo}},IoC-IMethod{System-Reflection-ConstructorInfo}@-'></a>
+### TryResolveConstructor(container,constructors,constructor) `method`
 
 ##### Summary
 
@@ -7975,11 +7975,12 @@ True if the constructor was resolved.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | Current container. |
 | constructors | [System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}}') | The set of available constructors. |
 | constructor | [IoC.IMethod{System.Reflection.ConstructorInfo}@](#T-IoC-IMethod{System-Reflection-ConstructorInfo}@ 'IoC.IMethod{System.Reflection.ConstructorInfo}@') | The resolved constructor. |
 
-<a name='M-IoC-IAutowiringStrategy-TryResolveInitializers-System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@-'></a>
-### TryResolveInitializers(methods,initializers) `method`
+<a name='M-IoC-IAutowiringStrategy-TryResolveInitializers-IoC-IContainer,System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}},System-Collections-Generic-IEnumerable{IoC-IMethod{System-Reflection-MethodInfo}}@-'></a>
+### TryResolveInitializers(container,methods,initializers) `method`
 
 ##### Summary
 
@@ -7993,11 +7994,12 @@ True if initializing methods were resolved.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | Current container. |
 | methods | [System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}') | The set of available methods. |
 | initializers | [System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Collections.Generic.IEnumerable 'System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@') | The set of initializing methods in the appropriate order. |
 
-<a name='M-IoC-IAutowiringStrategy-TryResolveType-System-Type,System-Type,System-Type@-'></a>
-### TryResolveType(registeredType,resolvingType,instanceType) `method`
+<a name='M-IoC-IAutowiringStrategy-TryResolveType-IoC-IContainer,System-Type,System-Type,System-Type@-'></a>
+### TryResolveType(container,registeredType,resolvingType,instanceType) `method`
 
 ##### Summary
 
@@ -8011,6 +8013,7 @@ True if the type was resolved.
 
 | Name | Type | Description |
 | ---- | ---- | ----------- |
+| container | [IoC.IContainer](#T-IoC-IContainer 'IoC.IContainer') | Current container. |
 | registeredType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | Registered type. |
 | resolvingType | [System.Type](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type 'System.Type') | Resolving type. |
 | instanceType | [System.Type@](http://msdn.microsoft.com/query/dev14.query?appId=Dev14IDEF1&l=EN-US&k=k:System.Type@ 'System.Type@') | The type to create an instance. |

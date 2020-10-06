@@ -8032,27 +8032,30 @@ namespace IoC
         /// <summary>
         /// Resolves type to create an instance.
         /// </summary>
+        /// <param name="container">Current container.</param>
         /// <param name="registeredType">Registered type.</param>
         /// <param name="resolvingType">Resolving type.</param>
         /// <param name="instanceType">The type to create an instance.</param>
         /// <returns>True if the type was resolved.</returns>
-        bool TryResolveType([NotNull] Type registeredType, [NotNull] Type resolvingType, out Type instanceType);
+        bool TryResolveType([NotNull] IContainer container, [NotNull] Type registeredType, [NotNull] Type resolvingType, out Type instanceType);
 
         /// <summary>
         /// Resolves a constructor from a set of available constructors.
         /// </summary>
+        /// <param name="container">Current container.</param>
         /// <param name="constructors">The set of available constructors.</param>
         /// <param name="constructor">The resolved constructor.</param>
         /// <returns>True if the constructor was resolved.</returns>
-        bool TryResolveConstructor([NotNull][ItemNotNull] IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor);
+        bool TryResolveConstructor([NotNull] IContainer container, [NotNull][ItemNotNull] IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor);
 
         /// <summary>
         /// Resolves initializing methods from a set of available methods/setters in the specific order which will be used to invoke them.
         /// </summary>
+        /// <param name="container">Current container.</param>
         /// <param name="methods">The set of available methods.</param>
         /// <param name="initializers">The set of initializing methods in the appropriate order.</param>
         /// <returns>True if initializing methods were resolved.</returns>
-        bool TryResolveInitializers([NotNull][ItemNotNull] IEnumerable<IMethod<MethodInfo>> methods, [ItemNotNull] out IEnumerable<IMethod<MethodInfo>> initializers);
+        bool TryResolveInitializers([NotNull] IContainer container, [NotNull][ItemNotNull] IEnumerable<IMethod<MethodInfo>> methods, [ItemNotNull] out IEnumerable<IMethod<MethodInfo>> initializers);
     }
 }
 
@@ -10529,7 +10532,7 @@ namespace IoC.Dependencies
 
         private Type ResolveInstanceType(IBuildContext buildContext, IAutowiringStrategy autoWiringStrategy)
         {
-            if (autoWiringStrategy.TryResolveType(_implementationType, buildContext.Key.Type, out var instanceType))
+            if (autoWiringStrategy.TryResolveType(buildContext.Container, _implementationType, buildContext.Key.Type, out var instanceType))
             {
                 return instanceType;
             }
@@ -10550,12 +10553,12 @@ namespace IoC.Dependencies
                 .Where(method => !method.IsStatic && (method.IsAssembly || method.IsPublic))
                 .Select(info => new Method<ConstructorInfo>(info));
 
-            if (autoWiringStrategy.TryResolveConstructor(constructors, out var ctor))
+            if (autoWiringStrategy.TryResolveConstructor(buildContext.Container, constructors, out var ctor))
             {
                 return ctor;
             }
 
-            if (DefaultAutowiringStrategy.Shared != autoWiringStrategy && DefaultAutowiringStrategy.Shared.TryResolveConstructor(constructors, out ctor))
+            if (DefaultAutowiringStrategy.Shared != autoWiringStrategy && DefaultAutowiringStrategy.Shared.TryResolveConstructor(buildContext.Container, constructors, out ctor))
             {
                 return ctor;
             }
@@ -10720,7 +10723,7 @@ namespace IoC.Dependencies
                 var thisVar = Expression.Variable(expression.Type);
 
                 var initializeExpressions =
-                    GetInitializers(autoWiringStrategy, typeDescriptor)
+                    GetInitializers(buildContext.Container, autoWiringStrategy, typeDescriptor)
                         .Select(initializer => (Expression)Expression.Call(thisVar, initializer.Info, initializer.GetParametersExpressions(buildContext)))
                         .Concat(_initializeInstanceExpressions.Select(statementExpression => ReplaceTypes(buildContext, statementExpression, _typesMap)))
                         .ToArray();
@@ -10771,15 +10774,15 @@ namespace IoC.Dependencies
         }
 
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        private static IEnumerable<IMethod<MethodInfo>> GetInitializers(IAutowiringStrategy autoWiringStrategy, TypeDescriptor typeDescriptor)
+        private static IEnumerable<IMethod<MethodInfo>> GetInitializers(IContainer container, IAutowiringStrategy autoWiringStrategy, TypeDescriptor typeDescriptor)
         {
             var methods = typeDescriptor.GetDeclaredMethods().Select(info => new Method<MethodInfo>(info));
-            if (autoWiringStrategy.TryResolveInitializers(methods, out var initializers))
+            if (autoWiringStrategy.TryResolveInitializers(container, methods, out var initializers))
             {
                 return initializers;
             }
 
-            if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(methods, out initializers))
+            if (DefaultAutowiringStrategy.Shared == autoWiringStrategy || !DefaultAutowiringStrategy.Shared.TryResolveInitializers(container, methods, out initializers))
             {
                 initializers = Enumerable.Empty<IMethod<MethodInfo>>();
             }
@@ -11218,7 +11221,7 @@ namespace IoC.Core
         }
 
         /// <inheritdoc />
-        public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
+        public bool TryResolveType(IContainer container, Type registeredType, Type resolvingType, out Type instanceType)
         {
             instanceType = default(Type);
             // Says that the default logic should be used
@@ -11227,10 +11230,10 @@ namespace IoC.Core
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
+        public bool TryResolveConstructor(IContainer container, IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
         {
             constructor = PrepareMethods(constructors).FirstOrDefault();
-            if (constructor == null && DefaultAutowiringStrategy.Shared.TryResolveConstructor(constructors, out var defaultConstructor))
+            if (constructor == null && DefaultAutowiringStrategy.Shared.TryResolveConstructor(container, constructors, out var defaultConstructor))
             {
                 // Initialize default ctor
                 constructor = PrepareMethods(new[] { defaultConstructor }, true).FirstOrDefault();
@@ -11241,7 +11244,7 @@ namespace IoC.Core
         }
 
         /// <inheritdoc />
-        public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
+        public bool TryResolveInitializers(IContainer container, IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
         {
             initializers = PrepareMethods(methods);
             // Says that current logic should be used
@@ -11417,21 +11420,24 @@ namespace IoC.Core
         }
 
         /// <inheritdoc />
-        public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType) =>
+        public bool TryResolveType(IContainer container, Type registeredType, Type resolvingType, out Type instanceType) =>
             GetAutowiringStrategy().TryResolveType(
+                container ?? throw new ArgumentNullException(nameof(container)),
                 registeredType ?? throw new ArgumentNullException(nameof(registeredType)),
                 resolvingType ?? throw new ArgumentNullException(nameof(resolvingType)),
                 out instanceType);
 
         /// <inheritdoc />
-        public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor) =>
+        public bool TryResolveConstructor(IContainer container, IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor) =>
             GetAutowiringStrategy().TryResolveConstructor(
+                container ?? throw new ArgumentNullException(nameof(container)),
                 constructors ?? throw new ArgumentNullException(nameof(constructors)),
                 out constructor);
 
         /// <inheritdoc />
-        public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers) =>
+        public bool TryResolveInitializers(IContainer container, IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers) =>
             GetAutowiringStrategy().TryResolveInitializers(
+                container ?? throw new ArgumentNullException(nameof(container)),
                 methods ?? throw new ArgumentNullException(nameof(methods)),
                 out initializers);
 
@@ -12275,37 +12281,42 @@ namespace IoC.Core
 
         private DefaultAutowiringStrategy() { }
 
-        public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
+        public bool TryResolveType(IContainer container, Type registeredType, Type resolvingType, out Type instanceType)
         {
             instanceType = default(Type);
             return false;
         }
 
-        public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
-            => (constructor = constructors.OrderBy(i => GetOrder(i.Info)).FirstOrDefault()) != null;
+        public bool TryResolveConstructor(IContainer container, IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
+            => (constructor = constructors.OrderBy(i => GetOrder(container, i.Info)).FirstOrDefault()) != null;
 
-        public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
+        public bool TryResolveInitializers(IContainer container, IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
         {
             initializers = Enumerable.Empty<IMethod<MethodInfo>>();
             return true;
         }
 
         [MethodImpl((MethodImplOptions)0x100)]
-        private static int GetOrder(MethodBase method)
+        private static int GetOrder(IContainer container, MethodBase method)
         {
             var order = 1;
             var parameters = method.GetParameters();
             for (var i = 0; i < parameters.Length; i++)
             {
                 var parameter = parameters[i];
-                if (!parameter.ParameterType.Descriptor().IsPublic())
+                if (!container.IsBound(parameter.ParameterType) && !container.CanResolve(parameter.ParameterType))
                 {
-                    order += 10;
+                    return int.MaxValue;
                 }
 
                 if (parameter.IsOut)
                 {
-                    order += 5;
+                    return int.MaxValue;
+                }
+
+                if (!parameter.ParameterType.Descriptor().IsPublic())
+                {
+                    order += 2;
                 }
 
                 order += 1;
@@ -12314,11 +12325,6 @@ namespace IoC.Core
             if (method.GetCustomAttributes(typeof(ObsoleteAttribute), true).Any())
             {
                 order <<= 4;
-            }
-
-            if (!method.IsPublic)
-            {
-                order <<= 8;
             }
 
             return order;

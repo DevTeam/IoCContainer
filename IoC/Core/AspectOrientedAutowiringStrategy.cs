@@ -17,7 +17,7 @@ namespace IoC.Core
         }
 
         /// <inheritdoc />
-        public bool TryResolveType(Type registeredType, Type resolvingType, out Type instanceType)
+        public bool TryResolveType(IContainer container, Type registeredType, Type resolvingType, out Type instanceType)
         {
             instanceType = default(Type);
             // Says that the default logic should be used
@@ -26,10 +26,10 @@ namespace IoC.Core
 
         /// <inheritdoc />
         [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
-        public bool TryResolveConstructor(IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
+        public bool TryResolveConstructor(IContainer container, IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
         {
             constructor = PrepareMethods(constructors).FirstOrDefault();
-            if (constructor == null && DefaultAutowiringStrategy.Shared.TryResolveConstructor(constructors, out var defaultConstructor))
+            if (constructor == null && DefaultAutowiringStrategy.Shared.TryResolveConstructor(container, constructors, out var defaultConstructor))
             {
                 // Initialize default ctor
                 constructor = PrepareMethods(new[] { defaultConstructor }, true).FirstOrDefault();
@@ -40,7 +40,7 @@ namespace IoC.Core
         }
 
         /// <inheritdoc />
-        public bool TryResolveInitializers(IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
+        public bool TryResolveInitializers(IContainer container, IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
         {
             initializers = PrepareMethods(methods);
             // Says that current logic should be used

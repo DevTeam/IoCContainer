@@ -759,13 +759,13 @@
             The optional resolving arguments.
             </summary>
         </member>
-        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveType(System.Type,System.Type,System.Type@)">
+        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveType(IoC.IContainer,System.Type,System.Type,System.Type@)">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
+        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveConstructor(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
+        <member name="M:IoC.Core.AspectOrientedAutowiringStrategy.TryResolveInitializers(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
             <inheritdoc />
         </member>
         <member name="T:IoC.Core.AspectOrientedMetadata">
@@ -773,13 +773,13 @@
             Metadata for aspect oriented autowiring strategy.
             </summary>
         </member>
-        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveType(System.Type,System.Type,System.Type@)">
+        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveType(IoC.IContainer,System.Type,System.Type,System.Type@)">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
+        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveConstructor(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
             <inheritdoc />
         </member>
-        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
+        <member name="M:IoC.Core.AspectOrientedMetadata.TryResolveInitializers(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
             <inheritdoc />
         </member>
         <member name="T:IoC.Core.BuildContext">
@@ -5499,27 +5499,30 @@
             Represents an abstraction for autowiring strategy.
             </summary>
         </member>
-        <member name="M:IoC.IAutowiringStrategy.TryResolveType(System.Type,System.Type,System.Type@)">
+        <member name="M:IoC.IAutowiringStrategy.TryResolveType(IoC.IContainer,System.Type,System.Type,System.Type@)">
             <summary>
             Resolves type to create an instance.
             </summary>
+            <param name="container">Current container.</param>
             <param name="registeredType">Registered type.</param>
             <param name="resolvingType">Resolving type.</param>
             <param name="instanceType">The type to create an instance.</param>
             <returns>True if the type was resolved.</returns>
         </member>
-        <member name="M:IoC.IAutowiringStrategy.TryResolveConstructor(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
+        <member name="M:IoC.IAutowiringStrategy.TryResolveConstructor(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.ConstructorInfo}},IoC.IMethod{System.Reflection.ConstructorInfo}@)">
             <summary>
             Resolves a constructor from a set of available constructors.
             </summary>
+            <param name="container">Current container.</param>
             <param name="constructors">The set of available constructors.</param>
             <param name="constructor">The resolved constructor.</param>
             <returns>True if the constructor was resolved.</returns>
         </member>
-        <member name="M:IoC.IAutowiringStrategy.TryResolveInitializers(System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
+        <member name="M:IoC.IAutowiringStrategy.TryResolveInitializers(IoC.IContainer,System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}},System.Collections.Generic.IEnumerable{IoC.IMethod{System.Reflection.MethodInfo}}@)">
             <summary>
             Resolves initializing methods from a set of available methods/setters in the specific order which will be used to invoke them.
             </summary>
+            <param name="container">Current container.</param>
             <param name="methods">The set of available methods.</param>
             <param name="initializers">The set of initializing methods in the appropriate order.</param>
             <returns>True if initializing methods were resolved.</returns>

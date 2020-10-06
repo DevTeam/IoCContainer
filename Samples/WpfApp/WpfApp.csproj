@@ -101,6 +101,10 @@
       <Project>{c7a8334e-c162-429f-9445-809060e39748}</Project>
       <Name>IoC</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Clock\Clock.csproj">
+      <Project>{66417a46-e53d-4712-904b-ccd1e437d1d5}</Project>
+      <Name>Clock</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
