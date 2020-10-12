@@ -6,7 +6,7 @@ namespace Clock.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Models;
     using Moq;
-    using Should;
+    using Shouldly;
     using ViewModels;
 
     [TestClass]
@@ -27,8 +27,8 @@ namespace Clock.Tests
             var time = viewModel.Time;
 
             // Then
-            date.ShouldEqual(now.ToString("d"));
-            time.ShouldEqual(now.ToString("T"));
+            date.ShouldBe(now.ToString("d"));
+            time.ShouldBe(now.ToString("T"));
         }
 
         [TestMethod]
@@ -51,8 +51,8 @@ namespace Clock.Tests
             observer?.OnNext(Tick.Shared);
 
             // Then
-            propertyNames.Count(i => i == nameof(IClockViewModel.Date)).ShouldEqual(2);
-            propertyNames.Count(i => i == nameof(IClockViewModel.Time)).ShouldEqual(2);
+            propertyNames.Count(i => i == nameof(IClockViewModel.Date)).ShouldBe(2);
+            propertyNames.Count(i => i == nameof(IClockViewModel.Time)).ShouldBe(2);
         }
 
         [TestMethod]

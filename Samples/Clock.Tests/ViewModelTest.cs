@@ -4,7 +4,7 @@
     using System.Collections.Generic;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Moq;
-    using Should;
+    using Shouldly;
     using ViewModels;
 
     [TestClass]
@@ -21,7 +21,7 @@
             model.RaiseOnPropertyChanged("SomeName2");
 
             // Then
-            model.PropertyNames.Count.ShouldEqual(2);
+            model.PropertyNames.Count.ShouldBe(2);
             model.PropertyNames.ShouldContain("SomeName1");
             model.PropertyNames.ShouldContain("SomeName2");
         }
@@ -38,7 +38,7 @@
             model.RaiseOnPropertyChanged("SomeName");
 
             // Then
-            model.PropertyNames.Count.ShouldEqual(1);
+            model.PropertyNames.Count.ShouldBe(1);
             model.PropertyNames.ShouldContain("SomeName");
             dispatcher.Verify(i => i.Dispatch(It.IsAny<Action>()), Times.Once);
         }
