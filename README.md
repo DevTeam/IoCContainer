@@ -682,7 +682,7 @@ isBound.ShouldBeTrue();
 
 ### Check for possible resolving [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ValidateResolving.cs)
 
-It is easy to validate without the actual operation.
+It is easy to validate without the actual resolving.
 
 ``` CSharp
 // Create and configure the container

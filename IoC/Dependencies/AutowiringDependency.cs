@@ -162,7 +162,7 @@
             return _implementationType;
         }
 
-        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+        [SuppressMessage("ReSharper", "PossibleMultipleE%numeration")]
         private static IMethod<ConstructorInfo> SelectConstructor(IBuildContext buildContext, TypeDescriptor typeDescriptor, IAutowiringStrategy autoWiringStrategy)
         {
             var constructors = (IEnumerable<IMethod<ConstructorInfo>>)typeDescriptor

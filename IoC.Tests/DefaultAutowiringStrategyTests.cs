@@ -68,9 +68,9 @@ namespace IoC.Tests
         {
             static DefaultCtorClass() {}
 
-            [Marker]
             public DefaultCtorClass() { }
 
+            [Marker]
             public DefaultCtorClass(int i) { }
         }
 
@@ -90,9 +90,9 @@ namespace IoC.Tests
 
             private CtorClass() { }
 
+            [Marker]
             public CtorClass(int i, int j) { }
 
-            [Marker]
             public CtorClass(int i) { }
         }
 

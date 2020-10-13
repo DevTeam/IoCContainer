@@ -12,7 +12,7 @@
             // $tag=advanced
             // $priority=08
             // $description=Check for possible resolving
-            // $header=It is easy to validate without the actual operation.
+            // $header=It is easy to validate without the actual resolving.
             // {
             // Create and configure the container
             using var container = Container

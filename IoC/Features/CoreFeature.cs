@@ -23,9 +23,6 @@
             yield return container.Register(ctx => FoundCyclicDependency.Shared);
             yield return container.Register(ctx => CannotBuildExpression.Shared);
             yield return container.Register(ctx => CannotGetResolver.Shared);
-            yield return container.Register(ctx => CannotParseLifetime.Shared);
-            yield return container.Register(ctx => CannotParseTag.Shared);
-            yield return container.Register(ctx => CannotParseType.Shared);
             yield return container.Register(ctx => CannotRegister.Shared);
             yield return container.Register(ctx => CannotResolveConstructor.Shared);
             yield return container.Register(ctx => CannotResolveDependency.Shared);

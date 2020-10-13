@@ -51,11 +51,31 @@ namespace IoC.Core
             where TMethodInfo : MethodBase =>
             from method in methods
             let methodMetadata = new Metadata(_metadata, method.Info.GetCustomAttributes(true))
-            where enforceSelection || !methodMetadata.IsEmpty
+            let parametersMetadata = GetParametersMetadata(method)
+            where enforceSelection || !methodMetadata.IsEmpty || parametersMetadata.Any(i => !i.IsEmpty)
             orderby methodMetadata.Order
-            select SetDependencies(method, methodMetadata);
+            select SetDependencies(method, parametersMetadata, methodMetadata);
 
-        private IMethod<TMethodInfo> SetDependencies<TMethodInfo>(IMethod<TMethodInfo> method, Metadata methodMetadata)
+        private Metadata[] GetParametersMetadata<TMethodInfo>(IMethod<TMethodInfo> method)
+            where TMethodInfo : MethodBase
+        {
+            var parameters = method.Info.GetParameters();
+            var metadata = new Metadata[parameters.Length];
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                var param = parameters[i];
+                if (param.IsOut)
+                {
+                    continue;
+                }
+
+                metadata[i] = new Metadata(_metadata, param.GetCustomAttributes(true));
+            }
+
+            return metadata;
+        }
+
+        private IMethod<TMethodInfo> SetDependencies<TMethodInfo>(IMethod<TMethodInfo> method, Metadata[] parametersMetadata, Metadata methodMetadata)
             where TMethodInfo : MethodBase
         {
             var parameters = method.Info.GetParameters();
@@ -67,7 +87,7 @@ namespace IoC.Core
                     continue;
                 }
 
-                var parameterMetadata = new Metadata(_metadata, param.GetCustomAttributes(true));
+                var parameterMetadata = parametersMetadata[i];
                 method.SetDependency(param.Position, parameterMetadata.Type ?? param.ParameterType, parameterMetadata.Tag ?? methodMetadata.Tag, param.IsOptional);
             }
 

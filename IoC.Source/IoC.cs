@@ -9280,9 +9280,6 @@ namespace IoC.Features
             yield return container.Register(ctx => FoundCyclicDependency.Shared);
             yield return container.Register(ctx => CannotBuildExpression.Shared);
             yield return container.Register(ctx => CannotGetResolver.Shared);
-            yield return container.Register(ctx => CannotParseLifetime.Shared);
-            yield return container.Register(ctx => CannotParseTag.Shared);
-            yield return container.Register(ctx => CannotParseType.Shared);
             yield return container.Register(ctx => CannotRegister.Shared);
             yield return container.Register(ctx => CannotResolveConstructor.Shared);
             yield return container.Register(ctx => CannotResolveDependency.Shared);
@@ -10545,7 +10542,7 @@ namespace IoC.Dependencies
             return _implementationType;
         }
 
-        [SuppressMessage("ReSharper", "PossibleMultipleEnumeration")]
+        [SuppressMessage("ReSharper", "PossibleMultipleE%numeration")]
         private static IMethod<ConstructorInfo> SelectConstructor(IBuildContext buildContext, TypeDescriptor typeDescriptor, IAutowiringStrategy autoWiringStrategy)
         {
             var constructors = (IEnumerable<IMethod<ConstructorInfo>>)typeDescriptor
@@ -11255,11 +11252,31 @@ namespace IoC.Core
             where TMethodInfo : MethodBase =>
             from method in methods
             let methodMetadata = new Metadata(_metadata, method.Info.GetCustomAttributes(true))
-            where enforceSelection || !methodMetadata.IsEmpty
+            let parametersMetadata = GetParametersMetadata(method)
+            where enforceSelection || !methodMetadata.IsEmpty || parametersMetadata.Any(i => !i.IsEmpty)
             orderby methodMetadata.Order
-            select SetDependencies(method, methodMetadata);
+            select SetDependencies(method, parametersMetadata, methodMetadata);
 
-        private IMethod<TMethodInfo> SetDependencies<TMethodInfo>(IMethod<TMethodInfo> method, Metadata methodMetadata)
+        private Metadata[] GetParametersMetadata<TMethodInfo>(IMethod<TMethodInfo> method)
+            where TMethodInfo : MethodBase
+        {
+            var parameters = method.Info.GetParameters();
+            var metadata = new Metadata[parameters.Length];
+            for (var i = 0; i < parameters.Length; i++)
+            {
+                var param = parameters[i];
+                if (param.IsOut)
+                {
+                    continue;
+                }
+
+                metadata[i] = new Metadata(_metadata, param.GetCustomAttributes(true));
+            }
+
+            return metadata;
+        }
+
+        private IMethod<TMethodInfo> SetDependencies<TMethodInfo>(IMethod<TMethodInfo> method, Metadata[] parametersMetadata, Metadata methodMetadata)
             where TMethodInfo : MethodBase
         {
             var parameters = method.Info.GetParameters();
@@ -11271,7 +11288,7 @@ namespace IoC.Core
                     continue;
                 }
 
-                var parameterMetadata = new Metadata(_metadata, param.GetCustomAttributes(true));
+                var parameterMetadata = parametersMetadata[i];
                 method.SetDependency(param.Position, parameterMetadata.Type ?? param.ParameterType, parameterMetadata.Tag ?? methodMetadata.Tag, param.IsOptional);
             }
 
@@ -11845,63 +11862,6 @@ namespace IoC.Core
 }
 
 #endregion
-#region CannotParseLifetime
-
-namespace IoC.Core
-{
-    using System;
-    using Issues;
-
-    internal sealed class CannotParseLifetime : ICannotParseLifetime
-    {
-        public static readonly ICannotParseLifetime Shared = new CannotParseLifetime();
-
-        private CannotParseLifetime() { }
-
-        public Lifetime Resolve(string statementText, int statementLineNumber, int statementPosition, string lifetimeName) => 
-            throw new InvalidOperationException($"Cannot parse the lifetime {lifetimeName} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
-    }
-}
-
-#endregion
-#region CannotParseTag
-
-namespace IoC.Core
-{
-    using System;
-    using Issues;
-
-    internal sealed class CannotParseTag : ICannotParseTag
-    {
-        public static readonly ICannotParseTag Shared = new CannotParseTag();
-
-        private CannotParseTag() { }
-
-        public object Resolve(string statementText, int statementLineNumber, int statementPosition, string tag) => 
-            throw new InvalidOperationException($"Cannot parse the tag {tag} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
-    }
-}
-
-#endregion
-#region CannotParseType
-
-namespace IoC.Core
-{
-    using System;
-    using Issues;
-
-    internal sealed class CannotParseType : ICannotParseType
-    {
-        public static readonly ICannotParseType Shared = new CannotParseType();
-
-        private CannotParseType() { }
-
-        public Type Resolve(string statementText, int statementLineNumber, int statementPosition, string typeName) => 
-            throw new InvalidOperationException($"Cannot parse the type {typeName} in the line {statementLineNumber} for the statement \"{statementText}\" at the position {statementPosition}.");
-    }
-}
-
-#endregion
 #region CannotRegister
 
 namespace IoC.Core
@@ -11946,7 +11906,7 @@ namespace IoC.Core
         public IMethod<ConstructorInfo> Resolve(IBuildContext buildContext, IEnumerable<IMethod<ConstructorInfo>> constructors)
         {
             if (constructors == null) throw new ArgumentNullException(nameof(constructors));
-            throw new InvalidOperationException($"Cannot find a constructor for the type {buildContext.Key.Type}.\n{buildContext}");
+            throw new BuildExpressionException($"Cannot find a constructor for the type {buildContext.Key.Type}.\n{buildContext}", null);
         }
     }
 }
@@ -12273,8 +12233,7 @@ namespace IoC.Core
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
-    using System.Runtime.CompilerServices;
-
+    
     internal sealed class DefaultAutowiringStrategy : IAutowiringStrategy
     {
         public static readonly IAutowiringStrategy Shared = new DefaultAutowiringStrategy();
@@ -12288,46 +12247,26 @@ namespace IoC.Core
         }
 
         public bool TryResolveConstructor(IContainer container, IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
-            => (constructor = constructors.OrderBy(i => GetOrder(container, i.Info)).FirstOrDefault()) != null;
+        {
+            var ctors =
+                from ctor in constructors
+                let isNotObsoleted = !ctor.Info.IsDefined(typeof(ObsoleteAttribute), false)
+                let parameters = ctor.Info.GetParameters()
+                let canBeResolved = parameters.All(parameter =>
+                    parameter.IsOptional ||
+                    container.IsBound(parameter.ParameterType) ||
+                    container.CanResolve(parameter.ParameterType))
+                let order = (parameters.Length + 1) * (canBeResolved ? 0xffff : 1) * (isNotObsoleted ? 0xff : 1)
+                orderby order descending
+                select ctor;
 
+            constructor = ctors.FirstOrDefault();
+            return constructor != null;
+        }
         public bool TryResolveInitializers(IContainer container, IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
         {
             initializers = Enumerable.Empty<IMethod<MethodInfo>>();
             return true;
-        }
-
-        [MethodImpl((MethodImplOptions)0x100)]
-        private static int GetOrder(IContainer container, MethodBase method)
-        {
-            var order = 1;
-            var parameters = method.GetParameters();
-            for (var i = 0; i < parameters.Length; i++)
-            {
-                var parameter = parameters[i];
-                if (!container.IsBound(parameter.ParameterType) && !container.CanResolve(parameter.ParameterType))
-                {
-                    return int.MaxValue;
-                }
-
-                if (parameter.IsOut)
-                {
-                    return int.MaxValue;
-                }
-
-                if (!parameter.ParameterType.Descriptor().IsPublic())
-                {
-                    order += 2;
-                }
-
-                order += 1;
-            }
-
-            if (method.GetCustomAttributes(typeof(ObsoleteAttribute), true).Any())
-            {
-                order <<= 4;
-            }
-
-            return order;
         }
     }
 }
