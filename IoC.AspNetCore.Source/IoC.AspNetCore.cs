@@ -191,21 +191,20 @@ namespace IoC.Features
             if (container == null) throw new ArgumentNullException(nameof(container));
             var singletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.Singleton.AsTag());
             var scopeSingletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.ScopeSingleton.AsTag());
-            var tags = new Dictionary<Type, long>();
-            foreach (var serviceGroup in this.GroupBy(i => i.ServiceType))
+            foreach (var serviceGroup in this.Select((service, index) => new { index, item = service }).GroupBy(i => i.item.ServiceType))
             {
-                foreach (var service in serviceGroup.Reverse())
+                var isFirst = true;
+                foreach (var description in serviceGroup)
                 {
+                    var service = description.item;
                     var binding = container.Bind(service.ServiceType);
-                    if (tags.TryGetValue(service.ServiceType, out var tag))
+                    if (!isFirst)
                     {
-                        tag++;
-                        binding = binding.Tag(tag);
-                        tags[service.ServiceType] = tag;
+                        binding = binding.Tag(description.index);
                     }
                     else
                     {
-                        tags.Add(service.ServiceType, 0);
+                        isFirst = false;
                     }
 
                     switch (service.Lifetime)
@@ -247,11 +246,23 @@ namespace IoC.Features
                 }
             }
 
+            var comparerTag = TagKeyCompare.Shared.AsTag();
+
             yield return container
                 .Bind<IServiceProvider>().Lifetime(singletonLifetimeResolver(container)).To<ServiceProvider>()
                 .Bind<IServiceScopeFactory>().Lifetime(singletonLifetimeResolver(container)).To<ServiceScopeFactory>()
                 .Bind<IServiceScope>().To<ServiceScope>()
-                .Bind<IEnumerable<TT>>().To(ctx => ctx.Container.Inject<TT[]>());
+                .Bind<IEnumerable<TT>>().To(ctx => ctx.Container.Inject<TT[]>(comparerTag));
+        }
+
+        private class TagKeyCompare : IComparer<Key>
+        {
+            public static readonly IComparer<Key> Shared = new TagKeyCompare();
+
+            private TagKeyCompare() { }
+
+            public int Compare(Key x, Key y) =>
+                Comparer<object>.Default.Compare(x.Tag, y.Tag);
         }
     }
 }

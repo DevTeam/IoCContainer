@@ -3,11 +3,9 @@ namespace WebApplication3
 {
     using Clock;
     using IoC;
-    using IoC.Features;
     using IoC.Features.AspNetCore;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.Extensions.Hosting;
-    using static System.Console;
 
     public class Program
     {
@@ -24,7 +22,7 @@ namespace WebApplication3
                 .CreateDefaultBuilder(args)
                 // Adds a service provider for the Inversion of Control container
                 .UseServiceProviderFactory(new ServiceProviderFactory(container))
-                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseKestrel().UseStartup<Startup>(); })
+                .ConfigureWebHostDefaults(webBuilder => { webBuilder.UseStartup<Startup>(); })
                 .Build();
 
             host.Run();

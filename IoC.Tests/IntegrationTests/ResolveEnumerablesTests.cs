@@ -92,6 +92,58 @@ namespace IoC.Tests.IntegrationTests
         }
 
         [Fact]
+        public void ContainerShouldResolveOrderedArray()
+        {
+            // Given
+            using var container = Container.Create();
+
+            var service0 = Mock.Of<IMyService>();
+            var service1 = Mock.Of<IMyService>();
+            var service2 = Mock.Of<IMyService>();
+            var service3 = Mock.Of<IMyService>();
+
+            // When
+            using (container.Bind<IMyService>().Tag(2).To(ctx => service2))
+            using (container.Bind<IMyService>().As(Lifetime.Singleton).To(ctx => service0))
+            using (container.Bind<IMyService>().As(Lifetime.Singleton).Tag(1).To(ctx => service1))
+            using (container.Bind<IMyService>().As(Lifetime.Transient).Tag(3).To(ctx => service3))
+            {
+                // Then
+                var actualInstances = container.Resolve<IMyService1[]>(new TagKeyCompare().AsTag());
+                actualInstances.ShouldBe(new IMyService1[] {service0, service1, service2, service3});
+            }
+        }
+
+        [Fact]
+        public void ContainerShouldResolveOrderedEnums()
+        {
+            // Given
+            using var container = Container.Create();
+
+            var service0 = Mock.Of<IMyService>();
+            var service1 = Mock.Of<IMyService>();
+            var service2 = Mock.Of<IMyService>();
+            var service3 = Mock.Of<IMyService>();
+
+            // When
+            using (container.Bind<IMyService>().As(Lifetime.Singleton).To(ctx => service0))
+            using (container.Bind<IMyService>().Tag(2).To(ctx => service2))
+            using (container.Bind<IMyService>().As(Lifetime.Singleton).Tag(1).To(ctx => service1))
+            using (container.Bind<IMyService>().As(Lifetime.Transient).Tag(3).To(ctx => service3))
+            {
+                // Then
+                var actualInstances = container.Resolve<IEnumerable<IMyService1>>(new TagKeyCompare().AsTag()).ToArray();
+                actualInstances.ShouldBe(new IMyService1[] { service0, service1, service2, service3 });
+            }
+        }
+
+        private class TagKeyCompare: IComparer<Key>
+        {
+            public int Compare(Key x, Key y) => 
+                Comparer<object>.Default.Compare(x.Tag, y.Tag);
+        }
+
+        [Fact]
         public void ContainerShouldResolveArrayWhenGeneric()
         {
             // Given

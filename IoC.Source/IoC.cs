@@ -8929,16 +8929,16 @@ namespace IoC.Features
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register(new[] { typeof(IEnumerable<TT>) }, new EnumerableDependency());
-            yield return container.Register(new[] { typeof(TT[]) }, new ArrayDependency());
-            yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => new List<TT>(ctx.Container.Inject<TT[]>()));
-            yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => new HashSet<TT>(ctx.Container.Inject<TT[]>()));
-            yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
+            yield return container.Register(new[] { typeof(IEnumerable<TT>) }, new EnumerableDependency(), null, new[] { Key.AnyTag });
+            yield return container.Register(new[] { typeof(TT[]) }, new ArrayDependency(), null, new []{ Key.AnyTag });
+            yield return container.Register<List<TT>, IList<TT>, ICollection<TT>>(ctx => new List<TT>(ctx.Container.Inject<TT[]>(ctx.Key)), null, new[] { Key.AnyTag });
+            yield return container.Register<HashSet<TT>, ISet<TT>>(ctx => new HashSet<TT>(ctx.Container.Inject<TT[]>(ctx.Key)), null, new[] { Key.AnyTag });
+            yield return container.Register<IObservable<TT>>(ctx => new Observable<TT>(ctx.Container.Inject<IEnumerable<TT>>(ctx.Key)), null, new[] { Key.AnyTag });
 #if !NET40
-            yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<TT[]>()));
+            yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<TT[]>(ctx.Key)), null, new[] { Key.AnyTag });
 #endif
 #if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx.Container.Inject<IEnumerable<TT>>()));
+            yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx.Container.Inject<IEnumerable<TT>>(ctx.Key)), null, new[] { Key.AnyTag });
 #endif
         }
 
@@ -9056,6 +9056,7 @@ namespace IoC.Features
             public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
             {
                 var type = buildContext.Key.Type.Descriptor();
+                var keyComparer = buildContext.Key.Tag as IComparer<Key>;
                 if (!type.IsConstructedGenericType())
                 {
                     throw new BuildExpressionException($"Unsupported enumerable type {type}.", null);
@@ -9068,7 +9069,12 @@ namespace IoC.Features
                 }
 
                 var elementType = genericTypeArguments[0];
-                var keys = GetKeys(buildContext.Container, elementType).ToArray();
+                var allKeys = GetKeys(buildContext.Container, elementType);
+                if (keyComparer != null)
+                {
+                    allKeys = allKeys.OrderBy(i => i, keyComparer);
+                }
+                var keys = allKeys.ToArray();
                 var positionVar = Expression.Variable(typeof(int));
 
                 var conditionExpression =
@@ -9196,13 +9202,20 @@ namespace IoC.Features
             public bool TryBuildExpression(IBuildContext buildContext, ILifetime lifetime, out Expression expression, out Exception error)
             {
                 var type = buildContext.Key.Type.Descriptor();
+                var keyComparer = buildContext.Key.Tag as IComparer<Key>;
                 var elementType = type.GetElementType();
                 if (elementType == null)
                 {
                     throw new BuildExpressionException($"Unsupported array type {type}.", null);
                 }
 
-                var keys = GetKeys(buildContext.Container, elementType).ToArray();
+                var allKeys = GetKeys(buildContext.Container, elementType);
+                if (keyComparer != null)
+                {
+                    allKeys = allKeys.OrderBy(i => i, keyComparer);
+                }
+                
+                var keys = allKeys.ToArray();
                 var expressions = new Expression[keys.Length];
                 for (var i = 0; i < keys.Length; i++)
                 {
