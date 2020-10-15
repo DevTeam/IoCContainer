@@ -18,15 +18,20 @@
         protected override Expression VisitNew(NewExpression node)
         {
             var newTypeDescriptor = ReplaceType(node.Type).Descriptor();
-            var newConstructor = newTypeDescriptor.GetDeclaredConstructors().SingleOrDefault(i => !i.IsPrivate && Match(node.Constructor.GetParameters(), i.GetParameters()));
+            if (newTypeDescriptor.IsAbstract() || newTypeDescriptor.Type == node.Type && node.Arguments.Count == 0)
+            {
+                return node;
+            }
+
+            var newConstructor = newTypeDescriptor.GetDeclaredConstructors().FirstOrDefault(i => !i.IsPrivate && Match(node.Constructor.GetParameters(), i.GetParameters()));
             if (newConstructor == null)
             {
                 if (newTypeDescriptor.IsValueType())
                 {
                     return Expression.Default(newTypeDescriptor.Type);
                 }
-
-                throw new BuildExpressionException($"Cannot find a constructor for {newTypeDescriptor.Type}.", null);
+                
+                throw new BuildExpressionException($"Cannot find a constructor with parameters({string.Join(", ", node.Constructor.GetParameters().Select(i => i.Name))}) for type {newTypeDescriptor.Type}({newTypeDescriptor.Trace()}), replaced type: {node.Type.Descriptor().Trace()}.", null);
             }
 
             return Expression.New(newConstructor, ReplaceAll(node.Arguments));
@@ -38,7 +43,7 @@
             var newMethod = newDeclaringType
                 .GetDeclaredMethods()
                 .SingleOrDefault(i => i.Name == node.Method.Name && Match(node.Method.GetParameters(), i.GetParameters()))
-                ?? throw new BuildExpressionException($"Cannot find method {node.Method} in the {node.Method.DeclaringType}.", new InvalidOperationException()); ;
+                ?? throw new BuildExpressionException($"Cannot find method {node.Method} in the {node.Method.DeclaringType}.", new InvalidOperationException());
 
             if (newMethod.IsGenericMethod)
             {
@@ -71,15 +76,18 @@
             }
 
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            var newType = ReplaceType(node.Type);
             if (node.IsByRef)
             {
-                newNode = Expression.Parameter(ReplaceType(node.Type).MakeByRefType(), node.Name);
-            }
-            else
-            {
-                newNode = Expression.Parameter(ReplaceType(node.Type), node.Name);
+                newType = newType.MakeByRefType();
             }
 
+            if (node.Type == newType)
+            {
+                return node;
+            }
+
+            newNode = Expression.Parameter(newType, node.Name);
             _parameters[node] = newNode;
             return newNode;
         }
@@ -91,6 +99,11 @@
             }
 
             var newType = ReplaceType(node.Type);
+            if (newType == node.Type)
+            {
+                return node;
+            }
+
             var value = node.Value;
             return node.Value == null ? (Expression) Expression.Default(newType) : Expression.Constant(value, newType);
         }
@@ -171,18 +184,36 @@
 
             for (var i = 0; i < baseParams.Count; i++)
             {
-                if (baseParams[i].Name != newParams[i].Name)
+                var baseParam = baseParams[i];
+                var newParam = newParams[i];
+                if (baseParam.Name != newParam.Name)
                 {
                     return false;
                 }
 
-                var paramTypeDescriptor = newParams[i].ParameterType.Descriptor();
-                if (paramTypeDescriptor.IsGenericParameter())
+                var newParamTypeDescriptor = newParam.ParameterType.Descriptor();
+                if (newParamTypeDescriptor.IsGenericParameter())
                 {
                     return true;
                 }
 
-                if (ReplaceType(baseParams[i].ParameterType).Descriptor().GetId() != paramTypeDescriptor.GetId())
+                var baseParamType = ReplaceType(baseParam.ParameterType).Descriptor();
+                if (baseParamType.IsGenericTypeDefinition())
+                {
+                    baseParamType = baseParamType.GetGenericTypeDefinition().Descriptor();
+                }
+
+                string baseParamAssembly = null;
+                string newParamAssembly = null;
+                try
+                {
+                    baseParamAssembly = baseParamType.GetAssembly().FullName;
+                    newParamAssembly = newParamTypeDescriptor.GetAssembly().FullName;
+                }
+                // ReSharper disable once EmptyGeneralCatchClause
+                catch { }
+
+                if (!Equals(baseParamType.Type.Name, newParamTypeDescriptor.Type.Name) || !Equals(baseParamAssembly, newParamAssembly))
                 {
                     return false;
                 }

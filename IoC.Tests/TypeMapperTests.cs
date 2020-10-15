@@ -29,6 +29,7 @@ namespace IoC.Tests
         {
             new object[] { typeof(TT), typeof(string), new Dictionary<Type, Type> { { typeof(TT), typeof(string) } }},
             new object[] { typeof(string), typeof(string), new Dictionary<Type, Type>()},
+            new object[] { typeof(Tuple<TT1, Tuple<string, TT>>), typeof(Tuple<TT1, Tuple<string, int>>), new Dictionary<Type, Type>{ { typeof(TT), typeof(int) }, { typeof(Tuple<string, TT>), typeof(Tuple<string, int>)}, { typeof(Tuple<TT1, Tuple<string, TT>>), typeof(Tuple<TT1, Tuple<string, int>>) } } },
             new object[] { typeof(IList<TT>), typeof(IList<string>), new Dictionary<Type, Type> { { typeof(TT), typeof(string) }, { typeof(IList<TT>), typeof(IList<string>) } }},
             new object[] { typeof(IList<TT>), typeof(List<string>), new Dictionary<Type, Type> { { typeof(TT), typeof(string)}, { typeof(IList<TT>), typeof(IList<string>) }, { typeof(ICollection<TT>), typeof(ICollection<string>) }, { typeof(IEnumerable<TT>), typeof(IEnumerable<string>) } }},
             new object[] { typeof(IList<>), typeof(IList<>), new Dictionary<Type, Type>() },

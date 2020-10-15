@@ -14,7 +14,6 @@ namespace WebApplication3
             using var container = Container
                 // Creates an Inversion of Control container
                 .Create()
-                //.Using(new ResolveUnboundFeature())
                 .Using<ClockConfiguration>();
 
             // Creates a host

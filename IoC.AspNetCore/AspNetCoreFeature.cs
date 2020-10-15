@@ -8,7 +8,7 @@
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
-    /// Allows to use ASP .NET and other related frameworks.
+    /// Allows to use ASP.NET and other related frameworks.
     /// </summary>
     [PublicAPI]
     public sealed class AspNetCoreFeature : Collection<ServiceDescriptor>, IServiceCollection, IConfiguration
@@ -30,7 +30,7 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             var singletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.Singleton.AsTag());
             var scopeSingletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.ScopeSingleton.AsTag());
-            foreach (var serviceGroup in this.Select((service, index) => new { index, item = service }).GroupBy(i => i.item.ServiceType))
+            foreach (var serviceGroup in this.Reverse().Select((service, index) => new { index, item = service }).GroupBy(i => i.item.ServiceType))
             {
                 var isFirst = true;
                 foreach (var description in serviceGroup)
@@ -85,23 +85,12 @@
                 }
             }
 
-            var comparerTag = TagKeyCompare.Shared.AsTag();
-
             yield return container
-                .Bind<IServiceProvider>().Lifetime(singletonLifetimeResolver(container)).To<ServiceProvider>()
+                .Bind<IServiceProvider>().Bind<ISupportRequiredService>().Lifetime(singletonLifetimeResolver(container)).To<ServiceProvider>()
                 .Bind<IServiceScopeFactory>().Lifetime(singletonLifetimeResolver(container)).To<ServiceScopeFactory>()
                 .Bind<IServiceScope>().To<ServiceScope>()
-                .Bind<IEnumerable<TT>>().To(ctx => ctx.Container.Inject<TT[]>(comparerTag));
-        }
-
-        private class TagKeyCompare : IComparer<Key>
-        {
-            public static readonly IComparer<Key> Shared = new TagKeyCompare();
-
-            private TagKeyCompare() { }
-
-            public int Compare(Key x, Key y) =>
-                Comparer<object>.Default.Compare(x.Tag, y.Tag);
+                // IEnumerable should preserve an order
+                .Bind<IEnumerable<TT>>().To(ctx => ctx.Container.Inject<IEnumerable<TT>>(TagKeyComparer.Shared, ctx.Args));
         }
     }
 }

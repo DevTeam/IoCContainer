@@ -52,6 +52,10 @@
             yield return container.Register<Func<IMutableContainer>>(ctx => () => ctx.Container.Inject<IMutableContainer>());
             yield return container.Register<Func<string, IMutableContainer>>(ctx => name => ctx.Container.Resolve<IMutableContainer>(name));
 
+            // Metadata
+            yield return container.Register(ctx => ctx.Container.Inject<IBuildContext>().Parent.Key);
+            yield return container.Register(ctx => ctx.Container.Inject<IBuildContext>().Parent.Key.Tag.AsTag());
+
             yield return container.Register(ctx => ContainerEventToStringConverter.Shared);
             yield return container.Register(ctx => TypeToStringConverter.Shared);
         }

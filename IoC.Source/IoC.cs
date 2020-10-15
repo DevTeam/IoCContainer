@@ -5648,7 +5648,7 @@ namespace IoC
         {
             if (parentContainer == null) throw new ArgumentNullException(nameof(parentContainer));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return parentContainer.Resolve<IMutableContainer>(parentContainer, name);
+            return parentContainer.Resolve<IMutableContainer>(name);
         }
 
         /// <summary>
@@ -5663,7 +5663,7 @@ namespace IoC
         {
             if (token == null) throw new ArgumentNullException(nameof(token));
             if (name == null) throw new ArgumentNullException(nameof(name));
-            return token.Container.Resolve<IMutableContainer>(token.Container, name);
+            return token.Container.Resolve<IMutableContainer>(name);
         }
 
         /// <summary>
@@ -9322,6 +9322,10 @@ namespace IoC.Features
             yield return container.Register<Func<IMutableContainer>>(ctx => () => ctx.Container.Inject<IMutableContainer>());
             yield return container.Register<Func<string, IMutableContainer>>(ctx => name => ctx.Container.Resolve<IMutableContainer>(name));
 
+            // Metadata
+            yield return container.Register(ctx => ctx.Container.Inject<IBuildContext>().Parent.Key);
+            yield return container.Register(ctx => ctx.Container.Inject<IBuildContext>().Parent.Key.Tag.AsTag());
+
             yield return container.Register(ctx => ContainerEventToStringConverter.Shared);
             yield return container.Register(ctx => TypeToStringConverter.Shared);
         }
@@ -10233,9 +10237,9 @@ namespace IoC.Lifetimes
 
 #if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (newInstance is IAsyncDisposable asyncDisposable)
-                {
-                    resourceRegistry.RegisterResource(asyncDisposable.ToDisposable());
-                }
+            {
+                resourceRegistry.RegisterResource(asyncDisposable.ToDisposable());
+            }
 #endif
 
             return newInstance;
@@ -11603,7 +11607,6 @@ namespace IoC.Core
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Text;
     using Issues;
@@ -11682,6 +11685,11 @@ namespace IoC.Core
 
                     parent = parent.Parent;
                 }
+            }
+
+            if (Key.Type == typeof(IBuildContext))
+            {
+                return Expression.Constant(Parent);
             }
 
             if (!selectedContainer.TryGetDependency(Key, out var dependency, out var lifetime))
@@ -14188,6 +14196,7 @@ namespace IoC.Core
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
+    using System.Text;
 
     internal struct TypeDescriptor
     {
@@ -14319,9 +14328,7 @@ namespace IoC.Core
         [NotNull]
         [Pure]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
-
-        public override string ToString() => TypeToStringConverter.Convert(Type);
-
+        
         public override bool Equals(object obj) => obj is TypeDescriptor other && Type == other.Type;
 
         public override int GetHashCode() => Type.GetHashCode();
@@ -14458,12 +14465,27 @@ namespace IoC.Core
         [Pure]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
 
-        public override string ToString() => TypeToStringConverter.Convert(Type);
-
         public override bool Equals(object obj) => obj is TypeDescriptor other && Type == other.Type;
 
         public override int GetHashCode() => Type != null ? Type.GetHashCode() : 0;
 #endif
+        public override string ToString() => TypeToStringConverter.Convert(Type);
+
+        public string Trace()
+        {
+            var sb = new StringBuilder(ToString());
+            sb.Append("{");
+            sb.Append($"IsValueType: {IsValueType()}, ");
+            sb.Append($"IsAbstract: {IsAbstract()}, ");
+            sb.Append($"IsInterface: {IsInterface()}, ");
+            sb.Append($"IsPublic: {IsPublic()}, ");
+            sb.Append($"IsArray: {IsArray()}, ");
+            sb.Append($"IsConstructedGenericType: {IsConstructedGenericType()}, ");
+            sb.Append($"IsGenericTypeDefinition: {IsGenericTypeDefinition()}, ");
+            sb.Append($"Ctors: {GetDeclaredConstructors().Count()}");
+            sb.Append("}");
+            return sb.ToString();
+        }
     }
 }
 
@@ -14641,15 +14663,20 @@ namespace IoC.Core
         protected override Expression VisitNew(NewExpression node)
         {
             var newTypeDescriptor = ReplaceType(node.Type).Descriptor();
-            var newConstructor = newTypeDescriptor.GetDeclaredConstructors().SingleOrDefault(i => !i.IsPrivate && Match(node.Constructor.GetParameters(), i.GetParameters()));
+            if (newTypeDescriptor.IsAbstract() || newTypeDescriptor.Type == node.Type && node.Arguments.Count == 0)
+            {
+                return node;
+            }
+
+            var newConstructor = newTypeDescriptor.GetDeclaredConstructors().FirstOrDefault(i => !i.IsPrivate && Match(node.Constructor.GetParameters(), i.GetParameters()));
             if (newConstructor == null)
             {
                 if (newTypeDescriptor.IsValueType())
                 {
                     return Expression.Default(newTypeDescriptor.Type);
                 }
-
-                throw new BuildExpressionException($"Cannot find a constructor for {newTypeDescriptor.Type}.", null);
+                
+                throw new BuildExpressionException($"Cannot find a constructor with parameters({string.Join(", ", node.Constructor.GetParameters().Select(i => i.Name))}) for type {newTypeDescriptor.Type}({newTypeDescriptor.Trace()}), replaced type: {node.Type.Descriptor().Trace()}.", null);
             }
 
             return Expression.New(newConstructor, ReplaceAll(node.Arguments));
@@ -14661,7 +14688,7 @@ namespace IoC.Core
             var newMethod = newDeclaringType
                 .GetDeclaredMethods()
                 .SingleOrDefault(i => i.Name == node.Method.Name && Match(node.Method.GetParameters(), i.GetParameters()))
-                ?? throw new BuildExpressionException($"Cannot find method {node.Method} in the {node.Method.DeclaringType}.", new InvalidOperationException()); ;
+                ?? throw new BuildExpressionException($"Cannot find method {node.Method} in the {node.Method.DeclaringType}.", new InvalidOperationException());
 
             if (newMethod.IsGenericMethod)
             {
@@ -14694,15 +14721,18 @@ namespace IoC.Core
             }
 
             // ReSharper disable once ConvertIfStatementToConditionalTernaryExpression
+            var newType = ReplaceType(node.Type);
             if (node.IsByRef)
             {
-                newNode = Expression.Parameter(ReplaceType(node.Type).MakeByRefType(), node.Name);
-            }
-            else
-            {
-                newNode = Expression.Parameter(ReplaceType(node.Type), node.Name);
+                newType = newType.MakeByRefType();
             }
 
+            if (node.Type == newType)
+            {
+                return node;
+            }
+
+            newNode = Expression.Parameter(newType, node.Name);
             _parameters[node] = newNode;
             return newNode;
         }
@@ -14714,6 +14744,11 @@ namespace IoC.Core
             }
 
             var newType = ReplaceType(node.Type);
+            if (newType == node.Type)
+            {
+                return node;
+            }
+
             var value = node.Value;
             return node.Value == null ? (Expression) Expression.Default(newType) : Expression.Constant(value, newType);
         }
@@ -14794,18 +14829,36 @@ namespace IoC.Core
 
             for (var i = 0; i < baseParams.Count; i++)
             {
-                if (baseParams[i].Name != newParams[i].Name)
+                var baseParam = baseParams[i];
+                var newParam = newParams[i];
+                if (baseParam.Name != newParam.Name)
                 {
                     return false;
                 }
 
-                var paramTypeDescriptor = newParams[i].ParameterType.Descriptor();
-                if (paramTypeDescriptor.IsGenericParameter())
+                var newParamTypeDescriptor = newParam.ParameterType.Descriptor();
+                if (newParamTypeDescriptor.IsGenericParameter())
                 {
                     return true;
                 }
 
-                if (ReplaceType(baseParams[i].ParameterType).Descriptor().GetId() != paramTypeDescriptor.GetId())
+                var baseParamType = ReplaceType(baseParam.ParameterType).Descriptor();
+                if (baseParamType.IsGenericTypeDefinition())
+                {
+                    baseParamType = baseParamType.GetGenericTypeDefinition().Descriptor();
+                }
+
+                string baseParamAssembly = null;
+                string newParamAssembly = null;
+                try
+                {
+                    baseParamAssembly = baseParamType.GetAssembly().FullName;
+                    newParamAssembly = newParamTypeDescriptor.GetAssembly().FullName;
+                }
+                // ReSharper disable once EmptyGeneralCatchClause
+                catch { }
+
+                if (!Equals(baseParamType.Type.Name, newParamTypeDescriptor.Type.Name) || !Equals(baseParamAssembly, newParamAssembly))
                 {
                     return false;
                 }

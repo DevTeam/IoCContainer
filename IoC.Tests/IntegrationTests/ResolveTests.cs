@@ -1,4 +1,6 @@
-﻿namespace IoC.Tests.IntegrationTests
+﻿// ReSharper disable ClassNeverInstantiated.Global
+// ReSharper disable MemberCanBePrivate.Global
+namespace IoC.Tests.IntegrationTests
 {
     using System;
     using System.Collections.Generic;
@@ -592,6 +594,24 @@
             }
         }
 
+        [Fact]
+        public void ContainerShouldResolveWhenHasKeyDependency()
+        {
+            // Given
+            using var container = Container.Create();
+
+            // When
+            using (container.Bind<IMyClass>().Tag(1).To<MyClassWithKey>())
+            {
+                var instance = container.Resolve<IMyClass>(1.AsTag());
+                
+                // Then
+                instance.ShouldBeOfType<MyClassWithKey>();
+                ((MyClassWithKey)instance).Key.ShouldBe(new Key(typeof(IMyClass), 1));
+                ((MyClassWithKey)instance).Tag.Value.ShouldBe(1);
+            }
+        }
+
         public interface IFactory<out T>
         {
             T Create();
@@ -618,6 +638,23 @@
             public MyClass(IFactory<IMyClass> factory) => _factory = factory;
 
             public IMyClass New() => _factory.Create();
+        }
+
+        public class MyClassWithKey: IMyClass
+        {
+            public Key Key { get; }
+            public Tag Tag { get; }
+
+            public MyClassWithKey(Key key, Tag tag)
+            {
+                Key = key;
+                Tag = tag;
+            }
+
+            public IMyClass New()
+            {
+                throw new NotImplementedException();
+            }
         }
 
 #if !NET40

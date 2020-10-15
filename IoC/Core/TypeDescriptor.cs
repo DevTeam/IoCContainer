@@ -7,6 +7,7 @@ namespace IoC.Core
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
+    using System.Text;
 
     internal struct TypeDescriptor
     {
@@ -138,9 +139,7 @@ namespace IoC.Core
         [NotNull]
         [Pure]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
-
-        public override string ToString() => TypeToStringConverter.Convert(Type);
-
+        
         public override bool Equals(object obj) => obj is TypeDescriptor other && Type == other.Type;
 
         public override int GetHashCode() => Type.GetHashCode();
@@ -277,12 +276,27 @@ namespace IoC.Core
         [Pure]
         public Type GetGenericTypeDefinition() => Type.GetGenericTypeDefinition();
 
-        public override string ToString() => TypeToStringConverter.Convert(Type);
-
         public override bool Equals(object obj) => obj is TypeDescriptor other && Type == other.Type;
 
         public override int GetHashCode() => Type != null ? Type.GetHashCode() : 0;
 #endif
+        public override string ToString() => TypeToStringConverter.Convert(Type);
+
+        public string Trace()
+        {
+            var sb = new StringBuilder(ToString());
+            sb.Append("{");
+            sb.Append($"IsValueType: {IsValueType()}, ");
+            sb.Append($"IsAbstract: {IsAbstract()}, ");
+            sb.Append($"IsInterface: {IsInterface()}, ");
+            sb.Append($"IsPublic: {IsPublic()}, ");
+            sb.Append($"IsArray: {IsArray()}, ");
+            sb.Append($"IsConstructedGenericType: {IsConstructedGenericType()}, ");
+            sb.Append($"IsGenericTypeDefinition: {IsGenericTypeDefinition()}, ");
+            sb.Append($"Ctors: {GetDeclaredConstructors().Count()}");
+            sb.Append("}");
+            return sb.ToString();
+        }
     }
 }
 

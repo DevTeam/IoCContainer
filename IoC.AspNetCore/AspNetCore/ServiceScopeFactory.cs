@@ -12,7 +12,6 @@
         public ServiceScopeFactory([NotNull] Func<IServiceScope> serviceScopeFactory) => 
             _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
 
-        public IServiceScope CreateScope() =>
-            _serviceScopeFactory();
+        public IServiceScope CreateScope() => _serviceScopeFactory();
     }
 }

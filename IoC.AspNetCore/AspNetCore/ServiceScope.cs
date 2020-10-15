@@ -4,15 +4,20 @@ namespace IoC.Features.AspNetCore
     using System;
     using Microsoft.Extensions.DependencyInjection;
 
-    internal sealed class ServiceScope : IServiceScope, IServiceProvider
+    internal sealed class ServiceScope : IServiceScope, IServiceProvider, ISupportRequiredService
     {
         [NotNull] private readonly IScope _scope;
-        [NotNull] private readonly IContainer _container;
+        [NotNull] private readonly IServiceProvider _serviceProvider;
+        [NotNull] private readonly ISupportRequiredService _supportRequiredService;
 
-        public ServiceScope([NotNull] IScope scope, [NotNull] IContainer container)
+        public ServiceScope(
+            [NotNull] IScope scope,
+            [NotNull] IServiceProvider serviceProvider,
+            [NotNull] ISupportRequiredService supportRequiredService)
         {
             _scope = scope ?? throw new ArgumentNullException(nameof(scope));
-            _container = container ?? throw new ArgumentNullException(nameof(container));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _supportRequiredService = supportRequiredService ?? throw new ArgumentNullException(nameof(supportRequiredService));
         }
 
         public IServiceProvider ServiceProvider => this;
@@ -21,7 +26,15 @@ namespace IoC.Features.AspNetCore
         {
             using (_scope.Activate())
             {
-                return _container.Resolve<object>(serviceType);
+                return _serviceProvider.GetService(serviceType);
+            }
+        }
+
+        public object GetRequiredService(Type serviceType)
+        {
+            using (_scope.Activate())
+            {
+                return _supportRequiredService.GetRequiredService(serviceType);
             }
         }
 

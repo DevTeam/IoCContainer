@@ -34,9 +34,9 @@
 
 #if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (newInstance is IAsyncDisposable asyncDisposable)
-                {
-                    resourceRegistry.RegisterResource(asyncDisposable.ToDisposable());
-                }
+            {
+                resourceRegistry.RegisterResource(asyncDisposable.ToDisposable());
+            }
 #endif
 
             return newInstance;

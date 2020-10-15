@@ -44,9 +44,10 @@ namespace IoC.Features.AspNetCore
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+    using Microsoft.Extensions.DependencyInjection;
 
     [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    internal sealed class ServiceProvider : IServiceProvider
+    internal sealed class ServiceProvider : IServiceProvider, ISupportRequiredService
     {
         private readonly IContainer _container;
 
@@ -54,6 +55,9 @@ namespace IoC.Features.AspNetCore
             _container = container ?? throw new ArgumentNullException(nameof(container));
 
         public object GetService(Type serviceType) => 
+            _container.TryGetResolver<object>(serviceType, null, out var resolver, out _) ? resolver(_container) : null;
+
+        public object GetRequiredService(Type serviceType) =>
             _container.GetResolver<object>(serviceType)(_container);
     }
 }
@@ -66,6 +70,7 @@ namespace IoC.Features.AspNetCore
 namespace IoC.Features.AspNetCore
 {
     using System;
+    using System.Threading;
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
@@ -73,19 +78,25 @@ namespace IoC.Features.AspNetCore
     /// </summary>
     public sealed class ServiceProviderFactory : IServiceProviderFactory<IContainer>, IDisposable
     {
+        private static long _counter;
         private readonly IMutableContainer _container;
 
         /// <summary>
         /// Creates a new instance of <c>IServiceProviderFactory</c>.
         /// </summary>
         /// <param name="container"></param>
-        public ServiceProviderFactory(IContainer container) => _container = container.Create();
+        public ServiceProviderFactory(IContainer container) =>
+            _container = container.Create("ASP.NET");
 
         /// <inheritdoc />
-        public IContainer CreateBuilder(IServiceCollection services) => _container.Using(new AspNetCoreFeature(services));
+        public IContainer CreateBuilder(IServiceCollection services) => 
+            _container
+                .Create($"builder_{Interlocked.Increment(ref _counter)}")
+                .Using(new AspNetCoreFeature(services));
 
         /// <inheritdoc />
-        public IServiceProvider CreateServiceProvider(IContainer containerBuilder) => containerBuilder.Resolve<IServiceProvider>();
+        public IServiceProvider CreateServiceProvider(IContainer containerBuilder) =>
+            containerBuilder.Resolve<IServiceProvider>();
 
         /// <inheritdoc />
         public void Dispose() => _container?.Dispose();
@@ -102,15 +113,20 @@ namespace IoC.Features.AspNetCore
     using System;
     using Microsoft.Extensions.DependencyInjection;
 
-    internal sealed class ServiceScope : IServiceScope, IServiceProvider
+    internal sealed class ServiceScope : IServiceScope, IServiceProvider, ISupportRequiredService
     {
         [NotNull] private readonly IScope _scope;
-        [NotNull] private readonly IContainer _container;
+        [NotNull] private readonly IServiceProvider _serviceProvider;
+        [NotNull] private readonly ISupportRequiredService _supportRequiredService;
 
-        public ServiceScope([NotNull] IScope scope, [NotNull] IContainer container)
+        public ServiceScope(
+            [NotNull] IScope scope,
+            [NotNull] IServiceProvider serviceProvider,
+            [NotNull] ISupportRequiredService supportRequiredService)
         {
             _scope = scope ?? throw new ArgumentNullException(nameof(scope));
-            _container = container ?? throw new ArgumentNullException(nameof(container));
+            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
+            _supportRequiredService = supportRequiredService ?? throw new ArgumentNullException(nameof(supportRequiredService));
         }
 
         public IServiceProvider ServiceProvider => this;
@@ -119,7 +135,15 @@ namespace IoC.Features.AspNetCore
         {
             using (_scope.Activate())
             {
-                return _container.Resolve<object>(serviceType);
+                return _serviceProvider.GetService(serviceType);
+            }
+        }
+
+        public object GetRequiredService(Type serviceType)
+        {
+            using (_scope.Activate())
+            {
+                return _supportRequiredService.GetRequiredService(serviceType);
             }
         }
 
@@ -145,11 +169,28 @@ namespace IoC.Features.AspNetCore
         public ServiceScopeFactory([NotNull] Func<IServiceScope> serviceScopeFactory) => 
             _serviceScopeFactory = serviceScopeFactory ?? throw new ArgumentNullException(nameof(serviceScopeFactory));
 
-        public IServiceScope CreateScope() =>
-            _serviceScopeFactory();
+        public IServiceScope CreateScope() => _serviceScopeFactory();
     }
 }
 
+
+#endregion
+#region TagKeyComparer
+
+namespace IoC.Features.AspNetCore
+{
+    using System.Collections.Generic;
+
+    internal class TagKeyComparer : IComparer<Key>
+    {
+        public static readonly IComparer<Key> Shared = new TagKeyComparer();
+
+        private TagKeyComparer() { }
+
+        public int Compare(Key x, Key y) =>
+            -Comparer<object>.Default.Compare(x.Tag, y.Tag);
+    }
+}
 
 #endregion
 
@@ -169,7 +210,7 @@ namespace IoC.Features
     using Microsoft.Extensions.DependencyInjection;
 
     /// <summary>
-    /// Allows to use ASP .NET and other related frameworks.
+    /// Allows to use ASP.NET and other related frameworks.
     /// </summary>
     [PublicAPI]
     public sealed class AspNetCoreFeature : Collection<ServiceDescriptor>, IServiceCollection, IConfiguration
@@ -191,7 +232,7 @@ namespace IoC.Features
             if (container == null) throw new ArgumentNullException(nameof(container));
             var singletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.Singleton.AsTag());
             var scopeSingletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.ScopeSingleton.AsTag());
-            foreach (var serviceGroup in this.Select((service, index) => new { index, item = service }).GroupBy(i => i.item.ServiceType))
+            foreach (var serviceGroup in this.Reverse().Select((service, index) => new { index, item = service }).GroupBy(i => i.item.ServiceType))
             {
                 var isFirst = true;
                 foreach (var description in serviceGroup)
@@ -246,23 +287,12 @@ namespace IoC.Features
                 }
             }
 
-            var comparerTag = TagKeyCompare.Shared.AsTag();
-
             yield return container
-                .Bind<IServiceProvider>().Lifetime(singletonLifetimeResolver(container)).To<ServiceProvider>()
+                .Bind<IServiceProvider>().Bind<ISupportRequiredService>().Lifetime(singletonLifetimeResolver(container)).To<ServiceProvider>()
                 .Bind<IServiceScopeFactory>().Lifetime(singletonLifetimeResolver(container)).To<ServiceScopeFactory>()
                 .Bind<IServiceScope>().To<ServiceScope>()
-                .Bind<IEnumerable<TT>>().To(ctx => ctx.Container.Inject<TT[]>(comparerTag));
-        }
-
-        private class TagKeyCompare : IComparer<Key>
-        {
-            public static readonly IComparer<Key> Shared = new TagKeyCompare();
-
-            private TagKeyCompare() { }
-
-            public int Compare(Key x, Key y) =>
-                Comparer<object>.Default.Compare(x.Tag, y.Tag);
+                // IEnumerable should preserve an order
+                .Bind<IEnumerable<TT>>().To(ctx => ctx.Container.Inject<IEnumerable<TT>>(TagKeyComparer.Shared, ctx.Args));
         }
     }
 }

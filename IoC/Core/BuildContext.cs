@@ -3,7 +3,6 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Linq.Expressions;
     using System.Text;
     using Issues;
@@ -82,6 +81,11 @@
 
                     parent = parent.Parent;
                 }
+            }
+
+            if (Key.Type == typeof(IBuildContext))
+            {
+                return Expression.Constant(Parent);
             }
 
             if (!selectedContainer.TryGetDependency(Key, out var dependency, out var lifetime))

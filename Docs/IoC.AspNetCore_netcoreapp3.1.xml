@@ -6,7 +6,7 @@
     <members>
         <member name="T:IoC.Features.AspNetCoreFeature">
             <summary>
-            Allows to use ASP .NET and other related frameworks.
+            Allows to use ASP.NET and other related frameworks.
             </summary>
         </member>
         <member name="M:IoC.Features.AspNetCoreFeature.#ctor">
