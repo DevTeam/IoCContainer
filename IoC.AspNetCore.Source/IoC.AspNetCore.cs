@@ -181,7 +181,7 @@ namespace IoC.Features.AspNetCore
 {
     using System.Collections.Generic;
 
-    internal class TagKeyComparer : IComparer<Key>
+    internal sealed class TagKeyComparer : IComparer<Key>
     {
         public static readonly IComparer<Key> Shared = new TagKeyComparer();
 

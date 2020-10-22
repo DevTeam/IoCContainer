@@ -3,7 +3,6 @@
     using System;
     using System.Diagnostics;
     using System.Runtime.CompilerServices;
-    using Core;
 
     /// <summary>
     /// Represents a dependency key.
