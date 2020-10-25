@@ -147,7 +147,7 @@ It allows you to take full advantage of dependency injection everywhere and ever
   dotnet add package IoC.AspNetCore
   ```
 
-For __ASP.NET Core 3+__ create the _IoC container_ and use the service provider factory based on this container at [Main](Samples/WebApplication3/Program.cs)
+For __ASP.NET Core 3+__ or __Blazor server__ create the _IoC container_ and use the service provider factory based on this container at [Main](Samples/WebApplication3/Program.cs)
 
 ```csharp
 public static void Main(string[] args)
@@ -169,7 +169,29 @@ public static void Main(string[] args)
 }
 ```
 
-For details please see [this sample](Samples/WebApplication3).
+For more details please see [this sample](Samples/WebApplication3) or [this Blazor sample](Samples/BlazorServerApp).
+
+For __Blazor WebAssembly__ create the _IoC container_ and use the service provider factory based on this container at [Main](Samples/BlazorWebAssemblyApp/Program.cs)
+
+```csharp
+public static async Task Main(string[] args)
+{
+    using var container = Container
+      // Creates an Inversion of Control container
+      .Create()
+      .Using<ClockConfiguration>();
+
+    var builder = WebAssemblyHostBuilder.CreateDefault(args);
+    builder.RootComponents.Add<App>("app");
+
+    // Adds a service provider for the Inversion of Control container
+    builder.ConfigureContainer(new ServiceProviderFactory(container));
+
+    await builder.Build().RunAsync();
+}
+```
+
+For more details please see [this sample](Samples/BlazorWebAssemblyApp).
 
 For __ASP.NET Core 2__ create the _IoC container_ with feature _AspNetCoreFeature_ and configure it at [Startup](Samples/WebApplication2/Startup.cs)
 
@@ -190,7 +212,7 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
 }
 ```
 
-For details please see [this sample](Samples/WebApplication2).
+For more details please see [this sample](Samples/WebApplication2).
 
 ## Interception
 

@@ -1,14 +1,10 @@
 namespace BlazorWebAssemblyApp
 {
-    using System;
-    using System.Net.Http;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
-    using Microsoft.Extensions.DependencyInjection;
     using Clock;
     using IoC;
     using IoC.Features.AspNetCore;
-    using Microsoft.Extensions.Logging;
 
     public class Program
     {
@@ -21,8 +17,6 @@ namespace BlazorWebAssemblyApp
 
             var builder = WebAssemblyHostBuilder.CreateDefault(args);
             builder.RootComponents.Add<App>("app");
-
-            builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
 
             // Adds a service provider for the Inversion of Control container
             builder.ConfigureContainer(new ServiceProviderFactory(container));
