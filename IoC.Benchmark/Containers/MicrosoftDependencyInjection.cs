@@ -12,7 +12,7 @@
         public MicrosoftDependencyInjection() =>
             _container = new Lazy<ServiceProvider>(() => _serviceCollection.BuildServiceProvider());
 
-        public ServiceProvider ActualContainer => _container.Value;
+        public ServiceProvider CreateActualContainer() => _container.Value;
 
         public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {

@@ -23,7 +23,7 @@ namespace IoC.Benchmark
             abstractContainer.Register(typeof(IService3), typeof(Service3v2), AbstractLifetime.Transient, "2");
             abstractContainer.Register(typeof(IService3), typeof(Service3v3), AbstractLifetime.Transient, "3");
             abstractContainer.Register(typeof(IService3), typeof(Service3v4), AbstractLifetime.Transient, "4");
-            return abstractContainer.ActualContainer;
+            return abstractContainer.CreateActualContainer();
         }
 
         [Benchmark(Description = "new", OperationsPerInvoke = 1000000)]

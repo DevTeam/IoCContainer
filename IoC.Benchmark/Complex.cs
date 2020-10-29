@@ -20,7 +20,7 @@ namespace IoC.Benchmark
             }
 
             abstractContainer.Register(typeof(IServiceRoot), typeBuilder.RootType);
-            return abstractContainer.ActualContainer;
+            return abstractContainer.CreateActualContainer();
         }
     }
 }

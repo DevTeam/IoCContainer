@@ -7,7 +7,9 @@
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class Unity: IAbstractContainer<UnityContainer>
     {
-        public UnityContainer ActualContainer { get; } = new UnityContainer();
+        private readonly UnityContainer _container = new UnityContainer();
+
+        public UnityContainer CreateActualContainer() => _container;
 
         public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
@@ -25,9 +27,9 @@
                     throw new ArgumentOutOfRangeException(nameof(lifetime), lifetime, null);
             }
 
-           ((IUnityContainer)ActualContainer).RegisterType(contractType, implementationType, name, lifetimeManager);
+           ((IUnityContainer)_container).RegisterType(contractType, implementationType, name, lifetimeManager);
         }
 
-        public void Dispose() => ActualContainer.Dispose();
+        public void Dispose() => _container.Dispose();
     }
 }

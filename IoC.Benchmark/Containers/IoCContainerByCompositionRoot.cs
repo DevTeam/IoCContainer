@@ -7,7 +7,7 @@
     {
         private readonly IoCContainer _abstractContainer = new IoCContainer();
 
-        public Func<TContract> ActualContainer => _abstractContainer.ActualContainer.Resolve<Func<TContract>>();
+        public Func<TContract> CreateActualContainer() => _abstractContainer.CreateActualContainer().Resolve<Func<TContract>>();
 
         public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name) =>
             _abstractContainer.Register(contractType, implementationType, lifetime, name);

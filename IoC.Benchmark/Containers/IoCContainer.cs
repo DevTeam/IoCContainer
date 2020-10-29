@@ -1,18 +1,19 @@
 ﻿namespace IoC.Benchmark.Containers
 {
     using System;
+    using Features;
     using Lifetimes;
 
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class IoCContainer: IAbstractContainer<Container>
     {
-        public IoCContainer() => ActualContainer = Container.Create();
+        private readonly Container _container = Container.Create(LightFeature.Set);
 
-        public Container ActualContainer { get; }
+        public Container CreateActualContainer() => _container;
 
         public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         { 
-            var bind = ActualContainer.Bind(contractType);
+            var bind = _container.Bind(contractType);
             switch (lifetime)
             {
                 case AbstractLifetime.Transient:
@@ -34,6 +35,6 @@
             bind.To(implementationType);
         }
 
-        public void Dispose() => ActualContainer.Dispose();
+        public void Dispose() => _container.Dispose();
     }
 }

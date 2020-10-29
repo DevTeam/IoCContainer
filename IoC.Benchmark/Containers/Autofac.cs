@@ -11,7 +11,7 @@
 
         public Autofac() => _container = new Lazy<IContainer>(() => _builder.Build());
 
-        public IContainer ActualContainer => _container.Value;
+        public IContainer CreateActualContainer() => _container.Value;
 
         public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {

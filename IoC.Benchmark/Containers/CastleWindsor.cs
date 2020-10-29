@@ -7,7 +7,9 @@
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class CastleWindsor: IAbstractContainer<WindsorContainer>
     {
-        public WindsorContainer ActualContainer { get; } = new WindsorContainer();
+        private readonly WindsorContainer _container = new WindsorContainer();
+
+        public WindsorContainer CreateActualContainer() => _container;
 
         public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
@@ -31,9 +33,9 @@
                 registration.Named(name);
             }
 
-            ActualContainer.Register(registration);
+            _container.Register(registration);
         }
 
-        public void Dispose() => ActualContainer.Dispose();
+        public void Dispose() => _container.Dispose();
     }
 }

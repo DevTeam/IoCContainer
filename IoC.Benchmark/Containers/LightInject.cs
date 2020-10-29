@@ -7,7 +7,9 @@
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class LightInject: IAbstractContainer<ServiceContainer>
     {
-        public ServiceContainer ActualContainer { get; } = new ServiceContainer();
+        private readonly ServiceContainer _container = new ServiceContainer();
+
+        public ServiceContainer CreateActualContainer() => _container;
 
         public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
@@ -16,11 +18,11 @@
                 case AbstractLifetime.Transient:
                     if (name.IsNullOrEmpty())
                     {
-                        ActualContainer.Register(contractType, implementationType);
+                        _container.Register(contractType, implementationType);
                     }
                     else
                     {
-                        ActualContainer.Register(contractType, implementationType, name);
+                        _container.Register(contractType, implementationType, name);
                     }
 
                     break;
@@ -28,11 +30,11 @@
                 case AbstractLifetime.Singleton:
                     if (name.IsNullOrEmpty())
                     {
-                        ActualContainer.Register(contractType, implementationType, new PerContainerLifetime());
+                        _container.Register(contractType, implementationType, new PerContainerLifetime());
                     }
                     else
                     {
-                        ActualContainer.Register(contractType, implementationType, name, new PerContainerLifetime());
+                        _container.Register(contractType, implementationType, name, new PerContainerLifetime());
                     }
 
                     break;
@@ -42,6 +44,6 @@
             }
         }
 
-        public void Dispose() => ActualContainer.Dispose();
+        public void Dispose() => _container.Dispose();
     }
 }

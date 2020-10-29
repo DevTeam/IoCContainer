@@ -18,7 +18,7 @@ namespace IoC.Benchmark
             abstractContainer.Register(typeof(IService1), typeof(Service1));
             abstractContainer.Register(typeof(IService2), typeof(Service2));
             abstractContainer.Register(typeof(IService3), typeof(Service3));
-            return abstractContainer.ActualContainer;
+            return abstractContainer.CreateActualContainer();
         }
 
         [Benchmark(Description = "new", OperationsPerInvoke = 1000000)]

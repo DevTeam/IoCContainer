@@ -5,7 +5,9 @@
 
     internal class DryIoc: IAbstractContainer<Container>
     {
-        public Container ActualContainer { get; } = new Container();
+        private readonly static Container _container = new Container();
+
+        public Container CreateActualContainer() => _container;
 
         public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
@@ -24,9 +26,9 @@
                     throw new ArgumentOutOfRangeException(nameof(lifetime), lifetime, null);
             }
 
-            ActualContainer.Register(new ReflectionFactory(implementationType, reuse), contractType, name, null, true);
+            _container.Register(new ReflectionFactory(implementationType, reuse), contractType, name, null, true);
         }
 
-        public void Dispose() => ActualContainer.Dispose();
+        public void Dispose() => _container.Dispose();
     }
 }

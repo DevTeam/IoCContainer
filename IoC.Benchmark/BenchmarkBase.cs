@@ -24,6 +24,7 @@
         private StandardKernel _ninjectContainer;
         private UnityContainer _unityContainer;
         private ServiceProvider _microsoftContainer;
+        private global::SimpleInjector.Container _simpleInjectorContainer;
 
         public abstract TContainer CreateContainer<TContainer, TAbstractContainer>() where TAbstractContainer : IAbstractContainer<TContainer>, new();
 
@@ -39,6 +40,7 @@
             _ninjectContainer = CreateContainer<StandardKernel, Ninject>();
             _unityContainer = CreateContainer<UnityContainer, Unity>();
             _microsoftContainer = CreateContainer<ServiceProvider, MicrosoftDependencyInjection>();
+            _simpleInjectorContainer = CreateContainer<global::SimpleInjector.Container, SimpleInjector>();
         }
 
         [Benchmark(Description = "IoC.Container", OperationsPerInvoke = Series * 10)]
@@ -99,6 +101,24 @@
                 _dryIocContainer.Resolve<IServiceRoot>().DoSomething();
                 _dryIocContainer.Resolve<IServiceRoot>().DoSomething();
                 _dryIocContainer.Resolve<IServiceRoot>().DoSomething();
+            }
+        }
+
+        [Benchmark(OperationsPerInvoke = Series * 10)]
+        public void SimpleInjector()
+        {
+            for (var i = 0; i < Series; i++)
+            {
+                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
             }
         }
 
