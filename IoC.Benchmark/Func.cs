@@ -40,6 +40,8 @@ namespace IoC.Benchmark
             }
         }
 
+        public override void SimpleInjector() => throw new NotSupportedException();
+
         public override void CastleWindsor() => throw new NotSupportedException();
 
         public override void Ninject() => throw new NotSupportedException();

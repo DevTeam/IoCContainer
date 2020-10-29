@@ -105,7 +105,7 @@
         }
 
         [Benchmark(OperationsPerInvoke = Series * 10)]
-        public void SimpleInjector()
+        public virtual void SimpleInjector()
         {
             for (var i = 0; i < Series; i++)
             {

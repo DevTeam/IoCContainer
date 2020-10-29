@@ -17,7 +17,6 @@
     <PackageTags>ioc container di</PackageTags>
     <Product>IoC Container</Product>
     <Copyright>Copyright (C) 2018-2020 Nikolay Pianikov</Copyright>
-    <DocumentationFile>..\Docs\IoC_$(TargetFramework).xml</DocumentationFile>
     <WarningsAsErrors />
     <NoWarn>$(NoWarn);NU5128</NoWarn>
     <MSBuildNative>C:\Program Files (x86)\Microsoft Visual Studio\2019\Professional\MSBuild</MSBuildNative>
