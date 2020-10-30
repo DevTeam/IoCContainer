@@ -18,6 +18,6 @@
         /// Unregisters a resource from the registry.
         /// </summary>
         /// <param name="resource">The target resource.</param>
-        void UnregisterResource([NotNull] IDisposable resource);
+        bool UnregisterResource([NotNull] IDisposable resource);
     }
 }

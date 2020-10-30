@@ -77,7 +77,7 @@ namespace IoC.Tests.UsageScenarios
             public void RegisterResource(IDisposable resource) => Parent.RegisterResource(resource);
 
             // Releases a token
-            public void UnregisterResource(IDisposable resource) => Parent.UnregisterResource(resource);
+            public bool UnregisterResource(IDisposable resource) => Parent.UnregisterResource(resource);
 
             public void Dispose() => (Parent as IMutableContainer)?.Dispose();
 

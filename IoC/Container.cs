@@ -339,12 +339,12 @@
 
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)0x200)]
-        public void UnregisterResource(IDisposable resource)
+        public bool UnregisterResource(IDisposable resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
             lock (_lockObject)
             {
-                _resources.Remove(resource);
+                return _resources.Remove(resource);
             }
         }
 

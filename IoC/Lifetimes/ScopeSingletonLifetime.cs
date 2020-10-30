@@ -50,9 +50,8 @@
                 return;
             }
 
-            if (releasedInstance is IDisposable disposable)
+            if (releasedInstance is IDisposable disposable && resourceRegistry.UnregisterResource(disposable))
             {
-                resourceRegistry.UnregisterResource(disposable);
                 disposable.Dispose();
             }
 
@@ -60,8 +59,10 @@
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();
-                resourceRegistry.UnregisterResource(disposable);
-                disposable.Dispose();
+                if(resourceRegistry.UnregisterResource(disposable))
+                {
+                    disposable.Dispose();
+                }
             }
 #endif
         }

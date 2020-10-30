@@ -1264,7 +1264,7 @@ namespace IoC
 
             // Create a root container
             var lockObject = new LockObject();
-            var rootContainer = new Container(string.Empty, NullContainer.Shared, lockObject);
+            var rootContainer = new Container(string.Empty, RootContainer.Shared, lockObject);
             rootContainer.Register<ILockObject>(ctx => lockObject);
             if (configurations.Length > 0)
             {
@@ -1432,7 +1432,7 @@ namespace IoC
                 {
                     // tries creating resolver
                     resolvingContainer = resolvingContainer ?? this;
-                    resolvingContainer = registration.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
+                    resolvingContainer = registration.Lifetime?.SelectContainer(this, resolvingContainer) ?? resolvingContainer;
                     if (!registration.TryCreateResolver(key, resolvingContainer, (resolvingContainer as Container ?? this)._registrationTracker, out resolver, out error))
                     {
                         return false;
@@ -1538,12 +1538,12 @@ namespace IoC
 
         /// <inheritdoc />
         [MethodImpl((MethodImplOptions)0x200)]
-        public void UnregisterResource(IDisposable resource)
+        public bool UnregisterResource(IDisposable resource)
         {
             if (resource == null) throw new ArgumentNullException(nameof(resource));
             lock (_lockObject)
             {
-                _resources.Remove(resource);
+                return _resources.Remove(resource);
             }
         }
 
@@ -1706,7 +1706,7 @@ namespace IoC
             [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
             public FullKey[] Keys => _container.GetAllKeys().SelectMany(i => i).ToArray();
 
-            public IContainer Parent => _container.Parent is NullContainer ? null : _container.Parent;
+            public IContainer Parent => _container.Parent is RootContainer ? null : _container.Parent;
 
             public int ResolversCount => _container.Resolvers.Count + _container.ResolversByType.Count;
 
@@ -8370,18 +8370,18 @@ namespace IoC
     public interface ILifetime: IBuilder, IDisposable
     {
         /// <summary>
-        /// Creates the similar lifetime to use with generic instances.
+        /// Creates a similar lifetime to use with generic instances.
         /// </summary>
         /// <returns>The new lifetime instance.</returns>
-        ILifetime Create();
+        ILifetime CreateLifetime();
 
         /// <summary>
-        /// Provides a container to resolve dependencies.
+        /// Select a container to resolve dependencies.
         /// </summary>
         /// <param name="registrationContainer">The container where a dependency was registered.</param>
         /// <param name="resolvingContainer">The container which is used to resolve an instance.</param>
         /// <returns>The selected container.</returns>
-        [NotNull] IContainer SelectResolvingContainer([NotNull] IContainer registrationContainer, [NotNull] IContainer resolvingContainer);
+        [NotNull] IContainer SelectContainer([NotNull] IContainer registrationContainer, [NotNull] IContainer resolvingContainer);
     }
 }
 
@@ -8630,7 +8630,7 @@ namespace IoC
         /// Unregisters a resource from the registry.
         /// </summary>
         /// <param name="resource">The target resource.</param>
-        void UnregisterResource([NotNull] IDisposable resource);
+        bool UnregisterResource([NotNull] IDisposable resource);
     }
 }
 
@@ -8643,16 +8643,32 @@ namespace IoC
     using System;
 
     /// <summary>
-    /// Represents an abstraction of a scope which is used with <c>Lifetime.ScopeSingleton</c>.
+    /// Represents an abstraction of a scope which is used with <c>Lifetime.ScopeSingleton</c> and <c>Lifetime.ScopeRoot</c>.
     /// </summary>
     [PublicAPI]
-    public interface IScope : IDisposable
+    public interface IScope : IScopeToken
     {
         /// <summary>
         /// Activate the scope.
         /// </summary>
         /// <returns>The token to deactivate the activated scope.</returns>
         IDisposable Activate();
+    }
+}
+
+#endregion
+#region IScopeToken
+
+namespace IoC
+{
+    using System;
+
+    /// <summary>
+    /// Represents an abstraction of a scope token which is used with <c>Lifetime.ScopeSingleton</c> and <c>Lifetime.ScopeRoot</c>.
+    /// </summary>
+    [PublicAPI]
+    public interface IScopeToken : IDisposable
+    {
     }
 }
 
@@ -8782,7 +8798,12 @@ namespace IoC
         /// <summary>
         /// For a singleton instance per scope.
         /// </summary>
-        ScopeSingleton = 4
+        ScopeSingleton = 4,
+
+        /// <summary>
+        /// Automatically creates a new scope.
+        /// </summary>
+        ScopeRoot = 5
     }
 }
 
@@ -9278,12 +9299,14 @@ namespace IoC.Features
             yield return container.Register<ILifetime>(ctx => new SingletonLifetime(true), null, new object[] { Lifetime.Singleton });
             yield return container.Register<ILifetime>(ctx => new ContainerSingletonLifetime(), null, new object[] { Lifetime.ContainerSingleton });
             yield return container.Register<ILifetime>(ctx => new ScopeSingletonLifetime(), null, new object[] { Lifetime.ScopeSingleton });
+            yield return container.Register<ILifetime>(ctx => new ScopeRootLifetime(), null, new object[] { Lifetime.ScopeRoot });
 
             // Scope
+            yield return container.Register<IScopeToken>(ctx => Scope.Current);
             yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Inject<ILockObject>()));
 
             // Current container
-            yield return container.Register<IContainer, IResourceRegistry, IObservable<ContainerEvent>>(ctx => ctx.Container);
+            yield return container.Register<IContainer, IObservable<ContainerEvent>>(ctx => ctx.Container);
 
             // New child container
             yield return container.Register<IMutableContainer>(
@@ -9832,101 +9855,6 @@ namespace IoC.Features
 
 #region Lifetimes
 
-#region BaseLifetime
-
-namespace IoC.Lifetimes
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-    using Core;
-
-    public abstract class BaseLifetime : ILifetime
-    {
-        [CanBeNull]
-        internal virtual ILockObject LockObject { get; } = new LockObject();
-
-        [NotNull] internal abstract ILifetimeBuilder Builder { get; }
-        
-        /// <inheritdoc />
-        public abstract ILifetime Create();
-
-        /// <inheritdoc />
-        public virtual IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer)
-            => resolvingContainer;
-
-        /// <inheritdoc />
-        public virtual Expression Build(IBuildContext context, Expression bodyExpression)
-        {
-            if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            var builder = Builder;
-            var instanceType = context.Key.Type;
-            var instanceVar = Expression.Variable(typeof(object));
-            var creationBlock = new List<Expression>();
-            if (builder.TryBuildBeforeCreating(context, out var creatingExpression))
-            {
-                creationBlock.Add(creatingExpression);
-            }
-
-            creationBlock.Add(Expression.Assign(instanceVar,  builder.BuildCreation(context, bodyExpression).Convert(typeof(object))));
-            if (builder.TryBuildAfterCreation(context, instanceVar, out var newInstanceVar))
-            {
-                creationBlock.Add(Expression.Assign(instanceVar, newInstanceVar));
-            }
-
-            if (builder.TryBuildSet(context, instanceVar, out var setExpression))
-            {
-                creationBlock.Add(setExpression);
-            }
-
-            creationBlock.Add(instanceVar);
-
-            if (!builder.TryBuildGet(context, out var getExpression))
-            {
-                return Expression.Block(creationBlock);
-            }
-
-            getExpression = Expression.Assign(instanceVar, getExpression);
-            Expression isEmptyExpression;
-            if (instanceType.Descriptor().IsValueType())
-            {
-                isEmptyExpression = Expression.Call(null, ExpressionBuilderExtensions.EqualsMethodInfo, instanceVar, Expression.Default(typeof(object)));
-            }
-            else
-            {
-                isEmptyExpression = Expression.ReferenceEqual(instanceVar, Expression.Default(instanceType));
-            }
-
-            var createExpression = Expression.Block(
-                new[] { instanceVar },
-                getExpression,
-                Expression.Condition(
-                    isEmptyExpression,
-                    Expression.Block(creationBlock),
-                    instanceVar));
-
-            var lockObject = LockObject;
-            if (lockObject != null)
-            {
-                // double check
-                createExpression = Expression.Block(
-                    new [] {instanceVar},
-                    getExpression,
-                    Expression.Condition(isEmptyExpression, createExpression.Lock(Expression.Constant(lockObject)), instanceVar)
-                );
-            }
-
-            return createExpression.Convert(instanceType);
-        }
-
-        public abstract void Dispose();
-    }
-}
-
-
-#endregion
 #region ContainerSingletonLifetime
 
 namespace IoC.Lifetimes
@@ -9948,7 +9876,7 @@ namespace IoC.Lifetimes
         public override string ToString() => Lifetime.ContainerSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Create() => new ContainerSingletonLifetime();
+        public override ILifetime CreateLifetime() => new ContainerSingletonLifetime();
 
         /// <inheritdoc />
         protected override object AfterCreation(object newInstance, IContainer targetContainer, IContainer container, object[] args)
@@ -10016,7 +9944,7 @@ namespace IoC.Lifetimes
         public override string ToString() => Lifetime.ContainerSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Create() => new ContainerStateSingletonLifetime(_isDisposable);
+        public override ILifetime CreateLifetime() => new ContainerStateSingletonLifetime(_isDisposable);
 
         /// <inheritdoc />
         protected override object AfterCreation(object newInstance, IContainer targetContainer, IContainer container, object[] args)
@@ -10074,15 +10002,13 @@ namespace IoC.Lifetimes
 
     internal interface ILifetimeBuilder
     {
-        bool TryBuildGet([NotNull] IBuildContext context, out Expression getExpression);
-
-        bool TryBuildSet([NotNull] IBuildContext context, [NotNull] Expression instanceExpression, out Expression setExpression);
+        bool TryBuildRestoreInstance([NotNull] IBuildContext context, out Expression getExpression);
 
         bool TryBuildBeforeCreating([NotNull] IBuildContext context, out Expression beforeCreatingExpression);
 
-        [NotNull] Expression BuildCreation([NotNull] IBuildContext context, [NotNull] Expression bodyExpression);
-
         bool TryBuildAfterCreation([NotNull] IBuildContext context, [NotNull] Expression instanceExpression, out Expression newInstanceExpression);
+
+        bool TryBuildSaveInstance([NotNull] IBuildContext context, [NotNull] Expression instanceExpression, out Expression setExpression);
     }
 }
 
@@ -10092,6 +10018,7 @@ namespace IoC.Lifetimes
 
 namespace IoC.Lifetimes
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -10103,7 +10030,7 @@ namespace IoC.Lifetimes
     /// </summary>
     /// <typeparam name="TKey">The key type.</typeparam>
     [PublicAPI]
-    public abstract class KeyBasedLifetime<TKey>: BaseLifetime, ILifetimeBuilder
+    public abstract class KeyBasedLifetime<TKey>: ILifetime, ILifetimeBuilder
     {
         private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
         private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
@@ -10112,6 +10039,8 @@ namespace IoC.Lifetimes
         private static readonly MethodInfo AfterCreationMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(AfterCreation));
         private static readonly ParameterExpression KeyVar = Expression.Variable(typeof(TKey), "key");
 
+        private readonly ILockObject _lockObject = new LockObject();
+        private readonly LifetimeDirector _lifetimeDirector;
         private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
         private readonly MemberExpression _instancesField;
         private readonly ConstantExpression _thisConst;
@@ -10121,30 +10050,31 @@ namespace IoC.Lifetimes
         /// </summary>
         protected KeyBasedLifetime()
         {
+            _lifetimeDirector = new LifetimeDirector(this, _lockObject);
             _thisConst = Expression.Constant(this);
             _instancesField = Expression.Field(_thisConst, InstancesFieldInfo);
         }
 
-        internal override ILifetimeBuilder Builder => this;
+        public abstract ILifetime CreateLifetime();
 
-        /// <inheritdoc />
-        public override Expression Build(IBuildContext context, Expression bodyExpression)
-        {
-            return Expression.Block(
+        public virtual IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+            resolvingContainer;
+
+        public Expression Build(IBuildContext context, Expression bodyExpression) =>
+            Expression.Block(
                 new[] { KeyVar },
                 // TKey key = CreateKey(container, args);
                 Expression.Assign(KeyVar, Expression.Call(_thisConst, CreateKeyMethodInfo, context.ContainerParameter, context.ArgsParameter)),
-                base.Build(context, bodyExpression)
+                _lifetimeDirector.Build(context, bodyExpression)
             );
-        }
 
-        bool ILifetimeBuilder.TryBuildGet(IBuildContext context, out Expression getExpression)
+        bool ILifetimeBuilder.TryBuildRestoreInstance(IBuildContext context, out Expression getExpression)
         {
             getExpression = Expression.Call(_instancesField, GetMethodInfo, KeyVar);
             return true;
         }
 
-        bool ILifetimeBuilder.TryBuildSet(IBuildContext context, Expression instanceExpression, out Expression setExpression)
+        bool ILifetimeBuilder.TryBuildSaveInstance(IBuildContext context, Expression instanceExpression, out Expression setExpression)
         {
             setExpression = Expression.Assign(_instancesField, Expression.Call(_instancesField, SetMethodInfo, KeyVar, instanceExpression));
             return true;
@@ -10156,23 +10086,19 @@ namespace IoC.Lifetimes
             return false;
         }
 
-        Expression ILifetimeBuilder.BuildCreation(IBuildContext context, Expression bodyExpression) =>
-            bodyExpression;
-
         bool ILifetimeBuilder.TryBuildAfterCreation(IBuildContext context, Expression instanceExpression, out Expression newInstanceExpression)
         {
             newInstanceExpression = Expression.Call(_thisConst, AfterCreationMethodInfo, instanceExpression, KeyVar, context.ContainerParameter, context.ArgsParameter);
             return true;
         }
 
-        /// <inheritdoc />
-        public override void Dispose()
+        [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
+        public virtual void Dispose()
         {
             Table<TKey, object> instances;
-            var lockObject = LockObject;
-            if (lockObject != null)
+            if (_lockObject != null)
             {
-                lock (lockObject)
+                lock (_lockObject)
                 {
                     instances = _instances;
                     _instances = Table<TKey, object>.Empty;
@@ -10214,21 +10140,19 @@ namespace IoC.Lifetimes
         /// </summary>
         /// <param name="releasedInstance">The released instance.</param>
         /// <param name="key">The instance key.</param>
-        protected virtual void OnRelease(object releasedInstance, TKey key)
-        {
-        }
+        protected virtual void OnRelease(object releasedInstance, TKey key) { }
 
         /// <summary>
         /// Forcibly remove an instance.
         /// </summary>
         /// <param name="key">The instance key.</param>
+        [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
         protected internal bool Remove(TKey key)
         {
             bool removed;
-            var lockObject = LockObject;
-            if (lockObject != null)
+            if (_lockObject != null)
             {
-                lock (lockObject)
+                lock (_lockObject)
                 {
                     _instances = _instances.Remove(key, out removed);
                 }
@@ -10239,6 +10163,126 @@ namespace IoC.Lifetimes
             }
 
             return removed;
+        }
+    }
+}
+
+
+#endregion
+#region LifetimeDirector
+
+namespace IoC.Lifetimes
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
+    using Core;
+
+    internal struct LifetimeDirector
+    {
+        [NotNull] private readonly ILifetimeBuilder _builder;
+        [CanBeNull] private readonly ILockObject _lockObject;
+
+        public LifetimeDirector(
+            [NotNull] ILifetimeBuilder builder,
+            [CanBeNull] ILockObject lockObject = null)
+        {
+            _builder = builder;
+            _lockObject = lockObject;
+        }
+        
+        [Pure]
+        public Expression Build(IBuildContext context, Expression bodyExpression)
+        {
+            if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            var instanceType = context.Key.Type;
+            var instanceVar = Expression.Variable(typeof(object));
+            var creationBlock = new List<Expression>();
+            if (_builder.TryBuildBeforeCreating(context, out var creatingExpression))
+            {
+                creationBlock.Add(creatingExpression);
+            }
+
+            creationBlock.Add(Expression.Assign(instanceVar,  bodyExpression.Convert(typeof(object))));
+            if (_builder.TryBuildAfterCreation(context, instanceVar, out var newInstanceVar))
+            {
+                creationBlock.Add(Expression.Assign(instanceVar, newInstanceVar));
+            }
+
+            if (_builder.TryBuildSaveInstance(context, instanceVar, out var setExpression))
+            {
+                creationBlock.Add(setExpression);
+            }
+
+            creationBlock.Add(instanceVar);
+
+            if (!_builder.TryBuildRestoreInstance(context, out var getExpression))
+            {
+                return Expression.Block(new[] { instanceVar }, creationBlock);
+            }
+
+            getExpression = Expression.Assign(instanceVar, getExpression);
+            Expression isEmptyExpression;
+            if (instanceType.Descriptor().IsValueType())
+            {
+                isEmptyExpression = Expression.Call(null, ExpressionBuilderExtensions.EqualsMethodInfo, instanceVar, Expression.Default(typeof(object)));
+            }
+            else
+            {
+                isEmptyExpression = Expression.ReferenceEqual(instanceVar, Expression.Default(instanceType));
+            }
+
+            var createExpression = Expression.Block(
+                new[] { instanceVar },
+                getExpression,
+                Expression.Condition(
+                    isEmptyExpression,
+                    Expression.Block(creationBlock),
+                    instanceVar));
+
+            var lockObject = _lockObject;
+            if (lockObject != null)
+            {
+                // double check
+                createExpression = Expression.Block(
+                    new [] {instanceVar},
+                    getExpression,
+                    Expression.Condition(isEmptyExpression, createExpression.Lock(Expression.Constant(lockObject)), instanceVar)
+                );
+            }
+
+            return createExpression.Convert(instanceType);
+        }
+    }
+}
+
+
+#endregion
+#region ScopeRootLifetime
+
+namespace IoC.Lifetimes
+{
+    using System;
+
+    public class ScopeRootLifetime: TrackedLifetime
+    {
+        [CanBeNull] private IDisposable _scopeToken;
+
+        public override ILifetime CreateLifetime() => new ScopeRootLifetime();
+
+        protected override void BeforeCreating(IContainer container, object[] args)
+        {
+            var scope = container.Resolve<IScope>();
+            _scopeToken = scope.Activate();
+            base.BeforeCreating(container, args);
+        }
+
+        protected override object AfterCreation(object newInstance, IContainer container, object[] args)
+        {
+            _scopeToken?.Dispose();
+            return base.AfterCreation(newInstance, container, args);
         }
     }
 }
@@ -10266,7 +10310,7 @@ namespace IoC.Lifetimes
         public override string ToString() => Lifetime.ScopeSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Create() => new ScopeSingletonLifetime();
+        public override ILifetime CreateLifetime() => new ScopeSingletonLifetime();
 
         /// <inheritdoc />
         protected override object AfterCreation(object newInstance, IScope scope, IContainer container, object[] args)
@@ -10299,9 +10343,8 @@ namespace IoC.Lifetimes
                 return;
             }
 
-            if (releasedInstance is IDisposable disposable)
+            if (releasedInstance is IDisposable disposable && resourceRegistry.UnregisterResource(disposable))
             {
-                resourceRegistry.UnregisterResource(disposable);
                 disposable.Dispose();
             }
 
@@ -10309,8 +10352,10 @@ namespace IoC.Lifetimes
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();
-                resourceRegistry.UnregisterResource(disposable);
-                disposable.Dispose();
+                if(resourceRegistry.UnregisterResource(disposable))
+                {
+                    disposable.Dispose();
+                }
             }
 #endif
         }
@@ -10385,7 +10430,7 @@ namespace IoC.Lifetimes
         }
 
         /// <inheritdoc />
-        public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+        public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
             registrationContainer;
 
         /// <inheritdoc />
@@ -10425,10 +10470,89 @@ namespace IoC.Lifetimes
         }
 
         /// <inheritdoc />
-        public ILifetime Create() => new SingletonLifetime(_lockObject != null);
+        public ILifetime CreateLifetime() => new SingletonLifetime(_lockObject != null);
 
         /// <inheritdoc />
         public override string ToString() => Lifetime.Singleton.ToString();
+    }
+}
+
+
+#endregion
+#region TrackedLifetime
+
+namespace IoC.Lifetimes
+{
+    using System.Linq;
+    using System.Linq.Expressions;
+    using System.Reflection;
+    using Core;
+    using static Core.TypeDescriptorExtensions;
+
+    public abstract class TrackedLifetime: ILifetime, ILifetimeBuilder
+    {
+        private static readonly MethodInfo BeforeCreatingMethodInfo = Descriptor<TrackedLifetime>().GetDeclaredMethods().Single(i => i.Name == nameof(BeforeCreating));
+        private static readonly MethodInfo AfterCreationMethodInfo = Descriptor<TrackedLifetime>().GetDeclaredMethods().Single(i => i.Name == nameof(AfterCreation));
+        private readonly LifetimeDirector _lifetimeDirector;
+        private readonly ConstantExpression _thisConst;
+
+        protected TrackedLifetime()
+        {
+            _lifetimeDirector = new LifetimeDirector(this);
+            _thisConst = Expression.Constant(this);
+        }
+
+        public Expression Build(IBuildContext context, Expression bodyExpression) =>
+            _lifetimeDirector.Build(context, bodyExpression).Convert(bodyExpression.Type);
+
+        public virtual void Dispose() { }
+
+        public abstract ILifetime CreateLifetime();
+
+        public virtual IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+            resolvingContainer;
+
+        bool ILifetimeBuilder.TryBuildRestoreInstance(IBuildContext context, out Expression getExpression)
+        {
+            getExpression = default(Expression);
+            return false;
+        }
+
+        bool ILifetimeBuilder.TryBuildSaveInstance(IBuildContext context, Expression instanceExpression, out Expression setExpression)
+        {
+            setExpression = default(Expression);
+            return false;
+        }
+
+        bool ILifetimeBuilder.TryBuildBeforeCreating(IBuildContext context, out Expression beforeCreatingExpression)
+        {
+            beforeCreatingExpression = Expression.Call(_thisConst, BeforeCreatingMethodInfo, context.ContainerParameter, context.ArgsParameter);
+            return true;
+        }
+
+        bool ILifetimeBuilder.TryBuildAfterCreation(IBuildContext context, Expression instanceExpression, out Expression newInstanceExpression)
+        {
+            newInstanceExpression = Expression.Call(_thisConst, AfterCreationMethodInfo, instanceExpression, context.ContainerParameter, context.ArgsParameter);
+            return true;
+        }
+
+        /// <summary>
+        /// Invoked before the new instance creation.
+        /// </summary>
+        /// <param name="container">The target container.</param>
+        /// <param name="args">Optional arguments.</param>
+        /// <returns>The created instance.</returns>
+        protected virtual void BeforeCreating(IContainer container, object[] args) { }
+
+        /// <summary>
+        /// Invoked after a new instance has been created.
+        /// </summary>
+        /// <param name="newInstance">The new instance.</param>
+        /// <param name="container">The target container.</param>
+        /// <param name="args">Optional arguments.</param>
+        /// <returns>The created instance.</returns>
+        protected virtual object AfterCreation(object newInstance, IContainer container, object[] args)
+            => newInstance;
     }
 }
 
@@ -13350,61 +13474,6 @@ namespace IoC.Core
 }
 
 #endregion
-#region NullContainer
-
-namespace IoC.Core
-{
-    using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Linq;
-    using Issues;
-
-    internal sealed class NullContainer : IContainer
-    {
-        public static readonly IContainer Shared = new NullContainer();
-        private static readonly NotSupportedException NotSupportedException = new NotSupportedException();
-
-        private NullContainer() { }
-
-        public IContainer Parent => null;
-
-        public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
-        {
-            dependency = default(IDependency);
-            lifetime = default(ILifetime);
-            return false;
-        }
-
-        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
-        {
-            if (type == typeof(ICannotGetResolver))
-            {
-                throw NotSupportedException;
-            }
-
-            resolver = default(Resolver<T>);
-            error = new InvalidOperationException($"Cannot get resolver for {type} and tag \"{tag}\".");
-            return false;
-        }
-
-        public void RegisterResource(IDisposable resource) { }
-
-        public void UnregisterResource(IDisposable resource) { }
-
-        public void Dispose() { }
-
-        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-        public IEnumerator<IEnumerable<Key>> GetEnumerator() => Enumerable.Empty<IEnumerable<Key>>().GetEnumerator();
-
-        public IDisposable Subscribe(IObserver<ContainerEvent> observer) => Disposable.Empty;
-
-        public override string ToString() => string.Empty;
-    }
-}
-
-#endregion
 #region Observable
 
 // ReSharper disable UnusedMember.Global
@@ -13597,7 +13666,7 @@ namespace IoC.Core
                 return lifetime;
             }
 
-            lifetime = Lifetime.Create();
+            lifetime = Lifetime.CreateLifetime();
             _lifetimes = _lifetimes.Set(lifetimeKey, lifetime);
 
             return lifetime;
@@ -13792,6 +13861,61 @@ namespace IoC.Core
 
 
 #endregion
+#region RootContainer
+
+namespace IoC.Core
+{
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.Linq;
+    using Issues;
+
+    internal sealed class RootContainer : IContainer
+    {
+        public static readonly IContainer Shared = new RootContainer();
+        private static readonly NotSupportedException NotSupportedException = new NotSupportedException();
+
+        private RootContainer() { }
+
+        public IContainer Parent => null;
+
+        public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime)
+        {
+            dependency = default(IDependency);
+            lifetime = default(ILifetime);
+            return false;
+        }
+
+        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
+        {
+            if (type == typeof(ICannotGetResolver))
+            {
+                throw NotSupportedException;
+            }
+
+            resolver = default(Resolver<T>);
+            error = new InvalidOperationException($"Cannot get resolver for {type} and tag \"{tag}\".");
+            return false;
+        }
+
+        public void RegisterResource(IDisposable resource) { }
+
+        public bool UnregisterResource(IDisposable resource) => false;
+
+        public void Dispose() { }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public IEnumerator<IEnumerable<Key>> GetEnumerator() => Enumerable.Empty<IEnumerable<Key>>().GetEnumerator();
+
+        public IDisposable Subscribe(IObserver<ContainerEvent> observer) => Disposable.Empty;
+
+        public override string ToString() => string.Empty;
+    }
+}
+
+#endregion
 #region Scope
 
 namespace IoC.Core
@@ -13835,7 +13959,6 @@ namespace IoC.Core
             }
 
             _prevScope = Current;
-
             _current = this;
             return Disposable.Create(() => { _current = _prevScope ?? throw new NotSupportedException(); });
         }
@@ -13871,11 +13994,11 @@ namespace IoC.Core
             }
         }
 
-        public void UnregisterResource(IDisposable resource)
+        public bool UnregisterResource(IDisposable resource)
         {
             lock (_lockObject)
             {
-                _resources.Remove(resource ?? throw new ArgumentNullException(nameof(resource)));
+                return _resources.Remove(resource ?? throw new ArgumentNullException(nameof(resource)));
             }
         }
 

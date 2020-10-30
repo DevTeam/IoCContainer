@@ -12,7 +12,7 @@
 
         public LifetimeDirector(
             [NotNull] ILifetimeBuilder builder,
-            [CanBeNull] ILockObject lockObject)
+            [CanBeNull] ILockObject lockObject = null)
         {
             _builder = builder;
             _lockObject = lockObject;
@@ -47,7 +47,7 @@
 
             if (!_builder.TryBuildRestoreInstance(context, out var getExpression))
             {
-                return Expression.Block(creationBlock);
+                return Expression.Block(new[] { instanceVar }, creationBlock);
             }
 
             getExpression = Expression.Assign(instanceVar, getExpression);

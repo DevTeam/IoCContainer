@@ -36,7 +36,7 @@
 
         public void RegisterResource(IDisposable resource) { }
 
-        public void UnregisterResource(IDisposable resource) { }
+        public bool UnregisterResource(IDisposable resource) => false;
 
         public void Dispose() { }
 

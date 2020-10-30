@@ -74,11 +74,11 @@
             }
         }
 
-        public void UnregisterResource(IDisposable resource)
+        public bool UnregisterResource(IDisposable resource)
         {
             lock (_lockObject)
             {
-                _resources.Remove(resource ?? throw new ArgumentNullException(nameof(resource)));
+                return _resources.Remove(resource ?? throw new ArgumentNullException(nameof(resource)));
             }
         }
 

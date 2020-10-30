@@ -3,10 +3,10 @@
     using System;
 
     /// <summary>
-    /// Represents an abstraction of a scope which is used with <c>Lifetime.ScopeSingleton</c>.
+    /// Represents an abstraction of a scope which is used with <c>Lifetime.ScopeSingleton</c> and <c>Lifetime.ScopeRoot</c>.
     /// </summary>
     [PublicAPI]
-    public interface IScope : IDisposable
+    public interface IScope : IScopeToken
     {
         /// <summary>
         /// Activate the scope.

@@ -19,6 +19,7 @@
             // $footer=- [_Singleton_](https://en.wikipedia.org/wiki/Singleton_pattern) - single instance
             // $footer=- _ContainerSingleton_ - singleton per container
             // $footer=- _ScopeSingleton_ - singleton per scope
+            // $footer=- _ScopeRoot_ - root of a scope
             // {
             using var container = Container
                 .Create()

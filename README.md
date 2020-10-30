@@ -344,6 +344,7 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Method injection](#method-injection-)
   - [Nullable value type](#nullable-value-type-)
   - [Property injection](#property-injection-)
+  - [Scope Root lifetime](#scope-root-lifetime-)
   - [Scope Singleton lifetime](#scope-singleton-lifetime-)
   - [Singleton lifetime](#singleton-lifetime-)
   - [Dependency tag](#dependency-tag-)
@@ -503,23 +504,16 @@ public void Run()
 }
 
 // Represents the custom thead singleton lifetime based on the KeyBasedLifetime
-public class ThreadLifetime : KeyBasedLifetime<int, object>
+public class ThreadLifetime : KeyBasedLifetime<int>
 {
     // Creates a clone of the current lifetime (for the case with generic types)
-    public override ILifetime Create() =>
+    public override ILifetime CreateLifetime() =>
         new ThreadLifetime();
 
     // Provides a key of an instance
     // If a key the same an instance is the same too
     protected override int CreateKey(IContainer container, object[] args) =>
         Thread.CurrentThread.ManagedThreadId;
-
-    // Just returns created instance
-    protected override object OnNewInstanceCreated(object newInstance, int key, IContainer container, object[] args) =>
-        newInstance;
-
-    // Do nothing
-    protected override void OnInstanceReleased(object releasedInstance, int key) { }
 }
 ```
 
@@ -906,11 +900,11 @@ public class MyTransientLifetime : ILifetime
         _baseLifetime.Build(context, expression);
 
     // Creates the similar lifetime to use with generic instances
-    public ILifetime Create() => new MyTransientLifetime();
+    public ILifetime CreateLifetime() => new MyTransientLifetime();
 
     // Select a container to resolve dependencies using the Singleton lifetime logic
-    public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
-        _baseLifetime.SelectResolvingContainer(registrationContainer, resolvingContainer);
+    public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+        _baseLifetime.SelectContainer(registrationContainer, resolvingContainer);
 
     // Disposes the instance of the Singleton lifetime
     public void Dispose() => _baseLifetime.Dispose();
@@ -1106,11 +1100,11 @@ public class MySingletonLifetime : ILifetime
     }
 
     // Creates the similar lifetime to use with generic instances
-    public ILifetime Create() => new MySingletonLifetime(_baseSingletonLifetime.Create(), _counter);
+    public ILifetime CreateLifetime() => new MySingletonLifetime(_baseSingletonLifetime.CreateLifetime(), _counter);
 
     // Select a container to resolve dependencies using the Singleton lifetime logic
-    public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
-        _baseSingletonLifetime.SelectResolvingContainer(registrationContainer, resolvingContainer);
+    public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+        _baseSingletonLifetime.SelectContainer(registrationContainer, resolvingContainer);
 
     // Disposes the instance of the Singleton lifetime
     public void Dispose() => _baseSingletonLifetime.Dispose();
@@ -1547,6 +1541,79 @@ otherInstance.Name.ShouldBe("beta");
 
 
 
+### Scope Root lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ScopeRootLifetime.cs)
+
+ScopeRoot lifetime creates an instance together with new scope and allows to managed all scope singletons by IScopeToken.
+
+``` CSharp
+using var container = Container
+    .Create()
+    // Bind "session" as a root of scope
+    .Bind<Session>().As(ScopeRoot).To<Session>()
+    // Bind a dependency as a scope singleton
+    .Bind<Service>().As(ScopeSingleton).To<Service>()
+    // It is optional. Bind IDisposable to IScopeToken to prevent any reference to IoC types from models
+    .Bind<IDisposable>().To(ctx => ctx.Container.Inject<IScopeToken>())
+    .Container;
+
+// Resolve 2 sessions in own scopes
+var session1 = container.Resolve<Session>();
+var session2 = container.Resolve<Session>();
+
+// Check sessions are not equal
+session1.ShouldNotBe(session2);
+
+// Check scope singletons are equal in the first scope 
+session1.Service1.ShouldBe(session1.Service2);
+
+// Check scope singletons are equal in the second scope
+session2.Service1.ShouldBe(session2.Service2);
+
+// Check scope singletons are not equal for different scopes
+session1.Service1.ShouldNotBe(session2.Service1);
+
+// Dispose the instance from the first scope
+session1.Dispose();
+
+// Check dependencies are disposed for the first scope
+session1.Service1.DisposeCounter.ShouldBe(1);
+
+// Dispose container
+container.Dispose();
+
+// Check all dependencies are disposed for the all scopes
+session2.Service1.DisposeCounter.ShouldBe(1);
+session1.Service1.DisposeCounter.ShouldBe(1);
+class Service: IDisposable
+{
+    public int DisposeCounter;
+
+    public void Dispose() => DisposeCounter++;
+}
+
+class Session: IDisposable
+{
+    private readonly IDisposable _scope;
+    public readonly Service Service1;
+    public readonly Service Service2;
+
+    public Session(
+        // There is no reference to the IoC type here
+        IDisposable scope,
+        Service service1,
+        Service service2)
+    {
+        _scope = scope;
+        Service1 = service1;
+        Service2 = service2;
+    }
+
+    public void Dispose() => _scope.Dispose();
+}
+```
+
+
+
 ### Scope Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ScopeSingletonLifetime.cs)
 
 Each scope has its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding. Scopes can be created, activated and deactivated. Scope can be injected like any other instance from container.
@@ -1567,8 +1634,8 @@ using (container.Bind<IService>().As(ScopeSingleton).To<Service>())
     // Check that instances from the default scope are equal
     defaultScopeInstance1.ShouldBe(defaultScopeInstance2);
 
-    // Using the scope #1
-    using var scope1 = container.CreateScope();
+    // Create scope #1
+    using var scope1 = container.Resolve<IScope>();
     using (scope1.Activate())
     {
         var scopeInstance1 = container.Resolve<IService>();
@@ -1601,8 +1668,8 @@ using (container.Bind<IService>().As(Transient).To<Service>())
     // Check that dependencies from the default scope are equal
     transientInstance1.Dependency.ShouldBe(transientInstance2.Dependency);
 
-    // Using the scope #1
-    using var scope2 = container.CreateScope();
+    // Create scope #2
+    using var scope2 = container.Resolve<IScope>();
     using (scope2.Activate())
     {
         // Resolve a transient instance in scope #2
@@ -1653,6 +1720,7 @@ The lifetime could be:
 - [_Singleton_](https://en.wikipedia.org/wiki/Singleton_pattern) - single instance
 - _ContainerSingleton_ - singleton per container
 - _ScopeSingleton_ - singleton per scope
+- _ScopeRoot_ - root of a scope
 
 ### Dependency tag [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/DependencyTag.cs)
 

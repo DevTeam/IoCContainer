@@ -24,6 +24,11 @@
         /// <summary>
         /// For a singleton instance per scope.
         /// </summary>
-        ScopeSingleton = 4
+        ScopeSingleton = 4,
+
+        /// <summary>
+        /// Automatically creates a new scope.
+        /// </summary>
+        ScopeRoot = 5
     }
 }

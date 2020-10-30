@@ -30,7 +30,7 @@
                 // Check that instances from the default scope are equal
                 defaultScopeInstance1.ShouldBe(defaultScopeInstance2);
 
-                // Using the scope #1
+                // Create scope #1
                 using var scope1 = container.Resolve<IScope>();
                 using (scope1.Activate())
                 {
@@ -64,7 +64,7 @@
                 // Check that dependencies from the default scope are equal
                 transientInstance1.Dependency.ShouldBe(transientInstance2.Dependency);
 
-                // Using the scope #1
+                // Create scope #2
                 using var scope2 = container.Resolve<IScope>();
                 using (scope2.Activate())
                 {
