@@ -31,7 +31,7 @@
                 defaultScopeInstance1.ShouldBe(defaultScopeInstance2);
 
                 // Using the scope #1
-                using var scope1 = container.CreateScope();
+                using var scope1 = container.Resolve<IScope>();
                 using (scope1.Activate())
                 {
                     var scopeInstance1 = container.Resolve<IService>();
@@ -65,7 +65,7 @@
                 transientInstance1.Dependency.ShouldBe(transientInstance2.Dependency);
 
                 // Using the scope #1
-                using var scope2 = container.CreateScope();
+                using var scope2 = container.Resolve<IScope>();
                 using (scope2.Activate())
                 {
                     // Resolve a transient instance in scope #2
