@@ -9,7 +9,7 @@
     {
         private readonly WindsorContainer _container = new WindsorContainer();
 
-        public WindsorContainer CreateActualContainer() => _container;
+        public WindsorContainer CreateContainer() => _container;
 
         public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {

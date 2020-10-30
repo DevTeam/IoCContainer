@@ -9,7 +9,7 @@
     {
         private readonly Container _container = Container.Create(LightFeature.Set);
 
-        public Container CreateActualContainer() => _container;
+        public Container CreateContainer() => _container;
 
         public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         { 

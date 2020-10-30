@@ -22,7 +22,7 @@ namespace IoC.Benchmark
             abstractContainer.Register(typeof(IService3), typeof(Service3v2), AbstractLifetime.Transient, "2");
             abstractContainer.Register(typeof(IService3), typeof(Service3v3), AbstractLifetime.Transient, "3");
             abstractContainer.Register(typeof(IService3), typeof(Service3v4), AbstractLifetime.Transient, "4");
-            return abstractContainer.CreateActualContainer();
+            return abstractContainer.CreateContainer();
         }
 
         [Benchmark(Description = "new", OperationsPerInvoke = 1000000)]
@@ -42,12 +42,6 @@ namespace IoC.Benchmark
                 NewInstance().DoSomething();
             }
         }
-
-        public override void CastleWindsor() => throw new NotSupportedException();
-
-        public override void Ninject() => throw new NotSupportedException();
-
-        public override void MicrosoftDependencyInjection() => throw new NotSupportedException();
 
         private static readonly Func<IService3> Service3Factory = () => new Service3();
 

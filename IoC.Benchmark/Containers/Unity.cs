@@ -9,7 +9,7 @@
     {
         private readonly UnityContainer _container = new UnityContainer();
 
-        public UnityContainer CreateActualContainer() => _container;
+        public UnityContainer CreateContainer() => _container;
 
         public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {

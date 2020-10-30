@@ -8,7 +8,7 @@
     {
         private readonly StandardKernel _container = new StandardKernel();
 
-        public StandardKernel CreateActualContainer() => _container;
+        public StandardKernel CreateContainer() => _container;
 
         public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {

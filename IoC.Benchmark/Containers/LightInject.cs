@@ -9,7 +9,7 @@
     {
         private readonly ServiceContainer _container = new ServiceContainer();
 
-        public ServiceContainer CreateActualContainer() => _container;
+        public ServiceContainer CreateContainer() => _container;
 
         public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {

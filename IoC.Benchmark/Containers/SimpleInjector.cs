@@ -30,7 +30,7 @@
             });
         }
 
-        public Container CreateActualContainer() => _containerProvider.Value;
+        public Container CreateContainer() => _containerProvider.Value;
 
         public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
