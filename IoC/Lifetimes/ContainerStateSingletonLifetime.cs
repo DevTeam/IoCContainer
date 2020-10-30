@@ -6,16 +6,13 @@
     /// <summary>
     /// For a singleton instance per state.
     /// </summary>
-    internal sealed class ContainerStateSingletonLifetime<TValue> : KeyBasedLifetime<IContainer, TValue>
-        where TValue : class
+    internal sealed class ContainerStateSingletonLifetime : KeyBasedLifetime<IContainer>
     {
         private readonly bool _isDisposable;
         private IDisposable _containerSubscription = Disposable.Empty;
 
-        public ContainerStateSingletonLifetime(bool isDisposable)
-        {
+        public ContainerStateSingletonLifetime(bool isDisposable) =>
             _isDisposable = isDisposable;
-        }
 
         /// <inheritdoc />
         protected override IContainer CreateKey(IContainer container, object[] args) => container;
@@ -24,10 +21,10 @@
         public override string ToString() => Lifetime.ContainerSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Create() => new ContainerStateSingletonLifetime<TValue>(_isDisposable);
+        public override ILifetime CreateLifetime() => new ContainerStateSingletonLifetime(_isDisposable);
 
         /// <inheritdoc />
-        protected override TValue OnNewInstanceCreated(TValue newInstance, IContainer targetContainer, IContainer container, object[] args)
+        protected override object AfterCreation(object newInstance, IContainer targetContainer, IContainer container, object[] args)
         {
             _containerSubscription = container.Subscribe(
                 value =>
@@ -53,7 +50,7 @@
         }
 
         /// <inheritdoc />
-        protected override void OnInstanceReleased(TValue releasedInstance, IContainer targetContainer)
+        protected override void OnRelease(object releasedInstance, IContainer targetContainer)
         {
             _containerSubscription.Dispose();
             if (_isDisposable && releasedInstance is IDisposable disposable)

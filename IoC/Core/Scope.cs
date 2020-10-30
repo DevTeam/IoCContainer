@@ -39,7 +39,6 @@
             }
 
             _prevScope = Current;
-
             _current = this;
             return Disposable.Create(() => { _current = _prevScope ?? throw new NotSupportedException(); });
         }

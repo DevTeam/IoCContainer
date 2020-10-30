@@ -87,11 +87,11 @@ namespace IoC.Tests.UsageScenarios
             }
 
             // Creates the similar lifetime to use with generic instances
-            public ILifetime Create() => new MySingletonLifetime(_baseSingletonLifetime.Create(), _counter);
+            public ILifetime CreateLifetime() => new MySingletonLifetime(_baseSingletonLifetime.CreateLifetime(), _counter);
 
             // Select a container to resolve dependencies using the Singleton lifetime logic
-            public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
-                _baseSingletonLifetime.SelectResolvingContainer(registrationContainer, resolvingContainer);
+            public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+                _baseSingletonLifetime.SelectContainer(registrationContainer, resolvingContainer);
 
             // Disposes the instance of the Singleton lifetime
             public void Dispose() => _baseSingletonLifetime.Dispose();

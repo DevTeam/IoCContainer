@@ -6233,32 +6233,6 @@ namespace IoC
 }
 
 #endregion
-#region FluentScope
-
-namespace IoC
-{
-    using System;
-    using System.Runtime.CompilerServices;
-
-    /// <summary>
-    /// Represents extensions dealing with scopes.
-    /// </summary>
-    public static class FluentScope
-    {
-        /// <summary>
-        /// Creates a new resolving scope. Can be used with <c>ScopeSingleton</c>.
-        /// </summary>
-        /// <param name="container">A container to resolve a scope.</param>
-        /// <returns>Tne new scope instance.</returns>
-        [MethodImpl((MethodImplOptions)0x100)]
-        [NotNull]
-        public static IScope CreateScope([NotNull] this IContainer container) =>
-            (container ?? throw new ArgumentNullException(nameof(container))).Resolve<IScope>();
-    }
-}
-
-
-#endregion
 #region FluentTrace
 
 namespace IoC
@@ -9405,18 +9379,18 @@ namespace IoC.Features
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
-            yield return container.Register(new[] { typeof(Func<TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime(false), AnyTag);
 
             if (_light) yield break;
 
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
-            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime<TT>(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime(false), AnyTag);
+            yield return container.Register(new[] { typeof(Func<TT1, TT2, TT3, TT4, TT5, TT6, TT7, TT8, TT>) }, new FuncDependency(), new ContainerStateSingletonLifetime(false), AnyTag);
         }
 
         private class FuncDependency : IDependency
@@ -9858,6 +9832,101 @@ namespace IoC.Features
 
 #region Lifetimes
 
+#region BaseLifetime
+
+namespace IoC.Lifetimes
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq.Expressions;
+    using Core;
+
+    public abstract class BaseLifetime : ILifetime
+    {
+        [CanBeNull]
+        internal virtual ILockObject LockObject { get; } = new LockObject();
+
+        [NotNull] internal abstract ILifetimeBuilder Builder { get; }
+        
+        /// <inheritdoc />
+        public abstract ILifetime Create();
+
+        /// <inheritdoc />
+        public virtual IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer)
+            => resolvingContainer;
+
+        /// <inheritdoc />
+        public virtual Expression Build(IBuildContext context, Expression bodyExpression)
+        {
+            if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
+            if (context == null) throw new ArgumentNullException(nameof(context));
+
+            var builder = Builder;
+            var instanceType = context.Key.Type;
+            var instanceVar = Expression.Variable(typeof(object));
+            var creationBlock = new List<Expression>();
+            if (builder.TryBuildBeforeCreating(context, out var creatingExpression))
+            {
+                creationBlock.Add(creatingExpression);
+            }
+
+            creationBlock.Add(Expression.Assign(instanceVar,  builder.BuildCreation(context, bodyExpression).Convert(typeof(object))));
+            if (builder.TryBuildAfterCreation(context, instanceVar, out var newInstanceVar))
+            {
+                creationBlock.Add(Expression.Assign(instanceVar, newInstanceVar));
+            }
+
+            if (builder.TryBuildSet(context, instanceVar, out var setExpression))
+            {
+                creationBlock.Add(setExpression);
+            }
+
+            creationBlock.Add(instanceVar);
+
+            if (!builder.TryBuildGet(context, out var getExpression))
+            {
+                return Expression.Block(creationBlock);
+            }
+
+            getExpression = Expression.Assign(instanceVar, getExpression);
+            Expression isEmptyExpression;
+            if (instanceType.Descriptor().IsValueType())
+            {
+                isEmptyExpression = Expression.Call(null, ExpressionBuilderExtensions.EqualsMethodInfo, instanceVar, Expression.Default(typeof(object)));
+            }
+            else
+            {
+                isEmptyExpression = Expression.ReferenceEqual(instanceVar, Expression.Default(instanceType));
+            }
+
+            var createExpression = Expression.Block(
+                new[] { instanceVar },
+                getExpression,
+                Expression.Condition(
+                    isEmptyExpression,
+                    Expression.Block(creationBlock),
+                    instanceVar));
+
+            var lockObject = LockObject;
+            if (lockObject != null)
+            {
+                // double check
+                createExpression = Expression.Block(
+                    new [] {instanceVar},
+                    getExpression,
+                    Expression.Condition(isEmptyExpression, createExpression.Lock(Expression.Constant(lockObject)), instanceVar)
+                );
+            }
+
+            return createExpression.Convert(instanceType);
+        }
+
+        public abstract void Dispose();
+    }
+}
+
+
+#endregion
 #region ContainerSingletonLifetime
 
 namespace IoC.Lifetimes
@@ -9870,7 +9939,7 @@ namespace IoC.Lifetimes
     /// For a singleton instance per container.
     /// </summary>
     [PublicAPI]
-    public sealed class ContainerSingletonLifetime: KeyBasedLifetime<IContainer, object>
+    public sealed class ContainerSingletonLifetime: KeyBasedLifetime<IContainer>
     {
         /// <inheritdoc />
         protected override IContainer CreateKey(IContainer container, object[] args) => container;
@@ -9882,7 +9951,7 @@ namespace IoC.Lifetimes
         public override ILifetime Create() => new ContainerSingletonLifetime();
 
         /// <inheritdoc />
-        protected override object OnNewInstanceCreated(object newInstance, IContainer targetContainer, IContainer container, object[] args)
+        protected override object AfterCreation(object newInstance, IContainer targetContainer, IContainer container, object[] args)
         {
             if (newInstance is IDisposable disposable)
             {
@@ -9900,7 +9969,7 @@ namespace IoC.Lifetimes
         }
 
         /// <inheritdoc />
-        protected override void OnInstanceReleased(object releasedInstance, IContainer targetContainer)
+        protected override void OnRelease(object releasedInstance, IContainer targetContainer)
         {
             if (releasedInstance is IDisposable disposable)
             {
@@ -9932,16 +10001,13 @@ namespace IoC.Lifetimes
     /// <summary>
     /// For a singleton instance per state.
     /// </summary>
-    internal sealed class ContainerStateSingletonLifetime<TValue> : KeyBasedLifetime<IContainer, TValue>
-        where TValue : class
+    internal sealed class ContainerStateSingletonLifetime : KeyBasedLifetime<IContainer>
     {
         private readonly bool _isDisposable;
         private IDisposable _containerSubscription = Disposable.Empty;
 
-        public ContainerStateSingletonLifetime(bool isDisposable)
-        {
+        public ContainerStateSingletonLifetime(bool isDisposable) =>
             _isDisposable = isDisposable;
-        }
 
         /// <inheritdoc />
         protected override IContainer CreateKey(IContainer container, object[] args) => container;
@@ -9950,10 +10016,10 @@ namespace IoC.Lifetimes
         public override string ToString() => Lifetime.ContainerSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Create() => new ContainerStateSingletonLifetime<TValue>(_isDisposable);
+        public override ILifetime Create() => new ContainerStateSingletonLifetime(_isDisposable);
 
         /// <inheritdoc />
-        protected override TValue OnNewInstanceCreated(TValue newInstance, IContainer targetContainer, IContainer container, object[] args)
+        protected override object AfterCreation(object newInstance, IContainer targetContainer, IContainer container, object[] args)
         {
             _containerSubscription = container.Subscribe(
                 value =>
@@ -9979,7 +10045,7 @@ namespace IoC.Lifetimes
         }
 
         /// <inheritdoc />
-        protected override void OnInstanceReleased(TValue releasedInstance, IContainer targetContainer)
+        protected override void OnRelease(object releasedInstance, IContainer targetContainer)
         {
             _containerSubscription.Dispose();
             if (_isDisposable && releasedInstance is IDisposable disposable)
@@ -10000,11 +10066,32 @@ namespace IoC.Lifetimes
 
 
 #endregion
+#region ILifetimeBuilder
+
+namespace IoC.Lifetimes
+{
+    using System.Linq.Expressions;
+
+    internal interface ILifetimeBuilder
+    {
+        bool TryBuildGet([NotNull] IBuildContext context, out Expression getExpression);
+
+        bool TryBuildSet([NotNull] IBuildContext context, [NotNull] Expression instanceExpression, out Expression setExpression);
+
+        bool TryBuildBeforeCreating([NotNull] IBuildContext context, out Expression beforeCreatingExpression);
+
+        [NotNull] Expression BuildCreation([NotNull] IBuildContext context, [NotNull] Expression bodyExpression);
+
+        bool TryBuildAfterCreation([NotNull] IBuildContext context, [NotNull] Expression instanceExpression, out Expression newInstanceExpression);
+    }
+}
+
+
+#endregion
 #region KeyBasedLifetime
 
 namespace IoC.Lifetimes
 {
-    using System;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
@@ -10015,137 +10102,93 @@ namespace IoC.Lifetimes
     /// Represents the abstraction for singleton based lifetimes.
     /// </summary>
     /// <typeparam name="TKey">The key type.</typeparam>
-    /// <typeparam name="TValue">The value type.</typeparam>
     [PublicAPI]
-    public abstract class KeyBasedLifetime<TKey, TValue> : ILifetime
-        where TValue: class
+    public abstract class KeyBasedLifetime<TKey>: BaseLifetime, ILifetimeBuilder
     {
-        private readonly bool _supportOnNewInstanceCreated;
-        private readonly bool _supportOnInstanceReleased;
-        private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey, TValue>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
-        private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey, TValue>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
-        private static readonly MethodInfo GetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, TValue>.Get));
-        private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, TValue>.Set));
-        private static readonly MethodInfo OnNewInstanceCreatedMethodInfo = Descriptor<KeyBasedLifetime<TKey, TValue>>().GetDeclaredMethods().Single(i => i.Name == nameof(OnNewInstanceCreated));
+        private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
+        private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
+        private static readonly MethodInfo GetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Get));
+        private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
+        private static readonly MethodInfo AfterCreationMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(AfterCreation));
         private static readonly ParameterExpression KeyVar = Expression.Variable(typeof(TKey), "key");
 
-        [CanBeNull] private readonly object _lockObject;
-        private volatile Table<TKey, TValue> _instances = Table<TKey, TValue>.Empty;
+        private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
+        private readonly MemberExpression _instancesField;
+        private readonly ConstantExpression _thisConst;
 
         /// <summary>
         /// Creates an instance
         /// </summary>
-        /// <param name="supportOnNewInstanceCreated">True to invoke OnNewInstanceCreated</param>
-        /// <param name="supportOnInstanceReleased">True to invoke OnInstanceReleased</param>
-        /// <param name="threadSafe"><c>True</c> to synchronize operations.</param>
-        protected KeyBasedLifetime(
-            bool supportOnNewInstanceCreated = true,
-            bool supportOnInstanceReleased = true,
-            bool threadSafe = true)
+        protected KeyBasedLifetime()
         {
-            _supportOnNewInstanceCreated = supportOnNewInstanceCreated;
-            _supportOnInstanceReleased = supportOnInstanceReleased;
-            if (threadSafe)
-            {
-                _lockObject = new LockObject();
-            }
+            _thisConst = Expression.Constant(this);
+            _instancesField = Expression.Field(_thisConst, InstancesFieldInfo);
         }
 
+        internal override ILifetimeBuilder Builder => this;
+
         /// <inheritdoc />
-        public Expression Build(IBuildContext context, Expression bodyExpression)
+        public override Expression Build(IBuildContext context, Expression bodyExpression)
         {
-            if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
-            if (context == null) throw new ArgumentNullException(nameof(context));
-            var returnType = context.Key.Type;
-            var thisConst = Expression.Constant(this);
-            var instanceVar = Expression.Variable(typeof(TValue));
-            var instancesField = Expression.Field(thisConst, InstancesFieldInfo);
-            var getExpression = Expression.Assign(instanceVar, Expression.Call(instancesField, GetMethodInfo, KeyVar));
-            Expression isEmptyExpression;
-            if (returnType.Descriptor().IsValueType())
-            {
-                isEmptyExpression = Expression.Call(null, ExpressionBuilderExtensions.EqualsMethodInfo, instanceVar.Convert(typeof(TValue)), Expression.Default(typeof(TValue)));
-            }
-            else
-            {
-                isEmptyExpression = Expression.ReferenceEqual(instanceVar, Expression.Default(returnType));
-            }
-
-            var initNewInstanceExpression = _supportOnNewInstanceCreated 
-                ? Expression.Call(thisConst, OnNewInstanceCreatedMethodInfo, instanceVar.Convert(typeof(TValue)), KeyVar, context.ContainerParameter, context.ArgsParameter).Convert(returnType)
-                : instanceVar;
-
-            Expression createExpression = Expression.Block(
-                // instance = _instances.Get(hashCode, key);
-                getExpression,
-                // if (instance == default(TValue))
-                Expression.Condition(
-                    isEmptyExpression,
-                    Expression.Block(
-                        // instance = new T();
-                        Expression.Assign(instanceVar, bodyExpression.Convert(typeof(TValue))),
-                        // Instances = _instances.Set(hashCode, key, instance);
-                        Expression.Assign(instancesField, Expression.Call(instancesField, SetMethodInfo, KeyVar, instanceVar.Convert(typeof(object)))),
-                        // instance or OnNewInstanceCreated(instance, key, container, args);
-                        initNewInstanceExpression,
-                        instanceVar), 
-                    instanceVar));
-
-            if (_lockObject != null)
-            {
-                // double check
-                createExpression = Expression.Block(
-                    // instance = _instances.Get(hashCode, key);
-                    getExpression,
-                    Expression.Condition(isEmptyExpression, createExpression.Lock(Expression.Constant(_lockObject)), instanceVar)
-                );
-            }
-
             return Expression.Block(
-                // Key key;
-                // int hashCode;
-                // T instance;
-                new[] { KeyVar, instanceVar },
+                new[] { KeyVar },
                 // TKey key = CreateKey(container, args);
-                Expression.Assign(KeyVar, Expression.Call(thisConst, CreateKeyMethodInfo, context.ContainerParameter, context.ArgsParameter)),
-                createExpression.Convert(returnType)
-            // }
+                Expression.Assign(KeyVar, Expression.Call(_thisConst, CreateKeyMethodInfo, context.ContainerParameter, context.ArgsParameter)),
+                base.Build(context, bodyExpression)
             );
         }
 
-        /// <inheritdoc />
-        public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
-            resolvingContainer;
+        bool ILifetimeBuilder.TryBuildGet(IBuildContext context, out Expression getExpression)
+        {
+            getExpression = Expression.Call(_instancesField, GetMethodInfo, KeyVar);
+            return true;
+        }
+
+        bool ILifetimeBuilder.TryBuildSet(IBuildContext context, Expression instanceExpression, out Expression setExpression)
+        {
+            setExpression = Expression.Assign(_instancesField, Expression.Call(_instancesField, SetMethodInfo, KeyVar, instanceExpression));
+            return true;
+        }
+
+        bool ILifetimeBuilder.TryBuildBeforeCreating(IBuildContext context, out Expression beforeCreatingExpression)
+        {
+            beforeCreatingExpression = default(Expression);
+            return false;
+        }
+
+        Expression ILifetimeBuilder.BuildCreation(IBuildContext context, Expression bodyExpression) =>
+            bodyExpression;
+
+        bool ILifetimeBuilder.TryBuildAfterCreation(IBuildContext context, Expression instanceExpression, out Expression newInstanceExpression)
+        {
+            newInstanceExpression = Expression.Call(_thisConst, AfterCreationMethodInfo, instanceExpression, KeyVar, context.ContainerParameter, context.ArgsParameter);
+            return true;
+        }
 
         /// <inheritdoc />
-        public virtual void Dispose()
+        public override void Dispose()
         {
-            Table<TKey, TValue> instances;
-            if (_lockObject != null)
+            Table<TKey, object> instances;
+            var lockObject = LockObject;
+            if (lockObject != null)
             {
-                lock (_lockObject)
+                lock (lockObject)
                 {
                     instances = _instances;
-                    _instances = Table<TKey, TValue>.Empty;
+                    _instances = Table<TKey, object>.Empty;
                 }
             }
             else
             {
                 instances = _instances;
-                _instances = Table<TKey, TValue>.Empty;
+                _instances = Table<TKey, object>.Empty;
             }
 
-            if (_supportOnInstanceReleased)
+            foreach (var instance in instances)
             {
-                foreach (var instance in instances)
-                {
-                    OnInstanceReleased(instance.Value, instance.Key);
-                }
+                OnRelease(instance.Value, instance.Key);
             }
         }
-
-        /// <inheritdoc />
-        public abstract ILifetime Create();
 
         /// <summary>
         /// Creates key for singleton.
@@ -10163,25 +10206,29 @@ namespace IoC.Lifetimes
         /// <param name="container">The target container.</param>
         /// <param name="args">Optional arguments.</param>
         /// <returns>The created instance.</returns>
-        protected abstract TValue OnNewInstanceCreated(TValue newInstance, TKey key, IContainer container, object[] args);
+        protected virtual object AfterCreation(object newInstance, TKey key, IContainer container, object[] args) 
+            => newInstance;
 
         /// <summary>
         /// Is invoked on the instance was released.
         /// </summary>
         /// <param name="releasedInstance">The released instance.</param>
         /// <param name="key">The instance key.</param>
-        protected abstract void OnInstanceReleased(TValue releasedInstance, TKey key);
+        protected virtual void OnRelease(object releasedInstance, TKey key)
+        {
+        }
 
         /// <summary>
         /// Forcibly remove an instance.
         /// </summary>
         /// <param name="key">The instance key.</param>
-        protected bool Remove(TKey key)
+        protected internal bool Remove(TKey key)
         {
             bool removed;
-            if (_lockObject != null)
+            var lockObject = LockObject;
+            if (lockObject != null)
             {
-                lock (_lockObject)
+                lock (lockObject)
                 {
                     _instances = _instances.Remove(key, out removed);
                 }
@@ -10210,7 +10257,7 @@ namespace IoC.Lifetimes
     /// For a singleton instance per scope.
     /// </summary>
     [PublicAPI]
-    public sealed class ScopeSingletonLifetime: KeyBasedLifetime<IScope, object>
+    public sealed class ScopeSingletonLifetime: KeyBasedLifetime<IScope>
     {
         /// <inheritdoc />
         protected override IScope CreateKey(IContainer container, object[] args) => Scope.Current;
@@ -10222,7 +10269,7 @@ namespace IoC.Lifetimes
         public override ILifetime Create() => new ScopeSingletonLifetime();
 
         /// <inheritdoc />
-        protected override object OnNewInstanceCreated(object newInstance, IScope scope, IContainer container, object[] args)
+        protected override object AfterCreation(object newInstance, IScope scope, IContainer container, object[] args)
         {
             if (!(scope is IResourceRegistry resourceRegistry))
             {
@@ -10245,7 +10292,7 @@ namespace IoC.Lifetimes
         }
 
         /// <inheritdoc />
-        protected override void OnInstanceReleased(object releasedInstance, IScope scope)
+        protected override void OnRelease(object releasedInstance, IScope scope)
         {
             if (!(scope is IResourceRegistry resourceRegistry))
             {

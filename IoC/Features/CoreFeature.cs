@@ -40,7 +40,7 @@
             yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Inject<ILockObject>()));
 
             // Current container
-            yield return container.Register<IContainer, IResourceRegistry, IObservable<ContainerEvent>>(ctx => ctx.Container);
+            yield return container.Register<IContainer, IObservable<ContainerEvent>>(ctx => ctx.Container);
 
             // New child container
             yield return container.Register<IMutableContainer>(

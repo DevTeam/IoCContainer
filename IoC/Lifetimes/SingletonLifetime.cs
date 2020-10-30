@@ -62,7 +62,7 @@
         }
 
         /// <inheritdoc />
-        public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+        public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
             registrationContainer;
 
         /// <inheritdoc />
@@ -102,7 +102,7 @@
         }
 
         /// <inheritdoc />
-        public ILifetime Create() => new SingletonLifetime(_lockObject != null);
+        public ILifetime CreateLifetime() => new SingletonLifetime(_lockObject != null);
 
         /// <inheritdoc />
         public override string ToString() => Lifetime.Singleton.ToString();

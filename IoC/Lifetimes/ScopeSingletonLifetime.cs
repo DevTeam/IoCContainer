@@ -8,7 +8,7 @@
     /// For a singleton instance per scope.
     /// </summary>
     [PublicAPI]
-    public sealed class ScopeSingletonLifetime: KeyBasedLifetime<IScope, object>
+    public sealed class ScopeSingletonLifetime: KeyBasedLifetime<IScope>
     {
         /// <inheritdoc />
         protected override IScope CreateKey(IContainer container, object[] args) => Scope.Current;
@@ -17,10 +17,10 @@
         public override string ToString() => Lifetime.ScopeSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Create() => new ScopeSingletonLifetime();
+        public override ILifetime CreateLifetime() => new ScopeSingletonLifetime();
 
         /// <inheritdoc />
-        protected override object OnNewInstanceCreated(object newInstance, IScope scope, IContainer container, object[] args)
+        protected override object AfterCreation(object newInstance, IScope scope, IContainer container, object[] args)
         {
             if (!(scope is IResourceRegistry resourceRegistry))
             {
@@ -43,7 +43,7 @@
         }
 
         /// <inheritdoc />
-        protected override void OnInstanceReleased(object releasedInstance, IScope scope)
+        protected override void OnRelease(object releasedInstance, IScope scope)
         {
             if (!(scope is IResourceRegistry resourceRegistry))
             {

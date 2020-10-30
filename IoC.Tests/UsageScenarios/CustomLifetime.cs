@@ -41,11 +41,11 @@
                 _baseLifetime.Build(context, expression);
 
             // Creates the similar lifetime to use with generic instances
-            public ILifetime Create() => new MyTransientLifetime();
+            public ILifetime CreateLifetime() => new MyTransientLifetime();
 
             // Select a container to resolve dependencies using the Singleton lifetime logic
-            public IContainer SelectResolvingContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
-                _baseLifetime.SelectResolvingContainer(registrationContainer, resolvingContainer);
+            public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+                _baseLifetime.SelectContainer(registrationContainer, resolvingContainer);
 
             // Disposes the instance of the Singleton lifetime
             public void Dispose() => _baseLifetime.Dispose();

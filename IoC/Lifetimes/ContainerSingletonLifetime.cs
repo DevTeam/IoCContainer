@@ -8,7 +8,7 @@
     /// For a singleton instance per container.
     /// </summary>
     [PublicAPI]
-    public sealed class ContainerSingletonLifetime: KeyBasedLifetime<IContainer, object>
+    public sealed class ContainerSingletonLifetime: KeyBasedLifetime<IContainer>
     {
         /// <inheritdoc />
         protected override IContainer CreateKey(IContainer container, object[] args) => container;
@@ -17,10 +17,10 @@
         public override string ToString() => Lifetime.ContainerSingleton.ToString();
 
         /// <inheritdoc />
-        public override ILifetime Create() => new ContainerSingletonLifetime();
+        public override ILifetime CreateLifetime() => new ContainerSingletonLifetime();
 
         /// <inheritdoc />
-        protected override object OnNewInstanceCreated(object newInstance, IContainer targetContainer, IContainer container, object[] args)
+        protected override object AfterCreation(object newInstance, IContainer targetContainer, IContainer container, object[] args)
         {
             if (newInstance is IDisposable disposable)
             {
@@ -38,7 +38,7 @@
         }
 
         /// <inheritdoc />
-        protected override void OnInstanceReleased(object releasedInstance, IContainer targetContainer)
+        protected override void OnRelease(object releasedInstance, IContainer targetContainer)
         {
             if (releasedInstance is IDisposable disposable)
             {

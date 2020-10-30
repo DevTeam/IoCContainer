@@ -65,7 +65,7 @@
 
             // Create a root container
             var lockObject = new LockObject();
-            var rootContainer = new Container(string.Empty, NullContainer.Shared, lockObject);
+            var rootContainer = new Container(string.Empty, RootContainer.Shared, lockObject);
             rootContainer.Register<ILockObject>(ctx => lockObject);
             if (configurations.Length > 0)
             {
@@ -233,7 +233,7 @@
                 {
                     // tries creating resolver
                     resolvingContainer = resolvingContainer ?? this;
-                    resolvingContainer = registration.Lifetime?.SelectResolvingContainer(this, resolvingContainer) ?? resolvingContainer;
+                    resolvingContainer = registration.Lifetime?.SelectContainer(this, resolvingContainer) ?? resolvingContainer;
                     if (!registration.TryCreateResolver(key, resolvingContainer, (resolvingContainer as Container ?? this)._registrationTracker, out resolver, out error))
                     {
                         return false;
@@ -507,7 +507,7 @@
             [DebuggerBrowsable(DebuggerBrowsableState.Collapsed)]
             public FullKey[] Keys => _container.GetAllKeys().SelectMany(i => i).ToArray();
 
-            public IContainer Parent => _container.Parent is NullContainer ? null : _container.Parent;
+            public IContainer Parent => _container.Parent is RootContainer ? null : _container.Parent;
 
             public int ResolversCount => _container.Resolvers.Count + _container.ResolversByType.Count;
 

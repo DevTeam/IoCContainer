@@ -48,34 +48,26 @@
             }
         }
 
-        public class StringKeyLifetime: KeyBasedLifetime<string, object>
+        public class StringKeyLifetime: KeyBasedLifetime<string>
         {
             [NotNull] private readonly string _key;
 
             public StringKeyLifetime([NotNull] string key) => _key = key ?? throw new ArgumentNullException(nameof(key));
 
-            public override ILifetime Create() => new StringKeyLifetime(_key);
+            public override ILifetime CreateLifetime() => new StringKeyLifetime(_key);
 
             protected override string CreateKey(IContainer container, object[] args) => _key;
-
-            protected override object OnNewInstanceCreated(object newInstance, string key, IContainer container, object[] args) => newInstance;
-
-            protected override void OnInstanceReleased(object releasedInstance, string key) { }
         }
 
-        public class IntKeyLifetime : KeyBasedLifetime<int, object>
+        public class IntKeyLifetime : KeyBasedLifetime<int>
         {
             private readonly int _key;
 
             public IntKeyLifetime(int key) => _key = key;
 
-            public override ILifetime Create() => new IntKeyLifetime(_key);
+            public override ILifetime CreateLifetime() => new IntKeyLifetime(_key);
 
             protected override int CreateKey(IContainer container, object[] args) => _key;
-
-            protected override object OnNewInstanceCreated(object newInstance, int key, IContainer container, object[] args) => newInstance;
-
-            protected override void OnInstanceReleased(object releasedInstance, int key) { }
         }
     }
 }

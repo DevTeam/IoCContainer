@@ -6,12 +6,12 @@
     using System.Linq;
     using Issues;
 
-    internal sealed class NullContainer : IContainer
+    internal sealed class RootContainer : IContainer
     {
-        public static readonly IContainer Shared = new NullContainer();
+        public static readonly IContainer Shared = new RootContainer();
         private static readonly NotSupportedException NotSupportedException = new NotSupportedException();
 
-        private NullContainer() { }
+        private RootContainer() { }
 
         public IContainer Parent => null;
 

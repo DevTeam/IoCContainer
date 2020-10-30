@@ -123,7 +123,7 @@
                 return lifetime;
             }
 
-            lifetime = Lifetime.Create();
+            lifetime = Lifetime.CreateLifetime();
             _lifetimes = _lifetimes.Set(lifetimeKey, lifetime);
 
             return lifetime;
