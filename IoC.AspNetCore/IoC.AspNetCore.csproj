@@ -17,7 +17,6 @@
     <PackageTags>ioc container di asp core</PackageTags>
     <Product>IoC Container AspNetCore feature</Product>
     <Copyright>Copyright (C) 2018-2020 Nikolay Pianikov</Copyright>
-    <DocumentationFile>..\Docs\IoC.AspNetCore_$(TargetFramework).xml</DocumentationFile>
     <WarningsAsErrors />
     <LangVersion>7</LangVersion>
     <!--NullableContextOptions>enable</NullableContextOptions-->

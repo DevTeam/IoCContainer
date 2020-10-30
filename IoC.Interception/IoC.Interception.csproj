@@ -17,7 +17,6 @@
     <PackageTags>ioc container di interception proxy</PackageTags>
     <Product>IoC Container Interception feature</Product>
     <Copyright>Copyright (C) 2018-2020 Nikolay Pianikov</Copyright>
-    <DocumentationFile>..\Docs\IoC.Interception_$(TargetFramework).xml</DocumentationFile>
     <WarningsAsErrors />
     <LangVersion>7</LangVersion>
     <!--NullableContextOptions>enable</NullableContextOptions-->
