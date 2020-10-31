@@ -9,7 +9,7 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
+            // $tag=1 Basics
             // $priority=03
             // $description=Autowiring with initialization
             // $header=Sometimes instances required some actions before you give them to use - some methods of initialization or fields which should be defined. You can solve these things easy.

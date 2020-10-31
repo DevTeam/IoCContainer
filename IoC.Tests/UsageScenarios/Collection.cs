@@ -10,8 +10,8 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
-            // $priority=05
+            // $tag=3 BCL types
+            // $priority=01
             // $description=Collection
             // $header=To resolve all possible instances of any tags of the specific type as a _collection_ just use the injection _ICollection<T>_
             // {

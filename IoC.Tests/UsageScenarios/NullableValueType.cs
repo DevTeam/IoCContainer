@@ -14,8 +14,8 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=basic
-        // $priority=03
+        // $tag=3 BCL types
+        // $priority=01
         // $description=Nullable value type
         public void Run()
         {

@@ -15,7 +15,7 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=basic
+        // $tag=1 Basics
         // $priority=06
         // $description=Optional injection
         // {

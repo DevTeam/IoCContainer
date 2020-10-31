@@ -10,8 +10,8 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
-            // $priority=03
+            // $tag=2 Lifetimes
+            // $priority=01
             // $description=Container Singleton lifetime
             // $header=Each container may have its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding.
             // {

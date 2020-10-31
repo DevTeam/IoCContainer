@@ -17,7 +17,7 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=basic
+        // $tag=1 Basics
         // $priority=05
         // $description=Struct
         // $header=Value types are fully supported avoiding any boxing/unboxing or cast operations, so the performance does not suffer!

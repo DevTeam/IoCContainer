@@ -14,7 +14,7 @@ namespace IoC.Tests.UsageScenarios
         public async void Run()
         {
             // $visible=true
-            // $tag=advanced
+            // $tag=4 Async
             // $priority=05
             // $description=Override a task scheduler
             // $header=_TaskScheduler.Current_ is used by default for an asynchronous construction, but it is easy to override it, binding abstract class _TaskScheduler_ to required implementation in a IoC container.

@@ -8,7 +8,7 @@
     {
         [Fact]
         // $visible=true
-        // $tag=advanced
+        // $tag=2 Lifetimes
         // $priority=10
         // $description=Custom lifetime
         // $header=Custom lifetimes allow to implement your own logic controlling every aspects of resolved instances. Also you could use the class [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs) as a base for others.

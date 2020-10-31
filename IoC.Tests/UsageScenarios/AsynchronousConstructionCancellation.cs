@@ -14,8 +14,8 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=advanced
-        // $priority=10
+        // $tag=4 Async
+        // $priority=03
         // $description=Cancellation of asynchronous construction
         // $header=It is possible to inject dependencies in asynchronous style and to cancel their creations using default _CancellationTokenSource_.
         // {

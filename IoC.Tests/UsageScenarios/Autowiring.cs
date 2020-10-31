@@ -9,7 +9,7 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
+            // $tag=1 Basics
             // $priority=01
             // $description=Autowiring
             // $header=Auto-writing is most natural way to use containers. At first step we should create a container. At the second step we bind interfaces to their implementations. After that the container is ready to resolve dependencies.

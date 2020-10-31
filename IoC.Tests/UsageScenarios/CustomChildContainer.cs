@@ -11,7 +11,7 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=advanced
+        // $tag=5 Advanced
         // $priority=10
         // $description=Custom child container
         // $header=You may replace the default implementation of container by your own. I can’t imagine why, but it’s possible!

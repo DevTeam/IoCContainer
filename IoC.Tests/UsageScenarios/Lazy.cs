@@ -12,8 +12,8 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
-            // $priority=05
+            // $tag=3 BCL types
+            // $priority=01
             // $description=Lazy
             // $header=_Lazy_ dependency helps when a logic needs to inject Lazy<T> to get instance once on demand.
             // {

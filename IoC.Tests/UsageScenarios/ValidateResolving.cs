@@ -9,7 +9,7 @@
         public void Run()
         {
             // $visible=true
-            // $tag=advanced
+            // $tag=5 Advanced
             // $priority=08
             // $description=Check for possible resolving
             // $header=It is easy to validate without the actual resolving.

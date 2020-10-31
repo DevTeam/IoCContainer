@@ -11,7 +11,7 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
+            // $tag=1 Basics
             // $priority=02
             // $description=Several contracts
             // $header=It is possible to bind several types to single implementation.

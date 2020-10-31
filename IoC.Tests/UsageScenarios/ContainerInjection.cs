@@ -8,13 +8,13 @@ namespace IoC.Tests.UsageScenarios
     using Shouldly;
     using Xunit;
 
-    public class ContainersInjection
+    public class ContainerInjection
     {
         [Fact]
         // $visible=true
-        // $tag=advanced
+        // $tag=5 Advanced
         // $priority=04
-        // $description=Containers injection
+        // $description=Container injection
         // $header=:warning: Please avoid injecting containers in non-infrastructure code. Keep your general code in ignorance of a container.
         // {
         public void Run()

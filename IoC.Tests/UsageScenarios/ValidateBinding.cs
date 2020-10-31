@@ -9,7 +9,7 @@
         public void Run()
         {
             // $visible=true
-            // $tag=advanced
+            // $tag=5 Advanced
             // $priority=08
             // $description=Check a binding
             // $header=It is easy to validate that binding is already exists.

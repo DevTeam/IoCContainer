@@ -9,7 +9,7 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
+            // $tag=1 Basics
             // $priority=04
             // $description=Manual wiring
             // $header=In the case when the full control of creating an instance is required it is possible to do it in simple way without any performance impact.

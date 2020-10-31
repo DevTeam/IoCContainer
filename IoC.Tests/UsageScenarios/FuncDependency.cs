@@ -10,7 +10,7 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
+            // $tag=1 Basics
             // $priority=05
             // $description=Func dependency
             // $header=No comments. Everything is very simple!

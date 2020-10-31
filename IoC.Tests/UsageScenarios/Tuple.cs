@@ -12,8 +12,8 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
-            // $priority=05
+            // $tag=3 BCL types
+            // $priority=01
             // $description=Tuple
             // $header=[Tuple](https://docs.microsoft.com/en-us/dotnet/api/system.tuple) has a specific number and sequence of elements which may be resolved at the same time.
             // {

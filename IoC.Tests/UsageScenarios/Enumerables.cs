@@ -11,8 +11,8 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
-            // $priority=05
+            // $tag=3 BCL types
+            // $priority=01
             // $description=Enumerable
             // $header=To resolve all possible instances of any tags of the specific type as an _enumerable_ just use the injection _IEnumerable<T>_
             // {

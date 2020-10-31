@@ -16,7 +16,7 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=advanced
+        // $tag=5 Advanced
         // $priority=10
         // $description=Custom autowiring strategy
         // {

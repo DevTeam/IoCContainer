@@ -10,7 +10,7 @@
         public void Run()
         {
             // $visible=true
-            // $tag=advanced
+            // $tag=5 Advanced
             // $priority=08
             // $description=Tracing
             // $header=Tracing allows to explore most aspects of container behavior: creating and removing child containers, adding and removing bindings, compiling instance factories.

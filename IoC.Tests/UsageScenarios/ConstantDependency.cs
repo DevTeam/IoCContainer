@@ -9,7 +9,7 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
+            // $tag=1 Basics
             // $priority=01
             // $description=Constant dependency
             // $header=It's obvious here.

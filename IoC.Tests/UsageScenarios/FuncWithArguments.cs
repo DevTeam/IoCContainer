@@ -10,8 +10,8 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
-            // $priority=05
+            // $tag=3 BCL types
+            // $priority=03
             // $description=Func with arguments
             // $header=It is easy to use Func<T> with arguments and to pass these arguments to the created instances.
             // {

@@ -10,7 +10,7 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
+            // $tag=1 Basics
             // $priority=03
             // $description=Property injection
             // $header=:warning: Please try using the constructor injection instead. The property injection is not recommended because of it is a cause of hidden dependencies.

@@ -12,8 +12,8 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
-            // $priority=04
+            // $tag=3 BCL types
+            // $priority=01
             // $description=Func
             // $header=_Func_ dependency helps when a logic needs to inject some number of type instances on demand.
             // {

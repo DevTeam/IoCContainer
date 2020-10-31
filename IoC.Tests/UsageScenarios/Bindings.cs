@@ -11,7 +11,7 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
+            // $tag=1 Basics
             // $priority=01
             // $description=Bindings
             // $header=It is possible to bind any number of types.

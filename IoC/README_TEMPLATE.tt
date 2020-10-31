@@ -90,15 +90,12 @@
 ## Usage Scenarios
 
 <#
-    foreach(var group in infos.Where(info => info["visible"] == "true").GroupBy(i => i["tag"]))
+    foreach(var group in infos.Where(info => info["visible"] == "true").GroupBy(i => i["tag"]).OrderBy(i => i.Key[0]))
     {
-        var groupName = group.Key;
-        groupName = groupName.Replace("basic", "Basic");
-        groupName = groupName.Replace("advanced", "Advanced");
-        groupName = groupName.Replace("samples", "Samples");
+        var groupName = group.Key.Substring(1).Trim();
     #>- <#=groupName#>
 <#
-        foreach(var info in group.OrderBy(i => i["priority"]))
+        foreach(var info in group.OrderBy(i => i["priority"] + "_" + i["description"]))
         {
             var description = info["description"];
             var reference = "#" + description.Replace(" ", "-").Replace("'", string.Empty).ToLowerInvariant() + "-";

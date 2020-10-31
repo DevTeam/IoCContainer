@@ -13,8 +13,8 @@ namespace IoC.Tests.UsageScenarios
     {
         [Fact]
         // $visible=true
-        // $tag=advanced
-        // $priority=05
+        // $tag=4 Async
+        // $priority=02
         // $description=Asynchronous construction
         // $header=It is easy to inject dependencies in asynchronous style.
         // {

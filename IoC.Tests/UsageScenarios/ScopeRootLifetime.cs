@@ -12,8 +12,8 @@ namespace IoC.Tests.UsageScenarios
         public void Run()
         {
             // $visible=true
-            // $tag=basic
-            // $priority=03
+            // $tag=2 Lifetimes
+            // $priority=01
             // $description=Scope Root lifetime
             // $header=ScopeRoot lifetime creates an instance together with new scope and allows to managed all scope singletons by IScopeToken.
             // {
@@ -55,6 +55,7 @@ namespace IoC.Tests.UsageScenarios
             // Check all dependencies are disposed for the all scopes
             session2.Service1.DisposeCounter.ShouldBe(1);
             session1.Service1.DisposeCounter.ShouldBe(1);
+
         // }
         }
 

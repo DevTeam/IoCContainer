@@ -14,8 +14,8 @@ namespace IoC.Tests.UsageScenarios
         public async void Run()
         {
             // $visible=true
-            // $tag=basic
-            // $priority=05
+            // $tag=4 Async
+            // $priority=01
             // $description=ValueTask
             // $header=In this scenario ValueTask is just wrapping a resolved instance.
             // {

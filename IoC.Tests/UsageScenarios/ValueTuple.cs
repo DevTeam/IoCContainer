@@ -12,8 +12,8 @@ namespace IoC.Tests.UsageScenarios
         public void Run()
         {
             // $visible=true
-            // $tag=basic
-            // $priority=05
+            // $tag=3 BCL types
+            // $priority=01
             // $description=ValueTuple
             // {
             using var container = Container

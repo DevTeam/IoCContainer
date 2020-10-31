@@ -10,8 +10,8 @@
         public void Run()
         {
             // $visible=true
-            // $tag=basic
-            // $priority=03
+            // $tag=2 Lifetimes
+            // $priority=01
             // $description=Scope Singleton lifetime
             // $header=Each scope has its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding. Scopes can be created, activated and deactivated. Scope can be injected like any other instance from container.
             // {
