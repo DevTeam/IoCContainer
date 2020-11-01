@@ -57,7 +57,9 @@
             var expectedInstance = new Mock<IDisposable>();
             var lifetime = new ContainerSingletonLifetime();
             var resolver = lifetime.Compile(() => expectedInstance.Object);
-            resolver(Mock.Of<IContainer>());
+            var container = new Mock<IContainer>();
+            container.Setup(i => i.UnregisterResource(expectedInstance.Object)).Returns(true);
+            resolver(container.Object);
 
             // When
             lifetime.Dispose();

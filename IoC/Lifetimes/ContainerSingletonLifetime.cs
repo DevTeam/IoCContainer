@@ -42,16 +42,20 @@
         {
             if (releasedInstance is IDisposable disposable)
             {
-                targetContainer.UnregisterResource(disposable);
-                disposable.Dispose();
+                if (targetContainer.UnregisterResource(disposable))
+                {
+                    disposable.Dispose();
+                }
             }
 
 #if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();
-                targetContainer.UnregisterResource(disposable);
-                disposable.Dispose();
+                if (targetContainer.UnregisterResource(disposable))
+                {
+                    disposable.Dispose();
+                }
             }
 #endif
         }

@@ -29,6 +29,11 @@
         /// <summary>
         /// Automatically creates a new scope.
         /// </summary>
-        ScopeRoot = 5
+        ScopeRoot = 5,
+
+        /// <summary>
+        /// Automatically calls the <c>Disposable()</c> method in disposable instances after a container has disposed.
+        /// </summary>
+        Disposing = 6
     }
 }

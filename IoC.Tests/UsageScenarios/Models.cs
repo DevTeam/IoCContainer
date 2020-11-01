@@ -30,8 +30,10 @@ namespace IoC.Tests.UsageScenarios
     {
     }
 
-    public class Service : IService, IAnotherService
+    public class Service : IService, IAnotherService, IDisposable
     {
+        public int DisposeCount;
+
         public Service(IDependency dependency) => Dependency = dependency;
 
         public Service(IDependency dependency, string state)
@@ -43,6 +45,8 @@ namespace IoC.Tests.UsageScenarios
         public IDependency Dependency { get; }
 
         public string State { get; }
+
+        public void Dispose() => DisposeCount++;
     }
 
     // Generic

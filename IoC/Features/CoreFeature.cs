@@ -36,6 +36,7 @@
             yield return container.Register<ILifetime>(ctx => new ContainerSingletonLifetime(), null, new object[] { Lifetime.ContainerSingleton });
             yield return container.Register<ILifetime>(ctx => new ScopeSingletonLifetime(), null, new object[] { Lifetime.ScopeSingleton });
             yield return container.Register<ILifetime>(ctx => new ScopeRootLifetime(), null, new object[] { Lifetime.ScopeRoot });
+            yield return container.Register<ILifetime>(ctx => new DisposingLifetime(), null, new object[] { Lifetime.Disposing });
 
             // Scope
             yield return container.Register<IScopeToken>(ctx => Scope.Current);

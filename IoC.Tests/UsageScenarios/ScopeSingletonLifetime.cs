@@ -31,11 +31,13 @@
                 defaultScopeInstance1.ShouldBe(defaultScopeInstance2);
 
                 // Create scope #1
-                using var scope1 = container.Resolve<IScope>();
+                var scope1 = container.Resolve<IScope>();
+                IService scopeInstance1;
+                IService scopeInstance2;
                 using (scope1.Activate())
                 {
-                    var scopeInstance1 = container.Resolve<IService>();
-                    var scopeInstance2 = container.Resolve<IService>();
+                    scopeInstance1 = container.Resolve<IService>();
+                    scopeInstance2 = container.Resolve<IService>();
 
                     // Check that instances from the scope #1 are equal
                     scopeInstance1.ShouldBe(scopeInstance2);
@@ -43,6 +45,11 @@
                     // Check that instances from different scopes are not equal
                     scopeInstance1.ShouldNotBe(defaultScopeInstance1);
                 }
+
+                // Dispose instances on disposing a scope
+                scope1.Dispose();
+                ((Service)scopeInstance1).DisposeCount.ShouldBe(1);
+                ((Service)scopeInstance2).DisposeCount.ShouldBe(1);
 
                 // Default scope again
                 var defaultScopeInstance3 = container.Resolve<IService>();

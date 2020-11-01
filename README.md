@@ -355,6 +355,7 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Aspect Oriented](#aspect-oriented-)
 - Lifetimes
   - [Container Singleton lifetime](#container-singleton-lifetime-)
+  - [Disposing lifetime](#disposing-lifetime-)
   - [Scope Root lifetime](#scope-root-lifetime-)
   - [Scope Singleton lifetime](#scope-singleton-lifetime-)
   - [Singleton lifetime](#singleton-lifetime-)
@@ -1200,7 +1201,7 @@ Also you can specify your own aspect oriented autowiring by implementing the int
 Each container may have its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding.
 
 ``` CSharp
-using var container = Container
+var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
     // Use the Container Singleton lifetime
@@ -1208,14 +1209,15 @@ using var container = Container
     .Container;
 
 // Resolve the container singleton twice
-var parentInstance1 = container.Resolve<IService>();
-var parentInstance2 = container.Resolve<IService>();
+var instance1 = container.Resolve<IService>();
+var instance2 = container.Resolve<IService>();
 
 // Check that instances from the parent container are equal
-parentInstance1.ShouldBe(parentInstance2);
+instance1.ShouldBe(instance2);
 
 // Create a child container
-using var childContainer = container.Create();
+var childContainer = container.Create();
+
 // Resolve the container singleton twice
 var childInstance1 = childContainer.Resolve<IService>();
 var childInstance2 = childContainer.Resolve<IService>();
@@ -1224,7 +1226,42 @@ var childInstance2 = childContainer.Resolve<IService>();
 childInstance1.ShouldBe(childInstance2);
 
 // Check that instances from different containers are not equal
-parentInstance1.ShouldNotBe(childInstance1);
+instance1.ShouldNotBe(childInstance1);
+
+// Dispose instances on disposing a child container
+childContainer.Dispose();
+((Service)childInstance1).DisposeCount.ShouldBe(1);
+((Service)childInstance2).DisposeCount.ShouldBe(1);
+((Service)instance1).DisposeCount.ShouldBe(0);
+((Service)instance2).DisposeCount.ShouldBe(0);
+
+// Dispose instances on disposing a container
+container.Dispose();
+((Service)childInstance1).DisposeCount.ShouldBe(1);
+((Service)childInstance2).DisposeCount.ShouldBe(1);
+((Service)instance1).DisposeCount.ShouldBe(1);
+((Service)instance2).DisposeCount.ShouldBe(1);
+```
+
+
+
+### Disposing lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/DisposingLifetime.cs)
+
+
+
+``` CSharp
+var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    // Use the Disposing lifetime
+    .Bind<IService>().As(Disposing).To<Service>()
+    .Container;
+
+var instance = container.Resolve<IService>();
+
+// Dispose instances on disposing a container
+container.Dispose();
+((Service)instance).DisposeCount.ShouldBe(1);
 ```
 
 
@@ -1324,11 +1361,13 @@ using (container.Bind<IService>().As(ScopeSingleton).To<Service>())
     defaultScopeInstance1.ShouldBe(defaultScopeInstance2);
 
     // Create scope #1
-    using var scope1 = container.Resolve<IScope>();
+    var scope1 = container.Resolve<IScope>();
+    IService scopeInstance1;
+    IService scopeInstance2;
     using (scope1.Activate())
     {
-        var scopeInstance1 = container.Resolve<IService>();
-        var scopeInstance2 = container.Resolve<IService>();
+        scopeInstance1 = container.Resolve<IService>();
+        scopeInstance2 = container.Resolve<IService>();
 
         // Check that instances from the scope #1 are equal
         scopeInstance1.ShouldBe(scopeInstance2);
@@ -1336,6 +1375,11 @@ using (container.Bind<IService>().As(ScopeSingleton).To<Service>())
         // Check that instances from different scopes are not equal
         scopeInstance1.ShouldNotBe(defaultScopeInstance1);
     }
+
+    // Dispose instances on disposing a scope
+    scope1.Dispose();
+    ((Service)scopeInstance1).DisposeCount.ShouldBe(1);
+    ((Service)scopeInstance2).DisposeCount.ShouldBe(1);
 
     // Default scope again
     var defaultScopeInstance3 = container.Resolve<IService>();
@@ -1377,7 +1421,7 @@ using (container.Bind<IService>().As(Transient).To<Service>())
 [Singleton](https://en.wikipedia.org/wiki/Singleton_pattern) is a design pattern which stands for having only one instance of some class during the whole application lifetime. The main complaint about Singleton is that it contradicts the Dependency Injection principle and thus hinders testability. It essentially acts as a global constant, and it is hard to substitute it with a test when needed. The _Singleton lifetime_ is indispensable in this case.
 
 ``` CSharp
-using var container = Container
+var container = Container
     .Create()
     .Bind<IDependency>().To<Dependency>()
     // Use the Singleton lifetime
@@ -1385,14 +1429,15 @@ using var container = Container
     .Container;
 
 // Resolve the singleton twice
-var parentInstance1 = container.Resolve<IService>();
-var parentInstance2 = container.Resolve<IService>();
+var instance1 = container.Resolve<IService>();
+var instance2 = container.Resolve<IService>();
 
 // Check that instances from the parent container are equal
-parentInstance1.ShouldBe(parentInstance2);
+instance1.ShouldBe(instance2);
 
 // Create a child container
 using var childContainer = container.Create();
+
 // Resolve the singleton twice
 var childInstance1 = childContainer.Resolve<IService>();
 var childInstance2 = childContainer.Resolve<IService>();
@@ -1401,7 +1446,14 @@ var childInstance2 = childContainer.Resolve<IService>();
 childInstance1.ShouldBe(childInstance2);
 
 // Check that instances from different containers are equal
-parentInstance1.ShouldBe(childInstance1);
+instance1.ShouldBe(childInstance1);
+
+// Dispose instances on disposing a container
+container.Dispose();
+((Service)childInstance1).DisposeCount.ShouldBe(1);
+((Service)childInstance2).DisposeCount.ShouldBe(1);
+((Service)instance1).DisposeCount.ShouldBe(1);
+((Service)instance2).DisposeCount.ShouldBe(1);
 ```
 
 The lifetime could be:

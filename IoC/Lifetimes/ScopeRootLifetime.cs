@@ -2,9 +2,18 @@
 {
     using System;
 
+    /// <summary>
+    /// Automatically creates a new scope.
+    /// </summary>
+    [PublicAPI]
     public class ScopeRootLifetime: TrackedLifetime
     {
         [CanBeNull] private IDisposable _scopeToken;
+
+        public ScopeRootLifetime()
+            : base(TrackTypes.AfterCreation | TrackTypes.BeforeCreating)
+        {
+        }
 
         public override ILifetime CreateLifetime() => new ScopeRootLifetime();
 

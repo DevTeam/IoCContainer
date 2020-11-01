@@ -8646,7 +8646,7 @@ namespace IoC
     /// Represents an abstraction of a scope which is used with <c>Lifetime.ScopeSingleton</c> and <c>Lifetime.ScopeRoot</c>.
     /// </summary>
     [PublicAPI]
-    public interface IScope : IScopeToken
+    public interface IScope : IScopeToken, IResourceRegistry
     {
         /// <summary>
         /// Activate the scope.
@@ -8803,7 +8803,12 @@ namespace IoC
         /// <summary>
         /// Automatically creates a new scope.
         /// </summary>
-        ScopeRoot = 5
+        ScopeRoot = 5,
+
+        /// <summary>
+        /// Automatically calls the <c>Disposable()</c> method in disposable instances after a container has disposed.
+        /// </summary>
+        Disposing = 6
     }
 }
 
@@ -9300,6 +9305,7 @@ namespace IoC.Features
             yield return container.Register<ILifetime>(ctx => new ContainerSingletonLifetime(), null, new object[] { Lifetime.ContainerSingleton });
             yield return container.Register<ILifetime>(ctx => new ScopeSingletonLifetime(), null, new object[] { Lifetime.ScopeSingleton });
             yield return container.Register<ILifetime>(ctx => new ScopeRootLifetime(), null, new object[] { Lifetime.ScopeRoot });
+            yield return container.Register<ILifetime>(ctx => new DisposingLifetime(), null, new object[] { Lifetime.Disposing });
 
             // Scope
             yield return container.Register<IScopeToken>(ctx => Scope.Current);
@@ -9901,16 +9907,20 @@ namespace IoC.Lifetimes
         {
             if (releasedInstance is IDisposable disposable)
             {
-                targetContainer.UnregisterResource(disposable);
-                disposable.Dispose();
+                if (targetContainer.UnregisterResource(disposable))
+                {
+                    disposable.Dispose();
+                }
             }
 
 #if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();
-                targetContainer.UnregisterResource(disposable);
-                disposable.Dispose();
+                if (targetContainer.UnregisterResource(disposable))
+                {
+                    disposable.Dispose();
+                }
             }
 #endif
         }
@@ -9987,6 +9997,90 @@ namespace IoC.Lifetimes
         public override void Dispose()
         {
             _containerSubscription.Dispose();
+            base.Dispose();
+        }
+    }
+}
+
+
+#endregion
+#region DisposingLifetime
+
+namespace IoC.Lifetimes
+{
+    using System;
+    using System.Collections.Generic;
+    // ReSharper disable once RedundantUsingDirective
+    using Core;
+
+    /// <summary>
+    /// Automatically calls the <c>Disposable()</c> method in disposable instances after a container has disposed.
+    /// </summary>
+    [PublicAPI]
+    public class DisposingLifetime: TrackedLifetime
+    {
+        private readonly List<IDisposable> _disposables = new List<IDisposable>();
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+        private readonly List<IAsyncDisposable> _asyncDisposables = new List<IAsyncDisposable>();
+#endif
+
+        public DisposingLifetime()
+            : base(TrackTypes.AfterCreation)
+        {
+        }
+
+        public override ILifetime CreateLifetime() => new DisposingLifetime();
+
+        protected override object AfterCreation(object newInstance, IContainer container, object[] args)
+        {
+            var instance = base.AfterCreation(newInstance, container, args);
+            lock (_disposables)
+            {
+                if (instance is IDisposable disposable)
+                {
+                    _disposables.Add(disposable);
+                }
+
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+                if (instance is IAsyncDisposable asyncDisposable)
+                {
+                    _asyncDisposables.Add(asyncDisposable);
+                }
+#endif
+            }
+
+            return instance;
+        }
+
+        public override void Dispose()
+        {
+            var disposables = new List<IDisposable>();
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+            var asyncDisposables = new List<IAsyncDisposable>();
+#endif
+            lock (_disposables)
+            {
+                disposables.AddRange(_disposables);
+                _disposables.Clear();
+
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+                asyncDisposables.AddRange(_asyncDisposables);
+                _asyncDisposables.Clear();
+#endif
+            }
+
+            foreach (var disposable in disposables)
+            {
+                disposable.Dispose();
+            }
+
+#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+            foreach (var asyncDisposable in asyncDisposables)
+            {
+                asyncDisposable.ToDisposable().Dispose();
+            }
+#endif
+
             base.Dispose();
         }
     }
@@ -10266,9 +10360,18 @@ namespace IoC.Lifetimes
 {
     using System;
 
+    /// <summary>
+    /// Automatically creates a new scope.
+    /// </summary>
+    [PublicAPI]
     public class ScopeRootLifetime: TrackedLifetime
     {
         [CanBeNull] private IDisposable _scopeToken;
+
+        public ScopeRootLifetime()
+            : base(TrackTypes.AfterCreation | TrackTypes.BeforeCreating)
+        {
+        }
 
         public override ILifetime CreateLifetime() => new ScopeRootLifetime();
 
@@ -10338,21 +10441,19 @@ namespace IoC.Lifetimes
         /// <inheritdoc />
         protected override void OnRelease(object releasedInstance, IScope scope)
         {
-            if (!(scope is IResourceRegistry resourceRegistry))
+            if (releasedInstance is IDisposable disposable)
             {
-                return;
-            }
-
-            if (releasedInstance is IDisposable disposable && resourceRegistry.UnregisterResource(disposable))
-            {
-                disposable.Dispose();
+                if (scope.UnregisterResource(disposable))
+                {
+                    disposable.Dispose();
+                }
             }
 
 #if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();
-                if(resourceRegistry.UnregisterResource(disposable))
+                if (scope.UnregisterResource(disposable))
                 {
                     disposable.Dispose();
                 }
@@ -10483,21 +10584,28 @@ namespace IoC.Lifetimes
 
 namespace IoC.Lifetimes
 {
+    using System;
     using System.Linq;
     using System.Linq.Expressions;
     using System.Reflection;
     using Core;
     using static Core.TypeDescriptorExtensions;
 
+    /// <summary>
+    /// Represents the abstraction for a lifetime with states.
+    /// </summary>
+    [PublicAPI]
     public abstract class TrackedLifetime: ILifetime, ILifetimeBuilder
     {
+        private readonly TrackTypes _trackTypes;
         private static readonly MethodInfo BeforeCreatingMethodInfo = Descriptor<TrackedLifetime>().GetDeclaredMethods().Single(i => i.Name == nameof(BeforeCreating));
         private static readonly MethodInfo AfterCreationMethodInfo = Descriptor<TrackedLifetime>().GetDeclaredMethods().Single(i => i.Name == nameof(AfterCreation));
         private readonly LifetimeDirector _lifetimeDirector;
         private readonly ConstantExpression _thisConst;
 
-        protected TrackedLifetime()
+        protected TrackedLifetime(TrackTypes trackTypes)
         {
+            _trackTypes = trackTypes;
             _lifetimeDirector = new LifetimeDirector(this);
             _thisConst = Expression.Constant(this);
         }
@@ -10526,12 +10634,24 @@ namespace IoC.Lifetimes
 
         bool ILifetimeBuilder.TryBuildBeforeCreating(IBuildContext context, out Expression beforeCreatingExpression)
         {
+            if ((_trackTypes & TrackTypes.BeforeCreating) == 0)
+            {
+                beforeCreatingExpression = default(Expression);
+                return false;
+            }
+
             beforeCreatingExpression = Expression.Call(_thisConst, BeforeCreatingMethodInfo, context.ContainerParameter, context.ArgsParameter);
             return true;
         }
 
         bool ILifetimeBuilder.TryBuildAfterCreation(IBuildContext context, Expression instanceExpression, out Expression newInstanceExpression)
         {
+            if ((_trackTypes & TrackTypes.AfterCreation) == 0)
+            {
+                newInstanceExpression = default(Expression);
+                return false;
+            }
+
             newInstanceExpression = Expression.Call(_thisConst, AfterCreationMethodInfo, instanceExpression, context.ContainerParameter, context.ArgsParameter);
             return true;
         }
@@ -10553,6 +10673,13 @@ namespace IoC.Lifetimes
         /// <returns>The created instance.</returns>
         protected virtual object AfterCreation(object newInstance, IContainer container, object[] args)
             => newInstance;
+
+        [Flags]
+        public enum TrackTypes: byte
+        {
+            AfterCreation = 0b1,
+            BeforeCreating = 0b10
+        }
     }
 }
 
@@ -13927,7 +14054,7 @@ namespace IoC.Core
     using System.Threading;
 
     [DebuggerDisplay("{" + nameof(ToString) + "()} with {" + nameof(ResourceCount) + "} resources")]
-    internal sealed class Scope: IScope, IResourceRegistry
+    internal sealed class Scope: IScope
     {
         private static long _currentScopeKey;
         [NotNull] private static readonly Scope Default = new Scope(new LockObject());

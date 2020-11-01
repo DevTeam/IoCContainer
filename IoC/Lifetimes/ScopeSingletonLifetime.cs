@@ -45,21 +45,19 @@
         /// <inheritdoc />
         protected override void OnRelease(object releasedInstance, IScope scope)
         {
-            if (!(scope is IResourceRegistry resourceRegistry))
+            if (releasedInstance is IDisposable disposable)
             {
-                return;
-            }
-
-            if (releasedInstance is IDisposable disposable && resourceRegistry.UnregisterResource(disposable))
-            {
-                disposable.Dispose();
+                if (scope.UnregisterResource(disposable))
+                {
+                    disposable.Dispose();
+                }
             }
 
 #if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             if (releasedInstance is IAsyncDisposable asyncDisposable)
             {
                 disposable = asyncDisposable.ToDisposable();
-                if(resourceRegistry.UnregisterResource(disposable))
+                if (scope.UnregisterResource(disposable))
                 {
                     disposable.Dispose();
                 }

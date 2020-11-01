@@ -21,7 +21,7 @@
             // $footer=- _ScopeSingleton_ - singleton per scope
             // $footer=- _ScopeRoot_ - root of a scope
             // {
-            using var container = Container
+            var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
                 // Use the Singleton lifetime
@@ -29,14 +29,15 @@
                 .Container;
 
             // Resolve the singleton twice
-            var parentInstance1 = container.Resolve<IService>();
-            var parentInstance2 = container.Resolve<IService>();
+            var instance1 = container.Resolve<IService>();
+            var instance2 = container.Resolve<IService>();
 
             // Check that instances from the parent container are equal
-            parentInstance1.ShouldBe(parentInstance2);
+            instance1.ShouldBe(instance2);
 
             // Create a child container
             using var childContainer = container.Create();
+            
             // Resolve the singleton twice
             var childInstance1 = childContainer.Resolve<IService>();
             var childInstance2 = childContainer.Resolve<IService>();
@@ -45,7 +46,14 @@
             childInstance1.ShouldBe(childInstance2);
 
             // Check that instances from different containers are equal
-            parentInstance1.ShouldBe(childInstance1);
+            instance1.ShouldBe(childInstance1);
+
+            // Dispose instances on disposing a container
+            container.Dispose();
+            ((Service)childInstance1).DisposeCount.ShouldBe(1);
+            ((Service)childInstance2).DisposeCount.ShouldBe(1);
+            ((Service)instance1).DisposeCount.ShouldBe(1);
+            ((Service)instance2).DisposeCount.ShouldBe(1);
             // }
         }
     }

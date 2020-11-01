@@ -7,7 +7,7 @@
     using System.Threading;
 
     [DebuggerDisplay("{" + nameof(ToString) + "()} with {" + nameof(ResourceCount) + "} resources")]
-    internal sealed class Scope: IScope, IResourceRegistry
+    internal sealed class Scope: IScope
     {
         private static long _currentScopeKey;
         [NotNull] private static readonly Scope Default = new Scope(new LockObject());
