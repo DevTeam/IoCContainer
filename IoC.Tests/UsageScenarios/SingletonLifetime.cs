@@ -20,6 +20,7 @@
             // $footer=- _ContainerSingleton_ - singleton per container
             // $footer=- _ScopeSingleton_ - singleton per scope
             // $footer=- _ScopeRoot_ - root of a scope
+            // $footer=- _Disposing_ - Automatically calls a Disposable() method for disposable instances
             // {
             var container = Container
                 .Create()

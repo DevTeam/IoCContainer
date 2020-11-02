@@ -343,6 +343,7 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Expression binding](#expression-binding-)
   - [Method injection](#method-injection-)
   - [Property injection](#property-injection-)
+  - [Aspect Oriented](#aspect-oriented-)
   - [Dependency tag](#dependency-tag-)
   - [Manual wiring](#manual-wiring-)
   - [Func dependency](#func-dependency-)
@@ -352,7 +353,6 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Optional injection](#optional-injection-)
   - [Resolve using arguments](#resolve-using-arguments-)
   - [Auto Disposing](#auto-disposing-)
-  - [Aspect Oriented](#aspect-oriented-)
 - Lifetimes
   - [Container Singleton lifetime](#container-singleton-lifetime-)
   - [Disposing lifetime](#disposing-lifetime-)
@@ -361,6 +361,7 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Singleton lifetime](#singleton-lifetime-)
   - [Custom lifetime](#custom-lifetime-)
   - [Replacement of Lifetime](#replacement-of-lifetime-)
+  - [Thread Singleton lifetime](#thread-singleton-lifetime-)
 - BCL types
   - [Array](#array-)
   - [Collection](#collection-)
@@ -382,7 +383,6 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Override a task scheduler](#override-a-task-scheduler-)
 - Advanced
   - [Change configuration on-the-fly](#change-configuration-on-the-fly-)
-  - [Thread Singleton lifetime](#thread-singleton-lifetime-)
   - [Resolve unbound implementations](#resolve-unbound-implementations-)
   - [Constructor choice](#constructor-choice-)
   - [Container injection](#container-injection-)
@@ -797,6 +797,112 @@ otherInstance.Name.ShouldBe("beta");
 
 
 
+### Aspect Oriented [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AspectOriented.cs)
+
+This framework has no special attributes to support aspect oriented autowiring because of a production code should not have references to these special attributes. But this code may contain these attributes by itself. And it is quite easy to use these attributes for aspect oriented autowiring, see the sample below.
+
+``` CSharp
+public void Run()
+{
+    var console = new Mock<IConsole>();
+
+    // Creates an aspect oriented autowiring strategy based the custom attribute `DependencyAttribute`
+    var autowiringStrategy = AutowiringStrategies.AspectOriented()
+        .Type<TypeAttribute>(attribute => attribute.Type)
+        .Order<OrderAttribute>(attribute => attribute.Order)
+        .Tag<TagAttribute>(attribute => attribute.Tag);
+
+    // Create the root container
+    using (var rootContainer = Container.Create("root"))
+    // Configure the child container
+    {
+        using var childContainer = rootContainer
+            .Create("child")
+            // Configure the child container by the custom aspect oriented autowiring strategy
+            .Bind<IAutowiringStrategy>().To(ctx => autowiringStrategy)
+            .Bind<IConsole>().Tag("MyConsole").To(ctx => console.Object)
+            .Bind<Clock>().To<Clock>()
+            .Bind<string>().Tag("Prefix").To(ctx => "info")
+            .Bind<ILogger>().To<Logger>()
+            .Container;
+
+        // Create a logger
+        var logger = childContainer.Resolve<ILogger>();
+
+        // Log the message
+        logger.Log("Hello");
+    }
+
+    // Check the console output
+    console.Verify(i => i.WriteLine(It.IsRegex(".+ - info: Hello")));
+}
+
+// Represents the dependency attribute to specify `type` for injection.
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
+public class TypeAttribute : Attribute
+{
+    // The tag, which will be used during an injection
+    [NotNull] public readonly Type Type;
+
+    public TypeAttribute([NotNull] Type type) => Type = type;
+}
+
+// Represents the dependency attribute to specify `tag` for injection.
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
+public class TagAttribute : Attribute
+{
+    // The tag, which will be used during an injection
+    [NotNull] public readonly object Tag;
+
+    public TagAttribute([NotNull] object tag) => Tag = tag;
+}
+
+// Represents the dependency attribute to specify `order` for injection.
+[AttributeUsage(AttributeTargets.Method)]
+public class OrderAttribute : Attribute
+{
+    // The order to be used to invoke a method
+    public readonly int Order;
+
+    public OrderAttribute(int order) => Order = order;
+}
+
+public interface IConsole { void WriteLine(string text); }
+
+public interface IClock { DateTimeOffset Now { get; } }
+
+public interface ILogger { void Log(string message); }
+
+public class Logger : ILogger
+{
+    private readonly IConsole _console;
+    private IClock _clock;
+
+    // Constructor injection
+    public Logger([Tag("MyConsole")] IConsole console) => _console = console;
+
+    // Method injection
+    [Order(1)]
+    public void Initialize([Type(typeof(Clock))] IClock clock) => _clock = clock;
+
+    // Property injection
+    public string Prefix { get; [Tag("Prefix"), Order(2)] set; }
+
+    // Adds current time and prefix before a message and writes it to console
+    public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");
+}
+
+public class Clock : IClock
+{
+    // "clockName" dependency is not resolved here but has default value
+    public Clock([Type(typeof(string)), Tag("ClockName")] string clockName = "SPb") { }
+
+    public DateTimeOffset Now => DateTimeOffset.Now;
+}
+```
+
+Also you can specify your own aspect oriented autowiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
+
 ### Dependency tag [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/DependencyTag.cs)
 
 Use a _tag_ to inject specific dependency from several bindings of the same types.
@@ -1090,112 +1196,6 @@ disposableService.Verify(i => i.DisposeAsync(), Times.Once);
 
 
 
-### Aspect Oriented [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/AspectOriented.cs)
-
-This framework has no special attributes to support aspect oriented autowiring because of a production code should not have references to these special attributes. But this code may contain these attributes by itself. And it is quite easy to use these attributes for aspect oriented autowiring, see the sample below.
-
-``` CSharp
-public void Run()
-{
-    var console = new Mock<IConsole>();
-
-    // Creates an aspect oriented autowiring strategy based the custom attribute `DependencyAttribute`
-    var autowiringStrategy = AutowiringStrategies.AspectOriented()
-        .Type<TypeAttribute>(attribute => attribute.Type)
-        .Order<OrderAttribute>(attribute => attribute.Order)
-        .Tag<TagAttribute>(attribute => attribute.Tag);
-
-    // Create the root container
-    using (var rootContainer = Container.Create("root"))
-    // Configure the child container
-    {
-        using var childContainer = rootContainer
-            .Create("child")
-            // Configure the child container by the custom aspect oriented autowiring strategy
-            .Bind<IAutowiringStrategy>().To(ctx => autowiringStrategy)
-            .Bind<IConsole>().Tag("MyConsole").To(ctx => console.Object)
-            .Bind<Clock>().To<Clock>()
-            .Bind<string>().Tag("Prefix").To(ctx => "info")
-            .Bind<ILogger>().To<Logger>()
-            .Container;
-
-        // Create a logger
-        var logger = childContainer.Resolve<ILogger>();
-
-        // Log the message
-        logger.Log("Hello");
-    }
-
-    // Check the console output
-    console.Verify(i => i.WriteLine(It.IsRegex(".+ - info: Hello")));
-}
-
-// Represents the dependency attribute to specify `type` for injection.
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
-public class TypeAttribute : Attribute
-{
-    // The tag, which will be used during an injection
-    [NotNull] public readonly Type Type;
-
-    public TypeAttribute([NotNull] Type type) => Type = type;
-}
-
-// Represents the dependency attribute to specify `tag` for injection.
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
-public class TagAttribute : Attribute
-{
-    // The tag, which will be used during an injection
-    [NotNull] public readonly object Tag;
-
-    public TagAttribute([NotNull] object tag) => Tag = tag;
-}
-
-// Represents the dependency attribute to specify `order` for injection.
-[AttributeUsage(AttributeTargets.Method)]
-public class OrderAttribute : Attribute
-{
-    // The order to be used to invoke a method
-    public readonly int Order;
-
-    public OrderAttribute(int order) => Order = order;
-}
-
-public interface IConsole { void WriteLine(string text); }
-
-public interface IClock { DateTimeOffset Now { get; } }
-
-public interface ILogger { void Log(string message); }
-
-public class Logger : ILogger
-{
-    private readonly IConsole _console;
-    private IClock _clock;
-
-    // Constructor injection
-    public Logger([Tag("MyConsole")] IConsole console) => _console = console;
-
-    // Method injection
-    [Order(1)]
-    public void Initialize([Type(typeof(Clock))] IClock clock) => _clock = clock;
-
-    // Property injection
-    public string Prefix { get; [Tag("Prefix"), Order(2)] set; }
-
-    // Adds current time and prefix before a message and writes it to console
-    public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");
-}
-
-public class Clock : IClock
-{
-    // "clockName" dependency is not resolved here but has default value
-    public Clock([Type(typeof(string)), Tag("ClockName")] string clockName = "SPb") { }
-
-    public DateTimeOffset Now => DateTimeOffset.Now;
-}
-```
-
-Also you can specify your own aspect oriented autowiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
-
 ### Container Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ContainerLifetime.cs)
 
 Each container may have its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding.
@@ -1462,6 +1462,7 @@ The lifetime could be:
 - _ContainerSingleton_ - singleton per container
 - _ScopeSingleton_ - singleton per scope
 - _ScopeRoot_ - root of a scope
+- _Disposing_ - Automatically calls a Disposable() method for disposable instances
 
 ### Custom lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomLifetime.cs)
 
@@ -1595,6 +1596,64 @@ public class MySingletonLifetime : ILifetime
 
     // Just counts the number of calls
     internal void IncrementCounter() => _counter.Increment();
+}
+```
+
+
+
+### Thread Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ThreadSingletonLifetime.cs)
+
+Sometimes it is useful to have a [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance per a thread (or more generally a singleton per something else). There is no special "lifetime" type in this framework to achieve this requirement, but it is quite easy create your own "lifetime" type for that using base type [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs).
+
+``` CSharp
+public void Run()
+{
+    var finish = new ManualResetEvent(false);
+    
+    var container = Container
+        .Create()
+        .Bind<IDependency>().To<Dependency>()
+        // Bind an interface to an implementation using the singleton per a thread lifetime
+        .Bind<IService>().Lifetime(new ThreadLifetime()).To<Service>()
+        .Container;
+
+    // Resolve the singleton twice
+    var instance1 = container.Resolve<IService>();
+    var instance2 = container.Resolve<IService>();
+    IService instance3 = null;
+    IService instance4 = null;
+
+    var newThread = new Thread(() =>
+    {
+        instance3 = container.Resolve<IService>();
+        instance4 = container.Resolve<IService>();
+        finish.Set();
+    });
+
+    newThread.Start();
+    finish.WaitOne();
+
+    // Check that instances resolved in a main thread are equal
+    instance1.ShouldBe(instance2);
+    // Check that instance resolved in a new thread is not null
+    instance3.ShouldNotBeNull();
+    // Check that instances resolved in different threads are not equal
+    instance1.ShouldNotBe(instance3);
+    // Check that instances resolved in a new thread are equal
+    instance4.ShouldBe(instance3);
+}
+
+// Represents the custom thead singleton lifetime based on the KeyBasedLifetime
+public sealed class ThreadLifetime : KeyBasedLifetime<int>
+{
+    // Creates a clone of the current lifetime (for the case with generic types)
+    public override ILifetime CreateLifetime() =>
+        new ThreadLifetime();
+
+    // Provides a key of an instance
+    // If a key the same an instance is the same too
+    protected override int CreateKey(IContainer container, object[] args) =>
+        Thread.CurrentThread.ManagedThreadId;
 }
 ```
 
@@ -2070,64 +2129,6 @@ using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
 
     // Check that instances are equal
     instance1.ShouldBe(instance2);
-}
-```
-
-
-
-### Thread Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ThreadSingletonLifetime.cs)
-
-Sometimes it is useful to have a [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance per a thread (or more generally a singleton per something else). There is no special "lifetime" type in this framework to achieve this requirement, but it is quite easy create your own "lifetime" type for that using base type [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs).
-
-``` CSharp
-public void Run()
-{
-    var finish = new ManualResetEvent(false);
-
-    using var container = Container
-        .Create()
-        .Bind<IDependency>().To<Dependency>()
-        // Bind an interface to an implementation using the singleton per a thread lifetime
-        .Bind<IService>().Lifetime(new ThreadLifetime()).To<Service>()
-        .Container;
-
-    // Resolve the singleton twice
-    var instance1 = container.Resolve<IService>();
-    var instance2 = container.Resolve<IService>();
-    IService instance3 = null;
-    IService instance4 = null;
-
-    var newThread = new Thread(() =>
-    {
-        instance3 = container.Resolve<IService>();
-        instance4 = container.Resolve<IService>();
-        finish.Set();
-    });
-
-    newThread.Start();
-    finish.WaitOne();
-
-    // Check that instances resolved in a main thread are equal
-    instance1.ShouldBe(instance2);
-    // Check that instance resolved in a new thread is not null
-    instance3.ShouldNotBeNull();
-    // Check that instances resolved in different threads are not equal
-    instance1.ShouldNotBe(instance3);
-    // Check that instances resolved in a new thread are equal
-    instance4.ShouldBe(instance3);
-}
-
-// Represents the custom thead singleton lifetime based on the KeyBasedLifetime
-public class ThreadLifetime : KeyBasedLifetime<int>
-{
-    // Creates a clone of the current lifetime (for the case with generic types)
-    public override ILifetime CreateLifetime() =>
-        new ThreadLifetime();
-
-    // Provides a key of an instance
-    // If a key the same an instance is the same too
-    protected override int CreateKey(IContainer container, object[] args) =>
-        Thread.CurrentThread.ManagedThreadId;
 }
 ```
 

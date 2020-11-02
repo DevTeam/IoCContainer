@@ -6,7 +6,7 @@
     using Core;
 
     /// <summary>
-    /// Automatically calls the <c>Disposable()</c> method in disposable instances after a container has disposed.
+    /// Automatically calls a <c>Disposable()</c> method for disposable instances after a container has disposed.
     /// </summary>
     [PublicAPI]
     public class DisposingLifetime: TrackedLifetime
