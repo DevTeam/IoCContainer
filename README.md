@@ -1466,45 +1466,75 @@ The lifetime could be:
 
 ### Custom lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomLifetime.cs)
 
-Custom lifetimes allow to implement your own logic controlling every aspects of resolved instances. Also you could use the class [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs) as a base for others.
+Custom lifetimes allow to implement your own logic controlling every aspects of resolved instances.
 
 ``` CSharp
 public void Run()
 {
+    var serviceLifetime = new MyLifetime();
+
     using var container = Container
         .Create()
         .Bind<IDependency>().To<Dependency>()
-        // Bind an interface to an implementation using the custom lifetime, based on the Singleton lifetime
-        .Bind<IService>().Lifetime(new MyTransientLifetime()).To<Service>()
+        // Bind using a custom lifetime
+        .Bind<IService>().Lifetime(serviceLifetime).To<Service>()
         .Container;
     
-    // Resolve the singleton twice
+    // Resolve instances
     var instance1 = container.Resolve<IService>();
     var instance2 = container.Resolve<IService>();
 
-    // Check that instances from the parent container are equal
-    instance1.ShouldBe(instance2);
+    // Check that instances were registered
+    serviceLifetime.ToList().ShouldBe(new object[] {instance1, instance2}, true);
 }
 
-// Represents the custom lifetime based on the Singleton lifetime
-public class MyTransientLifetime : ILifetime
+// Represents a custom lifetime that registers all created instances
+public class MyLifetime : TrackedLifetime, IEnumerable<object>
 {
-    // Creates the instance of the Singleton lifetime
-    private ILifetime _baseLifetime = new Lifetimes.SingletonLifetime();
+    private readonly List<WeakReference> _instances = new List<WeakReference>();
 
-    // Wraps the expression by the Singleton lifetime expression
-    public Expression Build(IBuildContext context, Expression expression) =>
-        _baseLifetime.Build(context, expression);
+    public MyLifetime() : base(TrackTypes.AfterCreation)
+    { }
 
-    // Creates the similar lifetime to use with generic instances
-    public ILifetime CreateLifetime() => new MyTransientLifetime();
+    // Creates the similar lifetime to use with generic types
+    public override ILifetime CreateLifetime() => new MyLifetime();
 
-    // Select a container to resolve dependencies using the Singleton lifetime logic
-    public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
-        _baseLifetime.SelectContainer(registrationContainer, resolvingContainer);
+    protected override object AfterCreation(object newInstance, IContainer container, object[] args)
+    {
+        var instance = base.AfterCreation(newInstance, container, args);
+        lock (_instances)
+        {
+            // Keep a weak reference for the instance
+            _instances.Add(new WeakReference(instance));
+        }
+        
+        return instance;
+    }
 
-    // Disposes the instance of the Singleton lifetime
-    public void Dispose() => _baseLifetime.Dispose();
+    public IEnumerator<object> GetEnumerator()
+    {
+        IEnumerable<WeakReference> instances;
+        lock (_instances)
+        {
+            instances = _instances.ToArray();
+        }
+
+        return (
+            from weakReference in instances
+            let instance = weakReference.Target
+            where weakReference.IsAlive
+            select instance ).GetEnumerator();
+    }
+
+    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+    public override void Dispose()
+    {
+        lock (_instances)
+        {
+            _instances.Clear();
+        }
+    }
 }
 ```
 
