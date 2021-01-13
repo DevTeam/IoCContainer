@@ -16,7 +16,7 @@
     <RepositoryType>git</RepositoryType>
     <PackageTags>ioc container di asp core</PackageTags>
     <Product>IoC Container AspNetCore feature</Product>
-    <Copyright>Copyright (C) 2018-2020 Nikolay Pianikov</Copyright>
+    <Copyright>Copyright (C) 2018-2022 Nikolay Pianikov</Copyright>
     <WarningsAsErrors />
     <LangVersion>7</LangVersion>
     <!--NullableContextOptions>enable</NullableContextOptions-->

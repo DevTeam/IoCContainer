@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -11,12 +11,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Xamarin.Forms" Version="4.8.0.1560" />
-    <PackageReference Include="Xamarin.Essentials" Version="1.5.3.2" />
+    <PackageReference Include="Xamarin.Forms" Version="5.0.0.1874" />
+    <PackageReference Include="Xamarin.Essentials" Version="1.6.0" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\IoC\IoC.csproj" />
     <ProjectReference Include="..\..\Clock\Clock.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="PresentationCore">
+      <HintPath>..\..\..\..\..\..\Program Files (x86)\Reference Assemblies\Microsoft\Framework\.NETFramework\v4.8\PresentationCore.dll</HintPath>
+    </Reference>
   </ItemGroup>
 </Project>

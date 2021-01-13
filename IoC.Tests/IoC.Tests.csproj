@@ -12,9 +12,13 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Castle.Core" Version="4.4.1" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
     <PackageReference Include="Shouldly" Version="3.0.2" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.2" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
   </ItemGroup>
   <Choose>
     <When Condition="'$(TargetFramework)'=='net40'">
@@ -35,7 +39,7 @@
     <Otherwise>
       <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0" />
-        <PackageReference Include="Moq" Version="4.10.1" />
+        <PackageReference Include="Moq" Version="4.15.2" />
         <PackageReference Include="xunit" Version="2.4.1" />
       </ItemGroup>
     </Otherwise>
