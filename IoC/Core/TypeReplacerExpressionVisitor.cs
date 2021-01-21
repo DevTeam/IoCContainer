@@ -64,6 +64,11 @@
             }
 
             var newMember = newDeclaringTypeDescriptor.GetDeclaredMembers().Single(i => i.Name == node.Member.Name);
+            if (node.Expression == null)
+            {
+                return Expression.MakeMemberAccess(node.Expression, newMember);
+            }
+
             var newExpression = Visit(node.Expression);
             return newExpression == null ? base.VisitMember(node) : Expression.MakeMemberAccess(newExpression, newMember);
         }

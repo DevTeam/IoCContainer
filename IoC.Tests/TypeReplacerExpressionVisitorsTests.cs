@@ -97,6 +97,22 @@
         }
 
         [Fact]
+        public void ShouldReplaceWhenVisitStaticMember()
+        {
+            // Given
+            Expression<Func<Pool<TT>>> expression = () => Pool<TT>.Shared;
+            var typesMap = CreateTypesMap(expression.ReturnType, typeof(Pool<byte>));
+            var replacingVisitor = new TypeReplacerExpressionVisitor(typesMap);
+
+            // When
+            var expressionExpression = replacingVisitor.Visit(expression.Body);
+            var func = Expression.Lambda<Func<Pool<byte>>>(expressionExpression).Compile();
+
+            // Then
+            func();
+        }
+
+        [Fact]
         public void ShouldReplaceWhenVisitMethodCallGeneric()
         {
             // Given
@@ -272,5 +288,10 @@
         [GenericTypeArgument]
         // ReSharper disable once InconsistentNaming
         public class TTT { }
+
+        public class Pool<T>
+        {
+            public static Pool<T> Shared { get; } = new Pool<T>();
+        }
     }
 }
