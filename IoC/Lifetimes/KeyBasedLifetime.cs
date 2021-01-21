@@ -74,7 +74,6 @@
             return true;
         }
 
-        [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
         public virtual void Dispose()
         {
             Table<TKey, object> instances;
