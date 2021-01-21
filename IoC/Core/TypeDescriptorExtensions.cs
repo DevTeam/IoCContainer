@@ -48,5 +48,17 @@
 
             return type;
         }
+
+        [MethodImpl((MethodImplOptions)0x100)]
+        [NotNull]
+        public static string GetShortName([NotNull] this Type type)
+        {
+            if (!TypeToStringConverter.Shared.TryConvert(type, type, out var typeName))
+            {
+                typeName = type.FullName;
+            }
+
+            return typeName ?? "UnknownType";
+        }
     }
 }

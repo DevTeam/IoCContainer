@@ -3,12 +3,13 @@
     using System;
     using System.Diagnostics;
     using System.Runtime.CompilerServices;
+    using Core;
 
     /// <summary>
     /// Represents a dependency key.
     /// </summary>
     [PublicAPI]
-    [DebuggerDisplay("Type = {" + nameof(Type) + "}, Tag = {" + nameof(Tag) + "}")]
+    [DebuggerDisplay("{ToString()}")]
     public struct Key
     {
         /// <summary>
@@ -39,7 +40,7 @@
 
         /// <inheritdoc />
         [Pure]
-        public override string ToString() => $"[Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {GetHashCode()}]";
+        public override string ToString() => Tag != null ? $"{Type.GetShortName()}(tag: {Tag})" : Type.GetShortName();
 
         /// <inheritdoc />
         [Pure]

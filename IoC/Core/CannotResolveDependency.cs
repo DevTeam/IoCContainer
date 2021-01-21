@@ -12,7 +12,7 @@
         public DependencyDescription Resolve(IBuildContext buildContext)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            throw new InvalidOperationException($"Cannot find the dependency for the key {buildContext.Key} in the container {buildContext.Container}.\n{buildContext}");
+            throw new InvalidOperationException($"Cannot find a dependency for {buildContext.Key} in {buildContext.Container}.\n{buildContext}");
         }
     }
 }

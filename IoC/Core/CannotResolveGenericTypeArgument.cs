@@ -11,7 +11,7 @@
         {
             var typeDescriptor = type.Descriptor();
             var genericTypeArgs = typeDescriptor.IsGenericTypeDefinition() ? typeDescriptor.GetGenericTypeParameters() : typeDescriptor.GetGenericTypeArguments();
-            throw new InvalidOperationException($"Cannot resolve the generic type argument \'{genericTypeArgs[genericTypeArgPosition]}\' at position {genericTypeArgPosition} of the type {typeDescriptor.Type}.");
+            throw new InvalidOperationException($"Cannot resolve the generic type argument \'{genericTypeArgs[genericTypeArgPosition]}\' at position {genericTypeArgPosition} of the type {typeDescriptor.Type.GetShortName()}.");
         }
     }
 }

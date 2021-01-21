@@ -494,8 +494,8 @@ namespace IoC.Tests.IntegrationTests
                 {
                     // Then
                     ex.InnerException.ShouldNotBeNull();
-                    ex.InnerException.Message.ShouldContain("Cannot find the dependency for the key");
-                    ex.InnerException.Message.ShouldContain("IoC.Tests.IntegrationTests.IMyService1");
+                    ex.InnerException.Message.ShouldContain("Cannot find a dependency for");
+                    ex.InnerException.Message.ShouldContain("IMyService1");
                 }
             }
         }

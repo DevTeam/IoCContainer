@@ -13,7 +13,7 @@
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (error == null) throw new ArgumentNullException(nameof(error));
-            throw new InvalidOperationException($"Cannot get resolver for the key {key} from the container {container}.", error);
+            throw new InvalidOperationException($"Cannot get resolver for {key} from {container}.", error);
         }
     }
 }
