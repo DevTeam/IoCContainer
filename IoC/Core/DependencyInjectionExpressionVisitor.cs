@@ -144,7 +144,7 @@ namespace IoC.Core
                             var type = (Type) ((ConstantExpression) Visit(methodCall.Arguments[1]) ?? throw InvalidExpressionError).Value ?? throw InvalidExpressionError;
                             var containerExpression = methodCall.Arguments[0];
                             var key = new Key(type);
-                            return CreateDependencyExpression(key, containerExpression, null);
+                            return CreateDependencyExpression(key, containerExpression, null).Convert(methodCall.Type);
                         }
 
                         if (Equals(methodCall.Method, Injections.TryInjectMethodInfo))
@@ -152,7 +152,7 @@ namespace IoC.Core
                             var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw InvalidExpressionError).Value ?? throw InvalidExpressionError;
                             var containerExpression = methodCall.Arguments[0];
                             var key = new Key(type);
-                            return CreateDependencyExpression(key, containerExpression, Expression.Default(type));
+                            return CreateDependencyExpression(key, containerExpression, Expression.Default(type)).Convert(methodCall.Type);
                         }
 
                         if (argumentsCount > 3)
@@ -167,7 +167,7 @@ namespace IoC.Core
                                 var argsExpression = Visit(methodCall.Arguments[3]);
 
                                 var key = new Key(type, tag);
-                                return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, null);
+                                return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, null).Convert(methodCall.Type);
                             }
 
                             if (Equals(methodCall.Method, Injections.TryInjectWithTagMethodInfo))
@@ -179,7 +179,7 @@ namespace IoC.Core
                                 var argsExpression = Visit(methodCall.Arguments[3]);
 
                                 var key = new Key(type, tag);
-                                return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, Expression.Default(type));
+                                return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, Expression.Default(type)).Convert(methodCall.Type);
                             }
                         }
                     }
