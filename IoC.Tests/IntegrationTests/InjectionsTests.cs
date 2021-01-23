@@ -302,6 +302,21 @@
             instance.Val.ShouldBe(0);
         }
 
+        [Fact]
+        public void InjectWhenInjectByType()
+        {
+            // Given
+            using var container = Container
+                .Create(CoreFeature.Set)
+                .Bind<string>().To(ctx => "abc")
+                // When
+                .Bind<MyClassRef>().To(ctx => new MyClassRef((string)ctx.Container.Inject(typeof(string))))
+                .Container;
+
+            // Then
+            container.Resolve<MyClassRef>().Val.ShouldBe("abc");
+        }
+
         public class MyClassRef
         {
             public string Val { get; }
