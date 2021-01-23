@@ -88,6 +88,11 @@
                 return new CompositionRoot<TInstance>(new Token(container, Disposable.Empty), resolver(container, args));
             }
 
+            if (typeof(TInstance).Descriptor().IsAbstract())
+            {
+                throw new InvalidOperationException("The composition root must be of a non-abstract type, or must be registered with the container.");
+            }
+
             var buildId = Guid.NewGuid();
             var token = container.Bind<TInstance>().Tag(buildId).To();
             try
