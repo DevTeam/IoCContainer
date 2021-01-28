@@ -1,81 +1,76 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFrameworks>net40;net48;netcoreapp1.0;netcoreapp2.1;netcoreapp3.1;net5.0</TargetFrameworks>
-    <IsTestProject>True</IsTestProject>
-    <SignAssembly>True</SignAssembly>
-    <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
-    <IsPackable>false</IsPackable>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
-    <NoWarn>1701;1702;1705;8002</NoWarn>
-    <LangVersion>8.0</LangVersion>
-  </PropertyGroup>
-  <ItemGroup>
-    <PackageReference Include="Castle.Core" Version="4.4.1" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
-    <PackageReference Include="Shouldly" Version="3.0.2" />
-    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
-  </ItemGroup>
-  <Choose>
-    <When Condition="'$(TargetFramework)'=='net40'">
-      <ItemGroup>
-        <PackageReference Include="Moq" Version="4.2.1510.2205" />
-        <PackageReference Include="xunit" Version="1.9.2" />
-      </ItemGroup>
-    </When>
+	<PropertyGroup>
+		<TargetFrameworks>net40</TargetFrameworks>
+		<IsTestProject>True</IsTestProject>
+		<SignAssembly>True</SignAssembly>
+		<AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
+		<IsPackable>false</IsPackable>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<WarningsAsErrors />
+		<NoWarn>1701;1702;1705;8002</NoWarn>
+		<LangVersion>8.0</LangVersion>
+	</PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Castle.Core" Version="4.4.1" />
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.3" />
+		<PackageReference Include="Shouldly" Version="3.0.2" />
+		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
+	</ItemGroup>
+	<Choose>
+		<When Condition="'$(TargetFramework)'=='net40'">
+			<ItemGroup>
+				<PackageReference Include="Moq" Version="4.2.1510.2205" />
+				<PackageReference Include="xunit" Version="1.9.2" />
+				<PackageReference Include="xunit.runner.visualstudio" Version="2.4.1">
+					<PrivateAssets>all</PrivateAssets>
+					<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+				</PackageReference>
+			</ItemGroup>
+		</When>
 
-    <When Condition="'$(TargetFramework)'=='netcoreapp1.0'">
-      <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.9.2" />
-        <PackageReference Include="Moq" Version="4.10.1" />
-        <PackageReference Include="xunit" Version="2.4.1" />
-      </ItemGroup>      
-    </When>
+		<Otherwise>
+			<ItemGroup>
+				<PackageReference Include="Moq" Version="4.16.0" />
+				<PackageReference Include="xunit" Version="2.4.1" />
+				<PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+					<PrivateAssets>all</PrivateAssets>
+					<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+				</PackageReference>
+			</ItemGroup>
+		</Otherwise>
+	</Choose>
 
-    <Otherwise>
-      <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.8.0" />
-        <PackageReference Include="Moq" Version="4.15.2" />
-        <PackageReference Include="xunit" Version="2.4.1" />
-      </ItemGroup>
-    </Otherwise>
-  </Choose>
-
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp1.0'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
-    <ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='netstandard2.1'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
-  </ItemGroup>  
-  <ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.10" />
-    <ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net48'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
-    <ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
-  </ItemGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='net5.0' AND '$(Configuration)'=='Debug'">
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
-    <ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\IoC.Interception\IoC.Interception.csproj" />
-    <ProjectReference Include="..\IoC\IoC.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Update="UsageScenarios\README.md">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>README.tt</DependentUpon>
-    </None>
-    <None Update="UsageScenarios\README.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-    </None>
-  </ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp1.0'">
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
+		<ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='netstandard2.1'">
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.2.0" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='netcoreapp3.1'">
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="3.1.10" />
+		<ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='net48'">
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
+		<ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='net5.0' AND '$(Configuration)'=='Debug'">
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="5.0.0" />
+		<ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\IoC.Interception\IoC.Interception.csproj" />
+		<ProjectReference Include="..\IoC\IoC.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="UsageScenarios\README.md">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>README.tt</DependentUpon>
+		</None>
+		<None Update="UsageScenarios\README.tt">
+			<Generator>TextTemplatingFileGenerator</Generator>
+		</None>
+	</ItemGroup>
 </Project>
