@@ -33,9 +33,9 @@ namespace IoC.Tests.IntegrationTests
             // Configure the child container by the custom aspect oriented autowiring strategy
             using (childContainer.Bind<IAutowiringStrategy>().To(ctx => autowiringStrategy))
             // Configure the child container
-            using (childContainer.Bind<IConsole>().Tag("MyConsole").To(ctx => console.Object))
+            using (childContainer.Bind<IConsole>().Tag(Tags.MyConsole).To(ctx => console.Object))
             using (childContainer.Bind<Clock>().To<Clock>())
-            using (childContainer.Bind<string>().Tag("Prefix").To(ctx => "info"))
+            using (childContainer.Bind<string>().Tag(Tags.Prefix).To(ctx => "info"))
             using (childContainer.Bind<ILogger>().To<Logger>())
             {
                 // Create a logger
@@ -47,6 +47,14 @@ namespace IoC.Tests.IntegrationTests
 
             // Check the console output
             console.Verify(i => i.WriteLine(It.IsRegex(".+ - info: Hello")));
+        }
+
+        // This enum is not required and created just to manage all tags.
+        // It is possible to use tags of any type.
+        public enum Tags
+        {
+            MyConsole,
+            Prefix
         }
 
         // Represents the tag attribute to specify `tag` for injection.
@@ -107,7 +115,7 @@ namespace IoC.Tests.IntegrationTests
             private readonly IConsole _console;
             private IClock _clock;
 
-            public Logger([Tag("MyConsole")] IConsole console) => _console = console;
+            public Logger([Tag(Tags.MyConsole)] IConsole console) => _console = console;
 
             // Method injection
             [Order(1)]
@@ -123,7 +131,7 @@ namespace IoC.Tests.IntegrationTests
             }
 
             // Property injection
-            public string Prefix { get; [Order(2), Tag("Prefix")] set; }
+            public string Prefix { get; [Order(2), Tag(Tags.Prefix)] set; }
 
             // Adds current time and prefix before a message and writes it to console
             public void Log(string message) => _console?.WriteLine($"{_clock.Now} - {Prefix}: {message}");

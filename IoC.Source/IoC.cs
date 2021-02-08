@@ -5714,6 +5714,11 @@ namespace IoC
                 return new CompositionRoot<TInstance>(new Token(container, Disposable.Empty), resolver(container, args));
             }
 
+            if (typeof(TInstance).Descriptor().IsAbstract())
+            {
+                throw new InvalidOperationException("The composition root must be of a non-abstract type, or must be registered with the container.");
+            }
+
             var buildId = Guid.NewGuid();
             var token = container.Bind<TInstance>().Tag(buildId).To();
             try
@@ -8700,12 +8705,13 @@ namespace IoC
     using System;
     using System.Diagnostics;
     using System.Runtime.CompilerServices;
+    using Core;
 
     /// <summary>
     /// Represents a dependency key.
     /// </summary>
     [PublicAPI]
-    [DebuggerDisplay("Type = {" + nameof(Type) + "}, Tag = {" + nameof(Tag) + "}")]
+    [DebuggerDisplay("{ToString()}")]
     public struct Key
     {
         /// <summary>
@@ -8736,7 +8742,7 @@ namespace IoC
 
         /// <inheritdoc />
         [Pure]
-        public override string ToString() => $"[Type = {Type.FullName}, Tag = {Tag ?? "empty"}, HashCode = {GetHashCode()}]";
+        public override string ToString() => Tag != null ? $"{Type.GetShortName()}(tag: {Tag})" : Type.GetShortName();
 
         /// <inheritdoc />
         [Pure]
@@ -10186,7 +10192,6 @@ namespace IoC.Lifetimes
             return true;
         }
 
-        [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
         public virtual void Dispose()
         {
             Table<TKey, object> instances;
@@ -12151,7 +12156,7 @@ namespace IoC.Core
         public Expression Resolve(IBuildContext buildContext, IDependency dependency, ILifetime lifetime, Exception error)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            throw new InvalidOperationException($"Cannot build expression for the key {buildContext.Key} in the container {buildContext.Container}.\n{buildContext}", error);
+            throw new InvalidOperationException($"Cannot build expression for {buildContext.Key} from {buildContext.Container}.\n{buildContext}", error);
         }
     }
 }
@@ -12174,7 +12179,7 @@ namespace IoC.Core
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (error == null) throw new ArgumentNullException(nameof(error));
-            throw new InvalidOperationException($"Cannot get resolver for the key {key} from the container {container}.", error);
+            throw new InvalidOperationException($"Cannot get resolver for {key} from {container}.", error);
         }
     }
 }
@@ -12199,7 +12204,7 @@ namespace IoC.Core
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (keys == null) throw new ArgumentNullException(nameof(keys));
-            throw new InvalidOperationException($"Keys {string.Join(", ", keys.Select(i => i.ToString()))} cannot be registered in the container {container}.");
+            throw new InvalidOperationException($"Keys {string.Join(", ", keys.Select(i => i.ToString()))} cannot be registered in {container}.");
         }
     }
 }
@@ -12224,7 +12229,7 @@ namespace IoC.Core
         public IMethod<ConstructorInfo> Resolve(IBuildContext buildContext, IEnumerable<IMethod<ConstructorInfo>> constructors)
         {
             if (constructors == null) throw new ArgumentNullException(nameof(constructors));
-            throw new BuildExpressionException($"Cannot find a constructor for the type {buildContext.Key.Type}.\n{buildContext}", null);
+            throw new BuildExpressionException($"Cannot find a constructor for {buildContext.Key}.\n{buildContext}", null);
         }
     }
 }
@@ -12246,7 +12251,7 @@ namespace IoC.Core
         public DependencyDescription Resolve(IBuildContext buildContext)
         {
             if (buildContext == null) throw new ArgumentNullException(nameof(buildContext));
-            throw new InvalidOperationException($"Cannot find the dependency for the key {buildContext.Key} in the container {buildContext.Container}.\n{buildContext}");
+            throw new InvalidOperationException($"Cannot find a dependency for {buildContext.Key} in {buildContext.Container}.\n{buildContext}");
         }
     }
 }
@@ -12267,7 +12272,7 @@ namespace IoC.Core
         {
             var typeDescriptor = type.Descriptor();
             var genericTypeArgs = typeDescriptor.IsGenericTypeDefinition() ? typeDescriptor.GetGenericTypeParameters() : typeDescriptor.GetGenericTypeArguments();
-            throw new InvalidOperationException($"Cannot resolve the generic type argument \'{genericTypeArgs[genericTypeArgPosition]}\' at position {genericTypeArgPosition} of the type {typeDescriptor.Type}.");
+            throw new InvalidOperationException($"Cannot resolve the generic type argument \'{genericTypeArgs[genericTypeArgPosition]}\' at position {genericTypeArgPosition} of the type {typeDescriptor.Type.GetShortName()}.");
         }
     }
 }
@@ -12291,7 +12296,7 @@ namespace IoC.Core
         {
             if (registeredType == null) throw new ArgumentNullException(nameof(registeredType));
             if (resolvingType == null) throw new ArgumentNullException(nameof(resolvingType));
-            throw new InvalidOperationException($"Cannot resolve instance type based on the registered type {registeredType} for resolving type {registeredType}.\n{buildContext}");
+            throw new InvalidOperationException($"Cannot resolve instance type based on the registered type {registeredType.GetShortName()} for resolving type {registeredType.GetShortName()}.\n{buildContext}");
         }
     }
 }
@@ -12772,7 +12777,7 @@ namespace IoC.Core
                             var type = (Type) ((ConstantExpression) Visit(methodCall.Arguments[1]) ?? throw InvalidExpressionError).Value ?? throw InvalidExpressionError;
                             var containerExpression = methodCall.Arguments[0];
                             var key = new Key(type);
-                            return CreateDependencyExpression(key, containerExpression, null);
+                            return CreateDependencyExpression(key, containerExpression, null).Convert(methodCall.Type);
                         }
 
                         if (Equals(methodCall.Method, Injections.TryInjectMethodInfo))
@@ -12780,7 +12785,7 @@ namespace IoC.Core
                             var type = (Type)((ConstantExpression)Visit(methodCall.Arguments[1]) ?? throw InvalidExpressionError).Value ?? throw InvalidExpressionError;
                             var containerExpression = methodCall.Arguments[0];
                             var key = new Key(type);
-                            return CreateDependencyExpression(key, containerExpression, Expression.Default(type));
+                            return CreateDependencyExpression(key, containerExpression, Expression.Default(type)).Convert(methodCall.Type);
                         }
 
                         if (argumentsCount > 3)
@@ -12795,7 +12800,7 @@ namespace IoC.Core
                                 var argsExpression = Visit(methodCall.Arguments[3]);
 
                                 var key = new Key(type, tag);
-                                return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, null);
+                                return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, null).Convert(methodCall.Type);
                             }
 
                             if (Equals(methodCall.Method, Injections.TryInjectWithTagMethodInfo))
@@ -12807,7 +12812,7 @@ namespace IoC.Core
                                 var argsExpression = Visit(methodCall.Arguments[3]);
 
                                 var key = new Key(type, tag);
-                                return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, Expression.Default(type));
+                                return OverrideArgsAndCreateDependencyExpression(argsExpression, key, containerExpression, Expression.Default(type)).Convert(methodCall.Type);
                             }
                         }
                     }
@@ -13591,7 +13596,7 @@ namespace IoC.Core
                     injectMethod,
                     ExpressionBuilderExtensions.ContainerExpression,
                     Expression.Constant(dependencyType),
-                    Expression.Constant(dependencyTag),
+                    Expression.Constant(dependencyTag).Convert(typeof(object)),
                     Expression.NewArrayInit(typeof(object), args.Select(Expression.Constant)))
                 .Convert(dependencyType);
 
@@ -14835,6 +14840,18 @@ namespace IoC.Core
 
             return type;
         }
+
+        [MethodImpl((MethodImplOptions)0x100)]
+        [NotNull]
+        public static string GetShortName([NotNull] this Type type)
+        {
+            if (!TypeToStringConverter.Shared.TryConvert(type, type, out var typeName))
+            {
+                typeName = type.FullName;
+            }
+
+            return typeName ?? "UnknownType";
+        }
     }
 }
 
@@ -15000,6 +15017,11 @@ namespace IoC.Core
             }
 
             var newMember = newDeclaringTypeDescriptor.GetDeclaredMembers().Single(i => i.Name == node.Member.Name);
+            if (node.Expression == null)
+            {
+                return Expression.MakeMemberAccess(node.Expression, newMember);
+            }
+
             var newExpression = Visit(node.Expression);
             return newExpression == null ? base.VisitMember(node) : Expression.MakeMemberAccess(newExpression, newMember);
         }

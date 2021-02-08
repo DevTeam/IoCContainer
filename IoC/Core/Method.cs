@@ -87,7 +87,7 @@
                     injectMethod,
                     ExpressionBuilderExtensions.ContainerExpression,
                     Expression.Constant(dependencyType),
-                    Expression.Constant(dependencyTag),
+                    Expression.Constant(dependencyTag).Convert(typeof(object)),
                     Expression.NewArrayInit(typeof(object), args.Select(Expression.Constant)))
                 .Convert(dependencyType);
 
