@@ -47,7 +47,7 @@
                 // if (this._instance == null)
                 isNullExpression,
                 // this._instance = new T();
-                Expression.Assign(instanceField, expression));
+                Expression.Assign(instanceField, expression.Convert(typeof(object))));
 
             if (_lockObject != null)
             {

@@ -26,6 +26,23 @@
         }
 
         [Fact]
+        public void ShouldCreateSingleInstanceWhenStruct()
+        {
+            // Given
+            var lifetime = new SingletonLifetime();
+            var resolver = lifetime.Compile(() => 10);
+
+            // When
+            var instance1 = resolver(Mock.Of<IContainer>());
+            var instance2 = resolver(Mock.Of<IContainer>());
+            var instance3 = resolver(Mock.Of<IContainer>());
+
+            // Then
+            instance2.ShouldBe(instance1);
+            instance3.ShouldBe(instance1);
+        }
+
+        [Fact]
         public void ShouldDisposeInstanceWhenDispose()
         {
             // Given
