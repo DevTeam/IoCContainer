@@ -49,56 +49,54 @@
         /// <returns>The disposable instance holder.</returns>
         [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
-        public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IConfiguration configuration, [NotNull] [ItemCanBeNull] params object[] args)
+        public static IComposition<TInstance> Build<TInstance>([NotNull] this IConfiguration configuration, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class
-            => Container.Create().Using(configuration ?? throw new ArgumentNullException(nameof(configuration))).BuildUp<TInstance>(args ?? throw new ArgumentNullException(nameof(args)));
+            => Container.Create().Using(configuration ?? throw new ArgumentNullException(nameof(configuration))).Build<TInstance>(args ?? throw new ArgumentNullException(nameof(args)));
 
         /// <summary>
-        /// Buildups an instance.
+        /// Build a composition root.
         /// Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
         /// </summary>
-        /// <typeparam name="TInstance">The instance type.</typeparam>
+        /// <typeparam name="T">The root instance type.</typeparam>
         /// <param name="token">The target container token.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>
         [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
-        public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
-            where TInstance : class =>
-            (token ?? throw new ArgumentNullException(nameof(token))).Container.BuildUp<TInstance>(args ?? throw new ArgumentNullException(nameof(args)));
+        public static IComposition<T> Build<T>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
+            where T : class =>
+            (token ?? throw new ArgumentNullException(nameof(token))).Container.Build<T>(args ?? throw new ArgumentNullException(nameof(args)));
 
         /// <summary>
-        /// Buildups an instance.
+        /// Build a composition root.
         /// Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
         /// </summary>
-        /// <typeparam name="TInstance">The instance type.</typeparam>
+        /// <typeparam name="T">The root instance type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>
         [NotNull]
         [MethodImpl((MethodImplOptions)0x200)]
-        public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IMutableContainer container, [NotNull] [ItemCanBeNull] params object[] args)
-            where TInstance : class
+        public static IComposition<T> Build<T>([NotNull] this IMutableContainer container, [NotNull] [ItemCanBeNull] params object[] args)
+            where T : class
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
 
-            if (container.TryGetResolver<TInstance>(out var resolver))
+            if (container.TryGetResolver<T>(out var resolver))
             {
-                return new CompositionRoot<TInstance>(new Token(container, Disposable.Empty), resolver(container, args));
+                return new Composition<T>(container, new Token(container, Disposable.Empty), resolver, args);
             }
 
-            if (typeof(TInstance).Descriptor().IsAbstract())
+            if (typeof(T).Descriptor().IsAbstract())
             {
                 throw new InvalidOperationException("The composition root must be of a non-abstract type, or must be registered with the container.");
             }
 
-            var buildId = Guid.NewGuid();
-            var token = container.Bind<TInstance>().Tag(buildId).To();
+            var token = container.Bind<T>().To();
             try
             {
-                var instance = container.Resolve<TInstance>(buildId.AsTag(), args);
-                return new CompositionRoot<TInstance>(token, instance);
+                return new Composition<T>(container, token, container.GetResolver<T>(), args);
             }
             catch
             {

@@ -5675,56 +5675,54 @@ namespace IoC
         /// <returns>The disposable instance holder.</returns>
         [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
-        public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IConfiguration configuration, [NotNull] [ItemCanBeNull] params object[] args)
+        public static IComposition<TInstance> Build<TInstance>([NotNull] this IConfiguration configuration, [NotNull] [ItemCanBeNull] params object[] args)
             where TInstance : class
-            => Container.Create().Using(configuration ?? throw new ArgumentNullException(nameof(configuration))).BuildUp<TInstance>(args ?? throw new ArgumentNullException(nameof(args)));
+            => Container.Create().Using(configuration ?? throw new ArgumentNullException(nameof(configuration))).Build<TInstance>(args ?? throw new ArgumentNullException(nameof(args)));
 
         /// <summary>
-        /// Buildups an instance.
+        /// Build a composition root.
         /// Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
         /// </summary>
-        /// <typeparam name="TInstance">The instance type.</typeparam>
+        /// <typeparam name="T">The root instance type.</typeparam>
         /// <param name="token">The target container token.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>
         [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
-        public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
-            where TInstance : class =>
-            (token ?? throw new ArgumentNullException(nameof(token))).Container.BuildUp<TInstance>(args ?? throw new ArgumentNullException(nameof(args)));
+        public static IComposition<T> Build<T>([NotNull] this IToken token, [NotNull] [ItemCanBeNull] params object[] args)
+            where T : class =>
+            (token ?? throw new ArgumentNullException(nameof(token))).Container.Build<T>(args ?? throw new ArgumentNullException(nameof(args)));
 
         /// <summary>
-        /// Buildups an instance.
+        /// Build a composition root.
         /// Registers the instance type in the container if it is required, resolves the instance and removes the registration from the container immediately if it was registered here.
         /// </summary>
-        /// <typeparam name="TInstance">The instance type.</typeparam>
+        /// <typeparam name="T">The root instance type.</typeparam>
         /// <param name="container">The target container.</param>
         /// <param name="args">The optional arguments.</param>
         /// <returns>The disposable instance holder.</returns>
         [NotNull]
         [MethodImpl((MethodImplOptions)0x200)]
-        public static ICompositionRoot<TInstance> BuildUp<TInstance>([NotNull] this IMutableContainer container, [NotNull] [ItemCanBeNull] params object[] args)
-            where TInstance : class
+        public static IComposition<T> Build<T>([NotNull] this IMutableContainer container, [NotNull] [ItemCanBeNull] params object[] args)
+            where T : class
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             if (args == null) throw new ArgumentNullException(nameof(args));
 
-            if (container.TryGetResolver<TInstance>(out var resolver))
+            if (container.TryGetResolver<T>(out var resolver))
             {
-                return new CompositionRoot<TInstance>(new Token(container, Disposable.Empty), resolver(container, args));
+                return new Composition<T>(container, new Token(container, Disposable.Empty), resolver, args);
             }
 
-            if (typeof(TInstance).Descriptor().IsAbstract())
+            if (typeof(T).Descriptor().IsAbstract())
             {
                 throw new InvalidOperationException("The composition root must be of a non-abstract type, or must be registered with the container.");
             }
 
-            var buildId = Guid.NewGuid();
-            var token = container.Bind<TInstance>().Tag(buildId).To();
+            var token = container.Bind<T>().To();
             try
             {
-                var instance = container.Resolve<TInstance>(buildId.AsTag(), args);
-                return new CompositionRoot<TInstance>(token, instance);
+                return new Composition<T>(container, token, container.GetResolver<T>(), args);
             }
             catch
             {
@@ -8248,7 +8246,7 @@ namespace IoC
 
 
 #endregion
-#region ICompositionRoot
+#region IComposition
 
 namespace IoC
 {
@@ -8257,14 +8255,14 @@ namespace IoC
     /// <summary>
     /// Represents an abstract composition root.
     /// </summary>
-    /// <typeparam name="TInstance"></typeparam>
+    /// <typeparam name="T"></typeparam>
     [PublicAPI]
-    public interface ICompositionRoot<out TInstance>: IDisposable
+    public interface IComposition<out T>: IDisposable
     {
         /// <summary>
         /// The composition root instance.
         /// </summary>
-        [NotNull] TInstance Instance { get; }
+        [NotNull] T Root { get; }
     }
 }
 
@@ -10521,7 +10519,7 @@ namespace IoC.Lifetimes
                 // if (this._instance == null)
                 isNullExpression,
                 // this._instance = new T();
-                Expression.Assign(instanceField, expression));
+                Expression.Assign(instanceField, expression.Convert(typeof(object))));
 
             if (_lockObject != null)
             {
@@ -12302,32 +12300,59 @@ namespace IoC.Core
 }
 
 #endregion
-#region CompositionRoot
+#region Composition
 
 namespace IoC.Core
 {
     using System;
 
-    internal sealed class CompositionRoot<TInstance> : ICompositionRoot<TInstance>
+    internal sealed class Composition<T> : IComposition<T>
     {
+        [NotNull] private readonly IContainer _container;
         [NotNull] private readonly IToken _token;
+        [NotNull] private readonly Resolver<T> _resolver;
+        [NotNull] [ItemCanBeNull] private readonly object[] _args;
+        private readonly ILockObject _lockObject = new LockObject();
+        private  T _root;
+        private volatile bool _resolved;
 
-        public CompositionRoot([NotNull] IToken token, [NotNull] TInstance instance)
+        public Composition([NotNull] IContainer container, [NotNull] IToken token, [NotNull] Resolver<T> resolver, [NotNull, ItemCanBeNull] object[] args)
         {
+            _container = container ?? throw new ArgumentNullException(nameof(container));
             _token = token ?? throw new ArgumentNullException(nameof(token));
-            Instance = instance;
+            _resolver = resolver ?? throw new ArgumentNullException(nameof(resolver));
+            _args = args ?? throw new ArgumentNullException(nameof(args));
         }
 
-        public TInstance Instance { get; }
+        public T Root
+        {
+            get
+            {
+                lock (_lockObject)
+                {
+                    if (!_resolved)
+                    {
+                        _root = _resolver(_container, _args);
+                        _resolved = true;
+                    }
+
+                    return _root;
+                }
+            }
+        }
 
         public void Dispose()
         {
             using (_token.Container)
             using (_token)
             {
-                if (Instance is IDisposable disposable)
+                lock (_lockObject)
                 {
-                    disposable.Dispose();
+                    if (_resolved && _root is IDisposable disposable)
+                    {
+                        disposable.Dispose();
+                        _root = default(T);
+                    }
                 }
             }
         }

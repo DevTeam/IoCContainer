@@ -35,16 +35,16 @@ namespace IoC.Tests.UsageScenarios
             {
                 // The Composition Root is an application infrastructure component
                 // It should be as close as possible to the application's entry point
-                using var compositionRoot = Container
+                using var composition =
                     // Creates the IoC container: a IoC Container should only be referenced to build a Composition Root
-                    .Create()
+                    Container.Create()
                     // Configures the container
                     .Using<Configuration>()
                     // Creates the composition root: single location for object construction
-                    .BuildUp<Program>();
+                    .Build<Program>();
 
                 // Runs a logic
-                compositionRoot.Instance.Run();
+                composition.Root.Run();
             }
 
             // Injects dependencies via a constructor

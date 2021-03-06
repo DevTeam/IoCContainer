@@ -10,28 +10,39 @@ namespace EntityFrameworkCore
     {
         public static void Main()
         {
-            using var program = Container
+            using var composition =
                 // Create a container
-                .Create()
+                Container.Create()
                 // Configure it
                 .Using<Configuration>()
                 // Build up a program
-                .BuildUp<Program>();
+                .Build<Program>();
+
+            composition.Root.Run();
         }
+
+        private readonly Db _db;
+        private readonly Func<Person> _person;
 
         internal Program(Db db, Func<Person> person)
         {
-            var nik = person();
+            _db = db;
+            _person = person;
+        }
+
+        private void Run()
+        {
+            var nik = _person();
             nik.Name = "Nik";
-            db.People.Add(nik);
+            _db.People.Add(nik);
 
-            var john = person();
+            var john = _person();
             john.Name = "John";
-            db.People.Add(john);
+            _db.People.Add(john);
 
-            db.SaveChanges();
+            _db.SaveChanges();
 
-            db.People.ForEachAsync(Console.WriteLine);
+            _db.People.ForEachAsync(Console.WriteLine);
         }
     }
 }

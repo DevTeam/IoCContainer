@@ -5,13 +5,13 @@
     /// <summary>
     /// Represents an abstract composition root.
     /// </summary>
-    /// <typeparam name="TInstance"></typeparam>
+    /// <typeparam name="T"></typeparam>
     [PublicAPI]
-    public interface ICompositionRoot<out TInstance>: IDisposable
+    public interface IComposition<out T>: IDisposable
     {
         /// <summary>
         /// The composition root instance.
         /// </summary>
-        [NotNull] TInstance Instance { get; }
+        [NotNull] T Root { get; }
     }
 }

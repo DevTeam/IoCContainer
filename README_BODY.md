@@ -88,21 +88,18 @@ _Defining generic type arguments using special marker types like [*__TT__*](#gen
 ### Time to open boxes!
 
 ```csharp
-// Creates an Inversion of Control container
+// Creates the Inversion of Control container
 using var container = Container.Create().Using<Glue>();
 
-// This is the Composition Root. It gets a cardboard box in the same way as the following expression:
+// Gets the cardboard box in the same way as the following expression:
 // var box = new CardboardBox<ICat>(new ShroedingersCat(new Lazy<State>(() => (State)indeterminacy.Next(2))));
 var box = container.Resolve<IBox<ICat>>();
+
 // Checks the cat's state
 WriteLine(box.Content);
 ```
 
-There is a place where we create our object graphs and it is better to concentrate this creation into a single area of your application. This place is called the [*__Composition Root__*]((https://blog.ploeh.dk/2011/07/28/CompositionRoot/)).
-
-#### Few aspects of the Composition Root
-
-The Composition Root is the single place in your application where the composition of the object graphs for your application take place, using the IoC container, but we can delay the creation of some instances or create a set of instances by injecting instance factories like *__Func&lt;T&gt;__* instead of the instances themselves.
+This is a [*__Composition Root__*](https://blog.ploeh.dk/2011/07/28/CompositionRoot/) - single place in an application where the composition of the object graphs for an application take place. It is possible to delay the creation of some instances or create a set of instances by injecting instance factories like *__Func&lt;T&gt;__* instead of the instances themselves. Also here are some important aspects regarding to a comosition root:
 
 - **As close to Init or Entry Point as possible:** It should be as close as possible to the application's entry point.
 - **Single location for object construction:** A Composition Root is a (preferably) unique location in an application where modules are composed together.
@@ -110,7 +107,7 @@ The Composition Root is the single place in your application where the compositi
 - **A IoC Container should only be referenced from the Composition Root:** All other modules should have no reference to the container.
 - **Predictable Dependency Graph:** It is better to have a pre-constructed, pre-discovered dependency graph.
 
-Each dependency is resolved by a strongly-typed block of statements like the operator `new` which is compiled on the fly from the coresponding expression tree to create or to get a required dependency instance with minimal impact on performance or memory consumtion. For instance, the getting (or injecting) of a box looks like:
+Each instance is resolved by a strongly-typed block of statements like the operator `new` which is compiled on the fly from the coresponding expression tree with minimal impact on performance or memory consumtion. For instance, the getting (or injecting) of a box looks like:
 
 ```csharp
 var indeterminacy = new Random();
