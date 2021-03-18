@@ -76,9 +76,9 @@ _Using NuGet packages allows you to optimize your application to include only th
   dotnet add package IoC.Container
   ```
 
-Declare the required dependencies in a dedicated class *__Glue__*. It is possible do this anywhere in your code, but putting this information in one place is often the better solution and helps keep your code more organized.
+Declare the required dependencies in a dedicated class *__Glue__*. It is possible to do this anywhere in your code, but putting this information in one place is often the better solution and helps keep your code more organized.
 
-Below is the concept of mutable containers (_IMutableContainer_). Any binding is not irreversible, thus the owner of a binding [can cancel this binding](#change-configuration-on-the-fly-) using the related binding token (_IToken_).
+Below is the concept of mutable containers (_IMutableContainer_). Any binding is not irreversible. Thus the owner of a binding [can cancel this binding](#change-configuration-on-the-fly-) using the related binding token (_IToken_).
 
 ```csharp
 public class Glue : IConfiguration
@@ -117,7 +117,7 @@ var box = container.Resolve<IBox<ICat>>();
 WriteLine(box.Content);
 ```
 
-This is a [*__Composition Root__*](https://blog.ploeh.dk/2011/07/28/CompositionRoot/) - single place in an application where the composition of the object graphs for an application take place. It is possible to delay the creation of some instances or create a set of instances by injecting instance factories like *__Func&lt;T&gt;__* instead of the instances themselves. Also here are some important aspects regarding to a comosition root:
+This is a [*__Composition Root__*](https://blog.ploeh.dk/2011/07/28/CompositionRoot/) - a single place in an application where the composition of the object graphs for an application take place. It is possible to delay the creation of some instances or create a set of instances by injecting instance factories like *__Func&lt;T&gt;__* instead of the instances themselves. Also here are some important aspects regarding a composition root:
 
 - **As close to Init or Entry Point as possible:** It should be as close as possible to the application's entry point.
 - **Single location for object construction:** A Composition Root is a (preferably) unique location in an application where modules are composed together.
@@ -125,14 +125,14 @@ This is a [*__Composition Root__*](https://blog.ploeh.dk/2011/07/28/CompositionR
 - **A IoC Container should only be referenced from the Composition Root:** All other modules should have no reference to the container.
 - **Predictable Dependency Graph:** It is better to have a pre-constructed, pre-discovered dependency graph.
 
-Each instance is resolved by a strongly-typed block of statements like the operator `new` which is compiled on the fly from the coresponding expression tree with minimal impact on performance or memory consumtion. For instance, the getting (or injecting) of a box looks like:
+Each instance is resolved by a strongly-typed block of statements like the operator new which is compiled on the fly from the corresponding expression tree with minimal impact on performance or memory consumption. For instance, the getting of a box looks like:
 
 ```csharp
 var indeterminacy = new Random();
 var box = new CardboardBox<ICat>(new ShroedingersCat(new Lazy<State>(() => (State)indeterminacy.Next(2))));
 ```
 
-It allows you to take full advantage of dependency injection everywhere and every time without any compromises in the same way as just a *__new__* keyword to create any instances.
+It allows you to take full advantage of dependency injection everywhere and every time without any compromises in the same way as just a *__new__* keyword to create instances.
 
 ## NuGet packages
 
@@ -270,7 +270,7 @@ class MyInterceptor : IInterceptor
 
 For details please see [this sample](IoC.Tests/UsageScenarios/Interception.cs).
 
-## Why this one?
+## Why this one framework?
 
 ### Graph of 27 transient instances
 
@@ -380,7 +380,7 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Override a task scheduler](#override-a-task-scheduler-)
 - Advanced
   - [Change configuration on-the-fly](#change-configuration-on-the-fly-)
-  - [Resolve unbound implementations](#resolve-unbound-implementations-)
+  - [Resolve Unbound](#resolve-unbound-)
   - [Constructor choice](#constructor-choice-)
   - [Container injection](#container-injection-)
   - [Check a binding](#check-a-binding-)
@@ -838,7 +838,7 @@ public void Run()
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
 public class TypeAttribute : Attribute
 {
-    // The tag, which will be used during an injection
+    // A type, which will be used during an injection
     [NotNull] public readonly Type Type;
 
     public TypeAttribute([NotNull] Type type) => Type = type;
@@ -848,7 +848,7 @@ public class TypeAttribute : Attribute
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
 public class TagAttribute : Attribute
 {
-    // The tag, which will be used during an injection
+    // A tag, which will be used during an injection
     [NotNull] public readonly object Tag;
 
     public TagAttribute([NotNull] object tag) => Tag = tag;
@@ -858,7 +858,7 @@ public class TagAttribute : Attribute
 [AttributeUsage(AttributeTargets.Method)]
 public class OrderAttribute : Attribute
 {
-    // The order to be used to invoke a method
+    // An order to be used to invoke a method
     public readonly int Order;
 
     public OrderAttribute(int order) => Order = order;
@@ -2161,7 +2161,7 @@ using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
 
 
 
-### Resolve unbound implementations [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveUnregisteredImplementations.cs)
+### Resolve Unbound [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveUnbound.cs)
 
 The feature _ResolveUnboundFeature_ allows you to resolve any implementation type from the container regardless of whether or not you specifically bound it.
 

@@ -3,15 +3,9 @@
 namespace IoC.Tests.UsageScenarios
 {
     using System;
-    using System.Diagnostics.CodeAnalysis;
     using Moq;
     using Xunit;
 
-    [SuppressMessage("ReSharper", "ClassNeverInstantiated.Global")]
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
-    [SuppressMessage("ReSharper", "MemberHidesStaticFromOuterClass")]
-    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
     public class AspectOriented
     {
         [Fact]
@@ -61,7 +55,7 @@ namespace IoC.Tests.UsageScenarios
         [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
         public class TypeAttribute : Attribute
         {
-            // The tag, which will be used during an injection
+            // A type, which will be used during an injection
             [NotNull] public readonly Type Type;
 
             public TypeAttribute([NotNull] Type type) => Type = type;
@@ -71,7 +65,7 @@ namespace IoC.Tests.UsageScenarios
         [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
         public class TagAttribute : Attribute
         {
-            // The tag, which will be used during an injection
+            // A tag, which will be used during an injection
             [NotNull] public readonly object Tag;
 
             public TagAttribute([NotNull] object tag) => Tag = tag;
@@ -81,7 +75,7 @@ namespace IoC.Tests.UsageScenarios
         [AttributeUsage(AttributeTargets.Method)]
         public class OrderAttribute : Attribute
         {
-            // The order to be used to invoke a method
+            // An order to be used to invoke a method
             public readonly int Order;
 
             public OrderAttribute(int order) => Order = order;
