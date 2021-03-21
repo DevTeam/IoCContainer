@@ -381,6 +381,8 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
 - Advanced
   - [Change configuration on-the-fly](#change-configuration-on-the-fly-)
   - [Resolve Unbound](#resolve-unbound-)
+  - [Resolve Unbound for abstractions](#resolve-unbound-for-abstractions-)
+  - [Resolve Unbound form context arguments](#resolve-unbound-form-context-arguments-)
   - [Constructor choice](#constructor-choice-)
   - [Container injection](#container-injection-)
   - [Check a binding](#check-a-binding-)
@@ -2161,6 +2163,42 @@ using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
 
 
 
+### Resolve Unbound form context arguments [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveFromArgs.cs)
+
+The feature _ResolveUnboundFeature_ allows you to resolve any instances from the context arguments regardless of whether or not you specifically bound it.
+
+``` CSharp
+public void Run()
+{
+    using var container = Container
+        .Create()
+        .Using<ResolveUnboundFeature>()
+        .Bind<IDependency>().To<Dependency>()
+        .Container;
+
+    var factory = container.Resolve<Func<string, int, Service<int>>>();
+    var service = factory("Some name", 99);
+    
+    service.Name.ShouldBe("Some name");
+    service.Id.ShouldBe(99);
+}
+
+class Service<T>
+{
+    public Service(IDependency dependency, string name, T id)
+    {
+        Id = id;
+        Name = name;
+    }
+
+    public T Id { get; }
+    
+    public string Name { get; }
+}
+```
+
+
+
 ### Resolve Unbound [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveUnbound.cs)
 
 The feature _ResolveUnboundFeature_ allows you to resolve any implementation type from the container regardless of whether or not you specifically bound it.
@@ -2187,6 +2225,32 @@ class OtherService<T>
 {
     public OtherService(T value) { }
 }
+```
+
+
+
+### Resolve Unbound for abstractions [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveUnboundForAbstractions.cs)
+
+The feature _ResolveUnboundFeature_ allows you to resolve any implementation type from the container regardless of whether or not you specifically bound it and find appropriate implementations for abstractions using "key resolver".
+
+``` CSharp
+public void Run()
+{
+    using var resolveUnboundFeature = new ResolveUnboundFeature(Options.ResolveArgs | Options.ResolveDefaults, KeyResolver);
+    using var container = Container.Create().Using(resolveUnboundFeature);
+
+    // Resolve an instance of unregistered type
+    container.Resolve<IService>();
+}
+
+// Find an appropriate implementation
+private static Key KeyResolver(Key key) =>
+    new Key(key.Type.Assembly.GetTypes()
+        .Where(implementationType => !implementationType.IsInterface && !implementationType.IsAbstract)
+        .FirstOrDefault(implementationType => key.Type.IsAssignableFrom(implementationType))
+            ?? throw new InvalidOperationException($"Cannot find a type assignable to {key}."),
+        key.Tag);
+
 ```
 
 
