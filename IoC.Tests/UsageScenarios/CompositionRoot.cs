@@ -33,18 +33,16 @@ namespace IoC.Tests.UsageScenarios
             // The application's entry point
             public static void TestMain()
             {
-                // The Composition Root is an application infrastructure component
-                // It should be as close as possible to the application's entry point
-                using var composition =
-                    // Creates the IoC container: a IoC Container should only be referenced to build a Composition Root
+                using var container =
                     Container.Create()
-                    // Configures the container
-                    .Using<Configuration>()
-                    // Creates the composition root: single location for object construction
-                    .Build<Program>();
+                    .Using<Configuration>();
+
+                // The Composition Root is a single location for objects construction
+                // it should be as close as possible to the application's entry point
+                var root = container.Resolve<Program>();
 
                 // Runs a logic
-                composition.Root.Run();
+                root.Run();
             }
 
             // Injects dependencies via a constructor

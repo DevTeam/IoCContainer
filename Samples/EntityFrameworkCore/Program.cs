@@ -10,15 +10,13 @@ namespace EntityFrameworkCore
     {
         public static void Main()
         {
-            using var composition =
+            using var container =
                 // Create a container
                 Container.Create()
                 // Configure it
-                .Using<Configuration>()
-                // Build up a program
-                .Build<Program>();
-
-            composition.Root.Run();
+                .Using<Configuration>();
+                
+            container.Resolve<Program>().Run();
         }
 
         private readonly Db _db;
