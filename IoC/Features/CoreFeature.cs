@@ -22,10 +22,8 @@
             if (container == null) throw new ArgumentNullException(nameof(container));
             yield return container.Register(ctx => FoundCyclicDependency.Shared);
             yield return container.Register(ctx => CannotBuildExpression.Shared);
-            yield return container.Register(ctx => CannotGetResolver.Shared);
             yield return container.Register(ctx => CannotRegister.Shared);
             yield return container.Register(ctx => CannotResolveConstructor.Shared);
-            yield return container.Register(ctx => CannotResolveDependency.Shared);
             yield return container.Register(ctx => CannotResolveType.Shared);
             yield return container.Register(ctx => CannotResolveGenericTypeArgument.Shared);
 
@@ -61,6 +59,9 @@
 
             yield return container.Register(ctx => ContainerEventToStringConverter.Shared);
             yield return container.Register(ctx => TypeToStringConverter.Shared);
+
+            // Core features
+            yield return container.Apply<ResolveUnboundFeature>();
         }
     }
 }

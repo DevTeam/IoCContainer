@@ -19,8 +19,9 @@ namespace IoC.Tests.UsageScenarios
         // {
         public void Run()
         {
-            using var resolveUnboundFeature = new ResolveUnboundFeature(Options.ResolveArgs | Options.ResolveDefaults, KeyResolver);
-            using var container = Container.Create().Using(resolveUnboundFeature);
+            using var container = Container
+                .Create()
+                .Using(new ResolveUnboundFeature(KeyResolver));
 
             // Resolve an instance of unregistered type
             container.Resolve<IService>();
@@ -28,10 +29,12 @@ namespace IoC.Tests.UsageScenarios
 
         // Find an appropriate implementation
         private static Key KeyResolver(Key key) =>
-            new Key(key.Type.Assembly.GetTypes()
-                .Where(implementationType => !implementationType.IsInterface && !implementationType.IsAbstract)
-                .FirstOrDefault(implementationType => key.Type.IsAssignableFrom(implementationType))
-                    ?? throw new InvalidOperationException($"Cannot find a type assignable to {key}."),
+            new Key((
+                from type in key.Type.Assembly.GetTypes()
+                where !type.IsInterface 
+                where !type.IsAbstract
+                where key.Type.IsAssignableFrom(type)
+                select type).FirstOrDefault() ?? throw new InvalidOperationException($"Cannot find a type assignable to {key}."),
                 key.Tag);
 
         // }

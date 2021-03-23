@@ -330,10 +330,12 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Autowiring](#autowiring-)
   - [Bindings](#bindings-)
   - [Constant dependency](#constant-dependency-)
+  - [Factory](#factory-)
   - [Generics](#generics-)
   - [Tags](#tags-)
   - [Wrapper](#wrapper-)
   - [Configuration](#configuration-)
+  - [Resolve Unbound](#resolve-unbound-)
   - [Several contracts](#several-contracts-)
   - [Autowiring with initialization](#autowiring-with-initialization-)
   - [Child container](#child-container-)
@@ -380,9 +382,7 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Override a task scheduler](#override-a-task-scheduler-)
 - Advanced
   - [Change configuration on-the-fly](#change-configuration-on-the-fly-)
-  - [Resolve Unbound](#resolve-unbound-)
   - [Resolve Unbound for abstractions](#resolve-unbound-for-abstractions-)
-  - [Resolve Unbound form context arguments](#resolve-unbound-form-context-arguments-)
   - [Constructor choice](#constructor-choice-)
   - [Container injection](#container-injection-)
   - [Check a binding](#check-a-binding-)
@@ -510,6 +510,29 @@ val.ShouldBe(10);
 
 
 
+### Factory [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Factory.cs)
+
+Use Func<.., T> with arguments as a factory passing a state.
+
+``` CSharp
+using var container = Container
+    .Create()
+    .Bind<IDependency>().To<Dependency>()
+    .Bind<INamedService>().To<NamedService>()
+    .Container;
+
+// Resolve a factory
+var factory = container.Resolve<Func<string, INamedService>>();
+
+// Run factory passing the string "beta" as argument
+var instance = factory("alpha");
+
+// Check that argument "beta" was used during constructing an instance
+instance.Name.ShouldBe("alpha");
+```
+
+
+
 ### Generics [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/Generics.cs)
 
 Autowriting of generic types via binding of open generic types or generic type markers are working the same way.
@@ -627,6 +650,32 @@ public class Glue : IConfiguration
             .Bind<IService>().To<Service>();
     }
 }
+```
+
+
+
+### Resolve Unbound [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveUnbound.cs)
+
+
+
+``` CSharp
+public void Run()
+{
+    using var container = Container
+        .Create()
+        .Bind<IDependency>().To<Dependency>()
+        .Container;
+
+    // Resolve an instance of unregistered type
+    container.Resolve<Service<int>>();
+}
+
+class Service<T>
+{
+    public Service(OtherService<T> otherService, IDependency dependency) { }
+}
+
+class OtherService<T>  { public OtherService(T value) { } }
 ```
 
 
@@ -1953,11 +2002,11 @@ instance.ShouldBeOfType<NamedService>();
 // Check that argument "alpha" was used during the construction of an instance
 instance.Name.ShouldBe("alpha");
 
-// Resolve a function to create instance
-var getterFunc = container.Resolve<Func<string, INamedService>>();
+// Resolve a factory
+var factory = container.Resolve<Func<string, INamedService>>();
 
 // Run this function and pass the string "beta" as argument
-var otherInstance = getterFunc("beta");
+var otherInstance = factory("beta");
 
 // Check that argument "beta" was used during constructing an instance
 otherInstance.Name.ShouldBe("beta");
@@ -2163,72 +2212,6 @@ using (container.Bind<IService>().As(Lifetime.Singleton).To<Service>())
 
 
 
-### Resolve Unbound form context arguments [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveFromArgs.cs)
-
-The feature _ResolveUnboundFeature_ allows you to resolve any instances from the context arguments regardless of whether or not you specifically bound it.
-
-``` CSharp
-public void Run()
-{
-    using var container = Container
-        .Create()
-        .Using<ResolveUnboundFeature>()
-        .Bind<IDependency>().To<Dependency>()
-        .Container;
-
-    var factory = container.Resolve<Func<string, int, Service<int>>>();
-    var service = factory("Some name", 99);
-    
-    service.Name.ShouldBe("Some name");
-    service.Id.ShouldBe(99);
-}
-
-class Service<T>
-{
-    public Service(IDependency dependency, string name, T id)
-    {
-        Id = id;
-        Name = name;
-    }
-
-    public T Id { get; }
-    
-    public string Name { get; }
-}
-```
-
-
-
-### Resolve Unbound [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveUnbound.cs)
-
-The feature _ResolveUnboundFeature_ allows you to resolve any implementation type from the container regardless of whether or not you specifically bound it.
-
-``` CSharp
-public void Run()
-{
-    using var container = Container
-        .Create()
-        .Using<ResolveUnboundFeature>()
-        .Bind<IDependency>().To<Dependency>()
-        .Container;
-
-    // Resolve an instance of unregistered type
-    container.Resolve<Service<int>>();
-}
-
-class Service<T>
-{
-    public Service(OtherService<T> otherService, IDependency dependency) { }
-}
-
-class OtherService<T>
-{
-    public OtherService(T value) { }
-}
-```
-
-
-
 ### Resolve Unbound for abstractions [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ResolveUnboundForAbstractions.cs)
 
 The feature _ResolveUnboundFeature_ allows you to resolve any implementation type from the container regardless of whether or not you specifically bound it and find appropriate implementations for abstractions using "key resolver".
@@ -2236,8 +2219,9 @@ The feature _ResolveUnboundFeature_ allows you to resolve any implementation typ
 ``` CSharp
 public void Run()
 {
-    using var resolveUnboundFeature = new ResolveUnboundFeature(Options.ResolveArgs | Options.ResolveDefaults, KeyResolver);
-    using var container = Container.Create().Using(resolveUnboundFeature);
+    using var container = Container
+        .Create()
+        .Using(new ResolveUnboundFeature(KeyResolver));
 
     // Resolve an instance of unregistered type
     container.Resolve<IService>();
@@ -2245,10 +2229,12 @@ public void Run()
 
 // Find an appropriate implementation
 private static Key KeyResolver(Key key) =>
-    new Key(key.Type.Assembly.GetTypes()
-        .Where(implementationType => !implementationType.IsInterface && !implementationType.IsAbstract)
-        .FirstOrDefault(implementationType => key.Type.IsAssignableFrom(implementationType))
-            ?? throw new InvalidOperationException($"Cannot find a type assignable to {key}."),
+    new Key((
+        from type in key.Type.Assembly.GetTypes()
+        where !type.IsInterface 
+        where !type.IsAbstract
+        where key.Type.IsAssignableFrom(type)
+        select type).FirstOrDefault() ?? throw new InvalidOperationException($"Cannot find a type assignable to {key}."),
         key.Tag);
 
 ```

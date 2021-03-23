@@ -3,25 +3,20 @@
 // ReSharper disable UnusedParameter.Local
 namespace IoC.Tests.UsageScenarios
 {
-    using System.Diagnostics.CodeAnalysis;
-    using Features;
     using Xunit;
 
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
     public class ResolveUnbound
     {
         [Fact]
         // $visible=true
-        // $tag=5 Advanced
+        // $tag=1 Basics
         // $priority=02
         // $description=Resolve Unbound
-        // $header=The feature _ResolveUnboundFeature_ allows you to resolve any implementation type from the container regardless of whether or not you specifically bound it.
         // {
         public void Run()
         {
             using var container = Container
                 .Create()
-                .Using<ResolveUnboundFeature>()
                 .Bind<IDependency>().To<Dependency>()
                 .Container;
 
@@ -34,10 +29,7 @@ namespace IoC.Tests.UsageScenarios
             public Service(OtherService<T> otherService, IDependency dependency) { }
         }
 
-        class OtherService<T>
-        {
-            public OtherService(T value) { }
-        }
+        class OtherService<T>  { public OtherService(T value) { } }
         // }
     }
 }

@@ -35,11 +35,11 @@
             // Check that argument "alpha" was used during the construction of an instance
             instance.Name.ShouldBe("alpha");
 
-            // Resolve a function to create instance
-            var getterFunc = container.Resolve<Func<string, INamedService>>();
+            // Resolve a factory
+            var factory = container.Resolve<Func<string, INamedService>>();
 
             // Run this function and pass the string "beta" as argument
-            var otherInstance = getterFunc("beta");
+            var otherInstance = factory("beta");
 
             // Check that argument "beta" was used during constructing an instance
             otherInstance.Name.ShouldBe("beta");
