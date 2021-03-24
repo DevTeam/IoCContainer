@@ -43,5 +43,19 @@
                     Expression.Call(EnterMethodInfo, lockObject),
                     body), 
                 Expression.Call(ExitMethodInfo, lockObject));
+
+
+        public static Expression BuildGetOrCreateInstance<T>([NotNull] T owner, [NotNull] IBuildContext context, [NotNull] Expression bodyExpression, string methodName)
+        {
+            var resolverType = bodyExpression.Type.ToResolverType();
+            var resolver = Expression.Constant(Expression.Lambda(resolverType, bodyExpression, false, context.ContainerParameter, context.ArgsParameter).Compile());
+            return Expression.Call(
+                Expression.Constant(owner),
+                methodName,
+                new[] { bodyExpression.Type },
+                resolver,
+                context.ContainerParameter,
+                context.ArgsParameter);
+        }
     }
 }

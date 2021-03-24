@@ -752,7 +752,7 @@ namespace IoC.Tests.IntegrationTests
         }
 #endif
 
-#if NETCOREAPP5_0 || NETCOREAPP2_1 || NETCOREAPP3_1
+#if NET5_0_OR_GREATER || NETCOREAPP2_1 || NETCOREAPP3_1
         [Fact]
         public void ContainerShouldResolveGenericWhenValueTuple()
         {

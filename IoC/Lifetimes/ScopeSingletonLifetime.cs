@@ -1,6 +1,5 @@
 ﻿namespace IoC.Lifetimes
 {
-    using System;
     // ReSharper disable once RedundantUsingDirective
     using Core;
 
@@ -22,47 +21,16 @@
         /// <inheritdoc />
         protected override object AfterCreation(object newInstance, IScope scope, IContainer container, object[] args)
         {
-            if (!(scope is IResourceRegistry resourceRegistry))
+            if (scope is IResourceRegistry resourceRegistry)
             {
-                return newInstance;
+                resourceRegistry.Register(newInstance.AsDisposable());
             }
-
-            if (newInstance is IDisposable disposable)
-            {
-                resourceRegistry.RegisterResource(disposable);
-            }
-
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            if (newInstance is IAsyncDisposable asyncDisposable)
-            {
-                resourceRegistry.RegisterResource(asyncDisposable.ToDisposable());
-            }
-#endif
 
             return newInstance;
         }
 
         /// <inheritdoc />
-        protected override void OnRelease(object releasedInstance, IScope scope)
-        {
-            if (releasedInstance is IDisposable disposable)
-            {
-                if (scope.UnregisterResource(disposable))
-                {
-                    disposable.Dispose();
-                }
-            }
-
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            if (releasedInstance is IAsyncDisposable asyncDisposable)
-            {
-                disposable = asyncDisposable.ToDisposable();
-                if (scope.UnregisterResource(disposable))
-                {
-                    disposable.Dispose();
-                }
-            }
-#endif
-        }
+        protected override void OnRelease(object releasedInstance, IScope scope) =>
+            scope.UnregisterAndDispose(releasedInstance.AsDisposable());
     }
 }

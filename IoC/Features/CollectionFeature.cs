@@ -40,7 +40,7 @@ namespace IoC.Features
 #if !NET40
             yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<TT[]>(ctx.Key)), null, new[] { Key.AnyTag });
 #endif
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NET5_0_OR_GREATER || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx.Container.Inject<IEnumerable<TT>>(ctx.Key)), null, new[] { Key.AnyTag });
 #endif
         }
@@ -125,7 +125,7 @@ namespace IoC.Features
             }
         }
 
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NET5_0_OR_GREATER || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
         private sealed class AsyncEnumeration<T> : IAsyncEnumerable<T>
         {
             private readonly IEnumerable<T> _instances;

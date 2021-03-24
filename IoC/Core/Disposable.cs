@@ -3,14 +3,17 @@ namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Threading;
 
     internal static class Disposable
     {
-        [NotNull]
-        public static readonly IDisposable Empty = EmptyDisposable.Shared;
+        private static readonly TypeDescriptor DisposableTypeDescriptor = typeof(IDisposable).Descriptor();
+#if NET5_0_OR_GREATER || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+        private static readonly TypeDescriptor AsyncDisposableTypeDescriptor = typeof(IAsyncDisposable).Descriptor();
+#endif
+
+        [NotNull] public static readonly IDisposable Empty = EmptyDisposable.Shared;
 
         [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
@@ -20,6 +23,56 @@ namespace IoC.Core
             if (action == null) throw new ArgumentNullException(nameof(action));
 #endif
             return new DisposableAction(action);
+        }
+
+        public static bool IsDisposable(this TypeDescriptor typeDescriptor)
+        {
+            if (DisposableTypeDescriptor.IsAssignableFrom(typeDescriptor))
+            {
+                return true;
+            }
+
+#if NET5_0_OR_GREATER || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+            if (AsyncDisposableTypeDescriptor.IsAssignableFrom(typeDescriptor))
+            {
+                return true;
+            }
+#endif
+
+            return false;
+        }
+
+    [CanBeNull]
+        public static IDisposable AsDisposable<T>(this T instance)
+        {
+            var disposable = instance as IDisposable;
+#if NET5_0_OR_GREATER || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+            if (instance is IAsyncDisposable asyncDisposable)
+            {
+                return new DisposableAction(() =>
+                    {
+                        disposable?.Dispose();
+                        asyncDisposable.DisposeAsync().AsTask().Wait();
+                    },
+                    instance);
+            }
+#endif
+            return disposable;
+        }
+
+        public static void Register([NotNull] this IResourceRegistry registry, [CanBeNull] IDisposable disposable)
+        {
+            if (disposable != null)
+            {
+                registry.RegisterResource(disposable);
+            }
+        }
+        public static void UnregisterAndDispose([NotNull] this IResourceRegistry registry, [CanBeNull] IDisposable disposable)
+        {
+            if (disposable != null && registry.UnregisterResource(disposable))
+            {
+                disposable.Dispose();
+            }
         }
 
         [MethodImpl((MethodImplOptions)0x100)]
@@ -32,16 +85,6 @@ namespace IoC.Core
             return new CompositeDisposable(disposables);
         }
 
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-        [MethodImpl((MethodImplOptions)0x100)]
-        public static IDisposable ToDisposable([NotNull] this IAsyncDisposable asyncDisposable)
-        {
-#if DEBUG
-            if (asyncDisposable == null) throw new ArgumentNullException(nameof(asyncDisposable));
-#endif
-            return new DisposableAction(() => { asyncDisposable.DisposeAsync().AsTask().Wait(); }, asyncDisposable);
-        }
-#endif
         private sealed class DisposableAction : IDisposable
         {
             [NotNull] private readonly Action _action;

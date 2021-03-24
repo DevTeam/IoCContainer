@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq.Expressions;
     // ReSharper disable once RedundantUsingDirective
     using Core;
 
@@ -9,71 +10,48 @@
     /// Automatically calls a <c>Disposable()</c> method for disposable instances after a container has disposed.
     /// </summary>
     [PublicAPI]
-    public class DisposingLifetime: TrackingLifetime
+    public sealed class DisposingLifetime: ILifetime
     {
         private readonly List<IDisposable> _disposables = new List<IDisposable>();
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-        private readonly List<IAsyncDisposable> _asyncDisposables = new List<IAsyncDisposable>();
-#endif
 
-        public DisposingLifetime()
-            : base(TrackTypes.AfterCreation)
+        public ILifetime CreateLifetime() => new DisposingLifetime();
+
+        public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+            resolvingContainer;
+
+        public Expression Build(IBuildContext context, Expression bodyExpression)
         {
+            if (bodyExpression.Type.Descriptor().IsDisposable())
+            {
+                return ExpressionBuilderExtensions.BuildGetOrCreateInstance(this, context, bodyExpression, nameof(GetOrCreateInstance));
+            }
+
+            return bodyExpression;
         }
 
-        public override ILifetime CreateLifetime() => new DisposingLifetime();
-
-        protected override object AfterCreation(object newInstance, IContainer container, object[] args)
+        public void Dispose()
         {
-            var instance = base.AfterCreation(newInstance, container, args);
             lock (_disposables)
             {
-                if (instance is IDisposable disposable)
+                foreach (var disposable in _disposables)
                 {
-                    _disposables.Add(disposable);
+                    disposable.Dispose();
                 }
 
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-                if (instance is IAsyncDisposable asyncDisposable)
-                {
-                    _asyncDisposables.Add(asyncDisposable);
-                }
-#endif
+                _disposables.Clear();
+            }
+        }
+
+        internal T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args)
+        {
+            var instance = resolver(container, args);
+            var disposable = instance.AsDisposable();
+            lock (_disposables)
+            {
+                _disposables.Add(disposable);
             }
 
             return instance;
-        }
-
-        public override void Dispose()
-        {
-            var disposables = new List<IDisposable>();
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            var asyncDisposables = new List<IAsyncDisposable>();
-#endif
-            lock (_disposables)
-            {
-                disposables.AddRange(_disposables);
-                _disposables.Clear();
-
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-                asyncDisposables.AddRange(_asyncDisposables);
-                _asyncDisposables.Clear();
-#endif
-            }
-
-            foreach (var disposable in disposables)
-            {
-                disposable.Dispose();
-            }
-
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            foreach (var asyncDisposable in asyncDisposables)
-            {
-                asyncDisposable.ToDisposable().Dispose();
-            }
-#endif
-
-            base.Dispose();
         }
     }
 }

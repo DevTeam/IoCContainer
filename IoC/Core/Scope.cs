@@ -3,32 +3,37 @@
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
     using System.Threading;
 
     [DebuggerDisplay("{" + nameof(ToString) + "()} with {" + nameof(ResourceCount) + "} resources")]
     internal sealed class Scope: IScope
     {
         private static long _currentScopeKey;
-        [NotNull] private static readonly Scope Default = new Scope(new LockObject());
+        [NotNull] private static readonly Scope Default = new Scope(new LockObject(), true);
         [CanBeNull] [ThreadStatic] private static Scope _current;
         internal readonly long ScopeKey;
+        private readonly int _scopeHashCode;
         [NotNull] private readonly ILockObject _lockObject;
+        private readonly bool _isDefault;
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
         [CanBeNull] private Scope _prevScope;
 
         [NotNull] internal static Scope Current => _current ?? Default;
 
-        public Scope([NotNull] ILockObject lockObject, long key)
+        // For tests only
+        internal Scope([NotNull] ILockObject lockObject, long key)
         {
             ScopeKey = key;
+            _scopeHashCode = ScopeKey.GetHashCode();
             _lockObject = lockObject ?? throw new ArgumentNullException(nameof(lockObject));
         }
 
-        public Scope([NotNull] ILockObject lockObject)
+        public Scope([NotNull] ILockObject lockObject, bool isDefault = false)
         {
             ScopeKey = Interlocked.Increment(ref _currentScopeKey);
+            _scopeHashCode = ScopeKey.GetHashCode();
             _lockObject = lockObject ?? throw new ArgumentNullException(nameof(lockObject));
+            _isDefault = isDefault;
         }
 
         public IDisposable Activate()
@@ -40,30 +45,28 @@
 
             _prevScope = Current;
             _current = this;
-            return Disposable.Create(() => { _current = _prevScope ?? throw new NotSupportedException(); });
+            return Disposable.Create(() => { _current = _prevScope; });
         }
 
         public void Dispose()
         {
-            List<IDisposable> resources;
             lock (_lockObject)
             {
-                 resources = _resources.ToList();
-                 _resources.Clear();
-            }
+                foreach (var resource in _resources)
+                {
+                    resource.Dispose();
+                }
 
-            foreach (var resource in resources)
-            {
-                resource.Dispose();
+                _resources.Clear();
             }
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return ScopeKey.Equals(((Scope) obj).ScopeKey);
+            // ReSharper disable once PossibleNullReferenceException
+            if (obj.GetType() != typeof(Scope)) return false;
+            return ScopeKey == ((Scope)obj).ScopeKey;
         }
 
         public void RegisterResource(IDisposable resource)
@@ -82,7 +85,7 @@
             }
         }
 
-        public override int GetHashCode() => ScopeKey.GetHashCode();
+        public override int GetHashCode() => _scopeHashCode;
 
         public override string ToString() => $"#{ScopeKey} Scope";
 

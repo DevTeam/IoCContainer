@@ -8724,14 +8724,19 @@ namespace IoC
         ScopeSingleton = 4,
 
         /// <summary>
-        /// Automatically creates a new scope.
+        /// Automatically calls a <c>Disposable()</c> method for disposable instances after a scope has disposed off.
         /// </summary>
-        ScopeRoot = 5,
+        ScopeTransient = 5,
 
         /// <summary>
-        /// Automatically calls a <c>Disposable()</c> method for disposable instances after a container has disposed.
+        /// Automatically creates a new scope.
         /// </summary>
-        Disposing = 6
+        ScopeRoot = 6,
+
+        /// <summary>
+        /// Automatically calls a <c>Disposable()</c> method for disposable instances after a container has disposed off.
+        /// </summary>
+        Disposing = 7
     }
 }
 
@@ -8859,7 +8864,7 @@ namespace IoC.Features
 #if !NET40
             yield return container.Register<ReadOnlyCollection<TT>, IReadOnlyList<TT>, IReadOnlyCollection<TT>>(ctx => new ReadOnlyCollection<TT>(ctx.Container.Inject<TT[]>(ctx.Key)), null, new[] { Key.AnyTag });
 #endif
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NET5_0_OR_GREATER || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
             yield return container.Register<IAsyncEnumerable<TT>>(ctx => new AsyncEnumeration<TT>(ctx.Container.Inject<IEnumerable<TT>>(ctx.Key)), null, new[] { Key.AnyTag });
 #endif
         }
@@ -8944,7 +8949,7 @@ namespace IoC.Features
             }
         }
 
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+#if NET5_0_OR_GREATER || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
         private sealed class AsyncEnumeration<T> : IAsyncEnumerable<T>
         {
             private readonly IEnumerable<T> _instances;
@@ -9225,12 +9230,13 @@ namespace IoC.Features
             yield return container.Register<ILifetime>(ctx => new SingletonLifetime(true), null, new object[] { Lifetime.Singleton });
             yield return container.Register<ILifetime>(ctx => new ContainerSingletonLifetime(), null, new object[] { Lifetime.ContainerSingleton });
             yield return container.Register<ILifetime>(ctx => new ScopeSingletonLifetime(), null, new object[] { Lifetime.ScopeSingleton });
+            yield return container.Register<ILifetime>(ctx => new ScopeTransientLifetime(), null, new object[] { Lifetime.ScopeTransient });
             yield return container.Register<ILifetime>(ctx => new ScopeRootLifetime(), null, new object[] { Lifetime.ScopeRoot });
             yield return container.Register<ILifetime>(ctx => new DisposingLifetime(), null, new object[] { Lifetime.Disposing });
 
             // Scope
             yield return container.Register<IScopeToken>(ctx => Scope.Current);
-            yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Inject<ILockObject>()));
+            yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Inject<ILockObject>(), false));
 
             // Current container
             yield return container.Register<IContainer, IObservable<ContainerEvent>>(ctx => ctx.Container);
@@ -9826,43 +9832,13 @@ namespace IoC.Lifetimes
         /// <inheritdoc />
         protected override object AfterCreation(object newInstance, IContainer targetContainer, IContainer container, object[] args)
         {
-            if (newInstance is IDisposable disposable)
-            {
-                targetContainer.RegisterResource(disposable);
-            }
-
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            if (newInstance is IAsyncDisposable asyncDisposable)
-            {
-                targetContainer.RegisterResource(asyncDisposable.ToDisposable());
-            }
-#endif
-
+            targetContainer.Register(newInstance.AsDisposable());
             return newInstance;
         }
 
         /// <inheritdoc />
-        protected override void OnRelease(object releasedInstance, IContainer targetContainer)
-        {
-            if (releasedInstance is IDisposable disposable)
-            {
-                if (targetContainer.UnregisterResource(disposable))
-                {
-                    disposable.Dispose();
-                }
-            }
-
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            if (releasedInstance is IAsyncDisposable asyncDisposable)
-            {
-                disposable = asyncDisposable.ToDisposable();
-                if (targetContainer.UnregisterResource(disposable))
-                {
-                    disposable.Dispose();
-                }
-            }
-#endif
-        }
+        protected override void OnRelease(object releasedInstance, IContainer targetContainer) =>
+            targetContainer.UnregisterAndDispose(releasedInstance.AsDisposable());
     }
 }
 
@@ -9913,9 +9889,9 @@ namespace IoC.Lifetimes
                 e => { },
                 () => { });
 
-            if (_isDisposable && newInstance is IDisposable disposable)
+            if (_isDisposable)
             {
-                targetContainer.RegisterResource(disposable);
+                targetContainer.Register(newInstance.AsDisposable());
             }
 
             return newInstance;
@@ -9925,11 +9901,7 @@ namespace IoC.Lifetimes
         protected override void OnRelease(object releasedInstance, IContainer targetContainer)
         {
             _containerSubscription.Dispose();
-            if (_isDisposable && releasedInstance is IDisposable disposable)
-            {
-                targetContainer.UnregisterResource(disposable);
-                disposable.Dispose();
-            }
+            targetContainer.UnregisterAndDispose(releasedInstance.AsDisposable());
         }
 
         /// <inheritdoc />
@@ -9949,6 +9921,7 @@ namespace IoC.Lifetimes
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq.Expressions;
     // ReSharper disable once RedundantUsingDirective
     using Core;
 
@@ -9956,92 +9929,49 @@ namespace IoC.Lifetimes
     /// Automatically calls a <c>Disposable()</c> method for disposable instances after a container has disposed.
     /// </summary>
     [PublicAPI]
-    public class DisposingLifetime: TrackingLifetime
+    public sealed class DisposingLifetime: ILifetime
     {
         private readonly List<IDisposable> _disposables = new List<IDisposable>();
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-        private readonly List<IAsyncDisposable> _asyncDisposables = new List<IAsyncDisposable>();
-#endif
 
-        public DisposingLifetime()
-            : base(TrackTypes.AfterCreation)
+        public ILifetime CreateLifetime() => new DisposingLifetime();
+
+        public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+            resolvingContainer;
+
+        public Expression Build(IBuildContext context, Expression bodyExpression)
         {
+            if (bodyExpression.Type.Descriptor().IsDisposable())
+            {
+                return ExpressionBuilderExtensions.BuildGetOrCreateInstance(this, context, bodyExpression, nameof(GetOrCreateInstance));
+            }
+
+            return bodyExpression;
         }
 
-        public override ILifetime CreateLifetime() => new DisposingLifetime();
-
-        protected override object AfterCreation(object newInstance, IContainer container, object[] args)
+        public void Dispose()
         {
-            var instance = base.AfterCreation(newInstance, container, args);
             lock (_disposables)
             {
-                if (instance is IDisposable disposable)
+                foreach (var disposable in _disposables)
                 {
-                    _disposables.Add(disposable);
+                    disposable.Dispose();
                 }
 
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-                if (instance is IAsyncDisposable asyncDisposable)
-                {
-                    _asyncDisposables.Add(asyncDisposable);
-                }
-#endif
+                _disposables.Clear();
+            }
+        }
+
+        internal T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args)
+        {
+            var instance = resolver(container, args);
+            var disposable = instance.AsDisposable();
+            lock (_disposables)
+            {
+                _disposables.Add(disposable);
             }
 
             return instance;
         }
-
-        public override void Dispose()
-        {
-            var disposables = new List<IDisposable>();
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            var asyncDisposables = new List<IAsyncDisposable>();
-#endif
-            lock (_disposables)
-            {
-                disposables.AddRange(_disposables);
-                _disposables.Clear();
-
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-                asyncDisposables.AddRange(_asyncDisposables);
-                _asyncDisposables.Clear();
-#endif
-            }
-
-            foreach (var disposable in disposables)
-            {
-                disposable.Dispose();
-            }
-
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            foreach (var asyncDisposable in asyncDisposables)
-            {
-                asyncDisposable.ToDisposable().Dispose();
-            }
-#endif
-
-            base.Dispose();
-        }
-    }
-}
-
-
-#endregion
-#region ILifetimeBuilder
-
-namespace IoC.Lifetimes
-{
-    using System.Linq.Expressions;
-
-    internal interface ILifetimeBuilder
-    {
-        bool TryBuildRestoreInstance([NotNull] IBuildContext context, out Expression getExpression);
-
-        bool TryBuildBeforeCreating([NotNull] IBuildContext context, out Expression beforeCreatingExpression);
-
-        bool TryBuildAfterCreation([NotNull] IBuildContext context, [NotNull] Expression instanceExpression, out Expression newInstanceExpression);
-
-        bool TryBuildSaveInstance([NotNull] IBuildContext context, [NotNull] Expression instanceExpression, out Expression setExpression);
     }
 }
 
@@ -10051,99 +9981,43 @@ namespace IoC.Lifetimes
 
 namespace IoC.Lifetimes
 {
+    using System.Collections.Concurrent;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Linq.Expressions;
-    using System.Reflection;
     using Core;
-    using static Core.TypeDescriptorExtensions;
 
     /// <summary>
     /// Represents the abstraction for singleton based lifetimes.
     /// </summary>
     /// <typeparam name="TKey">The key type.</typeparam>
     [PublicAPI]
-    public abstract class KeyBasedLifetime<TKey>: ILifetime, ILifetimeBuilder
+    public abstract class KeyBasedLifetime<TKey>: ILifetime
     {
-        private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
-        private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
-        private static readonly MethodInfo GetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Get));
-        private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
-        private static readonly MethodInfo AfterCreationMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(AfterCreation));
-        private static readonly ParameterExpression KeyVar = Expression.Variable(typeof(TKey), "key");
-
-        private readonly ILockObject _lockObject = new LockObject();
-        private readonly LifetimeDirector _lifetimeDirector;
-        private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
-        private readonly MemberExpression _instancesField;
-        private readonly ConstantExpression _thisConst;
-
-        /// <summary>
-        /// Creates an instance
-        /// </summary>
-        protected KeyBasedLifetime()
-        {
-            _lifetimeDirector = new LifetimeDirector(this, _lockObject);
-            _thisConst = Expression.Constant(this);
-            _instancesField = Expression.Field(_thisConst, InstancesFieldInfo);
-        }
-
-        public abstract ILifetime CreateLifetime();
+        private readonly ConcurrentDictionary<TKey, object> _instances = new ConcurrentDictionary<TKey, object>();
 
         public virtual IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
             resolvingContainer;
 
+        public abstract ILifetime CreateLifetime();
+
         public Expression Build(IBuildContext context, Expression bodyExpression) =>
-            Expression.Block(
-                new[] { KeyVar },
-                // TKey key = CreateKey(container, args);
-                Expression.Assign(KeyVar, Expression.Call(_thisConst, CreateKeyMethodInfo, context.ContainerParameter, context.ArgsParameter)),
-                _lifetimeDirector.Build(context, bodyExpression)
-            );
+            ExpressionBuilderExtensions.BuildGetOrCreateInstance(this, context, bodyExpression, nameof(GetOrCreateInstance));
 
-        bool ILifetimeBuilder.TryBuildRestoreInstance(IBuildContext context, out Expression getExpression)
-        {
-            getExpression = Expression.Call(_instancesField, GetMethodInfo, KeyVar);
-            return true;
-        }
-
-        bool ILifetimeBuilder.TryBuildSaveInstance(IBuildContext context, Expression instanceExpression, out Expression setExpression)
-        {
-            setExpression = Expression.Assign(_instancesField, Expression.Call(_instancesField, SetMethodInfo, KeyVar, instanceExpression));
-            return true;
-        }
-
-        bool ILifetimeBuilder.TryBuildBeforeCreating(IBuildContext context, out Expression beforeCreatingExpression)
-        {
-            beforeCreatingExpression = default(Expression);
-            return false;
-        }
-
-        bool ILifetimeBuilder.TryBuildAfterCreation(IBuildContext context, Expression instanceExpression, out Expression newInstanceExpression)
-        {
-            newInstanceExpression = Expression.Call(_thisConst, AfterCreationMethodInfo, instanceExpression, KeyVar, context.ContainerParameter, context.ArgsParameter);
-            return true;
-        }
+        protected T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args) =>
+            (T)_instances.GetOrAdd(CreateKey(container, args), key =>
+                {
+                    var newInstance = resolver(container, args);
+                    AfterCreation(newInstance, key, container, args);
+                    return newInstance;
+                });
 
         public virtual void Dispose()
         {
-            Table<TKey, object> instances;
-            if (_lockObject != null)
+            var instances = _instances.ToArray();
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var i = 0; i < instances.Length; i++)
             {
-                lock (_lockObject)
-                {
-                    instances = _instances;
-                    _instances = Table<TKey, object>.Empty;
-                }
-            }
-            else
-            {
-                instances = _instances;
-                _instances = Table<TKey, object>.Empty;
-            }
-
-            foreach (var instance in instances)
-            {
+                var instance = instances[i];
                 OnRelease(instance.Value, instance.Key);
             }
         }
@@ -10179,114 +10053,8 @@ namespace IoC.Lifetimes
         /// </summary>
         /// <param name="key">The instance key.</param>
         [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
-        protected internal bool Remove(TKey key)
-        {
-            bool removed;
-            if (_lockObject != null)
-            {
-                lock (_lockObject)
-                {
-                    _instances = _instances.Remove(key, out removed);
-                }
-            }
-            else
-            {
-                _instances = _instances.Remove(key, out removed);
-            }
-
-            return removed;
-        }
-    }
-}
-
-
-#endregion
-#region LifetimeDirector
-
-namespace IoC.Lifetimes
-{
-    using System;
-    using System.Collections.Generic;
-    using System.Linq.Expressions;
-    using Core;
-
-    internal struct LifetimeDirector
-    {
-        [NotNull] private readonly ILifetimeBuilder _builder;
-        [CanBeNull] private readonly ILockObject _lockObject;
-
-        public LifetimeDirector(
-            [NotNull] ILifetimeBuilder builder,
-            [CanBeNull] ILockObject lockObject = null)
-        {
-            _builder = builder;
-            _lockObject = lockObject;
-        }
-        
-        [Pure]
-        public Expression Build(IBuildContext context, Expression bodyExpression)
-        {
-            if (bodyExpression == null) throw new ArgumentNullException(nameof(bodyExpression));
-            if (context == null) throw new ArgumentNullException(nameof(context));
-
-            var instanceType = context.Key.Type;
-            var instanceVar = Expression.Variable(typeof(object));
-            var creationBlock = new List<Expression>();
-            if (_builder.TryBuildBeforeCreating(context, out var creatingExpression))
-            {
-                creationBlock.Add(creatingExpression);
-            }
-
-            creationBlock.Add(Expression.Assign(instanceVar,  bodyExpression.Convert(typeof(object))));
-            if (_builder.TryBuildAfterCreation(context, instanceVar, out var newInstanceVar))
-            {
-                creationBlock.Add(Expression.Assign(instanceVar, newInstanceVar));
-            }
-
-            if (_builder.TryBuildSaveInstance(context, instanceVar, out var setExpression))
-            {
-                creationBlock.Add(setExpression);
-            }
-
-            creationBlock.Add(instanceVar);
-
-            if (!_builder.TryBuildRestoreInstance(context, out var getExpression))
-            {
-                return Expression.Block(new[] { instanceVar }, creationBlock);
-            }
-
-            getExpression = Expression.Assign(instanceVar, getExpression);
-            Expression isEmptyExpression;
-            if (instanceType.Descriptor().IsValueType())
-            {
-                isEmptyExpression = Expression.Call(null, ExpressionBuilderExtensions.EqualsMethodInfo, instanceVar, Expression.Default(typeof(object)));
-            }
-            else
-            {
-                isEmptyExpression = Expression.ReferenceEqual(instanceVar, Expression.Default(instanceType));
-            }
-
-            var createExpression = Expression.Block(
-                new[] { instanceVar },
-                getExpression,
-                Expression.Condition(
-                    isEmptyExpression,
-                    Expression.Block(creationBlock),
-                    instanceVar));
-
-            var lockObject = _lockObject;
-            if (lockObject != null)
-            {
-                // double check
-                createExpression = Expression.Block(
-                    new [] {instanceVar},
-                    getExpression,
-                    Expression.Condition(isEmptyExpression, createExpression.Lock(Expression.Constant(lockObject)), instanceVar)
-                );
-            }
-
-            return createExpression.Convert(instanceType);
-        }
+        protected internal bool Remove(TKey key) =>
+            _instances.TryRemove(key, out _);
     }
 }
 
@@ -10296,35 +10064,33 @@ namespace IoC.Lifetimes
 
 namespace IoC.Lifetimes
 {
-    using System;
+    using System.Linq.Expressions;
+    using Core;
 
     /// <summary>
     /// Automatically creates a new scope.
     /// </summary>
     [PublicAPI]
-    public class ScopeRootLifetime: TrackingLifetime
+    public sealed class ScopeRootLifetime: ILifetime
     {
-        [CanBeNull] private IDisposable _scopeToken;
+        public ILifetime CreateLifetime() => new ScopeRootLifetime();
 
-        public ScopeRootLifetime()
-            : base(TrackTypes.AfterCreation | TrackTypes.BeforeCreating)
-        {
-        }
+        public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+            resolvingContainer;
 
-        public override ILifetime CreateLifetime() => new ScopeRootLifetime();
+        public Expression Build(IBuildContext context, Expression bodyExpression) =>
+            ExpressionBuilderExtensions.BuildGetOrCreateInstance(this, context, bodyExpression, nameof(GetOrCreateInstance));
 
-        protected override void BeforeCreating(IContainer container, object[] args)
+        internal T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args)
         {
             var scope = container.Resolve<IScope>();
-            _scopeToken = scope.Activate();
-            base.BeforeCreating(container, args);
+            using (scope.Activate())
+            {
+                return  resolver(container, args);
+            }
         }
 
-        protected override object AfterCreation(object newInstance, IContainer container, object[] args)
-        {
-            _scopeToken?.Dispose();
-            return base.AfterCreation(newInstance, container, args);
-        }
+        public void Dispose() { }
     }
 }
 
@@ -10334,7 +10100,6 @@ namespace IoC.Lifetimes
 
 namespace IoC.Lifetimes
 {
-    using System;
     // ReSharper disable once RedundantUsingDirective
     using Core;
 
@@ -10356,51 +10121,56 @@ namespace IoC.Lifetimes
         /// <inheritdoc />
         protected override object AfterCreation(object newInstance, IScope scope, IContainer container, object[] args)
         {
-            if (!(scope is IResourceRegistry resourceRegistry))
+            if (scope is IResourceRegistry resourceRegistry)
             {
-                return newInstance;
+                resourceRegistry.Register(newInstance.AsDisposable());
             }
-
-            if (newInstance is IDisposable disposable)
-            {
-                resourceRegistry.RegisterResource(disposable);
-            }
-
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            if (newInstance is IAsyncDisposable asyncDisposable)
-            {
-                resourceRegistry.RegisterResource(asyncDisposable.ToDisposable());
-            }
-#endif
 
             return newInstance;
         }
 
         /// <inheritdoc />
-        protected override void OnRelease(object releasedInstance, IScope scope)
-        {
-            if (releasedInstance is IDisposable disposable)
-            {
-                if (scope.UnregisterResource(disposable))
-                {
-                    disposable.Dispose();
-                }
-            }
-
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            if (releasedInstance is IAsyncDisposable asyncDisposable)
-            {
-                disposable = asyncDisposable.ToDisposable();
-                if (scope.UnregisterResource(disposable))
-                {
-                    disposable.Dispose();
-                }
-            }
-#endif
-        }
+        protected override void OnRelease(object releasedInstance, IScope scope) =>
+            scope.UnregisterAndDispose(releasedInstance.AsDisposable());
     }
 }
 
+
+#endregion
+#region ScopeTransientLifetime
+
+namespace IoC.Lifetimes
+{
+    using System.Linq.Expressions;
+    using Core;
+
+    public sealed class ScopeTransientLifetime: ILifetime
+    {
+        public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+            resolvingContainer;
+
+        public ILifetime CreateLifetime() => new ScopeTransientLifetime();
+
+        public Expression Build(IBuildContext context, Expression bodyExpression)
+        {
+            if (bodyExpression.Type.Descriptor().IsDisposable())
+            {
+                return ExpressionBuilderExtensions.BuildGetOrCreateInstance(this, context, bodyExpression, nameof(GetOrCreateInstance));
+            }
+
+            return bodyExpression;
+        }
+
+        public void Dispose() { }
+
+        internal T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args)
+        {
+            var instance = resolver(container, args);
+            Scope.Current.Register(instance.AsDisposable());
+            return instance;
+        }
+    }
+}
 
 #endregion
 #region SingletonLifetime
@@ -10480,32 +10250,15 @@ namespace IoC.Lifetimes
             {
                 lock (_lockObject)
                 {
-                    disposable = _instance as IDisposable;
+                    disposable = _instance.AsDisposable();
                 }
             }
             else
             {
-                disposable = _instance as IDisposable;
+                disposable = _instance.AsDisposable();
             }
 
             disposable?.Dispose();
-
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            IAsyncDisposable asyncDisposable;
-            if (_lockObject != null)
-            {
-                lock (_lockObject)
-                {
-                    asyncDisposable = _instance as IAsyncDisposable;
-                }
-            }
-            else
-            {
-                asyncDisposable = _instance as IAsyncDisposable;
-            }
-
-            asyncDisposable?.ToDisposable().Dispose();
-#endif
         }
 
         /// <inheritdoc />
@@ -10513,111 +10266,6 @@ namespace IoC.Lifetimes
 
         /// <inheritdoc />
         public override string ToString() => Lifetime.Singleton.ToString();
-    }
-}
-
-
-#endregion
-#region TrackingLifetime
-
-namespace IoC.Lifetimes
-{
-    using System;
-    using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using Core;
-    using static Core.TypeDescriptorExtensions;
-
-    /// <summary>
-    /// Represents the abstraction for a lifetime with states.
-    /// </summary>
-    [PublicAPI]
-    public abstract class TrackingLifetime: ILifetime, ILifetimeBuilder
-    {
-        private readonly TrackTypes _trackTypes;
-        private static readonly MethodInfo BeforeCreatingMethodInfo = Descriptor<TrackingLifetime>().GetDeclaredMethods().Single(i => i.Name == nameof(BeforeCreating));
-        private static readonly MethodInfo AfterCreationMethodInfo = Descriptor<TrackingLifetime>().GetDeclaredMethods().Single(i => i.Name == nameof(AfterCreation));
-        private readonly LifetimeDirector _lifetimeDirector;
-        private readonly ConstantExpression _thisConst;
-
-        protected TrackingLifetime(TrackTypes trackTypes)
-        {
-            _trackTypes = trackTypes;
-            _lifetimeDirector = new LifetimeDirector(this);
-            _thisConst = Expression.Constant(this);
-        }
-
-        public Expression Build(IBuildContext context, Expression bodyExpression) =>
-            _lifetimeDirector.Build(context, bodyExpression).Convert(bodyExpression.Type);
-
-        public virtual void Dispose() { }
-
-        public abstract ILifetime CreateLifetime();
-
-        public virtual IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
-            resolvingContainer;
-
-        bool ILifetimeBuilder.TryBuildRestoreInstance(IBuildContext context, out Expression getExpression)
-        {
-            getExpression = default(Expression);
-            return false;
-        }
-
-        bool ILifetimeBuilder.TryBuildSaveInstance(IBuildContext context, Expression instanceExpression, out Expression setExpression)
-        {
-            setExpression = default(Expression);
-            return false;
-        }
-
-        bool ILifetimeBuilder.TryBuildBeforeCreating(IBuildContext context, out Expression beforeCreatingExpression)
-        {
-            if ((_trackTypes & TrackTypes.BeforeCreating) == 0)
-            {
-                beforeCreatingExpression = default(Expression);
-                return false;
-            }
-
-            beforeCreatingExpression = Expression.Call(_thisConst, BeforeCreatingMethodInfo, context.ContainerParameter, context.ArgsParameter);
-            return true;
-        }
-
-        bool ILifetimeBuilder.TryBuildAfterCreation(IBuildContext context, Expression instanceExpression, out Expression newInstanceExpression)
-        {
-            if ((_trackTypes & TrackTypes.AfterCreation) == 0)
-            {
-                newInstanceExpression = default(Expression);
-                return false;
-            }
-
-            newInstanceExpression = Expression.Call(_thisConst, AfterCreationMethodInfo, instanceExpression, context.ContainerParameter, context.ArgsParameter);
-            return true;
-        }
-
-        /// <summary>
-        /// Invoked before the new instance creation.
-        /// </summary>
-        /// <param name="container">The target container.</param>
-        /// <param name="args">Optional arguments.</param>
-        /// <returns>The created instance.</returns>
-        protected virtual void BeforeCreating(IContainer container, object[] args) { }
-
-        /// <summary>
-        /// Invoked after a new instance has been created.
-        /// </summary>
-        /// <param name="newInstance">The new instance.</param>
-        /// <param name="container">The target container.</param>
-        /// <param name="args">Optional arguments.</param>
-        /// <returns>The created instance.</returns>
-        protected virtual object AfterCreation(object newInstance, IContainer container, object[] args)
-            => newInstance;
-
-        [Flags]
-        public enum TrackTypes: byte
-        {
-            AfterCreation = 0b1,
-            BeforeCreating = 0b10
-        }
     }
 }
 
@@ -12265,6 +11913,59 @@ namespace IoC.Core
 }
 
 #endregion
+#region ConcurrentDictionary
+
+#if NETSTANDARD1_0
+// ReSharper disable once CheckNamespace
+namespace System.Collections.Concurrent
+{
+    using Generic;
+    using Linq;
+
+    internal class ConcurrentDictionary<TKey, TValue>
+    {
+        private readonly Dictionary<TKey, TValue> _dict = new Dictionary<TKey, TValue>();
+
+        public TValue GetOrAdd(TKey key, Func<TKey, TValue> factoryFunc)
+        {
+            lock (_dict)
+            {
+                if (!_dict.TryGetValue(key, out var value))
+                {
+                    value = factoryFunc(key);
+                    _dict.Add(key, value);
+                }
+
+                return value;
+            }
+        }
+
+        public bool TryRemove(TKey key, out TValue value)
+        {
+            lock (_dict)
+            {
+                if (_dict.TryGetValue(key, out value))
+                {
+                    _dict.Remove(key);
+                    return true;
+                }
+
+                return false;
+            }
+        }
+
+        public KeyValuePair<TKey, TValue>[] ToArray()
+        {
+            lock (_dict)
+            {
+                return _dict.ToArray();
+            }
+        }
+    }
+}
+#endif
+
+#endregion
 #region ConfigurationFromDelegate
 
 namespace IoC.Core
@@ -12967,14 +12668,17 @@ namespace IoC.Core
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Runtime.CompilerServices;
     using System.Threading;
 
     internal static class Disposable
     {
-        [NotNull]
-        public static readonly IDisposable Empty = EmptyDisposable.Shared;
+        private static readonly TypeDescriptor DisposableTypeDescriptor = typeof(IDisposable).Descriptor();
+#if NET5_0_OR_GREATER || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+        private static readonly TypeDescriptor AsyncDisposableTypeDescriptor = typeof(IAsyncDisposable).Descriptor();
+#endif
+
+        [NotNull] public static readonly IDisposable Empty = EmptyDisposable.Shared;
 
         [MethodImpl((MethodImplOptions)0x100)]
         [NotNull]
@@ -12984,6 +12688,56 @@ namespace IoC.Core
             if (action == null) throw new ArgumentNullException(nameof(action));
 #endif
             return new DisposableAction(action);
+        }
+
+        public static bool IsDisposable(this TypeDescriptor typeDescriptor)
+        {
+            if (DisposableTypeDescriptor.IsAssignableFrom(typeDescriptor))
+            {
+                return true;
+            }
+
+#if NET5_0_OR_GREATER || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+            if (AsyncDisposableTypeDescriptor.IsAssignableFrom(typeDescriptor))
+            {
+                return true;
+            }
+#endif
+
+            return false;
+        }
+
+    [CanBeNull]
+        public static IDisposable AsDisposable<T>(this T instance)
+        {
+            var disposable = instance as IDisposable;
+#if NET5_0_OR_GREATER || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
+            if (instance is IAsyncDisposable asyncDisposable)
+            {
+                return new DisposableAction(() =>
+                    {
+                        disposable?.Dispose();
+                        asyncDisposable.DisposeAsync().AsTask().Wait();
+                    },
+                    instance);
+            }
+#endif
+            return disposable;
+        }
+
+        public static void Register([NotNull] this IResourceRegistry registry, [CanBeNull] IDisposable disposable)
+        {
+            if (disposable != null)
+            {
+                registry.RegisterResource(disposable);
+            }
+        }
+        public static void UnregisterAndDispose([NotNull] this IResourceRegistry registry, [CanBeNull] IDisposable disposable)
+        {
+            if (disposable != null && registry.UnregisterResource(disposable))
+            {
+                disposable.Dispose();
+            }
         }
 
         [MethodImpl((MethodImplOptions)0x100)]
@@ -12996,16 +12750,6 @@ namespace IoC.Core
             return new CompositeDisposable(disposables);
         }
 
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-        [MethodImpl((MethodImplOptions)0x100)]
-        public static IDisposable ToDisposable([NotNull] this IAsyncDisposable asyncDisposable)
-        {
-#if DEBUG
-            if (asyncDisposable == null) throw new ArgumentNullException(nameof(asyncDisposable));
-#endif
-            return new DisposableAction(() => { asyncDisposable.DisposeAsync().AsTask().Wait(); }, asyncDisposable);
-        }
-#endif
         private sealed class DisposableAction : IDisposable
         {
             [NotNull] private readonly Action _action;
@@ -13113,6 +12857,20 @@ namespace IoC.Core
                     Expression.Call(EnterMethodInfo, lockObject),
                     body), 
                 Expression.Call(ExitMethodInfo, lockObject));
+
+
+        public static Expression BuildGetOrCreateInstance<T>([NotNull] T owner, [NotNull] IBuildContext context, [NotNull] Expression bodyExpression, string methodName)
+        {
+            var resolverType = bodyExpression.Type.ToResolverType();
+            var resolver = Expression.Constant(Expression.Lambda(resolverType, bodyExpression, false, context.ContainerParameter, context.ArgsParameter).Compile());
+            return Expression.Call(
+                Expression.Constant(owner),
+                methodName,
+                new[] { bodyExpression.Type },
+                resolver,
+                context.ContainerParameter,
+                context.ArgsParameter);
+        }
     }
 }
 
@@ -13985,32 +13743,37 @@ namespace IoC.Core
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
     using System.Threading;
 
     [DebuggerDisplay("{" + nameof(ToString) + "()} with {" + nameof(ResourceCount) + "} resources")]
     internal sealed class Scope: IScope
     {
         private static long _currentScopeKey;
-        [NotNull] private static readonly Scope Default = new Scope(new LockObject());
+        [NotNull] private static readonly Scope Default = new Scope(new LockObject(), true);
         [CanBeNull] [ThreadStatic] private static Scope _current;
         internal readonly long ScopeKey;
+        private readonly int _scopeHashCode;
         [NotNull] private readonly ILockObject _lockObject;
+        private readonly bool _isDefault;
         [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
         [CanBeNull] private Scope _prevScope;
 
         [NotNull] internal static Scope Current => _current ?? Default;
 
-        public Scope([NotNull] ILockObject lockObject, long key)
+        // For tests only
+        internal Scope([NotNull] ILockObject lockObject, long key)
         {
             ScopeKey = key;
+            _scopeHashCode = ScopeKey.GetHashCode();
             _lockObject = lockObject ?? throw new ArgumentNullException(nameof(lockObject));
         }
 
-        public Scope([NotNull] ILockObject lockObject)
+        public Scope([NotNull] ILockObject lockObject, bool isDefault = false)
         {
             ScopeKey = Interlocked.Increment(ref _currentScopeKey);
+            _scopeHashCode = ScopeKey.GetHashCode();
             _lockObject = lockObject ?? throw new ArgumentNullException(nameof(lockObject));
+            _isDefault = isDefault;
         }
 
         public IDisposable Activate()
@@ -14022,30 +13785,28 @@ namespace IoC.Core
 
             _prevScope = Current;
             _current = this;
-            return Disposable.Create(() => { _current = _prevScope ?? throw new NotSupportedException(); });
+            return Disposable.Create(() => { _current = _prevScope; });
         }
 
         public void Dispose()
         {
-            List<IDisposable> resources;
             lock (_lockObject)
             {
-                 resources = _resources.ToList();
-                 _resources.Clear();
-            }
+                foreach (var resource in _resources)
+                {
+                    resource.Dispose();
+                }
 
-            foreach (var resource in resources)
-            {
-                resource.Dispose();
+                _resources.Clear();
             }
         }
 
         public override bool Equals(object obj)
         {
-            if (obj is null) return false;
             if (ReferenceEquals(this, obj)) return true;
-            if (obj.GetType() != GetType()) return false;
-            return ScopeKey.Equals(((Scope) obj).ScopeKey);
+            // ReSharper disable once PossibleNullReferenceException
+            if (obj.GetType() != typeof(Scope)) return false;
+            return ScopeKey == ((Scope)obj).ScopeKey;
         }
 
         public void RegisterResource(IDisposable resource)
@@ -14064,7 +13825,7 @@ namespace IoC.Core
             }
         }
 
-        public override int GetHashCode() => ScopeKey.GetHashCode();
+        public override int GetHashCode() => _scopeHashCode;
 
         public override string ToString() => $"#{ScopeKey} Scope";
 

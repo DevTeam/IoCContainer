@@ -21,8 +21,8 @@
             object instance12;
             object instance21;
             object instance22;
-            using (var scope1 = new Scope(new LockObject(), 1))
-            using (var scope2 = new Scope(new LockObject(), 2))
+            using (var scope1 = new Scope(new LockObject()))
+            using (var scope2 = new Scope(new LockObject()))
             {
                 using (scope1.Activate())
                 {

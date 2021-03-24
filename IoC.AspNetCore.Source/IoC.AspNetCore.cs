@@ -232,6 +232,7 @@ namespace IoC.Features
             if (container == null) throw new ArgumentNullException(nameof(container));
             var singletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.Singleton.AsTag());
             var scopeSingletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.ScopeSingleton.AsTag());
+            var scopeTransientLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.ScopeTransient.AsTag());
             foreach (var serviceGroup in this.Reverse().Select((service, index) => new { index, item = service }).GroupBy(i => i.item.ServiceType))
             {
                 var isFirst = true;
@@ -251,6 +252,7 @@ namespace IoC.Features
                     switch (service.Lifetime)
                     {
                         case ServiceLifetime.Transient:
+                            binding = binding.Lifetime(scopeTransientLifetimeResolver(container));
                             break;
 
                         case ServiceLifetime.Singleton:

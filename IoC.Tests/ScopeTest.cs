@@ -40,8 +40,8 @@
         public void ActiveScopeShouldAccessibleViaCurrentProperty()
         {
             // Given
-            using var scope1 = new Scope(new LockObject(), 1);
-            using var scope2 = new Scope(new LockObject(), 2);
+            using var scope1 = new Scope(new LockObject());
+            using var scope2 = new Scope(new LockObject());
 
             // When
             using var token1 = scope1.Activate();

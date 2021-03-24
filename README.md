@@ -208,7 +208,7 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
   return Container
     // Creates an Inversion of Control container
     .Create()
-    // using .NET ASP Feature
+    // using ASP .NET Feature
     .Using(new AspNetCoreFeature(services))
     // using Glue
     .Using<Glue>()
@@ -351,10 +351,10 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Disposing lifetime](#disposing-lifetime-)
   - [Scope Root lifetime](#scope-root-lifetime-)
   - [Scope Singleton lifetime](#scope-singleton-lifetime-)
+  - [Scope Transient lifetime](#scope-transient-lifetime-)
   - [Singleton lifetime](#singleton-lifetime-)
-  - [Custom lifetime](#custom-lifetime-)
+  - [Custom lifetime: thread Singleton](#custom-lifetime:-thread-singleton-)
   - [Replacement of Lifetime](#replacement-of-lifetime-)
-  - [Thread Singleton lifetime](#thread-singleton-lifetime-)
 - BCL types
   - [Arrays](#arrays-)
   - [Collections](#collections-)
@@ -1465,6 +1465,39 @@ using (container.Bind<IService>().As(Transient).To<Service>())
 
 
 
+### Scope Transient lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ScopeTransientLifetime .cs)
+
+This lifetime is similar to a transient (default) lifetime, except that each disposable instance is automatically disposed of when a current scope is disposed of.
+
+``` CSharp
+public void Run()
+{
+    var dependency = new Mock<IDisposingDependency>();
+    using var container = Container
+        .Create()
+        .Bind<IService>().As(ScopeSingleton).To<Service>()
+        .Bind<IDependency>().As(ScopeTransient).To(ctx => dependency.Object)
+        .Container;
+
+    // Create scope
+    var scope = container.Resolve<IScope>();
+    using (scope.Activate())
+    {
+        container.Resolve<IService>();
+    }
+
+    // Dispose of scope
+    scope.Dispose();
+
+    // Verify that scope transient instance was disposed
+    dependency.Verify(i => i.Dispose());
+}
+
+public interface IDisposingDependency: IDependency, IDisposable { }
+```
+
+
+
 ### Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/SingletonLifetime.cs)
 
 [Singleton](https://en.wikipedia.org/wiki/Singleton_pattern) is a design pattern that supposes for having only one instance of some class during the whole application lifetime. The main complaint about Singleton is that it contradicts the Dependency Injection principle and thus hinders testability. It essentially acts as a global constant, and it is hard to substitute it with a test when needed. The _Singleton lifetime_ is indispensable in this case.
@@ -1512,81 +1545,6 @@ The lifetime could be:
 - _ScopeSingleton_ - singleton per scope
 - _ScopeRoot_ - root of a scope
 - _Disposing_ - Automatically calls a Disposable() method for disposable instances
-
-### Custom lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/CustomLifetime.cs)
-
-Custom lifetimes allow implementing your own logic controlling every aspect of resolved instances.
-
-``` CSharp
-public void Run()
-{
-    var serviceLifetime = new MyLifetime();
-
-    using var container = Container
-        .Create()
-        .Bind<IDependency>().To<Dependency>()
-        // Bind using a custom lifetime
-        .Bind<IService>().Lifetime(serviceLifetime).To<Service>()
-        .Container;
-    
-    // Resolve instances
-    var instance1 = container.Resolve<IService>();
-    var instance2 = container.Resolve<IService>();
-
-    // Check that instances were registered
-    serviceLifetime.ToList().ShouldBe(new object[] {instance1, instance2}, true);
-}
-
-// Represents a custom lifetime that contains all created instances just for sample
-public class MyLifetime : TrackingLifetime, IEnumerable<object>
-{
-    private readonly List<WeakReference> _instances = new List<WeakReference>();
-
-    public MyLifetime() : base(TrackTypes.AfterCreation) { }
-
-    // Creates the similar lifetime to use with generic types
-    public override ILifetime CreateLifetime() => new MyLifetime();
-
-    protected override object AfterCreation(object newInstance, IContainer container, object[] args)
-    {
-        var instance = base.AfterCreation(newInstance, container, args);
-        lock (_instances)
-        {
-            // Keeps a weak reference for the instance
-            _instances.Add(new WeakReference(instance));
-        }
-        
-        return instance;
-    }
-
-    public IEnumerator<object> GetEnumerator()
-    {
-        IEnumerable<WeakReference> instances;
-        lock (_instances)
-        {
-            instances = _instances.ToArray();
-        }
-
-        return (
-            from weakReference in instances
-            let instance = weakReference.Target
-            where weakReference.IsAlive
-            select instance ).GetEnumerator();
-    }
-
-    IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
-
-    public override void Dispose()
-    {
-        lock (_instances)
-        {
-            _instances.Clear();
-        }
-    }
-}
-```
-
-
 
 ### Replacement of Lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ReplaceLifetime.cs)
 
@@ -1679,7 +1637,7 @@ public class MySingletonLifetime : ILifetime
 
 
 
-### Thread Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ThreadSingletonLifetime.cs)
+### Custom lifetime: thread Singleton [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ThreadSingletonLifetime.cs)
 
 Sometimes it is useful to have a [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance per a thread (or more generally a singleton per something else). There is no special "lifetime" type in this framework to achieve this requirement. Still, it is quite easy to create your own "lifetime" type for that using base type [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs).
 

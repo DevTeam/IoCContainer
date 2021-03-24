@@ -28,7 +28,7 @@
             // Check the singleton was disposed after the container was disposed
             disposableService.Verify(i => i.Dispose(), Times.Once);
             // }
-#if NETCOREAPP5_0 || NETCOREAPP3_1
+#if NET5_0_OR_GREATER || NETCOREAPP3_1
             // {
             disposableService.Verify(i => i.DisposeAsync(), Times.Once);
             // }

@@ -41,9 +41,9 @@
                 e => { },
                 () => { });
 
-            if (_isDisposable && newInstance is IDisposable disposable)
+            if (_isDisposable)
             {
-                targetContainer.RegisterResource(disposable);
+                targetContainer.Register(newInstance.AsDisposable());
             }
 
             return newInstance;
@@ -53,11 +53,7 @@
         protected override void OnRelease(object releasedInstance, IContainer targetContainer)
         {
             _containerSubscription.Dispose();
-            if (_isDisposable && releasedInstance is IDisposable disposable)
-            {
-                targetContainer.UnregisterResource(disposable);
-                disposable.Dispose();
-            }
+            targetContainer.UnregisterAndDispose(releasedInstance.AsDisposable());
         }
 
         /// <inheritdoc />

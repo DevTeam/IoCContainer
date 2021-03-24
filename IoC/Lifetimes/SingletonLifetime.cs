@@ -73,32 +73,15 @@
             {
                 lock (_lockObject)
                 {
-                    disposable = _instance as IDisposable;
+                    disposable = _instance.AsDisposable();
                 }
             }
             else
             {
-                disposable = _instance as IDisposable;
+                disposable = _instance.AsDisposable();
             }
 
             disposable?.Dispose();
-
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            IAsyncDisposable asyncDisposable;
-            if (_lockObject != null)
-            {
-                lock (_lockObject)
-                {
-                    asyncDisposable = _instance as IAsyncDisposable;
-                }
-            }
-            else
-            {
-                asyncDisposable = _instance as IAsyncDisposable;
-            }
-
-            asyncDisposable?.ToDisposable().Dispose();
-#endif
         }
 
         /// <inheritdoc />

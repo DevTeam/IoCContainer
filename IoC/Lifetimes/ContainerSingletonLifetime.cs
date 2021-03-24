@@ -22,42 +22,12 @@
         /// <inheritdoc />
         protected override object AfterCreation(object newInstance, IContainer targetContainer, IContainer container, object[] args)
         {
-            if (newInstance is IDisposable disposable)
-            {
-                targetContainer.RegisterResource(disposable);
-            }
-
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            if (newInstance is IAsyncDisposable asyncDisposable)
-            {
-                targetContainer.RegisterResource(asyncDisposable.ToDisposable());
-            }
-#endif
-
+            targetContainer.Register(newInstance.AsDisposable());
             return newInstance;
         }
 
         /// <inheritdoc />
-        protected override void OnRelease(object releasedInstance, IContainer targetContainer)
-        {
-            if (releasedInstance is IDisposable disposable)
-            {
-                if (targetContainer.UnregisterResource(disposable))
-                {
-                    disposable.Dispose();
-                }
-            }
-
-#if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1
-            if (releasedInstance is IAsyncDisposable asyncDisposable)
-            {
-                disposable = asyncDisposable.ToDisposable();
-                if (targetContainer.UnregisterResource(disposable))
-                {
-                    disposable.Dispose();
-                }
-            }
-#endif
-        }
+        protected override void OnRelease(object releasedInstance, IContainer targetContainer) =>
+            targetContainer.UnregisterAndDispose(releasedInstance.AsDisposable());
     }
 }

@@ -1,51 +1,42 @@
 ﻿namespace IoC.Lifetimes
 {
-    using System.Collections.Generic;
+    using System.Collections.Concurrent;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
+    using System.Linq.Expressions;
+    using Core;
 
     /// <summary>
     /// Represents the abstraction for singleton based lifetimes.
     /// </summary>
     /// <typeparam name="TKey">The key type.</typeparam>
     [PublicAPI]
-    public abstract class KeyBasedLifetime<TKey>: SimpleLifetime
+    public abstract class KeyBasedLifetime<TKey>: ILifetime
     {
-        private readonly Dictionary<TKey, object> _instances = new Dictionary<TKey, object>();
+        private readonly ConcurrentDictionary<TKey, object> _instances = new ConcurrentDictionary<TKey, object>();
 
-        protected override T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args)
-        {
-            var key = CreateKey(container, args);
-            object value;
-            var created = false;
-            lock (_instances)
-            {
-                if (!_instances.TryGetValue(key, out value))
+        public virtual IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+            resolvingContainer;
+
+        public abstract ILifetime CreateLifetime();
+
+        public Expression Build(IBuildContext context, Expression bodyExpression) =>
+            ExpressionBuilderExtensions.BuildGetOrCreateInstance(this, context, bodyExpression, nameof(GetOrCreateInstance));
+
+        protected T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args) =>
+            (T)_instances.GetOrAdd(CreateKey(container, args), key =>
                 {
-                    value = resolver(container, args);
-                    _instances.Add(key, value);
-                    created = true;
-                }
-            }
+                    var newInstance = resolver(container, args);
+                    AfterCreation(newInstance, key, container, args);
+                    return newInstance;
+                });
 
-            if (created)
-            {
-                AfterCreation(value, key, container, args);
-            }
-
-            return (T)value;
-        }
-
-        public override void Dispose()
+        public virtual void Dispose()
         {
-            KeyValuePair<TKey, object>[] instances;
-            lock (_instances)
+            var instances = _instances.ToArray();
+            // ReSharper disable once ForCanBeConvertedToForeach
+            for (var i = 0; i < instances.Length; i++)
             {
-                instances = _instances.ToArray();
-            }
-
-            foreach (var instance in instances)
-            {
+                var instance = instances[i];
                 OnRelease(instance.Value, instance.Key);
             }
         }
@@ -81,12 +72,7 @@
         /// </summary>
         /// <param name="key">The instance key.</param>
         [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
-        protected internal bool Remove(TKey key)
-        {
-            lock (_instances)
-            {
-                return _instances.Remove(key);
-            }
-        }
+        protected internal bool Remove(TKey key) =>
+            _instances.TryRemove(key, out _);
     }
 }

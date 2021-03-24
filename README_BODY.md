@@ -189,7 +189,7 @@ public IServiceProvider ConfigureServices(IServiceCollection services)
   return Container
     // Creates an Inversion of Control container
     .Create()
-    // using .NET ASP Feature
+    // using ASP .NET Feature
     .Using(new AspNetCoreFeature(services))
     // using Glue
     .Using<Glue>()

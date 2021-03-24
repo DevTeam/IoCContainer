@@ -12,7 +12,7 @@ namespace IoC.Tests.UsageScenarios
         // $visible=true
         // $tag=2 Lifetimes
         // $priority=10
-        // $description=Thread Singleton lifetime
+        // $description=Custom lifetime: thread Singleton
         // $header=Sometimes it is useful to have a [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance per a thread (or more generally a singleton per something else). There is no special "lifetime" type in this framework to achieve this requirement. Still, it is quite easy to create your own "lifetime" type for that using base type [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs).
         // {
         public void Run()

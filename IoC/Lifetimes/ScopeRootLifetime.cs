@@ -1,33 +1,31 @@
 ﻿namespace IoC.Lifetimes
 {
-    using System;
+    using System.Linq.Expressions;
+    using Core;
 
     /// <summary>
     /// Automatically creates a new scope.
     /// </summary>
     [PublicAPI]
-    public class ScopeRootLifetime: TrackingLifetime
+    public sealed class ScopeRootLifetime: ILifetime
     {
-        [CanBeNull] private IDisposable _scopeToken;
+        public ILifetime CreateLifetime() => new ScopeRootLifetime();
 
-        public ScopeRootLifetime()
-            : base(TrackTypes.AfterCreation | TrackTypes.BeforeCreating)
-        {
-        }
+        public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
+            resolvingContainer;
 
-        public override ILifetime CreateLifetime() => new ScopeRootLifetime();
+        public Expression Build(IBuildContext context, Expression bodyExpression) =>
+            ExpressionBuilderExtensions.BuildGetOrCreateInstance(this, context, bodyExpression, nameof(GetOrCreateInstance));
 
-        protected override void BeforeCreating(IContainer container, object[] args)
+        internal T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args)
         {
             var scope = container.Resolve<IScope>();
-            _scopeToken = scope.Activate();
-            base.BeforeCreating(container, args);
+            using (scope.Activate())
+            {
+                return  resolver(container, args);
+            }
         }
 
-        protected override object AfterCreation(object newInstance, IContainer container, object[] args)
-        {
-            _scopeToken?.Dispose();
-            return base.AfterCreation(newInstance, container, args);
-        }
+        public void Dispose() { }
     }
 }

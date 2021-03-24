@@ -24,7 +24,7 @@ namespace IoC.Tests.IntegrationTests
     }
 
     public interface IMyDisposableService: IDisposable
-#if NETCOREAPP5_0 || NETCOREAPP3_1
+#if NET5_0_OR_GREATER || NETCOREAPP3_1
     , IAsyncDisposable
 #endif
     {
