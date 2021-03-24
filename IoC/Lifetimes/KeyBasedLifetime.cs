@@ -1,94 +1,47 @@
 ﻿namespace IoC.Lifetimes
 {
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
-    using Core;
-    using static Core.TypeDescriptorExtensions;
 
     /// <summary>
     /// Represents the abstraction for singleton based lifetimes.
     /// </summary>
     /// <typeparam name="TKey">The key type.</typeparam>
     [PublicAPI]
-    public abstract class KeyBasedLifetime<TKey>: ILifetime, ILifetimeBuilder
+    public abstract class KeyBasedLifetime<TKey>: SimpleLifetime
     {
-        private static readonly FieldInfo InstancesFieldInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredFields().Single(i => i.Name == nameof(_instances));
-        private static readonly MethodInfo CreateKeyMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(CreateKey));
-        private static readonly MethodInfo GetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Get));
-        private static readonly MethodInfo SetMethodInfo = Descriptor<Table<TKey, object>>().GetDeclaredMethods().Single(i => i.Name == nameof(Table<TKey, object>.Set));
-        private static readonly MethodInfo AfterCreationMethodInfo = Descriptor<KeyBasedLifetime<TKey>>().GetDeclaredMethods().Single(i => i.Name == nameof(AfterCreation));
-        private static readonly ParameterExpression KeyVar = Expression.Variable(typeof(TKey), "key");
+        private readonly Dictionary<TKey, object> _instances = new Dictionary<TKey, object>();
 
-        private readonly ILockObject _lockObject = new LockObject();
-        private readonly LifetimeDirector _lifetimeDirector;
-        private volatile Table<TKey, object> _instances = Table<TKey, object>.Empty;
-        private readonly MemberExpression _instancesField;
-        private readonly ConstantExpression _thisConst;
-
-        /// <summary>
-        /// Creates an instance
-        /// </summary>
-        protected KeyBasedLifetime()
+        protected override T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args)
         {
-            _lifetimeDirector = new LifetimeDirector(this, _lockObject);
-            _thisConst = Expression.Constant(this);
-            _instancesField = Expression.Field(_thisConst, InstancesFieldInfo);
-        }
-
-        public abstract ILifetime CreateLifetime();
-
-        public virtual IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
-            resolvingContainer;
-
-        public Expression Build(IBuildContext context, Expression bodyExpression) =>
-            Expression.Block(
-                new[] { KeyVar },
-                // TKey key = CreateKey(container, args);
-                Expression.Assign(KeyVar, Expression.Call(_thisConst, CreateKeyMethodInfo, context.ContainerParameter, context.ArgsParameter)),
-                _lifetimeDirector.Build(context, bodyExpression)
-            );
-
-        bool ILifetimeBuilder.TryBuildRestoreInstance(IBuildContext context, out Expression getExpression)
-        {
-            getExpression = Expression.Call(_instancesField, GetMethodInfo, KeyVar);
-            return true;
-        }
-
-        bool ILifetimeBuilder.TryBuildSaveInstance(IBuildContext context, Expression instanceExpression, out Expression setExpression)
-        {
-            setExpression = Expression.Assign(_instancesField, Expression.Call(_instancesField, SetMethodInfo, KeyVar, instanceExpression));
-            return true;
-        }
-
-        bool ILifetimeBuilder.TryBuildBeforeCreating(IBuildContext context, out Expression beforeCreatingExpression)
-        {
-            beforeCreatingExpression = default(Expression);
-            return false;
-        }
-
-        bool ILifetimeBuilder.TryBuildAfterCreation(IBuildContext context, Expression instanceExpression, out Expression newInstanceExpression)
-        {
-            newInstanceExpression = Expression.Call(_thisConst, AfterCreationMethodInfo, instanceExpression, KeyVar, context.ContainerParameter, context.ArgsParameter);
-            return true;
-        }
-
-        public virtual void Dispose()
-        {
-            Table<TKey, object> instances;
-            if (_lockObject != null)
+            var key = CreateKey(container, args);
+            object value;
+            var created = false;
+            lock (_instances)
             {
-                lock (_lockObject)
+                if (!_instances.TryGetValue(key, out value))
                 {
-                    instances = _instances;
-                    _instances = Table<TKey, object>.Empty;
+                    value = resolver(container, args);
+                    _instances.Add(key, value);
+                    created = true;
                 }
             }
-            else
+
+            if (created)
             {
-                instances = _instances;
-                _instances = Table<TKey, object>.Empty;
+                AfterCreation(value, key, container, args);
+            }
+
+            return (T)value;
+        }
+
+        public override void Dispose()
+        {
+            KeyValuePair<TKey, object>[] instances;
+            lock (_instances)
+            {
+                instances = _instances.ToArray();
             }
 
             foreach (var instance in instances)
@@ -130,20 +83,10 @@
         [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
         protected internal bool Remove(TKey key)
         {
-            bool removed;
-            if (_lockObject != null)
+            lock (_instances)
             {
-                lock (_lockObject)
-                {
-                    _instances = _instances.Remove(key, out removed);
-                }
+                return _instances.Remove(key);
             }
-            else
-            {
-                _instances = _instances.Remove(key, out removed);
-            }
-
-            return removed;
         }
     }
 }
