@@ -13,14 +13,14 @@
             // $tag=2 Lifetimes
             // $priority=01
             // $description=Scope Singleton lifetime
-            // $header=Each scope has its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding. Scopes can be created, activated and deactivated. Scope can be injected like any other instance from container.
+            // $header=Each scope has its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding. Scopes can be created, activated, and deactivated. A scope can be injected like any other container instance.
             // {
             using var container = Container
                 .Create()
                 .Bind<IDependency>().As(ScopeSingleton).To<Dependency>()
                 .Container;
 
-            // Use the Scope Singleton lifetime for instance
+            // Use the Scope Singleton lifetime
             using (container.Bind<IService>().As(ScopeSingleton).To<Service>())
             {
                 // Resolve the default scope singleton twice
@@ -46,7 +46,7 @@
                     scopeInstance1.ShouldNotBe(defaultScopeInstance1);
                 }
 
-                // Dispose instances on disposing a scope
+                // Dispose of instances on disposing of a scope
                 scope1.Dispose();
                 ((Service)scopeInstance1).DisposeCount.ShouldBe(1);
                 ((Service)scopeInstance2).DisposeCount.ShouldBe(1);

@@ -4,7 +4,7 @@
     using Shouldly;
     using Xunit;
 
-    public class PropertyInjection
+    public class SetterInjection
     {
         [Fact]
         public void Run()
@@ -12,24 +12,25 @@
             // $visible=true
             // $tag=1 Basics
             // $priority=03
-            // $description=Property injection
-            // $header=:warning: Please try using the constructor injection instead. The property injection is not recommended because of it is a cause of hidden dependencies.
+            // $description=Setter or field injection
+            // $header=:warning: Please try using the constructor injection instead. The setter/field injection is not recommended because of it is a cause of hidden dependencies.
+            // $footer=It is possible to use DI aspects (Attributes) to use full autowring instead.
             // {
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
                 // Bind 'INamedService' to the instance creation and initialization, actually represented as an expression tree
                 .Bind<INamedService>().To<InitializingNamedService>(
-                    // Select the constructor and inject the dependency
+                    // Select a constructor and inject the dependency
                     ctx => new InitializingNamedService(ctx.Container.Inject<IDependency>()),
-                    // Select the property to inject after the instance creation and inject the value from arguments at index 0
-                    ctx => ctx.Container.Assign(ctx.It.Name, (string) ctx.Args[0]))
+                    // Select a setter/field to inject after the instance creation and inject the value from arguments at index 0
+                    ctx => ctx.Container.Assign(ctx.It.Name, (string)ctx.Args[0]))
                 .Container;
 
             // Resolve the instance using the argument "alpha"
             var instance = container.Resolve<INamedService>("alpha");
 
-            // Check the instance's type
+            // Check the instance type
             instance.ShouldBeOfType<InitializingNamedService>();
 
             // Check the injected dependency

@@ -6,7 +6,7 @@
     using Xunit;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public class Func
+    public class Funcs
     {
         [Fact]
         public void Run()
@@ -14,8 +14,8 @@
             // $visible=true
             // $tag=3 BCL types
             // $priority=01
-            // $description=Func
-            // $header=_Func_ dependency helps when a logic needs to inject some number of type instances on demand.
+            // $description=Funcs
+            // $header=_Func<>_ helps when a logic needs to inject some type of instances on-demand or solve circular dependency issues.
             // {
             using var container = Container
                 .Create()
@@ -26,11 +26,11 @@
             // Resolve function to create instances
             var factory = container.Resolve<Func<IService>>();
 
-            // Resolve instances
+            // Resolve few instances
             var instance1 = factory();
             var instance2 = factory();
             // }
-            // Check the instances
+            // Check each instance
             instance1.ShouldBeOfType<Service>();
             instance2.ShouldBeOfType<Service>();
         }

@@ -3,7 +3,7 @@
     using Shouldly;
     using Xunit;
 
-    public class Array
+    public class Arrays
     {
         [Fact]
         public void Run()
@@ -11,7 +11,7 @@
             // $visible=true
             // $tag=3 BCL types
             // $priority=01
-            // $description=Array
+            // $description=Arrays
             // $header=To resolve all possible instances of any tags of the specific type as an _array_ just use the injection _T[]_
             // {
             using var container = Container

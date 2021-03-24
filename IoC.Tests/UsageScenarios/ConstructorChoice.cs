@@ -12,7 +12,7 @@
             // $tag=5 Advanced
             // $priority=04
             // $description=Constructor choice
-            // $header
+            // $header=We can specify a constructor manually and all its arguments.
             // {
             using var container = Container
                 .Create()

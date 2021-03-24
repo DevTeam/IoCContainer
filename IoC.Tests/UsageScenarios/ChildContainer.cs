@@ -12,7 +12,7 @@
             // $tag=1 Basics
             // $priority=03
             // $description=Child container
-            // $header=Child containers allow to override or just to add bindings of a parent containers without any influence on a parent containers. This is most useful when there are some base parent container(s). And these containers are shared between several components which have its own child containers based on common parent container(s) and have some additional bindings.
+            // $header=Child containers allow to override or just to add bindings without any influence on parent containers. This is useful when few components have their own child containers with additional bindings based on a common parent container.
             // {
             using var parentContainer = Container
                 .Create()

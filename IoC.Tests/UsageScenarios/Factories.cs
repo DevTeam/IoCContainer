@@ -7,7 +7,7 @@ namespace IoC.Tests.UsageScenarios
     using Shouldly;
     using Xunit;
 
-    public class Factory
+    public class Factories
     {
         [Fact]
         public void Run()
@@ -15,8 +15,9 @@ namespace IoC.Tests.UsageScenarios
             // $visible=true
             // $tag=1 Basics
             // $priority=01
-            // $description=Factory
-            // $header=Use Func<.., T> with arguments as a factory passing a state.
+            // $description=Factories
+            // $header=Use _Func<..., T>_ with arguments as a factory passing a state.
+            // $footer=It is better to pass a state using a special type (but not via any base type like in the sample above) because in this case, it will be possible to create a complex object graph with a special state for every object within this graph.
             // {
             using var container = Container
                 .Create()

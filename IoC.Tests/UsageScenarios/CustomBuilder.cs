@@ -16,7 +16,7 @@ namespace IoC.Tests.UsageScenarios
         // $tag=5 Advanced
         // $priority=10
         // $description=Custom builder
-        // $header=The sample below shows how to use this extension point [_IBuilder_](IoCContainer/blob/master/IoC/IBuilder.cs) to rewrite the expression tree of creation any instances to check constructor arguments on null. It is possible to create other own builders to make any manipulation on expression tree before they will be compiled into factories for the instances creation. Any logic any automation - checking arguments, logging, thread safety, authorization aspects and etc.
+        // $header=The sample below shows how to use this extension point [_IBuilder_](IoCContainer/blob/master/IoC/IBuilder.cs) to rewrite the expression tree of creation any instances to check constructor arguments on null. It is possible to create other own builders to make any manipulation on expression trees before they will be compiled into factories for the creation of the instances. Any logic any automation - checking arguments, logging, thread safety, authorization aspects and etc.
         // {
         public void Run()
         {
@@ -47,7 +47,7 @@ namespace IoC.Tests.UsageScenarios
                     // arg ?? throw new ArgumentNullException(nameof(arg), "The argument ...")
                     ? Expression.Coalesce(
                         arg.expression,
-                        // throws an exception when an argument is null
+                        // Throws an exception when an argument is null
                         Expression.Block(
                             Expression.Throw(Expression.Constant(new ArgumentNullException(arg.info.Name, $"The argument \"{arg.info.Name}\" is null while constructing the instance of type \"{newExpression.Type.Name}\"."))),
                             Expression.Default(typeDescriptor.Type)))

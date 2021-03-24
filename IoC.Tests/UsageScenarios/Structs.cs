@@ -13,13 +13,13 @@ namespace IoC.Tests.UsageScenarios
     using Xunit;
     using static Lifetime;
 
-    public class Struct
+    public class Structs
     {
         [Fact]
         // $visible=true
         // $tag=1 Basics
         // $priority=05
-        // $description=Struct
+        // $description=Value types
         // $header=Value types are fully supported avoiding any boxing/unboxing or cast operations, so the performance does not suffer!
         // {
         public void Run()
@@ -50,7 +50,7 @@ namespace IoC.Tests.UsageScenarios
             public MyStruct(IDependency dependency) { }
         }
 
-        // This builder saves expressions that used to create resolvers into a map
+        // This builder saves expressions that used to create resolvers
         public class TracingBuilder : IBuilder
         {
             public readonly IDictionary<Key, Expression> Expressions = new Dictionary<Key, Expression>();

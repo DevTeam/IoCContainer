@@ -6,7 +6,7 @@ namespace IoC.Tests.UsageScenarios
     using Xunit;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public class ValueTuple
+    public class ValueTuples
     {
         [Fact]
         public void Run()
@@ -14,7 +14,7 @@ namespace IoC.Tests.UsageScenarios
             // $visible=true
             // $tag=3 BCL types
             // $priority=01
-            // $description=ValueTuple
+            // $description=Value Tuples
             // {
             using var container = Container
                 .Create()

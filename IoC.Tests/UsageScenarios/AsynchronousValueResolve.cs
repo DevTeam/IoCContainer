@@ -17,7 +17,7 @@ namespace IoC.Tests.UsageScenarios
             // $tag=4 Async
             // $priority=01
             // $description=ValueTask
-            // $header=In this scenario ValueTask is just wrapping a resolved instance.
+            // $header=In this scenario, ValueTask is just a container for a resolved instance.
             // {
             using var container = Container
                 .Create()

@@ -30,7 +30,7 @@
 
             // When
 
-            // Resolve instances
+            // Resolve plugins
             var plugins = container.Resolve<IEnumerable<IPlugin>>();
 
             // This also works when you cannot use a generic type like IEnumerable<IPlugin>

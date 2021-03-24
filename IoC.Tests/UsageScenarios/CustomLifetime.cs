@@ -15,7 +15,7 @@
         // $tag=2 Lifetimes
         // $priority=10
         // $description=Custom lifetime
-        // $header=Custom lifetimes allow to implement your own logic controlling every aspects of resolved instances.
+        // $header=Custom lifetimes allow implementing your own logic controlling every aspect of resolved instances.
         // {
         public void Run()
         {
@@ -36,13 +36,12 @@
             serviceLifetime.ToList().ShouldBe(new object[] {instance1, instance2}, true);
         }
 
-        // Represents a custom lifetime that registers all created instances
+        // Represents a custom lifetime that contains all created instances just for sample
         public class MyLifetime : TrackingLifetime, IEnumerable<object>
         {
             private readonly List<WeakReference> _instances = new List<WeakReference>();
 
-            public MyLifetime() : base(TrackTypes.AfterCreation)
-            { }
+            public MyLifetime() : base(TrackTypes.AfterCreation) { }
 
             // Creates the similar lifetime to use with generic types
             public override ILifetime CreateLifetime() => new MyLifetime();
@@ -52,7 +51,7 @@
                 var instance = base.AfterCreation(newInstance, container, args);
                 lock (_instances)
                 {
-                    // Keep a weak reference for the instance
+                    // Keeps a weak reference for the instance
                     _instances.Add(new WeakReference(instance));
                 }
                 

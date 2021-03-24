@@ -14,7 +14,7 @@
             // $tag=1 Basics
             // $priority=02
             // $description=Several contracts
-            // $header=It is possible to bind several types to single implementation.
+            // $header=It is possible to bind several types to a single implementation.
             // {
             using var container = Container
                 .Create()

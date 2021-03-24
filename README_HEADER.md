@@ -7,12 +7,13 @@
 - maximum performance
   - based on compiled expressions
   - free of boxing and unboxing
-  - avoids using delegates
+  - avoid using delegates
 
-- powered by Composition Root
-  - code is independent of IoC
+- thoughtful design
+  - code is fully independent of the IoC framework
   - supports for BCL types out of the box
   - ultra-fine tuning of generic types
-  - customizable aspects
-  - predictable Dependency Graph
+  - aspect-oriented DI
+  - predictable dependency graph
+  - _Func<... ,T>_ based factories passing a state
 

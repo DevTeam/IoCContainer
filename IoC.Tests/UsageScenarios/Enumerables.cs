@@ -13,8 +13,8 @@
             // $visible=true
             // $tag=3 BCL types
             // $priority=01
-            // $description=Enumerable
-            // $header=To resolve all possible instances of any tags of the specific type as an _enumerable_ just use the injection _IEnumerable<T>_
+            // $description=Enumerables
+            // $header=To resolve all possible instances of any tags of the specific type as an _enumerable_ just use the injection _IEnumerable<T>_.
             // {
             using var container = Container
                 .Create()
@@ -33,7 +33,7 @@
             // Check the number of resolved instances
             instances.Count.ShouldBe(3);
             // }
-            // Check instances
+            // Check each instance
             instances.ForEach(instance => instance.ShouldBeOfType<Service>());
         }
     }

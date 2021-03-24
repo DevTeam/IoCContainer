@@ -15,7 +15,7 @@ namespace IoC.Tests.UsageScenarios
         // $tag=5 Advanced
         // $priority=04
         // $description=Container injection
-        // $header=:warning: Please avoid injecting containers in non-infrastructure code. Keep your general code in ignorance of a container.
+        // $header=:warning: Please avoid injecting containers in non-infrastructure code. Keep your code in ignorance about a container framework.
         // {
         public void Run()
         {

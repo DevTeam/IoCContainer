@@ -14,7 +14,7 @@ namespace IoC.Tests.UsageScenarios
         // $tag=5 Advanced
         // $priority=10
         // $description=Custom child container
-        // $header=You may replace the default implementation of container by your own. I can’t imagine why, but it’s possible!
+        // $header=You may replace the default implementation of the container with your own. I can't imagine why it should be done, but it’s possible!
         // {
         public void Run()
         {
@@ -35,7 +35,7 @@ namespace IoC.Tests.UsageScenarios
             // Resolve an instance
             var instance = childContainer.Resolve<IService>();
 
-            // Check the child container's type
+            // Check the child container type
             childContainer.ShouldBeOfType<MyContainer>();
             // }
             // Check the instance
@@ -46,7 +46,7 @@ namespace IoC.Tests.UsageScenarios
         // Sample of transparent container implementation
         public class MyContainer: IMutableContainer
         {
-            // some implementation here
+            // Some implementation here
             // }
             // Stores the parent container to delegate all logic
             public MyContainer(IContainer current) => Parent = current;
@@ -69,7 +69,7 @@ namespace IoC.Tests.UsageScenarios
             public bool TryGetDependency(Key key, out IoC.IDependency dependency, out ILifetime lifetime)
                 => Parent.TryGetDependency(key, out dependency, out lifetime);
 
-            // Tries to get a resolver
+            // Tries getting a resolver
             public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null)
                 => Parent.TryGetResolver(type, tag, out resolver, out error, resolvingContainer);
 
@@ -81,10 +81,10 @@ namespace IoC.Tests.UsageScenarios
 
             public void Dispose() => (Parent as IMutableContainer)?.Dispose();
 
-            // Creates the registered keys' enumerator
+            // Creates a registered keys' enumerator
             IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-            // Creates the registered keys' strong-typed enumerator
+            // Creates a registered keys' strong-typed enumerator
             public IEnumerator<IEnumerable<Key>> GetEnumerator() => Parent.GetEnumerator();
 
             // Subscribes an observer to receive container events

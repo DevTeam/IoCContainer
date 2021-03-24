@@ -27,7 +27,7 @@ namespace IoC.Tests.UsageScenarios
             using var container = Container.Create()
                 // Bind cancellation token source
                 .Bind<CancellationTokenSource>().To(ctx => cancellationTokenSource)
-                // Bind cancellation token
+                // Bind the cancellation token
                 .Bind<CancellationToken>().To(ctx => ctx.Container.Inject<CancellationTokenSource>().Token)
                 // Bind some dependency
                 .Bind<IDependency>().To<SomeDependency>()
@@ -46,7 +46,7 @@ namespace IoC.Tests.UsageScenarios
 
         public class SomeDependency: IDependency
         {
-            // Time-consuming logic constructor with cancellation token
+            // A time-consuming logic constructor with 
             public SomeDependency(CancellationToken cancellationToken)
             {
                 while (!cancellationToken.IsCancellationRequested) { }
@@ -59,7 +59,7 @@ namespace IoC.Tests.UsageScenarios
         {
             public Consumer(Task<IDependency> dependency1, Task<IDependency> dependency2)
             {
-                // Time-consuming logic
+                // A time-consuming logic
                 var dep1 = dependency1.Result;
                 var dep2 = dependency2.Result;
             }

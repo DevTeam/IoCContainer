@@ -4,7 +4,7 @@
     using Shouldly;
     using Xunit;
 
-    public class Set
+    public class Sets
     {
         [Fact]
         public void Run()
@@ -12,8 +12,8 @@
             // $visible=true
             // $tag=3 BCL types
             // $priority=01
-            // $description=Set
-            // $header=To resolve all possible instances of any tags of the specific type as a _set_ just use the injection _ISet<T>_
+            // $description=Sets
+            // $header=To resolve all possible instances of any tags of the specific type as a _ISet<>_ just use the injection _ISet<T>_.
             // {
             using var container = Container
                 .Create()
@@ -34,7 +34,7 @@
             // }
             foreach (var instance in instances)
             {
-                // Check the instance
+                // Check each instance
                 instance.ShouldBeOfType<Service>();
             }
         }

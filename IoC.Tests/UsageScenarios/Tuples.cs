@@ -6,7 +6,7 @@
     using Xunit;
 
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    public class Tuple
+    public class Tuples
     {
         [Fact]
         public void Run()
@@ -14,8 +14,8 @@
             // $visible=true
             // $tag=3 BCL types
             // $priority=01
-            // $description=Tuple
-            // $header=[Tuple](https://docs.microsoft.com/en-us/dotnet/api/system.tuple) has a specific number and sequence of elements which may be resolved at the same time.
+            // $description=Tuples
+            // $header=[Tuple](https://docs.microsoft.com/en-us/dotnet/api/system.tuple) has a set of elements that should be resolved at the same time.
             // {
             using var container = Container
                 .Create()

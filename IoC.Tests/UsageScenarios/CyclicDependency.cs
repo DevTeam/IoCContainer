@@ -16,7 +16,7 @@ namespace IoC.Tests.UsageScenarios
         // $tag=9 Samples
         // $priority=00
         // $description=Cyclic dependency
-        // $header=By default, a circular dependency is detected after the 256th recursive resolution. This behaviour may be changed by overriding the interface _IFoundCyclicDependency_.
+        // $header=By default, a circular dependency is detected after the 256th recursive resolution. This behavior may be changed by overriding the interface _IFoundCyclicDependency_.
         // {
         public void Run()
         {

@@ -18,6 +18,7 @@ namespace ShroedingersCat
             // Creates the Inversion of Control container
             using var container = Container.Create().Using<Glue>();
 
+            // Composition Root
             // Gets the cardboard box in the same way as the following expression:
             // var box = new CardboardBox<ICat>(new ShroedingersCat(new Lazy<State>(() => (State)indeterminacy.Next(2))));
             var box = container.Resolve<IBox<ICat>>();

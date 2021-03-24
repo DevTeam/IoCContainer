@@ -12,7 +12,7 @@
             // $tag=1 Basics
             // $priority=03
             // $description=Expression binding
-            // $header=In this case the specific type is bound to an expression tree. This dependency will be introduced as is, without any additional overhead like _lambda call_ or _type cast_.
+            // $header=A specific type is bound as a part of an expression tree. This dependency will be introduced as is, without any additional overhead like _lambda call_ or _type cast_.
             // {
             using var container = Container
                 .Create()

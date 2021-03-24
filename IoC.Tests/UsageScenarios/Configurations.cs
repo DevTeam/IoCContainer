@@ -4,14 +4,14 @@
     using Shouldly;
     using Xunit;
 
-    public class Configuration
+    public class Configurations
     {
         [Fact]
         // $visible=true
         // $tag=1 Basics
         // $priority=02
-        // $description=Configuration
-        // $header=Configuration classes are used to dedicate a logic responsible for configuring containers.
+        // $description=Configurations
+        // $header=Configurations are used to dedicate a logic responsible for configuring containers.
         // {
         public void Run()
         {
@@ -30,7 +30,6 @@
         {
             public IEnumerable<IToken> Apply(IMutableContainer container)
             {
-                // Bind using full autowiring
                 yield return container
                     .Bind<IDependency>().To<Dependency>()
                     .Bind<IService>().To<Service>();

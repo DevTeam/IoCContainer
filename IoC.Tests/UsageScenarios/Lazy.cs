@@ -15,7 +15,7 @@
             // $tag=3 BCL types
             // $priority=01
             // $description=Lazy
-            // $header=_Lazy_ dependency helps when a logic needs to inject Lazy<T> to get instance once on demand.
+            // $header=_Lazy_ dependency helps when a logic needs to inject _Lazy<T>_ to get instance once on demand.
             // {
             using var container = Container
                 .Create()

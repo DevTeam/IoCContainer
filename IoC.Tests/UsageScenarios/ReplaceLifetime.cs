@@ -15,7 +15,7 @@ namespace IoC.Tests.UsageScenarios
         // $tag=2 Lifetimes
         // $priority=10
         // $description=Replacement of Lifetime
-        // $header=Is it possible to replace default lifetimes by your own. The sample below shows how to count the number of attempts to resolve [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instances.
+        // $header=It is possible to replace default lifetimes on your own one. The sample below shows how to count the number of attempts to resolve [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instances.
         // {
         public void Run()
         {
@@ -24,13 +24,13 @@ namespace IoC.Tests.UsageScenarios
             using var container = Container
                 .Create()
                 .Bind<ICounter>().To(ctx => counter.Object)
-                // Replace the Singleton lifetime
+                // Replace the Singleton lifetime with a custom lifetime
                 .Bind<ILifetime>().Tag(Lifetime.Singleton).To<MySingletonLifetime>(
                     // Select the constructor
                     ctx => new MySingletonLifetime(
-                        // Inject the singleton lifetime from the parent container to use delegate logic
+                        // Inject the singleton lifetime from the parent container for partially delegating logic
                         ctx.Container.Parent.Inject<ILifetime>(Lifetime.Singleton),
-                        // Inject the counter to store the number of created instances
+                        // Inject a counter to store the number of created instances
                         ctx.Container.Inject<ICounter>()))
                 // Configure the container as usual
                 .Bind<IDependency>().To<Dependency>()
@@ -78,7 +78,7 @@ namespace IoC.Tests.UsageScenarios
                 // Defines `this` variable to store the reference to the current lifetime instance to call internal method 'IncrementCounter'
                 var thisVar = Expression.Constant(this);
 
-                // Creates the code block
+                // Creates a code block
                 return Expression.Block(
                     // Adds the expression to call the method 'IncrementCounter' for the current lifetime instance
                     Expression.Call(thisVar, IncrementCounterMethodInfo),
@@ -86,7 +86,7 @@ namespace IoC.Tests.UsageScenarios
                     expression);
             }
 
-            // Creates the similar lifetime to use with generic instances
+            // Creates a similar lifetime to use with generic instances
             public ILifetime CreateLifetime() => new MySingletonLifetime(_baseSingletonLifetime.CreateLifetime(), _counter);
 
             // Select a container to resolve dependencies using the Singleton lifetime logic
@@ -96,7 +96,7 @@ namespace IoC.Tests.UsageScenarios
             // Disposes the instance of the Singleton lifetime
             public void Dispose() => _baseSingletonLifetime.Dispose();
 
-            // Just counts the number of calls
+            // Just counts the number of requested instances
             internal void IncrementCounter() => _counter.Increment();
         }
         // }

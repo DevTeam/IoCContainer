@@ -12,7 +12,7 @@
             // $tag=5 Advanced
             // $priority=08
             // $description=Check a binding
-            // $header=It is easy to validate that binding is already exists.
+            // $header=It is easy to validate that binding already exists.
             // {
             using var container = Container.Create();
 
@@ -21,6 +21,7 @@
             isBound.ShouldBeFalse();
 
             container.Bind<IService>().To<Service>();
+
             // _IService_ is already bound
             isBound = container.IsBound<IService>();
 

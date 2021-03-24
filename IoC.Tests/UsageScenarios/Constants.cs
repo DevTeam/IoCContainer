@@ -3,7 +3,7 @@
     using Shouldly;
     using Xunit;
 
-    public class ConstantDependency
+    public class Constants
     {
         [Fact]
         public void Run()
@@ -11,7 +11,7 @@
             // $visible=true
             // $tag=1 Basics
             // $priority=01
-            // $description=Constant dependency
+            // $description=Constants
             // $header=It's obvious here.
             // {
             using var container = Container

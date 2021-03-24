@@ -19,8 +19,8 @@ namespace IoC.Tests.IntegrationTests
         {
             var console = new Mock<IConsole>();
 
-            // Creates an aspect oriented autowiring strategy specifying which attributes should be used
-            // and which properties should be used to configure DI
+            // Creates an aspect - oriented auto wiring strategy specifying
+            // which attributes should be used and which properties should be used to configure DI
             var autowiringStrategy = AutowiringStrategies.AspectOriented()
                 .Type<TypeAttribute>(attribute => attribute.Type)
                 .Order<OrderAttribute>(attribute => attribute.Order)
@@ -30,11 +30,9 @@ namespace IoC.Tests.IntegrationTests
             using (var rootContainer = Container.Create("root"))
             // Configure the child container
             using (var childContainer = rootContainer.Create("Some child container"))
-            // Configure the child container by the custom aspect oriented autowiring strategy
+            // Configure the container to use DI aspects
             using (childContainer.Bind<IAutowiringStrategy>().To(ctx => autowiringStrategy))
-            // Configure the child container
             using (childContainer.Bind<IConsole>().Tag(Tags.MyConsole).To(ctx => console.Object))
-            using (childContainer.Bind<Clock>().To<Clock>())
             using (childContainer.Bind<string>().Tag(Tags.Prefix).To(ctx => "info"))
             using (childContainer.Bind<ILogger>().To<Logger>())
             {
@@ -45,7 +43,7 @@ namespace IoC.Tests.IntegrationTests
                 logger.Log("Hello");
             }
 
-            // Check the console output
+            // Check the output has the appropriate format
             console.Verify(i => i.WriteLine(It.IsRegex(".+ - info: Hello")));
         }
 
@@ -130,7 +128,7 @@ namespace IoC.Tests.IntegrationTests
                 return false;
             }
 
-            // Property injection
+            // Setter injection
             public string Prefix { get; [Order(2), Tag(Tags.Prefix)] set; }
 
             // Adds current time and prefix before a message and writes it to console

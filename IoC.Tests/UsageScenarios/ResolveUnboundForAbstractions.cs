@@ -15,7 +15,7 @@ namespace IoC.Tests.UsageScenarios
         // $tag=5 Advanced
         // $priority=02
         // $description=Resolve Unbound for abstractions
-        // $header=The feature _ResolveUnboundFeature_ allows you to resolve any implementation type from the container regardless of whether or not you specifically bound it and find appropriate implementations for abstractions using "key resolver".
+        // $header=The feature _ResolveUnboundFeature_ allows you to resolve any implementation type from the container regardless of whether or not you specifically bound it and find appropriate implementations for abstractions using a key "resolver".
         // {
         public void Run()
         {
@@ -27,7 +27,7 @@ namespace IoC.Tests.UsageScenarios
             container.Resolve<IService>();
         }
 
-        // Find an appropriate implementation
+        // Find an appropriate implementation using all non-abstract types defined in the current assembly
         private static Key KeyResolver(Key key) =>
             new Key((
                 from type in key.Type.Assembly.GetTypes()

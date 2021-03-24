@@ -11,67 +11,62 @@ namespace IoC.Tests.UsageScenarios
         [Fact]
         // $visible=true
         // $tag=1 Basics
-        // $priority=04
-        // $description=Aspect Oriented
-        // $header=This framework has no special attributes to support aspect oriented autowiring because of a production code should not have references to these special attributes. But this code may contain these attributes by itself. And it is quite easy to use these attributes for aspect oriented autowiring, see the sample below.
-        // $footer=Also you can specify your own aspect oriented autowiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
+        // $priority=02
+        // $description=Aspect-oriented DI
+        // $header=This framework has no special predefined attributes to support aspect-oriented auto wiring because a non-infrastructure code should not have references to this framework. But this code may contain these attributes by itself. And it is quite easy to use these attributes for aspect-oriented auto wiring, see the sample below.
+        // $footer=You can also specify your own aspect-oriented auto wiring by implementing the interface [_IAutowiringStrategy_](IoCContainer/blob/master/IoC/IAutowiringStrategy.cs).
         // {
         public void Run()
         {
             var console = new Mock<IConsole>();
 
-            // Creates an aspect oriented autowiring strategy based the custom attribute `DependencyAttribute`
+            // Creates an aspect - oriented auto wiring strategy specifying
+            // which attributes should be used and which properties should be used to configure DI
             var autowiringStrategy = AutowiringStrategies.AspectOriented()
                 .Type<TypeAttribute>(attribute => attribute.Type)
                 .Order<OrderAttribute>(attribute => attribute.Order)
                 .Tag<TagAttribute>(attribute => attribute.Tag);
 
-            // Create the root container
-            using (var rootContainer = Container.Create("root"))
-            // Configure the child container
-            {
-                using var childContainer = rootContainer
-                    .Create("child")
-                    // Configure the child container by the custom aspect oriented autowiring strategy
-                    .Bind<IAutowiringStrategy>().To(ctx => autowiringStrategy)
-                    .Bind<IConsole>().Tag("MyConsole").To(ctx => console.Object)
-                    .Bind<Clock>().To<Clock>()
-                    .Bind<string>().Tag("Prefix").To(ctx => "info")
-                    .Bind<ILogger>().To<Logger>()
-                    .Container;
+            using var container = Container
+                .Create()
+                // Configure the container to use DI aspects
+                .Bind<IAutowiringStrategy>().To(ctx => autowiringStrategy)
+                .Bind<IConsole>().Tag("MyConsole").To(ctx => console.Object)
+                .Bind<string>().Tag("Prefix").To(ctx => "info")
+                .Bind<ILogger>().To<Logger>()
+                .Container;
 
-                // Create a logger
-                var logger = childContainer.Resolve<ILogger>();
+            // Create a logger
+            var logger = container.Resolve<ILogger>();
 
-                // Log the message
-                logger.Log("Hello");
-            }
+            // Log the message
+            logger.Log("Hello");
 
-            // Check the console output
+            // Check the output has the appropriate format
             console.Verify(i => i.WriteLine(It.IsRegex(".+ - info: Hello")));
         }
 
-        // Represents the dependency attribute to specify `type` for injection.
+        // Represents the dependency aspect attribute to specify a type for injection.
         [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
         public class TypeAttribute : Attribute
         {
             // A type, which will be used during an injection
-            [NotNull] public readonly Type Type;
+            public readonly Type Type;
 
-            public TypeAttribute([NotNull] Type type) => Type = type;
+            public TypeAttribute(Type type) => Type = type;
         }
 
-        // Represents the dependency attribute to specify `tag` for injection.
+        // Represents the dependency aspect attribute to specify a tag for injection.
         [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
         public class TagAttribute : Attribute
         {
             // A tag, which will be used during an injection
-            [NotNull] public readonly object Tag;
+            public readonly object Tag;
 
-            public TagAttribute([NotNull] object tag) => Tag = tag;
+            public TagAttribute(object tag) => Tag = tag;
         }
 
-        // Represents the dependency attribute to specify `order` for injection.
+        // Represents the dependency aspect attribute to specify an order for injection.
         [AttributeUsage(AttributeTargets.Method)]
         public class OrderAttribute : Attribute
         {
@@ -92,14 +87,13 @@ namespace IoC.Tests.UsageScenarios
             private readonly IConsole _console;
             private IClock _clock;
 
-            // Constructor injection
+            // Constructor injection using the tag "MyConsole"
             public Logger([Tag("MyConsole")] IConsole console) => _console = console;
 
-            // Method injection
-            [Order(1)]
-            public void Initialize([Type(typeof(Clock))] IClock clock) => _clock = clock;
+            // Method injection after constructor using specified type _Clock_
+            [Order(1)] public void Initialize([Type(typeof(Clock))] IClock clock) => _clock = clock;
 
-            // Property injection
+            // Setter injection after the method injection above using the tag "Prefix"
             public string Prefix { get; [Tag("Prefix"), Order(2)] set; }
 
             // Adds current time and prefix before a message and writes it to console

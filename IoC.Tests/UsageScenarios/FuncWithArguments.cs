@@ -13,7 +13,8 @@
             // $tag=3 BCL types
             // $priority=03
             // $description=Func with arguments
-            // $header=It is easy to use Func<T> with arguments and to pass these arguments to the created instances.
+            // $header=It is easy to use _Func<..., T>_ with arguments and to pass these arguments to the created instances manually via context arguments.
+            // $footer=Besides that, you can rely on full autowring, when it is not needed to specify constructor arguments at all. In this case, all appropriate arguments are matching with context arguments automatically by type.
             // {
             Func<IDependency, string, INamedService> func = 
                 (dependency, name) => new NamedService(dependency, name);

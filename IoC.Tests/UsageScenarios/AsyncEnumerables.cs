@@ -15,8 +15,8 @@ namespace IoC.Tests.UsageScenarios
             // $visible=true
             // $tag=4 Async
             // $priority=02
-            // $description=AsyncEnumerable
-            // $header=It is easy to resolve an enumerator [IAsyncEnumerable<>](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1) that provides asynchronous iteration over values of a type for every tags.
+            // $description=Async Enumerables
+            // $header=It is easy to resolve an enumerator [IAsyncEnumerable<>](https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.iasyncenumerable-1) that provides asynchronous iteration over values of a type for every tag.
             // {
             using var container = Container
                 .Create()

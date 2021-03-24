@@ -16,7 +16,8 @@ namespace IoC.Tests.UsageScenarios
         // $tag=4 Async
         // $priority=02
         // $description=Asynchronous construction
-        // $header=It is easy to inject dependencies in asynchronous style.
+        // $header=It is easy to inject dependencies in an asynchronous style.
+        // $footer=It is better to not use any logic except an instance field setup logic within a constructor.
         // {
         public async void Run()
         {
@@ -35,7 +36,7 @@ namespace IoC.Tests.UsageScenarios
 
         public class SomeDependency: IDependency
         {
-            // Time-consuming logic constructor
+            // Some time-consuming constructor
             public SomeDependency() { }
 
             public int Index { get; set; }
@@ -45,7 +46,7 @@ namespace IoC.Tests.UsageScenarios
         {
             public Consumer(Task<IDependency> dependency1, Task<IDependency> dependency2)
             {
-                // Time-consuming logic
+                // Some time-consuming statements
                 var dep1 = dependency1.Result;
                 var dep2 = dependency2.Result;
             }

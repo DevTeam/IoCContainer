@@ -22,7 +22,7 @@ namespace IoC.Tests.UsageScenarios
             // Create and configure the container using a configuration class 'Generators'
             using var container = Container.Create().Using<Generators>();
             using (container.Bind<(int, int)>().To(
-                // Use a function because of the expression trees have a limitation in syntax
+                // Uses a function to create a tuple because the expression trees have a limitation in syntax
                 ctx => System.ValueTuple.Create(
                     // The first one is of sequential number generator
                     ctx.Container.Inject<int>(GeneratorType.Sequential),
@@ -59,15 +59,15 @@ namespace IoC.Tests.UsageScenarios
             public IEnumerable<IToken> Apply(IMutableContainer container)
             {
                 var value = 0;
-                // Define function to get sequential integer value
+                // Define a function to get sequential integer value
                 Func<int> generator = () => Interlocked.Increment(ref value);
-                // Bind to this function using the corresponding tag 'Sequential'
+                // Bind this function using the corresponding tag 'Sequential'
                 yield return container.Bind<int>().Tag(GeneratorType.Sequential).To(ctx => generator());
 
                 var random = new Random();
-                // Define function to get random integer value
+                // Define a function to get random integer value
                 Func<int> randomizer = () => random.Next();
-                // Bind to this function using the corresponding tag 'Random'
+                // Bind this function using the corresponding tag 'Random'
                 yield return container.Bind<int>().Tag(GeneratorType.Random).To(ctx => randomizer());
             }
         }

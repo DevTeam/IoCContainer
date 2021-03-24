@@ -27,7 +27,8 @@ namespace IoC.Tests.UsageScenarios
             // Create a container
             using var container = Container.Create().Using<InstantMessengerConfig>();
 
-            // Resolve messenger
+            // Composition Root
+            // Resolve a messenger
             var instantMessenger = container.Resolve<IInstantMessenger<IMessage>>();
             using var subscription = instantMessenger.Subscribe(observer.Object);
 
@@ -84,7 +85,6 @@ namespace IoC.Tests.UsageScenarios
         {
             private readonly Func<int> _idFactory;
 
-            // Injected constructor
             public Message(Func<int> idFactory) => _idFactory = idFactory;
 
             private Message(int id, [NotNull] string addressFrom, [NotNull] string addressTo, [NotNull] string text)

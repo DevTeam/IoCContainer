@@ -12,7 +12,7 @@
             // $tag=1 Basics
             // $priority=01
             // $description=Autowiring
-            // $header=Auto-writing is most natural way to use containers. At first step we should create a container. At the second step we bind interfaces to their implementations. After that the container is ready to resolve dependencies.
+            // $header=Autowring is the most natural way to use containers. In the first step, we should create a container. At the second step, we bind interfaces to their implementations. After that, the container is ready to resolve dependencies.
             // {
             // Create the container and configure it, using full autowiring
             using var container = Container

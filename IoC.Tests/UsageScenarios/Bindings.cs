@@ -19,16 +19,15 @@
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
-                // Bind using several tags
+                // Bind using few types
                 .Bind<IService>().Bind<IAnotherService>().Tag("abc").To<Service>()
                 .Container;
 
-            // Resolve instances using tags
+            // Resolve instances using different types
             var instance1 = container.Resolve<IService>("abc".AsTag());
             var instance2 = container.Resolve<IAnotherService>("abc".AsTag());
-
             // }
-            // Check the instances
+            // Check instances
             instance1.ShouldBeOfType<Service>();
             instance2.ShouldBeOfType<Service>();
         }

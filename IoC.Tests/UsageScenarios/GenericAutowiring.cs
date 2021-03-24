@@ -26,7 +26,7 @@ namespace IoC.Tests.UsageScenarios
                 // Bind using the predefined generic parameters marker TT (or TT1, TT2, TT3 ...)
                 .Bind<IService<TT>>().To<Service<TT>>()
                 // Bind using the predefined generic parameters marker TTList (or TTList1, TTList2 ...)
-                // Of other cases there are TTComparable, TTComparable<in T>, TTEquatable<T>, TTEnumerable<out T>, TTDictionary<TKey, TValue> and etc.
+                // For other cases there are TTComparable, TTComparable<in T>, TTEquatable<T>, TTEnumerable<out T>, TTDictionary<TKey, TValue> and etc.
                 .Bind<IListService<TTList<int>>>().To<ListService<TTList<int>>>()
                 // Bind using the custom generic parameters marker TCustom
                 .Bind<IService<TTMy>>().Tag("custom marker").To<Service<TTMy>>()

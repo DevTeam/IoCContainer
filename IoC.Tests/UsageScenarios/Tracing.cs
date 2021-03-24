@@ -17,30 +17,29 @@
             // {
             var traceMessages = new List<string>();
 
-            // This block to mark the scope for "using" statements
+            // This block is just to mark the scope for "using" statements
             {
-                // Create and configure the root container
+                // Create and configure a root container
                 using var rootContainer = Container
                     .Create("root")
                     // Aggregate trace messages to the list 'traceMessages'
                     .Trace(e => traceMessages.Add(e.Message))
                     .Container;
 
-                // Create and configure the parent container
+                // Create and configure a parent container
                 using var parentContainer = rootContainer
                     .Create("parent")
                     .Bind<IDependency>().To<Dependency>(ctx => new Dependency())
                     .Container;
 
-                // Create and configure the child container
+                // Create and configure a child container
                 using var childContainer = parentContainer
                     .Create("child")
                     .Bind<IService<TT>>().To<Service<TT>>()
                     .Container;
 
                 childContainer.Resolve<IService<int>>();
-            }
-            // Every containers were disposed here
+            } // All containers were disposed of here
 
             traceMessages.Count.ShouldBe(8);
             // }

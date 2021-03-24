@@ -12,7 +12,7 @@
             // $tag=1 Basics
             // $priority=01
             // $description=Generics
-            // $header=Autowriting of generic types via binding of open generic types or generic type markers are working the same way.
+            // $header=Autowring of generic types via binding of open generic types or generic type markers are working the same way.
             // {
             using var container = Container
                 .Create()
@@ -29,7 +29,7 @@
             // Resolve a generic instance using "just generic" binding
             var instance2 = container.Resolve<IService<string>>("just generic".AsTag());
             // }
-            // Check the instances' types
+            // Check each instance
             instance1.ShouldBeOfType<Service<int>>();
             instance2.ShouldBeOfType<Service<string>>();
         }

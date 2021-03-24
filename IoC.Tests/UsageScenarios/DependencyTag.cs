@@ -14,7 +14,7 @@
             // $tag=1 Basics
             // $priority=04
             // $description=Dependency tag
-            // $header=Use a _tag_ to inject specific dependency from several bindings of the same types.
+            // $header=Use a _tag_ to bind few dependencies for the same types.
             // {
             using var container = Container
                 .Create()

@@ -13,7 +13,7 @@ namespace IoC.Tests.UsageScenarios
         // $tag=2 Lifetimes
         // $priority=10
         // $description=Thread Singleton lifetime
-        // $header=Sometimes it is useful to have a [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance per a thread (or more generally a singleton per something else). There is no special "lifetime" type in this framework to achieve this requirement, but it is quite easy create your own "lifetime" type for that using base type [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs).
+        // $header=Sometimes it is useful to have a [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance per a thread (or more generally a singleton per something else). There is no special "lifetime" type in this framework to achieve this requirement. Still, it is quite easy to create your own "lifetime" type for that using base type [_KeyBasedLifetime<>_](IoC/Lifetimes/KeyBasedLifetime.cs).
         // {
         public void Run()
         {
@@ -44,23 +44,26 @@ namespace IoC.Tests.UsageScenarios
 
             // Check that instances resolved in a main thread are equal
             instance1.ShouldBe(instance2);
+
             // Check that instance resolved in a new thread is not null
             instance3.ShouldNotBeNull();
+
             // Check that instances resolved in different threads are not equal
             instance1.ShouldNotBe(instance3);
+
             // Check that instances resolved in a new thread are equal
             instance4.ShouldBe(instance3);
         }
 
-        // Represents the custom thead singleton lifetime based on the KeyBasedLifetime
+        // Represents the custom thread singleton lifetime based on the KeyBasedLifetime
         public sealed class ThreadLifetime : KeyBasedLifetime<int>
         {
             // Creates a clone of the current lifetime (for the case with generic types)
             public override ILifetime CreateLifetime() =>
                 new ThreadLifetime();
 
-            // Provides a key of an instance
-            // If a key the same an instance is the same too
+            // Provides an instance key. In this case, it is just a thread identifier.
+            // If a key the same an instance is the same too.
             protected override int CreateKey(IContainer container, object[] args) =>
                 Thread.CurrentThread.ManagedThreadId;
         }

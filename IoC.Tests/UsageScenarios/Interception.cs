@@ -14,9 +14,9 @@ namespace IoC.Tests.UsageScenarios
         // $tag=5 Advanced
         // $priority=10
         // $description=Interception
-        // $header=The _Interception_ feature allows specify the set of bindings which will be used to produce instances wrapped by proxy objects. These proxy objects intercept any invocations to the created (or injected) instances and allows to add any logic around it: checking arguments, logging, thread safety, authorization aspects and etc.
+        // $header=The _Interception_ feature allows specifying the set of bindings that will be used to produce instances wrapped by proxy objects. These proxy objects intercept any invocations to the created (or injected) instances and allow to add any logic around it: checking arguments, logging, thread safety, authorization aspects and etc.
         // {
-        // To use this feature just add the NuGet package https://www.nuget.org/packages/IoC.Interception
+        // To use this feature please add the NuGet package https://www.nuget.org/packages/IoC.Interception
         // or https://www.nuget.org/packages/IoC.Interception.Source
         public void Run()
         {
@@ -40,12 +40,12 @@ namespace IoC.Tests.UsageScenarios
             var state = instance.State;
             instance.Dependency.Index = 1;
 
-            // Check invocations from the interceptor
+            // Check invocations by our interceptor
             methods.ShouldContain("get_State");
             methods.ShouldContain("set_Index");
         }
 
-        // This interceptor just stores the name of called methods
+        // This interceptor just stores names of called methods
         public class MyInterceptor : IInterceptor
         {
             private readonly ICollection<string> _methods;

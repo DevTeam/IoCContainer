@@ -4,7 +4,7 @@
     using Shouldly;
     using Xunit;
 
-    public class Collection
+    public class Collections
     {
         [Fact]
         public void Run()
@@ -12,7 +12,7 @@
             // $visible=true
             // $tag=3 BCL types
             // $priority=01
-            // $description=Collection
+            // $description=Collections
             // $header=To resolve all possible instances of any tags of the specific type as a _collection_ just use the injection _ICollection<T>_
             // {
             using var container = Container
@@ -34,7 +34,7 @@
             // }
             foreach (var instance in instances)
             {
-                // Check the instance
+                // Check each instance
                 instance.ShouldBeOfType<Service>();
             }
         }

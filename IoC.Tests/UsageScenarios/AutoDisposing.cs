@@ -12,7 +12,7 @@
             // $tag=1 Basics
             // $priority=07
             // $description=Auto Disposing
-            // $header=A [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance it's a very special instance. If it implements the _IDisposable_ (or IAsyncDisposable) interface the _Sigleton_ lifetime take care about disposing this instance after disposing of the owning container (where this type was registered) or if after the binding cancelation.
+            // $header=A [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance it's a very special instance. If it implements the _IDisposable_ (or IAsyncDisposable) interface the _Sigleton_ lifetime takes care of disposing of this instance after disposing of the owning container (where this type was registered) or if after the binding cancellation.
             // {
             var disposableService = new Mock<IDisposableService>();
 

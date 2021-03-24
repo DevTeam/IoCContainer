@@ -15,7 +15,7 @@ namespace IoC.Tests.UsageScenarios
             // $tag=2 Lifetimes
             // $priority=01
             // $description=Scope Root lifetime
-            // $header=ScopeRoot lifetime creates an instance together with new scope and allows to managed all scope singletons by IScopeToken.
+            // $header=ScopeRoot lifetime creates an instance together with new scope and allows control of all scope singletons by IScopeToken.
             // {
             using var container = Container
                 .Create()
@@ -43,7 +43,7 @@ namespace IoC.Tests.UsageScenarios
             // Check scope singletons are not equal for different scopes
             session1.Service1.ShouldNotBe(session2.Service1);
 
-            // Dispose the instance from the first scope
+            // Dispose of the instance from the first scope
             session1.Dispose();
 
             // Check dependencies are disposed for the first scope
@@ -55,7 +55,6 @@ namespace IoC.Tests.UsageScenarios
             // Check all dependencies are disposed for the all scopes
             session2.Service1.DisposeCounter.ShouldBe(1);
             session1.Service1.DisposeCounter.ShouldBe(1);
-
         // }
         }
 

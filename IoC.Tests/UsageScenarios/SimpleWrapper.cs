@@ -26,7 +26,7 @@
             // Create and configure a child container
             using var childContainer = parentContainer
                 .Create()
-                // Binds wrapper, injecting the base IService from the parent container via constructor
+                // Binds a wrapper, injecting the base IService from the parent container via constructor
                 .Bind<IService>().To<WrapperForService>()
                 .Container;
 

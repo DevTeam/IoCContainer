@@ -22,19 +22,19 @@
             var now = new DateTimeOffset(2019, 9, 9, 12, 31, 34, TimeSpan.FromHours(3));
             clock.SetupGet(i => i.Now).Returns(now);
 
-            // Create and configure the root container
+            // Create and configure a root container
             using var rootContainer = Container
                 .Create("root")
                 .Bind<IConsole>().To(ctx => console.Object)
                 .Bind<ILogger>().To<Logger>()
                 .Container;
 
-            // Create and configure the child container
+            // Create and configure a child container
             using var childContainer = rootContainer
                 .Create("child")
                 .Bind<IClock>().To(ctx => clock.Object)
-                // Bind 'ILogger' to the instance creation, actually represented as an expression tree
-                // injecting the base logger from the parent container "root" and the clock from the current container "child"
+                // Binds 'ILogger' to the instance creation, actually represented as an expression tree
+                // and injects the base logger from the parent container "root" and the clock from the current container "child"
                 .Bind<ILogger>().To<TimeLogger>()
                 .Container;
 

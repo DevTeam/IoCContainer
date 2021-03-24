@@ -14,7 +14,7 @@
             // $tag=1 Basics
             // $priority=01
             // $description=Tags
-            // $header=Tags are useful while binding to several implementations.
+            // $header=Tags are useful while binding to several implementations of the same abstract types.
             // {
             using var container = Container
                 .Create()

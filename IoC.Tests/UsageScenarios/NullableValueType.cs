@@ -13,6 +13,7 @@ namespace IoC.Tests.UsageScenarios
     public class NullableValueType
     {
         [Fact]
+        [SuppressMessage("ReSharper", "ConditionIsAlwaysTrueOrFalse")]
         // $visible=true
         // $tag=3 BCL types
         // $priority=01

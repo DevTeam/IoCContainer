@@ -25,7 +25,7 @@ namespace IoC.Tests.UsageScenarios
             using var container = Container
                 .Create()
                 .Bind<IDependency>().To<Dependency>()
-                // Additionally NamedService requires name in the constructor
+                // NamedService requires the "name" parameter of a String type in the constructor
                 .Bind<INamedService>().To<NamedService>()
                 // Overrides the previous autowiring strategy for the current and children containers
                 .Bind<IAutowiringStrategy>().To<CustomAutowiringStrategy>()
@@ -45,10 +45,10 @@ namespace IoC.Tests.UsageScenarios
                 _baseStrategy = baseStrategy;
 
             public bool TryResolveType(IContainer container, Type registeredType, Type resolvingType, out Type instanceType) =>
-                // Just uses a logic from the previous autowiring strategy as is
+                // Just uses logic from the previous autowiring strategy as is
                 _baseStrategy.TryResolveType(container, registeredType, resolvingType, out instanceType);
 
-            // Overrides a logic to inject the constant "default name" to every constructors parameters named "name" of type String
+            // Overrides logic to inject the constant "default name" to every constructor's parameters named "name" of type String
             public bool TryResolveConstructor(IContainer container, IEnumerable<IMethod<ConstructorInfo>> constructors, out IMethod<ConstructorInfo> constructor)
             {
                 if (!_baseStrategy.TryResolveConstructor(container, constructors, out constructor))
@@ -60,14 +60,14 @@ namespace IoC.Tests.UsageScenarios
                 selectedConstructor.Info.GetParameters()
                     // Filters constructor parameters
                     .Where(p => p.Name == "name" && p.ParameterType == typeof(string)).ToList()
-                    // Overrides every parameters expression by the constant "default name"
+                    // Overrides every parameter's expression by the constant "default name"
                     .ForEach(p => selectedConstructor.SetExpression(p.Position, Expression.Constant("default name")));
 
                 return true;
             }
 
             public bool TryResolveInitializers(IContainer container, IEnumerable<IMethod<MethodInfo>> methods, out IEnumerable<IMethod<MethodInfo>> initializers)
-                // Just uses a logic from the previous autowiring strategy as is
+                // Just uses logic from the previous autowiring strategy as is
                 => _baseStrategy.TryResolveInitializers(container, methods, out initializers);
         }
         // }
