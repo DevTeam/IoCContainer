@@ -11,15 +11,15 @@
     /// Represents the abstraction for a lifetime with states.
     /// </summary>
     [PublicAPI]
-    public abstract class TrackedLifetime: ILifetime, ILifetimeBuilder
+    public abstract class TrackingLifetime: ILifetime, ILifetimeBuilder
     {
         private readonly TrackTypes _trackTypes;
-        private static readonly MethodInfo BeforeCreatingMethodInfo = Descriptor<TrackedLifetime>().GetDeclaredMethods().Single(i => i.Name == nameof(BeforeCreating));
-        private static readonly MethodInfo AfterCreationMethodInfo = Descriptor<TrackedLifetime>().GetDeclaredMethods().Single(i => i.Name == nameof(AfterCreation));
+        private static readonly MethodInfo BeforeCreatingMethodInfo = Descriptor<TrackingLifetime>().GetDeclaredMethods().Single(i => i.Name == nameof(BeforeCreating));
+        private static readonly MethodInfo AfterCreationMethodInfo = Descriptor<TrackingLifetime>().GetDeclaredMethods().Single(i => i.Name == nameof(AfterCreation));
         private readonly LifetimeDirector _lifetimeDirector;
         private readonly ConstantExpression _thisConst;
 
-        protected TrackedLifetime(TrackTypes trackTypes)
+        protected TrackingLifetime(TrackTypes trackTypes)
         {
             _trackTypes = trackTypes;
             _lifetimeDirector = new LifetimeDirector(this);

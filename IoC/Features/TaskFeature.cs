@@ -15,7 +15,7 @@
         [CanBeNull] private readonly TaskScheduler _taskScheduler;
 
         /// The default instance.
-        public static readonly IConfiguration Set = new TaskFeature(TaskScheduler.Current);
+        [NotNull] public static readonly IConfiguration Set = new TaskFeature(TaskScheduler.Current);
 
         public TaskFeature([CanBeNull] TaskScheduler taskScheduler = null) => _taskScheduler = taskScheduler;
 

@@ -24,7 +24,7 @@ namespace IoC.Features
     public sealed class CollectionFeature : IConfiguration
     {
         /// The default instance.
-        public static readonly IConfiguration Set = new CollectionFeature();
+        [NotNull] public static readonly IConfiguration Set = new CollectionFeature();
 
         private CollectionFeature() { }
 

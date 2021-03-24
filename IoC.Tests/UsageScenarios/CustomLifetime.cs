@@ -37,7 +37,7 @@
         }
 
         // Represents a custom lifetime that registers all created instances
-        public class MyLifetime : TrackedLifetime, IEnumerable<object>
+        public class MyLifetime : TrackingLifetime, IEnumerable<object>
         {
             private readonly List<WeakReference> _instances = new List<WeakReference>();
 

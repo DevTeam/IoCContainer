@@ -17,10 +17,10 @@
         [NotNull] private static readonly MethodInfo ResolveWithTagGenericMethodInfo = ((MethodCallExpression)((Expression<Func<object>>)(() => Resolve<object>(default(IContainer), default(Tag), default(object[])))).Body).Method.GetGenericMethodDefinition();
 
         /// The default instance.
-        public static readonly IConfiguration Set = new FuncFeature();
+        [NotNull] public static readonly IConfiguration Set = new FuncFeature();
 
         /// The high-performance instance.
-        public static readonly IConfiguration LightSet = new FuncFeature(true);
+        [NotNull] public static readonly IConfiguration LightSet = new FuncFeature(true);
 
         private readonly bool _light;
 

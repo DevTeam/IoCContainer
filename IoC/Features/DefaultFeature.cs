@@ -10,9 +10,9 @@
     public class DefaultFeature: IConfiguration
     {
         /// The default instance.
-        public static readonly IConfiguration Set = new DefaultFeature();
+        [NotNull] public static readonly IConfiguration Set = new DefaultFeature();
 
-        private static readonly IEnumerable<IConfiguration> Features = new[]
+        [NotNull] private static readonly IEnumerable<IConfiguration> Features = new[]
         {
             CoreFeature.Set,
             CollectionFeature.Set,

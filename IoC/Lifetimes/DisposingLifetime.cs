@@ -9,7 +9,7 @@
     /// Automatically calls a <c>Disposable()</c> method for disposable instances after a container has disposed.
     /// </summary>
     [PublicAPI]
-    public class DisposingLifetime: TrackedLifetime
+    public class DisposingLifetime: TrackingLifetime
     {
         private readonly List<IDisposable> _disposables = new List<IDisposable>();
 #if NETCOREAPP5_0 || NETCOREAPP3_0 || NETCOREAPP3_1 || NETSTANDARD2_1

@@ -7,7 +7,7 @@
     // ReSharper disable once ClassNeverInstantiated.Global
     internal class IoCContainer: IAbstractContainer<Container>
     {
-        private readonly Container _container = Container.Create(LightFeature.Set);
+        private readonly Container _container = Container.Create(CollectionFeature.Set, FuncFeature.Set);
 
         public Container CreateContainer() => _container;
 

@@ -665,7 +665,7 @@ public void Run()
         .Container;
 
     // Resolve an instance of unregistered type
-    container.Resolve<Service<int>>();
+    container.Resolve<Service<int>>(99);
 }
 
 class Service<T>
@@ -673,7 +673,13 @@ class Service<T>
     public Service(OtherService<T> otherService, IDependency dependency) { }
 }
 
-class OtherService<T>  { public OtherService(T value) { } }
+class OtherService<T>
+{
+    public OtherService(T value, long count = 10)
+    {
+
+    }
+}
 ```
 
 
@@ -1535,7 +1541,7 @@ public void Run()
 }
 
 // Represents a custom lifetime that registers all created instances
-public class MyLifetime : TrackedLifetime, IEnumerable<object>
+public class MyLifetime : TrackingLifetime, IEnumerable<object>
 {
     private readonly List<WeakReference> _instances = new List<WeakReference>();
 

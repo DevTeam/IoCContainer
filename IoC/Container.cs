@@ -10,6 +10,7 @@
     using System.Runtime.CompilerServices;
     using System.Threading;
     using Core;
+    using Features;
     using static Key;
     using FullKey = Key;
     using ShortKey = System.Type;
@@ -69,11 +70,16 @@
             rootContainer.Register<ILockObject>(ctx => lockObject);
             if (configurations.Length > 0)
             {
+                if (!configurations.Any(i => i is CoreFeature))
+                {
+                    rootContainer.ApplyConfigurations(CoreFeature.Set);
+                }
+
                 rootContainer.ApplyConfigurations(configurations);
             }
             else
             {
-                rootContainer.ApplyConfigurations(Features.DefaultFeature.Set);
+                rootContainer.ApplyConfigurations(DefaultFeature.Set);
             }
 
             // Create a target container

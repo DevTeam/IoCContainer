@@ -17,12 +17,11 @@
         ICannotGetResolver,
         ICannotResolveDependency
     {
-
         /// The default instance.
-        public static readonly IConfiguration Set = new ResolveUnboundFeature();
-
+        [NotNull] public static readonly IConfiguration Set = new ResolveUnboundFeature();
+        
+        private static readonly TypeDescriptor ArgsResolverDescriptor = typeof(ArgsResolver<>).Descriptor();
         [NotNull] private readonly Func<Key, Key> _keyResolver;
-        [NotNull] private readonly ISet<Key> _registeredKeys = new HashSet<Key>();
         private readonly Options _options;
 
         /// <summary>
@@ -39,9 +38,7 @@
         /// <param name="keyResolver">Use this resolver to replace a resolving key.</param>
         public ResolveUnboundFeature([NotNull] Func<Key, Key> keyResolver)
             : this(Options.ResolveArgs | Options.ResolveDefaults, keyResolver)
-
         {
-            _keyResolver = keyResolver;
         }
 
         /// <summary>
@@ -63,15 +60,16 @@
 
         Resolver<T> ICannotGetResolver.Resolve<T>(IContainer container, Key key, Exception error)
         {
-            if (KeyResolver(key, out var resolvedKey) && _registeredKeys.Add(resolvedKey))
+            if (
+                KeyResolver(key, out var resolvedKey)
+                && IsValidType(resolvedKey.Type)
+                && container is IMutableContainer mutableContainer
+                && mutableContainer.TryRegisterDependency(new[] { resolvedKey }, this, null, out var token))
             {
-                if (IsValidType(resolvedKey.Type) && container is IMutableContainer mutableContainer && mutableContainer.TryRegisterDependency(new[] {resolvedKey}, this, null, out var token))
-                {
-                    mutableContainer.RegisterResource(token);
-                    return resolvedKey.Tag != null
-                        ? container.GetResolver<T>(resolvedKey.Type, resolvedKey.Tag.AsTag())
-                        : container.GetResolver<T>(resolvedKey.Type);
-                }
+                mutableContainer.RegisterResource(token);
+                return resolvedKey.Tag != null
+                    ? container.GetResolver<T>(resolvedKey.Type, resolvedKey.Tag.AsTag())
+                    : container.GetResolver<T>(resolvedKey.Type);
             }
 
             return CannotGetResolver.Shared.Resolve<T>(container, key, error);
@@ -79,7 +77,9 @@
 
         DependencyDescription ICannotResolveDependency.Resolve(IBuildContext buildContext)
         {
-            if (KeyResolver(buildContext.Key, out var resolvedKey) && IsValidType(resolvedKey.Type))
+            if (
+                KeyResolver(buildContext.Key, out var resolvedKey)
+                && IsValidType(resolvedKey.Type))
             {
                 return new DependencyDescription(this, null);
             }
@@ -92,15 +92,14 @@
             var resolvedKey = _keyResolver(buildContext.Key);
             buildContext.CreateChild(resolvedKey, buildContext.Container);
             var type = resolvedKey.Type;
-            var autowired = new AutowiringDependency(type, buildContext.AutowiringStrategy).TryBuildExpression(buildContext, lifetime, out expression, out error);
+            var hasExpression = new AutowiringDependency(type, buildContext.AutowiringStrategy).TryBuildExpression(buildContext, lifetime, out expression, out error);
             if (_options.HasFlag(Options.ResolveArgs))
             {
-                var fromArgsResolverType = typeof(FromArgsResolver<>).Descriptor().MakeGenericType(type);
-                var ctor = fromArgsResolverType.Descriptor().GetDeclaredConstructors().Single(i => i.GetParameters().Length == 1);
-                var resolverVar = Expression.Variable(fromArgsResolverType);
-
+                var argsResolverType = ArgsResolverDescriptor.MakeGenericType(type).Descriptor();
+                var ctor = argsResolverType.GetDeclaredConstructors().Single(i => i.GetParameters().Length == 1);
+                var resolverVar = Expression.Variable(argsResolverType.Type);
                 var fallbackExpression = expression;
-                if (!autowired)
+                if (!hasExpression)
                 {
                     if (_options.HasFlag(Options.ResolveDefaults) && type.Descriptor().IsValueType())
                     {
@@ -120,8 +119,8 @@
                     new[] { resolverVar },
                     Expression.Assign(resolverVar, Expression.New(ctor, buildContext.ArgsParameter)),
                     Expression.Condition(
-                        Expression.Field(resolverVar, nameof(FromArgsResolver<object>.HasValue)),
-                        Expression.Field(resolverVar, nameof(FromArgsResolver<object>.Value)),
+                        Expression.Field(resolverVar, nameof(ArgsResolver<object>.HasValue)),
+                        Expression.Field(resolverVar, nameof(ArgsResolver<object>.Value)),
                         fallbackExpression)
                     );
 
@@ -167,35 +166,6 @@
         }
 
         private static Key DefaultKeyResolver(Key key) => key;
-
-        private struct FromArgsResolver<T>
-        {
-            private static readonly TypeDescriptor TypeDescriptor = typeof(T).Descriptor();
-            public readonly T Value;
-            public readonly bool HasValue;
-
-            public FromArgsResolver([NotNull] object[] args)
-            {
-                for (var index = 0; index < args.Length; index++)
-                {
-                    var element = args[index];
-                    if (element == null)
-                    {
-                        continue;
-                    }
-
-                    if (TypeDescriptor.IsAssignableFrom(element.GetType().Descriptor()))
-                    {
-                        Value = (T)element;
-                        HasValue = true;
-                        return;
-                    }
-                }
-
-                Value = default(T);
-                HasValue = false;
-            }
-        }
     }
 
     [Flags]

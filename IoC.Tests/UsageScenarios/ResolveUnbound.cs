@@ -21,7 +21,7 @@ namespace IoC.Tests.UsageScenarios
                 .Container;
 
             // Resolve an instance of unregistered type
-            container.Resolve<Service<int>>();
+            container.Resolve<Service<int>>(99);
         }
 
         class Service<T>
@@ -29,7 +29,13 @@ namespace IoC.Tests.UsageScenarios
             public Service(OtherService<T> otherService, IDependency dependency) { }
         }
 
-        class OtherService<T>  { public OtherService(T value) { } }
+        class OtherService<T>
+        {
+            public OtherService(T value, long count = 10)
+            {
+
+            }
+        }
         // }
     }
 }

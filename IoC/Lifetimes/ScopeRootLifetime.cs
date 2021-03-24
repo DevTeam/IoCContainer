@@ -6,7 +6,7 @@
     /// Automatically creates a new scope.
     /// </summary>
     [PublicAPI]
-    public class ScopeRootLifetime: TrackedLifetime
+    public class ScopeRootLifetime: TrackingLifetime
     {
         [CanBeNull] private IDisposable _scopeToken;
 
