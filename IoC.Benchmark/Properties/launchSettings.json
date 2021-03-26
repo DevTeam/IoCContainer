@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "IoC.Benchmark": {
+      "commandName": "Project",
+      "commandLineArgs": "AspDotnet"
+    }
+  }
+}

@@ -6,19 +6,12 @@ namespace IoC.Features.AspNetCore
 
     internal sealed class ServiceScope : IServiceScope, IServiceProvider, ISupportRequiredService
     {
+        private static readonly object[] EmptyArgs = new object[0];
         [NotNull] private readonly IScope _scope;
-        [NotNull] private readonly IServiceProvider _serviceProvider;
-        [NotNull] private readonly ISupportRequiredService _supportRequiredService;
-
+        
         public ServiceScope(
-            [NotNull] IScope scope,
-            [NotNull] IServiceProvider serviceProvider,
-            [NotNull] ISupportRequiredService supportRequiredService)
-        {
+            [NotNull] IScope scope) =>
             _scope = scope ?? throw new ArgumentNullException(nameof(scope));
-            _serviceProvider = serviceProvider ?? throw new ArgumentNullException(nameof(serviceProvider));
-            _supportRequiredService = supportRequiredService ?? throw new ArgumentNullException(nameof(supportRequiredService));
-        }
 
         public IServiceProvider ServiceProvider => this;
 
@@ -26,7 +19,10 @@ namespace IoC.Features.AspNetCore
         {
             using (_scope.Activate())
             {
-                return _serviceProvider.GetService(serviceType);
+                var container = _scope.Container;
+                return container.TryGetResolver<object>(serviceType, null, out var resolver, out var error)
+                    ? resolver(container, EmptyArgs)
+                    : null;
             }
         }
 
@@ -34,7 +30,8 @@ namespace IoC.Features.AspNetCore
         {
             using (_scope.Activate())
             {
-                return _supportRequiredService.GetRequiredService(serviceType);
+                var container = _scope.Container;
+                return container.GetResolver<object>(serviceType)(container, EmptyArgs);
             }
         }
 

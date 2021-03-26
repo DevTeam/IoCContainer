@@ -3,15 +3,17 @@
     using System;
     using Features;
     using Lifetimes;
+    using Microsoft.Extensions.DependencyInjection;
+    using Model;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class IoCContainer: IAbstractContainer<Container>
+    internal class IoCContainer: BaseAbstractContainer<Container>
     {
         private readonly Container _container = Container.Create(CollectionFeature.Set, FuncFeature.Set);
 
-        public Container CreateContainer() => _container;
+        public override Container CreateContainer() => _container;
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
+        public override void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         { 
             var bind = _container.Bind(contractType);
             switch (lifetime)
@@ -35,6 +37,11 @@
             bind.To(implementationType);
         }
 
-        public void Dispose() => _container.Dispose();
+        public override void Register(IServiceCollection services) =>
+            _container.Using(new AspNetCoreFeature(services));
+
+        public override T Resolve<T>() where T : class => _container.Resolve<T>();
+
+        public override void Dispose() => _container.Dispose();
     }
 }

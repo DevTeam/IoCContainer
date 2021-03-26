@@ -21,8 +21,8 @@ namespace IoC.Tests.UsageScenarios
                 .Create()
                 // Bind "session" as a root of scope
                 .Bind<Session>().As(ScopeRoot).To<Session>()
-                // Bind a dependency as a scope singleton
-                .Bind<Service>().As(ScopeSingleton).To<Service>()
+                // Bind a dependency as a container singleton
+                .Bind<Service>().As(ContainerSingleton).To<Service>()
                 // It is optional. Bind IDisposable to IScopeToken to prevent any reference to IoC types from models
                 .Bind<IDisposable>().To(ctx => ctx.Container.Inject<IScopeToken>())
                 .Container;
@@ -34,13 +34,13 @@ namespace IoC.Tests.UsageScenarios
             // Check sessions are not equal
             session1.ShouldNotBe(session2);
 
-            // Check scope singletons are equal in the first scope 
+            // Check singletons are equal in the first scope 
             session1.Service1.ShouldBe(session1.Service2);
 
-            // Check scope singletons are equal in the second scope
+            // Check singletons are equal in the second scope
             session2.Service1.ShouldBe(session2.Service2);
 
-            // Check scope singletons are not equal for different scopes
+            // Check singletons are not equal for different scopes
             session1.Service1.ShouldNotBe(session2.Service1);
 
             // Dispose of the instance from the first scope

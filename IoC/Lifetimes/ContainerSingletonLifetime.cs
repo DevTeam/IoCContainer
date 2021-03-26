@@ -1,7 +1,5 @@
 ﻿namespace IoC.Lifetimes
 {
-    using System;
-    // ReSharper disable once RedundantUsingDirective
     using Core;
 
     /// <summary>

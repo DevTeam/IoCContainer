@@ -10,13 +10,13 @@
     using Ninject;
     using Unity;
     using Microsoft.Extensions.DependencyInjection;
-    using Model;
+    using ICompositionRoot = Model.ICompositionRoot;
 
     public abstract class BenchmarkBase: IBenchmarkStrategy
     {
         private const int Series = 100000;
         private IoC.Container _iocContainer;
-        private Func<IServiceRoot> _iocRootResolver;
+        private Func<ICompositionRoot> _iocRootResolver;
         private global::Autofac.IContainer _autofacContainer;
         private WindsorContainer _windsorContainerContainer;
         private Container _dryIocContainer;
@@ -26,13 +26,13 @@
         private ServiceProvider _microsoftContainer;
         private global::SimpleInjector.Container _simpleInjectorContainer;
 
-        public abstract TContainer CreateContainer<TContainer, TAbstractContainer>() where TAbstractContainer : IAbstractContainer<TContainer>, new();
+        [CanBeNull] public abstract TContainer CreateContainer<TContainer, TAbstractContainer>() where TAbstractContainer : IAbstractContainer<TContainer>, new();
 
         [GlobalSetup]
         public void Setup()
         {
             _iocContainer = CreateContainer<IoC.Container, IoCContainer>();
-            _iocRootResolver = CreateContainer<Func<IServiceRoot>, IoCContainerByCompositionRoot<IServiceRoot>>();
+            _iocRootResolver = CreateContainer<Func<ICompositionRoot>, IoCContainerByCompositionRoot<ICompositionRoot>>();
             _autofacContainer = CreateContainer<global::Autofac.IContainer, Autofac>();
             _windsorContainerContainer = CreateContainer<WindsorContainer, CastleWindsor>();
             _dryIocContainer = CreateContainer<Container, DryIoc>();
@@ -48,16 +48,16 @@
         {
             for (var i = 0; i < Series; i++)
             {
-                _iocContainer.Resolve<IServiceRoot>().DoSomething();
-                _iocContainer.Resolve<IServiceRoot>().DoSomething();
-                _iocContainer.Resolve<IServiceRoot>().DoSomething();
-                _iocContainer.Resolve<IServiceRoot>().DoSomething();
-                _iocContainer.Resolve<IServiceRoot>().DoSomething();
-                _iocContainer.Resolve<IServiceRoot>().DoSomething();
-                _iocContainer.Resolve<IServiceRoot>().DoSomething();
-                _iocContainer.Resolve<IServiceRoot>().DoSomething();
-                _iocContainer.Resolve<IServiceRoot>().DoSomething();
-                _iocContainer.Resolve<IServiceRoot>().DoSomething();
+                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
             }
         }
 
@@ -81,26 +81,26 @@
         }
 
         [Benchmark]
-        public void Autofac() => _autofacContainer.Resolve<IServiceRoot>().DoSomething();
+        public void Autofac() => _autofacContainer.Resolve<ICompositionRoot>().DoSomething();
 
         [Benchmark]
-        public void CastleWindsor() => _windsorContainerContainer.Resolve<IServiceRoot>().DoSomething();
+        public void CastleWindsor() => _windsorContainerContainer.Resolve<ICompositionRoot>().DoSomething();
 
         [Benchmark(OperationsPerInvoke = Series * 10)]
         public void DryIoc()
         {
             for (var i = 0; i < Series; i++)
             {
-                _dryIocContainer.Resolve<IServiceRoot>().DoSomething();
-                _dryIocContainer.Resolve<IServiceRoot>().DoSomething();
-                _dryIocContainer.Resolve<IServiceRoot>().DoSomething();
-                _dryIocContainer.Resolve<IServiceRoot>().DoSomething();
-                _dryIocContainer.Resolve<IServiceRoot>().DoSomething();
-                _dryIocContainer.Resolve<IServiceRoot>().DoSomething();
-                _dryIocContainer.Resolve<IServiceRoot>().DoSomething();
-                _dryIocContainer.Resolve<IServiceRoot>().DoSomething();
-                _dryIocContainer.Resolve<IServiceRoot>().DoSomething();
-                _dryIocContainer.Resolve<IServiceRoot>().DoSomething();
+                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
+                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
             }
         }
 
@@ -109,16 +109,16 @@
         {
             for (var i = 0; i < Series; i++)
             {
-                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<IServiceRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
             }
         }
 
@@ -127,40 +127,40 @@
         {
             for (var i = 0; i < Series; i++)
             {
-                _lightInjectContainer.GetInstance<IServiceRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<IServiceRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<IServiceRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<IServiceRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<IServiceRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<IServiceRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<IServiceRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<IServiceRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<IServiceRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<IServiceRoot>().DoSomething();
+                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
+                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
             }
         }
 
         [Benchmark]
-        public void Ninject() => _ninjectContainer.Get<IServiceRoot>().DoSomething();
+        public void Ninject() => _ninjectContainer.Get<ICompositionRoot>().DoSomething();
 
         [Benchmark]
-        public void Unity() => _unityContainer.Resolve<IServiceRoot>().DoSomething();
+        public void Unity() => _unityContainer.Resolve<ICompositionRoot>().DoSomething();
 
         [Benchmark(OperationsPerInvoke = Series * 10)]
         public void MicrosoftDependencyInjection()
         {
             for (var i = 0; i < Series; i++)
             {
-                _microsoftContainer.GetService<IServiceRoot>().DoSomething();
-                _microsoftContainer.GetService<IServiceRoot>().DoSomething();
-                _microsoftContainer.GetService<IServiceRoot>().DoSomething();
-                _microsoftContainer.GetService<IServiceRoot>().DoSomething();
-                _microsoftContainer.GetService<IServiceRoot>().DoSomething();
-                _microsoftContainer.GetService<IServiceRoot>().DoSomething();
-                _microsoftContainer.GetService<IServiceRoot>().DoSomething();
-                _microsoftContainer.GetService<IServiceRoot>().DoSomething();
-                _microsoftContainer.GetService<IServiceRoot>().DoSomething();
-                _microsoftContainer.GetService<IServiceRoot>().DoSomething();
+                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
+                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
+                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
+                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
+                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
+                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
+                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
+                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
+                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
+                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
             }
         }
     }

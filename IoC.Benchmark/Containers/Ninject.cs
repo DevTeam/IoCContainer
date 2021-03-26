@@ -4,13 +4,13 @@
     using global::Ninject;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class Ninject: IAbstractContainer<StandardKernel>
+    internal class Ninject: BaseAbstractContainer<StandardKernel>
     {
         private readonly StandardKernel _container = new StandardKernel();
 
-        public StandardKernel CreateContainer() => _container;
+        public override StandardKernel CreateContainer() => _container;
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
+        public override void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
             var bind = _container.Bind(contractType).To(implementationType);
             switch (lifetime)
@@ -32,6 +32,8 @@
             }
         }
 
-        public void Dispose() => _container.Dispose();
+        public override T Resolve<T>() where T : class => _container.Get<T>();
+
+        public override void Dispose() => _container.Dispose();
     }
 }

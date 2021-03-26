@@ -21,16 +21,16 @@
         /// <summary>
         /// Creates an instance of feature based on a list of <c>ServiceDescriptor</c>.
         /// </summary>
-        /// <param name="list"></param>
-        public AspNetCoreFeature([NotNull] IList<ServiceDescriptor> list) : base(list) { }
+        /// <param name="services"></param>
+        public AspNetCoreFeature([NotNull] IList<ServiceDescriptor> services) : base(services) { }
 
         /// <inheritdoc />
         public IEnumerable<IToken> Apply(IMutableContainer container)
         {
             if (container == null) throw new ArgumentNullException(nameof(container));
             var singletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.Singleton.AsTag());
-            var scopeSingletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.ScopeSingleton.AsTag());
-            var scopeTransientLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.ScopeTransient.AsTag());
+            var containerSingletonLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.ContainerSingleton.AsTag());
+            var disposingLifetimeResolver = container.GetResolver<ILifetime>(Lifetime.Disposing.AsTag());
             foreach (var serviceGroup in this.Reverse().Select((service, index) => new { index, item = service }).GroupBy(i => i.item.ServiceType))
             {
                 var isFirst = true;
@@ -50,7 +50,7 @@
                     switch (service.Lifetime)
                     {
                         case ServiceLifetime.Transient:
-                            binding = binding.Lifetime(scopeTransientLifetimeResolver(container));
+                            binding = binding.Lifetime(disposingLifetimeResolver(container));
                             break;
 
                         case ServiceLifetime.Singleton:
@@ -58,7 +58,7 @@
                             break;
 
                         case ServiceLifetime.Scoped:
-                            binding = binding.Lifetime(scopeSingletonLifetimeResolver(container));
+                            binding = binding.Lifetime(containerSingletonLifetimeResolver(container));
                             break;
 
                         default:

@@ -1,5 +1,6 @@
 ﻿namespace IoC.Lifetimes
 {
+    using System;
     using System.Linq.Expressions;
     using Core;
 
@@ -7,9 +8,16 @@
     /// Automatically creates a new scope.
     /// </summary>
     [PublicAPI]
-    public sealed class ScopeRootLifetime: ILifetime
+    internal sealed class ScopeRootLifetime: ILifetime
     {
-        public ILifetime CreateLifetime() => new ScopeRootLifetime();
+        private readonly Func<IScope> _scopeFactory;
+
+        public ScopeRootLifetime(Func<IScope> scopeFactory)
+        {
+            _scopeFactory = scopeFactory;
+        }
+
+        public ILifetime CreateLifetime() => new ScopeRootLifetime(_scopeFactory);
 
         public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
             resolvingContainer;
@@ -19,10 +27,10 @@
 
         internal T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args)
         {
-            var scope = container.Resolve<IScope>();
+            var scope = _scopeFactory();
             using (scope.Activate())
             {
-                return  resolver(container, args);
+                return resolver(scope.Container, args);
             }
         }
 

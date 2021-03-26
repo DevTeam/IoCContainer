@@ -3,15 +3,17 @@
     using System;
     using Castle.Core.Internal;
     using global::LightInject;
+    using global::LightInject.Microsoft.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class LightInject: IAbstractContainer<ServiceContainer>
+    internal class LightInject: BaseAbstractContainer<ServiceContainer>
     {
         private readonly ServiceContainer _container = new ServiceContainer();
 
-        public ServiceContainer CreateContainer() => _container;
+        public override ServiceContainer CreateContainer() => _container;
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
+        public override void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
             switch (lifetime)
             {
@@ -44,6 +46,10 @@
             }
         }
 
-        public void Dispose() => _container.Dispose();
+        public override void Register(IServiceCollection services) => _container.CreateServiceProvider(services);
+
+        public override T Resolve<T>() where T : class => _container.GetInstance<T>();
+
+        public override void Dispose() => _container.Dispose();
     }
 }

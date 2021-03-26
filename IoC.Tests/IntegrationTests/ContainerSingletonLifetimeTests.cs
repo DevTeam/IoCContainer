@@ -16,6 +16,7 @@
             // Given
             using var container = Container.Create();
             Func<IMyService> func = Mock.Of<IMyService>;
+
             // When
             using (container.Bind<IMyService>().As(Lifetime.ContainerSingleton).To(ctx => func()))
             {

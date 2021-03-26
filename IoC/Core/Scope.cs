@@ -1,65 +1,53 @@
 ﻿namespace IoC.Core
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Threading;
 
-    [DebuggerDisplay("{" + nameof(ToString) + "()} with {" + nameof(ResourceCount) + "} resources")]
-    internal sealed class Scope: IScope
+    [DebuggerDisplay("{" + nameof(ToString) + "()}")]
+    internal sealed class Scope: IScope, IContainer
     {
         private static long _currentScopeKey;
-        [NotNull] private static readonly Scope Default = new Scope(new LockObject(), true);
-        [CanBeNull] [ThreadStatic] private static Scope _current;
         internal readonly long ScopeKey;
         private readonly int _scopeHashCode;
+        [NotNull] private readonly IScopeManager _scopeManager;
         [NotNull] private readonly ILockObject _lockObject;
+        private readonly IContainer _container;
+        private readonly IList<IDisposable> _resources = new List<IDisposable>();
         private readonly bool _isDefault;
-        [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
-        [CanBeNull] private Scope _prevScope;
 
-        [NotNull] internal static Scope Current => _current ?? Default;
-
-        // For tests only
-        internal Scope([NotNull] ILockObject lockObject, long key)
-        {
-            ScopeKey = key;
-            _scopeHashCode = ScopeKey.GetHashCode();
-            _lockObject = lockObject ?? throw new ArgumentNullException(nameof(lockObject));
-        }
-
-        public Scope([NotNull] ILockObject lockObject, bool isDefault = false)
+        public Scope([NotNull] IScopeManager scopeManager, [NotNull] ILockObject lockObject, IContainer container, bool isDefault = false)
         {
             ScopeKey = Interlocked.Increment(ref _currentScopeKey);
             _scopeHashCode = ScopeKey.GetHashCode();
+            _scopeManager = scopeManager;
             _lockObject = lockObject ?? throw new ArgumentNullException(nameof(lockObject));
+            _container = container;
             _isDefault = isDefault;
         }
 
-        public IDisposable Activate()
-        {
-            if (ReferenceEquals(this, Current))
-            {
-                return Disposable.Empty;
-            }
+        public IContainer Container => this;
 
-            _prevScope = Current;
-            _current = this;
-            return Disposable.Create(() => { _current = _prevScope; });
-        }
+        public IDisposable Activate() => _scopeManager.Activate(this);
 
         public void Dispose()
         {
             lock (_lockObject)
             {
-                foreach (var resource in _resources)
+                foreach (var disposable in _resources)
                 {
-                    resource.Dispose();
+                    disposable.Dispose();
                 }
 
                 _resources.Clear();
             }
         }
+
+        public IEnumerator<IEnumerable<Key>> GetEnumerator() => _container.GetEnumerator();
+
+        public IDisposable Subscribe(IObserver<ContainerEvent> observer) => _container.GetEnumerator();
 
         public override bool Equals(object obj)
         {
@@ -69,11 +57,17 @@
             return ScopeKey == ((Scope)obj).ScopeKey;
         }
 
+        public override int GetHashCode() => _scopeHashCode;
+
+        public override string ToString() => $"Scope #{ScopeKey}";
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
         public void RegisterResource(IDisposable resource)
         {
             lock (_lockObject)
             {
-                _resources.Add(resource ?? throw new ArgumentNullException(nameof(resource)));
+                _resources.Add(resource);
             }
         }
 
@@ -81,23 +75,16 @@
         {
             lock (_lockObject)
             {
-                return _resources.Remove(resource ?? throw new ArgumentNullException(nameof(resource)));
+                return _resources.Remove(resource);
             }
         }
 
-        public override int GetHashCode() => _scopeHashCode;
+        public IContainer Parent => _container.Parent;
 
-        public override string ToString() => $"#{ScopeKey} Scope";
+        public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime) => 
+            _container.TryGetDependency(key, out dependency, out lifetime);
 
-        internal int ResourceCount
-        {
-            get
-            {
-                lock (_lockObject)
-                {
-                    return _resources.Count;
-                }
-            }
-        }
+        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null) => 
+            _container.TryGetResolver(type, tag, out resolver, out error);
     }
 }

@@ -14,11 +14,11 @@ namespace IoC.Benchmark
         public override TActualContainer CreateContainer<TActualContainer, TAbstractContainer>()
         {
             var abstractContainer = new TAbstractContainer();
-            abstractContainer.Register(typeof(IServiceRoot), typeof(ServiceRoot));
+            abstractContainer.Register(typeof(ICompositionRoot), typeof(CompositionRoot));
             abstractContainer.Register(typeof(IService1), typeof(Service1), AbstractLifetime.Singleton);
             abstractContainer.Register(typeof(IService2), typeof(Service2));
             abstractContainer.Register(typeof(IService3), typeof(Service3));
-            return abstractContainer.CreateContainer();
+            return abstractContainer.TryCreate();
         }
 
         [Benchmark(Description = "new", OperationsPerInvoke = 1000000)]
@@ -43,7 +43,7 @@ namespace IoC.Benchmark
         private  volatile Service1 _service1;
 
         [MethodImpl((MethodImplOptions)0x100)]
-        private IServiceRoot NewInstance()
+        private ICompositionRoot NewInstance()
         {
             if (_service1 == null)
             {
@@ -56,7 +56,7 @@ namespace IoC.Benchmark
                 }
             }
 
-            return new ServiceRoot(_service1, new Service2(new Service3(), new Service3(), new Service3(), new Service3(), new Service3()), new Service2(new Service3(), new Service3(), new Service3(), new Service3(), new Service3()), new Service2(new Service3(), new Service3(), new Service3(), new Service3(), new Service3()), new Service3());
+            return new CompositionRoot(_service1, new Service2(new Service3(), new Service3(), new Service3(), new Service3(), new Service3()), new Service2(new Service3(), new Service3(), new Service3(), new Service3(), new Service3()), new Service2(new Service3(), new Service3(), new Service3(), new Service3(), new Service3()), new Service3());
         }
     }
 }

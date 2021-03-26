@@ -350,8 +350,6 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
   - [Container Singleton lifetime](#container-singleton-lifetime-)
   - [Disposing lifetime](#disposing-lifetime-)
   - [Scope Root lifetime](#scope-root-lifetime-)
-  - [Scope Singleton lifetime](#scope-singleton-lifetime-)
-  - [Scope Transient lifetime](#scope-transient-lifetime-)
   - [Singleton lifetime](#singleton-lifetime-)
   - [Custom lifetime: thread Singleton](#custom-lifetime:-thread-singleton-)
   - [Replacement of Lifetime](#replacement-of-lifetime-)
@@ -1325,8 +1323,8 @@ using var container = Container
     .Create()
     // Bind "session" as a root of scope
     .Bind<Session>().As(ScopeRoot).To<Session>()
-    // Bind a dependency as a scope singleton
-    .Bind<Service>().As(ScopeSingleton).To<Service>()
+    // Bind a dependency as a container singleton
+    .Bind<Service>().As(ContainerSingleton).To<Service>()
     // It is optional. Bind IDisposable to IScopeToken to prevent any reference to IoC types from models
     .Bind<IDisposable>().To(ctx => ctx.Container.Inject<IScopeToken>())
     .Container;
@@ -1338,13 +1336,13 @@ var session2 = container.Resolve<Session>();
 // Check sessions are not equal
 session1.ShouldNotBe(session2);
 
-// Check scope singletons are equal in the first scope 
+// Check singletons are equal in the first scope 
 session1.Service1.ShouldBe(session1.Service2);
 
-// Check scope singletons are equal in the second scope
+// Check singletons are equal in the second scope
 session2.Service1.ShouldBe(session2.Service2);
 
-// Check scope singletons are not equal for different scopes
+// Check singletons are not equal for different scopes
 session1.Service1.ShouldNotBe(session2.Service1);
 
 // Dispose of the instance from the first scope
@@ -1385,115 +1383,6 @@ class Session: IDisposable
 
     public void Dispose() => _scope.Dispose();
 }
-```
-
-
-
-### Scope Singleton lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ScopeSingletonLifetime.cs)
-
-Each scope has its own [singleton](https://en.wikipedia.org/wiki/Singleton_pattern) instance for specific binding. Scopes can be created, activated, and deactivated. A scope can be injected like any other container instance.
-
-``` CSharp
-using var container = Container
-    .Create()
-    .Bind<IDependency>().As(ScopeSingleton).To<Dependency>()
-    .Container;
-
-// Use the Scope Singleton lifetime
-using (container.Bind<IService>().As(ScopeSingleton).To<Service>())
-{
-    // Resolve the default scope singleton twice
-    var defaultScopeInstance1 = container.Resolve<IService>();
-    var defaultScopeInstance2 = container.Resolve<IService>();
-
-    // Check that instances from the default scope are equal
-    defaultScopeInstance1.ShouldBe(defaultScopeInstance2);
-
-    // Create scope #1
-    var scope1 = container.Resolve<IScope>();
-    IService scopeInstance1;
-    IService scopeInstance2;
-    using (scope1.Activate())
-    {
-        scopeInstance1 = container.Resolve<IService>();
-        scopeInstance2 = container.Resolve<IService>();
-
-        // Check that instances from the scope #1 are equal
-        scopeInstance1.ShouldBe(scopeInstance2);
-
-        // Check that instances from different scopes are not equal
-        scopeInstance1.ShouldNotBe(defaultScopeInstance1);
-    }
-
-    // Dispose of instances on disposing of a scope
-    scope1.Dispose();
-    ((Service)scopeInstance1).DisposeCount.ShouldBe(1);
-    ((Service)scopeInstance2).DisposeCount.ShouldBe(1);
-
-    // Default scope again
-    var defaultScopeInstance3 = container.Resolve<IService>();
-
-    // Check that instances from the default scope are equal
-    defaultScopeInstance3.ShouldBe(defaultScopeInstance1);
-}
-
-// Reconfigure the container to check dependencies only
-using (container.Bind<IService>().As(Transient).To<Service>())
-{
-    // Resolve transient instances
-    var transientInstance1 = container.Resolve<IService>();
-    var transientInstance2 = container.Resolve<IService>();
-
-    // Check that transient instances are not equal
-    transientInstance1.ShouldNotBe(transientInstance2);
-
-    // Check that dependencies from the default scope are equal
-    transientInstance1.Dependency.ShouldBe(transientInstance2.Dependency);
-
-    // Create scope #2
-    using var scope2 = container.Resolve<IScope>();
-    using (scope2.Activate())
-    {
-        // Resolve a transient instance in scope #2
-        var transientInstance3 = container.Resolve<IService>();
-
-        // Check that dependencies from different scopes are not equal
-        transientInstance3.Dependency.ShouldNotBe(transientInstance1.Dependency);
-    }
-}
-```
-
-
-
-### Scope Transient lifetime [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/ScopeTransientLifetime .cs)
-
-This lifetime is similar to a transient (default) lifetime, except that each disposable instance is automatically disposed of when a current scope is disposed of.
-
-``` CSharp
-public void Run()
-{
-    var dependency = new Mock<IDisposingDependency>();
-    using var container = Container
-        .Create()
-        .Bind<IService>().As(ScopeSingleton).To<Service>()
-        .Bind<IDependency>().As(ScopeTransient).To(ctx => dependency.Object)
-        .Container;
-
-    // Create scope
-    var scope = container.Resolve<IScope>();
-    using (scope.Activate())
-    {
-        container.Resolve<IService>();
-    }
-
-    // Dispose of scope
-    scope.Dispose();
-
-    // Verify that scope transient instance was disposed
-    dependency.Verify(i => i.Dispose());
-}
-
-public interface IDisposingDependency: IDependency, IDisposable { }
 ```
 
 

@@ -9,10 +9,17 @@
     internal sealed class Table<TKey, TValue>: IEnumerable<Table<TKey, TValue>.KeyValue>
     {
         private static readonly Bucket EmptyBucket = new Bucket(CoreExtensions.EmptyArray<KeyValue>());
-        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(4, EmptyBucket), 3, 0);
+        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(3);
         public readonly int Count;
         public readonly int Divisor;
         public readonly Bucket[] Buckets;
+
+        public Table(int size)
+            :this(
+                CoreExtensions.CreateArray(size + 1, EmptyBucket),
+                size,
+                0)
+        { }
 
         private Table(Bucket[] buckets, int divisor, int count)
         {

@@ -5,13 +5,13 @@
     using Castle.Windsor;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class CastleWindsor: IAbstractContainer<WindsorContainer>
+    internal class CastleWindsor: BaseAbstractContainer<WindsorContainer>
     {
         private readonly WindsorContainer _container = new WindsorContainer();
 
-        public WindsorContainer CreateContainer() => _container;
+        public override WindsorContainer CreateContainer() => _container;
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
+        public override void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
             var registration = Component.For(contractType).ImplementedBy(implementationType);
             switch (lifetime)
@@ -36,6 +36,8 @@
             _container.Register(registration);
         }
 
-        public void Dispose() => _container.Dispose();
+        public override T Resolve<T>() where T : class => _container.Resolve<T>();
+
+        public override void Dispose() => _container.Dispose();
     }
 }

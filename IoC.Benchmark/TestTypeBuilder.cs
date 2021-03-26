@@ -65,7 +65,7 @@
                 typeName,
                 TypeAttributes.Public | TypeAttributes.Class | TypeAttributes.AutoClass | TypeAttributes.AnsiClass | TypeAttributes.BeforeFieldInit | TypeAttributes.AutoLayout | TypeAttributes.Sealed,
                 null,
-                isRoot ? new [] { typeof(IServiceRoot) } : null);
+                isRoot ? new [] { typeof(ICompositionRoot) } : null);
 
             var ctorBuilder = typeBuilder.DefineConstructor(
                 MethodAttributes.Public | MethodAttributes.SpecialName | MethodAttributes.RTSpecialName, CallingConventions.Standard,
@@ -76,7 +76,7 @@
 
             if (isRoot)
             {
-                var doSomethingMethod = typeBuilder.DefineMethod(nameof(IServiceRoot.DoSomething), MethodAttributes.Public | MethodAttributes.Virtual, CallingConventions.Standard);
+                var doSomethingMethod = typeBuilder.DefineMethod(nameof(ICompositionRoot.DoSomething), MethodAttributes.Public | MethodAttributes.Virtual, CallingConventions.Standard);
                 var gen = doSomethingMethod.GetILGenerator();
                 gen.Emit(OpCodes.Ret);
             }

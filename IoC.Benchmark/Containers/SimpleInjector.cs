@@ -7,7 +7,7 @@
 
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class SimpleInjector: IAbstractContainer<Container>
+    internal class SimpleInjector: BaseAbstractContainer<Container>
     {
         private readonly Container _container = new Container();
         private readonly Lazy<Container> _containerProvider;
@@ -30,9 +30,9 @@
             });
         }
 
-        public Container CreateContainer() => _containerProvider.Value;
+        public override Container CreateContainer() => _containerProvider.Value;
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
+        public override void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
             switch (lifetime)
             {
@@ -59,6 +59,8 @@
             }
         }
 
-        public void Dispose() => _container.Dispose();
+        public override T Resolve<T>() where T : class => _container.GetInstance<T>();
+
+        public override void Dispose() => _container.Dispose();
     }
 }

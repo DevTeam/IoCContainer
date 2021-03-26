@@ -32,14 +32,14 @@
             // Lifetimes
             yield return container.Register<ILifetime>(ctx => new SingletonLifetime(true), null, new object[] { Lifetime.Singleton });
             yield return container.Register<ILifetime>(ctx => new ContainerSingletonLifetime(), null, new object[] { Lifetime.ContainerSingleton });
-            yield return container.Register<ILifetime>(ctx => new ScopeSingletonLifetime(), null, new object[] { Lifetime.ScopeSingleton });
-            yield return container.Register<ILifetime>(ctx => new ScopeTransientLifetime(), null, new object[] { Lifetime.ScopeTransient });
-            yield return container.Register<ILifetime>(ctx => new ScopeRootLifetime(), null, new object[] { Lifetime.ScopeRoot });
+            yield return container.Register<ILifetime>(ctx => new ScopeRootLifetime(ctx.Container.Inject<Func<IScope>>()), null, new object[] { Lifetime.ScopeRoot });
             yield return container.Register<ILifetime>(ctx => new DisposingLifetime(), null, new object[] { Lifetime.Disposing });
 
             // Scope
-            yield return container.Register<IScopeToken>(ctx => Scope.Current);
-            yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Inject<ILockObject>(), false));
+            var scopeManager = new ScopeManager(new LockObject(), container);
+            yield return container.Register<IScopeManager>(ctx => scopeManager);
+            yield return container.Register<IScopeToken>(ctx => ctx.Container.Inject<IScopeManager>().Current);
+            yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Inject<IScopeManager>(), ctx.Container.Inject<ILockObject>(), ctx.Container, false));
 
             // Current container
             yield return container.Register<IContainer, IObservable<ContainerEvent>>(ctx => ctx.Container);

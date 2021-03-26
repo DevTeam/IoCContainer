@@ -1,7 +1,9 @@
 ﻿namespace IoC.Benchmark.Model
 {
-    public interface IServiceRoot
+    public interface ICompositionRoot
     {
         void DoSomething();
+
+        bool Verify();
     }
 }

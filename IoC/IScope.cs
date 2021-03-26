@@ -6,8 +6,10 @@
     /// Represents an abstraction of a scope which is used with <c>Lifetime.ScopeSingleton</c> and <c>Lifetime.ScopeRoot</c>.
     /// </summary>
     [PublicAPI]
-    public interface IScope : IScopeToken, IResourceRegistry
+    public interface IScope : IScopeToken
     {
+        IContainer Container { get; }
+
         /// <summary>
         /// Activate the scope.
         /// </summary>

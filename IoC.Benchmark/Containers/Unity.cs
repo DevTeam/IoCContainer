@@ -5,13 +5,13 @@
     using global::Unity.Lifetime;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class Unity: IAbstractContainer<UnityContainer>
+    internal class Unity: BaseAbstractContainer<UnityContainer>
     {
         private readonly UnityContainer _container = new UnityContainer();
 
-        public UnityContainer CreateContainer() => _container;
+        public override UnityContainer CreateContainer() => _container;
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
+        public override void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
             ITypeLifetimeManager lifetimeManager = null;
             switch (lifetime)
@@ -30,6 +30,8 @@
            ((IUnityContainer)_container).RegisterType(contractType, implementationType, name, lifetimeManager);
         }
 
-        public void Dispose() => _container.Dispose();
+        public override T Resolve<T>() where T : class => _container.Resolve<T>();
+            
+        public override void Dispose() => _container.Dispose();
     }
 }

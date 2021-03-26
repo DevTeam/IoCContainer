@@ -1,7 +1,5 @@
 ﻿namespace IoC.Lifetimes
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq.Expressions;
     // ReSharper disable once RedundantUsingDirective
     using Core;
@@ -12,8 +10,6 @@
     [PublicAPI]
     public sealed class DisposingLifetime: ILifetime
     {
-        private readonly List<IDisposable> _disposables = new List<IDisposable>();
-
         public ILifetime CreateLifetime() => new DisposingLifetime();
 
         public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
@@ -31,26 +27,13 @@
 
         public void Dispose()
         {
-            lock (_disposables)
-            {
-                foreach (var disposable in _disposables)
-                {
-                    disposable.Dispose();
-                }
-
-                _disposables.Clear();
-            }
         }
 
         internal T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args)
         {
             var instance = resolver(container, args);
-            var disposable = instance.AsDisposable();
-            lock (_disposables)
-            {
-                _disposables.Add(disposable);
-            }
-
+            // ReSharper disable once AssignNullToNotNullAttribute
+            container.RegisterResource(instance.AsDisposable());
             return instance;
         }
     }

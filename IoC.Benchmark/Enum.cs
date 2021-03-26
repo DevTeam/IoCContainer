@@ -16,14 +16,14 @@ namespace IoC.Benchmark
         public override TActualContainer CreateContainer<TActualContainer, TAbstractContainer>()
         {
             var abstractContainer = new TAbstractContainer();
-            abstractContainer.Register(typeof(IServiceRoot), typeof(ServiceRoot));
+            abstractContainer.Register(typeof(ICompositionRoot), typeof(CompositionRoot));
             abstractContainer.Register(typeof(IService1), typeof(Service1));
             abstractContainer.Register(typeof(IService2), typeof(Service2Enum));
             abstractContainer.Register(typeof(IService3), typeof(Service3));
             abstractContainer.Register(typeof(IService3), typeof(Service3v2), AbstractLifetime.Transient, "2");
             abstractContainer.Register(typeof(IService3), typeof(Service3v3), AbstractLifetime.Transient, "3");
             abstractContainer.Register(typeof(IService3), typeof(Service3v4), AbstractLifetime.Transient, "4");
-            return abstractContainer.CreateContainer();
+            return abstractContainer.TryCreate();
         }
 
         [Benchmark(Description = "new", OperationsPerInvoke = 1000000)]
@@ -47,8 +47,8 @@ namespace IoC.Benchmark
         private static readonly Func<IService3> Service3Factory = () => new Service3();
 
         [MethodImpl((MethodImplOptions)0x100)]
-        private static IServiceRoot NewInstance() =>
-            new ServiceRoot(new Service1(new Service2Enum(Service3Enum())), new Service2Func(Service3Factory), new Service2Enum(Service3Enum()), new Service2Enum(Service3Enum()), new Service3());
+        private static ICompositionRoot NewInstance() =>
+            new CompositionRoot(new Service1(new Service2Enum(Service3Enum())), new Service2Func(Service3Factory), new Service2Enum(Service3Enum()), new Service2Enum(Service3Enum()), new Service3());
 
         private static IEnumerable<IService3> Service3Enum()
         {

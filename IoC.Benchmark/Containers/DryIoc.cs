@@ -2,14 +2,16 @@
 {
     using System;
     using global::DryIoc;
+    using global::DryIoc.Microsoft.DependencyInjection;
+    using Microsoft.Extensions.DependencyInjection;
 
-    internal class DryIoc: IAbstractContainer<Container>
+    internal class DryIoc: BaseAbstractContainer<Container>
     {
-        private readonly static Container _container = new Container();
+        private Container _container = new Container();
 
-        public Container CreateContainer() => _container;
+        public override Container CreateContainer() => _container;
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
+        public override void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
             IReuse reuse;
             switch (lifetime)
@@ -29,6 +31,13 @@
             _container.Register(new ReflectionFactory(implementationType, reuse), contractType, name, null, true);
         }
 
-        public void Dispose() => _container.Dispose();
+        public override void Register(IServiceCollection services)
+        {
+            _container = (Container) _container.WithDependencyInjectionAdapter(services);
+        }
+
+        public override T Resolve<T>() where T : class => _container.Resolve<T>();
+
+        public override void Dispose() => _container.Dispose();
     }
 }

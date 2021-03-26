@@ -8568,8 +8568,10 @@ namespace IoC
     /// Represents an abstraction of a scope which is used with <c>Lifetime.ScopeSingleton</c> and <c>Lifetime.ScopeRoot</c>.
     /// </summary>
     [PublicAPI]
-    public interface IScope : IScopeToken, IResourceRegistry
+    public interface IScope : IScopeToken
     {
+        IContainer Container { get; }
+
         /// <summary>
         /// Activate the scope.
         /// </summary>
@@ -8719,24 +8721,14 @@ namespace IoC
         ContainerSingleton = 3,
 
         /// <summary>
-        /// For a singleton instance per scope.
-        /// </summary>
-        ScopeSingleton = 4,
-
-        /// <summary>
-        /// Automatically calls a <c>Disposable()</c> method for disposable instances after a scope has disposed off.
-        /// </summary>
-        ScopeTransient = 5,
-
-        /// <summary>
         /// Automatically creates a new scope.
         /// </summary>
-        ScopeRoot = 6,
+        ScopeRoot = 4,
 
         /// <summary>
         /// Automatically calls a <c>Disposable()</c> method for disposable instances after a container has disposed off.
         /// </summary>
-        Disposing = 7
+        Disposing = 5
     }
 }
 
@@ -9229,14 +9221,14 @@ namespace IoC.Features
             // Lifetimes
             yield return container.Register<ILifetime>(ctx => new SingletonLifetime(true), null, new object[] { Lifetime.Singleton });
             yield return container.Register<ILifetime>(ctx => new ContainerSingletonLifetime(), null, new object[] { Lifetime.ContainerSingleton });
-            yield return container.Register<ILifetime>(ctx => new ScopeSingletonLifetime(), null, new object[] { Lifetime.ScopeSingleton });
-            yield return container.Register<ILifetime>(ctx => new ScopeTransientLifetime(), null, new object[] { Lifetime.ScopeTransient });
-            yield return container.Register<ILifetime>(ctx => new ScopeRootLifetime(), null, new object[] { Lifetime.ScopeRoot });
+            yield return container.Register<ILifetime>(ctx => new ScopeRootLifetime(ctx.Container.Inject<Func<IScope>>()), null, new object[] { Lifetime.ScopeRoot });
             yield return container.Register<ILifetime>(ctx => new DisposingLifetime(), null, new object[] { Lifetime.Disposing });
 
             // Scope
-            yield return container.Register<IScopeToken>(ctx => Scope.Current);
-            yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Inject<ILockObject>(), false));
+            var scopeManager = new ScopeManager(new LockObject(), container);
+            yield return container.Register<IScopeManager>(ctx => scopeManager);
+            yield return container.Register<IScopeToken>(ctx => ctx.Container.Inject<IScopeManager>().Current);
+            yield return container.Register<IScope>(ctx => new Scope(ctx.Container.Inject<IScopeManager>(), ctx.Container.Inject<ILockObject>(), ctx.Container, false));
 
             // Current container
             yield return container.Register<IContainer, IObservable<ContainerEvent>>(ctx => ctx.Container);
@@ -9810,8 +9802,6 @@ namespace IoC.Features
 
 namespace IoC.Lifetimes
 {
-    using System;
-    // ReSharper disable once RedundantUsingDirective
     using Core;
 
     /// <summary>
@@ -9919,8 +9909,6 @@ namespace IoC.Lifetimes
 
 namespace IoC.Lifetimes
 {
-    using System;
-    using System.Collections.Generic;
     using System.Linq.Expressions;
     // ReSharper disable once RedundantUsingDirective
     using Core;
@@ -9931,8 +9919,6 @@ namespace IoC.Lifetimes
     [PublicAPI]
     public sealed class DisposingLifetime: ILifetime
     {
-        private readonly List<IDisposable> _disposables = new List<IDisposable>();
-
         public ILifetime CreateLifetime() => new DisposingLifetime();
 
         public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
@@ -9950,26 +9936,13 @@ namespace IoC.Lifetimes
 
         public void Dispose()
         {
-            lock (_disposables)
-            {
-                foreach (var disposable in _disposables)
-                {
-                    disposable.Dispose();
-                }
-
-                _disposables.Clear();
-            }
         }
 
         internal T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args)
         {
             var instance = resolver(container, args);
-            var disposable = instance.AsDisposable();
-            lock (_disposables)
-            {
-                _disposables.Add(disposable);
-            }
-
+            // ReSharper disable once AssignNullToNotNullAttribute
+            container.RegisterResource(instance.AsDisposable());
             return instance;
         }
     }
@@ -9981,8 +9954,9 @@ namespace IoC.Lifetimes
 
 namespace IoC.Lifetimes
 {
-    using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Linq.Expressions;
     using Core;
 
@@ -9993,32 +9967,47 @@ namespace IoC.Lifetimes
     [PublicAPI]
     public abstract class KeyBasedLifetime<TKey>: ILifetime
     {
-        private readonly ConcurrentDictionary<TKey, object> _instances = new ConcurrentDictionary<TKey, object>();
-
-        public virtual IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
-            resolvingContainer;
+        private readonly Dictionary<TKey, object> _instances = new Dictionary<TKey, object>();
 
         public abstract ILifetime CreateLifetime();
+
+        public virtual IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer)
+            => resolvingContainer;
 
         public Expression Build(IBuildContext context, Expression bodyExpression) =>
             ExpressionBuilderExtensions.BuildGetOrCreateInstance(this, context, bodyExpression, nameof(GetOrCreateInstance));
 
-        protected T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args) =>
-            (T)_instances.GetOrAdd(CreateKey(container, args), key =>
+        protected T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args)
+        {
+            var key = CreateKey(container, args);
+            object value;
+            var created = false;
+            lock (_instances)
+            {
+                if (!_instances.TryGetValue(key, out value))
                 {
-                    var newInstance = resolver(container, args);
-                    AfterCreation(newInstance, key, container, args);
-                    return newInstance;
-                });
+                    value = resolver(container, args);
+                    _instances.Add(key, value);
+                    created = true;
+                }
+            }
+
+            if (created)
+            {
+                AfterCreation(value, key, container, args);
+            }
+
+            return (T)value;
+        }
 
         public virtual void Dispose()
         {
-            var instances = _instances.ToArray();
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var i = 0; i < instances.Length; i++)
+            lock (_instances)
             {
-                var instance = instances[i];
-                OnRelease(instance.Value, instance.Key);
+                foreach (var instance in _instances)
+                {
+                    OnRelease(instance.Value, instance.Key);
+                }
             }
         }
 
@@ -10053,8 +10042,13 @@ namespace IoC.Lifetimes
         /// </summary>
         /// <param name="key">The instance key.</param>
         [SuppressMessage("ReSharper", "InconsistentlySynchronizedField")]
-        protected internal bool Remove(TKey key) =>
-            _instances.TryRemove(key, out _);
+        protected internal bool Remove(TKey key)
+        {
+            lock (_instances)
+            {
+                return _instances.Remove(key);
+            }
+        }
     }
 }
 
@@ -10064,6 +10058,7 @@ namespace IoC.Lifetimes
 
 namespace IoC.Lifetimes
 {
+    using System;
     using System.Linq.Expressions;
     using Core;
 
@@ -10071,9 +10066,16 @@ namespace IoC.Lifetimes
     /// Automatically creates a new scope.
     /// </summary>
     [PublicAPI]
-    public sealed class ScopeRootLifetime: ILifetime
+    internal sealed class ScopeRootLifetime: ILifetime
     {
-        public ILifetime CreateLifetime() => new ScopeRootLifetime();
+        private readonly Func<IScope> _scopeFactory;
+
+        public ScopeRootLifetime(Func<IScope> scopeFactory)
+        {
+            _scopeFactory = scopeFactory;
+        }
+
+        public ILifetime CreateLifetime() => new ScopeRootLifetime(_scopeFactory);
 
         public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
             resolvingContainer;
@@ -10083,10 +10085,10 @@ namespace IoC.Lifetimes
 
         internal T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args)
         {
-            var scope = container.Resolve<IScope>();
+            var scope = _scopeFactory();
             using (scope.Activate())
             {
-                return  resolver(container, args);
+                return resolver(scope.Container, args);
             }
         }
 
@@ -10094,83 +10096,6 @@ namespace IoC.Lifetimes
     }
 }
 
-
-#endregion
-#region ScopeSingletonLifetime
-
-namespace IoC.Lifetimes
-{
-    // ReSharper disable once RedundantUsingDirective
-    using Core;
-
-    /// <summary>
-    /// For a singleton instance per scope.
-    /// </summary>
-    [PublicAPI]
-    public sealed class ScopeSingletonLifetime: KeyBasedLifetime<IScope>
-    {
-        /// <inheritdoc />
-        protected override IScope CreateKey(IContainer container, object[] args) => Scope.Current;
-
-        /// <inheritdoc />
-        public override string ToString() => Lifetime.ScopeSingleton.ToString();
-
-        /// <inheritdoc />
-        public override ILifetime CreateLifetime() => new ScopeSingletonLifetime();
-
-        /// <inheritdoc />
-        protected override object AfterCreation(object newInstance, IScope scope, IContainer container, object[] args)
-        {
-            if (scope is IResourceRegistry resourceRegistry)
-            {
-                resourceRegistry.Register(newInstance.AsDisposable());
-            }
-
-            return newInstance;
-        }
-
-        /// <inheritdoc />
-        protected override void OnRelease(object releasedInstance, IScope scope) =>
-            scope.UnregisterAndDispose(releasedInstance.AsDisposable());
-    }
-}
-
-
-#endregion
-#region ScopeTransientLifetime
-
-namespace IoC.Lifetimes
-{
-    using System.Linq.Expressions;
-    using Core;
-
-    public sealed class ScopeTransientLifetime: ILifetime
-    {
-        public IContainer SelectContainer(IContainer registrationContainer, IContainer resolvingContainer) =>
-            resolvingContainer;
-
-        public ILifetime CreateLifetime() => new ScopeTransientLifetime();
-
-        public Expression Build(IBuildContext context, Expression bodyExpression)
-        {
-            if (bodyExpression.Type.Descriptor().IsDisposable())
-            {
-                return ExpressionBuilderExtensions.BuildGetOrCreateInstance(this, context, bodyExpression, nameof(GetOrCreateInstance));
-            }
-
-            return bodyExpression;
-        }
-
-        public void Dispose() { }
-
-        internal T GetOrCreateInstance<T>(Resolver<T> resolver, IContainer container, object[] args)
-        {
-            var instance = resolver(container, args);
-            Scope.Current.Register(instance.AsDisposable());
-            return instance;
-        }
-    }
-}
 
 #endregion
 #region SingletonLifetime
@@ -10266,6 +10191,39 @@ namespace IoC.Lifetimes
 
         /// <inheritdoc />
         public override string ToString() => Lifetime.Singleton.ToString();
+    }
+}
+
+
+#endregion
+#region ThreadSingletonLifetime
+
+namespace IoC.Lifetimes
+{
+    using System;
+    using System.Threading;
+    
+    // Represents the custom thread singleton lifetime based on the KeyBasedLifetime
+    internal sealed class ThreadSingletonLifetime : KeyBasedLifetime<int>
+    {
+        [ThreadStatic] private static volatile int _threadId;
+        private static volatile int _latsThreadId;
+
+        // Creates a clone of the current lifetime (for the case with generic types)
+        public override ILifetime CreateLifetime() =>
+            new ThreadSingletonLifetime();
+
+        // Provides an instance key. In this case, it is just a thread identifier.
+        // If a key the same an instance is the same too.
+        protected override int CreateKey(IContainer container, object[] args)
+        {
+            if (_threadId == 0)
+            {
+                Interlocked.Exchange(ref _threadId, Interlocked.Increment(ref _latsThreadId));
+            }
+
+            return _threadId;
+        }
     }
 }
 
@@ -11913,59 +11871,6 @@ namespace IoC.Core
 }
 
 #endregion
-#region ConcurrentDictionary
-
-#if NETSTANDARD1_0
-// ReSharper disable once CheckNamespace
-namespace System.Collections.Concurrent
-{
-    using Generic;
-    using Linq;
-
-    internal class ConcurrentDictionary<TKey, TValue>
-    {
-        private readonly Dictionary<TKey, TValue> _dict = new Dictionary<TKey, TValue>();
-
-        public TValue GetOrAdd(TKey key, Func<TKey, TValue> factoryFunc)
-        {
-            lock (_dict)
-            {
-                if (!_dict.TryGetValue(key, out var value))
-                {
-                    value = factoryFunc(key);
-                    _dict.Add(key, value);
-                }
-
-                return value;
-            }
-        }
-
-        public bool TryRemove(TKey key, out TValue value)
-        {
-            lock (_dict)
-            {
-                if (_dict.TryGetValue(key, out value))
-                {
-                    _dict.Remove(key);
-                    return true;
-                }
-
-                return false;
-            }
-        }
-
-        public KeyValuePair<TKey, TValue>[] ToArray()
-        {
-            lock (_dict)
-            {
-                return _dict.ToArray();
-            }
-        }
-    }
-}
-#endif
-
-#endregion
 #region ConfigurationFromDelegate
 
 namespace IoC.Core
@@ -12732,6 +12637,7 @@ namespace IoC.Core
                 registry.RegisterResource(disposable);
             }
         }
+
         public static void UnregisterAndDispose([NotNull] this IResourceRegistry registry, [CanBeNull] IDisposable disposable)
         {
             if (disposable != null && registry.UnregisterResource(disposable))
@@ -13169,6 +13075,21 @@ namespace IoC.Core
         [NotNull] IAutowiringStrategy AutowiringStrategy { get; }
 
         [NotNull] IEnumerable<ICompiler> Compilers { get; }
+    }
+}
+
+#endregion
+#region IScopeManager
+
+namespace IoC.Core
+{
+    using System;
+
+    internal interface IScopeManager
+    {
+        [NotNull] IScope Current { get; }
+
+        [NotNull] IDisposable Activate([NotNull] IScope scope);
     }
 }
 
@@ -13741,65 +13662,53 @@ namespace IoC.Core
 namespace IoC.Core
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Threading;
 
-    [DebuggerDisplay("{" + nameof(ToString) + "()} with {" + nameof(ResourceCount) + "} resources")]
-    internal sealed class Scope: IScope
+    [DebuggerDisplay("{" + nameof(ToString) + "()}")]
+    internal sealed class Scope: IScope, IContainer
     {
         private static long _currentScopeKey;
-        [NotNull] private static readonly Scope Default = new Scope(new LockObject(), true);
-        [CanBeNull] [ThreadStatic] private static Scope _current;
         internal readonly long ScopeKey;
         private readonly int _scopeHashCode;
+        [NotNull] private readonly IScopeManager _scopeManager;
         [NotNull] private readonly ILockObject _lockObject;
+        private readonly IContainer _container;
+        private readonly IList<IDisposable> _resources = new List<IDisposable>();
         private readonly bool _isDefault;
-        [NotNull] private readonly List<IDisposable> _resources = new List<IDisposable>();
-        [CanBeNull] private Scope _prevScope;
 
-        [NotNull] internal static Scope Current => _current ?? Default;
-
-        // For tests only
-        internal Scope([NotNull] ILockObject lockObject, long key)
-        {
-            ScopeKey = key;
-            _scopeHashCode = ScopeKey.GetHashCode();
-            _lockObject = lockObject ?? throw new ArgumentNullException(nameof(lockObject));
-        }
-
-        public Scope([NotNull] ILockObject lockObject, bool isDefault = false)
+        public Scope([NotNull] IScopeManager scopeManager, [NotNull] ILockObject lockObject, IContainer container, bool isDefault = false)
         {
             ScopeKey = Interlocked.Increment(ref _currentScopeKey);
             _scopeHashCode = ScopeKey.GetHashCode();
+            _scopeManager = scopeManager;
             _lockObject = lockObject ?? throw new ArgumentNullException(nameof(lockObject));
+            _container = container;
             _isDefault = isDefault;
         }
 
-        public IDisposable Activate()
-        {
-            if (ReferenceEquals(this, Current))
-            {
-                return Disposable.Empty;
-            }
+        public IContainer Container => this;
 
-            _prevScope = Current;
-            _current = this;
-            return Disposable.Create(() => { _current = _prevScope; });
-        }
+        public IDisposable Activate() => _scopeManager.Activate(this);
 
         public void Dispose()
         {
             lock (_lockObject)
             {
-                foreach (var resource in _resources)
+                foreach (var disposable in _resources)
                 {
-                    resource.Dispose();
+                    disposable.Dispose();
                 }
 
                 _resources.Clear();
             }
         }
+
+        public IEnumerator<IEnumerable<Key>> GetEnumerator() => _container.GetEnumerator();
+
+        public IDisposable Subscribe(IObserver<ContainerEvent> observer) => _container.GetEnumerator();
 
         public override bool Equals(object obj)
         {
@@ -13809,11 +13718,17 @@ namespace IoC.Core
             return ScopeKey == ((Scope)obj).ScopeKey;
         }
 
+        public override int GetHashCode() => _scopeHashCode;
+
+        public override string ToString() => $"Scope #{ScopeKey}";
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
         public void RegisterResource(IDisposable resource)
         {
             lock (_lockObject)
             {
-                _resources.Add(resource ?? throw new ArgumentNullException(nameof(resource)));
+                _resources.Add(resource);
             }
         }
 
@@ -13821,27 +13736,50 @@ namespace IoC.Core
         {
             lock (_lockObject)
             {
-                return _resources.Remove(resource ?? throw new ArgumentNullException(nameof(resource)));
+                return _resources.Remove(resource);
             }
         }
 
-        public override int GetHashCode() => _scopeHashCode;
+        public IContainer Parent => _container.Parent;
 
-        public override string ToString() => $"#{ScopeKey} Scope";
+        public bool TryGetDependency(Key key, out IDependency dependency, out ILifetime lifetime) => 
+            _container.TryGetDependency(key, out dependency, out lifetime);
 
-        internal int ResourceCount
-        {
-            get
-            {
-                lock (_lockObject)
-                {
-                    return _resources.Count;
-                }
-            }
-        }
+        public bool TryGetResolver<T>(Type type, object tag, out Resolver<T> resolver, out Exception error, IContainer resolvingContainer = null) => 
+            _container.TryGetResolver(type, tag, out resolver, out error);
     }
 }
 
+#endregion
+#region ScopeManager
+
+namespace IoC.Core
+{
+    using System;
+
+    internal class ScopeManager : IScopeManager
+    {
+        [NotNull] private IScope _current;
+        [CanBeNull] private IScope _prev;
+
+        public ScopeManager([NotNull] ILockObject lockObject, IContainer container) =>
+            _current = new Scope(this, lockObject, container, true);
+
+        public IScope Current => _current;
+
+        public IDisposable Activate(IScope scope)
+        {
+            if (ReferenceEquals(scope, Current))
+            {
+                return Disposable.Empty;
+            }
+
+            _prev = Current;
+            _current = scope;
+            return Disposable.Create(() => { _current = _prev; });
+        }
+    }
+}
 
 #endregion
 #region Subject
@@ -13929,10 +13867,17 @@ namespace IoC.Core
     internal sealed class Table<TKey, TValue>: IEnumerable<Table<TKey, TValue>.KeyValue>
     {
         private static readonly Bucket EmptyBucket = new Bucket(CoreExtensions.EmptyArray<KeyValue>());
-        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(CoreExtensions.CreateArray(4, EmptyBucket), 3, 0);
+        public static readonly Table<TKey, TValue> Empty = new Table<TKey, TValue>(3);
         public readonly int Count;
         public readonly int Divisor;
         public readonly Bucket[] Buckets;
+
+        public Table(int size)
+            :this(
+                CoreExtensions.CreateArray(size + 1, EmptyBucket),
+                size,
+                0)
+        { }
 
         private Table(Bucket[] buckets, int divisor, int count)
         {

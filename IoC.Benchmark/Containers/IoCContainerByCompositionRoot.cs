@@ -1,17 +1,22 @@
 ﻿namespace IoC.Benchmark.Containers
 {
     using System;
+    using Microsoft.Extensions.DependencyInjection;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class IoCContainerByCompositionRoot<TContract> : IAbstractContainer<Func<TContract>>
+    internal class IoCContainerByCompositionRoot<TContract> : BaseAbstractContainer<Func<TContract>>
     {
-        private readonly IoCContainer _abstractContainer = new IoCContainer();
+        private readonly IoCContainer _container = new IoCContainer();
 
-        public Func<TContract> CreateContainer() => _abstractContainer.CreateContainer().Resolve<Func<TContract>>();
+        public override Func<TContract> CreateContainer() => _container.CreateContainer().Resolve<Func<TContract>>();
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name) =>
-            _abstractContainer.Register(contractType, implementationType, lifetime, name);
+        public override void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name) =>
+            _container.Register(contractType, implementationType, lifetime, name);
 
-        public void Dispose() => _abstractContainer.Dispose();
+        public override void Register(IServiceCollection services) => _container.Register(services);
+
+        public override T Resolve<T>() where T : class => _container.Resolve<T>();
+
+        public override void Dispose() => _container.Dispose();
     }
 }

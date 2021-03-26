@@ -19,8 +19,8 @@ namespace IoC.Benchmark
                 abstractContainer.Register(type, type);
             }
 
-            abstractContainer.Register(typeof(IServiceRoot), typeBuilder.RootType);
-            return abstractContainer.CreateContainer();
+            abstractContainer.Register(typeof(ICompositionRoot), typeBuilder.RootType);
+            return abstractContainer.TryCreate();
         }
     }
 }

@@ -4,16 +4,16 @@
     using global::Autofac;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class Autofac: IAbstractContainer<IContainer>
+    internal class Autofac: BaseAbstractContainer<IContainer>
     {
         private readonly ContainerBuilder _builder = new ContainerBuilder();
         private readonly Lazy<IContainer> _container;
 
         public Autofac() => _container = new Lazy<IContainer>(() => _builder.Build());
 
-        public IContainer CreateContainer() => _container.Value;
+        public override IContainer CreateContainer() => _container.Value;
 
-        public void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
+        public override void Register(Type contractType, Type implementationType, AbstractLifetime lifetime, string name)
         {
             var registration = _builder.RegisterType(implementationType).As(contractType);
             switch (lifetime)
@@ -35,6 +35,8 @@
             }
         }
 
-        public void Dispose() => _container.Value.Dispose();
+        public override T Resolve<T>() where T : class => _container.Value.Resolve<T>();
+
+        public override void Dispose() => _container.Value.Dispose();
     }
 }

@@ -67,6 +67,7 @@ namespace IoC.Core
                 registry.RegisterResource(disposable);
             }
         }
+
         public static void UnregisterAndDispose([NotNull] this IResourceRegistry registry, [CanBeNull] IDisposable disposable)
         {
             if (disposable != null && registry.UnregisterResource(disposable))

@@ -22,23 +22,13 @@
         ContainerSingleton = 3,
 
         /// <summary>
-        /// For a singleton instance per scope.
-        /// </summary>
-        ScopeSingleton = 4,
-
-        /// <summary>
-        /// Automatically calls a <c>Disposable()</c> method for disposable instances after a scope has disposed off.
-        /// </summary>
-        ScopeTransient = 5,
-
-        /// <summary>
         /// Automatically creates a new scope.
         /// </summary>
-        ScopeRoot = 6,
+        ScopeRoot = 4,
 
         /// <summary>
         /// Automatically calls a <c>Disposable()</c> method for disposable instances after a container has disposed off.
         /// </summary>
-        Disposing = 7
+        Disposing = 5
     }
 }
