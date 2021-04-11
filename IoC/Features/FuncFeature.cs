@@ -77,7 +77,7 @@
                         null,
                         ResolveWithTagGenericMethodInfo.MakeGenericMethod(instanceType),
                         context.ContainerParameter,
-                        Expression.Constant(context.Key.Tag),
+                        Expression.Constant(context.Key.Tag).Convert(typeof(object)),
                         context.ArgsParameter);
                 }
 
