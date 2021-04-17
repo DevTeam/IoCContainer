@@ -26,7 +26,7 @@ namespace IoC.Benchmark
             return abstractContainer.TryCreate();
         }
 
-        private class AspCompositionRoot: ICompositionRoot
+        private sealed class AspCompositionRoot: ICompositionRoot
         {
             private readonly IServiceScopeFactory _serviceScopeFactory;
 
