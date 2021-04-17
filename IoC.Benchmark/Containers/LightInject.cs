@@ -7,7 +7,7 @@
     using Microsoft.Extensions.DependencyInjection;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class LightInject: BaseAbstractContainer<ServiceContainer>
+    internal sealed class LightInject: BaseAbstractContainer<ServiceContainer>
     {
         private readonly ServiceContainer _container = new ServiceContainer();
 

@@ -4,7 +4,7 @@
     using global::Ninject;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class Ninject: BaseAbstractContainer<StandardKernel>
+    internal sealed class Ninject: BaseAbstractContainer<StandardKernel>
     {
         private readonly StandardKernel _container = new StandardKernel();
 

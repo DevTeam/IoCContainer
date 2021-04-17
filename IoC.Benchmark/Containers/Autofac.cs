@@ -4,7 +4,7 @@
     using global::Autofac;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class Autofac: BaseAbstractContainer<IContainer>
+    internal sealed class Autofac: BaseAbstractContainer<IContainer>
     {
         private readonly ContainerBuilder _builder = new ContainerBuilder();
         private readonly Lazy<IContainer> _container;

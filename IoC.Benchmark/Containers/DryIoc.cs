@@ -5,7 +5,7 @@
     using global::DryIoc.Microsoft.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection;
 
-    internal class DryIoc: BaseAbstractContainer<Container>
+    internal sealed class DryIoc: BaseAbstractContainer<Container>
     {
         private Container _container = new Container();
 

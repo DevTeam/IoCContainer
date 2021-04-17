@@ -5,7 +5,7 @@
     using Castle.Windsor;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class CastleWindsor: BaseAbstractContainer<WindsorContainer>
+    internal sealed class CastleWindsor: BaseAbstractContainer<WindsorContainer>
     {
         private readonly WindsorContainer _container = new WindsorContainer();
 

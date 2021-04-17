@@ -4,7 +4,7 @@
     using Microsoft.Extensions.DependencyInjection;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class MicrosoftDependencyInjection: BaseAbstractContainer<ServiceProvider>
+    internal sealed class MicrosoftDependencyInjection: BaseAbstractContainer<ServiceProvider>
     {
         private IServiceCollection _serviceCollection = new ServiceCollection();
         private readonly Lazy<ServiceProvider> _container;

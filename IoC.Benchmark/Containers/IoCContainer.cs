@@ -4,10 +4,9 @@
     using Features;
     using Lifetimes;
     using Microsoft.Extensions.DependencyInjection;
-    using Model;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class IoCContainer: BaseAbstractContainer<Container>
+    internal sealed class IoCContainer: BaseAbstractContainer<Container>
     {
         private readonly Container _container = Container.Create(CollectionFeature.Set, FuncFeature.Set);
 

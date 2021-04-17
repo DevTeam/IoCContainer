@@ -5,9 +5,8 @@
     using System.Linq;
     using global::SimpleInjector;
 
-
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class SimpleInjector: BaseAbstractContainer<Container>
+    internal sealed class SimpleInjector: BaseAbstractContainer<Container>
     {
         private readonly Container _container = new Container();
         private readonly Lazy<Container> _containerProvider;

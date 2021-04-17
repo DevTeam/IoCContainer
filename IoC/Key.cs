@@ -45,7 +45,7 @@
         /// <inheritdoc />
         [Pure]
         // ReSharper disable once PossibleNullReferenceException
-        [MethodImpl((MethodImplOptions)0x200)]
+        [MethodImpl((MethodImplOptions)0x300)]
         public override bool Equals(object obj) => this.Equals((Key)obj);
 
         /// <inheritdoc />
@@ -55,7 +55,7 @@
 
         /// <inheritdoc />
         [Pure]
-        [MethodImpl((MethodImplOptions)0x200)]
+        [MethodImpl((MethodImplOptions)0x300)]
         public override int GetHashCode()
         {
             unchecked

@@ -4,7 +4,7 @@
     using Microsoft.Extensions.DependencyInjection;
 
     // ReSharper disable once ClassNeverInstantiated.Global
-    internal class IoCContainerByCompositionRoot<TContract> : BaseAbstractContainer<Func<TContract>>
+    internal sealed class IoCContainerByCompositionRoot<TContract> : BaseAbstractContainer<Func<TContract>>
     {
         private readonly IoCContainer _container = new IoCContainer();
 
