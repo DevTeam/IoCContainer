@@ -14,7 +14,7 @@
         public readonly int Divisor;
         public readonly Bucket[] Buckets;
 
-        public Table(int size)
+        private Table(int size)
             :this(
                 CoreExtensions.CreateArray(size + 1, EmptyBucket),
                 size,
@@ -64,7 +64,6 @@
         public TValue Get(TKey key)
         {
             var bucket = Buckets[key.GetHashCode() & Divisor];
-            // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < bucket.KeyValues.Length; index++)
             {
                 var item = bucket.KeyValues[index];

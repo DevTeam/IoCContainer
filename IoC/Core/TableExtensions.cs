@@ -10,10 +10,8 @@
         public static bool TryGetByType<TValue>(this Table<Type, TValue> table, Type key, out TValue value)
         {
             var bucket = table.Buckets[key.GetHashCode() & table.Divisor];
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < bucket.KeyValues.Length; index++)
+            foreach (var item in bucket.KeyValues)
             {
-                var item = bucket.KeyValues[index];
                 if (key == item.Key)
                 {
                     value = item.Value;
@@ -30,10 +28,8 @@
         public static bool TryGetByKey<TValue>(this Table<Key, TValue> table, Key key, out TValue value)
         {
             var bucket = table.Buckets[key.GetHashCode() & table.Divisor];
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < bucket.KeyValues.Length; index++)
+            foreach (var item in bucket.KeyValues)
             {
-                var item = bucket.KeyValues[index];
                 if (key.Equals(item.Key))
                 {
                     value = item.Value;

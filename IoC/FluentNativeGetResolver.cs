@@ -1,5 +1,4 @@
-﻿// ReSharper disable ForCanBeConvertedToForeach
-namespace IoC
+﻿namespace IoC
 {
     using System;
     using System.Runtime.CompilerServices;
@@ -23,9 +22,8 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container)
         {
             var bucket = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor].KeyValues;
-            for (var index = 0; index < bucket.Length; index++)
+            foreach (var item in bucket)
             {
-                var item = bucket[index];
                 if (typeof(T) == item.Key)
                 {
                     return (Resolver<T>)item.Value;
@@ -72,9 +70,8 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type)
         {
             var bucket = container.ResolversByType.Buckets[type.GetHashCode() & container.ResolversByType.Divisor].KeyValues;
-            for (var index = 0; index < bucket.Length; index++)
+            foreach (var item in bucket)
             {
-                var item = bucket[index];
                 if (type == item.Key)
                 {
                     return (Resolver<T>) item.Value;
@@ -98,9 +95,8 @@ namespace IoC
         {
             var key = new Key(type, tag);
             var bucket = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor].KeyValues;
-            for (var index = 0; index < bucket.Length; index++)
+            foreach (var item in bucket)
             {
-                var item = bucket[index];
                 if (key.Equals(item.Key))
                 {
                     return (Resolver<T>)item.Value;

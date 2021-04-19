@@ -5805,7 +5805,6 @@ namespace IoC
 #endregion
 #region FluentNativeGetResolver
 
-// ReSharper disable ForCanBeConvertedToForeach
 namespace IoC
 {
     using System;
@@ -5830,9 +5829,8 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container)
         {
             var bucket = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor].KeyValues;
-            for (var index = 0; index < bucket.Length; index++)
+            foreach (var item in bucket)
             {
-                var item = bucket[index];
                 if (typeof(T) == item.Key)
                 {
                     return (Resolver<T>)item.Value;
@@ -5879,9 +5877,8 @@ namespace IoC
         public static Resolver<T> GetResolver<T>([NotNull] this Container container, [NotNull] Type type)
         {
             var bucket = container.ResolversByType.Buckets[type.GetHashCode() & container.ResolversByType.Divisor].KeyValues;
-            for (var index = 0; index < bucket.Length; index++)
+            foreach (var item in bucket)
             {
-                var item = bucket[index];
                 if (type == item.Key)
                 {
                     return (Resolver<T>) item.Value;
@@ -5905,9 +5902,8 @@ namespace IoC
         {
             var key = new Key(type, tag);
             var bucket = container.Resolvers.Buckets[key.GetHashCode() & container.Resolvers.Divisor].KeyValues;
-            for (var index = 0; index < bucket.Length; index++)
+            foreach (var item in bucket)
             {
-                var item = bucket[index];
                 if (key.Equals(item.Key))
                 {
                     return (Resolver<T>)item.Value;
@@ -5922,7 +5918,6 @@ namespace IoC
 #endregion
 #region FluentNativeResolve
 
-// ReSharper disable ForCanBeConvertedToForeach
 namespace IoC
 {
     using System;
@@ -5949,9 +5944,8 @@ namespace IoC
         public static T Resolve<T>([NotNull] this Container container)
         {
             var bucket = container.ResolversByType.Buckets[TypeDescriptor<T>.HashCode & container.ResolversByType.Divisor].KeyValues;
-            for (var index = 0; index < bucket.Length; index++)
+            foreach (var item in bucket)
             {
-                var item = bucket[index];
                 if (typeof(T) == item.Key)
                 {
                     return ((Resolver<T>)item.Value)(container, EmptyArgs);
@@ -8666,7 +8660,7 @@ namespace IoC
         /// <inheritdoc />
         [Pure]
         // ReSharper disable once PossibleNullReferenceException
-        [MethodImpl((MethodImplOptions)0x200)]
+        [MethodImpl((MethodImplOptions)0x300)]
         public override bool Equals(object obj) => this.Equals((Key)obj);
 
         /// <inheritdoc />
@@ -8676,7 +8670,7 @@ namespace IoC
 
         /// <inheritdoc />
         [Pure]
-        [MethodImpl((MethodImplOptions)0x200)]
+        [MethodImpl((MethodImplOptions)0x300)]
         public override int GetHashCode()
         {
             unchecked
@@ -9377,7 +9371,7 @@ namespace IoC.Features
                         null,
                         ResolveWithTagGenericMethodInfo.MakeGenericMethod(instanceType),
                         context.ContainerParameter,
-                        Expression.Constant(context.Key.Tag),
+                        Expression.Constant(context.Key.Tag).Convert(typeof(object)),
                         context.ArgsParameter);
                 }
 
@@ -13872,7 +13866,7 @@ namespace IoC.Core
         public readonly int Divisor;
         public readonly Bucket[] Buckets;
 
-        public Table(int size)
+        private Table(int size)
             :this(
                 CoreExtensions.CreateArray(size + 1, EmptyBucket),
                 size,
@@ -13922,7 +13916,6 @@ namespace IoC.Core
         public TValue Get(TKey key)
         {
             var bucket = Buckets[key.GetHashCode() & Divisor];
-            // ReSharper disable once ForCanBeConvertedToForeach
             for (var index = 0; index < bucket.KeyValues.Length; index++)
             {
                 var item = bucket.KeyValues[index];
@@ -14055,10 +14048,8 @@ namespace IoC.Core
         public static bool TryGetByType<TValue>(this Table<Type, TValue> table, Type key, out TValue value)
         {
             var bucket = table.Buckets[key.GetHashCode() & table.Divisor];
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < bucket.KeyValues.Length; index++)
+            foreach (var item in bucket.KeyValues)
             {
-                var item = bucket.KeyValues[index];
                 if (key == item.Key)
                 {
                     value = item.Value;
@@ -14075,10 +14066,8 @@ namespace IoC.Core
         public static bool TryGetByKey<TValue>(this Table<Key, TValue> table, Key key, out TValue value)
         {
             var bucket = table.Buckets[key.GetHashCode() & table.Divisor];
-            // ReSharper disable once ForCanBeConvertedToForeach
-            for (var index = 0; index < bucket.KeyValues.Length; index++)
+            foreach (var item in bucket.KeyValues)
             {
-                var item = bucket.KeyValues[index];
                 if (key.Equals(item.Key))
                 {
                     value = item.Value;
