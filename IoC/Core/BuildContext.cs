@@ -18,6 +18,7 @@
         [NotNull] private readonly IObserver<ContainerEvent> _eventObserver;
         private readonly IList<ParameterExpression> _parameters = new List<ParameterExpression>();
         [NotNull] private readonly IDictionary<Type, Type> _typesMap;
+        private IDictionary<Key, Expression> _cache = new Dictionary<Key, Expression>();
 
         internal BuildContext(
             [CanBeNull] BuildContext parent,
@@ -60,20 +61,25 @@
 
         public ParameterExpression ContainerParameter { get; private set; }
 
-        public IBuildContext CreateChild(Key key, IContainer container) => 
-            CreateInternal(key, container ?? throw new ArgumentNullException(nameof(container)));
+        public IBuildContext CreateChild(Key key, IContainer container)
+        {
+            return CreateInternal(key, container ?? throw new ArgumentNullException(nameof(container)));
+        }
 
         public Expression CreateExpression(Expression defaultExpression = null)
         {
+            if (Key.Type == typeof(IBuildContext))
+            {
+                return Expression.Constant(Parent);
+            }
+
             var selectedContainer = Container;
             if (selectedContainer.Parent != null)
             {
                 var parent = Parent;
                 while (parent != null)
                 {
-                    if (
-                        Key.Equals(parent.Key)
-                        && Equals(parent.Container, selectedContainer))
+                    if (Key.Equals(parent.Key) && Equals(parent.Container, selectedContainer))
                     {
                         selectedContainer = selectedContainer.Parent;
                         break;
@@ -83,14 +89,9 @@
                 }
             }
 
-            if (Key.Type == typeof(IBuildContext))
-            {
-                return Expression.Constant(Parent);
-            }
-
             if (!selectedContainer.TryGetDependency(Key, out var dependency, out var lifetime))
             {
-                if (Container == selectedContainer || !Container.TryGetDependency(Key, out dependency, out lifetime))
+                if (Equals(Container, selectedContainer) || !Container.TryGetDependency(Key, out dependency, out lifetime))
                 {
                     if (defaultExpression != null)
                     {
@@ -115,8 +116,14 @@
                 Container.Resolve<IFoundCyclicDependency>().Resolve(this);
             }
 
-            if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
+            if (_cache.TryGetValue(Key, out var expression))
             {
+                return expression;
+            }
+
+            if (dependency.TryBuildExpression(this, lifetime, out expression, out var error))
+            {
+                _cache[Key] = expression;
                 return expression;
             }
 
@@ -188,7 +195,10 @@
                 ArgsParameter,
                 ContainerParameter,
                 _eventObserver,
-                Depth + 1);
+                Depth + 1)
+            {
+                _cache = _cache
+            };
         }
 
         public override string ToString()

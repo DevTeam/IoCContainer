@@ -286,29 +286,27 @@ namespace IoC.Core
         private object GetTag([NotNull] Expression tagExpression)
         {
             if (tagExpression == null) throw new ArgumentNullException(nameof(tagExpression));
-            object tag;
             switch (tagExpression)
             {
                 case ConstantExpression constant:
-                    tag = constant.Value;
-                    break;
+                    return constant.Value;
 
-                default:
-                    // ReSharper disable once ConstantNullCoalescingCondition
-                    var expression = Visit(tagExpression) ?? throw new BuildExpressionException($"Invalid tag expression {tagExpression}.", new InvalidOperationException());
-                    if (_buildContext.TryCompile(Expression.Lambda(expression, true), out var tagFunc, out var error))
+                case UnaryExpression unary:
+                    if (unary.NodeType == ExpressionType.Convert)
                     {
-                        tag = ((Func<object>)tagFunc)();
+                        return GetTag(unary.Operand);
                     }
-                    else
-                    {
-                        throw error;
-                    }
-
                     break;
             }
 
-            return tag;
+            // ReSharper disable once ConstantNullCoalescingCondition
+            var expression = Visit(tagExpression) ?? throw new BuildExpressionException($"Invalid tag expression {tagExpression}.", new InvalidOperationException());
+            if (_buildContext.TryCompile(Expression.Lambda(expression.Convert(typeof(object)), true), out var tagFunc, out var error))
+            {
+                return ((Func<object>)tagFunc)();
+            }
+
+            throw error;
         }
 
         private IEnumerable<Expression> InjectAll(IEnumerable<Expression> expressions) => 
