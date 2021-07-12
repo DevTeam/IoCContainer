@@ -11487,6 +11487,7 @@ namespace IoC.Core
         [NotNull] private readonly IObserver<ContainerEvent> _eventObserver;
         private readonly IList<ParameterExpression> _parameters = new List<ParameterExpression>();
         [NotNull] private readonly IDictionary<Type, Type> _typesMap;
+        private IDictionary<Key, Expression> _cache = new Dictionary<Key, Expression>();
 
         internal BuildContext(
             [CanBeNull] BuildContext parent,
@@ -11529,20 +11530,25 @@ namespace IoC.Core
 
         public ParameterExpression ContainerParameter { get; private set; }
 
-        public IBuildContext CreateChild(Key key, IContainer container) => 
-            CreateInternal(key, container ?? throw new ArgumentNullException(nameof(container)));
+        public IBuildContext CreateChild(Key key, IContainer container)
+        {
+            return CreateInternal(key, container ?? throw new ArgumentNullException(nameof(container)));
+        }
 
         public Expression CreateExpression(Expression defaultExpression = null)
         {
+            if (Key.Type == typeof(IBuildContext))
+            {
+                return Expression.Constant(Parent);
+            }
+
             var selectedContainer = Container;
             if (selectedContainer.Parent != null)
             {
                 var parent = Parent;
                 while (parent != null)
                 {
-                    if (
-                        Key.Equals(parent.Key)
-                        && Equals(parent.Container, selectedContainer))
+                    if (Key.Equals(parent.Key) && Equals(parent.Container, selectedContainer))
                     {
                         selectedContainer = selectedContainer.Parent;
                         break;
@@ -11552,14 +11558,9 @@ namespace IoC.Core
                 }
             }
 
-            if (Key.Type == typeof(IBuildContext))
-            {
-                return Expression.Constant(Parent);
-            }
-
             if (!selectedContainer.TryGetDependency(Key, out var dependency, out var lifetime))
             {
-                if (Container == selectedContainer || !Container.TryGetDependency(Key, out dependency, out lifetime))
+                if (Equals(Container, selectedContainer) || !Container.TryGetDependency(Key, out dependency, out lifetime))
                 {
                     if (defaultExpression != null)
                     {
@@ -11584,8 +11585,14 @@ namespace IoC.Core
                 Container.Resolve<IFoundCyclicDependency>().Resolve(this);
             }
 
-            if (dependency.TryBuildExpression(this, lifetime, out var expression, out var error))
+            if (_cache.TryGetValue(Key, out var expression))
             {
+                return expression;
+            }
+
+            if (dependency.TryBuildExpression(this, lifetime, out expression, out var error))
+            {
+                _cache[Key] = expression;
                 return expression;
             }
 
@@ -11657,7 +11664,10 @@ namespace IoC.Core
                 ArgsParameter,
                 ContainerParameter,
                 _eventObserver,
-                Depth + 1);
+                Depth + 1)
+            {
+                _cache = _cache
+            };
         }
 
         public override string ToString()
@@ -12449,29 +12459,27 @@ namespace IoC.Core
         private object GetTag([NotNull] Expression tagExpression)
         {
             if (tagExpression == null) throw new ArgumentNullException(nameof(tagExpression));
-            object tag;
             switch (tagExpression)
             {
                 case ConstantExpression constant:
-                    tag = constant.Value;
-                    break;
+                    return constant.Value;
 
-                default:
-                    // ReSharper disable once ConstantNullCoalescingCondition
-                    var expression = Visit(tagExpression) ?? throw new BuildExpressionException($"Invalid tag expression {tagExpression}.", new InvalidOperationException());
-                    if (_buildContext.TryCompile(Expression.Lambda(expression, true), out var tagFunc, out var error))
+                case UnaryExpression unary:
+                    if (unary.NodeType == ExpressionType.Convert)
                     {
-                        tag = ((Func<object>)tagFunc)();
+                        return GetTag(unary.Operand);
                     }
-                    else
-                    {
-                        throw error;
-                    }
-
                     break;
             }
 
-            return tag;
+            // ReSharper disable once ConstantNullCoalescingCondition
+            var expression = Visit(tagExpression) ?? throw new BuildExpressionException($"Invalid tag expression {tagExpression}.", new InvalidOperationException());
+            if (_buildContext.TryCompile(Expression.Lambda(expression.Convert(typeof(object)), true), out var tagFunc, out var error))
+            {
+                return ((Func<object>)tagFunc)();
+            }
+
+            throw error;
         }
 
         private IEnumerable<Expression> InjectAll(IEnumerable<Expression> expressions) => 
