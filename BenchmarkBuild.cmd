@@ -1,1 +1,1 @@
-dotnet build IoC.Benchmark\IoC.Benchmark.csproj --framework net5.0 -c release
+dotnet build IoC.Benchmark\IoC.Benchmark.csproj --framework net6.0 -c release
