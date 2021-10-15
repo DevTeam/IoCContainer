@@ -76,12 +76,8 @@
 
             if (isRoot)
             {
-                var doSomethingMethod = typeBuilder.DefineMethod(nameof(ICompositionRoot.DoSomething), MethodAttributes.Public | MethodAttributes.Virtual, CallingConventions.Standard);
-                var gen = doSomethingMethod.GetILGenerator();
-                gen.Emit(OpCodes.Ret);
-
                 var verifyMethod = typeBuilder.DefineMethod(nameof(ICompositionRoot.Verify), MethodAttributes.Public | MethodAttributes.Virtual, CallingConventions.Standard, typeof(bool), null);
-                gen = verifyMethod.GetILGenerator();
+                var gen = verifyMethod.GetILGenerator();
                 gen.Emit(OpCodes.Ldc_I4_1);
                 gen.Emit(OpCodes.Ret);
             }

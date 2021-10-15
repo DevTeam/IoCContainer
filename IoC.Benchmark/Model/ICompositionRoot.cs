@@ -2,8 +2,6 @@
 {
     public interface ICompositionRoot
     {
-        void DoSomething();
-
         bool Verify();
     }
 }

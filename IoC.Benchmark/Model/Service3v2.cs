@@ -2,6 +2,5 @@
 {
     public sealed class Service3v2 : IService3
     {
-        public void DoSomething() { }
     }
 }

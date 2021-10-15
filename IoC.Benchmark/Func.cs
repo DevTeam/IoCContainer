@@ -22,22 +22,19 @@ namespace IoC.Benchmark
             return abstractContainer.TryCreate();
         }
 
-        [Benchmark(Description = "new", OperationsPerInvoke = 1000000)]
+        [Benchmark(Description = "new", OperationsPerInvoke = 10)]
         public void New()
         {
-            for (var i = 0; i < 100000; i++)
-            {
-                NewInstance().DoSomething();
-                NewInstance().DoSomething();
-                NewInstance().DoSomething();
-                NewInstance().DoSomething();
-                NewInstance().DoSomething();
-                NewInstance().DoSomething();
-                NewInstance().DoSomething();
-                NewInstance().DoSomething();
-                NewInstance().DoSomething();
-                NewInstance().DoSomething();
-            }
+            NewInstance();
+            NewInstance();
+            NewInstance();
+            NewInstance();
+            NewInstance();
+            NewInstance();
+            NewInstance();
+            NewInstance();
+            NewInstance();
+            NewInstance();
         }
 
         private static readonly Func<IService3> Service3Factory = () => new Service3();

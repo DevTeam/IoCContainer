@@ -43,7 +43,7 @@ namespace IoC.Performance.Tests
         {          
             for (var i = 0; i < _series; i++)
             {
-                _containerCore.Resolve<IService1>().DoSomething();
+                _containerCore.Resolve<IService1>();
             }
         }
 
@@ -52,7 +52,7 @@ namespace IoC.Performance.Tests
         {          
             for (var i = 0; i < _series; i++)
             {
-                _container.Resolve<IService1>().DoSomething();
+                _container.Resolve<IService1>();
             }
         }
 

@@ -33,12 +33,6 @@ namespace IoC.Benchmark
             public AspCompositionRoot(IServiceScopeFactory serviceScopeFactory) => 
                 _serviceScopeFactory = serviceScopeFactory;
 
-            public void DoSomething()
-            {
-                using var scope = _serviceScopeFactory.CreateScope();
-                scope.ServiceProvider.GetService<ISession>();
-            }
-
             public bool Verify()
             {
                 Session session1;

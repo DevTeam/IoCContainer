@@ -14,7 +14,6 @@
 
     public abstract class BenchmarkBase: IBenchmarkStrategy
     {
-        private const int Series = 100000;
         private IoC.Container _iocContainer;
         private Func<ICompositionRoot> _iocRootResolver;
         private global::Autofac.IContainer _autofacContainer;
@@ -43,125 +42,107 @@
             _simpleInjectorContainer = CreateContainer<global::SimpleInjector.Container, SimpleInjector>();
         }
 
-        [Benchmark(Description = "IoC.Container", OperationsPerInvoke = Series * 10)]
+        [Benchmark(Description = "IoC.Container", OperationsPerInvoke = 10)]
         public void This()
         {
-            for (var i = 0; i < Series; i++)
-            {
-                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _iocContainer.Resolve<ICompositionRoot>().DoSomething();
-            }
+            _iocContainer.Resolve<ICompositionRoot>();
+            _iocContainer.Resolve<ICompositionRoot>();
+            _iocContainer.Resolve<ICompositionRoot>();
+            _iocContainer.Resolve<ICompositionRoot>();
+            _iocContainer.Resolve<ICompositionRoot>();
+            _iocContainer.Resolve<ICompositionRoot>();
+            _iocContainer.Resolve<ICompositionRoot>();
+            _iocContainer.Resolve<ICompositionRoot>();
+            _iocContainer.Resolve<ICompositionRoot>();
+            _iocContainer.Resolve<ICompositionRoot>();
         }
 
-        [Benchmark(Description = "IoC.Container composition root", OperationsPerInvoke = Series * 10)]
+        [Benchmark(Description = "IoC.Container composition root", OperationsPerInvoke = 10)]
         // ReSharper disable once InconsistentNaming
         public void ThisByCR()
         {
-            for (var i = 0; i < Series; i++)
-            {
-                _iocRootResolver().DoSomething();
-                _iocRootResolver().DoSomething();
-                _iocRootResolver().DoSomething();
-                _iocRootResolver().DoSomething();
-                _iocRootResolver().DoSomething();
-                _iocRootResolver().DoSomething();
-                _iocRootResolver().DoSomething();
-                _iocRootResolver().DoSomething();
-                _iocRootResolver().DoSomething();
-                _iocRootResolver().DoSomething();
-            }
+            _iocRootResolver();
+            _iocRootResolver();
+            _iocRootResolver();
+            _iocRootResolver();
+            _iocRootResolver();
+            _iocRootResolver();
+            _iocRootResolver();
+            _iocRootResolver();
+            _iocRootResolver();
+            _iocRootResolver();
         }
 
         [Benchmark]
-        public void Autofac() => _autofacContainer.Resolve<ICompositionRoot>().DoSomething();
+        public void Autofac() => _autofacContainer.Resolve<ICompositionRoot>();
 
         [Benchmark]
-        public void CastleWindsor() => _windsorContainerContainer.Resolve<ICompositionRoot>().DoSomething();
+        public void CastleWindsor() => _windsorContainerContainer.Resolve<ICompositionRoot>();
 
-        [Benchmark(OperationsPerInvoke = Series * 10)]
+        [Benchmark(OperationsPerInvoke = 10)]
         public void DryIoc()
         {
-            for (var i = 0; i < Series; i++)
-            {
-                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
-                _dryIocContainer.Resolve<ICompositionRoot>().DoSomething();
-            }
+            _dryIocContainer.Resolve<ICompositionRoot>();
+            _dryIocContainer.Resolve<ICompositionRoot>();
+            _dryIocContainer.Resolve<ICompositionRoot>();
+            _dryIocContainer.Resolve<ICompositionRoot>();
+            _dryIocContainer.Resolve<ICompositionRoot>();
+            _dryIocContainer.Resolve<ICompositionRoot>();
+            _dryIocContainer.Resolve<ICompositionRoot>();
+            _dryIocContainer.Resolve<ICompositionRoot>();
+            _dryIocContainer.Resolve<ICompositionRoot>();
+            _dryIocContainer.Resolve<ICompositionRoot>();
         }
 
-        [Benchmark(OperationsPerInvoke = Series * 10)]
+        [Benchmark(OperationsPerInvoke = 10)]
         public void SimpleInjector()
         {
-            for (var i = 0; i < Series; i++)
-            {
-                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _simpleInjectorContainer.GetInstance<ICompositionRoot>().DoSomething();
-            }
+            _simpleInjectorContainer.GetInstance<ICompositionRoot>();
+            _simpleInjectorContainer.GetInstance<ICompositionRoot>();
+            _simpleInjectorContainer.GetInstance<ICompositionRoot>();
+            _simpleInjectorContainer.GetInstance<ICompositionRoot>();
+            _simpleInjectorContainer.GetInstance<ICompositionRoot>();
+            _simpleInjectorContainer.GetInstance<ICompositionRoot>();
+            _simpleInjectorContainer.GetInstance<ICompositionRoot>();
+            _simpleInjectorContainer.GetInstance<ICompositionRoot>();
+            _simpleInjectorContainer.GetInstance<ICompositionRoot>();
+            _simpleInjectorContainer.GetInstance<ICompositionRoot>();
         }
 
-        [Benchmark(OperationsPerInvoke = Series * 10)]
+        [Benchmark(OperationsPerInvoke = 10)]
         public void LightInject()
         {
-            for (var i = 0; i < Series; i++)
-            {
-                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
-                _lightInjectContainer.GetInstance<ICompositionRoot>().DoSomething();
-            }
+            _lightInjectContainer.GetInstance<ICompositionRoot>();
+            _lightInjectContainer.GetInstance<ICompositionRoot>();
+            _lightInjectContainer.GetInstance<ICompositionRoot>();
+            _lightInjectContainer.GetInstance<ICompositionRoot>();
+            _lightInjectContainer.GetInstance<ICompositionRoot>();
+            _lightInjectContainer.GetInstance<ICompositionRoot>();
+            _lightInjectContainer.GetInstance<ICompositionRoot>();
+            _lightInjectContainer.GetInstance<ICompositionRoot>();
+            _lightInjectContainer.GetInstance<ICompositionRoot>();
+            _lightInjectContainer.GetInstance<ICompositionRoot>();
         }
 
         [Benchmark]
-        public void Ninject() => _ninjectContainer.Get<ICompositionRoot>().DoSomething();
+        public void Ninject() => _ninjectContainer.Get<ICompositionRoot>();
 
         [Benchmark]
-        public void Unity() => _unityContainer.Resolve<ICompositionRoot>().DoSomething();
+        public void Unity() => _unityContainer.Resolve<ICompositionRoot>();
 
-        [Benchmark(OperationsPerInvoke = Series * 10)]
+        [Benchmark(OperationsPerInvoke = 10)]
         public void MicrosoftDependencyInjection()
         {
-            for (var i = 0; i < Series; i++)
-            {
-                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
-                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
-                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
-                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
-                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
-                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
-                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
-                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
-                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
-                _microsoftContainer.GetService<ICompositionRoot>().DoSomething();
-            }
+            _microsoftContainer.GetService<ICompositionRoot>();
+            _microsoftContainer.GetService<ICompositionRoot>();
+            _microsoftContainer.GetService<ICompositionRoot>();
+            _microsoftContainer.GetService<ICompositionRoot>();
+            _microsoftContainer.GetService<ICompositionRoot>();
+            _microsoftContainer.GetService<ICompositionRoot>();
+            _microsoftContainer.GetService<ICompositionRoot>();
+            _microsoftContainer.GetService<ICompositionRoot>();
+            _microsoftContainer.GetService<ICompositionRoot>();
+            _microsoftContainer.GetService<ICompositionRoot>();
         }
     }
 }

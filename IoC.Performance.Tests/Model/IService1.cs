@@ -2,6 +2,5 @@
 {
     public interface IService1
     {
-        void DoSomething();
     }
 }
