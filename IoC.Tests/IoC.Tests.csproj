@@ -56,7 +56,7 @@
 		<ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
 	</ItemGroup>
 	<ItemGroup Condition="'$(TargetFramework)'=='net6.0' AND '$(Configuration)'=='Debug'">
-		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0-rc.1.21451.13" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
 		<ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
 		<PackageReference Include="Shouldly" Version="4.0.3" />
 	</ItemGroup>
