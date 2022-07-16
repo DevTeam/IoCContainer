@@ -9,10 +9,10 @@
 <#
     var currentPath = this.Host.ResolvePath("");
     var solutionPath = Path.Combine(currentPath, "..");
-    var scenariousPath = Path.Combine(Path.Combine(solutionPath, "IoC.Tests"), "UsageScenarios");
+    var scenariosPath = Path.Combine(Path.Combine(solutionPath, "IoC.Tests"), "UsageScenarios");
 
     var infos = new List<Dictionary<string, string>>();
-    foreach(var file in Directory.GetFiles(scenariousPath, "*.cs"))
+    foreach(var file in Directory.GetFiles(scenariosPath, "*.cs"))
     {
         var isBody = false;
         var vars = new Dictionary<string, string>();
@@ -53,10 +53,10 @@
                 if (parts.Length == 2)
                 {
                     var key = parts[0];
-                    if (key == "header" || key == "footer")
+                    if (key is "header" or "footer")
                     {
                         var curVar = vars[key];
-                        if (curVar != String.Empty)
+                        if (curVar != string.Empty)
                         {
                             curVar += "\n";
                         }
@@ -136,8 +136,11 @@
     var featuresContent = File.ReadAllText(readmeFeaturesFile);
     File.AppendAllText(readmeFile, featuresContent);
 
-    var samplesContent = File.ReadAllText(samplesFile);
-    File.AppendAllText(readmeFile, samplesContent);
+    if (File.Exists(samplesFile))
+    {
+        var samplesContent = File.ReadAllText(samplesFile);
+        File.AppendAllText(readmeFile, samplesContent);
+    }
 
     var footerContent = File.ReadAllText(readmeFooterFile);
     File.AppendAllText(readmeFile, footerContent);
