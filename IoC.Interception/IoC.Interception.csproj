@@ -2,30 +2,18 @@
 
   <PropertyGroup>
     <RootNamespace>IoC.Features</RootNamespace>
-    <TargetFrameworks>netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;netstandard2.0;net40;net45;net46;net47;net48;netcoreapp1.0;netcoreapp1.1;netcoreapp2.0;netcoreapp3.0;net5.0;net6.0</TargetFrameworks>
+    <TargetFrameworks>$(DebugTargetFrameworks);net40</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <PackageId>IoC.Interception</PackageId>
-    <Authors>NikolayP</Authors>
     <Description>Interception feature for expressions based Inversion of Control container for .NET.</Description>
-    <PackageProjectUrl>https://github.com/DevTeam/IoCContainer/</PackageProjectUrl>
-    <PackageIcon>common\icon.png</PackageIcon>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <RepositoryUrl Condition="'$(TargetFramework)'!='net40'">https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
-    <RepositoryType>git</RepositoryType>
     <PackageTags>ioc container di interception proxy</PackageTags>
     <Product>IoC Container Interception feature</Product>
-    <Copyright>Copyright (C) 2018-2021 Nikolay Pianikov</Copyright>
-    <WarningsAsErrors />
-    <LangVersion>7</LangVersion>
-    <!--NullableContextOptions>enable</NullableContextOptions-->
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <Optimize>true</Optimize>
-    <DebugType>none</DebugType>
-    <DebugSymbols>false</DebugSymbols>
+    <TargetFrameworks>$(ReleaseTargetFrameworks);netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;net40</TargetFrameworks>
   </PropertyGroup>
 
   <ItemGroup>

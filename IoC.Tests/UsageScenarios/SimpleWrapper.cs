@@ -37,7 +37,7 @@
 
         public interface IService
         {
-            public string Value { get; }
+            string Value { get; }
         }
 
         public class Service: IService

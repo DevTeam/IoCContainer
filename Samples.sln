@@ -28,6 +28,9 @@ EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApplication3", "Samples\WebApplication3\WebApplication3.csproj", "{80567B7F-2ABF-433B-8988-A194C4D9EDF0}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{C0157565-1319-47E5-B55E-C12CCD466F1E}"
+	ProjectSection(SolutionItems) = preProject
+		Samples\Directory.Build.props = Samples\Directory.Build.props
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Clock", "Samples\Clock\Clock.csproj", "{66417A46-E53D-4712-904B-CCD1E437D1D5}"
 EndProject

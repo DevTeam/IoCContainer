@@ -1,0 +1,25 @@
+﻿<Project>
+    <PropertyGroup>
+        <Authors>NikolayP</Authors>
+        <PackageProjectUrl>https://github.com/DevTeam/IoCContainer/</PackageProjectUrl>
+        <PackageIcon>common\icon.png</PackageIcon>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <RepositoryType>git</RepositoryType>
+        <RepositoryUrl Condition="'$(TargetFramework)'!='net40'">https://github.com/DevTeam/IoCContainer.git</RepositoryUrl>
+        <Copyright>Copyright (C) 2018-2022 Nikolay Pianikov</Copyright>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <WarningsAsErrors/>
+        <LangVersion>7</LangVersion>
+        <NoWarn>$(NoWarn);NU5128;1701;1702;1705;8002;NETSDK1138</NoWarn>
+        <DebugTargetFrameworks>net6.0;netstandard2.1;net48</DebugTargetFrameworks>
+        <ReleaseTargetFrameworks>netstandard2.0;netstandard2.1;net45;net48;netcoreapp1.0;netcoreapp2.0;netcoreapp3.0;netcoreapp3.1;net5.0;net6.0</ReleaseTargetFrameworks>
+        <TestTargetFrameworks>net6.0;net48;net40</TestTargetFrameworks>
+    </PropertyGroup>
+    
+    <PropertyGroup Condition="'$(Configuration)'=='Release'">
+        <Optimize>true</Optimize>
+        <DebugType>none</DebugType>
+        <DebugSymbols>false</DebugSymbols>
+    </PropertyGroup>
+</Project>
+
