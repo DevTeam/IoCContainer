@@ -1,1 +1,0 @@
-dotnet run --project IoC.Benchmark\IoC.Benchmark.csproj --framework net6.0 -c release -- -r net60  -f *Singleton* *Transient* *Complex* *Operations* *Func* *Array* *Enum*

@@ -1,17 +1,17 @@
+#nullable enable
+
 using HostApi;
 using NuGet.Versioning;
 // ReSharper disable ArrangeTypeModifiers
+// ReSharper disable UnusedMethodReturnValue.Global
 // ReSharper disable CheckNamespace
-// ReSharper disable ConvertIfStatementToReturnStatement
+// ReSharper disable UnusedMember.Global
 
 static class Tools
 {
     public static bool UnderTeamCity => Environment.GetEnvironmentVariable("TEAMCITY_VERSION") != default;
-}
 
-static class Version
-{
-    public static NuGetVersion GetNext(NuGetRestoreSettings settings, NuGetVersion defaultVersion)
+    public static NuGetVersion GetNextVersion(NuGetRestoreSettings settings, NuGetVersion defaultVersion)
     {
         var floatRange = defaultVersion.Release != string.Empty
             ? new FloatRange(NuGetVersionFloatBehavior.Prerelease, defaultVersion)
@@ -21,35 +21,36 @@ static class Version
             .Restore(settings.WithHideWarningsAndErrors(true).WithVersionRange(new VersionRange(defaultVersion, floatRange)))
             .Where(i => i.Name == settings.PackageId)
             .Select(i => i.NuGetVersion)
-            .Select(i => defaultVersion.Release != string.Empty
-                ? new NuGetVersion(i.Major, i.Minor, i.Patch, GetNextRelease(i, defaultVersion.Release))
+            .Select(i => defaultVersion.Release != string.Empty 
+                ? new NuGetVersion(i.Major, i.Minor, i.Patch, defaultVersion.Release)
                 : new NuGetVersion(i.Major, i.Minor, i.Patch + 1))
             .Max() ?? defaultVersion;
     }
 
-    private static string GetNextRelease(SemanticVersion curVersion, string release)
+    public static void CheckRequiredSdk(Version requiredSdkVersion)
     {
-        if (!curVersion.Release.ToLowerInvariant().StartsWith(release.ToLowerInvariant()))
+        Version? sdkVersion = default;
+        if (
+            new DotNetCustom("--version")
+                .WithShortName($"Checking the .NET SDK version {requiredSdkVersion}")
+                .Run(output=> Version.TryParse(output.Line, out sdkVersion)) == 0
+            && sdkVersion != requiredSdkVersion)
         {
-            return release;
+            Error($".NET SDK {requiredSdkVersion} is required.");
+            Environment.Exit(1);
         }
-
-        if (int.TryParse(string.Concat(curVersion.Release.Where(char.IsNumber)), out var num))
-        {
-            return $"{string.Concat(curVersion.Release.Where(i => !char.IsNumber(i)))}{num + 1}";
-        }
-
-        return release;
     }
 }
 
 static class Property
 {
-    public static string Get(string name, string defaultProp, bool showWarning = false)
+    public static string Get(string name, string defaultProp, bool showWarning = false) =>
+        Get(Props, name, defaultProp, showWarning);
+
+    public static string Get(IProperties props, string name, string defaultProp, bool showWarning = false)
     {
-        if (Props.TryGetValue(name, out var prop) && !string.IsNullOrWhiteSpace(prop))
+        if (props.TryGetValue(name, out var prop) && !string.IsNullOrWhiteSpace(prop))
         {
-            WriteLine($"{name}: {prop}", Color.Highlighted);
             return prop;
         }
 
@@ -77,7 +78,19 @@ static class Assertion
         }
 
         Error($"{shortName} failed.");
-        Exit();
+        Environment.Exit(1);
+        return false;
+    }
+    
+    public static bool Succeed(IEnumerable<int?> exitCode, string shortName)
+    {
+        if (exitCode.All(i => i == 0))
+        {
+            return true;
+        }
+
+        Error($"{shortName} failed.");
+        Environment.Exit(1);
         return false;
     }
 
@@ -107,7 +120,7 @@ static class Assertion
     {
         if (!CheckBuildResult(result))
         {
-            Exit();
+            Environment.Exit(1);
         }
     }
 
@@ -118,7 +131,7 @@ static class Assertion
             return true;
         }
 
-        Exit();
+        Environment.Exit(1);
         return true;
     }
 
@@ -129,46 +142,7 @@ static class Assertion
             return true;
         }
 
-        Exit();
-        return true;
-    }
-
-    public static void Exit()
-    {
-        if (!Tools.UnderTeamCity)
-        {
-            var foregroundColor = Console.ForegroundColor;
-            try
-            {
-                Console.ForegroundColor = ConsoleColor.Yellow;
-                var timeout = TimeSpan.FromSeconds(10);
-                var period = TimeSpan.FromMilliseconds(10);
-                while (timeout > period)
-                {
-                    if (Console.KeyAvailable)
-                    {
-                        if (Console.ReadKey(true).Key == ConsoleKey.Y)
-                        {
-                            return;
-                        }
-                        else
-                        {
-                            break;
-                        }
-                    }
-
-                    Thread.Sleep(period);
-                    timeout -= period;
-                    Console.SetCursorPosition(0, Console.CursorTop);
-                    Console.Write($"Continue this build? {(int)timeout.TotalSeconds:00} y/n");
-                }
-            }
-            finally
-            {
-                Console.ForegroundColor = foregroundColor;
-            }
-        }
-        
         Environment.Exit(1);
+        return true;
     }
 }

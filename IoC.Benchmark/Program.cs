@@ -34,7 +34,7 @@ namespace IoC.Benchmark
 
                 benchmark.Setup();
                 Console.WriteLine($"Running benchmark \"{args[0]}\".");
-                benchmark.ThisByCR();
+                //benchmark.ThisByCR();
                 return 0;
             }
 
