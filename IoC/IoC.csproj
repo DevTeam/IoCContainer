@@ -2,7 +2,7 @@
   <PropertyGroup>
     <AssemblyName>$(AssemblyNamePrefix)IoC</AssemblyName>
     <TieredCompilation>false</TieredCompilation>
-    <TargetFrameworks>net6.0;net5.0;net40;net48;netstandard1.0;netstandard2.1;netcoreapp1.0;netcoreapp2.0;netcoreapp3.1</TargetFrameworks>
+    <TargetFrameworks>net7.0;net6.0;net5.0;net40;net48;netstandard1.0;netstandard2.1;netcoreapp1.0;netcoreapp2.0;netcoreapp3.1</TargetFrameworks>
     <SignAssembly>True</SignAssembly>
     <AssemblyOriginatorKeyFile>DevTeam.snk</AssemblyOriginatorKeyFile>
     <Product>IoC Container</Product>

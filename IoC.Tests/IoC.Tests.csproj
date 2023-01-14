@@ -49,6 +49,10 @@
 		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
 		<ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
 	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='net7.0' AND '$(Configuration)'=='Debug'">
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+		<ProjectReference Include="..\IoC.AspNetCore\IoC.AspNetCore.csproj" />
+	</ItemGroup>
 	<ItemGroup>
 		<ProjectReference Include="..\IoC.Interception\IoC.Interception.csproj" />
 	</ItemGroup>

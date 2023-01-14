@@ -49,6 +49,10 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="6.0.0" />
   </ItemGroup>
 
+  <ItemGroup Condition="'$(TargetFramework)'=='net7.0'">
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="7.0.0" />
+  </ItemGroup>
+
   <ItemGroup Condition="'$(TargetFramework)'=='net45' or '$(TargetFramework)'=='netstandard1.0'">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="1.1.1" />
   </ItemGroup>  
