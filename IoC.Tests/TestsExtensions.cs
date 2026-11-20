@@ -2,8 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Linq.Expressions;
     using System.Threading;
+    using System.Threading.Tasks;
     using Core;
     using Moq;
 
@@ -56,5 +58,43 @@
                 throw exceptions[0];
             }
         }
+
+#if !NET40
+        public static Task ParallelizeAsync(Func<Task> action, int count = 10, int parallelism = 100)
+        {
+            var exceptions = new List<Exception>();
+            async Task RunAction()
+            {
+                try
+                {
+                    for (var i = 0; i < count; i++)
+                    {
+                        await action();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    lock (exceptions)
+                    {
+                        exceptions.Add(ex);
+                    }
+                }
+            }
+
+            var tasks = new List<Task>();
+            for (var i = 0; i < parallelism; i++)
+            {
+                tasks.Add(Task.Run(RunAction));
+            }
+
+            return Task.WhenAll(tasks).ContinueWith(_ =>
+            {
+                if (exceptions.Count > 0)
+                {
+                    throw exceptions[0];
+                }
+            });
+        }
+#endif
     }
 }

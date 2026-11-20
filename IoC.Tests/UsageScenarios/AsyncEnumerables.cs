@@ -10,7 +10,7 @@ namespace IoC.Tests.UsageScenarios
     public class AsyncEnumerables
     {
         [Fact]
-        public async ValueTask Run()
+        public async Task Run()
         {
             // $visible=true
             // $tag=4 Async

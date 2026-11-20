@@ -19,7 +19,7 @@ namespace IoC.Tests.UsageScenarios
         // $description=Cancellation of asynchronous construction
         // $header=It is possible to inject dependencies in asynchronous style and to cancel their creations using default _CancellationTokenSource_.
         // {
-        public void Run()
+        public async Task Run()
         {
             // Create a cancellation token source
             var cancellationTokenSource = new CancellationTokenSource();
@@ -41,7 +41,8 @@ namespace IoC.Tests.UsageScenarios
             cancellationTokenSource.Cancel();
 
             // Get an instance
-            instanceTask.Result.ShouldBeOfType<Consumer>();
+            var instance = await instanceTask;
+            instance.ShouldBeOfType<Consumer>();
         }
 
         public class SomeDependency: IDependency

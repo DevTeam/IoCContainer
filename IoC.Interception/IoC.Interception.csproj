@@ -16,8 +16,17 @@
     <TargetFrameworks>$(ReleaseTargetFrameworks);netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;net40</TargetFrameworks>
   </PropertyGroup>
 
-  <ItemGroup>
+  <PropertyGroup>
+    <!-- Castle.Core 5.x has no assets for net40/net45/netstandard1.x/netcoreapp1.0, so legacy targets keep 4.4.1 -->
+    <LegacyCastleCore Condition="'$(TargetFramework)'=='net40' or '$(TargetFramework)'=='net45' or '$(TargetFramework)'=='netcoreapp1.0' or $(TargetFramework.StartsWith('netstandard1.'))">true</LegacyCastleCore>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(LegacyCastleCore)'=='true'">
     <PackageReference Include="Castle.Core" Version="4.4.1" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(LegacyCastleCore)'!='true'">
+    <PackageReference Include="Castle.Core" Version="5.2.1" />
   </ItemGroup>
 
   <ItemGroup>

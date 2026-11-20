@@ -1,7 +1,6 @@
 ﻿namespace IoC.Benchmark.Containers
 {
     using System;
-    using Castle.Core.Internal;
     using global::LightInject;
     using global::LightInject.Microsoft.DependencyInjection;
     using Microsoft.Extensions.DependencyInjection;
@@ -18,7 +17,7 @@
             switch (lifetime)
             {
                 case AbstractLifetime.Transient:
-                    if (name.IsNullOrEmpty())
+                    if (string.IsNullOrEmpty(name))
                     {
                         _container.Register(contractType, implementationType);
                     }
@@ -30,7 +29,7 @@
                     break;
 
                 case AbstractLifetime.Singleton:
-                    if (name.IsNullOrEmpty())
+                    if (string.IsNullOrEmpty(name))
                     {
                         _container.Register(contractType, implementationType, new PerContainerLifetime());
                     }

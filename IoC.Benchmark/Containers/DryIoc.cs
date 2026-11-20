@@ -28,7 +28,7 @@
                     throw new ArgumentOutOfRangeException(nameof(lifetime), lifetime, null);
             }
 
-            _container.Register(new ReflectionFactory(implementationType, reuse), contractType, name, null, true);
+            _container.Register(ReflectionFactory.Of(implementationType, reuse), contractType, name, null, true);
         }
 
         public override void Register(IServiceCollection services)

@@ -11,7 +11,7 @@ namespace IoC.Tests.UsageScenarios
     public class TaskSchedulerOverride
     {
         [Fact]
-        public async void Run()
+        public async Task Run()
         {
             // $visible=true
             // $tag=4 Async

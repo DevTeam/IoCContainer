@@ -659,47 +659,47 @@ namespace IoC.Tests.IntegrationTests
 
 #if !NET40
         [Fact]
-        public void ContainerShouldResolveGenericWhenComplex()
+        public async Task ContainerShouldResolveGenericWhenComplex()
         {
             // Given
             using var container = Container.Create();
             // When
             using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                var instance = container.Resolve<Task<Func<IEnumerable<Lazy<Tuple<Func<IMyGenericService<string, int>>, IMyGenericService<string, int>>>>>>>();
+                var instance = await container.Resolve<Task<Func<IEnumerable<Lazy<Tuple<Func<IMyGenericService<string, int>>, IMyGenericService<string, int>>>>>>>();
 
                 // Then
-                instance.Result().Single().Value.Item1().ShouldBeOfType<MyGenericService<string, int>>();
+                instance().Single().Value.Item1().ShouldBeOfType<MyGenericService<string, int>>();
             }
         }
 
         [Fact]
-        public void ContainerShouldResolveGenericWhenComplex_MT()
+        public async Task ContainerShouldResolveGenericWhenComplex_MT()
         {
             // Given
             using var container = Container.Create();
             // When
             using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                TestsExtensions.Parallelize(() =>
+                await TestsExtensions.ParallelizeAsync(async () =>
                 {
-                    var instance = container.Resolve<Task<Func<IEnumerable<Lazy<Tuple<Func<IMyGenericService<string, int>>, IMyGenericService<string, int>>>>>>>();
+                    var instance = await container.Resolve<Task<Func<IEnumerable<Lazy<Tuple<Func<IMyGenericService<string, int>>, IMyGenericService<string, int>>>>>>>();
 
                     // Then
-                    instance.Result().Single().Value.Item1().ShouldBeOfType<MyGenericService<string, int>>();
+                    instance().Single().Value.Item1().ShouldBeOfType<MyGenericService<string, int>>();
                 });
             }
         }
 
         [Fact]
-        public void ContainerShouldResolveGenericWhenTask()
+        public async Task ContainerShouldResolveGenericWhenTask()
         {
             // Given
             using var container = Container.Create();
             // When
             using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                var instance = container.Resolve<Task<IMyGenericService<string, int>>>().Result;
+                var instance = await container.Resolve<Task<IMyGenericService<string, int>>>();
 
                 // Then
                 instance.ShouldBeOfType<MyGenericService<string, int>>();
@@ -770,14 +770,14 @@ namespace IoC.Tests.IntegrationTests
         }
 
         [Fact]
-        public void ContainerShouldResolveGenericWhenValueTask()
+        public async Task ContainerShouldResolveGenericWhenValueTask()
         {
             // Given
             using var container = Container.Create();
             // When
             using (container.Bind<IMyGenericService<TT1, TT2>>().To<MyGenericService<TT1, TT2>>())
             {
-                var instance = container.Resolve<ValueTask<IMyGenericService<string, int>>>().Result;
+                var instance = await container.Resolve<ValueTask<IMyGenericService<string, int>>>();
 
                 // Then
                 instance.ShouldBeOfType<MyGenericService<string, int>>();

@@ -19,7 +19,7 @@ namespace IoC.Tests.UsageScenarios
         // $header=It is easy to inject dependencies in an asynchronous style.
         // $footer=It is better to not use any logic except an instance field setup logic within a constructor.
         // {
-        public async void Run()
+        public async Task Run()
         {
             using var container = Container.Create()
                 // Bind some dependency

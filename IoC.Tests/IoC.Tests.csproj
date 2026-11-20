@@ -11,10 +11,22 @@
 		<!-- .NET 7 is out of support and may be missing on build machines: run these tests on the newest installed runtime -->
 		<RollForward>LatestMajor</RollForward>
 	</PropertyGroup>
-	<ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'!='net40'">
+		<PackageReference Include="Castle.Core" Version="5.2.1" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='net40'">
 		<PackageReference Include="Castle.Core" Version="4.4.1" />
 		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="16.11.0" />
-		<PackageReference Include="System.ValueTuple" Version="4.5.0" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'=='net7.0'">
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+	</ItemGroup>
+	<ItemGroup Condition="'$(TargetFramework)'!='net40' and '$(TargetFramework)'!='net7.0'">
+		<PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.12.0" />
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="System.ValueTuple" Version="4.6.2" Condition="'$(TargetFramework)'!='net40'" />
+		<PackageReference Include="System.ValueTuple" Version="4.5.0" Condition="'$(TargetFramework)'=='net40'" />
 	</ItemGroup>
 	<Choose>
 		<When Condition="'$(TargetFramework)'=='net40'">
@@ -31,13 +43,17 @@
 
 		<Otherwise>
 			<ItemGroup>
-				<PackageReference Include="Moq" Version="4.16.1" />
-				<PackageReference Include="xunit" Version="2.4.1" />
-				<PackageReference Include="xunit.runner.visualstudio" Version="2.4.3">
+				<PackageReference Include="Moq" Version="4.21.0" />
+				<PackageReference Include="xunit" Version="2.9.3" />
+				<PackageReference Include="xunit.runner.visualstudio" Version="2.8.2" Condition="'$(TargetFramework)'=='net7.0'">
 					<PrivateAssets>all</PrivateAssets>
 					<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
 				</PackageReference>
-				<PackageReference Include="Shouldly" Version="4.0.3" />
+				<PackageReference Include="xunit.runner.visualstudio" Version="4.0.1" Condition="'$(TargetFramework)'!='net7.0'">
+					<PrivateAssets>all</PrivateAssets>
+					<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+				</PackageReference>
+				<PackageReference Include="Shouldly" Version="4.3.0" />
 			</ItemGroup>
 		</Otherwise>
 	</Choose>
