@@ -3,8 +3,8 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<IsPackable>false</IsPackable>
-		<TargetFramework>net7.0</TargetFramework>
-		<LangVersion>10</LangVersion>
+		<TargetFramework>net11.0</TargetFramework>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

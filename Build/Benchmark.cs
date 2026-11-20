@@ -37,7 +37,7 @@ class Benchmark
     {
         var benchmark = new DotNetRun()
             .WithProject(Path.Combine("IoC.Benchmark", "IoC.Benchmark.csproj"))
-            .WithFramework("net6.0")
+            .WithFramework("net11.0")
             .WithConfiguration("Release")
             .WithArgs("--", "--filter")
             .AddArgs(Reports.Select(filter => $"*{filter}*").ToArray());

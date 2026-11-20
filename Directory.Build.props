@@ -11,9 +11,11 @@
         <WarningsAsErrors/>
         <LangVersion>7</LangVersion>
         <NoWarn>$(NoWarn);NU5128;NU3005;1701;1702;1705;8002;NETSDK1138</NoWarn>
-        <DebugTargetFrameworks>net7.0;netstandard2.1;net48</DebugTargetFrameworks>
-        <ReleaseTargetFrameworks>netstandard2.0;netstandard2.1;net45;net48;netcoreapp1.0;netcoreapp2.0;netcoreapp3.0;netcoreapp3.1;net5.0;net6.0;net7.0</ReleaseTargetFrameworks>
-        <TestTargetFrameworks>net7.0;net48;net40</TestTargetFrameworks>
+        <!-- NuGet audit findings stay visible as warnings: the packages come from legacy TFMs (netcoreapp1.0/2.0) and dev-only tooling, and audit cannot be scoped to a single TFM -->
+        <WarningsNotAsErrors>$(WarningsNotAsErrors);NU1901;NU1902;NU1903;NU1904</WarningsNotAsErrors>
+        <DebugTargetFrameworks>net11.0;net10.0;net9.0;net8.0;net7.0;netstandard2.1;net48</DebugTargetFrameworks>
+        <ReleaseTargetFrameworks>netstandard2.0;netstandard2.1;net45;net48;netcoreapp1.0;netcoreapp2.0;netcoreapp3.0;netcoreapp3.1;net5.0;net6.0;net7.0;net8.0;net9.0;net10.0;net11.0</ReleaseTargetFrameworks>
+        <TestTargetFrameworks>net11.0;net10.0;net9.0;net8.0;net7.0;net48;net40</TestTargetFrameworks>
     </PropertyGroup>
     
     <PropertyGroup Condition="'$(Configuration)'=='Release'">
