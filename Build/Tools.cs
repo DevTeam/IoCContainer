@@ -33,7 +33,7 @@ static class Tools
         if (
             new DotNetCustom("--version")
                 .WithShortName($"Checking the .NET SDK version {requiredSdkVersion}")
-                .Run(output=> Version.TryParse(output.Line, out sdkVersion)) == 0
+                .Run(output=> Version.TryParse(output.Line, out sdkVersion)).ExitCode == 0
             && sdkVersion != requiredSdkVersion)
         {
             Error($".NET SDK {requiredSdkVersion} is required.");
@@ -82,26 +82,24 @@ static class Assertion
         return false;
     }
     
-    public static bool Succeed(IEnumerable<int?> exitCode, string shortName)
+    public static bool Succeed(ICommandLineResult result, string shortName)
     {
-        if (exitCode.All(i => i == 0))
+        if (result.Error != default)
         {
-            return true;
+            Error(result.Error.ToString());
         }
 
-        Error($"{shortName} failed.");
-        Environment.Exit(1);
-        return false;
+        return Succeed(result.ExitCode, shortName);
     }
 
     public static async Task<bool> Succeed(Task<int?> exitCodeTask, string shortName) =>
         Succeed(await exitCodeTask, shortName);
 
-    private static bool CheckBuildResult(IBuildResult result)
+    private static bool CheckBuildResult(IBuildResult result, string shortName)
     {
-        if (result.ExitCode == 0)
+        foreach (var error in result.Errors)
         {
-            return true;
+            Error(error.ToString());
         }
 
         foreach (var failedTest in
@@ -112,21 +110,26 @@ static class Assertion
             Error(failedTest);
         }
 
-        Error($"{result.StartInfo.ShortName} failed");
+        if (result.Summary.Errors == 0 && result.Summary.FailedTests == 0)
+        {
+            return true;
+        }
+
+        Error($"{shortName} failed");
         return false;
     }
 
-    public static void Succeed(IBuildResult result)
+    public static void Succeed(IBuildResult result, string shortName)
     {
-        if (!CheckBuildResult(result))
+        if (!CheckBuildResult(result, shortName))
         {
             Environment.Exit(1);
         }
     }
 
-    public static async Task<bool> Succeed(Task<IBuildResult> resultTask)
+    public static async Task<bool> Succeed(Task<IBuildResult> resultTask, string shortName)
     {
-        if (CheckBuildResult(await resultTask))
+        if (CheckBuildResult(await resultTask, shortName))
         {
             return true;
         }
@@ -135,9 +138,9 @@ static class Assertion
         return true;
     }
 
-    public static async Task<bool> Succeed(Task<IBuildResult[]> resultsTask)
+    public static async Task<bool> Succeed(Task<IBuildResult[]> resultsTask, string shortName)
     {
-        if ((await resultsTask).All(CheckBuildResult))
+        if ((await resultsTask).All(result => CheckBuildResult(result, shortName)))
         {
             return true;
         }

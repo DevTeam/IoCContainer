@@ -24,7 +24,7 @@ class Deploy
         var packages = _build.Run();
         if (!string.IsNullOrWhiteSpace(_settings.NuGetKey) && _settings.Version.Release != "dev")
         {
-            var push = new DotNetNuGetPush().WithApiKey(_settings.NuGetKey).WithSources("https://api.nuget.org/v3/index.json");
+            var push = new DotNetNuGetPush().WithApiKey(_settings.NuGetKey).WithSource("https://api.nuget.org/v3/index.json");
             foreach (var package in packages)
             {
                 Assertion.Succeed(_commandLineRunner.Run(push.WithPackage(package)), $"Pushing {Path.GetFileName(package)}");

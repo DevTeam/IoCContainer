@@ -43,8 +43,8 @@ class Build
             from  specialFolder in new[] { Environment.SpecialFolder.ProgramFiles, Environment.SpecialFolder.ProgramFilesX86 }
             // C:\Program Files (x86)\Microsoft Visual Studio
             from vsDir in Directory.EnumerateDirectories(Path.Combine(Environment.GetFolderPath(specialFolder)), "Microsoft Visual Studio")
-            // C:\Program Files (x86)\Microsoft Visual Studio\2022
-            from vsVersionDir in Directory.EnumerateDirectories(vsDir, "2022")
+            // C:\Program Files (x86)\Microsoft Visual Studio\2022 or \18
+            from vsVersionDir in Directory.EnumerateDirectories(vsDir).OrderByDescending(dir => Path.GetFileName(dir))
             // C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools
             from vsInstanceDir in Directory.EnumerateDirectories(vsVersionDir)
             // C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild
@@ -75,27 +75,30 @@ class Build
         };
         
         Assertion.Succeed(
-            _buildRunner.Run(new DotNetBuild()
+            _buildRunner.Build(new DotNetBuild()
                 .WithProject(_settings.SolutionFile)
                 .WithConfiguration(configuration)
-                .WithProps(buildProps))
+                .WithProps(buildProps)),
+            "Building"
         );
 
         Assertion.Succeed(
-            _buildRunner.Run(new DotNetTest()
+            _buildRunner.Build(new DotNetTest()
                 .WithProject(_settings.SolutionFile)
                 .WithConfiguration(configuration)
                 .WithProps(buildProps)
-                .WithNoBuild(true))
+                .WithNoBuild(true)),
+            "Testing"
         );
 
         Assertion.Succeed(
-            _buildRunner.Run(
+            _buildRunner.Build(
             new DotNetPack()
                 .WithProject(_settings.SolutionFile)
                 .WithConfiguration(configuration)
                 .WithProps(buildProps)
-                .WithNoBuild(true))
+                .WithNoBuild(true)),
+            "Packing"
         );
         
         var packages = new List<string>();

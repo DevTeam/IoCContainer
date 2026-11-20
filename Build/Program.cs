@@ -12,6 +12,7 @@ var settings = new Settings(
 
 GetService<IServiceCollection>()
     .AddSingleton<Root>()
+    .AddSingleton(Host.Props)
     .AddSingleton(_ => settings)
     .AddSingleton<Build>()
     .AddSingleton<Deploy>()
