@@ -3,6 +3,15 @@ using HostApi;
 using NuGet.Versioning;
 using Microsoft.Extensions.DependencyInjection;
 
+// Program.cs is also loaded as a script by Program.csx.
+#if BUILD_README
+if (args is ["readme"])
+{
+    await BuildDocumentation.ReadmeTarget.RunAsync(Environment.CurrentDirectory);
+    return;
+}
+#endif
+
 var settings = new Settings(
     Environment.OSVersion.Platform == PlatformID.Win32NT ? "Release" : "Linux",
     Tools.GetNextVersion(new NuGetRestoreSettings("IoC.Container"), NuGetVersion.Parse(Property.Get("version", "1.0.0-dev", Tools.UnderTeamCity))),

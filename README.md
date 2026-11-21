@@ -1919,7 +1919,7 @@ items.Count.ShouldBe(4);
 It is easy to inject dependencies in an asynchronous style.
 
 ``` CSharp
-public async void Run()
+public async Task Run()
 {
     using var container = Container.Create()
         // Bind some dependency
@@ -1960,7 +1960,7 @@ It is better to not use any logic except an instance field setup logic within a 
 It is possible to inject dependencies in asynchronous style and to cancel their creations using default _CancellationTokenSource_.
 
 ``` CSharp
-public void Run()
+public async Task Run()
 {
     // Create a cancellation token source
     var cancellationTokenSource = new CancellationTokenSource();
@@ -1982,7 +1982,8 @@ public void Run()
     cancellationTokenSource.Cancel();
 
     // Get an instance
-    instanceTask.Result.ShouldBeOfType<Consumer>();
+    var instance = await instanceTask;
+    instance.ShouldBeOfType<Consumer>();
 }
 
 public class SomeDependency: IDependency

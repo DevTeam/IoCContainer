@@ -1,0 +1,28 @@
+@using Microsoft.AspNetCore.Html
+@model BuildDocumentation.ReadmeModel
+
+## Usage Scenarios
+
+@foreach (var group in Model.Groups)
+{
+@:- @(new HtmlString(group.Title))
+    foreach (var scenario in group.Scenarios)
+    {
+<text>  - [@(new HtmlString(scenario.Title))](@(new HtmlString(scenario.Anchor)))
+</text>
+    }
+}
+
+@foreach (var scenario in Model.Scenarios)
+{
+<text>### @(new HtmlString(scenario.Title)) [![CSharp](https://img.shields.io/badge/C%23-code-blue.svg)](https://raw.githubusercontent.com/DevTeam/IoCContainer/master/IoC.Tests/UsageScenarios/@scenario.FileName)
+
+@(new HtmlString(scenario.Header))
+
+``` CSharp
+@(new HtmlString(scenario.Code))```
+
+@(new HtmlString(scenario.Footer))
+
+</text>
+}
