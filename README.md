@@ -2,7 +2,7 @@
 
 [![NuGet](https://buildstats.info/nuget/IoC.Container)](https://www.nuget.org/packages/IoC.Container)
 [![License](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[<img src="http://teamcity.jetbrains.com/app/rest/builds/buildType:(id:OpenSourceProjects_DevTeam_IoCContainer_BuildAndTest)/statusIcon"/>](http://teamcity.jetbrains.com/viewType.html?buildTypeId=OpenSourceProjects_DevTeam_IoCContainer_BuildAndTest&guest=1)
+[<img src="https://github.com/DevTeam/IoCContainer/actions/workflows/main.yml/badge.svg"/>](https://github.com/DevTeam/IoCContainer/actions/workflows/main.yml)
 
 #### Base concepts:
 
@@ -306,14 +306,12 @@ _[BenchmarkDotNet](https://github.com/dotnet/BenchmarkDotNet) was used to measur
 - .NET 4.0+
 - [.NET Core](https://docs.microsoft.com/en-us/dotnet/core/) 1.0+
 - [.NET Standard](https://docs.microsoft.com/en-us/dotnet/standard/net-standard) 1.0+
-- [UWP](https://docs.microsoft.com/en-us/windows/uwp/index) 10+
 
 ### Easy Integration
 
 - [ASP.NET Core](#aspnet-core)
 - [Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfApp)
 - [.NET core Windows Presentation Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WpfAppNetCore) 
-- [Universal Windows Platform](https://github.com/DevTeam/IoCContainer/blob/master/Samples/UwpApp)
 - [Windows Communication Foundation](https://github.com/DevTeam/IoCContainer/blob/master/Samples/WcfServiceLibrary)
 - [Entity Framework](https://github.com/DevTeam/IoCContainer/tree/master/Samples/EntityFrameworkCore)
 

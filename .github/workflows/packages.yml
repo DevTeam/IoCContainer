@@ -1,0 +1,241 @@
+name: Publish NuGet package
+
+# A tag names the version to build and publish: 1.2.3 for a release, 1.2.3-beta.1 for a prerelease.
+# The "v" prefix is not used. The patterns only select candidate tags;
+# the "release" job rejects anything that is not a version.
+on:
+  push:
+    tags:
+      - '[0-9]+.[0-9]+.[0-9]+'
+      - '[0-9]+.[0-9]+.[0-9]+-*'
+  # A manual run builds the version's tag, or the selected branch when the tag does not exist yet,
+  # and publishes only when asked. Publishing requires an existing tag.
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Version (1.2.3 or 1.2.3-beta.1); without its tag, builds the selected branch and cannot publish'
+        required: true
+        type: string
+      publish:
+        description: 'Publish the built packages to NuGet.org'
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: nuget-release
+  cancel-in-progress: false
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: true
+
+jobs:
+  # Resolves the version to the commit that every other job builds:
+  # the version tag's commit, or the selected branch's commit for a manual build without publication.
+  release:
+    name: release
+    runs-on: windows-latest
+    outputs:
+      version: ${{ steps.release.outputs.version }}
+      commit: ${{ steps.release.outputs.commit }}
+      publish: ${{ steps.release.outputs.publish }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Resolve version
+        id: release
+        shell: pwsh
+        env:
+          RELEASE_TAG: ${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
+          PUBLISH_PACKAGES: ${{ github.event_name == 'push' || inputs.publish }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $version = $env:RELEASE_TAG
+          $publish = $env:PUBLISH_PACKAGES -eq 'true'
+          # Canonical SemVer without a v prefix or build metadata.
+          if ($version -cnotmatch '^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(-((0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*)(\.(0|[1-9][0-9]*|[0-9]*[A-Za-z-][0-9A-Za-z-]*))*))?$') {
+            throw "Version must be canonical, such as 1.2.3 or 1.2.3-beta.1, but it is '$version'."
+          }
+          # actions/checkout already has the tag that started a tag push run,
+          # and fetching it again can fail with "would clobber existing tag".
+          $commit = git rev-parse --verify --quiet "refs/tags/${version}^{commit}"
+          if ($LASTEXITCODE -eq 0) {
+            $source = "tag $version"
+          }
+          else {
+            # Exit code 2 means that the remote has no such tag.
+            git ls-remote --exit-code --tags origin "refs/tags/${version}" | Out-Null
+            $tagStatus = $LASTEXITCODE
+            if ($tagStatus -eq 0) {
+              git fetch --no-tags origin "+refs/tags/${version}:refs/tags/${version}"
+              if ($LASTEXITCODE -ne 0) { throw 'Version tag could not be fetched.' }
+              $commit = git rev-parse --verify "refs/tags/${version}^{commit}"
+              if ($LASTEXITCODE -ne 0) { throw 'Tag does not point to a commit.' }
+              $source = "tag $version"
+            }
+            elseif ($tagStatus -eq 2 -and -not $publish) {
+              $commit = $env:GITHUB_SHA
+              $source = "branch $env:GITHUB_REF_NAME (tag $version does not exist)"
+            }
+            elseif ($tagStatus -eq 2) {
+              throw "Tag $version was not found. Publishing requires an existing version tag; push the tag to build and publish it."
+            }
+            else {
+              throw 'Remote tags could not be listed.'
+            }
+          }
+          # The runner ends a pwsh step with "exit $LASTEXITCODE", so a missing tag must not fail it.
+          $global:LASTEXITCODE = 0
+          "version=$version" >> $env:GITHUB_OUTPUT
+          "commit=$commit" >> $env:GITHUB_OUTPUT
+          "publish=$($publish.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+          "Version: $version`n`nSource: $source`n`nCommit: $commit`n`nPublish: $publish" >> $env:GITHUB_STEP_SUMMARY
+
+  # Builds and tests the solution and packs every package that is published.
+  build:
+    name: build, test and pack
+    needs: release
+    runs-on: windows-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout release sources
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ needs.release.outputs.commit }}
+          persist-credentials: false
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('global.json', '**/Directory.Build.props', '**/*.csproj', '**/*.nuspec') }}
+          restore-keys: nuget-${{ runner.os }}-
+
+      - name: Build
+        shell: pwsh
+        env:
+          PACKAGE_VERSION: ${{ needs.release.outputs.version }}
+        run: dotnet build IoC.sln --configuration Release --property:version=$env:PACKAGE_VERSION -verbosity:minimal
+
+      - name: Test
+        run: dotnet test IoC.sln --configuration Release --no-build --logger trx --results-directory artifacts/test-results
+
+      - name: Save test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: artifacts/test-results
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Pack
+        shell: pwsh
+        env:
+          PACKAGE_VERSION: ${{ needs.release.outputs.version }}
+        run: dotnet pack IoC.sln --configuration Release --no-build --property:version=$env:PACKAGE_VERSION --output artifacts/packages
+
+      # The published packages are fixed and every one of them must be produced for the release version.
+      - name: Validate the packages
+        shell: pwsh
+        env:
+          PACKAGE_VERSION: ${{ needs.release.outputs.version }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $packageIds = @(
+            'IoC.Container',
+            'IoC.AspNetCore',
+            'IoC.Container.Source',
+            'IoC.AspNetCore.Source',
+            'IoC.Interception',
+            'IoC.Interception.Source'
+          )
+          Add-Type -AssemblyName System.IO.Compression.FileSystem
+          $summary = [System.Collections.Generic.List[string]]::new()
+          foreach ($packageId in $packageIds) {
+            $package = "artifacts/packages/$packageId.$env:PACKAGE_VERSION.nupkg"
+            if (-not (Test-Path $package)) { throw "Package not found: $package" }
+            $zip = [System.IO.Compression.ZipFile]::OpenRead((Resolve-Path $package))
+            try {
+              $entries = $zip.Entries.FullName
+            }
+            finally {
+              $zip.Dispose()
+            }
+            if ($entries -notcontains "$packageId.nuspec") { throw "The package does not contain $packageId.nuspec." }
+            $summary.Add("- ``$packageId.$env:PACKAGE_VERSION.nupkg``: $($entries.Count) entries")
+          }
+          "The packages contain:`n$($summary -join "`n")" >> $env:GITHUB_STEP_SUMMARY
+
+      - name: Save NuGet packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: nuget-packages
+          path: artifacts/packages/*.nupkg
+          if-no-files-found: error
+          retention-days: 30
+
+  # Publishes with a short-lived key from nuget.org trusted publishing (no long-lived API key):
+  # the NuGet/login step exchanges a GitHub OIDC token for a key that lives for one hour.
+  # It requires a trusted publishing policy on nuget.org, owned by the account that owns the packages:
+  #   Repository Owner: DevTeam        Repository: IoCContainer
+  #   Workflow File: packages.yml      Environment: nuget
+  # and the repository secret NUGET_USER with the nuget.org profile name (not an email address).
+  publish:
+    name: publish
+    if: ${{ needs.release.outputs.publish == 'true' }}
+    needs: [ release, build ]
+    runs-on: windows-latest
+    environment: nuget
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v4
+        with:
+          global-json-file: global.json
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: nuget-packages
+          path: packages
+
+      - name: NuGet login
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
+      - name: Publish the packages
+        shell: pwsh
+        env:
+          NUGET_API_KEY: ${{ steps.login.outputs.NUGET_API_KEY }}
+          PACKAGE_VERSION: ${{ needs.release.outputs.version }}
+          RELEASE_COMMIT: ${{ needs.release.outputs.commit }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $packages = Get-ChildItem 'packages/*.nupkg'
+          if ($packages.Count -eq 0) { throw 'No packages to publish.' }
+          foreach ($package in $packages) {
+            dotnet nuget push $package.FullName --source https://api.nuget.org/v3/index.json --api-key $env:NUGET_API_KEY --skip-duplicate
+            if ($LASTEXITCODE -ne 0) { throw "Publishing $($package.Name) failed." }
+          }
+          "Published $(($packages | ForEach-Object Name) -join ', ')`n`nRelease commit: $env:RELEASE_COMMIT" >> $env:GITHUB_STEP_SUMMARY

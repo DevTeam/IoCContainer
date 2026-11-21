@@ -9,30 +9,12 @@
     <PackageId>IoC.Container</PackageId>
     <Description>Simple, powerful and fast expressions based Inversion of Control container for .NET.</Description>
     <PackageTags>ioc container di</PackageTags>
-    <MSBuildNative Condition="'$(MSBuildNative)'==''">C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild</MSBuildNative>
-    <XamlTargets>$(MSBuildNative)\Microsoft\WindowsXaml\v17.0\Microsoft.Windows.UI.Xaml.CSharp.Targets</XamlTargets>
     <TransformOnBuild>True</TransformOnBuild>
     <TransformOutOfDateOnly>false</TransformOutOfDateOnly>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)'=='Release'">
-    <TargetFrameworks>$(ReleaseTargetFrameworks);uap10.0;netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;net40</TargetFrameworks>
+    <TargetFrameworks>$(ReleaseTargetFrameworks);netstandard1.0;netstandard1.1;netstandard1.2;netstandard1.3;netstandard1.4;netstandard1.5;netstandard1.6;net40</TargetFrameworks>
   </PropertyGroup>
-  <PropertyGroup Condition="'$(TargetFramework)'=='uap10.0'">
-    <DefaultLanguage>en-US</DefaultLanguage>
-    <CopyLocalLockFileAssemblies>false</CopyLocalLockFileAssemblies>
-    <NugetTargetMoniker>UAP,Version=v10.0</NugetTargetMoniker>
-    <TargetPlatformIdentifier>UAP</TargetPlatformIdentifier>
-    <TargetPlatformVersion>10.0.16299.0</TargetPlatformVersion>
-    <TargetPlatformMinVersion>10.0.10240.0</TargetPlatformMinVersion>
-    <TargetFrameworkIdentifier>.NETCore</TargetFrameworkIdentifier>
-    <TargetFrameworkVersion>v5.0</TargetFrameworkVersion>
-    <DefineConstants>$(DefineConstants);WINDOWS_UWP;NO_HTTPS</DefineConstants>
-    <ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>None</ResolveAssemblyWarnOrErrorOnTargetArchitectureMismatch>
-    <LanguageTargets Condition="Exists('$(XamlTargets)')">$(XamlTargets)</LanguageTargets>
-  </PropertyGroup>
-  <ItemGroup Condition="'$(TargetFramework)'=='uap10.0'">
-    <PackageReference Include="Microsoft.NETCore.UniversalWindowsPlatform" Version="6.2.10" />
-  </ItemGroup>
   <ItemGroup>
     <None Include="FluentBindGenerated.cs">
       <DesignTime>True</DesignTime>
